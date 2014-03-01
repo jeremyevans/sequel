@@ -134,7 +134,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1225</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">f</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">f</span>, <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1226</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">f</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">f</span>, <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -155,7 +155,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-2A-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1233</span>&#x000A;<span class="ruby-keyword">def</span> *(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">f</span>, <span class="ruby-constant">WILDCARD</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1234</span>&#x000A;<span class="ruby-keyword">def</span> *(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">f</span>, <span class="ruby-constant">WILDCARD</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-distinct'>
@@ -173,7 +173,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-distinct-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-distinct-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1242</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">distinct</span>&#x000A;  <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">f</span>, <span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">DISTINCT</span> <span class="ruby-operator">+</span> <span class="ruby-constant">COMMA_ARRAY</span> * (<span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>), <span class="ruby-identifier">args</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-distinct-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1243</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">distinct</span>&#x000A;  <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">f</span>, <span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">DISTINCT</span> <span class="ruby-operator">+</span> <span class="ruby-constant">COMMA_ARRAY</span> * (<span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>), <span class="ruby-identifier">args</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-over'>
@@ -191,7 +191,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-over-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-over-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1247</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">over</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">WindowFunction</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-over-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1248</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">over</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">WindowFunction</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-12-06 21:17:11 -0800</span>
+          <span class='datetime'>2014-02-06 13:15:21 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -663,10 +663,9 @@
             <p>Associations are used in order to specify relationships between model
             classes that reflect relationships between tables in the database, which
             are usually specified using foreign keys.  You specify model associations
-            via the <code>many_to_one</code>, <code>one_to_one</code>,
-            <code>one_to_many</code>, and <code>many_to_many</code> class methods:</p>
+            via class methods:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">author</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">comments</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">author</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">comments</span>&#x000A;  <span class="ruby-identifier">one_to_one</span> :<span class="ruby-identifier">first_comment</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Comment</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span>&#x000A;  <span class="ruby-identifier">one_through_one</span> :<span class="ruby-identifier">first_tag</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Tag</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">right_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tag_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p><code>many_to_one</code> and <code>one_to_one</code> create a getter and
             setter for each model object:</p>
@@ -728,6 +727,22 @@
             value:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Eagerly load only replies containing &#39;foo&#39;, and the person and tags for those replies</span>&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">replies=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">text</span>, <span class="ruby-string">&#39;%foo%&#39;</span>))}=<span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">person</span>, :<span class="ruby-identifier">tags</span>]}).<span class="ruby-identifier">all</span></pre>
+            
+            <h3 id="label-Joining+with+Associations">Joining with Associations</h3>
+            
+            <p>You can use the association_join method to add a join to the model&#39;s
+            dataset based on the assocation:</p>
+            
+            <pre>Post.association_join(:author)&#x000A;# SELECT * FROM posts&#x000A;# INNER JOIN authors AS author ON (author.id = posts.author_id)</pre>
+            
+            <p>This comes with variants for different join types:</p>
+            
+            <pre>Post.association_left_join(:replies)&#x000A;# SELECT * FROM posts&#x000A;# LEFT JOIN replies ON (replies.post_id = posts.id)</pre>
+            
+            <p>Similar to the eager loading methods, you can use multiple associations and
+            nested associations:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">association_join</span>(:<span class="ruby-identifier">author</span>, :<span class="ruby-identifier">replies=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">person</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span>&#x000A;<span class="ruby-comment"># INNER JOIN authors AS author ON (author.id = posts.author_id)</span>&#x000A;<span class="ruby-comment"># INNER JOIN replies ON (replies.post_id = posts.id)</span>&#x000A;<span class="ruby-comment"># INNER JOIN people AS person ON (person.id = replies.person_id)</span></pre>
             
             <h3 id="label-Extending+the+underlying+dataset">Extending the underlying dataset</h3>
             

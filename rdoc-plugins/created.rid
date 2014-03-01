@@ -1,8 +1,8 @@
-Sat, 01 Feb 2014 09:23:43 -0800
+Sat, 01 Mar 2014 09:51:42 -0800
 lib/sequel/extensions/_pretty_table.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/blank.rb	Tue, 19 Jun 2012 10:06:46 -0700
-lib/sequel/extensions/columns_introspection.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/extensions/columns_introspection.rb	Tue, 25 Feb 2014 11:18:28 -0800
 lib/sequel/extensions/connection_validator.rb	Thu, 21 Feb 2013 21:43:08 -0800
 lib/sequel/extensions/constraint_validations.rb	Mon, 14 Oct 2013 13:19:12 -0700
 lib/sequel/extensions/core_extensions.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -19,18 +19,18 @@ lib/sequel/extensions/inflector.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/looser_typecasting.rb	Sat, 04 May 2013 17:31:16 -0700
 lib/sequel/extensions/meta_def.rb	Tue, 08 Jan 2013 11:56:58 -0800
 lib/sequel/extensions/migration.rb	Sat, 26 Oct 2013 06:54:00 -0700
-lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Mon, 14 Oct 2013 09:17:33 -0700
+lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Tue, 25 Feb 2014 11:18:28 -0800
 lib/sequel/extensions/named_timezones.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/null_dataset.rb	Sun, 02 Jun 2013 14:09:32 -0700
 lib/sequel/extensions/pagination.rb	Mon, 30 Sep 2013 17:19:34 -0700
-lib/sequel/extensions/pg_array.rb	Sun, 01 Dec 2013 14:54:14 -0800
-lib/sequel/extensions/pg_array_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_array.rb	Sat, 08 Feb 2014 10:11:21 -0800
+lib/sequel/extensions/pg_array_ops.rb	Thu, 06 Feb 2014 13:15:21 -0800
 lib/sequel/extensions/pg_hstore.rb	Sun, 01 Dec 2013 14:51:56 -0800
-lib/sequel/extensions/pg_hstore_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_hstore_ops.rb	Thu, 06 Feb 2014 13:15:21 -0800
 lib/sequel/extensions/pg_inet.rb	Sun, 01 Dec 2013 14:52:18 -0800
 lib/sequel/extensions/pg_interval.rb	Sun, 01 Dec 2013 14:52:34 -0800
 lib/sequel/extensions/pg_json.rb	Sun, 01 Dec 2013 14:52:52 -0800
-lib/sequel/extensions/pg_json_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
+lib/sequel/extensions/pg_json_ops.rb	Thu, 06 Feb 2014 13:15:21 -0800
 lib/sequel/extensions/pg_loose_count.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/pg_range.rb	Sun, 01 Dec 2013 14:53:24 -0800
 lib/sequel/extensions/pg_range_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
@@ -38,7 +38,7 @@ lib/sequel/extensions/pg_row.rb	Sun, 01 Dec 2013 14:53:47 -0800
 lib/sequel/extensions/pg_row_ops.rb	Sat, 26 Oct 2013 06:54:00 -0700
 lib/sequel/extensions/pg_static_cache_updater.rb	Fri, 23 Aug 2013 16:59:00 -0700
 lib/sequel/extensions/pretty_table.rb	Thu, 22 Aug 2013 12:22:05 -0700
-lib/sequel/extensions/query.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/extensions/query.rb	Tue, 11 Feb 2014 12:09:28 -0800
 lib/sequel/extensions/query_literals.rb	Thu, 22 Aug 2013 12:22:05 -0700
 lib/sequel/extensions/ruby18_symbol_extensions.rb	Thu, 02 May 2013 12:05:52 -0700
 lib/sequel/extensions/schema_caching.rb	Sun, 02 Jun 2013 14:13:04 -0700
@@ -51,7 +51,7 @@ lib/sequel/extensions/split_array_nil.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/sql_expr.rb	Tue, 19 Jun 2012 10:06:46 -0700
 lib/sequel/extensions/string_date_time.rb	Tue, 19 Jun 2012 10:06:46 -0700
 lib/sequel/extensions/thread_local_timezones.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/extensions/to_dot.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/extensions/to_dot.rb	Tue, 25 Feb 2014 11:18:28 -0800
 lib/sequel/plugins/active_model.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/after_initialize.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/association_autoreloading.rb	Mon, 03 Jun 2013 16:35:29 -0700
@@ -62,10 +62,10 @@ lib/sequel/plugins/auto_validations.rb	Wed, 08 Jan 2014 15:06:43 -0800
 lib/sequel/plugins/blacklist_security.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/boolean_readers.rb	Sat, 06 Apr 2013 16:15:38 -0700
 lib/sequel/plugins/caching.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/class_table_inheritance.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/plugins/class_table_inheritance.rb	Thu, 06 Feb 2014 13:15:21 -0800
 lib/sequel/plugins/composition.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/constraint_validations.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/dataset_associations.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/plugins/dataset_associations.rb	Tue, 18 Feb 2014 13:21:46 -0800
 lib/sequel/plugins/defaults_setter.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/dirty.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/eager_each.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -78,12 +78,12 @@ lib/sequel/plugins/instance_hooks.rb	Wed, 15 Jan 2014 10:40:54 -0800
 lib/sequel/plugins/json_serializer.rb	Sat, 26 Oct 2013 06:54:00 -0700
 lib/sequel/plugins/lazy_attributes.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/list.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/many_through_many.rb	Mon, 21 Oct 2013 09:49:08 -0700
+lib/sequel/plugins/many_through_many.rb	Tue, 25 Feb 2014 11:18:29 -0800
 lib/sequel/plugins/many_to_one_pk_lookup.rb	Mon, 03 Jun 2013 16:35:29 -0700
 lib/sequel/plugins/mssql_optimistic_locking.rb	Wed, 06 Nov 2013 11:51:32 -0800
-lib/sequel/plugins/nested_attributes.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/plugins/nested_attributes.rb	Fri, 07 Feb 2014 16:03:41 -0800
 lib/sequel/plugins/optimistic_locking.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/pg_array_associations.rb	Wed, 15 Jan 2014 10:40:54 -0800
+lib/sequel/plugins/pg_array_associations.rb	Tue, 11 Feb 2014 12:09:28 -0800
 lib/sequel/plugins/pg_row.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/pg_typecast_on_load.rb	Mon, 15 Jul 2013 08:40:45 -0700
 lib/sequel/plugins/prepared_statements.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -96,7 +96,7 @@ lib/sequel/plugins/scissors.rb	Sun, 02 Jun 2013 13:49:44 -0700
 lib/sequel/plugins/serialization.rb	Mon, 21 Oct 2013 09:49:08 -0700
 lib/sequel/plugins/serialization_modification_detection.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/sharding.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/single_table_inheritance.rb	Sat, 26 Oct 2013 06:54:00 -0700
+lib/sequel/plugins/single_table_inheritance.rb	Thu, 06 Feb 2014 13:15:21 -0800
 lib/sequel/plugins/skip_create_refresh.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/static_cache.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/string_stripper.rb	Thu, 19 Sep 2013 07:06:56 -0700

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-15 10:40:54 -0800</span>
+          <span class='datetime'>2014-02-14 12:14:25 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -73,9 +73,14 @@
             
             <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>)</pre>
             
+            <p>It also makes it easier to creating queries that use joins based on the
+            association:</p>
+            
+            <pre>Artist.association_join(:albums)&#x000A;# SELECT * FROM artists&#x000A;# INNER JOIN albums ON (albums.artist_id = artists.id)</pre>
+            
             <h2 id="label-The+Types+of+Associations">The Types of Associations</h2>
             
-            <p><a href="../../classes/Sequel.html">Sequel</a> has four different
+            <p><a href="../../classes/Sequel.html">Sequel</a> has five different
             association types built in:</p>
             <ul><li>
             <p>many_to_one</p>
@@ -85,7 +90,11 @@
             <p>one_to_one</p>
             </li><li>
             <p>many_to_many</p>
+            </li><li>
+            <p>one_through_one</p>
             </li></ul>
+            
+            <p>It ships with additional association types via plugins.</p>
             
             <h3 id="label-many_to_one">many_to_one</h3>
             
@@ -96,25 +105,23 @@
             
             <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums             artists</span>&#x000A;<span class="ruby-comment">#   :id           /--&gt; :id</span>&#x000A;<span class="ruby-comment">#   :artist_id --/     :name</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-comment"># Uses singular form of associated model name</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-one_to_many">one_to_many</h3>
+            <h3 id="label-one_to_many+and+one_to_one">one_to_many and one_to_one</h3>
             
             <p>The one_to_many association is used when the table for the associated class
             contains a foreign key that references the primary key in the table for the
             current class.  It is named because for each row in the current table there
             can be many rows in the associated table:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  artists            albums</span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\       :id</span>&#x000A;<span class="ruby-comment">#   :name       \----- :artist_id </span>&#x000A;<span class="ruby-comment">#                      :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-            
-            <h3 id="label-one_to_one">one_to_one</h3>
-            
             <p>The one_to_one association can be thought of as a subset of the one_to_many
             association, but where there can only be either 0 or 1 records in the
-            associated table. It is the least frequently used of the four associations.
-            If you assume each artist cannot be associated with more than one album:</p>
+            associated table.  This is useful if there is a unique constraint on the
+            foreign key field in the associated table. It&#39;s also useful if you want
+            to impose an order on the association and just want the first record
+            returned.</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  artists            albums</span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\       :id</span>&#x000A;<span class="ruby-comment">#   :name       \----- :artist_id </span>&#x000A;<span class="ruby-comment">#                      :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Uses singular form of associated model name</span>&#x000A;  <span class="ruby-identifier">one_to_one</span> :<span class="ruby-identifier">album</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  artists            albums</span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\       :id</span>&#x000A;<span class="ruby-comment">#   :name       \----- :artist_id </span>&#x000A;<span class="ruby-comment">#                      :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;&#x000A;  <span class="ruby-comment"># Uses singular form of associated model name</span>&#x000A;  <span class="ruby-identifier">one_to_one</span> :<span class="ruby-identifier">album</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-many_to_many">many_to_many</h3>
+            <h3 id="label-many_to_many+and+one_through_one">many_to_many and one_through_one</h3>
             
             <p>The many_to_many association allows each row in the current table to be
             associated to many rows in the associated table, and each row in the
@@ -122,13 +129,22 @@
             to associate the two tables. If you assume each artist can have multiple
             albums and each album can have multiple artists:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums </span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\ </span>&#x000A;<span class="ruby-comment">#   :name       \     albums_artists</span>&#x000A;<span class="ruby-comment">#                \---- :album_id</span>&#x000A;<span class="ruby-comment">#  artists       /---- :artist_id</span>&#x000A;<span class="ruby-comment">#   :id   &lt;-----/</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <p>The one_through_one association can be thought of as a subset of the
+            many_to_many association, but where there can only be 0 or 1 records in the
+            associated table. This is useful if there is a unique constraint on the
+            foreign key in the join table that refrences the current table.  It&#39;s
+            also useful if you want to impose an order on the association and just want
+            the first record returned.  The one_through_one association is so named
+            because it sets up a one-to-one association through a single join table.</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums </span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\ </span>&#x000A;<span class="ruby-comment">#   :name       \     albums_artists</span>&#x000A;<span class="ruby-comment">#                \---- :album_id</span>&#x000A;<span class="ruby-comment">#  artists       /---- :artist_id</span>&#x000A;<span class="ruby-comment">#   :id   &lt;-----/</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">one_through_one</span> :<span class="ruby-identifier">album</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-Differences+Between+many_to_one+and+one_to_one">Differences Between many_to_one and one_to_one</h3>
             
-            <p>If you want to setup a 1-1 relationship between two models, you have to use
-            many_to_one in one model, and one_to_one in the other model.  How do you
-            know which to use in which model?</p>
+            <p>If you want to setup a 1-1 relationship between two models, where the
+            foreign key in one table references the associated table directly, you have
+            to use many_to_one in one model, and one_to_one in the other model.  How do
+            you know which to use in which model?</p>
             
             <p>The simplest way to remember is that the model whose table has the foreign
             key uses many_to_one, and the other model uses one_to_one:</p>
@@ -211,6 +227,8 @@
             
             <pre>@artist.add_album(@album)&#x000A;@artist.remove_album(@album)&#x000A;@artist.remove_all_albums</pre>
             
+            <p>one_through_one associations do not have any modification methods added.</p>
+            
             <h2 id="label-Caching">Caching</h2>
             
             <p>Associations are cached after being retrieved:</p>
@@ -238,7 +256,7 @@
             ending in <code>_dataset</code> that returns a dataset representing the
             objects in the associated table:</p>
             
-            <pre>@album.artist_id&#x000A;# 10&#x000A;@album.artist_dataset&#x000A;# SELECT * FROM artists WHERE (id = 10)&#x000A;@artist.id&#x000A;# 20&#x000A;@artist.albums_dataset&#x000A;# SELECT * FROM albums WHERE (artist_id = 20)</pre>
+            <pre>@album.artist_id&#x000A;# 10&#x000A;@album.artist_dataset&#x000A;# SELECT * FROM artists WHERE (id = 10) LIMIT 1&#x000A;@artist.id&#x000A;# 20&#x000A;@artist.albums_dataset&#x000A;# SELECT * FROM albums WHERE (artist_id = 20)</pre>
             
             <p>The association dataset is just like any other <a
             href="../../classes/Sequel.html">Sequel</a> dataset, in that it can be
@@ -291,10 +309,9 @@
             <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">publisher=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@publisher</span>)</pre>
             
             <p>This doesn&#39;t just work for <code>many_to_one</code> associations, it
-            also works for <code>one_to_one</code>, <code>one_to_many</code>, and
-            <code>many_to_many</code> associations:</p>
+            also works for the other associations:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> :<span class="ruby-identifier">album_info</span>&#x000A;<span class="ruby-comment"># The album related to that AlbumInfo instance</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">album_info=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">AlbumInfo</span>[<span class="ruby-value">2</span>])&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">tracks</span>&#x000A;<span class="ruby-comment"># The album related to that Track instance</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">tracks=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Track</span>[<span class="ruby-value">3</span>])&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span>&#x000A;<span class="ruby-comment"># All albums related to that Tag instance</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Tag</span>[<span class="ruby-value">4</span>])</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_one</span> :<span class="ruby-identifier">album_info</span>&#x000A;<span class="ruby-comment"># The album related to that AlbumInfo instance</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">album_info=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">AlbumInfo</span>[<span class="ruby-value">2</span>])&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">tracks</span>&#x000A;<span class="ruby-comment"># The album related to that Track instance</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">tracks=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Track</span>[<span class="ruby-value">3</span>])&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span>&#x000A;<span class="ruby-comment"># All albums related to that Tag instance</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">tags=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Tag</span>[<span class="ruby-value">4</span>])&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_through_one</span> :<span class="ruby-identifier">tag</span>&#x000A;<span class="ruby-comment"># All albums related to that Tag instance</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">tag=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Tag</span>[<span class="ruby-value">4</span>])</pre>
             
             <p>Note that for <code>one_to_many</code> and <code>many_to_many</code>
             associations, you still use the plural form even though only a single model
@@ -354,9 +371,7 @@
             one of those tags.</p>
             
             <p>Note that filtering by associations does not work for associations that use
-            blocks with instance-specific code, or associations that have a limit or
-            offset. This includes many_to_one/one_to_one associations that would return
-            multiple values if they were not limited to a single value.</p>
+            blocks with instance-specific code.</p>
             
             <h2 id="label-Name+Collisions">Name Collisions</h2>
             
@@ -733,7 +748,7 @@
             <p>This probably doesn&#39;t make a lot of sense for *_to_one associations,
             though you could use it to specify an offset.</p>
             
-            <h4 id="label-%3Ajoin_table+%5Bmany_to_many%5D">:join_table [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Ajoin_table+%5Bmany_to_many%2C+one_through_one%5D">:join_table [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>Name of table that includes the foreign keys to both the current model and
             the associated model, as a symbol.  Defaults to the name of current model
@@ -742,7 +757,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span> <span class="ruby-comment"># :join_table=&gt;:albums_artists</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">artists</span> <span class="ruby-comment"># :join_table=&gt;:albums_artists</span>&#x000A;<span class="ruby-constant">Person</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">colleges</span> <span class="ruby-comment"># :join_table=&gt;:colleges_people</span></pre>
             
-            <h4 id="label-%3Aleft_key+%5Bmany_to_many%5D">:left_key [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Aleft_key+%5Bmany_to_many%2C+one_through_one%5D">:left_key [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>Foreign key in join table that points to current model&#39;s primary key,
             as a symbol.  Defaults to :"#{model_name.underscore}_id".</p>
@@ -751,10 +766,12 @@
             
             <p>Can use an array of symbols for a composite key association.</p>
             
-            <h4 id="label-%3Aright_key+%5Bmany_to_many%5D">:right_key [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Aright_key+%5Bmany_to_many%2C+one_through_one%5D">:right_key [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>Foreign key in join table that points to associated model&#39;s primary
-            key, as a symbol.  Defaults to :"#{association_name.singularize}_id".</p>
+            key, as a symbol.  Defaults to :"#{association_name.singularize}_id" for
+            <code>many_to_many</code> and :"#{association_name}_id" for
+            <code>one_through_one</code>.</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span> <span class="ruby-comment"># :right_key=&gt;:tag_id</span></pre>
             
@@ -821,7 +838,7 @@
             set up association extensions.  For more information , please see the <a
             href="advanced_associations_rdoc.html">Advanced Associations page</a></p>
             
-            <h4 id="label-%3Aprimary_key">:primary_key</h4>
+            <h4 id="label-%3Aprimary_key+%5Bmany_to_one%2C+one_to_one%2C+one_to_many%5D">:primary_key [<code>many_to_one</code>, <code>one_to_one</code>, <code>one_to_many</code>]</h4>
             
             <p>The column that the :key option references, as a symbol. For
             <code>many_to_one</code> associations, this column is in the associated
@@ -832,7 +849,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_primary_key</span> :<span class="ruby-identifier">arid</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span> <span class="ruby-comment"># :primary_key=&gt;:arid</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">artist</span> <span class="ruby-comment"># :primary_key=&gt;:arid</span></pre>
             
-            <h4 id="label-%3Aleft_primary_key+%5Bmany_to_many%5D">:left_primary_key [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Aleft_primary_key+%5Bmany_to_many%2C+one_through_one%5D">:left_primary_key [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>Column in current table that :left_key option points to, as a symbol.
             Defaults to primary key of current table.</p>
@@ -841,7 +858,7 @@
             
             <p>Can use an array of symbols for a composite key association.</p>
             
-            <h4 id="label-%3Aright_primary_key+%5Bmany_to_many%5D">:right_primary_key [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Aright_primary_key+%5Bmany_to_many%2C+one_through_one%5D">:right_primary_key [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>Column in associated table that :right_key points to, as a symbol. Defaults
             to primary key of the associated table.</p>
@@ -850,7 +867,7 @@
             
             <p>Can use an array of symbols for a composite key association.</p>
             
-            <h4 id="label-%3Ajoin_table_block+%5Bmany_to_many%5D">:join_table_block [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Ajoin_table_block+%5Bmany_to_many%2C+one_through_one%5D">:join_table_block [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>A proc that can be used to modify the dataset used in the
             add/remove/remove_all methods.  It&#39;s separate from the association
@@ -1074,21 +1091,28 @@
             
             <p>If specified, should be a proc that accepts a single hash argument, which
             will contain at least the following keys:</p>
-            <dl class="rdoc-list note-list"><dt>:self 
+            <dl class="rdoc-list note-list"><dt>:callback 
+            <dd>
+            <p>A callback proc used to dynamically modify the dataset to graph into the
+            current dataset, before such graphing is done. This is nil if no callback
+            proc is used.</p>
+            </dd><dt>:implicit_qualifier 
+            <dd>
+            <p>The alias that was used for the current table (since you can cascade
+            associations).</p>
+            </dd><dt>:join_type 
+            <dd>
+            <p>Override the join type to use when graphing.</p>
+            </dd><dt>:limit_strategy 
+            <dd>
+            <p>The limit strategy symbol to use when graphing (for limited associations
+            only)</p>
+            </dd><dt>:self 
             <dd>
             <p>The dataset that is doing the eager loading</p>
             </dd><dt>:table_alias 
             <dd>
             <p>An alias to use for the table to graph for this association.</p>
-            </dd><dt>:implicit_qualifier 
-            <dd>
-            <p>The alias that was used for the current table (since you can cascade
-            associations).</p>
-            </dd><dt>:callback 
-            <dd>
-            <p>A callback proc used to dynamically modify the dataset to graph into the
-            current dataset, before such graphing is done. This is nil if no callback
-            proc is used.</p>
             </dd></dl>
             
             <p>Example:</p>
@@ -1105,7 +1129,15 @@
             dataset.  In most cases it does so correctly, but if it has problems,
             you&#39;ll probably want to set this option to false.</p>
             
-            <h4 id="label-%3Agraph_join_table_conditions+%5Bmany_to_many%5D">:graph_join_table_conditions [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Agraph_order">:graph_order</h4>
+            
+            <p>Override the order added when using eager_graph, instead of using the one
+            defined in :order.  This is useful if :order contains qualified
+            identifiers, as the qualifiers may not match the aliases automatically used
+            by eager_graph. This should contain unqualified identifiers, and
+            eager_graph will automatically qualify them with the appropriate alias.</p>
+            
+            <h4 id="label-%3Agraph_join_table_conditions+%5Bmany_to_many%2C+one_through_one%5D">:graph_join_table_conditions [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>The additional conditions to use on the SQL join for the join table when
             eagerly loading the association via eager_graph. Should be a hash or an
@@ -1118,7 +1150,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Person</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">bs_degree_colleges</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">College</span>,&#x000A;  :<span class="ruby-identifier">join_table=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">degrees_received</span>, &#x000A;  :<span class="ruby-identifier">graph_join_table_conditions=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">degree=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;BS&#39;</span>}</pre>
             
-            <h4 id="label-%3Agraph_join_table_block+%5Bmany_to_many%5D">:graph_join_table_block [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Agraph_join_table_block+%5Bmany_to_many%2C+one_through_one%5D">:graph_join_table_block [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>The block to pass to join_table for the join table when eagerly loading the
             association via eager_graph.  This is used for similar reasons as
@@ -1138,7 +1170,7 @@
             <p>This should be done when graphing the join table, instead of when graphing
             the final table, as :degree is a column of the join table.</p>
             
-            <h4 id="label-%3Agraph_join_table_join_type+%5Bmany_to_many%5D">:graph_join_table_join_type [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Agraph_join_table_join_type+%5Bmany_to_many%2C+one_through_one%5D">:graph_join_table_join_type [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>The type of SQL join to use for the join table when eagerly loading the
             association via eager_graph.  Defaults to the :graph_join_type option or
@@ -1146,7 +1178,7 @@
             you want to use a different join type when JOINing to the join table then
             you want to use for JOINing to the final table</p>
             
-            <h4 id="label-%3Agraph_join_table_only_conditions+%5Bmany_to_many%5D">:graph_join_table_only_conditions [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Agraph_join_table_only_conditions+%5Bmany_to_many%2C+one_through_one%5D">:graph_join_table_only_conditions [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>The conditions to use on the SQL join for the join table when eagerly
             loading the association via eager_graph, instead of the default conditions
@@ -1195,13 +1227,13 @@
             <p>Like the :key option, but :key references the column name, while
             :key_method references the method name.</p>
             
-            <h4 id="label-%3Aleft_primary_key_column+%5Bmany_to_many%5D">:left_primary_key_column [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Aleft_primary_key_column+%5Bmany_to_many%2C+one_through_one%5D">:left_primary_key_column [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>Like the :left_primary_key option, but :left_primary_key references the
             method name, while :left_primary_key_column references the underlying
             column.</p>
             
-            <h4 id="label-%3Aright_primary_key_method+%5Bmany_to_many%5D">:right_primary_key_method [<code>many_to_many</code>]</h4>
+            <h4 id="label-%3Aright_primary_key_method+%5Bmany_to_many%2C+one_through_one%5D">:right_primary_key_method [<code>many_to_many</code>, <code>one_through_one</code>]</h4>
             
             <p>Like the :right_primary_key option, but :right_primary_key references the
             column name, while :right_primary_key_method references the method name.</p>
@@ -1318,7 +1350,7 @@
             <h4 id="label-%3Acartesian_product_number+">:cartesian_product_number </h4>
             
             <p>The number of joins completed by this association that could cause more
-            than one row for each row in the current table (default: 0 for *_to_one
+            than one row for each row in the current table (default: 0 for *_one
             associations, 1 for *_to_many associations).</p>
             
             <p>This should only be modified in specific cases.  For example, if you have a
@@ -1342,44 +1374,43 @@
             
             <h4 id="label-%3Aeager_limit_strategy">:eager_limit_strategy</h4>
             
-            <p>This setting determines what strategy to use for loading the associations
-            that use the :limit setting to limit the number of returned records. You
-            can&#39;t use LIMIT directly, since you want a limit for each group of
-            associated records, not a LIMIT on the total number of records returned by
-            the dataset.</p>
+            <p>This setting determines what strategy to use for eager loading the
+            associations that use the :limit setting to limit the number of returned
+            records. You can&#39;t use LIMIT directly, since you want a limit for each
+            group of associated records, not a LIMIT on the total number of records
+            returned by the dataset.</p>
             
             <p>By default, if a *_to_many association uses a limit or offset, or a
-            one_to_one association uses an offset, <a
+            one_*_one association uses an offset or an order, <a
             href="../../classes/Sequel.html">Sequel</a> will choose to use an eager
             limit strategy.  The default strategy depends on the database being used. 
             For databases which support window functions, a window function will be
             used.  Other databases will just have an ruby array slice done on the
             entire record set.</p>
             
-            <p>For one_to_one associations without offsets, no strategy is used by default
-            because none is needed for a true one_to_one association (since there is
-            only one associated record per current record).  However, if you are using
-            a one_to_one association where the relationship is really one_to_many, and
-            using an order to pick the first matching row, then if you don&#39;t
-            specify an :eager_limit_strategy option, you&#39;ll be loading all related
-            rows just to have <a href="../../classes/Sequel.html">Sequel</a> ignore all
-            rows after the first.  By using a strategy to change the query to only
-            return one associated record per current record, you can get much better
-            database performance.</p>
+            <p>For one_*_one associations without an offset or order, no strategy is used
+            by default because none is needed for a true one-to-one association (since
+            there is only one associated record per current record).  However, if you
+            are using a one_to_one association where the relationship is really
+            one_to_many, and using an order to pick the first matching row, then if you
+            don&#39;t use an limit strategy, you&#39;ll be loading all related rows
+            just to have <a href="../../classes/Sequel.html">Sequel</a> ignore all rows
+            after the first.  By using a strategy to change the query to only return
+            one associated record per current record, you can get much better database
+            performance.</p>
             
             <p>In general, <a href="../../classes/Sequel.html">Sequel</a> picks an
             appropriate strategy, so it is not usually necessary to specify a specific
-            strategy.  The exception is for one_to_one associations where there is more
-            than one associated record per current record.  For those, you should
-            probably specify true to this option to have <a
-            href="../../classes/Sequel.html">Sequel</a> pick an appropriate strategy.</p>
+            strategy.</p>
             
-            <p>You can also specify a symbol to manually choose a strategy.  The available
-            strategies are:</p>
+            <p>You can specify true for this option to have <a
+            href="../../classes/Sequel.html">Sequel</a> choose which strategy to use
+            (this is the default).  You can specify a symbol to manually choose a
+            strategy.  The available strategies are:</p>
             <dl class="rdoc-list note-list"><dt>:distinct_on 
             <dd>
             <p>Uses DISTINCT ON to ensure only the first matching record is loaded (only
-            used for one_to_one associations without offsets on PostgreSQL).</p>
+            used for one_*_one associations without offsets on PostgreSQL).</p>
             </dd><dt>:window_function 
             <dd>
             <p>Uses a ROW_NUMBER window functions to ensure the correctly limited/offset

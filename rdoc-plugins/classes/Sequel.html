@@ -888,7 +888,7 @@
             href="Sequel/Postgres/ArrayOp.html">Sequel::Postgres::ArrayOp</a> object
             that can be used for easier querying:</p>
             
-            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)</pre>
+            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.hstore          # hstore(int_array_column)&#x000A;ia.hstore(:a)      # hstore(int_array_column, a)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)</pre>
             
             <p>See the PostgreSQL array function and operator documentation for more
             details on what these functions and operators do.</p>
@@ -896,6 +896,9 @@
             <p>If you are also using the pg_array extension, you should load it before
             loading this extension.  Doing so will allow you to use PGArray#op to get
             an ArrayOp, allowing you to perform array operations on array literals.</p>
+            
+            <p>In order for hstore to automatically wrap the returned value correctly in
+            an HStoreOp, you need to load the pg_hstore_ops extension.</p>
             
             <p>The pg_hstore_ops extension adds support to Sequel&#39;s DSL to make it
             easier to call PostgreSQL hstore functions and operators.</p>
@@ -941,6 +944,15 @@
             loading this extension.  Doing so will allow you to use HStore#op to get an
             HStoreOp, allowing you to perform hstore operations on hstore literals.</p>
             
+            <p>Some of these methods will accept ruby arrays and convert them
+            automatically to PostgreSQL arrays if you have the pg_array extension
+            loaded.  Some of these methods will accept ruby hashes and convert them
+            automatically to PostgreSQL hstores if the pg_hstore extension is loaded. 
+            Methods representing expressions that return PostgreSQL arrays will have
+            the returned expression automatically wrapped in a <a
+            href="Sequel/Postgres/ArrayOp.html">Postgres::ArrayOp</a> if the
+            pg_array_ops extension is loaded.</p>
+            
             <p>The pg_json_ops extension adds support to Sequel&#39;s DSL to make it
             easier to call PostgreSQL JSON functions and operators (added first in
             PostgreSQL 9.3).</p>
@@ -981,6 +993,10 @@
             loading this extension.  Doing so will allow you to use JSONHash#op and
             JSONArray#op to get a JSONOp, allowing you to perform json operations on
             json literals.</p>
+            
+            <p>In order to get the automatic conversion from a ruby array to a PostgreSQL
+            array (as shown in the #[] and get_text examples above), you need to load
+            the pg_array extension.</p>
             
             <p>The pg_loose_count extension looks at the table statistics in the
             PostgreSQL system tables to get a fast approximate count of the number of
@@ -1175,9 +1191,10 @@
             
             <pre>DB.extension(:pretty_table)</pre>
             
-            <p>The query extension adds Sequel::Dataset#query which allows a different way
-            to construct queries instead of the usual method chaining.  See
-            Sequel::Dataset#query for details.</p>
+            <p>The query extension adds a query method which allows a different way to
+            construct queries instead of the usual method chaining:</p>
+            
+            <pre>dataset = DB[:items].query do&#x000A;  select :x, :y, :z&#x000A;  filter{(x &gt; 1) &amp; (y &gt; 2)}&#x000A;  reverse :z&#x000A;end</pre>
             
             <p>You can load this extension into specific datasets:</p>
             

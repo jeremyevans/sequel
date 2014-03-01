@@ -31,12 +31,80 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-31 11:26:01 -0800</span>
+          <span class='datetime'>2014-02-28 09:33:59 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.8.0+%282014-03-01%29">4.8.0 (2014-03-01)</h3>
+            <ul><li>
+            <p>Add SQL::AliasedExpression#alias alias for aliaz (jeremyevans)</p>
+            </li><li>
+            <p>Handle SQL::Identifier, SQL::QualifiedIdentifier, and
+            SQL::AliasedExpression objects as first argument to Dataset#graph
+            (jeremyevans)</p>
+            </li><li>
+            <p>Respect qualification and aliases in symbols passed as first argument to
+            Dataset#graph (dividedmind) (#769)</p>
+            </li><li>
+            <p>Recognize new constraint violation error messages in SQLite 3.8.2+
+            (itswindtw) (#766)</p>
+            </li><li>
+            <p>Use limit strategy to correctly handle limited associations in the
+            dataset_associations plugin (jeremyevans)</p>
+            </li><li>
+            <p>Handle issues in dataset_associations plugin when dataset uses unqualified
+            identifiers for associations requiring joins (jeremyevans)</p>
+            </li><li>
+            <p>Handle fractional seconds in input timestamps in the odbc/mssql adapter
+            (Ross Attrill, jeremyevans)</p>
+            </li><li>
+            <p>Return fractional seconds in timestamps in the odbc adapter (jeremyevans)</p>
+            </li><li>
+            <p>Support :plain and :phrase options to Dataset#full_text_search on
+            PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Use limit strategy to correctly handle filtering by limited associations
+            (jeremyevans)</p>
+            </li><li>
+            <p>Simplify queries used for filtering by associations with conditions
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use an eager limit strategy by default for *_one associations with orders
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support :limit_strategy eager_graph option, for specifying strategy used
+            for limited associations in that eager graph (jeremyevans)</p>
+            </li><li>
+            <p>Add eager_graph_with_options to model datasets, for specifying options
+            specific to the eager_graph call (jeremyevans)</p>
+            </li><li>
+            <p>Handle offsets on *_many associations when eager graphing when there are no
+            associated results (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#register_array_type work without existing scalar conversion
+            proc in the pg_array extension (jeremyevans)</p>
+            </li><li>
+            <p>Handle presence validations on foreign keys in associated objects when
+            creating new associated objects in the nested_attributes plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Respect offsets when eager graphing *_one associations (jeremyevans)</p>
+            </li><li>
+            <p>Add association_join to model datasets, for setting up joins based on
+            associations (jeremyevans)</p>
+            </li><li>
+            <p>Add one_through_many association to many_through_many plugin, for only
+            returning a single record (jeremyevans)</p>
+            </li><li>
+            <p>Add :graph_order association option, useful when :order needs to contain
+            qualified identifiers (jeremyevans)</p>
+            </li><li>
+            <p>Add one_through_one association, similar to many_to_many but only returning
+            a single record (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.7.0+%282014-02-01%29">4.7.0 (2014-02-01)</h3>
             <ul><li>

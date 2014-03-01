@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-02-06 13:15:21 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -80,6 +80,14 @@
             <p>If you are also using the pg_hstore extension, you should load it before
             loading this extension.  Doing so will allow you to use HStore#op to get an
             HStoreOp, allowing you to perform hstore operations on hstore literals.</p>
+            
+            <p>Some of these methods will accept ruby arrays and convert them
+            automatically to PostgreSQL arrays if you have the pg_array extension
+            loaded.  Some of these methods will accept ruby hashes and convert them
+            automatically to PostgreSQL hstores if the pg_hstore extension is loaded. 
+            Methods representing expressions that return PostgreSQL arrays will have
+            the returned expression automatically wrapped in a Postgres::ArrayOp if the
+            pg_array_ops extension is loaded.</p>
           </div>
           <div id='context'>
           </div>

@@ -102,10 +102,10 @@
                     <td>=</td>
                     <td class='context-item-value'>
                       {
-                      /(is|are) not unique\z/ => UniqueConstraintViolation,
-                      /foreign key constraint failed\z/ => ForeignKeyConstraintViolation,
+                      /(is|are) not unique\z|UNIQUE constraint failed: .+\z/ => UniqueConstraintViolation,
+                      /foreign key constraint failed\z|FOREIGN KEY constraint failed\z/ => ForeignKeyConstraintViolation,
                       /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => ConstraintViolation,
-                      /may not be NULL\z/ => NotNullConstraintViolation,
+                      /may not be NULL\z|NOT NULL constraint failed: .+\z/ => NotNullConstraintViolation,
                       }.freeze
                     </td>
                     <td>&nbsp;</td>

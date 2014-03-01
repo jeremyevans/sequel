@@ -31,16 +31,17 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-09-19 07:06:56 -0700</span>
+          <span class='datetime'>2014-02-11 12:09:28 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
             
-            <p>The query extension adds Sequel::Dataset#query which allows a different way
-            to construct queries instead of the usual method chaining.  See
-            Sequel::Dataset#query for details.</p>
+            <p>The query extension adds a query method which allows a different way to
+            construct queries instead of the usual method chaining:</p>
+            
+            <pre>dataset = DB[:items].query do&#x000A;  select :x, :y, :z&#x000A;  filter{(x &gt; 1) &amp; (y &gt; 2)}&#x000A;  reverse :z&#x000A;end</pre>
             
             <p>You can load this extension into specific datasets:</p>
             

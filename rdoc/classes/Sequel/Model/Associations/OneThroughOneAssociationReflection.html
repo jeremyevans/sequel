@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::Model::Associations::InstanceMethods</title>
+    <title>Sequel::Model::Associations::OneThroughOneAssociationReflection</title>
     <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -26,8 +26,8 @@
     <div class='class' id='wrapper'>
       <div class='header'>
         <h1 class='name'>
-          <span class='type'>module</span>
-          Sequel::Model::Associations::InstanceMethods
+          <span class='type'>class</span>
+          Sequel::Model::Associations::OneThroughOneAssociationReflection
         </h1>
         <ol class='paths'>
           <li>
@@ -41,59 +41,59 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Instance methods used to implement the associations support.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-associations">associations</a></li>
-              <li><a target="docwin" href="#method-i-freeze">freeze</a></li>
+              <li><a target="docwin" href="#method-i-default_right_key">default_right_key</a></li>
+              <li><a target="docwin" href="#method-i-reciprocal">reciprocal</a></li>
             </ol>
           </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="SingularAssociationReflection.html">SingularAssociationReflection</a></li>
+              </ol>
+            </div>
           </div>
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-associations'>
-                <a name='method-i-associations'></a>
+              <div class='method public-instance' id='method-method-i-default_right_key'>
+                <a name='method-i-default_right_key'></a>
                 <div class='synopsis'>
-                  <span class='name'>associations</span>
+                  <span class='name'>default_right_key</span>
                   <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   
-                  <p>The currently cached associations.  A hash with the keys being the
-                  association name symbols and the values being the associated object or nil
-                  (many_to_one), or the array of associated objects (*_to_many).</p>
+                  <p>one_through_one associations should not singularize the association name
+                  when creating the foreign key.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-associations-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-default_right_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-associations-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1765</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associations</span>&#x000A;  <span class="ruby-ivar">@associations</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-default_right_key-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 983</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_right_key</span>&#x000A;  <span class="ruby-value">:&quot;#{self[:name]}_id&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-method-i-freeze'>
-                <a name='method-i-freeze'></a>
+              <div class='method public-instance' id='method-method-i-reciprocal'>
+                <a name='method-i-reciprocal'></a>
                 <div class='synopsis'>
-                  <span class='name'>freeze</span>
+                  <span class='name'>reciprocal</span>
                   <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Freeze the associations cache when freezing the object.  Note that
-                  retrieving associations after freezing will still work in most cases, but
-                  the associations will not be cached in the association cache.</p>
+                  <p>one_through_one associations have no reciprocals</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-reciprocal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1772</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-reciprocal-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 988</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
