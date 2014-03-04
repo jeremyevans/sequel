@@ -626,6 +626,15 @@ module Sequel
         execute(sql){|res| yield_hash_rows(res, fetch_rows_set_cols(res)){|h| yield h}}
       end
       
+      # Support the :strategy=>:cursor option.
+      def paged_each(opts=OPTS, &block)
+        if opts[:strategy] == :cursor
+          use_cursor(opts).each(&block)
+        else
+          super
+        end
+      end
+
       # Uses a cursor for fetching records, instead of fetching the entire result
       # set at once.  Can be used to process large datasets without holding
       # all rows in memory (which is what the underlying drivers do

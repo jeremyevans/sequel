@@ -258,6 +258,44 @@ describe "A PostgreSQL dataset" do
     @db.drop_table?(:test)
   end
 
+  specify "should support Dataset#paged_each :strategy=>:cursor option" do
+    @db.create_table!(:atest){primary_key :id; Integer :number}
+    @ds = @db[:atest]
+    (1..100).each{|i| @ds.insert(:number=>i*10)}
+
+    rows = []
+    @ds.order(:number).paged_each(:rows_per_fetch=>5, :strategy=>:cursor){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(:number).paged_each(:rows_per_fetch=>3, :strategy=>:cursor){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(:number, :id).paged_each(:rows_per_fetch=>5, :strategy=>:cursor){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.reverse_order(:number).paged_each(:rows_per_fetch=>5, :strategy=>:cursor){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}.reverse
+
+    rows = []
+    @ds.order(Sequel.desc(:number), :id).paged_each(:rows_per_fetch=>5, :strategy=>:cursor){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}.reverse
+
+    rows = []
+    @ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3, :strategy=>:cursor){|row| rows << row}
+    rows.should == (26..75).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5, :strategy=>:cursor){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5, :strategy=>:cursor){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+  end
+
   specify "should quote columns and tables using double quotes if quoting identifiers" do
     check_sqls do
       @d.select(:name).sql.should == 'SELECT "name" FROM "test"'
