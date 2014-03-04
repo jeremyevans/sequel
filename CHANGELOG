@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#use_cursor :hold option in the postgres adapter for supporting cursor use outside of a transaction (jeremyevans)
+
 * Add Dataset#paged_each :strategy=>:cursor option in the postgres adapter (jeremyevans)
 
 * Add Dataset#paged_each :strategy=>:filter option for increased performance (jeremyevans)

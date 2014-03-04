@@ -1535,6 +1535,13 @@ if DB.adapter_scheme == :postgres
       end
     end
 
+    specify "should respect the :hold=>true option for creating the cursor WITH HOLD and not using a transaction" do
+      @ds.use_cursor.each{@db.in_transaction?.should == true}
+      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.should == false}
+      @ds.use_cursor(:hold=>true).each{@db.in_transaction?.should == false}
+      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.should == true}
+    end
+
     specify "should respect the :cursor_name option" do
       one_rows = []
       two_rows = []

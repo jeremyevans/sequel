@@ -637,13 +637,15 @@ module Sequel
 
       # Uses a cursor for fetching records, instead of fetching the entire result
       # set at once.  Can be used to process large datasets without holding
-      # all rows in memory (which is what the underlying drivers do
+      # all rows in memory (which is what the underlying drivers may do
       # by default). Options:
       #
-      # * :rows_per_fetch - the number of rows per fetch (default 1000).  Higher
-      #   numbers result in fewer queries but greater memory use.
-      # * :cursor_name - the name assigned to the cursor (default 'sequel_cursor').
-      #   Nested cursors require different names.
+      # :cursor_name :: The name assigned to the cursor (default 'sequel_cursor').
+      #                 Nested cursors require different names.
+      # :hold :: Declare the cursor WITH HOLD and don't use transaction around the
+      #          cursor usage.
+      # :rows_per_fetch :: The number of rows per fetch (default 1000).  Higher
+      #                    numbers result in fewer queries but greater memory use.
       #
       # Usage:
       #
@@ -769,11 +771,14 @@ module Sequel
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
       def cursor_fetch_rows(sql)
         server_opts = {:server=>@opts[:server] || :read_only}
-        cursor_name = quote_identifier(@opts[:cursor][:cursor_name])
-        db.transaction(server_opts) do 
+        cursor = @opts[:cursor]
+        hold = cursor[:hold]
+        cursor_name = quote_identifier(cursor[:cursor_name])
+        rows_per_fetch = cursor[:rows_per_fetch].to_i
+
+        db.send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do 
           begin
-            execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}", server_opts)
-            rows_per_fetch = @opts[:cursor][:rows_per_fetch].to_i
+            execute_ddl("DECLARE #{cursor_name} NO SCROLL CURSOR WITH#{'OUT' unless hold} HOLD FOR #{sql}", server_opts)
             rows_per_fetch = 1000 if rows_per_fetch <= 0
             fetch_sql = "FETCH FORWARD #{rows_per_fetch} FROM #{cursor_name}"
             cols = nil
