@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#create_join_table? and #create_join_table! for consistency (jeremyevans)
+
 * Add Dataset#where_current_of to the postgres adapter for supporting updating rows based on a cursor's current position (jeremyevans)
 
 * Add Dataset#use_cursor :hold option in the postgres adapter for supporting cursor use outside of a transaction (jeremyevans)

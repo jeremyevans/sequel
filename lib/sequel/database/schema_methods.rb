@@ -134,6 +134,21 @@ module Sequel
       end
     end
 
+    # Forcibly create a join table, attempting to drop it if it already exists, then creating it.
+    def create_join_table!(hash, options=OPTS)
+      drop_table?(join_table_name(hash, options))
+      create_join_table(hash, options)
+    end
+    
+    # Creates the join table unless it already exists.
+    def create_join_table?(hash, options=OPTS)
+      if supports_create_table_if_not_exists?
+        create_join_table(hash, options.merge(:if_not_exists=>true))
+      elsif !table_exists?(join_table_name(hash, options))
+        create_join_table(hash, options)
+      end
+    end
+
     # Creates a table with the columns given in the provided block:
     #
     #   DB.create_table :posts do

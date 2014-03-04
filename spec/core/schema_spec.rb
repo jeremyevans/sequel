@@ -701,6 +701,12 @@ describe "DB#create_table!" do
     @db.create_table!(:cats){|*a|}
     @db.sqls.should == ['DROP TABLE cats', 'CREATE TABLE cats ()']
   end
+  
+  specify "should use IF EXISTS if the database supports it" do
+    meta_def(@db, :supports_drop_table_if_exists?){true}
+    @db.create_table!(:cats){|*a|}
+    @db.sqls.should == ['DROP TABLE IF EXISTS cats', 'CREATE TABLE cats ()']
+  end
 end
 
 describe "DB#create_table?" do
@@ -772,6 +778,54 @@ describe "DB#create_join_table" do
     proc{@db.create_join_table({:cat_id=>:cats})}.should raise_error(Sequel::Error)
     proc{@db.create_join_table({:cat_id=>:cats, :human_id=>:humans, :dog_id=>:dog})}.should raise_error(Sequel::Error)
     proc{@db.create_join_table({:cat_id=>:cats, :dog_id=>{}})}.should raise_error(Sequel::Error)
+  end
+end
+  
+describe "DB#create_join_table?" do
+  before do
+    @db = Sequel.mock
+  end
+  
+  specify "should create the table if it does not already exist" do
+    meta_def(@db, :table_exists?){|a| false}
+    @db.create_join_table?(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
+  end
+
+  specify "should not create the table if it already exists" do
+    meta_def(@db, :table_exists?){|a| true}
+    @db.create_join_table?(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == []
+  end
+
+  specify "should use IF NOT EXISTS if the database supports it" do
+    meta_def(@db, :supports_create_table_if_not_exists?){true}
+    @db.create_join_table?(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == ['CREATE TABLE IF NOT EXISTS cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
+  end
+end
+  
+describe "DB#create_join_table!" do
+  before do
+    @db = Sequel.mock
+  end
+  
+  specify "should drop the table first if it already exists" do
+    meta_def(@db, :table_exists?){|a| true}
+    @db.create_join_table!(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == ['DROP TABLE cats_dogs', 'CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
+  end
+
+  specify "should not drop the table if it doesn't exists" do
+    meta_def(@db, :table_exists?){|a| false}
+    @db.create_join_table!(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == ['CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
+  end
+
+  specify "should use IF EXISTS if the database supports it" do
+    meta_def(@db, :supports_drop_table_if_exists?){true}
+    @db.create_join_table!(:cat_id=>:cats, :dog_id=>:dogs)
+    @db.sqls.should == ['DROP TABLE IF EXISTS cats_dogs', 'CREATE TABLE cats_dogs (cat_id integer NOT NULL REFERENCES cats, dog_id integer NOT NULL REFERENCES dogs, PRIMARY KEY (cat_id, dog_id))', 'CREATE INDEX cats_dogs_dog_id_cat_id_index ON cats_dogs (dog_id, cat_id)']
   end
 end
   
