@@ -618,6 +618,7 @@ module Sequel
 
       Database::DatasetClass = self
       APOS = Sequel::Dataset::APOS
+      DEFAULT_CURSOR_NAME = 'sequel_cursor'.freeze
       
       # Yield all rows returned by executing the given SQL and converting
       # the types.
@@ -656,7 +657,19 @@ module Sequel
       # This is untested with the prepared statement/bound variable support,
       # and unlikely to work with either.
       def use_cursor(opts=OPTS)
-        clone(:cursor=>{:rows_per_fetch=>1000, :cursor_name => 'sequel_cursor'}.merge(opts))
+        clone(:cursor=>{:rows_per_fetch=>1000}.merge(opts))
+      end
+
+      # Replace the WHERE clause with one that uses CURRENT OF with the given
+      # cursor name (or the default cursor name).  This allows you to update a
+      # large dataset by updating individual rows while processing the dataset
+      # via a cursor:
+      #
+      #   DB[:huge_table].use_cursor(:rows_per_fetch=>1).each do |row|
+      #     DB[:huge_table].where_current_of.update(:column=>ruby_method(row))
+      #   end
+      def where_current_of(cursor_name=DEFAULT_CURSOR_NAME)
+        clone(:where=>Sequel.lit(['CURRENT OF '], Sequel.identifier(cursor_name)))
       end
 
       if SEQUEL_POSTGRES_USES_PG
@@ -773,7 +786,7 @@ module Sequel
         server_opts = {:server=>@opts[:server] || :read_only}
         cursor = @opts[:cursor]
         hold = cursor[:hold]
-        cursor_name = quote_identifier(cursor[:cursor_name])
+        cursor_name = quote_identifier(cursor[:cursor_name] || DEFAULT_CURSOR_NAME)
         rows_per_fetch = cursor[:rows_per_fetch].to_i
 
         db.send(*(hold ? [:synchronize, server_opts[:server]] : [:transaction, server_opts])) do 

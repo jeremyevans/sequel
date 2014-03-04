@@ -1542,6 +1542,16 @@ if DB.adapter_scheme == :postgres
       check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.should == true}
     end
 
+    specify "should support updating individual rows based on a cursor" do
+      @db.transaction(:rollback=>:always) do
+        @ds.use_cursor(:rows_per_fetch=>1).each do |row|
+          @ds.where_current_of.update(:x=>Sequel.*(row[:x], 10))
+        end
+        @ds.select_order_map(:x).should == (0..1000).map{|x| x * 10}
+      end
+      @ds.select_order_map(:x).should == (0..1000).to_a
+    end
+
     specify "should respect the :cursor_name option" do
       one_rows = []
       two_rows = []
