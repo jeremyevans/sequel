@@ -434,49 +434,106 @@ module Sequel
       import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
     end
 
-    # Yields each row in the dataset, but interally uses multiple queries as needed with
-    # limit and offset to process the entire result set without keeping all
-    # rows in the dataset in memory, even if the underlying driver buffers all
-    # query results in memory.
+    # Yields each row in the dataset, but interally uses multiple queries as needed to
+    # process the entire result set without keeping all rows in the dataset in memory,
+    # even if the underlying driver buffers all query results in memory.
     #
     # Because this uses multiple queries internally, in order to remain consistent,
-    # it also uses a transaction internally.  Additionally, to make sure that all rows
-    # in the dataset are yielded and none are yielded twice, the dataset must have an
-    # unambiguous order.  Sequel requires that datasets using this method have an
-    # order, but it cannot ensure that the order is unambiguous.
+    # it also uses a transaction internally.  Additionally, to work correctly, the dataset
+    # must have unambiguous order.  Using an ambiguous order can result in an infinite loop,
+    # as well as subtler bugs such as yielding duplicate rows or rows being skipped.
+    #
+    # Sequel checks that the datasets using this method have an order, but it cannot
+    # ensure that the order is unambiguous.
     #
     # Options:
     # :rows_per_fetch :: The number of rows to fetch per query.  Defaults to 1000.
+    # :strategy :: The strategy to use for paging of results.  By default this is :offset,
+    #              for using an approach with a limit and offset for every page.  This can
+    #              be set to :filter, which uses a limit and a filter that excludes
+    #              rows from previous pages.  In order for this strategy to work, you must be
+    #              selecting the columns you are ordering by, and non of the columns can contain
+    #              NULLs.
+    # :filter_values :: If the :strategy=>:filter option is used, this option should be a proc
+    #                   that accepts the last retreived row for the previous page and an array of
+    #                   ORDER BY expressions, and returns an array of values relating to those
+    #                   expressions for the last retrieved row.  You will need to use this option
+    #                   if your ORDER BY expressions are not simple columns, if they contain
+    #                   qualified identifiers that would be ambiguous unqualified, if they contain
+    #                   any identifiers that are aliased in SELECT, and potentially other cases.
+    #
+    # Examples:
+    #
+    #   DB[:table].order(:id).paged_each{|row| ...}
+    #   # SELECT * FROM table ORDER BY id LIMIT 1000
+    #   # SELECT * FROM table ORDER BY id LIMIT 1000 OFFSET 1000
+    #   # ...
+    #
+    #   DB[:table].order(:id).paged_each(:rows_per_fetch=>100){|row| ...}
+    #   # SELECT * FROM table ORDER BY id LIMIT 100
+    #   # SELECT * FROM table ORDER BY id LIMIT 100 OFFSET 100
+    #   # ...
+    #
+    #   DB[:table].order(:id).paged_each(:strategy=>:filter){|row| ...}
+    #   # SELECT * FROM table ORDER BY id LIMIT 1000
+    #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
+    #   # ...
+    #
+    #   DB[:table].order(:table__id).paged_each(:strategy=>:filter,
+    #     :filter_values=>proc{|row, exprs| [row[:id]]}){|row| ...}
+    #   # SELECT * FROM table ORDER BY id LIMIT 1000
+    #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
+    #   # ...
     def paged_each(opts=OPTS)
       unless @opts[:order]
         raise Sequel::Error, "Dataset#paged_each requires the dataset be ordered"
       end
 
       total_limit = @opts[:limit]
-      offset = @opts[:offset] || 0
-
+      offset = @opts[:offset]
       if server = @opts[:server]
         opts = opts.merge(:server=>server)
       end
 
       rows_per_fetch = opts[:rows_per_fetch] || 1000
-      num_rows_yielded = rows_per_fetch
-      total_rows = 0
+      strategy = if offset || total_limit
+        :offset
+      else
+        opts[:strategy] || :offset
+      end
 
       db.transaction(opts) do
-        while num_rows_yielded == rows_per_fetch && (total_limit.nil? || total_rows < total_limit)
-          if total_limit && total_rows + rows_per_fetch > total_limit
-            rows_per_fetch = total_limit - total_rows
+        case strategy
+        when :filter
+          filter_values = opts[:filter_values] || proc{|row, exprs| exprs.map{|e| row[hash_key_symbol(e)]}}
+          base_ds = ds = limit(rows_per_fetch)
+          while ds
+            last_row = nil
+            ds.each do |row|
+              last_row = row
+              yield row
+            end
+            ds = (base_ds.where(ignore_values_preceding(last_row, &filter_values)) if last_row)
           end
+        else
+          offset ||= 0
+          num_rows_yielded = rows_per_fetch
+          total_rows = 0
 
-          num_rows_yielded = 0
-          limit(rows_per_fetch, offset).each do |row|
-            num_rows_yielded += 1
-            total_rows += 1 if total_limit
-            yield row
+          while num_rows_yielded == rows_per_fetch && (total_limit.nil? || total_rows < total_limit)
+            if total_limit && total_rows + rows_per_fetch > total_limit
+              rows_per_fetch = total_limit - total_rows
+            end
+
+            num_rows_yielded = 0
+            limit(rows_per_fetch, offset).each do |row|
+              num_rows_yielded += 1
+              total_rows += 1 if total_limit
+              yield row
+            end
+
+            offset += rows_per_fetch
           end
-
-          offset += rows_per_fetch
         end
       end
 
@@ -850,6 +907,33 @@ module Sequel
       s.is_a?(Array) ? s.map{|c| hash_key_symbol(c)} : hash_key_symbol(s)
     end
     
+    # Returns an expression that will ignore values preceding the given row, using the
+    # receiver's current order. This yields the row and the array of order expressions
+    # to the block, which should return an array of values to use.
+    def ignore_values_preceding(row)
+      @opts[:order].map{|v| v.is_a?(SQL::OrderedExpression) ? v.expression : v}
+
+      order_exprs = @opts[:order].map do |v|
+        if v.is_a?(SQL::OrderedExpression)
+          descending = v.descending
+          v = v.expression
+        else
+          descending = false
+        end
+        [v, descending]
+      end
+
+      row_values = yield(row, order_exprs.map{|e| e.first})
+
+      last_expr = []
+      cond = order_exprs.zip(row_values).map do |(v, descending), value|
+        expr =  last_expr + [SQL::BooleanExpression.new(descending ? :< : :>, v, value)]
+        last_expr += [SQL::BooleanExpression.new(:'=', v, value)]
+        Sequel.&(*expr)
+      end
+      Sequel.|(*cond)
+    end
+
     # Modify the identifier returned from the database based on the
     # identifier_output_method.
     def output_identifier(v)

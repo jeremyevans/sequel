@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add Dataset#paged_each :strategy=>:filter option for increased performance (jeremyevans)
+
 === 4.8.0 (2014-03-01)
 
 * Add SQL::AliasedExpression#alias alias for #aliaz (jeremyevans)

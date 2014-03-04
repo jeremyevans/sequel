@@ -124,17 +124,39 @@ describe "Simple Dataset operations" do
   specify "should support iterating over large numbers of records with paged_each" do
     (2..100).each{|i| @ds.insert(:number=>i*10)}
 
-    rows = []
-    @ds.order(:number).paged_each(:rows_per_fetch=>5){|row| rows << row}
-    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+    [:offset, :filter].each do |strategy|
+      rows = []
+      @ds.order(:number).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
 
-    rows = []
-    @ds.order(:number).paged_each(:rows_per_fetch=>3){|row| rows << row}
-    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+      rows = []
+      @ds.order(:number).paged_each(:rows_per_fetch=>3, :strategy=>strategy){|row| rows << row}
+      rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+      rows = []
+      @ds.order(:number, :id).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+      rows = []
+      @ds.reverse_order(:number).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}.reverse
+
+      rows = []
+      @ds.order(Sequel.desc(:number), :id).paged_each(:rows_per_fetch=>5, :strategy=>strategy){|row| rows << row}
+      rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}.reverse
+    end
 
     rows = []
     @ds.order(:number).limit(50, 25).paged_each(:rows_per_fetch=>3){|row| rows << row}
     rows.should == (26..75).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    rows = []
+    @ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, :filter_values=>proc{|row, _| [row[:number] * 2]}){|row| rows << row}
+    rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
   end
 
   specify "should fetch all results correctly" do

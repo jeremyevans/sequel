@@ -4562,6 +4562,32 @@ describe "Dataset#paged_each" do
     @ds.limit(nil, 2).paged_each(:rows_per_fetch=>3, &@proc)
     @ds.db.sqls[1...-1].should == ["SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 2", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 5", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 8", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 11"]
   end
+
+  it "should support :strategy=>:filter" do
+    @ds._fetch = @db.each_slice(5).to_a
+    @ds.paged_each(:rows_per_fetch=>5, :strategy=>:filter, &@proc)
+    @ds.db.sqls[1...-1].should == ["SELECT * FROM test ORDER BY x LIMIT 5", "SELECT * FROM test WHERE (x > 4) ORDER BY x LIMIT 5", "SELECT * FROM test WHERE (x > 9) ORDER BY x LIMIT 5"]
+    @rows.should == @db
+
+    @rows = []
+    db = @db.map{|h| h[:y] = h[:x] % 5; h[:z] = h[:x] % 9; h}.sort_by{|h| [h[:z], -h[:y], h[:x]]}
+    @ds._fetch = db.each_slice(5).to_a
+    @ds.order(Sequel.identifier(:z), Sequel.desc(Sequel.qualify(:test, :y)), Sequel.asc(:x)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, &@proc)
+    @ds.db.sqls[1...-1].should == ["SELECT * FROM test ORDER BY z, test.y DESC, x ASC LIMIT 5",
+      "SELECT * FROM test WHERE ((z > 3) OR ((z = 3) AND (test.y < 3)) OR ((z = 3) AND (test.y = 3) AND (x > 3))) ORDER BY z, test.y DESC, x ASC LIMIT 5",
+      "SELECT * FROM test WHERE ((z > 8) OR ((z = 8) AND (test.y < 3)) OR ((z = 8) AND (test.y = 3) AND (x > 8))) ORDER BY z, test.y DESC, x ASC LIMIT 5"]
+    @rows.should == db
+  end
+
+  it "should support :strategy=>:filter with :filter_values option" do
+    db = @db.map{|h| h[:y] = h[:x] % 5; h[:z] = h[:x] % 9; h}.sort_by{|h| [h[:z], -h[:y], h[:x]]}
+    @ds._fetch = db.each_slice(5).to_a
+    @ds.order(Sequel.identifier(:z), Sequel.desc(Sequel.qualify(:test, :y) * 2), Sequel.asc(:x)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, :filter_values=>proc{|row, expr| [row[expr[0].value], row[expr[1].args.first.column] * expr[1].args.last, row[expr[2]]]}, &@proc)
+    @ds.db.sqls[1...-1].should == ["SELECT * FROM test ORDER BY z, (test.y * 2) DESC, x ASC LIMIT 5",
+      "SELECT * FROM test WHERE ((z > 3) OR ((z = 3) AND ((test.y * 2) < 6)) OR ((z = 3) AND ((test.y * 2) = 6) AND (x > 3))) ORDER BY z, (test.y * 2) DESC, x ASC LIMIT 5",
+      "SELECT * FROM test WHERE ((z > 8) OR ((z = 8) AND ((test.y * 2) < 6)) OR ((z = 8) AND ((test.y * 2) = 6) AND (x > 8))) ORDER BY z, (test.y * 2) DESC, x ASC LIMIT 5"]
+    @rows.should == db
+  end
 end
 
 describe "Dataset#escape_like" do
