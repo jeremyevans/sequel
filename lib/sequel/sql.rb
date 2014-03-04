@@ -216,7 +216,7 @@ module Sequel
         case op
         when *N_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires at least 1 argument") unless args.length >= 1
-          old_args = args
+          old_args = args.map{|a| a.is_a?(self.class) && a.op == :NOOP ? a.args.first : a}
           args = []
           old_args.each{|a| a.is_a?(self.class) && a.op == op ? args.concat(a.args) : args.push(a)}
         when *TWO_ARITY_OPERATORS
@@ -798,20 +798,23 @@ module Sequel
     # arguments with the appropriate operator, and the & and | operators return
     # boolean expressions combining all of the arguments with either AND or OR.
     module OperatorBuilders
-      %w'+ - * /'.each do |op|
-        class_eval(<<-END, __FILE__, __LINE__ + 1)
-          def #{op}(*args)
-            SQL::NumericExpression.new(:#{op}, *args)
-          end
-        END
-      end
-
-      {'&'=>'AND', '|'=>'OR'}.each do |m, op|
-        class_eval(<<-END, __FILE__, __LINE__ + 1)
-          def #{m}(*args)
-            SQL::BooleanExpression.new(:#{op}, *args)
-          end
-        END
+      {'::Sequel::SQL::NumericExpression'=>{'+'=>'+', '-'=>'-', '*'=>'*', '/'=>'/'},
+       '::Sequel::SQL::BooleanExpression'=>{'&'=>'AND', '|'=>'OR'}}.each do |klass, ops|
+        ops.each do |m, op|
+          class_eval(<<-END, __FILE__, __LINE__ + 1)
+            def #{m}(*args)
+              if (args.length == 1)
+                if (v = args.first).class.is_a?(#{klass})
+                  v
+                else
+                  #{klass}.new(:NOOP, v)
+                end
+              else
+                #{klass}.new(:#{op}, *args)
+              end
+            end
+          END
+        end
       end
       
       # Invert the given expression.  Returns a <tt>Sequel::SQL::BooleanExpression</tt>

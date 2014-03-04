@@ -714,7 +714,7 @@ describe "Sequel core extension replacements" do
   end
 
   it "Sequel.& should join all arguments given with AND" do
-    l(Sequel.&(:a), "(a)")
+    l(Sequel.&(:a), "a")
     l(Sequel.&(:a, :b=>:c), "(a AND (b = c))")
     l(Sequel.&(:a, {:b=>:c}, Sequel.lit('d')), "(a AND (b = c) AND d)")
   end
@@ -724,7 +724,7 @@ describe "Sequel core extension replacements" do
   end
 
   it "Sequel.| should join all arguments given with OR" do
-    l(Sequel.|(:a), "(a)")
+    l(Sequel.|(:a), "a")
     l(Sequel.|(:a, :b=>:c), "(a OR (b = c))")
     l(Sequel.|(:a, {:b=>:c}, Sequel.lit('d')), "(a OR (b = c) OR d)")
   end
@@ -808,7 +808,7 @@ describe "Sequel core extension replacements" do
 
   it "Sequel.{+,-,*,/} should accept arguments and use the appropriate operator" do
     %w'+ - * /'.each do |op|
-      l(Sequel.send(op, 1), '(1)')
+      l(Sequel.send(op, 1), '1')
       l(Sequel.send(op, 1, 2), "(1 #{op} 2)")
       l(Sequel.send(op, 1, 2, 3), "(1 #{op} 2 #{op} 3)")
     end
