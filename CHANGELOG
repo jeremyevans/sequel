@@ -1,5 +1,7 @@
 === HEAD
 
+* Use streaming to implement paging for Dataset#paged_each in the mysql2 adapter (jeremyevans)
+
 * Use a cursor to implement paging for Dataset#paged_each in the postgres adapter (jeremyevans)
 
 * Add Database#create_join_table? and #create_join_table! for consistency (jeremyevans)
