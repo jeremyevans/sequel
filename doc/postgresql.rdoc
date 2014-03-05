@@ -44,14 +44,15 @@ pg_range :: ranges (for any scalar type), as a ruby Range-like object
 pg_row :: row-valued/composite types, as a ruby Hash-like or Sequel::Model object
 
 In general, these extensions just add support for Database objects to return retrieved
-column values as the appropriate type (<tt>postgres only</tt>), and support for literalizing
-the objects correctly for use in an SQL string, or using them as bound variable values (<tt>postgres/pg only</tt>).
+column values as the appropriate type (<tt>postgres and jdbc/postgres only</tt>), and support for literalizing
+the objects correctly for use in an SQL string, or using them as bound variable values (<tt>postgres/pg and jdbc/postgres only</tt>).
 
 There are also type-specific extensions that make it easy to use database functions
 and operators related to the type.  These extensions are:
 
 pg_array_ops :: array-related functions and operators
 pg_hstore_ops :: hstore-related functions and operators
+pg_json_ops :: json-related functions and operators
 pg_range_ops :: range-related functions and operators
 pg_row_ops :: row-valued/composite type syntax support
 
@@ -75,7 +76,7 @@ You can also add exclusion constraints in +alter_table+ blocks using add_exclusi
   end
   # ALTER TABLE "table" ADD CONSTRAINT "table_during_excl" EXCLUDE USING gist ("during" WITH &&)
 
-=== Adding Foreign Key Constraints Without Initial Validation
+=== Adding Foreign Key and Check Constraints Without Initial Validation
 
 You can add a <tt>:not_valid=>true</tt> option when adding constraints to existing tables so
 that it doesn't check if all current rows are valid:
@@ -83,16 +84,21 @@ that it doesn't check if all current rows are valid:
   DB.alter_table(:table) do
     # Assumes t_id column already exists
     add_foreign_key([:t_id], :table, :not_valid=>true, :name=>:table_fk)
+
+    constraint({:name=>:col_123, :not_valid=>true}, :col=>[1,2,3])
   end
   # ALTER TABLE "table" ADD CONSTRAINT "table_fk" FOREIGN KEY ("t_id") REFERENCES "table" NOT VALID
+  # ALTER TABLE "table" ADD CONSTRAINT "col_123" CHECK (col IN (1, 2, 3)) NOT VALID
 
 Such constraints will be enforced for newly inserted and updated rows, but not for existing rows. After
 all existing rows have been fixed, you can validate the constraint:
 
   DB.alter_table(:table) do
     validate_constraint(:table_fk)
+    validate_constraint(:col_123)
   end
   # ALTER TABLE "table" VALIDATE CONSTRAINT "table_fk"
+  # ALTER TABLE "table" VALIDATE CONSTRAINT "col_123"
 
 === Creating Indexes Concurrently
 
@@ -202,6 +208,17 @@ without keeping all rows in memory:
   # CLOSE sequel_cursor
   # COMMIT
 
+This support is used by default when using <tt>Dataset#paged_each</tt>.
+
+Using cursors, it is possible to update individual rows of a large dataset
+easily using the <tt>:rows_per_fetch=>1</tt> option in conjunction with
+<tt>Dataset#where_current_of</tt>.  This is useful if the logic needed to
+update the rows exists in the application and not in the database:
+
+  ds.use_cursor(:rows_per_fetch=>1).each do |row|
+    ds.where_current_of.update(:col=>new_col_value(row))
+  end
+
 === Truncate Modifiers
 
 Sequel supports PostgreSQL-specific truncate options:
@@ -261,6 +278,10 @@ notifications:
 
   DB.listen(:channel, :loop=>true){|channel| p channel}
 
+The +pg_static_cache_updater+ extension uses this support to automatically update
+the caches for models using the +static_cache+ plugin.  Look at the documentation of that
+plugin for details.
+
 === Locking Tables
 
 Sequel makes it easy to lock tables, though it is generally better to let the database
@@ -300,3 +321,6 @@ Then you can stream individual datasets:
 Or stream all datasets by default:
 
   DB.stream_all_queries = true
+
+When streaming is enabled, <tt>Dataset#paged_each</tt> will use streaming to implement
+paging.
