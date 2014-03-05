@@ -1,12 +1,12 @@
 === HEAD
 
+* Use a cursor to implement paging for Dataset#paged_each in the postgres adapter (jeremyevans)
+
 * Add Database#create_join_table? and #create_join_table! for consistency (jeremyevans)
 
 * Add Dataset#where_current_of to the postgres adapter for supporting updating rows based on a cursor's current position (jeremyevans)
 
 * Add Dataset#use_cursor :hold option in the postgres adapter for supporting cursor use outside of a transaction (jeremyevans)
-
-* Add Dataset#paged_each :strategy=>:cursor option in the postgres adapter (jeremyevans)
 
 * Add Dataset#paged_each :strategy=>:filter option for increased performance (jeremyevans)
 

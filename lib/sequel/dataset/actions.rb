@@ -453,8 +453,8 @@ module Sequel
     #              be set to :filter, which uses a limit and a filter that excludes
     #              rows from previous pages.  In order for this strategy to work, you must be
     #              selecting the columns you are ordering by, and non of the columns can contain
-    #              NULLs.  When using the postgres adapter, you can set this to :cursor to implement
-    #              paging via a cursor.
+    #              NULLs.  Note that some Sequel adapters have optimized implementations that will
+    #              use cursors or streaming regardless of the :strategy option used.
     # :filter_values :: If the :strategy=>:filter option is used, this option should be a proc
     #                   that accepts the last retreived row for the previous page and an array of
     #                   ORDER BY expressions, and returns an array of values relating to those
