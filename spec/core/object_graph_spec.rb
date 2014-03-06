@@ -104,9 +104,18 @@ describe Sequel::Dataset, "graphing" do
 
     it "should accept a SQL::Identifier as the dataset" do
       ds = @ds1.graph(Sequel.identifier(:lines), :x=>:id)
-      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines AS lines ON (lines.x = points.id)'
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
       ds = @ds1.graph(Sequel.identifier('lines'), :x=>:id)
       ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines AS lines ON (lines.x = points.id)'
+    end
+
+    it "should handle a SQL::Identifier with double underscores correctly" do
+      ds = @ds1.graph(Sequel.identifier(:lin__es), :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.x, points.y, lin__es.id AS lin__es_id, lin__es.name, lin__es.x AS lin__es_x, lin__es.y AS lin__es_y, lin__es.lines_x FROM points LEFT OUTER JOIN lin__es ON (lin__es.x = points.id)'
+      ds = @ds1.from(Sequel.identifier(:poi__nts)).graph(Sequel.identifier(:lin__es), :x=>:id)
+      ds.sql.should == 'SELECT poi__nts.id, poi__nts.name, poi__nts.x, poi__nts.y, poi__nts.lines_x, lin__es.id AS lin__es_id, lin__es.name AS lin__es_name, lin__es.x AS lin__es_x, lin__es.y AS lin__es_y, lin__es.lines_x AS lin__es_lines_x FROM poi__nts LEFT OUTER JOIN lin__es ON (lin__es.x = poi__nts.id)'
+      ds = @ds1.from(Sequel.identifier(:poi__nts).qualify(:foo)).graph(Sequel.identifier(:lin__es).qualify(:bar), :x=>:id)
+      ds.sql.should == 'SELECT foo.poi__nts.id, foo.poi__nts.x, foo.poi__nts.y, foo.poi__nts.graph_id, lin__es.id AS lin__es_id, lin__es.name, lin__es.x AS lin__es_x, lin__es.y AS lin__es_y, lin__es.lines_x FROM foo.poi__nts LEFT OUTER JOIN bar.lin__es AS lin__es ON (lin__es.x = foo.poi__nts.id)'
     end
 
     it "should accept a SQL::QualifiedIdentifier as the dataset" do
@@ -118,6 +127,13 @@ describe Sequel::Dataset, "graphing" do
       ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN schema.lines AS lines ON (lines.x = points.id)'
       ds = @ds1.graph(Sequel.qualify(Sequel.identifier('schema'), Sequel.identifier('lines')), :x=>:id)
       ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN schema.lines AS lines ON (lines.x = points.id)'
+    end
+
+    it "should handle a qualified identifier as the source" do
+      ds = @ds1.from(:schema__points).graph(:lines, :x=>:id)
+      ds.sql.should == 'SELECT schema.points.id, schema.points.x, schema.points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM schema.points LEFT OUTER JOIN lines ON (lines.x = schema.points.id)'
+      ds = @ds1.from(Sequel.qualify(:schema, :points)).graph(:lines, :x=>:id)
+      ds.sql.should == 'SELECT schema.points.id, schema.points.x, schema.points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM schema.points LEFT OUTER JOIN lines ON (lines.x = schema.points.id)'
     end
 
     it "should accept a SQL::AliasedExpression as the dataset" do

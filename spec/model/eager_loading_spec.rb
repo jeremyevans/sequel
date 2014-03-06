@@ -1725,6 +1725,8 @@ describe Sequel::Model, "#eager_graph" do
     c1.many_to_many :a_genres, :class=>c2, :left_primary_key=>:id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:s__ag
     ds = c1.join(:s__t, [:b_id]).eager_graph(:a_genres)
     ds.sql.should == 'SELECT a.id, a_genres.id AS a_genres_id FROM (SELECT * FROM s.a INNER JOIN s.t USING (b_id)) AS a LEFT OUTER JOIN s.ag AS ag ON (ag.album_id = a.id) LEFT OUTER JOIN s.g AS a_genres ON (a_genres.id = ag.genre_id)'
+    ds = c1.eager_graph(:a_genres)
+    ds.sql.should == 'SELECT s.a.id, a_genres.id AS a_genres_id FROM s.a LEFT OUTER JOIN s.ag AS ag ON (ag.album_id = s.a.id) LEFT OUTER JOIN s.g AS a_genres ON (a_genres.id = ag.genre_id)'
   end
 
   it "should respect :after_load callbacks on associations when eager graphing" do
@@ -1868,3 +1870,33 @@ describe Sequel::Model, "#eager_graph" do
     a.album.tracks.should == [GraphTrack.load(:id => 3, :album_id => 1)]
   end
 end
+
+describe "Sequel::Models with double underscores in table names" do
+  before do
+    @db = Sequel.mock(:fetch=>{:id=>1, :foo_id=>2})
+    @Foo = Class.new(Sequel::Model(@db[Sequel.identifier(:fo__os)]))
+    @Foo.columns :id, :foo_id
+    @Foo.one_to_many :foos, :class=>@Foo
+    @db.sqls
+  end
+
+  it "should have working eager_graph implementations" do
+    @db.fetch = {:id=>1, :foo_id=>1, :foos_id=>1, :foos_foo_id=>1}
+    foos = @Foo.eager_graph(:foos).all
+    @db.sqls.should == ["SELECT fo__os.id, fo__os.foo_id, foos.id AS foos_id, foos.foo_id AS foos_foo_id FROM fo__os LEFT OUTER JOIN (SELECT * FROM fo__os) AS foos ON (foos._id = fo__os.id)"]
+    foos.should == [@Foo.load(:id=>1, :foo_id=>1)]
+    foos.first.foos.should == [@Foo.load(:id=>1, :foo_id=>1)]
+  end
+
+  it "should have working eager_graph implementations when qualified" do
+    @Foo.dataset = Sequel.identifier(:fo__os).qualify(:s)
+    @Foo.columns :id, :foo_id
+    @db.sqls
+    @db.fetch = {:id=>1, :foo_id=>1, :foos_id=>1, :foos_foo_id=>1}
+    foos = @Foo.eager_graph(:foos).all
+    @db.sqls.should == ["SELECT s.fo__os.id, s.fo__os.foo_id, foos.id AS foos_id, foos.foo_id AS foos_foo_id FROM s.fo__os LEFT OUTER JOIN (SELECT * FROM s.fo__os) AS foos ON (foos._id = s.fo__os.id)"]
+    foos.should == [@Foo.load(:id=>1, :foo_id=>1)]
+    foos.first.foos.should == [@Foo.load(:id=>1, :foo_id=>1)]
+  end
+end
+

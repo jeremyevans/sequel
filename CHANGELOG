@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix multiple corner cases in the eager_graph support (jeremyevans) (#771)
+
 * Use streaming to implement paging for Dataset#paged_each in the mysql2 adapter (jeremyevans)
 
 * Use a cursor to implement paging for Dataset#paged_each in the postgres adapter (jeremyevans)
