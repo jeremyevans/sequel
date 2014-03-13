@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#column_schema_to_ruby_default a public method in the schema_dumper extension (jeremyevans) (#776)
+
 * Fix multiple corner cases in the eager_graph support (jeremyevans) (#771)
 
 * Use streaming to implement paging for Dataset#paged_each in the mysql2 adapter (jeremyevans)
