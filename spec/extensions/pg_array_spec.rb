@@ -189,7 +189,7 @@ describe "pg_array extension" do
 
   it "should parse array types from the schema correctly" do
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]'}, {:name=>'f', :db_type=>'real[]'}, {:name=>'d', :db_type=>'numeric[]'}, {:name=>'t', :db_type=>'text[]'}]
-    @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :integer_array, :float_array, :decimal_array, :string_array]
+    @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :integer_array, :real_array, :decimal_array, :string_array]
   end
 
   it "should support typecasting of the various array types" do
@@ -315,12 +315,6 @@ describe "pg_array extension" do
   it "should support registering custom types with :array_type option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>3, :array_type=>:blah)
     @db.literal(Sequel::Postgres::PG_TYPES[3].call('{}')).should == "'{}'::blah[]"
-  end
-
-  it "should use and not override existing database typecast method if :typecast_method option is given" do
-    Sequel::Postgres::PGArray.register('foo', :typecast_method=>:float)
-    @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
-    @db.schema(:items).map{|e| e[1][:type]}.should == [:float_array]
   end
 
   it "should support registering custom array types on a per-Database basis" do

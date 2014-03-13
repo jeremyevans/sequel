@@ -159,10 +159,6 @@ module Sequel
       # :type_symbol :: The base of the schema type symbol for this type.  For example, if you provide
       #                 :integer, Sequel will recognize this type as :integer_array during schema parsing.
       #                 Defaults to the db_type argument.
-      # :typecast_method :: If given, specifies the :type_symbol option, but additionally causes no
-      #                     typecasting method to be created in the database.  This should only be used
-      #                     to alias existing array types.  For example, if there is an array type that can be
-      #                     treated just like an integer array, you can do :typecast_method=>:integer.
       # :typecast_method_map :: The map in which to place the database type string to type symbol mapping.
       #                         Defaults to ARRAY_TYPES.
       # :typecast_methods_module :: If given, a module object to add the typecasting method to.  Defaults
@@ -171,8 +167,7 @@ module Sequel
       # If a block is given, it is treated as the :converter option.
       def self.register(db_type, opts=OPTS, &block)
         db_type = db_type.to_s
-        typecast_method = opts[:typecast_method]
-        type = (typecast_method || opts[:type_symbol] || db_type).to_sym
+        type = (opts[:type_symbol] || db_type).to_sym
         type_procs = opts[:type_procs] || PG_TYPES
         mod = opts[:typecast_methods_module] || DatabaseMethods
         typecast_method_map = opts[:typecast_method_map] || ARRAY_TYPES
@@ -193,7 +188,7 @@ module Sequel
 
         typecast_method_map[db_type] = :"#{type}_array"
 
-        define_array_typecast_method(mod, type, creator, opts.fetch(:scalar_typecast, type)) unless typecast_method
+        define_array_typecast_method(mod, type, creator, opts.fetch(:scalar_typecast, type))
 
         if oid = opts[:oid]
           type_procs[oid] = creator
@@ -261,7 +256,7 @@ module Sequel
             opts[:oid] = array_oid unless opts.has_key?(:oid)
           end
           PGArray.register(db_type, opts, &block)
-          @schema_type_classes[:"#{opts[:typecast_method] || opts[:type_symbol] || db_type}_array"] = PGArray
+          @schema_type_classes[:"#{opts[:type_symbol] || db_type}_array"] = PGArray
         end
 
         # Return PGArray if this type matches any supported array type.
@@ -334,7 +329,6 @@ module Sequel
         #   typecast all members of the array in ruby for performance reasons, but
         #   it will cast the array the appropriate database type when the array is
         #   literalized.
-        # * If given a String, call the parser for the subclass with it.
         def typecast_value_pg_array(value, creator, scalar_typecast_method=nil)
           case value
           when PGArray
@@ -571,11 +565,11 @@ module Sequel
       register('time with time zone', :oid=>1270, :scalar_oid=>1083, :type_symbol=>:time_timezone, :scalar_typecast=>:time)
       register('timestamp with time zone', :oid=>1185, :scalar_oid=>1184, :type_symbol=>:datetime_timezone, :scalar_typecast=>:datetime)
 
-      register('smallint', :oid=>1005, :parser=>:json, :typecast_method=>:integer)
-      register('oid', :oid=>1028, :parser=>:json, :typecast_method=>:integer)
-      register('real', :oid=>1021, :scalar_oid=>701, :typecast_method=>:float)
-      register('character', :oid=>1014, :array_type=>:text, :typecast_method=>:string)
-      register('character varying', :oid=>1015, :typecast_method=>:string)
+      register('smallint', :oid=>1005, :parser=>:json, :scalar_typecast=>:integer)
+      register('oid', :oid=>1028, :parser=>:json, :scalar_typecast=>:integer)
+      register('real', :oid=>1021, :scalar_oid=>701, :scalar_typecast=>:float)
+      register('character', :oid=>1014, :array_type=>:text, :scalar_typecast=>:string)
+      register('character varying', :oid=>1015, :scalar_typecast=>:string, :type_symbol=>:varchar)
     end
   end
 

@@ -1869,7 +1869,7 @@ describe 'PostgreSQL array handling' do
       column :r, 'real[]'
       column :dp, 'double precision[]'
     end
-    @tp.call.should == [:integer_array, :integer_array, :bigint_array, :float_array, :float_array]
+    @tp.call.should == [:smallint_array, :integer_array, :bigint_array, :real_array, :float_array]
     @ds.insert(Sequel.pg_array([1], :int2), Sequel.pg_array([nil, 2], :int4), Sequel.pg_array([3, nil], :int8), Sequel.pg_array([4, nil, 4.5], :real), Sequel.pg_array([5, nil, 5.5], "double precision"))
     @ds.count.should == 1
     rs = @ds.all
@@ -1932,7 +1932,7 @@ describe 'PostgreSQL array handling' do
       column :vc, 'varchar[]'
       column :t, 'text[]'
     end
-    @tp.call.should == [:string_array, :string_array, :string_array]
+    @tp.call.should == [:character_array, :varchar_array, :string_array]
     @ds.insert(Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], 'char(4)'), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :varchar), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :text))
     @ds.count.should == 1
     rs = @ds.all
@@ -1989,7 +1989,7 @@ describe 'PostgreSQL array handling' do
       column :tz, 'timetz[]'
       column :o, 'oid[]'
     end
-    @tp.call.should == [:blob_array, :time_timezone_array, :integer_array]
+    @tp.call.should == [:blob_array, :time_timezone_array, :oid_array]
     @ds.insert(Sequel.pg_array([Sequel.blob("a\0"), nil], :bytea), Sequel.pg_array([t, nil], :timetz), Sequel.pg_array([1, 2, 3], :oid))
     @ds.count.should == 1
     if @native
@@ -2126,11 +2126,33 @@ describe 'PostgreSQL array handling' do
     end
     c = Class.new(Sequel::Model(@db[:items]))
     c.plugin :pg_typecast_on_load, :i, :f, :d, :t unless @native
+    h = {:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']]}
+    o = c.create(h)
+    o.i.should == [1, 2, nil]
+    o.f.should == [[1, 2.5], [3, 4.5]]
+    o.d.should == [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
+    o.t.should == [%w'a b c', ['NULL', nil, '1']]
+    c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.should == [o]
+    o2 = c.new(h)
+    c.where(:i=>o2.i, :f=>o2.f, :d=>o2.d, :t=>o2.t).all.should == [o]
+
+    @db.create_table!(:items) do
+      primary_key :id
+      column :i, 'int2[]'
+      column :f, 'real[]'
+      column :d, 'numeric(30,28)[]'
+      column :t, 'varchar[]'
+    end
+    c = Class.new(Sequel::Model(@db[:items]))
+    c.plugin :pg_typecast_on_load, :i, :f, :d, :t unless @native
     o = c.create(:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']])
     o.i.should == [1, 2, nil]
     o.f.should == [[1, 2.5], [3, 4.5]]
     o.d.should == [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
     o.t.should == [%w'a b c', ['NULL', nil, '1']]
+    c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.should == [o]
+    o2 = c.new(h)
+    c.where(:i=>o2.i, :f=>o2.f, :d=>o2.d, :t=>o2.t).all.should == [o]
   end
 
   specify 'operations/functions with pg_array_ops' do
@@ -2990,8 +3012,8 @@ end if (begin require 'active_support/duration'; require 'active_support/inflect
 describe 'PostgreSQL row-valued/composite types' do
   before(:all) do
     @db = DB
-    Sequel.extension :pg_array_ops, :pg_row_ops
     @db.extension :pg_array, :pg_row
+    Sequel.extension :pg_array_ops, :pg_row_ops
     @ds = @db[:person]
 
     @db.create_table!(:address) do
