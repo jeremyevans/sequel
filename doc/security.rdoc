@@ -126,7 +126,7 @@ Note that for that type of query, Sequel generally encourages the following form
   DB[:table].where{|o| o.name > params[:id].to_s} # Safe
 
 Sequel's DSL supports a wide variety of SQL concepts, so it's possible to
-code most applications without every using raw SQL.
+code most applications without ever using raw SQL.
 
 A large number of dataset methods ultimately pass down their arguments to a filter
 method, even some you may not expect, so you should be careful.  At least the
