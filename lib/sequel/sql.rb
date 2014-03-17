@@ -1015,6 +1015,8 @@ module Sequel
           StringExpression.like(l, r)
         when DelayedEvaluation
           Sequel.delay{from_value_pair(l, r.callable.call)}
+        when Dataset::PlaceholderLiteralizer::Argument
+          r.transform{|v| from_value_pair(l, v)}
         else
           new(:'=', l, r)
         end

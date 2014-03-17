@@ -36,5 +36,5 @@ module Sequel
     include SQL::StringMethods
   end
   
-  require(%w"query actions features graph prepared_statements misc mutation sql", 'dataset')
+  require(%w"query actions features graph prepared_statements misc mutation sql placeholder_literalizer", 'dataset')
 end

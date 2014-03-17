@@ -1049,6 +1049,8 @@ module Sequel
         end
       when String
         LiteralString.new("(#{expr})")
+      when PlaceholderLiteralizer::Argument
+        expr.transform{|v| filter_expr(v)}
       else
         raise(Error, "Invalid filter argument: #{expr.inspect}")
       end
