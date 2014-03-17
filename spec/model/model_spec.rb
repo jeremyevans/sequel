@@ -437,32 +437,35 @@ end
 
 describe Sequel::Model, ".find_or_create" do
   before do
-    @c = Class.new(Sequel::Model(:items)) do
+    @db = Sequel.mock
+    @c = Class.new(Sequel::Model(@db[:items])) do
       set_primary_key :id
       columns :x
     end
-    DB.reset
+    @db.sqls
   end
 
   it "should find the record" do
+    @db.fetch = [{:x=>1, :id=>1}]
+    @db.autoid = 1
     @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
-    DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
+    @db.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
   end
   
   it "should create the record if not found" do
-    @c.instance_dataset._fetch = @c.dataset._fetch = [[], {:x=>1, :id=>1}]
-    @c.instance_dataset.autoid = @c.dataset.autoid = 1
+    @db.fetch = [[], {:x=>1, :id=>1}]
+    @db.autoid = 1
     @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
-    DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
+    @db.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
       "INSERT INTO items (x) VALUES (1)",
       "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
 
   it "should pass the new record to be created to the block if no record is found" do
-    @c.instance_dataset._fetch = @c.dataset._fetch = [[], {:x=>1, :id=>1}]
-    @c.instance_dataset.autoid = @c.dataset.autoid = 1
+    @db.fetch = [[], {:x=>1, :id=>1}]
+    @db.autoid = 1
     @c.find_or_create(:x => 1){|x| x[:y] = 2}.should == @c.load(:x=>1, :id=>1)
-    sqls = DB.sqls
+    sqls = @db.sqls
     sqls.first.should == "SELECT * FROM items WHERE (x = 1) LIMIT 1"
     ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(sqls[1])
     sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
