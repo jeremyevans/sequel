@@ -3286,8 +3286,71 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
   end
   
   specify "#execute should execute the SQL on the database" do
-    @db.should_receive(:execute).once.with('SELECT 1', :server=>:read_only)
     @ds.send(:execute, 'SELECT 1')
+    @db.sqls.should == ["SELECT 1 -- read_only"]
+  end
+end
+
+describe "Dataset#with_sql_*" do
+  before do
+    @db = Sequel.mock(:servers=>{:read_only=>{}}, :autoid=>1, :fetch=>{:id=>1})
+    @ds = @db[:items]
+  end
+
+  specify "#with_sql_insert should execute given insert SQL" do
+    @ds.with_sql_insert('INSERT INTO foo (1)').should == 1
+    @db.sqls.should == ["INSERT INTO foo (1)"]
+  end
+
+  specify "#with_sql_delete should execute given delete SQL" do
+    @ds.with_sql_delete('DELETE FROM foo').should == 0
+    @db.sqls.should == ["DELETE FROM foo"]
+  end
+
+  specify "#with_sql_update should execute given update SQL" do
+    @ds.with_sql_update('UPDATE foo SET a = 1').should == 0
+    @db.sqls.should == ["UPDATE foo SET a = 1"]
+  end
+
+  specify "#with_sql_all should return all rows from running the SQL" do
+    @ds.with_sql_all('SELECT * FROM foo').should == [{:id=>1}]
+    @db.sqls.should == ["SELECT * FROM foo -- read_only"]
+  end
+
+  specify "#with_sql_all should yield each row to the block" do
+    a = []
+    @ds.with_sql_all('SELECT * FROM foo'){|r| a << r}
+    a.should == [{:id=>1}]
+    @db.sqls.should == ["SELECT * FROM foo -- read_only"]
+  end
+
+  specify "#with_sql_each should yield each row to the block" do
+    a = []
+    @ds.with_sql_each('SELECT * FROM foo'){|r| a << r}
+    a.should == [{:id=>1}]
+    @db.sqls.should == ["SELECT * FROM foo -- read_only"]
+  end
+
+  specify "#with_sql_first should return first row" do
+    @ds.with_sql_first('SELECT * FROM foo').should == {:id=>1}
+    @db.sqls.should == ["SELECT * FROM foo -- read_only"]
+  end
+
+  specify "#with_sql_first should return nil if no rows returned" do
+    @db.fetch = []
+    @ds.with_sql_first('SELECT * FROM foo').should == nil
+    @db.sqls.should == ["SELECT * FROM foo -- read_only"]
+  end
+
+  specify "#with_sql_single_value should return first value from first row" do
+    @ds.with_sql_single_value('SELECT * FROM foo').should == 1
+    @db.sqls.should == ["SELECT * FROM foo -- read_only"]
+  end
+
+  specify "#with_sql_single_value should return nil if no rows returned" do
+    @db.fetch = []
+    @ds.with_sql_single_value('SELECT * FROM foo').should == nil
+    @db.sqls.should == ["SELECT * FROM foo -- read_only"]
   end
 end
 

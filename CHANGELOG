@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#with_sql_{each,all,first,single_value,insert,update} optimized methods (jeremyevans)
+
 * Make pg_array extension use correct type when typecasting column values for smallint, oid, real, character, and varchar arrays (jeremyevans)
 
 * Make Database#column_schema_to_ruby_default a public method in the schema_dumper extension (jeremyevans) (#776)

@@ -42,11 +42,7 @@ module Sequel
     #   # Iterate over all rows in the table
     #   DB[:table].all{|row| p row}
     def all(&block)
-      a = []
-      each{|r| a << r}
-      post_load(a)
-      a.each(&block) if block
-      a
+      _all(block){|a| each{|r| a << r}}
     end
     
     # Returns the average value for the given column/expression.
@@ -778,11 +774,53 @@ module Sequel
       end
     end
 
+    # Run the given SQL and return an array of all rows.  If a block is given,
+    # each row is yielded to the block after all rows are loaded. See with_sql_each.
+    def with_sql_all(sql, &block)
+      _all(block){|a| with_sql_each(sql){|r| a << r}}
+    end
+
     # Execute the given SQL and return the number of rows deleted.  This exists
     # solely as an optimization, replacing with_sql(sql).delete.  It's significantly
     # faster as it does not require cloning the current dataset.
     def with_sql_delete(sql)
       execute_dui(sql)
+    end
+    alias with_sql_update with_sql_delete
+
+    # Run the given SQL and yield each returned row to the block.
+    #
+    # This method should not be called on a shared dataset if the columns selected
+    # in the given SQL do not match the columns in the receiver.
+    def with_sql_each(sql)
+      if row_proc = @row_proc
+        fetch_rows(sql){|r| yield row_proc.call(r)}
+      else
+        fetch_rows(sql){|r| yield r}
+      end
+      self
+    end
+    
+    # Run the given SQL and return the first row, or nil if no rows were returned.
+    # See with_sql_each.
+    def with_sql_first(sql)
+      with_sql_each(sql){|r| return r}
+      nil
+    end
+
+    # Run the given SQL and return the first value in the first row, or nil if no
+    # rows were returned.  For this to make sense, the SQL given should select
+    # only a single value.  See with_sql_each.
+    def with_sql_single_value(sql)
+      if r = with_sql_first(sql)
+        r.values.first
+      end
+    end
+
+    # Execute the given SQL and (on most databases) return the primary key of the
+    # inserted row.
+    def with_sql_insert(sql)
+      execute_insert(sql)
     end
 
     protected
@@ -811,6 +849,15 @@ module Sequel
     end
   
     private
+    
+    # Internals of all and with_sql_all
+    def _all(block)
+      a = []
+      yield a
+      post_load(a)
+      a.each(&block) if block
+      a
+    end
     
     # Internals of +select_hash+ and +select_hash_groups+
     def _select_hash(meth, key_column, value_column)
