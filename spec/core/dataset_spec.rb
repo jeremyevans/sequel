@@ -3254,46 +3254,30 @@ describe "Dataset#grep" do
   end
 end
 
-describe "Dataset default #fetch_rows, #insert, #update, #delete, #with_sql_delete, #truncate, #execute" do
+describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #execute" do
   before do
-    @db = Sequel::Database.new
+    @db = Sequel.mock(:servers=>{:read_only=>{}}, :autoid=>1)
     @ds = @db[:items]
   end
 
   specify "#delete should execute delete SQL" do
-    @db.should_receive(:execute).once.with('DELETE FROM items', :server=>:default)
-    @ds.delete
-    @db.should_receive(:execute_dui).once.with('DELETE FROM items', :server=>:default)
-    @ds.delete
-  end
-
-  specify "#with_sql_delete should execute delete SQL" do
-    sql = 'DELETE FROM foo'
-    @db.should_receive(:execute).once.with(sql, :server=>:default)
-    @ds.with_sql_delete(sql)
-    @db.should_receive(:execute_dui).once.with(sql, :server=>:default)
-    @ds.with_sql_delete(sql)
+    @ds.delete.should == 0
+    @db.sqls.should == ["DELETE FROM items"]
   end
 
   specify "#insert should execute insert SQL" do
-    @db.should_receive(:execute).once.with('INSERT INTO items DEFAULT VALUES', :server=>:default)
-    @ds.insert([])
-    @db.should_receive(:execute_insert).once.with('INSERT INTO items DEFAULT VALUES', :server=>:default)
-    @ds.insert([])
+    @ds.insert([]).should == 1
+    @db.sqls.should == ["INSERT INTO items DEFAULT VALUES"]
   end
 
   specify "#update should execute update SQL" do
-    @db.should_receive(:execute).once.with('UPDATE items SET number = 1', :server=>:default)
-    @ds.update(:number=>1)
-    @db.should_receive(:execute_dui).once.with('UPDATE items SET number = 1', :server=>:default)
-    @ds.update(:number=>1)
+    @ds.update(:number=>1).should == 0
+    @db.sqls.should == ["UPDATE items SET number = 1"]
   end
   
   specify "#truncate should execute truncate SQL" do
-    @db.should_receive(:execute).once.with('TRUNCATE TABLE items', :server=>:default)
     @ds.truncate.should == nil
-    @db.should_receive(:execute_ddl).once.with('TRUNCATE TABLE items', :server=>:default)
-    @ds.truncate.should == nil
+    @db.sqls.should == ["TRUNCATE TABLE items"]
   end
   
   specify "#truncate should raise an InvalidOperation exception if the dataset is filtered" do
