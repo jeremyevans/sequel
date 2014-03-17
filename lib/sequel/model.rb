@@ -119,7 +119,7 @@ module Sequel
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
-      :@fast_instance_delete_sql=>nil,
+      :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
       :@db=>nil, :@default_set_fields_options=>:dup}
 
     # Regular expression that determines if a method name is normal in the sense that
@@ -138,6 +138,8 @@ module Sequel
     @dataset_method_modules = []
     @default_eager_limit_strategy = true
     @default_set_fields_options = {}
+    @finders = {}
+    @finder_loaders = {}
     @overridable_methods_module = nil
     @fast_pk_lookup_sql = nil
     @fast_instance_delete_sql = nil

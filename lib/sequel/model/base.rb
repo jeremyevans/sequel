@@ -308,7 +308,12 @@ module Sequel
       #   Artist.find{name > 'M'}
       #   # SELECT * FROM artists WHERE (name > 'M') LIMIT 1
       def find(*args, &block)
-        filter(*args, &block).first
+        if args.length == 1 && !block
+          # Use optimized finder
+          first_where(args.first)
+        else
+          filter(*args, &block).first
+        end
       end
       
       # Like +find+ but invokes create with given conditions when record does not
@@ -327,6 +332,114 @@ module Sequel
         find(cond) || create(cond, &block)
       end
     
+
+      FINDER_TYPES = [:first, :all, :each, :get].freeze
+
+      # Create an optimized finder method using a dataset placeholder literalizer.
+      # This pre-computes the SQL to use for the query, except for given arguments.
+      #
+      # There are two ways to use this.  The recommended way is to pass a symbol
+      # that represents a model class method that returns a dataset:
+      #
+      #   def Artist.by_name(name)
+      #     where(:name=>name)
+      #   end
+      #
+      #   Artist.finder :by_name
+      #
+      # This creates an optimized first_by_name method, which you can call normally:
+      #
+      #   Artist.first_by_name("Joe")
+      #
+      # The alternative way to use this to pass your own block:
+      #
+      #   Artist.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
+      #
+      # Note that if you pass your own block, you are responsible for manually setting
+      # limits if necessary (as shown above).
+      #
+      # Options:
+      # :arity :: When using a symbol method name, this specifies the arity of the method.
+      #           This should be used if if the method accepts an arbitrary number of arguments,
+      #           or the method has default argument values.  Note that if the method is defined
+      #           as a dataset method, the class method Sequel creates accepts an arbitrary number
+      #           of arguments, so you should use this option in that case.  If you want to handle
+      #           multiple possible arities, you need to call the finder method multiple times with
+      #           unique :arity and :name methods each time.
+      # :name :: The name of the method to create.  This must be given if you pass a block.
+      #          If you use a symbol, this defaults to the symbol prefixed by the type.
+      # :mod :: The module in which to create the finder method.  Defaults to the singleton
+      #         class of the model.
+      # :type :: The type of query to run.  Can be :first, :each, :all, or :get, defaults to
+      #          :first.
+      #
+      # Caveats:
+      #
+      # This doesn't handle all possible cases.  For example, if you have a method such as:
+      #
+      #   def Artist.by_name(name)
+      #     name ? where(:name=>name) : exclude(:name=>nil)
+      #   end
+      #
+      # Then calling a finder without an argument will not work as you expect.
+      #
+      #   Artist.finder :by_name
+      #   Artist.by_name(nil).first
+      #   # WHERE (name IS NOT NULL)
+      #   Artist.first_by_name(nil)
+      #   # WHERE (name IS NULL)
+      #
+      # See Dataset::PlaceholderLiteralizer for additional caveats.
+      def finder(meth=OPTS, opts=OPTS, &block)
+        if block
+          raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
+          raise Error, "cannot pass two option hashes to Model.finder" unless opts.equal?(OPTS)
+          opts = meth
+          raise Error, "must provide method name via :name option when passing block to Model.finder" unless meth_name = opts[:name]
+        end
+
+        type = opts.fetch(:type, :first)
+        raise Error, ":type option to Model.finder must be :first, :all, :each, or :get" unless FINDER_TYPES.include?(type)
+        limit1 = type == :first || type == :get
+        meth_name ||= opts[:name] || :"#{type}_#{meth}"
+
+        loader_proc = proc do |model|
+          unless block
+            argn = opts[:arity]
+            block =  lambda do |pl, model2|
+              method = model2.method(meth)
+              argn ||= (method.arity < 0 ? method.arity.abs - 1 : method.arity)
+              args = (0...argn).map{pl.arg}
+              ds = method.call(*args)
+              ds = ds.limit(1) if limit1
+              ds
+            end
+          end
+
+          Sequel::Dataset::PlaceholderLiteralizer.loader(model, &block) 
+        end
+        Sequel.synchronize{@finder_loaders[meth_name] = loader_proc}
+        mod = opts[:mod] || (class << self; self; end)
+        def_finder_method(mod, meth_name, type)
+      end
+
+      # An alias for calling first on the model's dataset, but with
+      # optimized handling of the single argument case.
+      def first(*args, &block)
+        if args.length == 1 && !block && !args.first.is_a?(Integer)
+          # Use optimized finder
+          first_where(args.first)
+        else
+          dataset.first(*args, &block)
+        end
+      end
+
+      # An alias for calling first! on the model's dataset, but with
+      # optimized handling of the single argument case.
+      def first!(*args, &block)
+        first(*args, &block) || raise(Sequel::NoMatchingRow)
+      end
+
       # Clear the setter_methods cache when a module is included, as it
       # may contain setter methods.
       def include(mod)
@@ -699,6 +812,24 @@ module Sequel
         end
       end
 
+      # Define a finder method in the given module with the given method name that
+      # load rows using the finder with the given name.
+      def def_finder_method(mod, meth, type)
+        mod.send(:define_method, meth){|*args, &block| finder_for(meth).send(type, *args, &block)}
+      end
+
+      # Find the finder to use for the give method.  If a finder has not been loaded
+      # for the method, load the finder and set correctly in the finders hash, then
+      # return the finder.
+      def finder_for(meth)
+        unless finder = Sequel.synchronize{@finders[meth]}
+          finder_loader = @finder_loaders.fetch(meth)
+          finder = finder_loader.call(self)
+          Sequel.synchronize{@finders[meth] = finder}
+        end
+        finder
+      end
+
       # Get the schema from the database, fall back on checking the columns
       # via the database if that will return inaccurate results or if
       # it raises an error.
@@ -849,6 +980,7 @@ module Sequel
       # Reset the instance dataset to a modified copy of the current dataset,
       # should be used whenever the model's dataset is modified.
       def reset_instance_dataset
+        @finders.clear if @finders
         @instance_dataset = @dataset.limit(1).naked if @dataset
       end
   
@@ -2055,5 +2187,6 @@ module Sequel
 
     extend ClassMethods
     plugin self
+    finder(:where, :arity=>1, :mod=>ClassMethods)
   end
 end

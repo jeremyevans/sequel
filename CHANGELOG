@@ -1,5 +1,9 @@
 === HEAD
 
+* Automatically optimize Model.find, .first, and .first! when called with a single argument (jeremyevans)
+
+* Add Model.finder for creating optimized finder methods using Dataset::PlaceholderLiteralizer (jeremyevans)
+
 * Add Dataset::PlaceholderLiteralizer optimization framework (jeremyevans)
 
 * Add Dataset#with_sql_{each,all,first,single_value,insert,update} optimized methods (jeremyevans)
