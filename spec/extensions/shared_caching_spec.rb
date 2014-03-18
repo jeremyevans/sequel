@@ -27,7 +27,7 @@ describe "Shared caching behavior" do
       @c.load(:id=>3, :caching_model_id=>1, :caching_model_id2=>2).caching_model2.should equal(@cm12)
       @c.load(:id=>3, :caching_model_id=>2, :caching_model_id2=>1).caching_model2.should equal(@cm21)
       @db.sqls.should == []
-      @cc.dataset._fetch = []
+      @db.fetch = []
       @c.load(:id=>4, :caching_model_id=>2, :caching_model_id2=>2).caching_model2.should == nil
     end
   end
@@ -39,7 +39,7 @@ describe "Shared caching behavior" do
       @c.load(:id=>3, :caching_model_id=>1).caching_model.should equal(@cm1)
       @c.load(:id=>4, :caching_model_id=>2).caching_model.should equal(@cm2)
       @db.sqls.should == []
-      @cc.dataset._fetch = []
+      @db.fetch = []
       @c.load(:id=>4, :caching_model_id=>3).caching_model.should == nil
     end
 
@@ -128,7 +128,7 @@ describe "Shared caching behavior" do
       @cache = cache
       
       @cc.plugin :caching, @cache
-      @cc.dataset._fetch = {:id=>1}
+      @db.fetch = {:id=>1}
       @cm1 = @cc[1]
       @cm2 = @cc[2]
       @cm12 = @cc[1, 2]
@@ -143,7 +143,7 @@ describe "Shared caching behavior" do
 
   describe "With static_cache plugin with single key" do
     before do
-      @cc.dataset._fetch = [{:id=>1}, {:id=>2}]
+      @db.fetch = [{:id=>1}, {:id=>2}]
       @cc.plugin :static_cache
       @cm1 = @cc[1]
       @cm2 = @cc[2]
@@ -163,7 +163,7 @@ describe "Shared caching behavior" do
   describe "With static_cache plugin with composite key" do
     before do
       @cc.set_primary_key([:id, :id2])
-      @cc.dataset._fetch = [{:id=>1, :id2=>2}, {:id=>2, :id2=>1}]
+      @db.fetch = [{:id=>1, :id2=>2}, {:id=>2, :id2=>1}]
       @cc.plugin :static_cache
       @cm12 = @cc[[1, 2]]
       @cm21 = @cc[[2, 1]]
