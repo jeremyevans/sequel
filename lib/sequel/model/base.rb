@@ -962,7 +962,7 @@ module Sequel
           ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
         else
-          dataset[primary_key_hash(pk)]
+          first_where(primary_key_hash(pk))
         end
       end
 
