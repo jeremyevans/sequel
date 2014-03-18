@@ -113,4 +113,16 @@ describe "Dataset::PlaceholderLiteralizer" do
     proc{loader.first(1)}.should raise_error(Sequel::Error)
     proc{loader.first(1, 2, 3)}.should raise_error(Sequel::Error)
   end
+
+  specify "should raise an error if argument literalized into a different string than returned by query" do
+    o = Object.new
+    def o.wrap(v)
+      @v = v
+      self
+    end
+    def o.sql_literal(ds)
+      ds.literal(@v)
+    end
+    proc{@c.loader(@ds){|pl, ds| ds.where(o.wrap(pl.arg))}}.should raise_error(Sequel::Error)
+  end
 end

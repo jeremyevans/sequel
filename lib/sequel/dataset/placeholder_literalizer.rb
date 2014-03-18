@@ -54,7 +54,7 @@ module Sequel
         # Record the SQL query offset, argument position, and transforming block where the
         # argument should be literalized.
         def sql_literal_append(ds, sql)
-          @recorder.use(sql.length, @pos, @transformer)
+          @recorder.use(sql, @pos, @transformer)
         end
 
         # Return a new Argument object for the same recorder and argument position, but with a
@@ -77,7 +77,8 @@ module Sequel
           sql = ds.sql
 
           last_offset = 0
-          fragments = @args.map do |offset, arg, t|
+          fragments = @args.map do |used_sql, offset, arg, t|
+            raise Error, "placeholder literalizer argument literalized into different string than dataset returned" unless used_sql.equal?(sql)
             a = [sql[last_offset...offset], arg, t]
             last_offset = offset
             a
@@ -100,8 +101,8 @@ module Sequel
 
         # Record the offset at which the argument is used in the SQL query, and any
         # transforming
-        def use(offset, arg, transformer)
-          @args << [offset, arg, transformer]
+        def use(sql, arg, transformer)
+          @args << [sql, sql.length, arg, transformer]
         end
       end
 
