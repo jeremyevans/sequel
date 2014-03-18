@@ -29,6 +29,12 @@ module Sequel
       #   errors.full_messages
       #   # => ['name is not valid',
       #   #     'hometown is not at least 2 letters']
+      #
+      # If the message is a Sequel::LiteralString, it will be used literally, without the column name:
+      #
+      #   errors.add(:name, Sequel.lit("Album name is not valid"))
+      #   errors.full_messages
+      #   # => ['Album name is not valid']
       def full_messages
         inject([]) do |m, kv| 
           att, errors = *kv

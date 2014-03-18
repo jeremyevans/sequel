@@ -510,6 +510,14 @@ Here, you don't care about validating the release date if there were validation 
   album.errors.full_messages
   # => ["name cannot be empty"]
   
+Note that the column names used in the errors are used verbatim in the error messages.  If you want full control over the error messages, you can use +add+ with a literal string:
+
+  errors.add(:name, Sequel.lit("Album name is not valid"))
+  errors.full_messages
+  # => ["Album name is not valid"]
+
+Alternatively, feel free to override Sequel::Model::Errors#full_messages.  As long as it returns an array of strings, overridding it is completely safe.
+
 === +count+
 
 +count+ returns the total number of error messages in the errors.
