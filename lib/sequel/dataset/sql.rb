@@ -62,15 +62,8 @@ module Sequel
       clone(:columns=>columns, :values=>values)._insert_sql
     end
     
-    # Returns a literal representation of a value to be used as part
-    # of an SQL expression. 
+    # Append a literal representation of a value to the given SQL string.
     # 
-    #   DB[:items].literal("abc'def\\") #=> "'abc''def\\\\'"
-    #   DB[:items].literal(:items__id) #=> "items.id"
-    #   DB[:items].literal([1, 2, 3]) => "(1, 2, 3)"
-    #   DB[:items].literal(DB[:items]) => "(SELECT * FROM items)"
-    #   DB[:items].literal(:x + 1 > :y) => "((x + 1) > y)"
-    #
     # If an unsupported object is given, an +Error+ is raised.
     def literal_append(sql, v)
       case v
@@ -295,13 +288,13 @@ module Sequel
       END
     end
 
-    # SQL fragment for AliasedExpression
+    # Append literalization of aliased expression to SQL string.
     def aliased_expression_sql_append(sql, ae)
       literal_append(sql, ae.expression)
       as_sql_append(sql, ae.alias)
     end
 
-    # SQL fragment for Array
+    # Append literalization of array to SQL string.
     def array_sql_append(sql, a)
       if a.empty?
         sql << ARRAY_EMPTY
@@ -312,7 +305,7 @@ module Sequel
       end
     end
 
-    # SQL fragment for BooleanConstants
+    # Append literalization of boolean constant to SQL string.
     def boolean_constant_sql_append(sql, constant)
       if (constant == true || constant == false) && !supports_where_true?
         sql << (constant == true ? CONDITION_TRUE : CONDITION_FALSE)
@@ -321,7 +314,7 @@ module Sequel
       end
     end
 
-    # SQL fragment for CaseExpression
+    # Append literalization of case expression to SQL string.
     def case_expression_sql_append(sql, ce)
       sql << CASE_OPEN
       if ce.expression?
@@ -341,7 +334,7 @@ module Sequel
       sql << CASE_END
     end
 
-    # SQL fragment for the SQL CAST expression
+    # Append literalization of cast expression to SQL string.
     def cast_sql_append(sql, expr, type)
       sql << CAST_OPEN
       literal_append(sql, expr)
@@ -349,12 +342,12 @@ module Sequel
       sql << PAREN_CLOSE
     end
 
-    # SQL fragment for specifying all columns in a given table
+    # Append literalization of column all selection to SQL string.
     def column_all_sql_append(sql, ca)
       qualified_identifier_sql_append(sql, ca.table, WILDCARD)
     end
 
-    # SQL fragment for the complex expression.
+    # Append literalization of complex expression to SQL string.
     def complex_expression_sql_append(sql, op, args)
       case op
       when *IS_OPERATORS
@@ -459,18 +452,18 @@ module Sequel
       end
     end
     
-    # SQL fragment for constants
+    # Append literalization of constant to SQL string.
     def constant_sql_append(sql, constant)
       sql << constant.to_s
     end
 
-    # SQL fragment for delayed evaluations, evaluating the
-    # object and literalizing the returned value.
+    # Append literalization of delayed evaluation to SQL string,
+    # causing the delayed evaluation proc to be evaluated.
     def delayed_evaluation_sql_append(sql, callable)
       literal_append(sql, callable.call)
     end
 
-    # SQL fragment specifying an emulated SQL function call.
+    # Append literalization of emulated function call to SQL string.
     # By default, assumes just the function name may need to
     # be emulated, adapters should set an EMULATED_FUNCTION_MAP
     # hash mapping emulated functions to native functions in
@@ -479,12 +472,12 @@ module Sequel
       _function_sql_append(sql, native_function_name(f.f), f.args)
     end
 
-    # SQL fragment specifying an SQL function call without emulation.
+    # Append literalization of function call to SQL string.
     def function_sql_append(sql, f)
       _function_sql_append(sql, f.f, f.args)
     end
 
-    # SQL fragment specifying a JOIN clause without ON or USING.
+    # Append literalization of JOIN clause without ON or USING to SQL string.
     def join_clause_sql_append(sql, jc)
       table = jc.table
       table_alias = jc.table_alias
@@ -494,14 +487,14 @@ module Sequel
       as_sql_append(sql, table_alias) if table_alias
     end
 
-    # SQL fragment specifying a JOIN clause with ON.
+    # Append literalization of JOIN ON clause to SQL string.
     def join_on_clause_sql_append(sql, jc)
       join_clause_sql_append(sql, jc)
       sql << ON
       literal_append(sql, filter_expr(jc.on))
     end
 
-    # SQL fragment specifying a JOIN clause with USING.
+    # Append literalization of JOIN USING clause to SQL string.
     def join_using_clause_sql_append(sql, jc)
       join_clause_sql_append(sql, jc)
       sql << USING
@@ -509,14 +502,13 @@ module Sequel
       sql << PAREN_CLOSE
     end
     
-    # SQL fragment for NegativeBooleanConstants
+    # Append literalization of negative boolean constant to SQL string.
     def negative_boolean_constant_sql_append(sql, constant)
       sql << NOT_SPACE
       boolean_constant_sql_append(sql, constant)
     end
 
-    # SQL fragment for the ordered expression, used in the ORDER BY
-    # clause.
+    # Append literalization of ordered expression to SQL string.
     def ordered_expression_sql_append(sql, oe)
       literal_append(sql, oe.expression)
       sql << (oe.descending ? DESC : ASC)
@@ -528,7 +520,7 @@ module Sequel
       end
     end
 
-    # SQL fragment for a literal string with placeholders
+    # Append literalization of placeholder literal string to SQL string.
     def placeholder_literal_string_sql_append(sql, pls)
       args = pls.args
       str = pls.str
@@ -572,8 +564,7 @@ module Sequel
       sql << PAREN_CLOSE if pls.parens
     end
 
-    # SQL fragment for the qualifed identifier, specifying
-    # a table and a column (or schema and table).
+    # Append literalization of qualified identifier to SQL string.
     # If 3 arguments are given, the 2nd should be the table/qualifier and the third should be
     # column/qualified.  If 2 arguments are given, the 2nd should be an SQL::QualifiedIdentifier.
     def qualified_identifier_sql_append(sql, table, column=(c = table.column; table = table.table; c))
@@ -582,6 +573,7 @@ module Sequel
       identifier_append(sql, column)
     end
 
+    # Append literalization of unqualified identifier to SQL string.
     # Adds quoting to identifiers (columns and tables). If identifiers are not
     # being quoted, returns name as a string.  If identifiers are being quoted
     # quote the name with quoted_identifier.
@@ -599,8 +591,7 @@ module Sequel
       end
     end
 
-    # Separates the schema from the table and returns a string with them
-    # quoted (if quoting identifiers)
+    # Append literalization of identifier or unqualified identifier to SQL string.
     def quote_schema_table_append(sql, table)
       schema, table = schema_and_table(table)
       if schema
@@ -610,6 +601,7 @@ module Sequel
       quote_identifier_append(sql, table)
     end
 
+    # Append literalization of quoted identifier to SQL string.
     # This method quotes the given name with the SQL standard double quote. 
     # should be overridden by subclasses to provide quoting not matching the
     # SQL standard, such as backtick (used by MySQL and SQLite).
@@ -657,7 +649,7 @@ module Sequel
       end
     end
 
-    # SQL fragment for specifying subscripts (SQL array accesses)
+    # Append literalization of subscripts (SQL array accesses) to SQL string.
     def subscript_sql_append(sql, s)
       literal_append(sql, s.f)
       sql << BRACKET_OPEN
@@ -673,7 +665,7 @@ module Sequel
       sql << BRACKET_CLOSE
     end
 
-    # The SQL fragment for the given window's options.
+    # Append literalization of windows (for window functions) to SQL string.
     def window_sql_append(sql, opts)
       raise(Error, 'This dataset does not support window functions') unless supports_window_functions?
       sql << PAREN_OPEN
@@ -714,7 +706,7 @@ module Sequel
       sql << PAREN_CLOSE
     end
 
-    # The SQL fragment for the given window function's function and window.
+    # Append literalization of window function calls to SQL string.
     def window_function_sql_append(sql, function, window)
       literal_append(sql, function)
       sql << OVER
@@ -815,7 +807,7 @@ module Sequel
       options_overlap(COUNT_FROM_SELF_OPTS) ? from_self : unordered
     end
 
-    # SQL fragment for specifying an alias.  expression should already be literalized.
+    # Append aliasing expression to SQL string.
     def as_sql_append(sql, aliaz)
       sql << AS
       quote_identifier_append(sql, aliaz)
@@ -840,6 +832,7 @@ module Sequel
       sql
     end
 
+    # Append column list to SQL string.
     # Converts an array of column names into a comma seperated string of 
     # column names. If the array is empty, a wildcard (*) is returned.
     def column_list_append(sql, columns)
@@ -891,8 +884,7 @@ module Sequel
       sql << DELETE
     end
 
-    # Converts an array of expressions into a comma separated string of
-    # expressions.
+    # Append literalization of array of expressions to SQL string.
     def expression_list_append(sql, columns)
       c = false
       co = COMMA
@@ -941,8 +933,8 @@ module Sequel
       sprintf(FORMAT_TIMESTAMP_USEC, usec)
     end
 
-    # Append the value, but special case regular (non-literal, non-blob) strings
-    # so that they are considered as identifiers and not SQL strings.
+    # Append literalization of identifier to SQL string, considering regular strings
+    # as SQL identifiers instead of SQL strings.
     def identifier_append(sql, v)
       if v.is_a?(String)
         case v
@@ -958,7 +950,7 @@ module Sequel
       end
     end
 
-    # Append all identifiers in args interspersed by commas.
+    # Append literalization of array of identifiers to SQL string.
     def identifier_list_append(sql, args)
       c = false
       comma = COMMA
@@ -975,7 +967,6 @@ module Sequel
       (i = identifier_input_method) ? v.to_s.send(i) : v.to_s
     end
 
-    # SQL fragment specifying the table to insert INTO
     def insert_into_sql(sql)
       sql << INTO
       source_list_append(sql, @opts[:from])
@@ -986,7 +977,6 @@ module Sequel
       INSERT_CLAUSE_METHODS
     end
 
-    # SQL fragment specifying the columns to insert into
     def insert_columns_sql(sql)
       columns = opts[:columns]
       if columns && !columns.empty?
@@ -1000,7 +990,6 @@ module Sequel
       sql << INSERT
     end
 
-    # SQL fragment specifying the values to insert.
     def insert_values_sql(sql)
       case values = opts[:values]
       when Array
@@ -1020,7 +1009,6 @@ module Sequel
       end
     end
 
-    # SQL fragment specifying the values to return.
     def insert_returning_sql(sql)
       if opts.has_key?(:returning)
         sql << RETURNING
@@ -1041,7 +1029,8 @@ module Sequel
      (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
     end
 
-    # SQL fragment for Array.  Treats as an expression if an array of all two pairs, or as a SQL array otherwise.
+    # Append a literalization of the array to SQL string.
+    # Treats as an expression if an array of all two pairs, or as a SQL array otherwise.
     def literal_array_append(sql, v)
       if Sequel.condition_specifier?(v)
         literal_expression_append(sql, SQL::BooleanExpression.from_value_pairs(v))
@@ -1056,12 +1045,12 @@ module Sequel
       v.nan? || v.infinite? ?  "'#{d}'" : d
     end
 
-    # SQL fragment for SQL::Blob
+    # Append literalization of SQL::Blob to SQL string.
     def literal_blob_append(sql, v)
       literal_string_append(sql, v)
     end
 
-    # SQL fragment for Dataset.  Does a subselect inside parantheses.
+    # Append literalization of dataset to SQL string.  Does a subselect inside parantheses.
     def literal_dataset_append(sql, v)
       sql << LATERAL if v.opts[:lateral]
       sql << PAREN_OPEN
@@ -1083,7 +1072,7 @@ module Sequel
       format_timestamp(v)
     end
 
-    # SQL fragment for SQL::Expression, result depends on the specific type of expression.
+    # Append literalization of SQL::Expression to SQL string.
     def literal_expression_append(sql, v)
       v.to_s_append(self, sql)
     end
@@ -1098,7 +1087,7 @@ module Sequel
       v.to_s
     end
 
-    # SQL fragment for Hash, treated as an expression
+    # Append literalization of Hash to SQL string, treating hash as a boolean expression.
     def literal_hash_append(sql, v)
       literal_expression_append(sql, SQL::BooleanExpression.from_value_pairs(v))
     end
@@ -1113,11 +1102,9 @@ module Sequel
       NULL
     end
 
-    # SQL fragment for a type of object not handled by Dataset#literal.
-    # Calls +sql_literal+ if object responds to it, otherwise raises an error.
-    # Classes implementing +sql_literal+ should call a class-specific method on the dataset
-    # provided and should add that method to Sequel::Dataset, allowing for adapters
-    # to provide customized literalizations.
+    # Append a literalization of the object to the given SQL string.
+    # Calls +sql_literal_append+ if object responds to it, otherwise
+    # calls +sql_literal+ if object responds to it, otherwise raises an error.
     # If a database specific type is allowed, this should be overriden in a subclass.
     def literal_other_append(sql, v)
       if v.respond_to?(:sql_literal_append)
@@ -1134,19 +1121,12 @@ module Sequel
       v.strftime("'%H:%M:%S#{format_timestamp_usec(v.usec) if supports_timestamp_usecs?}'")
     end
 
-    # SQL fragment for String.  Doubles \ and ' by default.
+    # Append literalization of string to SQL string.
     def literal_string_append(sql, v)
       sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
     end
 
-    # Converts a symbol into a column name. This method supports underscore
-    # notation in order to express qualified (two underscores) and aliased
-    # (three underscores) columns:
-    #
-    #   dataset.literal(:abc) #=> "abc"
-    #   dataset.literal(:abc___a) #=> "abc AS a"
-    #   dataset.literal(:items__abc) #=> "items.abc"
-    #   dataset.literal(:items__abc___a) #=> "items.abc AS a"
+    # Append literalization of symbol to SQL string.
     def literal_symbol_append(sql, v)
       c_table, column, c_alias = split_symbol(v)
       if c_table
@@ -1203,13 +1183,11 @@ module Sequel
       SELECT_CLAUSE_METHODS
     end
 
-    # Modify the sql to add the columns selected
     def select_columns_sql(sql)
       sql << SPACE
       column_list_append(sql, @opts[:select])
     end
 
-    # Modify the sql to add the DISTINCT modifier
     def select_distinct_sql(sql)
       if distinct = @opts[:distinct]
         sql << DISTINCT
@@ -1234,7 +1212,6 @@ module Sequel
       end
     end
 
-    # Modify the sql to add the list of tables to select FROM
     def select_from_sql(sql)
       if f = @opts[:from]
         sql << FROM
@@ -1243,7 +1220,6 @@ module Sequel
     end
     alias delete_from_sql select_from_sql
 
-    # Modify the sql to add the expressions to GROUP BY
     def select_group_sql(sql)
       if group = @opts[:group]
         sql << GROUP_BY
@@ -1262,7 +1238,6 @@ module Sequel
       end
     end
 
-    # Modify the sql to add the filter criteria in the HAVING clause
     def select_having_sql(sql)
       if having = @opts[:having]
         sql << HAVING
@@ -1270,14 +1245,12 @@ module Sequel
       end
     end
 
-    # Modify the sql to add the list of tables to JOIN to
     def select_join_sql(sql)
       if js = @opts[:join]
         js.each{|j| literal_append(sql, j)}
       end
     end
 
-    # Modify the sql to limit the number of rows returned and offset
     def select_limit_sql(sql)
       if l = @opts[:limit]
         sql << LIMIT
@@ -1289,7 +1262,6 @@ module Sequel
       end
     end
   
-    # Modify the sql to support the different types of locking modes.
     def select_lock_sql(sql)
       case l = @opts[:lock]
       when :update
@@ -1299,7 +1271,6 @@ module Sequel
       end
     end
 
-    # Modify the sql to add the expressions to ORDER BY
     def select_order_sql(sql)
       if o = @opts[:order]
         sql << ORDER_BY
@@ -1313,7 +1284,6 @@ module Sequel
       sql << SELECT
     end
 
-    # Modify the sql to add the filter criteria in the WHERE clause
     def select_where_sql(sql)
       if w = @opts[:where]
         sql << WHERE
@@ -1323,7 +1293,6 @@ module Sequel
     alias delete_where_sql select_where_sql
     alias update_where_sql select_where_sql
     
-    # SQL Fragment specifying the WITH clause
     def select_with_sql(sql)
       ws = opts[:with]
       return if !ws || ws.empty?
@@ -1353,7 +1322,8 @@ module Sequel
       SQL_WITH
     end
 
-    # Converts an array of source names into into a comma separated list.
+    # Append literalization of array of sources/tables to SQL string, raising an Error if there
+    # are no sources.
     def source_list_append(sql, sources)
       raise(Error, 'No source specified for query') if sources.nil? || sources == []
       identifier_list_append(sql, sources)
@@ -1372,7 +1342,8 @@ module Sequel
     
     # SQL to use if this dataset uses static SQL.  Since static SQL
     # can be a PlaceholderLiteralString in addition to a String,
-    # we literalize nonstrings.
+    # we literalize nonstrings.  If there is an append_sql for this
+    # dataset, append to that SQL instead of returning the value.
     def static_sql(sql)
       if append_sql = @opts[:append_sql]
         if sql.is_a?(String)
@@ -1389,7 +1360,7 @@ module Sequel
       end
     end
 
-    # SQL fragment for a subselect using the given database's SQL.
+    # Append literalization of the subselect to SQL String.
     def subselect_sql_append(sql, ds)
       ds.clone(:append_sql=>sql).sql
     end
@@ -1399,15 +1370,12 @@ module Sequel
       UPDATE_CLAUSE_METHODS
     end
 
-    # SQL fragment specifying the tables from with to delete.
-    # Includes join table if modifying joins is allowed.
     def update_table_sql(sql)
       sql << SPACE
       source_list_append(sql, @opts[:from])
       select_join_sql(sql) if supports_modifying_joins?
     end
 
-    # The SQL fragment specifying the columns and values to SET.
     def update_set_sql(sql)
       values = opts[:values]
       sql << SET
