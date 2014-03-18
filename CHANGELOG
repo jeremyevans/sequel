@@ -1,5 +1,7 @@
 === HEAD
 
+* Automatically optimize Model.[] when called with a hash (jeremyevans)
+
 * Automatically optimize Model.find, .first, and .first! when called with a single argument (jeremyevans)
 
 * Add Model.finder for creating optimized finder methods using Dataset::PlaceholderLiteralizer (jeremyevans)

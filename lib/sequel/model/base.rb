@@ -107,7 +107,7 @@ module Sequel
       #   # => #<Artist {:name=>'Bob', ...}>
       def [](*args)
         args = args.first if args.size <= 1
-        args.is_a?(Hash) ? dataset[args] : (primary_key_lookup(args) unless args.nil?)
+        args.is_a?(Hash) ? first_where(args) : (primary_key_lookup(args) unless args.nil?)
       end
 
       # Initializes a model instance as an existing record. This constructor is
