@@ -539,11 +539,7 @@ module Sequel
           sql << NOT_SPACE
           complex_expression_sql_append(sql, (op == :"NOT ILIKE" ? :ILIKE : :LIKE), args)
         when :^
-          sql << complex_expression_arg_pairs(args) do |a, b|
-            a = literal(a)
-            b = literal(b)
-            "((~(#{a} & #{b})) & (#{a} | #{b}))"
-          end
+          complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.lit(["((~(", " & ", ")) & (", " | ", "))"], a, b, a, b)}
         when :extract
           part = args.at(0)
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]

@@ -173,8 +173,6 @@ module Sequel
         PAREN_OPEN = Dataset::PAREN_OPEN
         OFFSET = Dataset::OFFSET
         CAST_STRING_OPEN = "RTRIM(".freeze
-        BITCOMP_OPEN = "((0 - ".freeze
-        BITCOMP_CLOSE = ") - 1)".freeze
         BLOB_OPEN = "CAST(X'".freeze
         BLOB_CLOSE = "' AS BLOB)".freeze
         HSTAR = "H*".freeze
@@ -212,14 +210,10 @@ module Sequel
 
         def complex_expression_sql_append(sql, op, args)
           case op
-          when :%
-            sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
+          when :%, :'B~'
+            complex_expression_emulate_append(sql, op, args)
           when :&, :|, :^, :<<, :>>
             raise Error, "Derby doesn't support the #{op} operator"
-          when :'B~'
-            sql << BITCOMP_OPEN
-            literal_append(sql, args.at(0))
-            sql << BITCOMP_CLOSE
           when :extract
             sql << args.at(0).to_s << PAREN_OPEN
             literal_append(sql, args.at(1))

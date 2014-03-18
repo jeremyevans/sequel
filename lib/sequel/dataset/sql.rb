@@ -183,6 +183,9 @@ module Sequel
     AS = ' AS '.freeze
     ASC = ' ASC'.freeze
     BACKSLASH = "\\".freeze
+    BITCOMP_CLOSE = ") - 1)".freeze
+    BITCOMP_OPEN = "((0 - ".freeze
+    BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
     BRACKET_CLOSE =  ']'.freeze
@@ -843,24 +846,50 @@ module Sequel
       end
     end
 
-    # Yield each two pair of arguments to the block, which should
-    # return a string representing the SQL code for those
-    # two arguments.  If more than 2 arguments are provided, all
-    # calls to the block # after the first will have a LiteralString
-    # as the first argument, representing the application of the block to
-    # the previous arguments.
+    # Yield each pair of arguments to the block, which should
+    # return an object representing the SQL expression for those
+    # two arguments.  For more than two arguments, the first
+    # argument to the block will be result of the previous block call.
     def complex_expression_arg_pairs(args)
       case args.length
       when 1
-        literal(args.at(0))
+        args.at(0)
       when 2
         yield args.at(0), args.at(1)
       else
-        args.inject{|m, a| LiteralString.new(yield(m, a))}
+        args.inject{|m, a| yield(m, a)}
       end
     end
 
-    # The SQL to use for the dataset used in a UNION/INTERSECT/EXCEPT clause. 
+    # Append the literalization of the args using complex_expression_arg_pairs
+    # to the given SQL string, used when database operator/function is 2-ary
+    # where Sequel expression is N-ary.
+    def complex_expression_arg_pairs_append(sql, args, &block)
+      literal_append(sql, complex_expression_arg_pairs(args, &block))
+    end
+
+    # Append literalization of complex expression to SQL string, for
+    # operators unsupported by some databases. Used by adapters for databases
+    # that don't support the operators natively.
+    def complex_expression_emulate_append(sql, op, args)
+      case op
+      when :%
+        complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(:MOD, a, b)}
+      when :>>
+        complex_expression_arg_pairs_append(sql, args){|a, b| Sequel./(a, Sequel.function(:power, 2, b))}
+      when :<<
+        complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.*(a, Sequel.function(:power, 2, b))}
+      when :&, :|, :^
+        f = BITWISE_METHOD_MAP[op]
+        complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(f, a, b)}
+      when :'B~'
+        sql << BITCOMP_OPEN
+        literal_append(sql, args.at(0))
+        sql << BITCOMP_CLOSE
+      end
+    end
+
+    # Append literalization of dataset used in UNION/INTERSECT/EXCEPT clause to SQL string.
     def compound_dataset_sql_append(sql, ds)
       subselect_sql_append(sql, ds)
     end

@@ -254,43 +254,28 @@ module Sequel
       APOS_RE = Dataset::APOS_RE
       DOUBLE_APOS = Dataset::DOUBLE_APOS
       FROM = Dataset::FROM
-      BITCOMP_OPEN = "((0 - ".freeze
-      BITCOMP_CLOSE = ") - 1)".freeze
       TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
       TIMESTAMP_OFFSET_FORMAT = "%+03i:%02i".freeze
       BOOL_FALSE = "'N'".freeze
       BOOL_TRUE = "'Y'".freeze
       HSTAR = "H*".freeze
       DUAL = ['DUAL'.freeze].freeze
+      BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
 
       def complex_expression_sql_append(sql, op, args)
         case op
         when :&
-          sql << complex_expression_arg_pairs(args){|a, b| "CAST(BITAND(#{literal(a)}, #{literal(b)}) AS INTEGER)"}
+          complex_expression_arg_pairs_append(sql, args, &BITAND_PROC)
         when :|
-          sql << complex_expression_arg_pairs(args) do |a, b|
-            s1 = ''
-            complex_expression_sql_append(s1, :&, [a, b])
-            "(#{literal(a)} - #{s1} + #{literal(b)})"
-          end
+          complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.lit(["(", " - ", " + ", ")"], a, complex_expression_arg_pairs([a, b], &BITAND_PROC), b)}
         when :^
-          sql << complex_expression_arg_pairs(args) do |*x|
-            s1 = ''
-            s2 = ''
-            complex_expression_sql_append(s1, :|, x)
-            complex_expression_sql_append(s2, :&, x)
-            "(#{s1} - #{s2})"
+          complex_expression_arg_pairs_append(sql, args) do |*x|
+            s1 = complex_expression_arg_pairs(x){|a, b| Sequel.lit(["(", " - ", " + ", ")"], a, complex_expression_arg_pairs([a, b], &BITAND_PROC), b)}
+            s2 = complex_expression_arg_pairs(x, &BITAND_PROC)
+            Sequel.lit(["(", " - ", ")"], s1, s2)
           end
-        when :'B~'
-          sql << BITCOMP_OPEN
-          literal_append(sql, args.at(0))
-          sql << BITCOMP_CLOSE
-        when :<<
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * power(2, #{literal(b)}))"}
-        when :>>
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / power(2, #{literal(b)}))"}
-        when :%
-          sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
+        when :%, :<<, :>>, :'B~'
+          complex_expression_emulate_append(sql, op, args)
         else
           super
         end

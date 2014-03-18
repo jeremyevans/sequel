@@ -256,16 +256,8 @@ module Sequel
 
       def complex_expression_sql_append(sql, op, args)
         case op
-        when :&, :|, :^
-          # works with db2 v9.5 and after
-          op = BITWISE_METHOD_MAP[op]
-          sql << complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(op, a, b))}
-        when :<<
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
-        when :>>
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
-        when :%
-          sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
+        when :&, :|, :^, :%, :<<, :>>
+          complex_expression_emulate_append(sql, op, args)
         when :'B~'
           literal_append(sql, SQL::Function.new(:BITNOT, *args))
         when :extract

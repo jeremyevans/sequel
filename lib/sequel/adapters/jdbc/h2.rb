@@ -143,11 +143,8 @@ module Sequel
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
-        BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
         APOS = Dataset::APOS
         HSTAR = "H*".freeze
-        BITCOMP_OPEN = "((0 - ".freeze
-        BITCOMP_CLOSE = ") - 1)".freeze
         ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
         TIME_FORMAT = "'%H:%M:%S'".freeze
         
@@ -156,16 +153,8 @@ module Sequel
           case op
           when :ILIKE, :"NOT ILIKE"
             super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), [SQL::PlaceholderLiteralString.new(ILIKE_PLACEHOLDER, [args.at(0)]), args.at(1)])
-          when :&, :|, :^
-            sql << complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(BITWISE_METHOD_MAP[op], a, b))}
-          when :<<
-            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
-          when :>>
-            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
-          when :'B~'
-            sql << BITCOMP_OPEN
-            literal_append(sql, args.at(0))
-            sql << BITCOMP_CLOSE
+          when :&, :|, :^, :<<, :>>, :'B~'
+            complex_expression_emulate_append(sql, op, args)
           else
             super
           end

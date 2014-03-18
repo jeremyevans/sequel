@@ -4361,7 +4361,7 @@ describe "Dataset emulating bitwise operator support" do
     @ds = Sequel::Database.new.dataset
     @ds.quote_identifiers = true
     def @ds.complex_expression_sql_append(sql, op, args)
-      sql << complex_expression_arg_pairs(args){|a, b| "bitand(#{literal(a)}, #{literal(b)})"}
+      complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(:bitand, a, b)}
     end
   end
 
@@ -4764,5 +4764,60 @@ describe "Dataset mutation methods" do
     dsc.server!(:a)
     dsc.opts[:server].should == :a
     dsc.graph!(dsc, {:b=>:c}, :table_alias=>:foo).ungraphed!.opts[:graph].should be_nil
+  end
+end
+
+describe "Dataset emulated complex expression operators" do
+  before do
+    @ds = Sequel.mock[:test]
+    def @ds.complex_expression_sql_append(sql, op, args)
+      case op
+      when :&, :|, :^, :%, :<<, :>>, :'B~'
+        complex_expression_emulate_append(sql, op, args)
+      else
+        super
+      end
+    end
+    @n = Sequel.expr(:x).sql_number
+  end
+
+  it "should emulate &" do
+    @ds.literal(Sequel::SQL::NumericExpression.new(:&, @n)).should == "x"
+    @ds.literal(@n & 1).should == "BITAND(x, 1)"
+    @ds.literal(@n & 1 & 2).should == "BITAND(BITAND(x, 1), 2)"
+  end
+
+  it "should emulate |" do
+    @ds.literal(Sequel::SQL::NumericExpression.new(:|, @n)).should == "x"
+    @ds.literal(@n | 1).should == "BITOR(x, 1)"
+    @ds.literal(@n | 1 | 2).should == "BITOR(BITOR(x, 1), 2)"
+  end
+
+  it "should emulate ^" do
+    @ds.literal(Sequel::SQL::NumericExpression.new(:^, @n)).should == "x"
+    @ds.literal(@n ^ 1).should == "BITXOR(x, 1)"
+    @ds.literal(@n ^ 1 ^ 2).should == "BITXOR(BITXOR(x, 1), 2)"
+  end
+
+  it "should emulate %" do
+    @ds.literal(Sequel::SQL::NumericExpression.new(:%, @n)).should == "x"
+    @ds.literal(@n % 1).should == "MOD(x, 1)"
+    @ds.literal(@n % 1 % 2).should == "MOD(MOD(x, 1), 2)"
+  end
+
+  it "should emulate >>" do
+    @ds.literal(Sequel::SQL::NumericExpression.new(:>>, @n)).should == "x"
+    @ds.literal(@n >> 1).should == "(x / power(2, 1))"
+    @ds.literal(@n >> 1 >> 2).should == "(x / power(2, 1) / power(2, 2))"
+  end
+
+  it "should emulate <<" do
+    @ds.literal(Sequel::SQL::NumericExpression.new(:<<, @n)).should == "x"
+    @ds.literal(@n << 1).should == "(x * power(2, 1))"
+    @ds.literal(@n << 1 << 2).should == "(x * power(2, 1) * power(2, 2))"
+  end
+
+  it "should emulate B~" do
+    @ds.literal(~@n).should == "((0 - x) - 1)"
   end
 end

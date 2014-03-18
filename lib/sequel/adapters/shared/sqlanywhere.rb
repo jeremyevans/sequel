@@ -306,10 +306,8 @@ module Sequel
         case op
         when :'||'
           super(sql, :+, args)
-        when :<<
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
-        when :>>
-          sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
+        when :<<, :>>
+          complex_expression_emulate_append(sql, op, args)
         when :LIKE, :"NOT LIKE"
           sql << Sequel::Dataset::PAREN_OPEN
           literal_append(sql, args.at(0))

@@ -111,7 +111,6 @@ module Sequel
       
       # Dataset class for HSQLDB datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        BITWISE_METHOD_MAP = {:& =>:BITAND, :| => :BITOR, :^ => :BITXOR}
         BOOL_TRUE = 'TRUE'.freeze
         BOOL_FALSE = 'FALSE'.freeze
         # HSQLDB does support common table expressions, but the support is broken.
@@ -124,8 +123,6 @@ module Sequel
         APOS = Dataset::APOS
         HSTAR = "H*".freeze
         BLOB_OPEN = "X'".freeze
-        BITCOMP_OPEN = "((0 - ".freeze
-        BITCOMP_CLOSE = ") - 1)".freeze
         DEFAULT_FROM = " FROM (VALUES (0))".freeze
         TIME_FORMAT = "'%H:%M:%S'".freeze
 
@@ -134,19 +131,8 @@ module Sequel
           case op
           when :ILIKE, :"NOT ILIKE"
             super(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|v| SQL::Function.new(:ucase, v)})
-          when :&, :|, :^
-            op = BITWISE_METHOD_MAP[op]
-            sql << complex_expression_arg_pairs(args){|a, b| literal(SQL::Function.new(op, a, b))}
-          when :<<
-            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} * POWER(2, #{literal(b)}))"}
-          when :>>
-            sql << complex_expression_arg_pairs(args){|a, b| "(#{literal(a)} / POWER(2, #{literal(b)}))"}
-          when :%
-            sql << complex_expression_arg_pairs(args){|a, b| "MOD(#{literal(a)}, #{literal(b)})"}
-          when :'B~'
-            sql << BITCOMP_OPEN
-            literal_append(sql, args.at(0))
-            sql << BITCOMP_CLOSE
+          when :&, :|, :^, :%, :<<, :>>, :'B~'
+            complex_expression_emulate_append(sql, op, args)
           else
             super
           end
