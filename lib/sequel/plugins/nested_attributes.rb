@@ -286,7 +286,7 @@ module Sequel
         def validate_associated_object(reflection, obj)
           return if reflection[:validate] == false
           association = reflection[:name]
-          if (reflection[:type] == :one_to_many || reflection[:type] == :one_to_one) && (key = reflection[:key]).is_a?(Symbol) && !obj.values[key]
+          if (reflection[:type] == :one_to_many || reflection[:type] == :one_to_one) && (key = reflection[:key]).is_a?(Symbol) && !(pk_val = obj.values[key])
             # There could be a presence validation on the foreign key in the associated model,
             # which will fail if we validate before saving the current object.  If there is
             # no value for the foreign key, set it to the current primary key value, or a dummy
@@ -295,7 +295,7 @@ module Sequel
             key = nil if pk
           end
           obj.errors.full_messages.each{|m| errors.add(association, m)} unless obj.valid?
-          if key
+          if key && !pk_val
             # If we used a dummy value of 0, remove it so it doesn't accidently remain.
             obj.values.delete(key)
           end

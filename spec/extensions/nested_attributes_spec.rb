@@ -5,7 +5,7 @@ describe "NestedAttributes plugin" do
     if should.is_a?(Array)
       should.should include(is)
     else
-      should.should == is
+      is.should == should
     end
   end
 
@@ -94,7 +94,19 @@ describe "NestedAttributes plugin" do
       "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)",
       ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
   end
-  
+
+  it "should should not remove existing values from object when validating" do
+    @Artist.one_to_one :first_album, :class=>@Album, :key=>:id
+    @Artist.nested_attributes :first_album
+    @db.fetch = {:id=>1}
+    a = @Artist.load(:id=>1)
+    a.set(:first_album_attributes=>{:id=>1, :name=>'Ar'})
+    a.first_album.values.should == {:id=>1, :name=>'Ar'}
+    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.id = 1) LIMIT 1"]
+    a.save_changes
+    check_sql_array("UPDATE albums SET name = 'Ar' WHERE (id = 1)")
+  end
+
   it "should support creating new many_to_many objects" do
     a = @Album.new({:name=>'Al', :tags_attributes=>[{:name=>'T'}]})
     @db.sqls.should == []
