@@ -170,8 +170,31 @@ describe "A PostgreSQL database" do
     @db.server_version.should > 70000
   end
 
+  specify "should support disable_insert_returning" do
+    ds = @db[:public__testfk].disable_insert_returning
+    ds.delete
+    ds.insert.should == nil
+    id = ds.max(:id)
+    ds.select_order_map([:id, :i]).should == [[id, nil]]
+    ds.insert(:i=>id).should == nil
+    ds.select_order_map([:id, :i]).should == [[id, nil], [id+1, id]]
+    ds.insert_select(:i=>ds.max(:id)).should == nil
+    ds.select_order_map([:id, :i]).should == [[id, nil], [id+1, id]]
+    c = Class.new(Sequel::Model(ds))
+    c.class_eval do
+      def before_create
+        self.id = model.max(:id)+1
+        super
+      end
+    end
+    c.create(:i=>id+1).should == c.load(:id=>id+2, :i=>id+1)
+    ds.select_order_map([:id, :i]).should == [[id, nil], [id+1, id], [id+2, id+1]]
+    ds.delete
+  end
+
   specify "should support functions with and without quoting" do
     ds = @db[:public__testfk]
+    ds.delete
     ds.insert
     ds.get{sum(1)}.should == 1
     ds.get{Sequel.function('pg_catalog.sum', 1)}.should == 1

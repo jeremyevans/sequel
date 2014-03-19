@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#disable_insert_returning on PostgreSQL for skipping implicit use of RETURNING (jeremyevans)
+
 * Automatically optimize Model.[], .with_pk, and .with_pk! for models with composite keys (jeremyevans)
 
 * Automatically optimize Model.[] when called with a hash (jeremyevans)

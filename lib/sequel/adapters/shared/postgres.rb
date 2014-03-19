@@ -1183,6 +1183,24 @@ module Sequel
         end
       end
 
+      # Disables automatic use of INSERT ... RETURNING.  You can still use
+      # returning manually to force the use of RETURNING when inserting.
+      #
+      # This is designed for cases where INSERT RETURNING cannot be used,
+      # such as when you are using partitioning with trigger functions
+      # or conditional rules, or when you are using a PostgreSQL version
+      # less than 8.2, or a PostgreSQL derivative that does not support
+      # returning.
+      #
+      # Note that when this method is used, insert will not return the
+      # primary key of the inserted row, you will have to get the primary
+      # key of the inserted row before inserting via nextval, or after
+      # inserting via currval or lastval (making sure to use the same
+      # database connection for currval or lastval).
+      def disable_insert_returning
+        clone(:disable_insert_returning=>true)
+      end
+
       # Return the results of an EXPLAIN query as a string
       def explain(opts=OPTS)
         with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join(CRLF)
@@ -1220,24 +1238,24 @@ module Sequel
       # Insert given values into the database.
       def insert(*values)
         if @opts[:returning]
-          # already know which columns to return, let the standard code
-          # handle it
+          # Already know which columns to return, let the standard code handle it
           super
-        elsif @opts[:sql]
-          # raw SQL used, so don't know which table is being inserted
-          # into, and therefore can't determine primary key.  Run the
-          # insert statement and return nil.
+        elsif @opts[:sql] || @opts[:disable_insert_returning]
+          # Raw SQL used or RETURNING disabled, just use the default behavior
+          # and return nil since sequence is not known.
           super
           nil
         else
-          # Force the use of RETURNING with the primary key value.
+          # Force the use of RETURNING with the primary key value,
+          # unless it has been disabled.
           returning(insert_pk).insert(*values){|r| return r.values.first}
         end
       end
 
-      # Insert a record returning the record inserted
+      # Insert a record returning the record inserted.  Always returns nil without
+      # inserting a query if disable_insert_returning is used.
       def insert_select(*values)
-        returning.insert(*values){|r| return r}
+        returning.insert(*values){|r| return r} unless @opts[:disable_insert_returning]
       end
 
       # Locks all tables in the dataset's FROM clause (but not in JOINs) with
@@ -1277,6 +1295,11 @@ module Sequel
       # DISTINCT ON is a PostgreSQL extension
       def supports_distinct_on?
         true
+      end
+
+      # True unless insert returning has been disabled for this dataset.
+      def supports_insert_select?
+        !@opts[:disable_insert_returning]
       end
 
       # PostgreSQL 9.3rc1+ supports lateral subqueries
