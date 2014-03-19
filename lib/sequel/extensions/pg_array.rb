@@ -23,7 +23,7 @@
 #
 #   array.pg_array
 #
-# You can also provide a type, though it many cases it isn't necessary:
+# You can also provide a type, though in many cases it isn't necessary:
 #
 #   Sequel.pg_array(array, :varchar) # or :integer, :"double precision", etc.
 #   array.pg_array(:varchar) # or :integer, :"double precision", etc.
