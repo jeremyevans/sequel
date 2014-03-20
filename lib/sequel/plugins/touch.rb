@@ -104,10 +104,9 @@ module Sequel
 
         private
 
-        # The value to use when modifying the touch column for the association datasets.  Uses
-        # the SQL standard CURRENT_TIMESTAMP.
+        # The value to use when modifying the touch column for the association datasets.
         def touch_association_value
-          Sequel::CURRENT_TIMESTAMP
+          Time.now
         end
 
         # Update the updated at field for all associated objects that should be touched.
