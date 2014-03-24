@@ -36,6 +36,12 @@ module Sequel
       o.is_a?(self.class) && db == o.db && opts == o.opts && sql == o.sql
     end
 
+    # An object representing the current date or time, should be an instance
+    # of Sequel.datetime_class.
+    def current_datetime
+      Sequel.datetime_class.now
+    end
+
     # Alias for ==
     def eql?(o)
       self == o

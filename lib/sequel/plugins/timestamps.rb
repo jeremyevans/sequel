@@ -79,7 +79,7 @@ module Sequel
         def set_create_timestamp(time=nil)
           field = model.create_timestamp_field
           meth = :"#{field}="
-          self.send(meth, time||=Sequel.datetime_class.now) if respond_to?(field) && respond_to?(meth) && (model.create_timestamp_overwrite? || send(field).nil?)
+          self.send(meth, time||=model.dataset.current_datetime) if respond_to?(field) && respond_to?(meth) && (model.create_timestamp_overwrite? || send(field).nil?)
           set_update_timestamp(time) if model.set_update_timestamp_on_create?
         end
         
@@ -87,7 +87,7 @@ module Sequel
         # object has a setter method for the update timestamp field.
         def set_update_timestamp(time=nil)
           meth = :"#{model.update_timestamp_field}="
-          self.send(meth, time||Sequel.datetime_class.now) if respond_to?(meth)
+          self.send(meth, time||model.dataset.current_datetime) if respond_to?(meth)
         end
       end
     end

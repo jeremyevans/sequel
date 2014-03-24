@@ -4637,6 +4637,23 @@ describe "Dataset#paged_each" do
   end
 end
 
+describe "Dataset#current_datetime" do
+  after do
+    Sequel.datetime_class = Time
+  end
+
+  it "should return an instance of Sequel.datetime_class for the current datetime" do
+    t = Sequel::Dataset.new(nil).current_datetime 
+    t.should be_a_kind_of(Time)
+    (Time.now - t < 0.1).should == true
+
+    Sequel.datetime_class = DateTime
+    t = Sequel::Dataset.new(nil).current_datetime 
+    t.should be_a_kind_of(DateTime)
+    (DateTime.now - t < (0.1/86400)).should == true
+  end
+end
+
 describe "Dataset#escape_like" do
   before do
     @ds = Sequel.mock[:test]

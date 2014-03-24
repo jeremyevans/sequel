@@ -130,9 +130,9 @@ module Sequel
         end
 
         # The value to use when modifying the touch column for the model instance.
-        # Uses Time.now to work well with typecasting.
+        # Uses Time/DateTime.now to work well with typecasting.
         def touch_instance_value
-          Time.now
+          model.dataset.current_datetime
         end
       end
     end

@@ -46,7 +46,7 @@ module Sequel
           when Sequel::CURRENT_DATE
             lambda{Date.today}
           when Sequel::CURRENT_TIMESTAMP
-            lambda{Sequel.datetime_class.now}
+            lambda{dataset.current_datetime}
           else
             v
           end
