@@ -97,9 +97,9 @@ module Sequel
       when Array
         literal_array_append(sql, v)
       when Time
-        sql << (v.is_a?(SQLTime) ? literal_sqltime(v) : literal_time(v))
+        v.is_a?(SQLTime) ? literal_sqltime_append(sql, v) : literal_time_append(sql, v)
       when DateTime
-        sql << literal_datetime(v)
+        literal_datetime_append(sql, v)
       when Date
         sql << literal_date(v)
       when Dataset
@@ -1101,6 +1101,11 @@ module Sequel
       format_timestamp(v)
     end
 
+    # Append literalization of DateTime to SQL string.
+    def literal_datetime_append(sql, v)
+      sql << literal_datetime(v)
+    end
+
     # Append literalization of SQL::Expression to SQL string.
     def literal_expression_append(sql, v)
       v.to_s_append(self, sql)
@@ -1150,6 +1155,11 @@ module Sequel
       v.strftime("'%H:%M:%S#{format_timestamp_usec(v.usec) if supports_timestamp_usecs?}'")
     end
 
+    # Append literalization of Sequel::SQLTime to SQL string.
+    def literal_sqltime_append(sql, v)
+      sql << literal_sqltime(v)
+    end
+
     # Append literalization of string to SQL string.
     def literal_string_append(sql, v)
       sql << APOS << v.gsub(APOS_RE, DOUBLE_APOS) << APOS
@@ -1169,6 +1179,11 @@ module Sequel
     # SQL fragment for Time
     def literal_time(v)
       format_timestamp(v)
+    end
+
+    # Append literalization of Time to SQL string.
+    def literal_time_append(sql, v)
+      sql << literal_time(v)
     end
 
     # SQL fragment for true
