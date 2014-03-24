@@ -47,6 +47,18 @@ describe "Sequel::Plugins::DefaultsSetter" do
     (t - DateTime.now).should < 1/86400.0
   end
 
+  it "should work correctly with the current_datetime_timestamp extension" do
+    @db.autoid = 1
+    @db.fetch = {:id=>1}
+    @c.dataset = @c.dataset.extension(:current_datetime_timestamp)
+    c = @pr.call(Sequel::CURRENT_TIMESTAMP)
+    @db.sqls
+    o = c.new
+    o.a = o.a
+    o.save
+    @db.sqls.should == ["INSERT INTO foo (a) VALUES (CURRENT_TIMESTAMP)", "SELECT * FROM foo WHERE (id = 1) LIMIT 1"]
+  end
+
   it "should not override a given value" do
     @pr.call(2)
     @c.new('a'=>3).a.should == 3

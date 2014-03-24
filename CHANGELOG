@@ -1,5 +1,7 @@
 === HEAD
 
+* Add current_datetime_timestamp extension, for current Time/DateTime instances that are literalized as CURRENT_TIMESTAMP (jeremyevans)
+
 * Recognize additional unique constraint violations on SQLite (jeremyevans) (#782)
 
 * Don't remove column value when validating nested attributes for one_to_* association where association foreign key is the model's primary key (jeremyevans)

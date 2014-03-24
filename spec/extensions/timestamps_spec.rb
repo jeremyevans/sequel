@@ -34,6 +34,15 @@ describe "Sequel::Plugins::Timestamps" do
     o.updated_at.should == '2009-08-01'
   end
 
+  it "should work with current_datetime_timestamp extension" do
+    Sequel.datetime_class = Time
+    @c.dataset = @c.dataset.extension(:current_datetime_timestamp)
+    o = @c.create
+    @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES (CURRENT_TIMESTAMP)"]
+    o = @c.load(:id=>1).save
+    @c.db.sqls.should == ["UPDATE t SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+  end
+
   it "should not update the update timestamp on creation" do
     @c.create.updated_at.should == nil
   end

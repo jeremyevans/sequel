@@ -26,6 +26,15 @@ describe "Touch plugin" do
     DB.sqls.first.should =~ /UPDATE a SET updated_at = '[-0-9 :.]+' WHERE \(id = 1\)/
   end
 
+  specify "should work with current_datetime_timestamp extension" do
+    c = Class.new(Sequel::Model).set_dataset(:a)
+    c.dataset = c.dataset.extension(:current_datetime_timestamp)
+    c.plugin :touch
+    c.columns :id, :updated_at
+    c.load(:id=>1).touch
+    DB.sqls.should == ["UPDATE a SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+  end
+
   specify "should allow #touch instance method for updating the updated_at column" do
     @Artist.plugin :touch
     @a.touch
