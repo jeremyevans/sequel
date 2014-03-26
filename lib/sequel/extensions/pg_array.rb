@@ -74,32 +74,6 @@
 # operators, look into the pg_array_ops extension.
 #
 # This extension requires both the json and delegate libraries.
-#
-# == Additional License
-#
-# PGArray::Parser code was translated from Javascript code in the
-# node-postgres project and has the following additional license:
-# 
-# Copyright (c) 2010 Brian Carlson (brian.m.carlson@gmail.com)
-# 
-# Permission is hereby granted, free of charge, to any person obtaining
-# a copy of this software and associated documentation files (the
-# "Software"), to deal in the Software without restriction, including
-# without limitation the rights to use, copy, modify, merge, publish,
-# distribute, sublicense, and/or sell copies of the Software, and to
-# permit persons to whom the Software is furnished to do so, subject
-# to the following conditions:
-# 
-# The above copyright notice and this permission notice shall be included
-# in all copies or substantial portions of the Software.
-# 
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
-# KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-# WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-# OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-# WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 require 'delegate'
 require 'json'
@@ -350,7 +324,7 @@ module Sequel
 
       # PostgreSQL array parser that handles all types of input.
       #
-      # This parser is very simple and unoptimized, but should still
+      # This parser is not optimized, but should still
       # be O(n) where n is the length of the input string.
       class Parser
         # Current position in the input string.
@@ -361,32 +335,25 @@ module Sequel
         # the source may contain text after the end current parse,
         # which will be ignored.
         def initialize(source, converter=nil)
-          @source = source
-          @source_length = source.length
+          @source = source.split(//)
           @converter = converter 
-          @pos = -1
-          @entries = []
+          @stack = []
           @recorded = ""
-          @dimension = 0
         end
 
         # Return 2 objects, whether the next character in the input
         # was escaped with a backslash, and what the next character is.
         def next_char
-          @pos += 1
-          if (c = @source[@pos..@pos]) == BACKSLASH
-            @pos += 1
-            [true, @source[@pos..@pos]]
+          case c = @source.shift
+          when nil
+            nil
+          when BACKSLASH
+            [true, @source.shift]
           else
             [false, c]
           end
         end
 
-        # Add a new character to the buffer of recorded characters.
-        def record(c)
-          @recorded << c
-        end
-        
         # Take the buffer of recorded characters and add it to the array
         # of entries, and use a new buffer for recorded characters.
         def new_entry(include_empty=false)
@@ -397,53 +364,69 @@ module Sequel
             elsif @converter
               entry = @converter.call(entry)
             end
-            @entries.push(entry)
+            @stack.last.push(entry)
             @recorded = ""
           end
         end
 
         # Parse the input character by character, returning an array
         # of parsed (and potentially converted) objects.
-        def parse(nested=false)
+        def parse
           # quote sets whether we are inside of a quoted string.
           quote = false
-          until @pos >= @source_length
-            escaped, char = next_char
-            if char == OPEN_BRACE && !quote
-              @dimension += 1
-              if (@dimension > 1)
-                # Multi-dimensional array encounter, use a subparser
-                # to parse the next level down.
-                subparser = self.class.new(@source[@pos..-1], @converter)
-                @entries.push(subparser.parse(true))
-                @pos += subparser.pos - 1
+
+          while (escaped, char = next_char; char)
+            if quote
+              if char == QUOTE && !escaped 
+                # Already inside a quoted string, so unescaped quote
+                # ends the string, add entry to current array and
+                # remove quote flag
+                new_entry(true)
+                quote = false
+              else
+                # In all other cases in quoted string, add character
+                # to current string
+                @recorded << char
               end
-            elsif char == CLOSE_BRACE && !quote
-              @dimension -= 1
-              if (@dimension == 0)
-                new_entry
-                # Exit early if inside a subparser, since the
-                # text after parsing the current level should be
-                # ignored as it is handled by the parent parser.
-                return @entries if nested
-              end
-            elsif char == QUOTE && !escaped
-              # If already inside the quoted string, this is the
-              # ending quote, so add the entry.  Otherwise, this
-              # is the opening quote, so set the quote flag.
-              new_entry(true) if quote
-              quote = !quote
-            elsif char == COMMA && !quote
-              # If not inside a string and a comma occurs, it indicates
-              # the end of the entry, so add the entry.
+            elsif char == COMMA
+              # Comma outside quoted string indicates end of current entry
               new_entry
+            elsif char == QUOTE
+              if escaped
+                # Escaped quote outside of quoted string is treated as regular character
+                @recorded << char
+              else
+                # Unescaped quote outside quoted string starts a quoted string
+                quote = !quote
+              end
+            elsif char == OPEN_BRACE
+              # Start of new array, add it to the stack
+              new = []
+              if l = @stack.last
+                l << new
+              end
+              @stack << new
+            elsif char == CLOSE_BRACE
+              # End of current array, add current entry to the current array
+              new_entry
+
+              if @stack.length == 1
+                raise Sequel::Error, "data remaining after parsing array" unless @source.empty?
+
+                # Top level of array, parsing should be over.
+                # Pop current array off stack and return it as result
+                return @stack.pop
+              else
+                # Nested array, pop current array off stack
+                @stack.pop
+              end
             else
               # Add the character to the recorded character buffer.
-              record(char)
+              @recorded << char
             end
           end
-          raise Sequel::Error, "array dimensions not balanced" unless @dimension == 0
-          @entries
+
+          raise Sequel::Error, "array parsing finished with array unclosed"
         end
       end unless Sequel::Postgres.respond_to?(:parse_pg_array)
 

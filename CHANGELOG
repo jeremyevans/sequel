@@ -1,5 +1,7 @@
 === HEAD
 
+* Massive speedup for PostgreSQL array parser (jeremyevans) (#788)
+
 * Add current_datetime_timestamp extension, for current Time/DateTime instances that are literalized as CURRENT_TIMESTAMP (jeremyevans)
 
 * Recognize additional unique constraint violations on SQLite (jeremyevans) (#782)

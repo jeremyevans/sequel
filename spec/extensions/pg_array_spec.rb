@@ -126,6 +126,12 @@ describe "pg_array extension" do
     c.call('{NULLA,"NULL",NULL}').to_a.should == ["NULLA", "NULL", nil]
   end
 
+  it "should raise errors for unbalanced arrays" do
+    c = @converter[1009]
+    proc{c.call('{}}')}.should raise_error(Sequel::Error)
+    proc{c.call('{{}')}.should raise_error(Sequel::Error)
+  end
+
   it "should literalize arrays without types correctly" do
     @db.literal(@m::PGArray.new([])).should == 'ARRAY[]'
     @db.literal(@m::PGArray.new([1])).should == 'ARRAY[1]'
