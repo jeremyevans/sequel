@@ -567,7 +567,7 @@ module Sequel
 
       register('smallint', :oid=>1005, :parser=>:json, :scalar_typecast=>:integer)
       register('oid', :oid=>1028, :parser=>:json, :scalar_typecast=>:integer)
-      register('real', :oid=>1021, :scalar_oid=>701, :scalar_typecast=>:float)
+      register('real', :oid=>1021, :scalar_oid=>700, :scalar_typecast=>:float)
       register('character', :oid=>1014, :array_type=>:text, :scalar_typecast=>:string)
       register('character varying', :oid=>1015, :scalar_typecast=>:string, :type_symbol=>:varchar)
     end
