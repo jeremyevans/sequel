@@ -335,23 +335,10 @@ module Sequel
         # the source may contain text after the end current parse,
         # which will be ignored.
         def initialize(source, converter=nil)
-          @source = source.split(//)
+          @source = source
           @converter = converter 
           @stack = []
           @recorded = ""
-        end
-
-        # Return 2 objects, whether the next character in the input
-        # was escaped with a backslash, and what the next character is.
-        def next_char
-          case c = @source.shift
-          when nil
-            nil
-          when BACKSLASH
-            [true, @source.shift]
-          else
-            [false, c]
-          end
         end
 
         # Take the buffer of recorded characters and add it to the array
@@ -374,8 +361,14 @@ module Sequel
         def parse
           # quote sets whether we are inside of a quoted string.
           quote = false
+          escaped = false
 
-          while (escaped, char = next_char; char)
+          @source.each_char do |char|
+            if char == BACKSLASH && escaped == false
+              escaped = true
+              next
+            end
+
             if quote
               if char == QUOTE && !escaped 
                 # Already inside a quoted string, so unescaped quote
@@ -411,8 +404,6 @@ module Sequel
               new_entry
 
               if @stack.length == 1
-                raise Sequel::Error, "data remaining after parsing array" unless @source.empty?
-
                 # Top level of array, parsing should be over.
                 # Pop current array off stack and return it as result
                 return @stack.pop
@@ -424,6 +415,8 @@ module Sequel
               # Add the character to the recorded character buffer.
               @recorded << char
             end
+
+            escaped = false
           end
 
           raise Sequel::Error, "array parsing finished with array unclosed"

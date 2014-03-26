@@ -126,9 +126,8 @@ describe "pg_array extension" do
     c.call('{NULLA,"NULL",NULL}').to_a.should == ["NULLA", "NULL", nil]
   end
 
-  it "should raise errors for unbalanced arrays" do
+  it "should raise errors when parsing ends with array unclosed" do
     c = @converter[1009]
-    proc{c.call('{}}')}.should raise_error(Sequel::Error)
     proc{c.call('{{}')}.should raise_error(Sequel::Error)
   end
 
