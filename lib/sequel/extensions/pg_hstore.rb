@@ -28,16 +28,16 @@
 # Since the hstore type only supports strings, non string keys and
 # values are converted to strings
 #
-#   {:foo=>1}.hstore.to_hash # {'foo'=>'1'}
-#   v = {}.hstore
+#   Sequel.hstore(:foo=>1).to_hash # {'foo'=>'1'}
+#   v = Sequel.hstore({})
 #   v[:foo] = 1
 #   v # {'foo'=>'1'}
 #
 # However, to make life easier, lookups by key are converted to
 # strings (even when accessing the underlying hash directly):
 #
-#   {'foo'=>'bar'}.hstore[:foo] # 'bar'
-#   {'foo'=>'bar'}.hstore.to_hash[:foo] # 'bar'
+#   Sequel.hstore('foo'=>'bar')[:foo] # 'bar'
+#   Sequel.hstore('foo'=>'bar').to_hash[:foo] # 'bar'
 # 
 # HStore instances mostly just delegate to the underlying hash
 # instance, so Hash methods that modify the receiver or returned
@@ -66,7 +66,7 @@
 #
 # If you want to insert a hash into an hstore database column:
 #
-#   DB[:table].insert(:column=>{'foo'=>'bar'}.hstore)
+#   DB[:table].insert(:column=>Sequel.hstore('foo'=>'bar'))
 #
 # If you would like to use hstore columns in your model objects, you
 # probably want to modify the schema parsing/typecasting so that it
