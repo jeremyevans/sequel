@@ -162,6 +162,9 @@ module Sequel
         db.extend(Sequel::JDBC::SqlAnywhere::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::SqlAnywhere::Dataset
         drv
+      end,
+      :datadirect=>proc do |db|
+        Java::com.ddtek.jdbc.openedge.OpenEdgeDriver
       end
     }
     
