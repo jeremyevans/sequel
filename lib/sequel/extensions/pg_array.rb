@@ -73,9 +73,10 @@
 # If you want an easy way to call PostgreSQL array functions and
 # operators, look into the pg_array_ops extension.
 #
-# This extension requires both the json and delegate libraries.
+# This extension requires the json, strscan, and delegate libraries.
 
 require 'delegate'
+require 'strscan'
 require 'json'
 Sequel.require 'adapters/utils/pg_types'
 
@@ -322,22 +323,23 @@ module Sequel
         end
       end
 
-      # PostgreSQL array parser that handles all types of input.
-      #
-      # This parser is not optimized, but should still
-      # be O(n) where n is the length of the input string.
-      class Parser
-        # Current position in the input string.
-        attr_reader :pos
+      # PostgreSQL array parser that handles PostgreSQL array output format.
+      # Note that does not handle all forms out input that PostgreSQL will
+      # accept, and it will not raise an error for all forms of invalid input.
+      class Parser < StringScanner
+        UNQUOTED_RE = /[{}",]|[^{}",]+/
+        QUOTED_RE = /["\\]|[^"\\]+/
+        NULL_RE = /NULL",/
+        OPEN_RE = /\{/
 
         # Set the source for the input, and any converter callable
         # to call with objects to be created.  For nested parsers
         # the source may contain text after the end current parse,
         # which will be ignored.
         def initialize(source, converter=nil)
-          @source = source
+          super(source)
           @converter = converter 
-          @stack = []
+          @stack = [[]]
           @recorded = ""
         end
 
@@ -359,51 +361,43 @@ module Sequel
         # Parse the input character by character, returning an array
         # of parsed (and potentially converted) objects.
         def parse
-          # quote sets whether we are inside of a quoted string.
-          quote = false
-          escaped = false
+          raise Sequel::Error, "invalid array, empty string" if eos?
+          raise Sequel::Error, "invalid array, doesn't start with {" unless scan(OPEN_RE)
 
-          @source.each_char do |char|
-            if char == BACKSLASH && escaped == false
-              escaped = true
-              next
-            end
-
-            if quote
-              if char == QUOTE && !escaped 
-                # Already inside a quoted string, so unescaped quote
-                # ends the string, add entry to current array and
-                # remove quote flag
-                new_entry(true)
-                quote = false
-              else
-                # In all other cases in quoted string, add character
-                # to current string
-                @recorded << char
-              end
-            elsif char == COMMA
+          while !eos?
+            char = scan(UNQUOTED_RE)
+            if char == COMMA
               # Comma outside quoted string indicates end of current entry
               new_entry
             elsif char == QUOTE
-              if escaped
-                # Escaped quote outside of quoted string is treated as regular character
-                @recorded << char
-              else
-                # Unescaped quote outside quoted string starts a quoted string
-                quote = !quote
+              raise Sequel::Error, "invalid array, opening quote with existing recorded data" unless @recorded.empty?
+              while true
+                char = scan(QUOTED_RE)
+                if char == BACKSLASH
+                  @recorded << getch
+                elsif char == QUOTE
+                  n = peek(1)
+                  raise Sequel::Error, "invalid array, closing quote not followed by comma or closing brace" unless n == COMMA || n == CLOSE_BRACE
+                  break
+                else
+                  @recorded << char
+                end
               end
+              new_entry(true)
             elsif char == OPEN_BRACE
+              raise Sequel::Error, "invalid array, opening brace with existing recorded data" unless @recorded.empty?
+
               # Start of new array, add it to the stack
               new = []
-              if l = @stack.last
-                l << new
-              end
+              @stack.last << new
               @stack << new
             elsif char == CLOSE_BRACE
               # End of current array, add current entry to the current array
               new_entry
 
               if @stack.length == 1
+                raise Sequel::Error, "array parsing finished without parsing entire string" unless eos?
+
                 # Top level of array, parsing should be over.
                 # Pop current array off stack and return it as result
                 return @stack.pop
@@ -415,8 +409,6 @@ module Sequel
               # Add the character to the recorded character buffer.
               @recorded << char
             end
-
-            escaped = false
           end
 
           raise Sequel::Error, "array parsing finished with array unclosed"

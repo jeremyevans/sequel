@@ -24,6 +24,9 @@ describe "pg_array extension" do
     c = @converter[1009]
     c.call("{a}").to_a.first.should be_a_kind_of(String)
     c.call("{}").to_a.should == []
+    c.call('{""}').to_a.should == [""]
+    c.call('{"",""}').to_a.should == ["",""]
+    c.call('{"","",""}').to_a.should == ["","",""]
     c.call("{a}").to_a.should == ['a']
     c.call('{"a b"}').to_a.should == ['a b']
     c.call('{a,b}').to_a.should == ['a', 'b']
@@ -126,9 +129,15 @@ describe "pg_array extension" do
     c.call('{NULLA,"NULL",NULL}').to_a.should == ["NULLA", "NULL", nil]
   end
 
-  it "should raise errors when parsing ends with array unclosed" do
+  it "should raise errors when for certain recognized invalid arrays" do
     c = @converter[1009]
+    proc{c.call('')}.should raise_error(Sequel::Error)
+    proc{c.call('}')}.should raise_error(Sequel::Error)
     proc{c.call('{{}')}.should raise_error(Sequel::Error)
+    proc{c.call('{}}')}.should raise_error(Sequel::Error)
+    proc{c.call('{a""}')}.should raise_error(Sequel::Error)
+    proc{c.call('{a{}}')}.should raise_error(Sequel::Error)
+    proc{c.call('{""a}')}.should raise_error(Sequel::Error)
   end
 
   it "should literalize arrays without types correctly" do

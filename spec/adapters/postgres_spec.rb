@@ -1956,11 +1956,11 @@ describe 'PostgreSQL array handling' do
       column :t, 'text[]'
     end
     @tp.call.should == [:character_array, :varchar_array, :string_array]
-    @ds.insert(Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], 'char(4)'), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :varchar), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :text))
+    @ds.insert(Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], 'char(4)'), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c', '', ''], :varchar), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :text))
     @ds.count.should == 1
     rs = @ds.all
     if @native
-      rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c'], :t=>['a', nil, 'NULL', 'b"\'c']}]
+      rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c', '', ''], :t=>['a', nil, 'NULL', 'b"\'c']}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
@@ -1969,10 +1969,10 @@ describe 'PostgreSQL array handling' do
     end
 
     @ds.delete
-    @ds.insert(Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], 'char(4)'), Sequel.pg_array([[['a'], ['']], [['NULL'], ['b"\'c']]], :varchar), Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], :text))
+    @ds.insert(Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], 'char(4)'), Sequel.pg_array([[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :varchar), Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], :text))
     rs = @ds.all
     if @native
-      rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
+      rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
       rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
       rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
       @ds.delete
