@@ -1,5 +1,7 @@
 === HEAD
 
+* Do not attempt to eager load when calling Dataset#columns in the eager_each plugin (jeremyevans)
+
 * Support :driver option for jdbc adapter, for specifying driver class for cases where getConnection doesn't work (jeremyevans) (#785)
 
 * Massive speedup for PostgreSQL array parser (jeremyevans) (#788)
