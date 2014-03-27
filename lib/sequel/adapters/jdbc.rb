@@ -188,7 +188,7 @@ module Sequel
       # The type of database we are connecting to
       attr_reader :database_type
       
-      # The Java database driver we are using
+      # The Java database driver we are using (should be a Java class)
       attr_reader :driver
       
       # Whether to convert some Java types to ruby types when retrieving rows.
@@ -379,8 +379,10 @@ module Sequel
         
         resolved_uri = jndi? ? get_uri_from_jndi : uri
 
-        if match = /\Ajdbc:([^:]+)/.match(resolved_uri) and prok = DATABASE_SETUP[match[1].to_sym]
-          @driver = prok.call(self)
+        @driver = if (match = /\Ajdbc:([^:]+)/.match(resolved_uri)) && (prok = DATABASE_SETUP[match[1].to_sym])
+          prok.call(self)
+        else
+          @opts[:driver]
         end        
       end
       

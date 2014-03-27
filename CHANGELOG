@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :driver option for jdbc adapter, for specifying driver class for cases where getConnection doesn't work (jeremyevans) (#785)
+
 * Massive speedup for PostgreSQL array parser (jeremyevans) (#788)
 
 * Add current_datetime_timestamp extension, for current Time/DateTime instances that are literalized as CURRENT_TIMESTAMP (jeremyevans)
