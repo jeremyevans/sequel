@@ -78,11 +78,23 @@ module Sequel
             type = "nvarchar(max)" unless type
             varname = "var#{i}" unless varname
             select ||= varname
+
+            values << if select.is_a?(Array)
+              select, procedure_varname = select
+              "@#{ procedure_varname }=@#{ varname } OUTPUT"
+            else
+              "@#{varname} OUTPUT"
+            end
+
             names << "@#{varname} AS #{quote_identifier(select)}"
             declarations << "@#{varname} #{type}"
-            values << "@#{varname} OUTPUT"
           else
-            values << literal(v)
+            values << if type
+              parameter_name = type 
+             "@#{ parameter_name }=#{ literal(v) }"
+            else
+              literal(v)
+            end
           end
         end
 
