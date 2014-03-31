@@ -133,7 +133,7 @@ single join table.
     # Uses plural form of associated model name
     many_to_many :albums
 
-    # Uses plural form of associated model name
+    # Uses singular form of associated model name
     one_through_one :album
   end
 
