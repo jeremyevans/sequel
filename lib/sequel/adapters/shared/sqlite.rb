@@ -132,7 +132,7 @@ module Sequel
       def sqlite_version
         return @sqlite_version if defined?(@sqlite_version)
         @sqlite_version = begin
-          v = get{sqlite_version{}}
+          v = fetch('SELECT sqlite_version()').single_value
           [10000, 100, 1].zip(v.split('.')).inject(0){|a, m| a + m[0] * Integer(m[1])}
         rescue
           0
@@ -498,6 +498,9 @@ module Sequel
       include Dataset::Replace
 
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with delete from where')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with insert into columns values')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with update table set where')
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
       EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
       EXTRACT_MAP = {:year=>"'%Y'", :month=>"'%m'", :day=>"'%d'", :hour=>"'%H'", :minute=>"'%M'", :second=>"'%f'"}
@@ -657,11 +660,29 @@ module Sequel
         end
       end
 
+      # SQLite >= 3.8.3 supports the WITH clause in DELETE
+      def delete_clause_methods
+        if db.sqlite_version >= 30803
+          DELETE_CLAUSE_METHODS
+        else
+          super
+        end
+      end
+      
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
         columns.map{|i| quote_identifier(i)}.join(COMMA)
       end
     
+      # SQLite >= 3.8.3 supports the WITH clause in INSERT
+      def insert_clause_methods
+        if db.sqlite_version >= 30803
+          INSERT_CLAUSE_METHODS
+        else
+          super
+        end
+      end
+      
       # SQLite uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
         sql << BLOB_START << v.unpack(HSTAR).first << APOS
@@ -679,7 +700,11 @@ module Sequel
 
       # SQLite does not support the SQL WITH clause
       def select_clause_methods
-        SELECT_CLAUSE_METHODS
+        if db.sqlite_version >= 30803
+          super
+        else
+          SELECT_CLAUSE_METHODS
+        end
       end
       
       # SQLite does not support FOR UPDATE, but silently ignore it
@@ -697,6 +722,15 @@ module Sequel
       # SQLite treats a DELETE with no WHERE clause as a TRUNCATE
       def _truncate_sql(table)
         "DELETE FROM #{table}"
+      end
+
+      # SQLite >= 3.8.3 supports the WITH clause in UPDATE
+      def update_clause_methods
+        if db.sqlite_version >= 30803
+          UPDATE_CLAUSE_METHODS
+        else
+          super
+        end
       end
     end
   end

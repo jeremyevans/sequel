@@ -140,7 +140,7 @@ END
   end
 
   it "-E should echo SQL statements to stdout" do
-    bin(:args=>'-E -c DB.tables').should =~ %r{I, \[\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+ #\d+\]  INFO -- : \(\d\.\d+s\) PRAGMA foreign_keys = 1\nI, \[\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+ #\d+\]  INFO -- : \(\d\.\d+s\) PRAGMA case_sensitive_like = 1\nI, \[\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+ #\d+\]  INFO -- : \(\d\.\d+s\) SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
+    bin(:args=>'-E -c DB.tables').should =~ %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
   end
 
   it "-I should include directory in load path" do
@@ -149,7 +149,7 @@ END
 
   it "-l should log SQL statements to file" do
     bin(:args=>"-l #{TMP_FILE} -c DB.tables").should == ''
-    File.read(TMP_FILE).should =~ %r{I, \[\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+ #\d+\]  INFO -- : \(\d\.\d+s\) PRAGMA foreign_keys = 1\nI, \[\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+ #\d+\]  INFO -- : \(\d\.\d+s\) PRAGMA case_sensitive_like = 1\nI, \[\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d+ #\d+\]  INFO -- : \(\d\.\d+s\) SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
+    File.read(TMP_FILE).should =~ %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
   end
 
   it "-L should load all *.rb files in given directory" do
