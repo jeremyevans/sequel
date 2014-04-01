@@ -698,6 +698,12 @@ module Sequel
         @db.integer_booleans ? '1' : "'t'"
       end
 
+      # SQLite only supporting multiple rows in the VALUES clause
+      # starting in 3.7.11.  On older versions, fallback to using a UNION.
+      def multi_insert_sql_strategy
+        db.sqlite_version >= 30711 ? :values : :union
+      end
+
       # SQLite does not support the SQL WITH clause
       def select_clause_methods
         if db.sqlite_version >= 30803

@@ -407,6 +407,11 @@ module Sequel
         INSERT_CLAUSE_METHODS
       end
 
+      # Sybase supports multiple rows in INSERT.
+      def multi_insert_sql_strategy
+        :values
+      end
+
       def select_clause_methods
         SELECT_CLAUSE_METHODS
       end

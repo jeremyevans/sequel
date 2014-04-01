@@ -293,6 +293,11 @@ module Sequel
           end
         end
 
+        # Derby supports multiple rows in INSERT.
+        def multi_insert_sql_strategy
+          :values
+        end
+
         # Derby doesn't support common table expressions.
         def select_clause_methods
           SELECT_CLAUSE_METHODS

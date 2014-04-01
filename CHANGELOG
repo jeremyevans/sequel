@@ -1,5 +1,7 @@
 === HEAD
 
+* Use INSERT VALUES with multiple rows for Dataset#import and #multi_insert on more databases (jeremyevans)
+
 * Support common table expressions (WITH clause) on SQLite >=3.8.3 (jeremyevans)
 
 === 4.9.0 (2014-04-01)

@@ -484,8 +484,6 @@ module Sequel
       DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
       DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
       DATEPART_OPEN = "datepart(".freeze
-      UNION_ALL = ' UNION ALL '.freeze
-      SELECT_SPACE = 'SELECT '.freeze
       TIMESTAMP_USEC_FORMAT = ".%03d".freeze
       OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
       HEX_START = '0x'.freeze
@@ -602,20 +600,6 @@ module Sequel
       # Specify a table for a SELECT ... INTO query.
       def into(table)
         clone(:into => table)
-      end
-
-      # MSSQL uses a UNION ALL statement to insert multiple values at once.
-      def multi_insert_sql(columns, values)
-        c = false
-        sql = LiteralString.new('')
-        u = UNION_ALL
-        values.each do |v|
-          sql << u if c
-          sql << SELECT_SPACE
-          expression_list_append(sql, v)
-          c ||= true
-        end
-        [insert_sql(columns, sql)]
       end
 
       # Allows you to do a dirty read of uncommitted data using WITH (NOLOCK).
@@ -873,6 +857,12 @@ module Sequel
         BOOL_TRUE
       end
       
+      # MSSQL 2008+ supports multiple rows in the VALUES clause, older versions
+      # can use UNION.
+      def multi_insert_sql_strategy
+        is_2008_or_later? ? :values : :union
+      end
+
       # MSSQL adds the limit before the columns, except on 2012+ when using
       # offsets on ordered queries.
       def select_clause_methods

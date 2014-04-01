@@ -209,6 +209,11 @@ module Sequel
           v.strftime(TIME_FORMAT)
         end
 
+        # H2 supports multiple rows in INSERT.
+        def multi_insert_sql_strategy
+          :values
+        end
+
         def select_clause_methods
           SELECT_CLAUSE_METHODS
         end

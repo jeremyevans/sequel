@@ -1279,13 +1279,6 @@ module Sequel
         nil
       end
 
-      # PostgreSQL allows inserting multiple rows at once.
-      def multi_insert_sql(columns, values)
-        sql = LiteralString.new('VALUES ')
-        expression_list_append(sql, values.map{|r| Array(r)})
-        [insert_sql(columns, sql)]
-      end
-
       # PostgreSQL supports using the WITH clause in subqueries if it
       # supports using WITH at all (i.e. on PostgreSQL 8.4+).
       def supports_cte_in_subqueries?
@@ -1477,6 +1470,11 @@ module Sequel
       # PostgreSQL uses FALSE for false values
       def literal_true
         BOOL_TRUE
+      end
+
+      # PostgreSQL supports multiple rows in INSERT.
+      def multi_insert_sql_strategy
+        :values
       end
 
       # The order of clauses in the SELECT SQL statement

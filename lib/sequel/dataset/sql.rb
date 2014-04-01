@@ -116,7 +116,28 @@ module Sequel
     # This method should be overridden by descendants if the support
     # inserting multiple records in a single SQL statement.
     def multi_insert_sql(columns, values)
-      values.map{|r| insert_sql(columns, r)}
+      case multi_insert_sql_strategy
+      when :values
+        sql = LiteralString.new('VALUES ')
+        expression_list_append(sql, values.map{|r| Array(r)})
+        [insert_sql(columns, sql)]
+      when :union
+        c = false
+        sql = LiteralString.new('')
+        u = UNION_ALL_SELECT
+        values.each do |v|
+          if c
+            sql << u
+          else
+            sql << SELECT << SPACE
+            c = true
+          end
+          expression_list_append(sql, v)
+        end
+        [insert_sql(columns, sql)]
+      else
+        values.map{|r| insert_sql(columns, r)}
+      end
     end
     
     # Returns a SELECT SQL query string.
@@ -277,6 +298,7 @@ module Sequel
     UPDATE = 'UPDATE'.freeze
     UPDATE_CLAUSE_METHODS = clause_methods(:update, %w'update table set where')
     USING = ' USING ('.freeze
+    UNION_ALL_SELECT = ' UNION ALL SELECT '.freeze
     VALUES = " VALUES ".freeze
     V190 = '1.9.0'.freeze
     WHERE = " WHERE ".freeze
@@ -1189,6 +1211,14 @@ module Sequel
     # SQL fragment for true
     def literal_true
       BOOL_TRUE
+    end
+
+    # What strategy to use for import/multi_insert.  While SQL-92 defaults
+    # to allowing multiple rows in a VALUES clause, there are enough databases
+    # that don't allow that that it can't be the default.  Use separate queries
+    # by default, which works everywhere.
+    def multi_insert_sql_strategy
+      :separate
     end
 
     # Get the native function name given the emulated function name.

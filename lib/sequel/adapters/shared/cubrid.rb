@@ -200,6 +200,11 @@ module Sequel
         BOOL_TRUE
       end
      
+      # CUBRID supports multiple rows in INSERT.
+      def multi_insert_sql_strategy
+        :values
+      end
+
       # CUBRID doesn't support CTEs or FOR UPDATE.
       def select_clause_methods
         SELECT_CLAUSE_METHODS

@@ -706,13 +706,6 @@ module Sequel
         clone(:on_duplicate_key_update => args)
       end
 
-      # MySQL specific syntax for inserting multiple values at once.
-      def multi_insert_sql(columns, values)
-        sql = LiteralString.new('VALUES ')
-        expression_list_append(sql, values.map{|r| Array(r)})
-        [insert_sql(columns, sql)]
-      end
-      
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier_append(sql, c)
         sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
@@ -905,6 +898,11 @@ module Sequel
         BOOL_TRUE
       end
       
+      # MySQL supports multiple rows in INSERT.
+      def multi_insert_sql_strategy
+        :values
+      end
+
       # MySQL does not support the SQL WITH clause for SELECT statements
       def select_clause_methods
         SELECT_CLAUSE_METHODS

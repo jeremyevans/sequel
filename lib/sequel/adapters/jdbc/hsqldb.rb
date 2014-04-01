@@ -180,6 +180,11 @@ module Sequel
           BOOL_TRUE
         end
 
+        # HSQLDB supports multiple rows in INSERT.
+        def multi_insert_sql_strategy
+          :values
+        end
+
         # HSQLDB does not support CTEs well enough for Sequel to enable support for them.
         def select_clause_methods
           SELECT_CLAUSE_METHODS
