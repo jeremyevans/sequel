@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-04-07 16:43:44 -0700</span>
+          <span class='datetime'>2014-03-05 09:51:37 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -111,8 +111,9 @@
             </dd></dl>
             
             <p>In general, these extensions just add support for Database objects to
-            return retrieved column values as the appropriate type (<code>postgres&#x000A;only</code>), and support for literalizing the objects correctly for use in
-            an SQL string, or using them as bound variable values (<code>postgres/pg&#x000A;only</code>).</p>
+            return retrieved column values as the appropriate type (<code>postgres and&#x000A;jdbc/postgres only</code>), and support for literalizing the objects
+            correctly for use in an SQL string, or using them as bound variable values
+            (<code>postgres/pg and jdbc/postgres only</code>).</p>
             
             <p>There are also type-specific extensions that make it easy to use database
             functions and operators related to the type.  These extensions are:</p>
@@ -122,6 +123,9 @@
             </dd><dt>pg_hstore_ops 
             <dd>
             <p>hstore-related functions and operators</p>
+            </dd><dt>pg_json_ops 
+            <dd>
+            <p>json-related functions and operators</p>
             </dd><dt>pg_range_ops 
             <dd>
             <p>range-related functions and operators</p>
@@ -144,19 +148,19 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_exclusion_constraint</span>([[:<span class="ruby-identifier">during</span>, <span class="ruby-string">&#39;&amp;&amp;&#39;</span>]], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">table_during_excl</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; ADD CONSTRAINT &quot;table_during_excl&quot; EXCLUDE USING gist (&quot;during&quot; WITH &amp;&amp;)</span></pre>
             
-            <h3 id="label-Adding+Foreign+Key+Constraints+Without+Initial+Validation">Adding Foreign Key Constraints Without Initial Validation</h3>
+            <h3 id="label-Adding+Foreign+Key+and+Check+Constraints+Without+Initial+Validation">Adding Foreign Key and Check Constraints Without Initial Validation</h3>
             
             <p>You can add a <code>:not_valid=&gt;true</code> option when adding
             constraints to existing tables so that it doesn&#39;t check if all current
             rows are valid:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># Assumes t_id column already exists</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span>([:<span class="ruby-identifier">t_id</span>], :<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">not_valid=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">table_fk</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; ADD CONSTRAINT &quot;table_fk&quot; FOREIGN KEY (&quot;t_id&quot;) REFERENCES &quot;table&quot; NOT VALID</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># Assumes t_id column already exists</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span>([:<span class="ruby-identifier">t_id</span>], :<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">not_valid=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">table_fk</span>)&#x000A;&#x000A;  <span class="ruby-identifier">constraint</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">col_123</span>, :<span class="ruby-identifier">not_valid=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}, :<span class="ruby-identifier">col=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>])&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; ADD CONSTRAINT &quot;table_fk&quot; FOREIGN KEY (&quot;t_id&quot;) REFERENCES &quot;table&quot; NOT VALID</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; ADD CONSTRAINT &quot;col_123&quot; CHECK (col IN (1, 2, 3)) NOT VALID</span></pre>
             
             <p>Such constraints will be enforced for newly inserted and updated rows, but
             not for existing rows. After all existing rows have been fixed, you can
             validate the constraint:</p>
             
-            <pre>DB.alter_table(:table) do&#x000A;  validate_constraint(:table_fk)&#x000A;end&#x000A;# ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;table_fk&quot;</pre>
+            <pre>DB.alter_table(:table) do&#x000A;  validate_constraint(:table_fk)&#x000A;  validate_constraint(:col_123)&#x000A;end&#x000A;# ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;table_fk&quot;&#x000A;# ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;col_123&quot;</pre>
             
             <h3 id="label-Creating+Indexes+Concurrently">Creating Indexes Concurrently</h3>
             
@@ -224,6 +228,16 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">use_cursor</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-comment"># BEGIN;</span>&#x000A;<span class="ruby-comment"># DECLARE sequel_cursor NO SCROLL CURSOR WITHOUT HOLD FOR SELECT * FROM &quot;table&quot;;</span>&#x000A;<span class="ruby-comment"># FETCH FORWARD 1000 FROM sequel_cursor</span>&#x000A;<span class="ruby-comment"># FETCH FORWARD 1000 FROM sequel_cursor</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-comment"># FETCH FORWARD 1000 FROM sequel_cursor</span>&#x000A;<span class="ruby-comment"># CLOSE sequel_cursor</span>&#x000A;<span class="ruby-comment"># COMMIT</span></pre>
             
+            <p>This support is used by default when using <code>Dataset#paged_each</code>.</p>
+            
+            <p>Using cursors, it is possible to update individual rows of a large dataset
+            easily using the <code>:rows_per_fetch=&gt;1</code> option in conjunction
+            with <code>Dataset#where_current_of</code>.  This is useful if the logic
+            needed to update the rows exists in the application and not in the
+            database:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">use_cursor</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where_current_of</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">col=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">new_col_value</span>(<span class="ruby-identifier">row</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+            
             <h3 id="label-Truncate+Modifiers">Truncate Modifiers</h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports PostgreSQL-specific
@@ -270,6 +284,11 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">listen</span>(:<span class="ruby-identifier">channel</span>, :<span class="ruby-identifier">loop=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">channel</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">channel</span>}</pre>
             
+            <p>The <code>pg_static_cache_updater</code> extension uses this support to
+            automatically update the caches for models using the
+            <code>static_cache</code> plugin.  Look at the documentation of that plugin
+            for details.</p>
+            
             <h3 id="label-Locking+Tables">Locking Tables</h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to lock
@@ -307,6 +326,9 @@
             <p>Or stream all datasets by default:</p>
             
             <pre>DB.stream_all_queries = true</pre>
+            
+            <p>When streaming is enabled, <code>Dataset#paged_each</code> will use
+            streaming to implement paging.</p>
           </div>
           <div id='context'>
           </div>

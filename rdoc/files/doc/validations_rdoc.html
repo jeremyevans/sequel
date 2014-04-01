@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-10 07:39:31 -0800</span>
+          <span class='datetime'>2014-03-18 14:41:16 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -626,6 +626,17 @@
             messages to display to the user:</p>
             
             <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;[&quot;cannot be empty&quot;]}</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;name cannot be empty&quot;]</span></pre>
+            
+            <p>Note that the column names used in the errors are used verbatim in the
+            error messages.  If you want full control over the error messages, you can
+            use <code>add</code> with a literal string:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;Album name is not valid&quot;</span>))&#x000A;<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;Album name is not valid&quot;]</span></pre>
+            
+            <p>Alternatively, feel free to override <a
+            href="../../classes/Sequel/Model/Errors.html#method-i-full_messages">Sequel::Model::Errors#full_messages</a>.
+            As long as it returns an array of strings, overridding it is completely
+            safe.</p>
             
             <h3 id="label-count"><code>count</code></h3>
             

@@ -46,6 +46,9 @@
             <a target="docwin" href="../files/lib/sequel/extensions/constraint_validations_rb.html">lib/sequel/extensions/constraint_validations.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/current_datetime_timestamp_rb.html">lib/sequel/extensions/current_datetime_timestamp.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/date_arithmetic_rb.html">lib/sequel/extensions/date_arithmetic.rb</a>
           </li>
           <li class='other'>
@@ -611,6 +614,29 @@
             and then readd all constraints you want to use inside the alter table
             block, making no other changes inside the alter_table block.</p>
             </li></ul>
+            
+            <p>The current_datetime_timestamp extension makes Dataset#current_datetime
+            return an object that operates like Sequel.datetime_class.now, but will be
+            literalized as CURRENT_TIMESTAMP.</p>
+            
+            <p>This allows you to use the defaults_setter, timestamps, and touch model
+            plugins and make sure that CURRENT_TIMESTAMP is used instead of a
+            literalized timestamp value.</p>
+            
+            <p>The reason that CURRENT_TIMESTAMP is better than a literalized version of
+            the timestamp is that it obeys correct transactional semantics (all calls
+            to CURRENT_TIMESTAMP in the same transaction return the same timestamp, at
+            least on some databases).</p>
+            
+            <p>To have current_datetime be literalized as CURRENT_TIMESTAMP for a single
+            dataset:</p>
+            
+            <pre>ds = ds.extension(:current_datetime_timestamp)</pre>
+            
+            <p>To have current_datetime be literalized as CURRENT_TIMESTAMP for all
+            datasets of a given database.</p>
+            
+            <pre>DB.extension(:current_datetime_timestamp)</pre>
             
             <p>The date_arithmetic extension adds the ability to perform
             database-independent addition/substraction of intervals to/from dates and
@@ -1445,6 +1471,7 @@
               <li><a target="docwin" href="Sequel/ConnectionValidator.html">Sequel::ConnectionValidator</a></li>
               <li><a target="docwin" href="Sequel/ConstraintValidations.html">Sequel::ConstraintValidations</a></li>
               <li><a target="docwin" href="Sequel/CoreRefinements.html">Sequel::CoreRefinements</a></li>
+              <li><a target="docwin" href="Sequel/CurrentDateTimeTimestamp.html">Sequel::CurrentDateTimeTimestamp</a></li>
               <li><a target="docwin" href="Sequel/Database.html">Sequel::Database</a></li>
               <li><a target="docwin" href="Sequel/DatabaseQuery.html">Sequel::DatabaseQuery</a></li>
               <li><a target="docwin" href="Sequel/DatasetPagination.html">Sequel::DatasetPagination</a></li>

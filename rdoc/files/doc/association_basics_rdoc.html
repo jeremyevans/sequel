@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-14 12:14:25 -0800</span>
+          <span class='datetime'>2014-03-30 21:56:17 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -137,7 +137,7 @@
             the first record returned.  The one_through_one association is so named
             because it sets up a one-to-one association through a single join table.</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums </span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\ </span>&#x000A;<span class="ruby-comment">#   :name       \     albums_artists</span>&#x000A;<span class="ruby-comment">#                \---- :album_id</span>&#x000A;<span class="ruby-comment">#  artists       /---- :artist_id</span>&#x000A;<span class="ruby-comment">#   :id   &lt;-----/</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">one_through_one</span> :<span class="ruby-identifier">album</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums </span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\ </span>&#x000A;<span class="ruby-comment">#   :name       \     albums_artists</span>&#x000A;<span class="ruby-comment">#                \---- :album_id</span>&#x000A;<span class="ruby-comment">#  artists       /---- :artist_id</span>&#x000A;<span class="ruby-comment">#   :id   &lt;-----/</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Uses plural form of associated model name</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;&#x000A;  <span class="ruby-comment"># Uses singular form of associated model name</span>&#x000A;  <span class="ruby-identifier">one_through_one</span> :<span class="ruby-identifier">album</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-Differences+Between+many_to_one+and+one_to_one">Differences Between many_to_one and one_to_one</h3>
             

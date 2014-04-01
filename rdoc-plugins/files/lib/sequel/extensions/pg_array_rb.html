@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-08 10:11:21 -0800</span>
+          <span class='datetime'>2014-03-27 11:19:55 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -73,7 +73,7 @@
             
             <pre>array.pg_array</pre>
             
-            <p>You can also provide a type, though it many cases it isn&#39;t necessary:</p>
+            <p>You can also provide a type, though in many cases it isn&#39;t necessary:</p>
             
             <pre>Sequel.pg_array(array, :varchar) # or :integer, :&quot;double precision&quot;, etc.&#x000A;array.pg_array(:varchar) # or :integer, :&quot;double precision&quot;, etc.</pre>
             
@@ -124,38 +124,14 @@
             <p>If you want an easy way to call PostgreSQL array functions and operators,
             look into the pg_array_ops extension.</p>
             
-            <p>This extension requires both the json and delegate libraries.</p>
-            
-            <h2 id="label-Additional+License">Additional License</h2>
-            
-            <p>PGArray::Parser code was translated from Javascript code in the
-            node-postgres project and has the following additional license:</p>
-            
-            <p>Copyright (c) 2010 Brian Carlson (gmail at brian.m.carlson.com)</p>
-            
-            <p>Permission is hereby granted, free of charge, to any person obtaining a
-            copy of this software and associated documentation files (the "Software"),
-            to deal in the Software without restriction, including without limitation
-            the rights to use, copy, modify, merge, publish, distribute, sublicense,
-            and/or sell copies of the Software, and to permit persons to whom the
-            Software is furnished to do so, subject to the following conditions:</p>
-            
-            <p>The above copyright notice and this permission notice shall be included in
-            all copies or substantial portions of the Software.</p>
-            
-            <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-            IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-            FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-            AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-            LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-            FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-            DEALINGS IN THE SOFTWARE.</p>
+            <p>This extension requires the json, strscan, and delegate libraries.</p>
           </div>
           <div id='context'>
             <div id='requires'>
               <h2>Required files</h2>
               <ol>
                 <li>delegate</li>
+                <li>strscan</li>
                 <li>json</li>
                 <li>adapters/utils/pg_types</li>
               </ol>

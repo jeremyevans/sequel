@@ -165,7 +165,7 @@
                     <td>=</td>
                     <td class='context-item-value'>
                       (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
-                      [:each_server]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]
+                      [:each_server]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
@@ -202,7 +202,7 @@
                       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
                       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
                       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
-                      :@fast_instance_delete_sql=>nil,
+                      :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
                       :@db=>nil, :@default_set_fields_options=>:dup}
                     </td>
                     <td>&nbsp;</td>

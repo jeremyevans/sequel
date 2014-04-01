@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-09-05 16:10:21 -0700</span>
+          <span class='datetime'>2014-03-27 13:56:06 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -64,7 +64,7 @@
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">RSpec</span><span class="ruby-operator">::</span><span class="ruby-constant">Core</span><span class="ruby-operator">::</span><span class="ruby-constant">ExampleGroup</span>&#x000A;  <span class="ruby-comment"># Setting an around filter globally doesn&#39;t appear to work in &lt;2.8,</span>&#x000A;  <span class="ruby-comment"># so set one up for each subclass.</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">around</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">example</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>){<span class="ruby-identifier">example</span>.<span class="ruby-identifier">call</span>}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-RSpec+2%2C+%3E%3D2.8">RSpec 2, &gt;=2.8</h3>
+            <h3 id="label-RSpec+%3E%3D2.8">RSpec &gt;=2.8</h3>
             
             <pre class="ruby"><span class="ruby-comment"># Global around filters should work</span>&#x000A;<span class="ruby-constant">RSpec</span>.<span class="ruby-identifier">configure</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">c</span>.<span class="ruby-identifier">around</span>(:<span class="ruby-identifier">each</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">example</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>){<span class="ruby-identifier">example</span>.<span class="ruby-identifier">run</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
@@ -122,7 +122,7 @@
             <h1 id="label-Testing+Sequel+Itself">Testing <a href="../../classes/Sequel.html">Sequel</a> Itself</h1>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> has multiple separate test
-            suites.  All test suites run under either RSpec 1 or RSpec 2.</p>
+            suites.  All test suites run under rspec &gt;=1.3.</p>
             
             <h2 id="label-rake+spec">rake spec</h2>
             

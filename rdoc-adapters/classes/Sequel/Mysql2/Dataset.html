@@ -51,6 +51,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#method-i-fetch_rows">fetch_rows</a></li>
+              <li><a target="docwin" href="#method-i-paged_each">paged_each</a></li>
               <li><a target="docwin" href="#method-i-stream">stream</a></li>
             </ol>
           </div>
@@ -75,6 +76,13 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>STREAMING_SUPPORTED</td>
+                    <td>=</td>
+                    <td class='context-item-value'>::Mysql2::VERSION >= '0.3.12'</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
                 </table>
               </div>
             </div>
@@ -94,7 +102,25 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 151</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-ivar">@columns</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">identifier_output_method</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>.<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>(<span class="ruby-value">:cast_booleans=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">convert_tinyint_to_bool?</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-ivar">@columns</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">identifier_output_method</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>.<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>(<span class="ruby-value">:cast_booleans=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">convert_tinyint_to_bool?</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-paged_each'>
+                <a name='method-i-paged_each'></a>
+                <div class='synopsis'>
+                  <span class='name'>paged_each</span>
+                  <span class='arguments'>(opts=OPTS, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Use streaming to implement paging if <a href="../Mysql2.html">Mysql2</a>
+                  supports it.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-paged_each-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-paged_each-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 165</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">STREAMING_SUPPORTED</span>&#x000A;    <span class="ruby-identifier">stream</span>.<span class="ruby-identifier">each</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-stream'>
@@ -107,13 +133,13 @@
                   
                   <p>Return a clone of the dataset that will stream rows when iterating over the
                   result set, so it can handle large datasets that won&#39;t fit in memory
-                  (Requires mysql 0.3.12 to have an effect).</p>
+                  (Requires mysql 0.3.12+ to have an effect).</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-stream-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-stream-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 166</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">stream</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:stream=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-stream-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 176</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">stream</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:stream=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

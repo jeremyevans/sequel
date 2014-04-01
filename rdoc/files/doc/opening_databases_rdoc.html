@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-11-17 15:14:46 -0800</span>
+          <span class='datetime'>2014-03-27 07:59:03 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -365,6 +365,13 @@
             of rows. Note that you can&#39;t provide this option inside the connection
             string (as that is passed directly to JDBC), you have to pass it as a
             separate option.</p>
+            </dd><dt>:driver 
+            <dd>
+            <p>Specify the Java driver class to use to connect to the database.  This only
+            has an effect if the database type is not recognized from the connection
+            string, and only helps cases where
+            <code>java.sql.DriverManager.getConnection</code> does not return a
+            connection.</p>
             </dd><dt>:login_timeout 
             <dd>
             <p>Set the login timeout on the JDBC connection (in seconds).</p>

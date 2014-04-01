@@ -67,20 +67,6 @@
               <div class='name-list'>
                 <table summary='Constants'>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>BITCOMP_CLOSE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>") - 1)".freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>BITCOMP_OPEN</td>
-                    <td>=</td>
-                    <td class='context-item-value'>"((0 - ".freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>BLOB_CLOSE</td>
                     <td>=</td>
                     <td class='context-item-value'>"' AS BLOB)".freeze</td>
@@ -240,7 +226,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-case_expression_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-case_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 196</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">case_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ce</span>.<span class="ruby-identifier">with_merged_expression</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-case_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 194</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">case_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ce</span>.<span class="ruby-identifier">with_merged_expression</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-cast_sql_append'>
@@ -259,7 +245,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cast_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 203</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST_STRING_OPEN</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cast_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 201</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST_STRING_OPEN</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-complex_expression_sql_append'>
@@ -275,7 +261,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-complex_expression_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 213</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:%</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">complex_expression_arg_pairs</span>(<span class="ruby-identifier">args</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;MOD(#{literal(a)}, #{literal(b)})&quot;</span>}&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>, <span class="ruby-value">:|</span>, <span class="ruby-value">:^</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Derby doesn&#39;t support the #{op} operator&quot;</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&#39;B~&#39;</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">BITCOMP_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">BITCOMP_CLOSE</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>).<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 211</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:%</span>, <span class="ruby-value">:&#39;B~&#39;</span>&#x000A;    <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>, <span class="ruby-value">:|</span>, <span class="ruby-value">:^</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Derby doesn&#39;t support the #{op} operator&quot;</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>).<span class="ruby-identifier">to_s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_group_rollup-3F'>
@@ -292,7 +278,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_group_rollup-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_group_rollup-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 233</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_group_rollup?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_group_rollup-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_group_rollup?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -309,7 +295,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_is_true-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 238</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 232</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
@@ -327,7 +313,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_multiple_column_in-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 243</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 237</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

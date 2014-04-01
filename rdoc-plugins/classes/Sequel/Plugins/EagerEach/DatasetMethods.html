@@ -47,6 +47,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#method-i-all">all</a></li>
+              <li><a target="docwin" href="#method-i-columns">columns</a></li>
               <li><a target="docwin" href="#method-i-each">each</a></li>
             </ol>
           </div>
@@ -72,7 +73,25 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-all-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-all-source'><span class="ruby-comment"># File lib/sequel/plugins/eager_each.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">all</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">use_eager_all?</span>&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:all_called=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">all</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-all-source'><span class="ruby-comment"># File lib/sequel/plugins/eager_each.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">all</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">use_eager_all?</span>&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:all_called=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">all</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-columns'>
+                <a name='method-i-columns'></a>
+                <div class='synopsis'>
+                  <span class='name'>columns</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Don&#39;t call <a href="DatasetMethods.html#method-i-all">all</a> when
+                  attempting to load the columns.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/plugins/eager_each.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">use_eager_all?</span>&#x000A;    <span class="ruby-identifier">clone</span>(<span class="ruby-value">:all_called=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-each'>
@@ -92,7 +111,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-each-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/plugins/eager_each.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">use_eager_all?</span>&#x000A;    <span class="ruby-identifier">all</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/plugins/eager_each.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">use_eager_all?</span>&#x000A;    <span class="ruby-identifier">all</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

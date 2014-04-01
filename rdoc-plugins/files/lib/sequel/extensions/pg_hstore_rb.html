@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-12-01 14:51:56 -0800</span>
+          <span class='datetime'>2014-03-26 09:08:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -78,12 +78,12 @@
             <p>Since the hstore type only supports strings, non string keys and values are
             converted to strings</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">foo=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">hstore</span>.<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>&#x000A;<span class="ruby-identifier">v</span> = {}.<span class="ruby-identifier">hstore</span>&#x000A;<span class="ruby-identifier">v</span>[:<span class="ruby-identifier">foo</span>] = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">foo=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_hash</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span>&#x000A;<span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>({})&#x000A;<span class="ruby-identifier">v</span>[:<span class="ruby-identifier">foo</span>] = <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">v</span> <span class="ruby-comment"># {&#39;foo&#39;=&gt;&#39;1&#39;}</span></pre>
             
             <p>However, to make life easier, lookups by key are converted to strings (even
             when accessing the underlying hash directly):</p>
             
-            <pre class="ruby">{<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>}.<span class="ruby-identifier">hstore</span>[:<span class="ruby-identifier">foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span>&#x000A;{<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>}.<span class="ruby-identifier">hstore</span>.<span class="ruby-identifier">to_hash</span>[:<span class="ruby-identifier">foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>)[:<span class="ruby-identifier">foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">to_hash</span>[:<span class="ruby-identifier">foo</span>] <span class="ruby-comment"># &#39;bar&#39;</span></pre>
             
             <p>HStore instances mostly just delegate to the underlying hash instance, so
             <a href="../../../../classes/Hash.html">Hash</a> methods that modify the
@@ -130,7 +130,7 @@
             
             <p>If you want to insert a hash into an hstore database column:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>}.<span class="ruby-identifier">hstore</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-string">&#39;foo&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;bar&#39;</span>))</pre>
             
             <p>If you would like to use hstore columns in your model objects, you probably
             want to modify the schema parsing/typecasting so that it recognizes and

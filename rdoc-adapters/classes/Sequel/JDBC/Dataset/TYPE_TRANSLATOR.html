@@ -125,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-blob-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 752</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">blob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getBytes</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>))) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-blob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 754</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">blob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getBytes</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>))) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-buffered_reader'>
@@ -141,7 +141,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-buffered_reader-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-buffered_reader-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 754</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">buffered_reader</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">lines</span> = <span class="ruby-string">&quot;&quot;</span>&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">while</span>(<span class="ruby-identifier">line</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">read_line</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">lines</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">LF</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>&#x000A;    <span class="ruby-identifier">lines</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">line</span>&#x000A;    <span class="ruby-identifier">c</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">lines</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-buffered_reader-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 756</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">buffered_reader</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">lines</span> = <span class="ruby-string">&quot;&quot;</span>&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">while</span>(<span class="ruby-identifier">line</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">read_line</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">lines</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">LF</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">c</span>&#x000A;    <span class="ruby-identifier">lines</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">line</span>&#x000A;    <span class="ruby-identifier">c</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">lines</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-byte_array'>
@@ -157,7 +157,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-byte_array-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-byte_array-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 751</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">byte_array</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">v</span>)) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-byte_array-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 753</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">byte_array</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">String</span>.<span class="ruby-identifier">from_java_bytes</span>(<span class="ruby-identifier">v</span>)) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-clob'>
@@ -173,7 +173,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-clob-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-clob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 753</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">clob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-clob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 755</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">clob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-date'>
@@ -189,7 +189,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-date-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-date-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 749</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Date</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getYear</span> <span class="ruby-operator">+</span> <span class="ruby-value">1900</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMonth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getDate</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-date-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 751</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Date</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getYear</span> <span class="ruby-operator">+</span> <span class="ruby-value">1900</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMonth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getDate</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-db2_clob'>
@@ -221,7 +221,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-decimal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-decimal-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 750</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">decimal</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-decimal-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 752</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">decimal</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-derby_clob'>
@@ -237,7 +237,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-derby_clob-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-derby_clob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 252</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">derby_clob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-derby_clob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/derby.rb, line 246</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">derby_clob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-h2_clob'>
@@ -253,7 +253,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-h2_clob-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-h2_clob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/h2.rb, line 199</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">h2_clob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-h2_clob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/h2.rb, line 188</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">h2_clob</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hash_map'>
@@ -269,7 +269,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-hash_map-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-hash_map-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 765</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hash_map</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_hash</span> <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-hash_map-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 767</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hash_map</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_hash</span> <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-jtds_clob'>
@@ -350,7 +350,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-time-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 748</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-node">&quot;#{v.to_string}.#{sprintf(&#39;%03i&#39;, v.getTime.divmod(1000).last)}&quot;</span>) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 750</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">v</span>) <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_time</span>(<span class="ruby-node">&quot;#{v.to_string}.#{sprintf(&#39;%03i&#39;, v.getTime.divmod(1000).last)}&quot;</span>) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-uuid'>
@@ -366,7 +366,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-uuid-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-uuid-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 764</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">uuid</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span> <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-uuid-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 766</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">uuid</span>(<span class="ruby-identifier">v</span>) <span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span> <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

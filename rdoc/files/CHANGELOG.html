@@ -31,12 +31,81 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-28 09:33:59 -0800</span>
+          <span class='datetime'>2014-04-01 10:01:57 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.9.0+%282014-04-01%29">4.9.0 (2014-04-01)</h3>
+            <ul><li>
+            <p>Recognize CHECK constraint violations on newer versions of SQLite
+            (jeremyevans)</p>
+            </li><li>
+            <p>Do not attempt to eager load when calling Dataset#columns in the eager_each
+            plugin (jeremyevans)</p>
+            </li><li>
+            <p>Support :driver option for jdbc adapter, for specifying driver class for
+            cases where getConnection doesn&#39;t work (jeremyevans) (#785)</p>
+            </li><li>
+            <p>Massive speedup for PostgreSQL array parser (jeremyevans) (#788)</p>
+            </li><li>
+            <p>Add current_datetime_timestamp extension, for current Time/DateTime
+            instances that are literalized as CURRENT_TIMESTAMP (jeremyevans)</p>
+            </li><li>
+            <p>Recognize additional unique constraint violations on SQLite (jeremyevans)
+            (#782)</p>
+            </li><li>
+            <p>Don&#39;t remove column value when validating nested attributes for
+            one_to_* association where association foreign key is the model&#39;s
+            primary key (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#disable_insert_returning on PostgreSQL for skipping implicit
+            use of RETURNING (jeremyevans)</p>
+            </li><li>
+            <p>Automatically optimize Model.[], .with_pk, and .with_pk! for models with
+            composite keys (jeremyevans)</p>
+            </li><li>
+            <p>Automatically optimize Model.[] when called with a hash (jeremyevans)</p>
+            </li><li>
+            <p>Automatically optimize Model.find, .first, and .first! when called with a
+            single argument (jeremyevans)</p>
+            </li><li>
+            <p>Add Model.finder for creating optimized finder methods using
+            Dataset::PlaceholderLiteralizer (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset::PlaceholderLiteralizer optimization framework (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_sql_{each,all,first,single_value,insert,update} optimized
+            methods (jeremyevans)</p>
+            </li><li>
+            <p>Make pg_array extension use correct type when typecasting column values for
+            smallint, oid, real, character, and varchar arrays (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#column_schema_to_ruby_default a public method in the
+            schema_dumper extension (jeremyevans) (#776)</p>
+            </li><li>
+            <p>Fix multiple corner cases in the eager_graph support (jeremyevans) (#771)</p>
+            </li><li>
+            <p>Use streaming to implement paging for Dataset#paged_each in the mysql2
+            adapter (jeremyevans)</p>
+            </li><li>
+            <p>Use a cursor to implement paging for Dataset#paged_each in the postgres
+            adapter (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#create_join_table? and create_join_table! for consistency
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#where_current_of to the postgres adapter for supporting
+            updating rows based on a cursor&#39;s current position (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#use_cursor :hold option in the postgres adapter for supporting
+            cursor use outside of a transaction (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#paged_each :strategy=&gt;:filter option for increased
+            performance (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.8.0+%282014-03-01%29">4.8.0 (2014-03-01)</h3>
             <ul><li>
