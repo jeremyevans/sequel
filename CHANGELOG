@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.9.0 (2014-04-01)
 
 * Recognize CHECK constraint violations on newer versions of SQLite (jeremyevans)
 
