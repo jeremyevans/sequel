@@ -1732,33 +1732,31 @@ can't use LIMIT directly, since you want a limit for each group of
 associated records, not a LIMIT on the total number of records returned
 by the dataset.
 
-By default, if a *_to_many association uses a limit or offset, or a
-one_*_one association uses an offset or an order, Sequel will choose to use an
-eager limit strategy.  The default strategy depends on the database
-being used.  For databases which support window functions, a window
-function will be used.  Other databases will just have an ruby array
-slice done on the entire record set.
-
-For one_*_one associations without an offset or order, no strategy is used by default
-because none is needed for a true one-to-one association (since there
-is only one associated record per current record).  However, if you are
-using a one_to_one association where the relationship is really one_to_many,
-and using an order to pick the first matching row, then if you don't
-use an limit strategy, you'll be loading all related
-rows just to have Sequel ignore all rows after the first.  By using a
-strategy to change the query to only return one associated record per
-current record, you can get much better database performance.
-
 In general, Sequel picks an appropriate strategy, so it is not usually
-necessary to specify a specific strategy.
+necessary to specify a strategy.  You can specify true for this option to
+have Sequel choose which strategy to use (this is the default).  You can
+specify a symbol to manually choose a strategy.  The available strategies are:
 
-You can specify true for this option to have Sequel choose which strategy
-to use (this is the default).  You can specify a symbol to manually choose
-a strategy.  The available strategies are:
-
+:union :: Uses one or more UNION queries with a subquery for each record
+          you are eagerly loading for (this is the default strategy).
 :distinct_on :: Uses DISTINCT ON to ensure only the first matching record
                 is loaded (only used for one_*_one associations without
                 offsets on PostgreSQL).
 :window_function :: Uses a ROW_NUMBER window functions to ensure the
                     correctly limited/offset records are returned.
 :ruby :: Uses ruby array slicing to emulate database limiting/offsetting.
+
+==== :subqueries_per_union
+
+The number of subqueries per union query to use when eager loading for a
+limited association using a union strategy.  This defaults to 40, but the
+optimum number depends on the database in use and the latency between the
+database and the application.
+
+==== :filter_limit_strategy
+
+The strategy to use when filtering by limited associations.  In general
+Sequel will choose either a :distinct_on or :window_function strategy based
+on what the database supports, but you can override that if necessary using
+this option.
+

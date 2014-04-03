@@ -157,7 +157,7 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == ['SELECT * FROM albums']
   end
   
-  it "should use first matching entry when eager loading one_to_one association" do
+  it "should eagerly load a single one_to_one association without an order" do
     EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id
     EagerTrack.dataset._fetch = [{:id => 3, :album_id=>1}, {:id => 4, :album_id=>1}]
     a = EagerAlbum.eager(:track).all
@@ -167,9 +167,18 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
+  it "should eagerly load a single one_to_one association with an order" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:a
+    a = EagerAlbum.eager(:track).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY a LIMIT 1) AS t1']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    DB.sqls.should == []
+  end
+  
   it "should eagerly load a single one_to_one association using the :distinct_on strategy" do
     def (EagerTrack.dataset).supports_distinct_on?() true end
-    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:a
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:a, :eager_limit_strategy=>:distinct_on
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', 'SELECT DISTINCT ON (tracks.album_id) * FROM tracks WHERE (tracks.album_id IN (1)) ORDER BY tracks.album_id, a']
@@ -179,7 +188,7 @@ describe Sequel::Model, "#eager" do
   
   it "should eagerly load a single one_to_one association using the :window_function strategy" do
     def (EagerTrack.dataset).supports_window_functions?() true end
-    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :eager_limit_strategy=>true
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :eager_limit_strategy=>:window_function
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x = 1)']
@@ -187,23 +196,49 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
-  it "should not use distinct on eager limit strategy if the association has an offset" do
-    def (EagerTrack.dataset).supports_distinct_on?() true end
-    def (EagerTrack.dataset).supports_window_functions?() true end
-    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :order=>:name
+  it "should automatically use an eager limit stategy if the association has an offset" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1]
+    EagerTrack.dataset._fetch = [{:id => 4, :album_id=>1}]
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
-    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x = 2)']
-    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1']
+    a.first.track.should == EagerTrack.load(:id => 4, :album_id=>1)
     DB.sqls.should == []
   end
   
-  it "should automatically use an eager limit stategy if the association has an offset" do
-    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1]
+  it "should handle offsets when using the :ruby eager limit stategy" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :eager_limit_strategy=>:ruby
     EagerTrack.dataset._fetch = [{:id => 3, :album_id=>1}, {:id => 4, :album_id=>1}]
     a = EagerAlbum.eager(:track).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a.first.track.should == EagerTrack.load(:id => 4, :album_id=>1)
+    DB.sqls.should == []
+  end
+  
+  it "should support a :subqueries_per_union option for the number of subqueries in a union" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :subqueries_per_union=>1
+    EagerAlbum.dataset._fetch = [{:id => 1, :band_id => 2}, {:id => 2, :band_id => 3}, {:id => 3, :band_id => 4}]
+    EagerTrack.dataset._fetch = [[{:id => 4, :album_id=>1}], [{:id=>5, :album_id=>2}], [{:id=>6, :album_id=>3}]]
+    a = EagerAlbum.eager(:track).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2), EagerAlbum.load(:id => 2, :band_id => 3), EagerAlbum.load(:id => 3, :band_id => 4)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1', 'SELECT * FROM (SELECT * FROM tracks WHERE (2 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1', 'SELECT * FROM (SELECT * FROM tracks WHERE (3 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1']
+    a.first.track.should == EagerTrack.load(:id => 4, :album_id=>1)
+    DB.sqls.should == []
+
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :subqueries_per_union=>2
+    EagerTrack.dataset._fetch = [[{:id => 4, :album_id=>1}, {:id=>5, :album_id=>2}], [{:id=>6, :album_id=>3}]]
+    a = EagerAlbum.eager(:track).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2), EagerAlbum.load(:id => 2, :band_id => 3), EagerAlbum.load(:id => 3, :band_id => 4)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1 UNION ALL SELECT * FROM (SELECT * FROM tracks WHERE (2 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1', 'SELECT * FROM (SELECT * FROM tracks WHERE (3 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1']
+    a.first.track.should == EagerTrack.load(:id => 4, :album_id=>1)
+    DB.sqls.should == []
+
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :limit=>[1,1], :subqueries_per_union=>3
+    EagerTrack.dataset._fetch = [[{:id => 4, :album_id=>1}, {:id=>5, :album_id=>2}, {:id=>6, :album_id=>3}]]
+    a = EagerAlbum.eager(:track).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2), EagerAlbum.load(:id => 2, :band_id => 3), EagerAlbum.load(:id => 3, :band_id => 4)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1 UNION ALL SELECT * FROM (SELECT * FROM tracks WHERE (2 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1 UNION ALL SELECT * FROM (SELECT * FROM tracks WHERE (3 = tracks.album_id) LIMIT 1 OFFSET 1) AS t1']
     a.first.track.should == EagerTrack.load(:id => 4, :album_id=>1)
     DB.sqls.should == []
   end
@@ -233,9 +268,18 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
+  it "should eagerly load a single one_through_one association" do
+    EagerAlbum.one_through_one :genre, :clone=>:genre, :order=>:a
+    a = EagerAlbum.eager(:genre).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (1 = ag.album_id)) ORDER BY a LIMIT 1) AS t1"]
+    a.first.genre.should == EagerGenre.load(:id=>4)
+    DB.sqls.should == []
+  end
+  
   it "should eagerly load a single one_through_one association using the :distinct_on strategy" do
     def (EagerGenre.dataset).supports_distinct_on?() true end
-    EagerAlbum.one_through_one :genre, :clone=>:genre, :order=>:a
+    EagerAlbum.one_through_one :genre, :clone=>:genre, :order=>:a, :eager_limit_strategy=>:distinct_on
     a = EagerAlbum.eager(:genre).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', "SELECT DISTINCT ON (ag.album_id) genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1))) ORDER BY ag.album_id, a"]
@@ -245,7 +289,7 @@ describe Sequel::Model, "#eager" do
   
   it "should eagerly load a single one_through_one association using the :window_function strategy" do
     def (EagerGenre.dataset).supports_window_functions?() true end
-    EagerAlbum.one_through_one :genre, :clone=>:genre, :eager_limit_strategy=>true
+    EagerAlbum.one_through_one :genre, :clone=>:genre, :eager_limit_strategy=>:window_function
     a = EagerAlbum.eager(:genre).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x, row_number() OVER (PARTITION BY ag.album_id) AS x_sequel_row_number_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))) AS t1 WHERE (x_sequel_row_number_x = 1)"]
@@ -428,6 +472,32 @@ describe Sequel::Model, "#eager" do
     a.album.should == EagerAlbum.load(:id => 1, :band_id => 2)
     a.album.band.should == EagerBand.load(:id => 2)
     a.album.band.members.should == [EagerBandMember.load(:id => 5)]
+    DB.sqls.should == []
+  end
+  
+  it "should cascade eager loading when using a UNION strategy for eager loading limited associations" do
+    EagerTrack.many_to_one :album2, :clone=>:album
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:a
+    a = EagerAlbum.eager(:track=>:album2).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY a LIMIT 1) AS t1', 'SELECT * FROM albums WHERE (albums.id IN (1))']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    a.first.track.album2.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    DB.sqls.should == []
+
+    a = EagerAlbum.eager(:track=>[:album2]).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY a LIMIT 1) AS t1', 'SELECT * FROM albums WHERE (albums.id IN (1))']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    a.first.track.album2.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    DB.sqls.should == []
+
+    a = EagerAlbum.eager(:track=>{:album2=>:track}).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY a LIMIT 1) AS t1', 'SELECT * FROM albums WHERE (albums.id IN (1))', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY a LIMIT 1) AS t1']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    a.first.track.album2.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.first.track.album2.track.should == EagerTrack.load(:id => 3, :album_id=>1)
     DB.sqls.should == []
   end
   
@@ -647,8 +717,8 @@ describe Sequel::Model, "#eager" do
     as.first.special_genre.should == EagerGenre.load(:id=>5)
   end
 
-  it "should respect the :limit option on a one_to_many association" do
-    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>2
+  it "should respect the :limit option on a one_to_many association using the :ruby strategy" do
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>2, :eager_limit_strategy=>:ruby
     EagerTrack.dataset._fetch = [{:album_id=>1, :id=>2}, {:album_id=>1, :id=>3}, {:album_id=>1, :id=>4}]
     as = EagerAlbum.eager(:first_two_tracks).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (1))"]
@@ -656,43 +726,60 @@ describe Sequel::Model, "#eager" do
     as.first.first_two_tracks.should == [EagerTrack.load(:album_id=>1, :id=>2), EagerTrack.load(:album_id=>1, :id=>3)]
 
     DB.reset
-    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>[1,1]
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>[1,1], :eager_limit_strategy=>:ruby
     as = EagerAlbum.eager(:first_two_tracks).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (1))"]
     as.length.should == 1
     as.first.first_two_tracks.should == [EagerTrack.load(:album_id=>1, :id=>3)]
 
     DB.reset
-    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>[nil,1]
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>[nil,1], :eager_limit_strategy=>:ruby
     as = EagerAlbum.eager(:first_two_tracks).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (1))"]
     as.length.should == 1
     as.first.first_two_tracks.should == [EagerTrack.load(:album_id=>1, :id=>3), EagerTrack.load(:album_id=>1, :id=>4)]
   end
 
+  it "should respect the :limit option on a one_to_many association" do
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2
+    a = EagerAlbum.eager(:tracks).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY name LIMIT 2) AS t1']
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.should == []
+  
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>[2, 1]
+    a = EagerAlbum.eager(:tracks).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY name LIMIT 2 OFFSET 1) AS t1']
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.should == []
+  
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>[nil, 1]
+    a = EagerAlbum.eager(:tracks).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE (1 = tracks.album_id) ORDER BY name OFFSET 1) AS t1']
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.should == []
+  end
+  
   it "should respect the :limit option on a one_to_many association using the :window_function strategy" do
     def (EagerTrack.dataset).supports_window_functions?() true end
-    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2, :eager_limit_strategy=>:window_function
     a = EagerAlbum.eager(:tracks).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
     a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
     DB.sqls.should == []
-  end
   
-  it "should respect the :limit option with an offset on a one_to_many association using the :window_function strategy" do
-    def (EagerTrack.dataset).supports_window_functions?() true end
-    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>[2, 1]
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>[2, 1], :eager_limit_strategy=>:window_function
     a = EagerAlbum.eager(:tracks).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE ((x_sequel_row_number_x >= 2) AND (x_sequel_row_number_x < 4))']
     a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
     DB.sqls.should == []
-  end
   
-  it "should respect the :limit option with just an offset on a one_to_many association using the :window_function strategy" do
-    def (EagerTrack.dataset).supports_window_functions?() true end
-    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>[nil, 1]
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>[nil, 1], :eager_limit_strategy=>:window_function
     a = EagerAlbum.eager(:tracks).all
     a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
     DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x >= 2)']
@@ -700,8 +787,31 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
-  it "should respect the limit option on a many_to_many association" do
-    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>2
+  it "should use a ruby strategy for limit if :eager_graph option is used" do
+    EagerTrack.many_to_one :album2, :clone=>:album
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>2, :eager_graph=>:album2
+    EagerTrack.dataset._fetch = [{:album_id=>1, :id=>2, :album2_id=>1, :band_id=>5}, {:album_id=>1, :id=>3, :album2_id=>1, :band_id=>5}, {:album_id=>1, :id=>4, :album2_id=>1, :band_id=>5}]
+    as = EagerAlbum.eager(:first_two_tracks).all
+    DB.sqls.should == ['SELECT * FROM albums', "SELECT tracks.id, tracks.album_id, album2.id AS album2_id, album2.band_id FROM tracks LEFT OUTER JOIN albums AS album2 ON (album2.id = tracks.album_id) WHERE (tracks.album_id IN (1))"]
+    as.length.should == 1
+    tracks = as.first.first_two_tracks
+    tracks.should == [EagerTrack.load(:album_id=>1, :id=>2), EagerTrack.load(:album_id=>1, :id=>3)]
+    tracks.first.album2.should == EagerAlbum.load(:id=>1, :band_id=>5)
+    tracks.last.album2.should == EagerAlbum.load(:id=>1, :band_id=>5)
+  end
+  
+  it "should not use a union strategy for limit by default if providing a per-eager load callback" do
+    def (EagerTrack.dataset).supports_window_functions?() true end
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2
+    a = EagerAlbum.eager(:tracks=>proc{|ds| ds.where(:id=>3)}).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY name) AS x_sequel_row_number_x FROM tracks WHERE ((tracks.album_id IN (1)) AND (id = 3))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.should == []
+  end
+
+  it "should respect the limit option on a many_to_many association using the :ruby strategy" do
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>2, :eager_limit_strategy=>:ruby
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}, {:x_foreign_key_x=>2, :id=>7}]
     as = EagerAlbum.eager(:first_two_genres).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))"]
@@ -709,23 +819,47 @@ describe Sequel::Model, "#eager" do
     as.first.first_two_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
     
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}, {:x_foreign_key_x=>2, :id=>7}]
-    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[1, 1]
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[1, 1], :eager_limit_strategy=>:ruby
     as = EagerAlbum.eager(:first_two_genres).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))"]
     as.length.should == 1
     as.first.first_two_genres.should == [EagerGenre.load(:id=>6)]
     
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}, {:x_foreign_key_x=>2, :id=>7}]
-    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[nil, 1]
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[nil, 1], :eager_limit_strategy=>:ruby
     as = EagerAlbum.eager(:first_two_genres).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))"]
     as.length.should == 1
     as.first.first_two_genres.should == [EagerGenre.load(:id=>6), EagerGenre.load(:id=>7)]
   end
 
-  it "should respect the limit option on a many_to_many association using the :window_function strategy" do
+  it "should respect the limit option on a many_to_many association" do
     def (EagerGenre.dataset).supports_window_functions?() true end
     EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>2, :order=>:name
+    EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}]
+    as = EagerAlbum.eager(:first_two_genres).all
+    DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (2 = ag.album_id)) ORDER BY name LIMIT 2) AS t1"]
+    as.length.should == 1
+    as.first.first_two_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
+
+    EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}]
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[1, 1], :order=>:name
+    as = EagerAlbum.eager(:first_two_genres).all
+    DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (2 = ag.album_id)) ORDER BY name LIMIT 1 OFFSET 1) AS t1"]
+    as.length.should == 1
+    as.first.first_two_genres.should == [EagerGenre.load(:id=>5)]
+
+    EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}]
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[nil, 1], :order=>:name
+    as = EagerAlbum.eager(:first_two_genres).all
+    DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (2 = ag.album_id)) ORDER BY name OFFSET 1) AS t1"]
+    as.length.should == 1
+    as.first.first_two_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
+  end
+
+  it "should respect the limit option on a many_to_many association using the :window_function strategy" do
+    def (EagerGenre.dataset).supports_window_functions?() true end
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>2, :order=>:name, :eager_limit_strategy=>:window_function
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}]
     as = EagerAlbum.eager(:first_two_genres).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x, row_number() OVER (PARTITION BY ag.album_id ORDER BY name) AS x_sequel_row_number_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))) AS t1 WHERE (x_sequel_row_number_x <= 2)"]
@@ -733,14 +867,14 @@ describe Sequel::Model, "#eager" do
     as.first.first_two_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
 
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}]
-    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[1, 1], :order=>:name
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[1, 1], :order=>:name, :eager_limit_strategy=>:window_function
     as = EagerAlbum.eager(:first_two_genres).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x, row_number() OVER (PARTITION BY ag.album_id ORDER BY name) AS x_sequel_row_number_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))) AS t1 WHERE ((x_sequel_row_number_x >= 2) AND (x_sequel_row_number_x < 3))"]
     as.length.should == 1
     as.first.first_two_genres.should == [EagerGenre.load(:id=>5)]
 
     EagerGenre.dataset._fetch = [{:x_foreign_key_x=>2, :id=>5}, {:x_foreign_key_x=>2, :id=>6}]
-    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[nil, 1], :order=>:name
+    EagerAlbum.many_to_many :first_two_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :limit=>[nil, 1], :order=>:name, :eager_limit_strategy=>:window_function
     as = EagerAlbum.eager(:first_two_genres).all
     DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM (SELECT genres.*, ag.album_id AS x_foreign_key_x, row_number() OVER (PARTITION BY ag.album_id ORDER BY name) AS x_sequel_row_number_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (2)))) AS t1 WHERE (x_sequel_row_number_x >= 2)"]
     as.length.should == 1

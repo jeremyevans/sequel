@@ -156,6 +156,13 @@ module Sequel
           h
         end
 
+        def eager_load_base_dataset(keys)
+          ds = associated_class 
+          reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
+          ft = final_reverse_edge
+          ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[predicate_key, keys]], :table_alias=>ft[:alias], :qualify=>:deep)
+        end
+
         def filter_by_associations_add_conditions_dataset_filter(ds)
           reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
           ft = final_reverse_edge
@@ -175,6 +182,18 @@ module Sequel
           reverse_edges.each{|t| subquery = subquery.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
           ft = final_reverse_edge
           subquery.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep)
+        end
+
+        def union_eager_loader_proc
+          proc do |pl, ds|
+            keys = predicate_keys
+            ds = associated_dataset
+            reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
+            ft = final_reverse_edge
+            ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + keys.map{pl.arg}.zip(keys), :table_alias=>ft[:alias], :qualify=>:deep).
+              select_append(*associated_key_array).
+              from_self
+          end
         end
       end
 
@@ -233,8 +252,7 @@ module Sequel
           end
 
           left_key = opts[:left_key] = opts[:through].first[:left]
-          uses_lcks = opts[:uses_left_composite_keys] = left_key.is_a?(Array)
-          left_keys = Array(left_key)
+          opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           left_pks = opts[:left_primary_keys] = Array(left_pk)
@@ -247,42 +265,8 @@ module Sequel
             ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + opts.predicate_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias], :qualify=>:deep)
           end
 
-          slice_range = opts.slice_range
-          left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
-          opts[:eager_loader] ||= lambda do |eo|
-            h = eo[:id_map]
-            rows = eo[:rows]
-            ds = opts.associated_class 
-            opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
-            ft = opts.final_reverse_edge
-
-            ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[opts.predicate_key, h.keys]], :table_alias=>ft[:alias], :qualify=>:deep)
-            ds = model.eager_loading_dataset(opts, ds, nil, eo[:associations], eo)
-            ds = opts.apply_eager_limit_strategy(ds)
-            opts.initialize_association_cache(rows)
-
-            assign_singular = opts.assign_singular?
-            delete_rn = opts.delete_row_number_column(ds)
-            ds.all do |assoc_record|
-              assoc_record.values.delete(delete_rn) if delete_rn
-              hash_key = if uses_lcks
-                left_key_alias.map{|k| assoc_record.values.delete(k)}
-              else
-                assoc_record.values.delete(left_key_alias)
-              end
-              next unless objects = h[hash_key]
-              if assign_singular
-                objects.each do |object|
-                  object.associations[name] ||= assoc_record
-                end
-              else
-                objects.each do |object|
-                  object.associations[name].push(assoc_record)
-                end
-              end
-            end
-            opts.apply_ruby_eager_limit_strategy(rows)
-          end
+          opts[:left_key_alias] ||= opts.default_associated_key_alias
+          opts[:eager_loader] ||= opts.method(:default_eager_loader)
 
           join_type = opts[:graph_join_type]
           select = opts[:graph_select]

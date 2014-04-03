@@ -4,7 +4,7 @@ shared_examples_for "one_to_one eager limit strategies" do
   specify "eager loading one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els) if @els
     Artist.one_to_one  :last_album, {:clone=>:last_album}.merge(@els) if @els
-    Artist.one_to_one  :second_album, {:clone=>:second_album}.merge(@els) if @els
+    Artist.one_to_one  :second_album, {:clone=>:second_album}.merge(@els) if @els && @els[:eager_limit_strategy] != :distinct_on
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     ar = @pr.call[1]
@@ -29,7 +29,9 @@ shared_examples_for "one_to_one eager limit strategies" do
     [@album, same_album].should include(a.first.first_album)
     a.last.first_album.should == nil
   end
+end
 
+shared_examples_for "one_to_one eager_graph limit strategies" do
   specify "eager graphing one_to_one associations should work correctly" do
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
@@ -50,7 +52,7 @@ shared_examples_for "one_to_one eager limit strategies" do
     a.last.last_album.should == nil
     a.first.last_album.values.should == diff_album.values
 
-    a = ds.eager_graph_with_options(:second_album, limit_strategy).all
+    a = ds.eager_graph_with_options(:second_album, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
     a = ds.eager_graph(:second_album).all
     a.should == [@artist, ar]
     a.first.second_album.should == diff_album
@@ -93,7 +95,9 @@ shared_examples_for "one_to_many eager limit strategies" do
     ars.first.not_first_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
     ars.first.last_two_albums.map{|x| x.values}.should == [diff_album, middle_album].map{|x| x.values}
   end
+end
 
+shared_examples_for "one_to_many eager_graph limit strategies" do
   specify "should correctly handle limits and offsets when eager graphing one_to_many associations" do
     @album.update(:artist => @artist)
     middle_album = @middle_album.call
@@ -108,7 +112,7 @@ shared_examples_for "one_to_many eager limit strategies" do
     ars.last.first_two_albums.should == []
     ars.first.first_two_albums.map{|x| x.values}.should == [@album, middle_album].map{|x| x.values}
 
-    ars = ds.eager_graph_with_options(:second_two_albums, limit_strategy).all
+    ars = ds.eager_graph_with_options(:second_two_albums, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
     ars.should == [@artist, ar]
     ars.first.second_two_albums.should == [middle_album, diff_album]
     ars.last.second_two_albums.should == []
@@ -131,7 +135,7 @@ end
 shared_examples_for "one_through_one eager limit strategies" do
   specify "should correctly handle offsets when eager loading one_through_one associations" do
     Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els) if @els
-    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els
+    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els && @els[:eager_limit_strategy] != :distinct_on
     Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els) if @els
     tu, tv = @other_tags.call
     al = @pr.call.first
@@ -150,7 +154,9 @@ shared_examples_for "one_through_one eager limit strategies" do
     als.first.second_tag.values.should == tu.values
     als.first.last_tag.values.should == tv.values
   end
+end
 
+shared_examples_for "one_through_one eager_graph limit strategies" do
   specify "should correctly handle offsets when eager graphing one_through_one associations" do
     tu, tv = @other_tags.call
     al = @pr.call.first
@@ -163,7 +169,7 @@ shared_examples_for "one_through_one eager limit strategies" do
     als.last.first_tag.should == nil
     als.first.first_tag.values.should == @tag.values
 
-    als = ds.eager_graph_with_options(:second_tag, limit_strategy).all
+    als = ds.eager_graph_with_options(:second_tag, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
     als.should == [@album, al]
     als.first.second_tag.should == tu
     als.last.second_tag.should == nil
@@ -203,7 +209,9 @@ shared_examples_for "many_to_many eager limit strategies" do
     als.first.not_first_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
     als.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
+end
 
+shared_examples_for "many_to_many eager_graph limit strategies" do
   specify "should correctly handle limits and offsets when eager loading many_to_many associations" do
     tu, tv = @other_tags.call
     al = @pr.call.first
@@ -266,7 +274,9 @@ shared_examples_for "many_through_many eager limit strategies" do
     ars.first.not_first_tags.map{|x| x.values}.should == [tu, tv].map{|x| x.values}
     ars.first.last_two_tags.map{|x| x.values}.should == [tv, tu].map{|x| x.values}
   end
+end
 
+shared_examples_for "many_through_many eager_graph limit strategies" do
   specify "should correctly handle limits and offsets when eager loading many_through_many associations" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
@@ -305,7 +315,7 @@ end
 shared_examples_for "one_through_many eager limit strategies" do
   specify "should correctly handle offsets when eager loading one_through_many associations" do
     Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els) if @els
-    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els
+    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els && @els[:eager_limit_strategy] != :distinct_on
     Artist.one_through_many :last_tag, {:clone=>:last_tag}.merge(@els) if @els
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
@@ -327,7 +337,9 @@ shared_examples_for "one_through_many eager limit strategies" do
     ars.first.second_tag.values.should == tu.values
     ars.first.last_tag.values.should == tv.values
   end
+end
 
+shared_examples_for "one_through_many eager_graph limit strategies" do
   specify "should correctly handle offsets when eager graphing one_through_many associations" do
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
@@ -343,7 +355,7 @@ shared_examples_for "one_through_many eager limit strategies" do
     ars.last.first_tag.should == tu
     ars.first.first_tag.values.should == @tag.values
 
-    ars = ds.eager_graph_with_options(:second_tag, limit_strategy).all
+    ars = ds.eager_graph_with_options(:second_tag, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
     ars.should == [@artist, ar]
     ars.first.second_tag.should == tu
     ars.last.second_tag.should == nil
@@ -364,6 +376,15 @@ shared_examples_for "eager limit strategies" do
   it_should_behave_like "one_through_one eager limit strategies"
   it_should_behave_like "many_through_many eager limit strategies"
   it_should_behave_like "one_through_many eager limit strategies"
+end
+
+shared_examples_for "eager_graph limit strategies" do
+  it_should_behave_like "one_to_one eager_graph limit strategies"
+  it_should_behave_like "one_to_many eager_graph limit strategies"
+  it_should_behave_like "many_to_many eager_graph limit strategies"
+  it_should_behave_like "one_through_one eager_graph limit strategies"
+  it_should_behave_like "many_through_many eager_graph limit strategies"
+  it_should_behave_like "one_through_many eager_graph limit strategies"
 end
 
 shared_examples_for "filtering/excluding by associations" do
@@ -1012,7 +1033,7 @@ shared_examples_for "filter by associations singular association limit strategie
   specify "filter by associations with limited one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
     Artist.one_to_one :last_album, {:clone=>:last_album}.merge(@els)
-    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els)
+    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     ar = @pr.call[1]
@@ -1042,7 +1063,7 @@ shared_examples_for "filter by associations singular association limit strategie
   specify "dataset associations with limited one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
     Artist.one_to_one :last_album, {:clone=>:last_album}.merge(@els)
-    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els)
+    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     ar = @pr.call[1]
@@ -1063,7 +1084,7 @@ shared_examples_for "filter by associations singular association limit strategie
 
   specify "filter by associations with limited one_through_one associations should work correctly" do
     Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els)
-    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els)
+    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
     Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els)
     tu, tv = @other_tags.call
     al = @pr.call.first
@@ -1104,7 +1125,7 @@ shared_examples_for "filter by associations singular association limit strategie
 
   specify "dataset associations with limited one_through_one associations should work correctly" do
     Album.one_through_one :first_tag, {:clone=>:first_tag}.merge(@els)
-    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els)
+    Album.one_through_one :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
     Album.one_through_one :last_tag, {:clone=>:last_tag}.merge(@els)
     tu, tv = @other_tags.call
     al = @pr.call.first
@@ -1135,7 +1156,7 @@ shared_examples_for "filter by associations singular association limit strategie
 
   specify "filter by associations with limited one_through_many associations should work correctly" do
     Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els)
-    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els)
+    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
     Artist.one_through_many :last_tag, {:clone=>:last_tag}.merge(@els)
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
@@ -1178,7 +1199,7 @@ shared_examples_for "filter by associations singular association limit strategie
 
   specify "dataset associations with limited one_through_many associations should work correctly" do
     Artist.one_through_many :first_tag, {:clone=>:first_tag}.merge(@els)
-    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els)
+    Artist.one_through_many :second_tag, {:clone=>:second_tag}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
     Artist.one_through_many :last_tag, {:clone=>:last_tag}.merge(@els)
     @album.update(:artist => @artist)
     tu, tv = @other_tags.call
@@ -1660,20 +1681,31 @@ shared_examples_for "regular and composite key associations" do
     it_should_behave_like "filtering/excluding by associations"
   end
 
+  describe "with default/union :eager_limit_strategy" do
+    before do
+      @els = {}
+    end
+    it_should_behave_like "eager limit strategies"
+  end
+
   describe "with :eager_limit_strategy=>:ruby" do
     before do
       @els = {:eager_limit_strategy=>:ruby}
     end
     it_should_behave_like "eager limit strategies"
+    it_should_behave_like "eager_graph limit strategies"
   end
 
-  describe "with :eager_limit_strategy=>true" do
+  describe "with :eager_limit_strategy=>:distinct_on" do
     before do
-      @els = {:eager_limit_strategy=>true}
+      @els = {:eager_limit_strategy=>:distinct_on}
     end
     it_should_behave_like "one_to_one eager limit strategies"
     it_should_behave_like "one_through_one eager limit strategies"
     it_should_behave_like "one_through_many eager limit strategies"
+    it_should_behave_like "one_to_one eager_graph limit strategies"
+    it_should_behave_like "one_through_one eager_graph limit strategies"
+    it_should_behave_like "one_through_many eager_graph limit strategies"
     it_should_behave_like "filter by associations singular association limit strategies"
   end if DB.dataset.supports_ordered_distinct_on?
 
@@ -1682,6 +1714,7 @@ shared_examples_for "regular and composite key associations" do
       @els = {:eager_limit_strategy=>:window_function}
     end
     it_should_behave_like "eager limit strategies"
+    it_should_behave_like "eager_graph limit strategies"
     it_should_behave_like "filter by associations limit strategies"
   end if DB.dataset.supports_window_functions?
 
@@ -2168,6 +2201,7 @@ describe "Sequel::Model pg_array_to_many" do
   
   it_should_behave_like "basic regular and composite key associations"
   it_should_behave_like "many_to_many eager limit strategies"
+  it_should_behave_like "many_to_many eager_graph limit strategies"
 
   it "should handle adding and removing entries in array" do
     a = Album.create
@@ -2248,6 +2282,7 @@ describe "Sequel::Model many_to_pg_array" do
   
   it_should_behave_like "basic regular and composite key associations"
   it_should_behave_like "many_to_many eager limit strategies"
+  it_should_behave_like "many_to_many eager_graph limit strategies"
 
   it "should handle adding and removing entries in array" do
     a = Album.create

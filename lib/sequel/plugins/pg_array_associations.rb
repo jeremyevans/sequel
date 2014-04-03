@@ -107,6 +107,11 @@ module Sequel
           end
         end
 
+        # Don't use a filter by associations limit strategy
+        def filter_by_associations_limit_strategy
+          nil
+        end
+
         # Handle silent failure of add/remove methods if raise_on_save_failure is false.
         def handle_silent_modification_failure?
           self[:raise_on_save_failure] == false
@@ -188,6 +193,11 @@ module Sequel
           cached_fetch(:_eager_limit_strategy) do
             :ruby if self[:limit]
           end
+        end
+
+        # Don't use a filter by associations limit strategy
+        def filter_by_associations_limit_strategy
+          nil
         end
 
         # Handle silent failure of add/remove methods if raise_on_save_failure is false

@@ -491,7 +491,7 @@ describe 'Sequel::Plugins::ManyThroughMany::ManyThroughManyAssociationReflection
   end
 end
 
-describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
+describe "many_through_many eager loading methods" do
   before do
     class ::Artist < Sequel::Model
       plugin :many_through_many
@@ -684,6 +684,35 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should respect the :limit option on a many_through_many association" do
     @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}]
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (1 = albums_artists.artist_id)) LIMIT 2) AS t1']
+    a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
+    DB.sqls.length.should == 0
+
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[1,1]
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>6}]
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (1 = albums_artists.artist_id)) LIMIT 1 OFFSET 1) AS t1']
+    a.first.first_two_tags.should == [Tag.load(:id=>6)]
+    DB.sqls.length.should == 0
+
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1]
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>6}, {:x_foreign_key_x=>1, :id=>7}]
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (1 = albums_artists.artist_id)) OFFSET 1) AS t1']
+    a.first.first_two_tags.should == [Tag.load(:id=>6), Tag.load(:id=>7)]
+    DB.sqls.length.should == 0
+  end
+
+  it "should respect the :limit option on a many_through_many association using a :ruby strategy" do
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :eager_limit_strategy=>:ruby
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}, {:x_foreign_key_x=>1, :id=>7}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
@@ -692,7 +721,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
     DB.sqls.length.should == 0
 
-    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[1,1]
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[1,1], :eager_limit_strategy=>:ruby
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     DB.sqls.should == ['SELECT * FROM artists',
@@ -700,7 +729,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     a.first.first_two_tags.should == [Tag.load(:id=>6)]
     DB.sqls.length.should == 0
 
-    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1]
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :eager_limit_strategy=>:ruby
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     DB.sqls.should == ['SELECT * FROM artists',
@@ -711,7 +740,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
 
   it "should respect the :limit option on a many_through_many association using a :window_function strategy" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
-    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :order=>:name
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :order=>:name, :eager_limit_strategy=>:window_function
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5},{:x_foreign_key_x=>1, :id=>6}]
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
@@ -720,7 +749,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
     DB.sqls.length.should == 0
 
-    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1], :order=>:name
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1], :order=>:name, :eager_limit_strategy=>:window_function
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     DB.sqls.should == ['SELECT * FROM artists',
@@ -728,7 +757,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
     DB.sqls.length.should == 0
 
-    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name
+    @c1.many_through_many :first_two_tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name, :eager_limit_strategy=>:window_function
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id=>1)]
     DB.sqls.should == ['SELECT * FROM artists',
@@ -737,7 +766,7 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     DB.sqls.length.should == 0
   end
 
-  it "should respect the :limit option on a many_through_many association with composite primary keys on the main table using a :window_function strategy" do
+  it "should respect the :limit option on a many_through_many association with composite primary keys on the main table" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
     @c1.set_primary_key([:id1, :id2])
     @c1.columns :id1, :id2
@@ -747,11 +776,34 @@ describe "Sequel::Plugins::ManyThroughMany eager loading methods" do
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id1=>1, :id2=>2)]
     DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id1 AS x_foreign_key_0_x, albums_artists.artist_id2 AS x_foreign_key_1_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (1 = albums_artists.artist_id1) AND (2 = albums_artists.artist_id2)) ORDER BY name LIMIT 2) AS t1']
+    a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
+    DB.sqls.length.should == 0
+
+    @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1]
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id1=>1, :id2=>2)]
+    DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id1 AS x_foreign_key_0_x, albums_artists.artist_id2 AS x_foreign_key_1_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (1 = albums_artists.artist_id1) AND (2 = albums_artists.artist_id2)) LIMIT 2 OFFSET 1) AS t1']
+    a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
+    DB.sqls.length.should == 0
+  end
+
+  it "should respect the :limit option on a many_through_many association with composite primary keys on the main table using a :window_function strategy" do
+    Tag.dataset.meta_def(:supports_window_functions?){true}
+    @c1.set_primary_key([:id1, :id2])
+    @c1.columns :id1, :id2
+    @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>2, :order=>:name, :eager_limit_strategy=>:window_function
+    @c1.dataset._fetch = [{:id1=>1, :id2=>2}]
+    Tag.dataset._fetch = [{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}, {:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>6}]
+    a = @c1.eager(:first_two_tags).all
+    a.should == [@c1.load(:id1=>1, :id2=>2)]
+    DB.sqls.should == ['SELECT * FROM artists',
       'SELECT * FROM (SELECT tags.*, albums_artists.artist_id1 AS x_foreign_key_0_x, albums_artists.artist_id2 AS x_foreign_key_1_x, row_number() OVER (PARTITION BY albums_artists.artist_id1, albums_artists.artist_id2 ORDER BY name) AS x_sequel_row_number_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND ((albums_artists.artist_id1, albums_artists.artist_id2) IN ((1, 2))))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
     a.first.first_two_tags.should == [Tag.load(:id=>5), Tag.load(:id=>6)]
     DB.sqls.length.should == 0
 
-    @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1], :order=>:name
+    @c1.many_through_many :first_two_tags, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[2,1], :order=>:name, :eager_limit_strategy=>:window_function
     a = @c1.eager(:first_two_tags).all
     a.should == [@c1.load(:id1=>1, :id2=>2)]
     DB.sqls.should == ['SELECT * FROM artists',
@@ -1533,7 +1585,7 @@ describe Sequel::Model, "one_through_many" do
   end
 end
 
-describe "Sequel::Plugins::OneThroughMany eager loading methods" do
+describe "one_through_many eager loading methods" do
   before do
     class ::Artist < Sequel::Model
       plugin :many_through_many
@@ -1695,7 +1747,7 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
   end
   
   it "should respect :order when eagerly loading" do
-    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :order=>:blah
+    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :order=>:blah, :eager_limit_strategy=>:ruby
     a = @c1.eager(:tag).all
     a.should == [@c1.load(:id=>1)]
     DB.sqls.should == ['SELECT * FROM artists',
@@ -1726,6 +1778,17 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
 
   it "should respect the :limit option on a one_through_many association" do
     @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1]
+    Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>6}]
+    a = @c1.eager(:second_tag).all
+    a.should == [@c1.load(:id=>1)]
+    DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (1 = albums_artists.artist_id)) LIMIT 1 OFFSET 1) AS t1']
+    a.first.second_tag.should == Tag.load(:id=>6)
+    DB.sqls.length.should == 0
+  end
+
+  it "should respect the :limit option on a one_through_many association using the :ruby strategy" do
+    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :eager_limit_strategy=>:ruby
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5}, {:x_foreign_key_x=>1, :id=>6}]
     a = @c1.eager(:second_tag).all
     a.should == [@c1.load(:id=>1)]
@@ -1737,7 +1800,7 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
 
   it "should eagerly load a single one_through_many association using the :distinct_on strategy" do
     Tag.dataset.meta_def(:supports_distinct_on?){true}
-    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :order=>:name
+    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :order=>:name, :eager_limit_strategy=>:distinct_on
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5}]
     a = @c1.eager(:second_tag).all
     a.should == [@c1.load(:id=>1)]
@@ -1748,7 +1811,7 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
   
   it "should eagerly load a single one_through_many association using the :window_function strategy" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
-    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name
+    @c1.one_through_many :second_tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name, :eager_limit_strategy=>:window_function
     Tag.dataset._fetch = [{:x_foreign_key_x=>1, :id=>5}]
     a = @c1.eager(:second_tag).all
     a.should == [@c1.load(:id=>1)]
@@ -1758,12 +1821,29 @@ describe "Sequel::Plugins::OneThroughMany eager loading methods" do
     DB.sqls.length.should == 0
   end
 
-  it "should respect the :limit option on a one_through_many association with composite primary keys on the main table using a :window_function strategy" do
+  it "should respect the :limit option on a one_through_many association with composite primary keys on the main table" do
     Tag.dataset.meta_def(:supports_window_functions?){true}
     @c1.set_primary_key([:id1, :id2])
     @c1.columns :id1, :id2
 
     @c1.one_through_many :second_tag, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name
+    ds = @c1.eager(:second_tag)
+    ds._fetch = {:id1=>1, :id2=>2}
+    Tag.dataset._fetch = [{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}]
+    a = ds.all
+    a.should == [@c1.load(:id1=>1, :id2=>2)]
+    DB.sqls.should == ['SELECT * FROM artists',
+      'SELECT * FROM (SELECT tags.*, albums_artists.artist_id1 AS x_foreign_key_0_x, albums_artists.artist_id2 AS x_foreign_key_1_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (1 = albums_artists.artist_id1) AND (2 = albums_artists.artist_id2)) ORDER BY name LIMIT 1 OFFSET 1) AS t1']
+    a.first.second_tag.should == Tag.load(:id=>5)
+    DB.sqls.length.should == 0
+  end
+
+  it "should respect the :limit option on a one_through_many association with composite primary keys on the main table using a :window_function strategy" do
+    Tag.dataset.meta_def(:supports_window_functions?){true}
+    @c1.set_primary_key([:id1, :id2])
+    @c1.columns :id1, :id2
+
+    @c1.one_through_many :second_tag, [[:albums_artists, [:artist_id1, :artist_id2], :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :class=>Tag, :limit=>[nil,1], :order=>:name, :eager_limit_strategy=>:window_function
     ds = @c1.eager(:second_tag)
     ds._fetch = {:id1=>1, :id2=>2}
     Tag.dataset._fetch = [{:x_foreign_key_0_x=>1, :x_foreign_key_1_x=>2, :id=>5}]

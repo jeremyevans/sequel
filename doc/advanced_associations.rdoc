@@ -255,22 +255,36 @@ a LIMIT:
 === Eager Loading via eager
 
 However, if you want to eagerly load an association, you must use a different
-approach.  Sequel has 3 separate strategies for dealing with such cases,
-depending on database support.
+approach.  Sequel has 4 separate strategies for dealing with such cases.
 
-On PostgreSQL, for *_one associations that don't use an offset, it will by
-default use the distinct on strategy, which uses a DISTINCT ON clause:
+The default strategy used on all databases is a UNION-based approach, which
+will submit multiple subqueries in a UNION query:
 
-  Artist.one_to_one :first_album, :class=>:Album, :order=>:release_date
+  Artist.where(:id=>[1,2]).eager(:first_10_albums).all
+  # SELECT * FROM (SELECT * FROM albums WHERE (artist_id = 1) LIMIT 10) UNION ALL
+  # SELECT * FROM (SELECT * FROM albums WHERE (artist_id = 2) LIMIT 10)
+
+This is the fastest way to load the associated objects on most databases, as long as
+there is an index on albums.artist_id.  Without an index it is probably the slowest
+approach, so make sure you have an index on the key columns.  If you cannot add an
+index, you'll want to manually specify the :eager_limit_strategy option as shown below.
+
+On PostgreSQL, for *_one associations that don't use an offset, you can
+choose to use a the distinct on strategy:
+
+  Artist.one_to_one :first_album, :class=>:Album, :order=>:release_date,
+    :eager_limit_strategy=>:distinct_on
   Artist.where(:id=>[1,2]).eager(:first_album).all
   # SELECT DISTINCT ON (albums.artist_id) *
   # FROM albums
   # WHERE (albums.artist_id IN (1, 2))
   # ORDER BY albums.artist_id, release_date
   
-Otherwise, if the database supports window functions, it will use a subquery
-with a window function:
+Otherwise, if the database supports window functions, you can choose to use
+the window function strategy:
 
+  Artist.one_to_many :first_10_albums, :class=>:Album, :order=>:release_date, :limit=>10,
+    :eager_limit_strategy=>:window_function
   Artist.where(:id=>[1,2]).eager(:first_10_albums).all
   # SELECT * FROM (
   #   SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY release_date) AS x_sequel_row_number_x
@@ -279,18 +293,19 @@ with a window function:
   # ) AS t1
   # WHERE (x_sequel_row_number_x <= 10)
   
-If the database doesn't support window functions, it will fall back to
+Alternatively, you can use the :ruby strategy, which will fall back to
 retrieving all records, and then will slice the resulting array to get
 the first 10 after retrieval.
 
 === Eager Loading via eager_graph_with_options
 
 When eager loading an association via eager_graph (which uses JOINs), the
-situation is similar.  Sequel can use a variant of the same 3 strategies,
-but by default it retrieves all records and then does the array slice
-in ruby.  As eager_graph does not support options, to use an eager_graph
-limit strategy you have to use the eager_graph_with_options method with
-the :limit_strategy option.
+situation is similar.  While the UNION-based strategy cannot be used as
+you don't know the records being eagerly loaded in advance, Sequel can use
+a variant of the other 3 strategies.  By default it retrieves all records
+and then does the array slice in ruby.  As eager_graph does not support
+options, to use an eager_graph limit strategy you have to use the
+eager_graph_with_options method with the :limit_strategy option.
 
 The distinct on strategy uses DISTINCT ON in a subquery and JOINs that
 subquery:
@@ -334,8 +349,12 @@ it against the default behavior and found it is faster for your use case.
 === Filtering By Associations
 
 In order to return correct results, Sequel automatically uses a limit strategy when
-using filtering by associations with limited associations, using a similar approach as
-when using eager to eagerly load.
+using filtering by associations with limited associations, if the database supports
+it.  As in the eager_graph case, the UNION-based strategy doesn't work.  Unlike
+in the eager and eager_graph cases, the array slicing in ruby approach does not work,
+you must use an SQL-based strategy.  Sequel will select an appropriate default
+strategy based on the database you are using, and you can override it using the
+:filter_limit_strategy option.
 
 The distinct on strategy:
 
