@@ -2,10 +2,6 @@
 # returns a cloned dataset that will never issue a query to the
 # database.  It implements the null object pattern for datasets.
 #
-# To load the extension:
-#
-#   Sequel.extension :null_dataset
-#
 # The most common usage is probably in a method that must return
 # a dataset, where the method knows the dataset shouldn't return
 # anything.  With standard Sequel, you'd probably just add a
@@ -26,6 +22,14 @@
 # the same options to get the columns.
 #
 # This extension uses Object#extend at runtime, which can hurt performance.
+#
+# To add the nullify method to a single dataset:
+#
+#   ds = ds.extension(:null_dataset)
+#
+# To add the nullify method to all datasets on a single database:
+#
+#   DB.extension(:null_dataset)
 
 module Sequel
   class Dataset
