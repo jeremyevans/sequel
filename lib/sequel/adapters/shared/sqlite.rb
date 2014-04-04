@@ -520,6 +520,7 @@ module Sequel
       HSTAR = "H*".freeze
       DATE_OPEN = "date(".freeze
       DATETIME_OPEN = "datetime(".freeze
+      ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
 
       def cast_sql_append(sql, expr, type)
         if type == Time or type == DateTime
@@ -720,6 +721,11 @@ module Sequel
         super unless @opts[:lock] == :update
       end
 
+      def select_only_offset_sql(sql)
+        sql << ONLY_OFFSET
+        literal_append(sql, @opts[:offset])
+      end
+  
       # SQLite supports quoted function names.
       def supports_quoted_function_names?
         true

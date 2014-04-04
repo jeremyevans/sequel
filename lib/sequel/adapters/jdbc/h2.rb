@@ -147,6 +147,7 @@ module Sequel
         HSTAR = "H*".freeze
         ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
         TIME_FORMAT = "'%H:%M:%S'".freeze
+        ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
         
         # Emulate the case insensitive LIKE operator and the bitwise operators.
         def complex_expression_sql_append(sql, op, args)
@@ -218,6 +219,11 @@ module Sequel
           SELECT_CLAUSE_METHODS
         end
 
+        def select_only_offset_sql(sql)
+          sql << ONLY_OFFSET
+          literal_append(sql, @opts[:offset])
+        end
+  
         # H2 supports quoted function names.
         def supports_quoted_function_names?
           true

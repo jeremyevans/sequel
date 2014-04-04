@@ -1329,13 +1329,15 @@ module Sequel
       if l = @opts[:limit]
         sql << LIMIT
         literal_append(sql, l)
-      end
-      if o = @opts[:offset]
-        sql << OFFSET
-        literal_append(sql, o)
+        if o = @opts[:offset]
+          sql << OFFSET
+          literal_append(sql, o)
+        end
+      elsif @opts[:offset]
+        select_only_offset_sql(sql)
       end
     end
-  
+
     def select_lock_sql(sql)
       case l = @opts[:lock]
       when :update
@@ -1345,6 +1347,14 @@ module Sequel
       end
     end
 
+    # Used only if there is an offset and no limit, making it easier to override
+    # in the adapter, as many databases do not support just a plain offset with
+    # no limit.
+    def select_only_offset_sql(sql)
+      sql << OFFSET
+      literal_append(sql, @opts[:offset])
+    end
+  
     def select_order_sql(sql)
       if o = @opts[:order]
         sql << ORDER_BY

@@ -261,6 +261,7 @@ module Sequel
       HSTAR = "H*".freeze
       CROSS_APPLY = 'CROSS APPLY'.freeze
       OUTER_APPLY = 'OUTER APPLY'.freeze
+      ONLY_OFFSET = " TOP 2147483647".freeze
 
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the SqlAnywhere module setting.
@@ -430,14 +431,21 @@ module Sequel
       # Sybase uses TOP N for limit.  For Sybase TOP (N) is used
       # to allow the limit to be a bound variable.
       def select_limit_sql(sql)
-        if l = @opts[:limit]
-          sql << TOP
-          literal_append(sql, l)
-        end
-        if o = @opts[:offset]
-          sql << START_AT + "("
-          literal_append(sql, o)
-          sql << " + 1)"
+        l = @opts[:limit]
+        o = @opts[:offset]
+        if l || o
+          if l
+            sql << TOP
+            literal_append(sql, l)
+          else
+            sql << ONLY_OFFSET
+          end
+
+          if o 
+            sql << START_AT + "("
+            literal_append(sql, o)
+            sql << " + 1)"
+          end
         end
       end
 

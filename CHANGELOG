@@ -1,5 +1,7 @@
 === HEAD
 
+* Support offsets without limits on MySQL, SQLite, H2, SQLAnywhere and CUBRID (jeremyevans)
+
 * Remove the install/uninstall rake tasks (jeremyevans)
 
 * Use INSERT VALUES with multiple rows for Dataset#import and #multi_insert on more databases (jeremyevans)

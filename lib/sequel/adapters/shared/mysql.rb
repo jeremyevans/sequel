@@ -567,6 +567,9 @@ module Sequel
       EMPTY_BLOB = "''".freeze
       HSTAR = "H*".freeze
 
+      # Comes directly from MySQL's documentation, used for queries with limits without offsets
+      ONLY_OFFSET = ",18446744073709551615".freeze
+
       include Sequel::Dataset::Replace
 
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
@@ -908,6 +911,12 @@ module Sequel
         SELECT_CLAUSE_METHODS
       end
       
+      def select_only_offset_sql(sql)
+        sql << LIMIT
+        literal_append(sql, @opts[:offset])
+        sql << ONLY_OFFSET
+      end
+  
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super
