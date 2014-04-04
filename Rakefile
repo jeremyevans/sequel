@@ -7,23 +7,12 @@ VERS = lambda do
   Sequel.version
 end
 CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*", '**/*.rbc']
-SUDO = ENV['SUDO'] || 'sudo'
 
 # Gem Packaging and Release
 
 desc "Build sequel gem"
 task :package=>[:clean] do |p|
   sh %{#{FileUtils::RUBY} -S gem build sequel.gemspec}
-end
-
-desc "Install sequel gem"
-task :install=>[:package] do
-  sh %{#{SUDO} #{FileUtils::RUBY} -S gem install ./#{NAME}-#{VERS.call} --local}
-end
-
-desc "Uninstall sequel gem"
-task :uninstall=>[:clean] do
-  sh %{#{SUDO} #{FileUtils::RUBY} -S gem uninstall #{NAME}}
 end
 
 desc "Publish sequel gem to rubygems.org"
