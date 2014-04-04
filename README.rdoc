@@ -34,7 +34,7 @@ If you have any comments or suggestions please post to the Google group.
 
 == Installation
 
-  sudo gem install sequel
+  gem install sequel
   
 == A Short Example
 
