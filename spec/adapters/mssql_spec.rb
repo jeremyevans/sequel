@@ -719,4 +719,4 @@ describe "MSSQL Stored Procedure support" do
       })[:result].should == 1
     end
   end
-end unless DB.adapter_scheme != :odbc
+end unless DB.adapter_scheme == :odbc
