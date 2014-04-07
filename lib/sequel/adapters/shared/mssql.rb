@@ -56,7 +56,7 @@ module Sequel
       #     DB.call_mssql_sproc(:SequelTest, :args => {
       #       'input_arg1_name' => 'input arg1 value',
       #       'input_arg2_name' => 'input arg2 value',
-      #       'output_arg_name' => ['varname', :outbound, 'int']
+      #       'output_arg_name' => ['varname', :output, 'int']
       #     })
       #     So [varname] - variable name for method result,
       #     [output_arg_name] - stored procedure output parameter name
