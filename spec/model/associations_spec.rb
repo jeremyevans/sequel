@@ -3004,7 +3004,7 @@ describe "Filtering by associations" do
   end
 
   it "should be able to filter on one_to_one associations with :eager_limit_strategy" do
-    @Album.one_to_one :l_track2, :clone=>:track, :filter_limit_strategy=>:window_function
+    @Album.one_to_one :l_track2, :clone=>:track, :eager_limit_strategy=>:window_function
     @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT id FROM (SELECT tracks.id, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks) AS t1 WHERE (x_sequel_row_number_x = 1))) AND (tracks.id = 5))))"
   end
 
@@ -3032,6 +3032,11 @@ describe "Filtering by associations" do
   it "should be able to filter on one_to_one associations with :order and :eager_limit_strategy=>:ruby" do
     @Album.one_to_one :l_track2, :clone=>:l_track, :eager_limit_strategy=>:ruby
     @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT DISTINCT ON (tracks.album_id) tracks.id FROM tracks ORDER BY tracks.album_id, name)) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_one associations with :filter_limit_strategy :correlated_subquery" do
+    @Album.one_to_one :l_track2, :clone=>:track, :filter_limit_strategy=>:correlated_subquery
+    @Album.filter(:l_track2=>@Track.load(:id=>5, :album_id=>3)).sql.should == "SELECT * FROM albums WHERE (albums.id IN (SELECT tracks.album_id FROM tracks WHERE ((tracks.album_id IS NOT NULL) AND (tracks.id IN (SELECT t1.id FROM tracks AS t1 WHERE (t1.album_id = tracks.album_id) LIMIT 1)) AND (tracks.id = 5))))"
   end
 
   it "should be able to filter on many_to_many associations with :limit" do
@@ -3108,6 +3113,11 @@ describe "Filtering by associations" do
 
   it "should be able to filter on one_to_many associations with :limit and composite keys" do
     @Album.filter(:l_ctracks=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE ((tracks.album_id1 IS NOT NULL) AND (tracks.album_id2 IS NOT NULL) AND (tracks.id IN (SELECT id FROM (SELECT tracks.id, row_number() OVER (PARTITION BY tracks.album_id1, tracks.album_id2) AS x_sequel_row_number_x FROM tracks) AS t1 WHERE (x_sequel_row_number_x <= 10))) AND (tracks.id = 5))))"
+  end
+
+  it "should be able to filter on one_to_many associations with composite keys and :filter_limit_strategy :correlated_subquery" do
+    @Album.one_to_one :l_ctracks2, :clone=>:l_ctracks, :filter_limit_strategy=>:correlated_subquery
+    @Album.filter(:l_ctracks2=>@Track.load(:id=>5, :album_id1=>3, :album_id2=>4)).sql.should == "SELECT * FROM albums WHERE ((albums.id1, albums.id2) IN (SELECT tracks.album_id1, tracks.album_id2 FROM tracks WHERE ((tracks.album_id1 IS NOT NULL) AND (tracks.album_id2 IS NOT NULL) AND (tracks.id IN (SELECT t1.id FROM tracks AS t1 WHERE ((t1.album_id1 = tracks.album_id1) AND (t1.album_id2 = tracks.album_id2)) LIMIT 1)) AND (tracks.id = 5))))"
   end
 
   it "should be able to filter on one_to_one associations with :order and composite keys" do

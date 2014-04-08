@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :correlated_subquery as an eager_graph and filter by associations limit strategy for one_to_* associations (jeremyevans)
+
 * Support named paramters in call_mssql_sproc on Microsoft SQL Server (y.zemlyanukhin, jeremyevans) (#792)
 
 * Handle placeholder literalizer arguments when emulating offsets (jeremyevans)

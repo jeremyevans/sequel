@@ -1228,6 +1228,19 @@ describe Sequel::Model, "#eager_graph" do
     a.first.ltrack.should == sub.load(:id => 3, :album_id=>1)
   end
   
+  it "should eagerly graph a single one_to_one association using the :correlated_subquery strategy" do
+    sub = Class.new(GraphTrack)
+    def (sub.dataset).supports_window_functions?() true end
+    def (sub.dataset).columns() [:id, :album_id] end
+    GraphAlbum.one_to_one :ltrack, :clone=>:track, :class=>sub
+    ds = GraphAlbum.eager_graph_with_options(:ltrack, :limit_strategy=>:correlated_subquery)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, ltrack.id AS ltrack_id, ltrack.album_id FROM albums LEFT OUTER JOIN (SELECT * FROM tracks WHERE (tracks.id IN (SELECT t1.id FROM tracks AS t1 WHERE (t1.album_id = tracks.album_id) LIMIT 1))) AS ltrack ON (ltrack.album_id = albums.id)'
+    ds._fetch = {:id=>1, :band_id=>2, :ltrack_id=>3, :album_id=>1}
+    a = ds.all
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.ltrack.should == sub.load(:id => 3, :album_id=>1)
+  end
+  
   it "should eagerly load a single one_to_many association" do
     ds = GraphAlbum.eager_graph(:tracks)
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)'

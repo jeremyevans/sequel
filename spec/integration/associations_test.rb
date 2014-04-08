@@ -1029,7 +1029,7 @@ shared_examples_for "filtering/excluding by associations" do
   end
 end
 
-shared_examples_for "filter by associations singular association limit strategies" do
+shared_examples_for "filter by associations one_to_one limit strategies" do
   specify "filter by associations with limited one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
     Artist.one_to_one :last_album, {:clone=>:last_album}.merge(@els)
@@ -1059,6 +1059,10 @@ shared_examples_for "filter by associations singular association limit strategie
     ds.where(:first_album=>[@album, diff_album]).all.should == [ar]
     ds.exclude(:first_album=>[@album, diff_album]).all.should == [@artist]
   end
+end
+
+shared_examples_for "filter by associations singular association limit strategies" do
+  it_should_behave_like "filter by associations one_to_one limit strategies"
 
   specify "dataset associations with limited one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
@@ -1231,9 +1235,7 @@ shared_examples_for "filter by associations singular association limit strategie
   end
 end
 
-shared_examples_for "filter by associations limit strategies" do
-  it_should_behave_like "filter by associations singular association limit strategies"
-
+shared_examples_for "filter by associations one_to_many limit strategies" do
   specify "filter by associations with limited one_to_many associations should work correctly" do
     Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els)
     Artist.one_to_many :second_two_albums, {:clone=>:second_two_albums}.merge(@els)
@@ -1266,6 +1268,11 @@ shared_examples_for "filter by associations limit strategies" do
     ds.where(:first_two_albums=>[@album, diff_album]).all.should == [ar]
     ds.exclude(:first_two_albums=>[@album, diff_album]).all.should == [@artist]
   end
+end
+
+shared_examples_for "filter by associations limit strategies" do
+  it_should_behave_like "filter by associations singular association limit strategies"
+  it_should_behave_like "filter by associations one_to_many limit strategies"
 
   specify "dataset associations with limited one_to_many associations should work correctly" do
     Artist.one_to_many :first_two_albums, {:clone=>:first_two_albums}.merge(@els)
@@ -1866,6 +1873,17 @@ describe "Sequel::Model Simple Associations" do
   
   it_should_behave_like "regular and composite key associations"
 
+  describe "with :correlated_subquery limit strategy" do
+    before do
+      @els = {:eager_limit_strategy=>:correlated_subquery}
+    end
+
+    it_should_behave_like "one_to_one eager_graph limit strategies"
+    it_should_behave_like "one_to_many eager_graph limit strategies"
+    it_should_behave_like "filter by associations one_to_one limit strategies"
+    it_should_behave_like "filter by associations one_to_many limit strategies"
+  end unless DB.database_type == :mysql
+
   specify "should handle many_to_one associations with same name as :key" do
     Album.def_column_alias(:artist_id_id, :artist_id)
     Album.many_to_one :artist_id, :key_column =>:artist_id, :class=>Artist
@@ -2090,6 +2108,17 @@ describe "Sequel::Model Composite Key Associations" do
   end
 
   it_should_behave_like "regular and composite key associations"
+
+  describe "with :correlated_subquery limit strategy" do
+    before do
+      @els = {:eager_limit_strategy=>:correlated_subquery}
+    end
+
+    it_should_behave_like "one_to_one eager_graph limit strategies"
+    it_should_behave_like "one_to_many eager_graph limit strategies"
+    it_should_behave_like "filter by associations one_to_one limit strategies"
+    it_should_behave_like "filter by associations one_to_many limit strategies"
+  end if DB.database_type != :mysql && DB.dataset.supports_multiple_column_in?
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums

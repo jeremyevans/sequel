@@ -724,6 +724,16 @@ module Sequel
       class OneToManyAssociationReflection < AssociationReflection
         ASSOCIATION_TYPES[:one_to_many] = self
         
+        # Support a correlated subquery limit strategy when using eager_graph.
+        def apply_eager_graph_limit_strategy(strategy, ds)
+          case strategy
+          when :correlated_subquery
+            apply_correlated_subquery_limit_strategy(ds)
+          else
+            super
+          end
+        end
+
         # The keys in the associated model's table related to this association
         def associated_object_keys
           self[:keys]
@@ -790,6 +800,33 @@ module Sequel
     
         private
     
+        # Use a correlated subquery to limit the dataset.  Note that this will not
+        # work correctly if the associated dataset uses qualified identifers in the WHERE clause,
+        # as they would reference the containing query instead of the subquery.
+        def apply_correlated_subquery_limit_strategy(ds)
+          table = ds.first_source_table
+          table_alias = ds.first_source_alias
+          primary_key = associated_class.primary_key
+          key = self[:key]
+          cs_alias = :t1
+          cs = associated_dataset.
+            from(Sequel.as(table, :t1)).
+            select(*qualify(cs_alias, primary_key)).
+            where(Array(qualify(cs_alias, key)).zip(Array(qualify(table_alias, key)))).
+            limit(*limit_and_offset)
+          ds.where(qualify(table_alias, primary_key)=>cs)
+        end
+
+        # Support correlated subquery strategy when filtering by limited associations.
+        def apply_filter_by_associations_limit_strategy(ds)
+          case filter_by_associations_limit_strategy
+          when :correlated_subquery
+            apply_correlated_subquery_limit_strategy(ds)
+          else
+            super
+          end
+        end
+
         def eager_load_base_dataset(keys)
           associated_class.where(predicate_key=>keys)
         end
@@ -824,6 +861,18 @@ module Sequel
           :many_to_one
         end
 
+        # Support automatic use of correlated subqueries if :ruby option is best available option,
+        # MySQL is not being used, and either the associated class has a non-composite primary key
+        # or the database supports multiple columns in IN.
+        def true_eager_graph_limit_strategy
+          r = super
+          if r == :ruby && associated_class.db.database_type != :mysql && (Array(associated_class.primary_key).length == 1 || associated_dataset.supports_multiple_column_in?)
+            :correlated_subquery
+          else
+            r
+          end
+        end
+
         def union_eager_loader_proc
           proc do |pl, ds|
             keys = predicate_keys
@@ -846,6 +895,16 @@ module Sequel
         # underlying relationship is probably not one-to-one.
         def filter_by_associations_add_conditions?
           super || self[:order] || self[:eager_limit_strategy] || self[:filter_limit_strategy]
+        end
+
+        # Make sure singular associations always have 1 as the limit
+        def limit_and_offset
+          r = super
+          if r.first == 1
+            r
+          else
+            [1, r[1]]
+          end
         end
 
         # Singular associations always return a single object, not an array.
@@ -1302,7 +1361,8 @@ module Sequel
         #                      for the eager loader.  Can be set to nil to not populate the key_hash.
         # :extend :: A module or array of modules to extend the dataset with.
         # :filter_limit_strategy :: Determines the strategy used for enforcing limits and offsets when filtering by
-        #                           limited associations.
+        #                           limited associations.  Possible options are :window_function, :distinct_on, or
+        #                           :correlated_subquery depending on association type and database type.
         # :graph_alias_base :: The base name to use for the table alias when eager graphing.  Defaults to the name
         #                      of the association.  If the alias name has already been used in the query, Sequel will create
         #                      a unique alias by appending a numeric suffix (e.g. alias_0, alias_1, ...) until the alias is
@@ -2332,6 +2392,7 @@ END
         #                    Appropriate :limit_strategy values are:
         #                    true :: Pick the most appropriate based on what the database supports
         #                    :distinct_on :: Force use of DISTINCT ON stategy (*_one associations only)
+        #                    :correlated_subquery :: Force use of correlated subquery strategy (one_to_* associations only)
         #                    :window_function :: Force use of window function strategy
         #                    :ruby :: Don't modify the SQL, implement limits/offsets with array slicing
         #

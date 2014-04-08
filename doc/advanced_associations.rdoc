@@ -307,7 +307,7 @@ and then does the array slice in ruby.  As eager_graph does not support
 options, to use an eager_graph limit strategy you have to use the
 eager_graph_with_options method with the :limit_strategy option.
 
-The distinct on strategy uses DISTINCT ON in a subquery and JOINs that
+The :distinct_on strategy uses DISTINCT ON in a subquery and JOINs that
 subquery:
 
   Artist.eager_graph_with_options(:first_album, :limit_strategy=>true).all
@@ -321,7 +321,7 @@ subquery:
   #   ORDER BY albums.artist_id, release_date
   # ) AS first_album ON (first_album.artist_id = artists.id)
 
-The window function approach JOINs to a nested subquery using a window
+The :window_function approach JOINs to a nested subquery using a window
 function:
 
   Artist.eager_graph_with_options(:first_10_albums, :limit_strategy=>true).all
@@ -337,8 +337,30 @@ function:
   #   ) AS t1 WHERE (x_sequel_row_number_x <= 10)
   # ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)
 
-The reason that Sequel does not automatically use the distinct on or
-window function strategy for eager_graph is that it can perform much worse than the
+The :correlated_subquery approach JOINs to a nested subquery using a correlated
+subquery:
+
+  Artist.eager_graph_with_options(:first_10_albums, :limit_strategy=>true).all
+  # SELECT artists.id, artists.name, first_10_albums.id AS first_10_albums_id,
+  #        first_10_albums.name AS first_10_albums_name, first_10_albums.artist_id,
+  #        first_10_albums.release_date
+  # FROM artists 
+  # LEFT OUTER JOIN (
+  #   SELECT *
+  #   FROM albums
+  #   WHERE albums.id IN (
+  #     SELECT t1.id
+  #     FROM tracks AS t1
+  #     WHERE (t1.album_id = tracks.album_id)
+  #     ORDER BY release_date
+  #     LIMIT 10
+  #   )
+  # ) AS first_10_albums ON (first_10_albums.artist_id = artists.id)
+
+(SELECT * FROM tracks WHERE (tracks.id IN (SELECT t1.id FROM tracks AS t1 WHERE (t1.album_id = tracks.album_id) LIMIT 1)))
+
+The reason that Sequel does not automatically use the :distinct_on, :window function
+or :correlated_subquery strategy for eager_graph is that it can perform much worse than the
 default of just doing the array slicing in ruby.  If you are only using eager_graph to
 return a few records, it may be cheaper to get all of their associated records and filter
 them in ruby as opposed to computing the set of limited associated records for all rows.
@@ -356,7 +378,7 @@ you must use an SQL-based strategy.  Sequel will select an appropriate default
 strategy based on the database you are using, and you can override it using the
 :filter_limit_strategy option.
 
-The distinct on strategy:
+The :distinct_on strategy:
 
   Artist.where(:first_album=>Album[1]).all
   # SELECT *
@@ -370,7 +392,7 @@ The distinct on strategy:
   #     ORDER BY albums.artist_id, release_date
   #   )) AND (albums.id = 1))))
 
-The window function strategy:
+The :window_function strategy:
 
   Artist.where(:first_10_albums=>Album[1]).all
   # SELECT *
@@ -386,9 +408,25 @@ The window function strategy:
   #     WHERE (x_sequel_row_number_x <= 10)
   #   )) AND (albums.id = 1))))
 
-Note that if the database does not support window functions, filtering by associations
-with limited associations will not work correctly, leading it to return results where
-associated object used as an argument is not within the limit of the association.
+The :correlated_subquery strategy:
+
+  Artist.where(:first_10_albums=>Album[1]).all
+  # SELECT *
+  # FROM artists
+  # WHERE (artists.id IN (
+  #   SELECT albums.artist_id
+  #   FROM albums
+  #   WHERE ((albums.artist_id IS NOT NULL) AND (albums.id IN (
+  #     SELECT t1.id
+  #     FROM albums AS t1
+  #     WHERE (t1.artist_id = albums.artist_id)
+  #     ORDER BY release_date
+  #     LIMIT 1
+  #   )) AND (albums.id = 1))))
+
+Note that filtering by limited associations does not work on MySQL, as does not support
+any of the strategies.  It's also not supported when using composite keys on databases
+that don't support window functions and don't support multiple columns in IN.
 
 == Additional Association Types
 

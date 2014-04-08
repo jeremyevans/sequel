@@ -1756,7 +1756,8 @@ database and the application.
 ==== :filter_limit_strategy
 
 The strategy to use when filtering by limited associations.  In general
-Sequel will choose either a :distinct_on or :window_function strategy based
-on what the database supports, but you can override that if necessary using
+Sequel will choose either a :distinct_on, :window_function, or
+:correlated_subquery strategy based on the association type and what
+the database supports, but you can override that if necessary using
 this option.
 
