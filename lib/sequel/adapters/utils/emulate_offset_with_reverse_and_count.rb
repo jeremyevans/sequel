@@ -18,6 +18,7 @@ module Sequel
     # reversed in the subselect.  Note that the order needs to be unambiguous
     # to work correctly, and you must select all columns that you are ordering on.
     def select_sql
+      return super if @opts[:sql]
       return super unless o = @opts[:offset]
 
       order = @opts[:order] || default_offset_order

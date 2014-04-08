@@ -50,7 +50,7 @@ module Sequel
 
     # Whether to use ROW_NUMBER to emulate offsets
     def emulate_offset_with_row_number?
-      @opts[:offset]
+      @opts[:offset] && !@opts[:sql]
     end
   end
 end
