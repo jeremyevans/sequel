@@ -2434,3 +2434,22 @@ describe "Database#schema_type_class" do
     end
   end
 end
+
+describe "Database#execute_{dui,ddl,insert}" do
+  before do
+    @db = Sequel::Database.new
+    def @db.execute(sql, opts={})
+      (@sqls ||= []) << sql
+    end
+    def @db.sqls
+      @sqls
+    end
+  end
+
+  specify "should execute the SQL" do
+    @db.execute_dui "DELETE FROM table"
+    @db.execute_ddl "SET foo"
+    @db.execute_insert "INSERT INTO table DEFAULT VALUES"
+    @db.sqls.should == ["DELETE FROM table", "SET foo", "INSERT INTO table DEFAULT VALUES"]
+  end
+end
