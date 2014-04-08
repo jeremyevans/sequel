@@ -101,6 +101,11 @@ describe "Dataset::PlaceholderLiteralizer" do
     @db.sqls.should == ["SELECT * FROM items WHERE (a = 2)"]
   end
 
+  specify "should literalize args as NULL if :placeholder_literal_null is set" do
+    loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg=>:a).clone(:placeholder_literal_null=>true)}
+    loader.sql(1).should == "SELECT * FROM items WHERE (NULL = a)"
+  end
+  
   specify "should raise an error if called with an incorrect number of arguments" do
     loader = @c.loader(@ds){|pl, ds| ds.where(:a=>pl.arg)}
     proc{loader.first}.should raise_error(Sequel::Error)

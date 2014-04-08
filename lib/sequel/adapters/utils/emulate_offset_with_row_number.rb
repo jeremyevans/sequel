@@ -20,7 +20,7 @@ module Sequel
         end
       end
 
-      columns = clone(:append_sql=>'').columns
+      columns = clone(:append_sql=>'', :placeholder_literal_null=>true).columns
       dsa1 = dataset_alias(1)
       rn = row_number_column
       sql = @opts[:append_sql] || ''

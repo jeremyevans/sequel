@@ -54,7 +54,11 @@ module Sequel
         # Record the SQL query offset, argument position, and transforming block where the
         # argument should be literalized.
         def sql_literal_append(ds, sql)
-          @recorder.use(sql, @pos, @transformer)
+          if ds.opts[:placeholder_literal_null]
+            ds.send(:literal_append, sql, nil)
+          else
+            @recorder.use(sql, @pos, @transformer)
+          end
         end
 
         # Return a new Argument object for the same recorder and argument position, but with a
