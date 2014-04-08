@@ -685,8 +685,8 @@ describe "MSSQL Stored Procedure support" do
       r = @db.call_mssql_sproc(:SequelTest, :args => {
         'Input' => @now,
         'IntegerInput' => 1,
-        'Output' => ['output', :output],
-        'IntegerOutput' => ['integer_output', :output]
+        'Output' => [:output, nil, 'output'],
+        'IntegerOutput' => [:output, nil, 'integer_output']
       })
       r.should be_a_kind_of(Hash)
       r.values_at(:output, :integer_output).should == [@now, '1']
@@ -696,8 +696,8 @@ describe "MSSQL Stored Procedure support" do
       @db.call_mssql_sproc(:SequelTest, :args => {
         'Input' => @now,
         'IntegerInput' => 1,
-        'Output' => ['output', :output],
-        'IntegerOutput' => ['integer_output', :output, 'int']
+        'Output' => [:output, nil, 'output'],
+        'IntegerOutput' => [:output, 'int', 'integer_output']
       })[:integer_output].should == 1
     end
 
@@ -705,8 +705,8 @@ describe "MSSQL Stored Procedure support" do
       @db.call_mssql_sproc(:SequelTest, :args => {
         'Input' => @now,
         'IntegerInput' => 1,
-        'Output' => ['output', :output],
-        'IntegerOutput' => ['integer_output', :output]
+        'Output' => [:output, nil, 'output'],
+        'IntegerOutput' => [:output, nil, 'integer_output']
       })[:numrows].should == 1
     end
 
@@ -714,8 +714,8 @@ describe "MSSQL Stored Procedure support" do
       @db.call_mssql_sproc(:SequelTest, :args => {
         'Input' => @now,
         'IntegerInput' => 1,
-        'Output' => ['output', :output],
-        'IntegerOutput' => ['integer_output', :output]
+        'Output' => [:output, nil, 'output'],
+        'IntegerOutput' => [:output, nil, 'integer_output']
       })[:result].should == 1
     end
   end
