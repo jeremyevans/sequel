@@ -334,7 +334,7 @@ module Sequel
       def select_sql
         return super if @opts[:sql]
         if o = @opts[:offset]
-          columns = clone(:append_sql=>'').columns
+          columns = clone(:append_sql=>'', :placeholder_literal_null=>true).columns
           dsa1 = dataset_alias(1)
           rn = row_number_column
           limit = @opts[:limit]

@@ -1,5 +1,9 @@
 === HEAD
 
+* Handle placeholder literalizer arguments when emulating offsets (jeremyevans)
+
+* Don't attempt to emulate offsets if the dataset uses literal SQL (jeremyevans)
+
 * Use a UNION-based strategy by default to eagerly load limited associations (jeremyevans)
 
 * Support offsets without limits on MySQL, SQLite, H2, SQLAnywhere and CUBRID (jeremyevans)
