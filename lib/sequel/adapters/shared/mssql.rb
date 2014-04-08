@@ -41,35 +41,33 @@ module Sequel
       #          the function are specified using :output.  You can also name
       #          output parameters and provide a type by using an array containing
       #          :output, the type name, and the parameter name.
+      #          Since named params are supported by stored procedures, they
+      #          can be specified like hash of key/value pairs. 
+      #          For output variables values are array of [<arg_name>, :output, <type>],
+      #          where type is optional.
       # :server :: The server/shard on which to execute the procedure.
       #
       # Examples:
       #
       #     DB.call_mssql_sproc(:SequelTest, {:args => ['input arg', :output]})
       #     DB.call_mssql_sproc(:SequelTest, {:args => ['input arg', [:output, 'int', 'varname']]})
+      #
+      #     named params:
+      #     DB.call_mssql_sproc(:SequelTest, :args => {
+      #       'input_arg1_name' => 'input arg1 value',
+      #       'input_arg2_name' => 'input arg2 value',
+      #       'output_arg_name' => ['varname', :output, 'int']
+      #     })
+      #     So [varname] - variable name for method result,
+      #     [output_arg_name] - stored procedure output parameter name
+
+
       def call_mssql_sproc(name, opts=OPTS)
         args = opts[:args] || []
-        names = ['@RC AS RESULT', '@@ROWCOUNT AS NUMROWS']
-        declarations = ['@RC int']
-        values = []
 
-        args.each_with_index do |v, i|
-          if v.is_a?(Array)
-            v, type, select = v
-          else
-            type = select = nil
-          end
-
-          if v == :output
-            type = "nvarchar(max)" unless type
-            varname = "var#{i}" unless varname
-            select ||= varname
-            names << "@#{varname} AS #{quote_identifier(select)}"
-            declarations << "@#{varname} #{type}"
-            values << "@#{varname} OUTPUT"
-          else
-            values << literal(v)
-          end
+        declarations, values, names = case args.class.name
+        when 'Array' then array2sproc_variables args
+        when 'Hash' then hash2sproc_variables args
         end
 
         sql = "DECLARE #{declarations.join(', ')}; EXECUTE @RC = #{name} #{values.join(', ')}; SELECT #{names.join(', ')}"
@@ -211,6 +209,29 @@ module Sequel
         end
       end
 
+      def array2sproc_variables(args)
+        names = ['@RC AS RESULT', '@@ROWCOUNT AS NUMROWS']
+        declarations = ['@RC int']
+        values = []
+
+        args.each_with_index do |v, i|
+          v, type, select = v
+
+          values << if v == :output
+            type = "nvarchar(max)" unless type
+            varname = "var#{i}" unless varname
+            select ||= varname
+            names << "@#{varname} AS #{quote_identifier(select)}"
+            declarations << "@#{varname} #{type}"
+            "@#{varname} OUTPUT"
+          else
+            literal(v)
+          end
+        end
+
+        [declarations, values, names]
+      end
+
       # MSSQL uses the IDENTITY(1,1) column for autoincrementing columns.
       def auto_increment_sql
         AUTO_INCREMENT
@@ -346,6 +367,27 @@ module Sequel
           select(:table_name).
           filter(:table_type=>type, :table_schema=>(opts[:schema]||'dbo').to_s).
           map{|x| m.call(x[:table_name])}
+      end
+
+      def hash2sproc_variables(args)
+        names = ['@RC AS RESULT', '@@ROWCOUNT AS NUMROWS']
+        declarations = ['@RC int']
+        values = []
+
+        args.each do |k, v|
+          v, output, type = v
+
+          values <<  if output == :output
+            type ||= "nvarchar(max)"
+            names << "@#{ v } as #{quote_identifier(v)}"
+            declarations << "@#{ v } #{ type }"
+            "@#{ k }=@#{ v } OUTPUT"
+          else
+            "@#{ k }=#{ literal(v) }"
+          end
+        end
+
+        [declarations, values, names]
       end
 
       # Always quote identifiers in the metadata_dataset, so schema parsing works.
