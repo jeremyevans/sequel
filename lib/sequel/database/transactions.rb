@@ -36,6 +36,8 @@ module Sequel
     #
     # The following general options are respected:
     #
+    # :auto_savepoint :: Automatically use a savepoint for Database#transaction calls
+    #                    inside this transaction block.
     # :isolation :: The transaction isolation level to use for this transaction,
     #               should be :uncommitted, :committed, :repeatable, or :serializable,
     #               used if given and the database/adapter supports customizable
@@ -59,7 +61,8 @@ module Sequel
     # :savepoint :: Whether to create a new savepoint for this transaction,
     #               only respected if the database/adapter supports savepoints.  By
     #               default Sequel will reuse an existing transaction, so if you want to
-    #               use a savepoint you must use this option.
+    #               use a savepoint you must use this option.  If the surrounding transaction
+    #               uses :auto_savepoint, you can set this to false to not use a savepoint.
     #
     # PostgreSQL specific options:
     #
@@ -88,9 +91,14 @@ module Sequel
             if opts[:retrying]
               raise Sequel::Error, "cannot set :retry_on options if you are already inside a transaction"
             end
-            return yield(conn)
+            if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last
+              _transaction(conn, opts.merge(:savepoint=>true), &block)
+            else
+              return yield(conn)
+            end
+          else
+            _transaction(conn, opts, &block)
           end
-          _transaction(conn, opts, &block)
         end
       end
     end
@@ -151,18 +159,24 @@ module Sequel
 
     # Add the current thread to the list of active transactions
     def add_transaction(conn, opts)
+      hash = {}
+
       if supports_savepoints?
-        unless _trans(conn)
+        if _trans(conn)
+          hash = nil
+          _trans(conn)[:savepoints].push(opts[:auto_savepoint])
+        else
+          hash[:savepoints] = [opts[:auto_savepoint]]
           if (prep = opts[:prepare]) && supports_prepared_transactions?
-            Sequel.synchronize{@transactions[conn] = {:savepoint_level=>0, :prepare=>prep}}
-          else
-            Sequel.synchronize{@transactions[conn] = {:savepoint_level=>0}}
+            hash[:prepare] = prep
           end
         end
       elsif (prep = opts[:prepare]) && supports_prepared_transactions?
-        Sequel.synchronize{@transactions[conn] = {:prepare => prep}}
-      else
-        Sequel.synchronize{@transactions[conn] = {}}
+        hash[:prepare] = prep
+      end
+
+      if hash
+        Sequel.synchronize{@transactions[conn] = hash}
       end
     end    
 
@@ -200,12 +214,12 @@ module Sequel
     def begin_transaction(conn, opts=OPTS)
       if supports_savepoints?
         th = _trans(conn)
-        if (depth = th[:savepoint_level]) > 0
-          log_connection_execute(conn, begin_savepoint_sql(depth))
+        depth = savepoint_level(conn)
+        if depth > 1
+          log_connection_execute(conn, begin_savepoint_sql(depth-1))
         else
           begin_new_transaction(conn, opts)
         end
-        th[:savepoint_level] += 1
       else
         begin_new_transaction(conn, opts)
       end
@@ -243,7 +257,7 @@ module Sequel
     # Commit the active transaction on the connection
     def commit_transaction(conn, opts=OPTS)
       if supports_savepoints?
-        depth = _trans(conn)[:savepoint_level]
+        depth = savepoint_level(conn)
         log_connection_execute(conn, depth > 1 ? commit_savepoint_sql(depth-1) : commit_transaction_sql)
       else
         log_connection_execute(conn, commit_transaction_sql)
@@ -263,7 +277,7 @@ module Sequel
 
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
-      if !supports_savepoints? || ((_trans(conn)[:savepoint_level] -= 1) <= 0)
+      if transaction_finished?(conn)
         begin
           if committed
             after_transaction_commit(conn)
@@ -284,7 +298,7 @@ module Sequel
     # Rollback the active transaction on the connection
     def rollback_transaction(conn, opts=OPTS)
       if supports_savepoints?
-        depth = _trans(conn)[:savepoint_level]
+        depth = savepoint_level(conn)
         log_connection_execute(conn, depth > 1 ? rollback_savepoint_sql(depth-1) : rollback_transaction_sql)
       else
         log_connection_execute(conn, rollback_transaction_sql)
@@ -308,12 +322,29 @@ module Sequel
       "SET TRANSACTION ISOLATION LEVEL #{TRANSACTION_ISOLATION_LEVELS[level]}"
     end
 
+    # Current savepoint level.
+    def savepoint_level(conn)
+      _trans(conn)[:savepoints].length
+    end
+
     # Raise a database error unless the exception is an Rollback.
     def transaction_error(e, opts=OPTS)
       if e.is_a?(Rollback)
         raise e if opts[:rollback] == :reraise
       else
         raise_error(e, opts.merge(:classes=>database_error_classes))
+      end
+    end
+
+    # Finish a subtransaction.  If savepoints are supported, pops the current
+    # tansaction off the savepoint stack.
+    def transaction_finished?(conn)
+      if supports_savepoints?
+        stack = _trans(conn)[:savepoints]
+        stack.pop
+        stack.empty?
+      else
+        true
       end
     end
   end

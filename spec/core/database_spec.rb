@@ -927,7 +927,6 @@ describe "Database#transaction with savepoint support" do
   it_should_behave_like "Database#transaction"
 
   specify "should support after_commit inside savepoints" do
-    meta_def(@db, :supports_savepoints?){true}
     @db.transaction do
       @db.after_commit{@db.execute('foo')}
       @db.transaction(:savepoint=>true){@db.after_commit{@db.execute('bar')}}
@@ -937,7 +936,6 @@ describe "Database#transaction with savepoint support" do
   end
 
   specify "should support after_rollback inside savepoints" do
-    meta_def(@db, :supports_savepoints?){true}
     @db.transaction do
       @db.after_rollback{@db.execute('foo')}
       @db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('bar')}}
@@ -948,14 +946,12 @@ describe "Database#transaction with savepoint support" do
   end
 
   specify "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do
-    meta_def(@db, :supports_savepoints?){true}
     meta_def(@db, :supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
 
   specify "should raise an error if you attempt to use after_rollback inside a savepoint in a prepared transaction" do
-    meta_def(@db, :supports_savepoints?){true}
     meta_def(@db, :supports_prepared_transactions?){true}
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('foo')}}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
@@ -1021,6 +1017,25 @@ describe "Database#transaction with savepoints" do
   specify "should use savepoints if given the :savepoint option" do
     @db.transaction{@db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test;'}}
     @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+  
+  specify "should use savepoints if surrounding transaction uses :auto_savepoint option" do
+    @db.transaction(:auto_savepoint=>true){@db.transaction{@db.execute 'DROP TABLE test;'}}
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+
+    @db.transaction(:auto_savepoint=>true){@db.transaction{@db.transaction{@db.execute 'DROP TABLE test;'}}}
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+
+    @db.transaction(:auto_savepoint=>true){@db.transaction(:auto_savepoint=>true){@db.transaction{@db.execute 'DROP TABLE test;'}}}
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+
+    @db.transaction{@db.transaction(:auto_savepoint=>true, :savepoint=>true){@db.transaction{@db.execute 'DROP TABLE test;'}}}
+    @db.sqls.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'SAVEPOINT autopoint_2', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_2', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+
+  specify "should not use savepoints if surrounding transaction uses :auto_savepoint and current transaction uses :savepoint=>false option" do
+    @db.transaction(:auto_savepoint=>true){@db.transaction(:savepoint=>false){@db.execute 'DROP TABLE test;'}}
+    @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
   specify "should not use a savepoint if no transaction is in progress" do

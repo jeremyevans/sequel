@@ -47,14 +47,13 @@ module Sequel
       def begin_transaction(conn, opts=OPTS)
         if supports_savepoints?
           th = _trans(conn)
-          if sps = th[:savepoints]
+          if sps = th[:savepoint_objs]
             sps << log_yield(TRANSACTION_SAVEPOINT){conn.set_savepoint}
           else
             log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
-            th[:savepoints] = []
+            th[:savepoint_objs] = []
             set_transaction_isolation(conn, opts)
           end
-          th[:savepoint_level] += 1
         else
           log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
           set_transaction_isolation(conn, opts)
@@ -64,7 +63,7 @@ module Sequel
       # Use JDBC connection's commit method to commit transactions
       def commit_transaction(conn, opts=OPTS)
         if supports_savepoints?
-          sps = _trans(conn)[:savepoints]
+          sps = _trans(conn)[:savepoint_objs]
           if sps.empty?
             log_yield(TRANSACTION_COMMIT){conn.commit}
           elsif supports_releasing_savepoints?
@@ -81,7 +80,7 @@ module Sequel
           conn.setTransactionIsolation(jdbc_level)
         end
         if supports_savepoints?
-          sps = _trans(conn)[:savepoints]
+          sps = _trans(conn)[:savepoint_objs]
           conn.setAutoCommit(true) if sps.empty?
           sps.pop
         else
@@ -94,7 +93,7 @@ module Sequel
       # Use JDBC connection's rollback method to rollback transactions
       def rollback_transaction(conn, opts=OPTS)
         if supports_savepoints?
-          sps = _trans(conn)[:savepoints]
+          sps = _trans(conn)[:savepoint_objs]
           if sps.empty?
             log_yield(TRANSACTION_ROLLBACK){conn.rollback}
           else

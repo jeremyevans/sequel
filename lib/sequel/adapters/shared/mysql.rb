@@ -292,9 +292,8 @@ module Sequel
       # Use XA START to start a new prepared transaction if the :prepare
       # option is given.
       def begin_transaction(conn, opts=OPTS)
-        if (s = opts[:prepare]) && (th = _trans(conn))[:savepoint_level] == 0
+        if (s = opts[:prepare]) && savepoint_level(conn) == 1
           log_connection_execute(conn, "XA START #{literal(s)}")
-          th[:savepoint_level] += 1
         else
           super
         end
@@ -315,7 +314,7 @@ module Sequel
       # Prepare the XA transaction for a two-phase commit if the
       # :prepare option is given.
       def commit_transaction(conn, opts=OPTS)
-        if (s = opts[:prepare]) && _trans(conn)[:savepoint_level] <= 1
+        if (s = opts[:prepare]) && savepoint_level(conn) <= 1
           log_connection_execute(conn, "XA END #{literal(s)}")
           log_connection_execute(conn, "XA PREPARE #{literal(s)}")
         else
@@ -421,7 +420,7 @@ module Sequel
 
       # Rollback the currently open XA transaction
       def rollback_transaction(conn, opts=OPTS)
-        if (s = opts[:prepare]) && _trans(conn)[:savepoint_level] <= 1
+        if (s = opts[:prepare]) && savepoint_level(conn) <= 1
           log_connection_execute(conn, "XA END #{literal(s)}")
           log_connection_execute(conn, "XA PREPARE #{literal(s)}")
           log_connection_execute(conn, "XA ROLLBACK #{literal(s)}")

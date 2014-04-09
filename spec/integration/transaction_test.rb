@@ -107,6 +107,30 @@ describe "Database transactions" do
 
       @d.order(:name).map(:name).should == %w{1 4 5 6}
     end
+
+    specify "should support nested transactions through savepoints using the auto_savepoint option" do
+      @db.transaction(:auto_savepoint=>true) do
+        @d << {:name => '1'}
+        @db.transaction do
+          @d << {:name => '2'}
+          @db.transaction do
+            @d << {:name => '3'}
+            raise Sequel::Rollback
+          end
+        end
+        @d << {:name => '4'}
+        @db.transaction(:auto_savepoint=>true) do
+          @d << {:name => '6'}
+          @db.transaction do
+            @d << {:name => '7'}
+            raise Sequel::Rollback
+          end
+        end
+        @d << {:name => '5'}
+      end
+
+      @d.order(:name).map(:name).should == %w{1 4 5 6}
+    end
   end
 
   specify "should handle returning inside of the block by committing" do

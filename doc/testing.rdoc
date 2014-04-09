@@ -11,7 +11,7 @@ These run each test in its own transaction, the recommended way to test.
   class Spec::Example::ExampleGroup
     def execute(*args, &block)
       result = nil
-      Sequel::Model.db.transaction(:rollback=>:always){result = super(*args, &block)}
+      Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){result = super(*args, &block)}
       result
     end
   end
@@ -24,7 +24,7 @@ These run each test in its own transaction, the recommended way to test.
     def self.inherited(subclass)
       super
       subclass.around do |example|
-        Sequel::Model.db.transaction(:rollback=>:always){example.call}
+        Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){example.call}
       end
     end
   end
@@ -34,7 +34,7 @@ These run each test in its own transaction, the recommended way to test.
   # Global around filters should work
   RSpec.configure do |c|
     c.around(:each) do |example|
-      DB.transaction(:rollback=>:always){example.run}
+      DB.transaction(:rollback=>:always, :auto_savepoint=>true){example.run}
     end
   end
 
@@ -44,7 +44,7 @@ These run each test in its own transaction, the recommended way to test.
   class SequelTestCase < Test::Unit::TestCase
     def run(*args, &block)
       result = nil
-      Sequel::Model.db.transaction(:rollback=>:always){result = super}
+      Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){result = super}
       result
     end
   end
@@ -55,7 +55,7 @@ These run each test in its own transaction, the recommended way to test.
 
     def run(*args, &block)
       result = nil
-      Sequel::Model.db.transaction(:rollback => :always) do
+      Sequel::Model.db.transaction(:rollback => :always, :auto_savepoint=>true) do
         result = _original_run(*args, &block)
       end
       result
@@ -69,7 +69,7 @@ These run each test in its own transaction, the recommended way to test.
   class SequelTestCase < MiniTest::Unit::TestCase
     def run(*args, &block)
       result = nil
-      Sequel::Model.db.transaction(:rollback=>:always){result = super}
+      Sequel::Model.db.transaction(:rollback=>:always, :auto_savepoint=>true){result = super}
       result
     end
   end
@@ -80,7 +80,7 @@ These run each test in its own transaction, the recommended way to test.
 
     def run(*args, &block)
       result = nil
-      Sequel::Model.db.transaction(:rollback => :always) do
+      Sequel::Model.db.transaction(:rollback => :always, :auto_savepoint=>true) do
         result = _original_run(*args, &block)
       end
       result

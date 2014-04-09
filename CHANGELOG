@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#transaction :auto_savepoint option, for automatically using a savepoint in nested transactions (jeremyevans)
+
 * Add :server_version Database option on Microsoft SQL Server, instead of querying the database for it (jeremyevans)
 
 * Support :correlated_subquery as an eager_graph and filter by associations limit strategy for one_to_* associations (jeremyevans)

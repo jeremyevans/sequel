@@ -91,6 +91,14 @@ You can use the <tt>:savepoint => true</tt> option in the inner transaction to e
     end # RELEASE SAVEPOINT
   end # COMMIT
 
+You can use the <tt>:auto_savepoint => true</tt> option in the outer transaction to explicitly use a savepoint in the inner transaction (if the database supports it):
+
+  DB.transaction(:auto_savepoint => true) do # BEGIN
+    DB.transaction do # SAVEPOINT
+      DB[:foo].insert(1) # INSERT
+    end # RELEASE SAVEPOINT
+  end # COMMIT
+
 If a Sequel::Rollback exception is raised inside the savepoint block, it will only rollback to the savepoint:
 
   DB.transaction do # BEGIN
