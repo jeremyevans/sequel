@@ -27,7 +27,7 @@ module Sequel
       end
 
       ds = unlimited
-      row_count = @opts[:offset_total_count] || ds.clone(:append_sql=>'').count
+      row_count = @opts[:offset_total_count] || ds.clone(:append_sql=>'', :placeholder_literal_null=>true).count
       dsa1 = dataset_alias(1)
 
       if o.is_a?(Symbol) && @opts[:bind_vars] && (match = Sequel::Dataset::PreparedStatementMethods::PLACEHOLDER_RE.match(o.to_s))
