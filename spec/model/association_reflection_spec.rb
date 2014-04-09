@@ -352,8 +352,8 @@ describe Sequel::Model::Associations::AssociationReflection, "#filter_by_associa
     @c.association_reflection(:cs).send(:filter_by_associations_limit_strategy).should == :ruby
   end
 
-  it "should use :ruby for one_to_many associations if offset requires count and an offset is used" do
-    def (@c.dataset).offset_requires_count?; true; end
+  it "should use :ruby for one_to_many associations if offset doesn't work in correlated subqueries and an offset is used" do
+    def (@c.dataset).supports_offsets_in_correlated_subqueries?; false; end
     @c.one_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
     @c.association_reflection(:cs).send(:filter_by_associations_limit_strategy).should == :correlated_subquery
     @c.one_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>[1, 1]

@@ -6,11 +6,6 @@ module Sequel
     # dataset supports a feature.
     # ---------------------
     
-    # Whether offset queries require an accurate count of the dataset, false by default.
-    def offset_requires_count?
-      false
-    end
-
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
       if defined?(@quote_identifiers)
@@ -118,6 +113,11 @@ module Sequel
     # Whether the IN/NOT IN operators support multiple columns when an
     # array of values is given.
     def supports_multiple_column_in?
+      true
+    end
+
+    # Whether offsets are supported in correlated subqueries, true by default.
+    def supports_offsets_in_correlated_subqueries?
       true
     end
 

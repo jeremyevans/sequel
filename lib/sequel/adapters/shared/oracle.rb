@@ -386,6 +386,11 @@ module Sequel
         false
       end
       
+      # Oracle does not supports offsets in correlated subqueries.
+      def supports_offsets_in_correlated_subqueries?
+        false
+      end
+
       # Oracle does not support SELECT *, column
       def supports_select_all_and_column?
         false

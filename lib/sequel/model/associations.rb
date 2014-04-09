@@ -576,7 +576,7 @@ module Sequel
         # What eager limit strategy should be used when true is given as the value,
         # defaults to UNION as that is the fastest strategy if the appropriate keys are indexed.
         def true_eager_limit_strategy
-          if self[:eager_graph] || (offset && associated_dataset.offset_requires_count?)
+          if self[:eager_graph] || (offset && !associated_dataset.supports_offsets_in_correlated_subqueries?)
             # An SQL-based approach won't work if you are also eager graphing,
             # so use a ruby based approach in that case.
             :ruby
@@ -867,7 +867,7 @@ module Sequel
         def true_eager_graph_limit_strategy
           r = super
           ds = associated_dataset
-          if r == :ruby && ds.supports_limits_in_subqueries? && (Array(associated_class.primary_key).length == 1 || associated_dataset.supports_multiple_column_in?) && !(offset && associated_dataset.offset_requires_count?)
+          if r == :ruby && ds.supports_limits_in_subqueries? && (Array(associated_class.primary_key).length == 1 || associated_dataset.supports_multiple_column_in?) && (!offset || associated_dataset.supports_offsets_in_correlated_subqueries?)
             :correlated_subquery
           else
             r

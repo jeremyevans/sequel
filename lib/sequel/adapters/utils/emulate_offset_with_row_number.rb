@@ -35,6 +35,12 @@ module Sequel
       sql
     end
 
+    # This does not support offsets in correlated subqueries, as it requires a query to get
+    # the columns that will be invalid if a correlated subquery is used.
+    def supports_offsets_in_correlated_subqueries?
+      false
+    end
+
     private
 
     # The default order to use for datasets with offsets, if no order is defined.

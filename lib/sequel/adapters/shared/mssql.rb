@@ -733,6 +733,11 @@ module Sequel
         false
       end
       
+      # MSSQL 2012+ supports offsets in correlated subqueries.
+      def supports_offsets_in_correlated_subqueries?
+        is_2012_or_later?
+      end
+
       # MSSQL 2005+ supports the output clause.
       def supports_output_clause?
         is_2005_or_later?

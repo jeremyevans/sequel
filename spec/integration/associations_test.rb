@@ -52,12 +52,14 @@ shared_examples_for "one_to_one eager_graph limit strategies" do
     a.last.last_album.should == nil
     a.first.last_album.values.should == diff_album.values
 
-    a = ds.eager_graph_with_options(:second_album, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
-    a = ds.eager_graph(:second_album).all
-    a.should == [@artist, ar]
-    a.first.second_album.should == diff_album
-    a.last.second_album.should == nil
-    a.first.second_album.values.should == diff_album.values
+    if @els[:eager_limit_strategy] != :distinct_on && (@els[:eager_limit_strategy] != :correlated_subquery || Album.dataset.supports_offsets_in_correlated_subqueries?) 
+      a = ds.eager_graph_with_options(:second_album, limit_strategy).all
+      a = ds.eager_graph(:second_album).all
+      a.should == [@artist, ar]
+      a.first.second_album.should == diff_album
+      a.last.second_album.should == nil
+      a.first.second_album.values.should == diff_album.values
+    end
 
     same_album = @same_album.call
     a = ds.eager_graph_with_options(:first_album, limit_strategy).all
@@ -112,17 +114,19 @@ shared_examples_for "one_to_many eager_graph limit strategies" do
     ars.last.first_two_albums.should == []
     ars.first.first_two_albums.map{|x| x.values}.should == [@album, middle_album].map{|x| x.values}
 
-    ars = ds.eager_graph_with_options(:second_two_albums, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
-    ars.should == [@artist, ar]
-    ars.first.second_two_albums.should == [middle_album, diff_album]
-    ars.last.second_two_albums.should == []
-    ars.first.second_two_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
+    if @els[:eager_limit_strategy] != :correlated_subquery || Album.dataset.supports_offsets_in_correlated_subqueries?
+      ars = ds.eager_graph_with_options(:second_two_albums, limit_strategy).all
+      ars.should == [@artist, ar]
+      ars.first.second_two_albums.should == [middle_album, diff_album]
+      ars.last.second_two_albums.should == []
+      ars.first.second_two_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
 
-    ars = ds.eager_graph_with_options(:not_first_albums, limit_strategy).all
-    ars.should == [@artist, ar]
-    ars.first.not_first_albums.should == [middle_album, diff_album]
-    ars.last.not_first_albums.should == []
-    ars.first.not_first_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
+      ars = ds.eager_graph_with_options(:not_first_albums, limit_strategy).all
+      ars.should == [@artist, ar]
+      ars.first.not_first_albums.should == [middle_album, diff_album]
+      ars.last.not_first_albums.should == []
+      ars.first.not_first_albums.map{|x| x.values}.should == [middle_album, diff_album].map{|x| x.values}
+    end
 
     ars = ds.eager_graph_with_options(:last_two_albums, limit_strategy).all
     ars.should == [@artist, ar]
@@ -1033,7 +1037,7 @@ shared_examples_for "filter by associations one_to_one limit strategies" do
   specify "filter by associations with limited one_to_one associations should work correctly" do
     Artist.one_to_one :first_album, {:clone=>:first_album}.merge(@els)
     Artist.one_to_one :last_album, {:clone=>:last_album}.merge(@els)
-    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els) if @els[:eager_limit_strategy] != :distinct_on
+    Artist.one_to_one :second_album, {:clone=>:second_album}.merge(@els)
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     ar = @pr.call[1]
@@ -1044,10 +1048,12 @@ shared_examples_for "filter by associations one_to_one limit strategies" do
     ds.exclude(:first_album=>@album).all.should == [ar]
     ds.exclude(:first_album=>diff_album).all.should == [@artist, ar]
 
-    ds.where(:second_album=>@album).all.should == []
-    ds.where(:second_album=>diff_album).all.should == [@artist]
-    ds.exclude(:second_album=>@album).all.should == [@artist, ar]
-    ds.exclude(:second_album=>diff_album).all.should == [ar]
+    if @els[:eager_limit_strategy] != :distinct_on && (@els[:eager_limit_strategy] != :correlated_subquery || Album.dataset.supports_offsets_in_correlated_subqueries?) 
+      ds.where(:second_album=>@album).all.should == []
+      ds.where(:second_album=>diff_album).all.should == [@artist]
+      ds.exclude(:second_album=>@album).all.should == [@artist, ar]
+      ds.exclude(:second_album=>diff_album).all.should == [ar]
+    end
 
     ds.where(:last_album=>@album).all.should == []
     ds.where(:last_album=>diff_album).all.should == [@artist]
@@ -1254,7 +1260,13 @@ shared_examples_for "filter by associations one_to_many limit strategies" do
     ds.exclude(:first_two_albums=>middle_album).all.should == [ar]
     ds.exclude(:first_two_albums=>diff_album).all.should == [@artist, ar]
     
-    [:second_two_albums, :not_first_albums, :last_two_albums].each do |a|
+    assocs = if @els[:eager_limit_strategy] != :correlated_subquery || Album.dataset.supports_offsets_in_correlated_subqueries?
+      [:second_two_albums, :not_first_albums, :last_two_albums]
+    else
+      [:last_two_albums]
+    end
+
+    assocs.each do |a|
       ds.where(a=>@album).all.should == []
       ds.where(a=>middle_album).all.should == [@artist]
       ds.where(a=>diff_album).all.should == [@artist]

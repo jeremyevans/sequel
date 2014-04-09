@@ -58,9 +58,10 @@ module Sequel
       sql
     end
 
-    # This emulates offsets using a count.
-    def offset_requires_count?
-      true
+    # This does not support offsets in correlated subqueries, as it requires a query to get
+    # a count that will be invalid if a correlated subquery is used.
+    def supports_offsets_in_correlated_subqueries?
+      false
     end
 
     private
