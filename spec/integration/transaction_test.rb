@@ -84,7 +84,7 @@ describe "Database transactions" do
   end 
   
   if DB.supports_savepoints?
-    cspecify "should support nested transactions through savepoints using the savepoint option", [:jdbc, :sqlite] do
+    specify "should support nested transactions through savepoints using the savepoint option" do
       @db.transaction do
         @d << {:name => '1'}
         @db.transaction(:savepoint=>true) do
