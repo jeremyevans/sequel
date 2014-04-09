@@ -347,7 +347,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#filter_by_associa
   end
 
   it "should use :ruby for one_to_many associations if the database doesn't support limits in subqueries" do
-    def (@c.dataset).supports_limits_in_subqueries?; false; end
+    def (@c.dataset).supports_limits_in_correlated_subqueries?; false; end
     @c.one_to_many :cs, :class=>@c, :eager_limit_strategy=>true, :limit=>1
     @c.association_reflection(:cs).send(:filter_by_associations_limit_strategy).should == :ruby
   end

@@ -1894,7 +1894,7 @@ describe "Sequel::Model Simple Associations" do
     it_should_behave_like "one_to_many eager_graph limit strategies"
     it_should_behave_like "filter by associations one_to_one limit strategies"
     it_should_behave_like "filter by associations one_to_many limit strategies"
-  end if DB.dataset.supports_limits_in_subqueries?
+  end if DB.dataset.supports_limits_in_correlated_subqueries?
 
   specify "should handle eager loading limited associations for many objects" do
     @db[:artists].import([:name], (1..99).map{|i| [i.to_s]})
@@ -2147,7 +2147,7 @@ describe "Sequel::Model Composite Key Associations" do
     it_should_behave_like "one_to_many eager_graph limit strategies"
     it_should_behave_like "filter by associations one_to_one limit strategies"
     it_should_behave_like "filter by associations one_to_many limit strategies"
-  end if DB.dataset.supports_limits_in_subqueries? && DB.dataset.supports_multiple_column_in?
+  end if DB.dataset.supports_limits_in_correlated_subqueries? && DB.dataset.supports_multiple_column_in?
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums

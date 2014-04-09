@@ -729,8 +729,8 @@ module Sequel
         false
       end
       
-      # MySQL does not support limits in IN subqueries.
-      def supports_limits_in_subqueries?
+      # MySQL does not support limits in correlated subqueries (or any subqueries that use IN).
+      def supports_limits_in_correlated_subqueries?
         false
       end
     

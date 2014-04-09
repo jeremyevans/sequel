@@ -386,7 +386,12 @@ module Sequel
         false
       end
       
-      # Oracle does not supports offsets in correlated subqueries.
+      # Oracle does not support limits in correlated subqueries.
+      def supports_limits_in_correlated_subqueries?
+        false
+      end
+    
+      # Oracle does not support offsets in correlated subqueries.
       def supports_offsets_in_correlated_subqueries?
         false
       end

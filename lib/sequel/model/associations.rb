@@ -867,7 +867,7 @@ module Sequel
         def true_eager_graph_limit_strategy
           r = super
           ds = associated_dataset
-          if r == :ruby && ds.supports_limits_in_subqueries? && (Array(associated_class.primary_key).length == 1 || associated_dataset.supports_multiple_column_in?) && (!offset || associated_dataset.supports_offsets_in_correlated_subqueries?)
+          if r == :ruby && ds.supports_limits_in_correlated_subqueries? && (Array(associated_class.primary_key).length == 1 || associated_dataset.supports_multiple_column_in?) && (!offset || associated_dataset.supports_offsets_in_correlated_subqueries?)
             :correlated_subquery
           else
             r

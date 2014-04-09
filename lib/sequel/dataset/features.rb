@@ -100,8 +100,8 @@ module Sequel
       false
     end
 
-    # Whether limits are supported in IN subqueries.  True by default.
-    def supports_limits_in_subqueries?
+    # Whether limits are supported in correlated subqueries.  True by default.
+    def supports_limits_in_correlated_subqueries?
       true
     end
     
