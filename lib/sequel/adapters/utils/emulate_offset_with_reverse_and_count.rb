@@ -58,6 +58,11 @@ module Sequel
       sql
     end
 
+    # This emulates offsets using a count.
+    def offset_requires_count?
+      true
+    end
+
     private
 
     # The default order to use for datasets with offsets, if no order is defined.

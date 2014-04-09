@@ -1882,7 +1882,7 @@ describe "Sequel::Model Simple Associations" do
     it_should_behave_like "one_to_many eager_graph limit strategies"
     it_should_behave_like "filter by associations one_to_one limit strategies"
     it_should_behave_like "filter by associations one_to_many limit strategies"
-  end unless DB.database_type == :mysql
+  end if DB.dataset.supports_limits_in_subqueries?
 
   specify "should handle many_to_one associations with same name as :key" do
     Album.def_column_alias(:artist_id_id, :artist_id)
@@ -2118,7 +2118,7 @@ describe "Sequel::Model Composite Key Associations" do
     it_should_behave_like "one_to_many eager_graph limit strategies"
     it_should_behave_like "filter by associations one_to_one limit strategies"
     it_should_behave_like "filter by associations one_to_many limit strategies"
-  end if DB.database_type != :mysql && DB.dataset.supports_multiple_column_in?
+  end if DB.dataset.supports_limits_in_subqueries? && DB.dataset.supports_multiple_column_in?
 
   specify "should have add method accept hashes and create new records" do
     @artist.remove_all_albums

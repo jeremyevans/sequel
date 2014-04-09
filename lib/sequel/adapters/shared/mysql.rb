@@ -730,6 +730,11 @@ module Sequel
         false
       end
       
+      # MySQL does not support limits in IN subqueries.
+      def supports_limits_in_subqueries?
+        false
+      end
+    
       # MySQL supports modifying joined datasets
       def supports_modifying_joins?
         true

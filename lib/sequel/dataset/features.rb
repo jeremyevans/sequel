@@ -6,6 +6,11 @@ module Sequel
     # dataset supports a feature.
     # ---------------------
     
+    # Whether offset queries require an accurate count of the dataset, false by default.
+    def offset_requires_count?
+      false
+    end
+
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
       if defined?(@quote_identifiers)
@@ -98,6 +103,11 @@ module Sequel
     # Whether the dataset supports LATERAL for subqueries in the FROM or JOIN clauses.
     def supports_lateral_subqueries?
       false
+    end
+
+    # Whether limits are supported in IN subqueries.  True by default.
+    def supports_limits_in_subqueries?
+      true
     end
     
     # Whether modifying joined datasets is supported.
