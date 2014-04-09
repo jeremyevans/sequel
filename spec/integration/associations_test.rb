@@ -1884,6 +1884,23 @@ describe "Sequel::Model Simple Associations" do
     it_should_behave_like "filter by associations one_to_many limit strategies"
   end if DB.dataset.supports_limits_in_subqueries?
 
+  specify "should handle eager loading limited associations for many objects" do
+    @db[:artists].import([:name], (1..99).map{|i| [i.to_s]})
+    artists = Artist.eager(:albums).all
+    artists.length.should == 100
+    artists.each{|a| a.albums.should == []}
+    artists = Artist.eager(:first_two_albums).all
+    artists.length.should == 100
+    artists.each{|a| a.first_two_albums.should == []}
+    @db[:albums].insert([:artist_id], @db[:artists].select(:id))
+    artists = Artist.eager(:albums).all
+    artists.length.should == 100
+    artists.each{|a| a.albums.length.should == 1}
+    artists = Artist.eager(:first_two_albums).all
+    artists.length.should == 100
+    artists.each{|a| a.first_two_albums.length.should == 1}
+  end
+
   specify "should handle many_to_one associations with same name as :key" do
     Album.def_column_alias(:artist_id_id, :artist_id)
     Album.many_to_one :artist_id, :key_column =>:artist_id, :class=>Artist
