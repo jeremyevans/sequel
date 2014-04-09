@@ -193,6 +193,9 @@ module Sequel
       # SQL Server 2008 Express).
       def server_version(server=nil)
         return @server_version if @server_version
+        if @opts[:server_version]
+          return @server_version = Integer(@opts[:server_version])
+        end
         @server_version = synchronize(server) do |conn|
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end

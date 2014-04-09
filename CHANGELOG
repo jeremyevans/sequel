@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :server_version Database option on Microsoft SQL Server, instead of querying the database for it (jeremyevans)
+
 * Support :correlated_subquery as an eager_graph and filter by associations limit strategy for one_to_* associations (jeremyevans)
 
 * Support named paramters in call_mssql_sproc on Microsoft SQL Server (y.zemlyanukhin, jeremyevans) (#792)
