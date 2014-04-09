@@ -1,5 +1,9 @@
 === HEAD
 
+* Support connecting to a DB2 catalog name in the ibmdb adapter (calh) (#821)
+
+* Fix warnings in some cases in the ibmdb adapter (calh) (#820)
+
 * Add SQL::Function#with_ordinality for creating set returning functions WITH ORDINALITY (jeremyevans)
 
 * Add SQL::Function#filter for creating filtered aggregate function calls (jeremyevans)
