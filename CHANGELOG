@@ -1,5 +1,9 @@
 === HEAD
 
+* Support drop_view :if_exists option on SQLite, MySQL, H2, and HSQLDB (jeremyevans) (#793)
+
+* Support drop_table :if_exists option on HSQLDB (jeremyevans)
+
 * Add Database#transaction :auto_savepoint option, for automatically using a savepoint in nested transactions (jeremyevans)
 
 * Add :server_version Database option on Microsoft SQL Server, instead of querying the database for it (jeremyevans)

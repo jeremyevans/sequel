@@ -1433,9 +1433,14 @@ describe "Database#drop_view" do
     @db.sqls.should == ['DROP VIEW cats', 'DROP VIEW dogs']
   end
 
-  specify "should take an options hash and support the :cascade option" do
+  specify "should support the :cascade option" do
     @db.drop_view :cats, :dogs, :cascade=>true
     @db.sqls.should == ['DROP VIEW cats CASCADE', 'DROP VIEW dogs CASCADE']
+  end
+
+  specify "should support the :if_exists option" do
+    @db.drop_view :cats, :dogs, :if_exists=>true
+    @db.sqls.should == ['DROP VIEW IF EXISTS cats', 'DROP VIEW IF EXISTS dogs']
   end
 end
 

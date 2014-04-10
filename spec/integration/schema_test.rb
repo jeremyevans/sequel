@@ -266,6 +266,10 @@ describe "Database schema modifiers" do
     @db[:items2].all.should == [{:number=>10}]
   end
   
+  specify "should not raise an error if table doesn't exist when using drop_table :if_exists" do
+    proc{@db.drop_table(:items, :if_exists=>true)}.should_not raise_error
+  end if DB.supports_drop_table_if_exists?
+
   describe "views" do
     before do
       @db.drop_view(:items_view) rescue nil
@@ -286,6 +290,16 @@ describe "Database schema modifiers" do
       @db.create_view(:items_view, @ds.where(:number=>1), :columns=>[:n])
       @db[:items_view].map(:n).should == [1]
     end
+
+    specify "should drop views correctly" do
+      @db.create_view(:items_view, @ds.where(:number=>1))
+      @db.drop_view(:items_view)
+      proc{@db[:items_view].map(:number)}.should raise_error(Sequel::DatabaseError)
+    end
+
+    specify "should not raise an error if view doesn't exist when using drop_view :if_exists" do
+      proc{@db.drop_view(:items_view, :if_exists=>true)}.should_not raise_error
+    end if DB.supports_drop_table_if_exists?
 
     specify "should create or replace views correctly" do
       @db.create_or_replace_view(:items_view, @ds.where(:number=>1))

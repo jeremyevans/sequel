@@ -32,6 +32,11 @@ module Sequel
           end
         end
         
+        # HSQLDB supports DROP TABLE IF EXISTS
+        def supports_drop_table_if_exists?
+          true
+        end
+
         private
         
         # HSQLDB specific SQL for renaming columns, and changing column types and/or nullity.
@@ -69,6 +74,16 @@ module Sequel
         }.freeze
         def database_error_regexps
           DATABASE_ERROR_REGEXPS
+        end
+
+        # IF EXISTS comes after table name on HSQLDB
+        def drop_table_sql(name, options)
+          "DROP TABLE #{quote_schema_table(name)}#{' IF EXISTS' if options[:if_exists]}#{' CASCADE' if options[:cascade]}"
+        end
+        
+        # IF EXISTS comes after view name on HSQLDB
+        def drop_view_sql(name, options)
+          "DROP VIEW #{quote_schema_table(name)}#{' IF EXISTS' if options[:if_exists]}#{' CASCADE' if options[:cascade]}"
         end
 
         # Use IDENTITY() to get the last inserted id.
