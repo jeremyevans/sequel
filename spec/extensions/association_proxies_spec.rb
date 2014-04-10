@@ -25,7 +25,7 @@ describe "Sequel::Plugins::AssociationProxies" do
   
   it "should send method calls to the association dataset if sent a non-array method" do
     @i.associations.has_key?(:tags).should == false
-    @t.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+    @t.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
     @i.associations.has_key?(:tags).should == false
   end
   
@@ -34,9 +34,9 @@ describe "Sequel::Plugins::AssociationProxies" do
       opts[:method] == :where || opts[:arguments].length == 2 || opts[:block]
     end
     @i.associations.has_key?(:tags).should == false
-    @t.where(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
-    @t.filter('a = ?', 1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
-    @t.filter{{:a=>1}}.sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+    @t.where(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    @t.filter('a = ?', 1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
+    @t.filter{{:a=>1}}.sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
 
     @i.associations.has_key?(:tags).should == false
     Item.plugin :association_proxies do |opts|
@@ -47,11 +47,11 @@ describe "Sequel::Plugins::AssociationProxies" do
       is_size && !cached && !proxy_arg && !proxy_block
     end
     @t.size.should == 1
-    Item.db.sqls.should == ["SELECT count(*) AS count FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) LIMIT 1"]
+    Item.db.sqls.should == ["SELECT count(*) AS count FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE (items_tags.item_id = 1) LIMIT 1"]
     @i.tags{|ds| ds}.size.should == 1
-    Item.db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1))"]
+    Item.db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE (items_tags.item_id = 1)"]
     @i.tags(true).size.should == 1
-    Item.db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1))"]
+    Item.db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE (items_tags.item_id = 1)"]
     @t.size.should == 1
     Item.db.sqls.should == []
   end
@@ -63,7 +63,7 @@ describe "Sequel::Plugins::AssociationProxies" do
     Item.db.sqls.length.should == 0
     @i.tags(true).select{|x| false}.should == []
     Item.db.sqls.length.should == 1
-    @t.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+    @t.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
     Item.db.sqls.length.should == 0
   end
   
@@ -80,7 +80,7 @@ describe "Sequel::Plugins::AssociationProxies" do
     i.associations.has_key?(:tags).should == false
     i.tags.select{|x| false}.should == []
     i.associations.has_key?(:tags).should == true
-    i.tags.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON ((items_tags.tag_id = tags.id) AND (items_tags.item_id = 1)) WHERE (a = 1)"
+    i.tags.filter(:a=>1).sql.should == "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
   end
   
 end

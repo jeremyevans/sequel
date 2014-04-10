@@ -113,7 +113,7 @@ describe "sharding plugin" do
     album.artist.update(:name=>'AS')
     @db.sqls.should == ["SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1 -- s1", "UPDATE artists SET name = 'AS' WHERE (id = 2) -- s1"]
     album.tags.map{|a| a.update(:name=>'SR')}
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.album_id = 1)) -- s1", "UPDATE tags SET name = 'SR' WHERE (id = 3) -- s1"]
+    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) -- s1", "UPDATE tags SET name = 'SR' WHERE (id = 3) -- s1"]
     @Artist.server(:s2).first.albums.map{|a| a.update(:name=>'MO')}
     @db.sqls.should == ["SELECT * FROM artists LIMIT 1 -- s2", "SELECT * FROM albums WHERE (albums.artist_id = 2) -- s2", "UPDATE albums SET name = 'MO' WHERE (id = 1) -- s2"]
   end 
@@ -145,7 +145,7 @@ describe "sharding plugin" do
     sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 2) AND (albums.id = 1)) LIMIT 1 -- s2"]
     
     album.remove_tag(3)
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.album_id = 1)) WHERE (tags.id = 3) LIMIT 1 -- s1", "DELETE FROM albums_tags WHERE ((album_id = 1) AND (tag_id = 3)) -- s1"]
+    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id = 1) AND (tags.id = 3)) LIMIT 1 -- s1", "DELETE FROM albums_tags WHERE ((album_id = 1) AND (tag_id = 3)) -- s1"]
   end 
 
   specify "should have objects retrieved from a specific shard remove all associated objects from that shard" do

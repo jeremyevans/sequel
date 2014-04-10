@@ -139,7 +139,7 @@ describe "Touch plugin" do
     @Artist.plugin :touch, :associations=>:albums
     @a.touch
     DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
-      "SELECT albums.* FROM albums INNER JOIN aa ON ((aa.album_id = albums.id) AND (aa.artist_id = 1))",
+      "SELECT albums.* FROM albums INNER JOIN aa ON (aa.album_id = albums.id) WHERE (aa.artist_id = 1)",
       "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 
@@ -149,7 +149,7 @@ describe "Touch plugin" do
     @Artist.plugin :touch, :associations=>:albums
     @a.touch
     DB.sqls.should == ["UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)",
-      "SELECT albums.* FROM albums INNER JOIN aa ON ((aa.album_id = albums.id) AND (aa.artist_id = 1))",
+      "SELECT albums.* FROM albums INNER JOIN aa ON (aa.album_id = albums.id) WHERE (aa.artist_id = 1)",
       "UPDATE albums SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 

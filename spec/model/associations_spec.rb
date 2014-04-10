@@ -1860,19 +1860,19 @@ describe Sequel::Model, "many_to_many" do
 
   it "should use implicit key values and join table if omitted" do
     @c2.many_to_many :attributes, :class => @c1 
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
   end
   
   it "should use implicit key values and join table if omitted" do
     @c2.one_through_one :attribute, :class => @c1 
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1'
   end
   
   it "should use implicit class if omitted" do
     begin
       class ::Tag < Sequel::Model; end
       @c2.many_to_many :tags
-      @c2.new(:id => 1234).tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON ((nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234))'
+      @c2.new(:id => 1234).tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) WHERE (nodes_tags.node_id = 1234)'
     ensure
       Object.send(:remove_const, :Tag)
     end
@@ -1884,7 +1884,7 @@ describe Sequel::Model, "many_to_many" do
         class Tag < Sequel::Model; end
       end
       @c2.many_to_many :tags, :class=>'::Historical::Tag'
-      @c2.new(:id => 1234).tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON ((nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234))'
+      @c2.new(:id => 1234).tags_dataset.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) WHERE (nodes_tags.node_id = 1234)'
     ensure
       Object.send(:remove_const, :Historical)
     end
@@ -1892,41 +1892,41 @@ describe Sequel::Model, "many_to_many" do
   
   it "should respect :eager_loader_predicate_key when lazily loading" do
     @c2.many_to_many :attributes, :class => @c1, :eager_loading_predicate_key=>Sequel.subscript(:attributes_nodes__node_id, 0)
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id[0] = 1234))'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id[0] = 1234)'
   end
   
   it "should use explicit key values and join table if given" do
     @c2.many_to_many :attributes, :class => @c1, :left_key => :nodeid, :right_key => :attributeid, :join_table => :attribute2node
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON ((attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234))'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON (attribute2node.attributeid = attributes.id) WHERE (attribute2node.nodeid = 1234)'
   end
   
   it "should support a conditions option" do
     @c2.many_to_many :attributes, :class => @c1, :conditions => {:a=>32}
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32)'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234))'
 
     @c2.many_to_many :attributes, :class => @c1, :conditions => ['a = ?', 32]
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32)'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234))'
     @c2.new(:id => 1234).attributes.should == [@c1.load({})]
   end
   
   it "should support an order option" do
     @c2.many_to_many :attributes, :class => @c1, :order => :blah
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) ORDER BY blah'
   end
   
   it "should support an array for the order option" do
     @c2.many_to_many :attributes, :class => @c1, :order => [:blah1, :blah2]
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah1, blah2'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) ORDER BY blah1, blah2'
   end
   
   it "should support :left_primary_key and :right_primary_key options" do
     @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
-    @c2.new(:id => 1234, :xxx=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.yyy) AND (attributes_nodes.node_id = 5))'
+    @c2.new(:id => 1234, :xxx=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.yyy) WHERE (attributes_nodes.node_id = 5)'
   end
   
   it "should support composite keys" do
     @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
-    @c2.load(:id => 1234, :x=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.r1 = attributes.id) AND (attributes_nodes.r2 = attributes.y) AND (attributes_nodes.l1 = 1234) AND (attributes_nodes.l2 = 5))'
+    @c2.load(:id => 1234, :x=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.r1 = attributes.id) AND (attributes_nodes.r2 = attributes.y)) WHERE ((attributes_nodes.l1 = 1234) AND (attributes_nodes.l2 = 5))'
   end
   
   it "should not issue query if not all keys have values" do
@@ -1951,13 +1951,13 @@ describe Sequel::Model, "many_to_many" do
   it "should support a select option" do
     @c2.many_to_many :attributes, :class => @c1, :select => :blah
 
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
   end
   
   it "should support an array for the select option" do
     @c2.many_to_many :attributes, :class => @c1, :select => [Sequel::SQL::ColumnAll.new(:attributes), :attribute_nodes__blah2]
 
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
   end
   
   it "should accept a block" do
@@ -1967,7 +1967,7 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     n.xxx = 555
-    n.attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555)'
+    n.attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (xxx = 555))'
   end
 
   it "should allow the :order option while accepting a block" do
@@ -1977,7 +1977,7 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     n.xxx = 555
-    n.attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) ORDER BY blah1, blah2'
+    n.attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (xxx = 555)) ORDER BY blah1, blah2'
   end
 
   it "should support a :dataset option that is used instead of the default" do
@@ -1994,7 +1994,7 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "should support a :dataset option that accepts the reflection as an argument" do
-    @c2.many_to_many :attributes, :class => @c1, :dataset=>lambda{|opts| opts.associated_dataset.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :limit=>10, :select=>nil do |ds|
+    @c2.many_to_many :attributes, :class => @c1, :dataset=>lambda{|opts| opts.associated_class.natural_join(:an).filter(:an__nodeid=>pk)}, :order=> :a, :limit=>10, :select=>nil do |ds|
       ds.filter(:xxx => @xxx)
     end
 
@@ -2007,9 +2007,9 @@ describe Sequel::Model, "many_to_many" do
 
   it "should support a :limit option" do
     @c2.many_to_many :attributes, :class => @c1 , :limit=>10
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 10'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 10'
     @c2.many_to_many :attributes, :class => @c1 , :limit=>[10, 10]
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 10 OFFSET 10'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 10 OFFSET 10'
   end
 
   it "should have the :eager option affect the _dataset method" do
@@ -2021,7 +2021,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1, :join_table => :attribute2node___attributes_nodes
     n = @c2.load(:id => 1234)
     a = @c1.load(:id => 2345)
-    n.attributes_dataset.sql.should == "SELECT attributes.* FROM attributes INNER JOIN attribute2node AS attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))"
+    n.attributes_dataset.sql.should == "SELECT attributes.* FROM attributes INNER JOIN attribute2node AS attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)"
     a.should == n.add_attribute(a)
     a.should == n.remove_attribute(a)
     n.remove_all_attributes
@@ -2100,7 +2100,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     @c1.dataset._fetch = {:id=>234}
     n.remove_attribute(234).should == @c1.load(:id => 234)
-    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (attributes.id = 234) LIMIT 1",
+    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (attributes.id = 234)) LIMIT 1",
       "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"]
   end
     
@@ -2192,8 +2192,8 @@ describe Sequel::Model, "many_to_many" do
     @c1.dataset._fetch = {:id=>234, :y=>8}
     @c1.load(:id => 234, :y=>8).should == n.remove_attribute([234, 8])
     sqls = DB.sqls
-    ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((attributes.id = 234) AND (attributes.y = 8)) LIMIT 1",
-      "SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((attributes.y = 8) AND (attributes.id = 234)) LIMIT 1"].should include(sqls.shift)
+    ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (attributes.id = 234) AND (attributes.y = 8)) LIMIT 1",
+      "SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (attributes.y = 8) AND (attributes.id = 234)) LIMIT 1"].should include(sqls.shift)
     sqls.should == ["DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"]
   end
     
@@ -2255,7 +2255,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1
     
     @c2.new(:id => 1234).attributes.should == [@c1.load({})]
-    DB.sqls.should == ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))']
+    DB.sqls.should == ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)']
   end
 
   it "should populate cache when accessed" do
@@ -2282,7 +2282,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     n.associations[:attributes] = 42
     n.attributes(true).should_not == 42
-    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))"]
+    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)"]
   end
 
   it "should add item to cache if it exists when calling add_" do
@@ -2608,7 +2608,7 @@ describe Sequel::Model, "many_to_many" do
   
   it "should support a :distinct option that uses the DISTINCT clause" do
     @c2.many_to_many :attributes, :class => @c1, :distinct=>true
-    @c2.load(:id=>10).attributes_dataset.sql.should == "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 10))"
+    @c2.load(:id=>10).attributes_dataset.sql.should == "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 10)"
   end
 
   it "should not apply association options when removing all associated records" do
@@ -2625,7 +2625,7 @@ describe Sequel::Model, "many_to_many" do
     end
     @c1.dataset._fetch = {:id=>2}
     @c2.load(:id=>1).remove_attribute(2)
-    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1)) WHERE ((join_table_att = 3) AND (attributes.id = 2)) LIMIT 1",
+    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1) AND (join_table_att = 3) AND (attributes.id = 2)) LIMIT 1",
       "DELETE FROM attributes_nodes WHERE ((node_id = 1) AND (attribute_id = 2))"] 
   end
 end
@@ -2657,46 +2657,46 @@ describe Sequel::Model, "one_through_one" do
 
   it "should use implicit key values and join table if omitted" do
     @c2.one_through_one :attribute, :class => @c1 
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1'
   end
   
   it "should respect :eager_loader_predicate_key when lazily loading" do
     @c2.one_through_one :attribute, :class => @c1, :eager_loading_predicate_key=>Sequel.subscript(:attributes_nodes__node_id, 0)
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id[0] = 1234)) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id[0] = 1234) LIMIT 1'
   end
   
   it "should use explicit key values and join table if given" do
     @c2.one_through_one :attribute, :class => @c1, :left_key => :nodeid, :right_key => :attributeid, :join_table => :attribute2node
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON ((attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234)) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON (attribute2node.attributeid = attributes.id) WHERE (attribute2node.nodeid = 1234) LIMIT 1'
   end
   
   it "should support a conditions option" do
     @c2.one_through_one :attribute, :class => @c1, :conditions => {:a=>32}
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
 
     @c2.one_through_one :attribute, :class => @c1, :conditions => ['a = ?', 32]
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((a = 32) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
     @c2.new(:id => 1234).attribute.should == @c1.load({})
   end
   
   it "should support an order option" do
     @c2.one_through_one :attribute, :class => @c1, :order => :blah
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) ORDER BY blah LIMIT 1'
   end
   
   it "should support an array for the order option" do
     @c2.one_through_one :attribute, :class => @c1, :order => [:blah1, :blah2]
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah1, blah2 LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) ORDER BY blah1, blah2 LIMIT 1'
   end
   
   it "should support :left_primary_key and :right_primary_key options" do
     @c2.one_through_one :attribute, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
-    @c2.new(:id => 1234, :xxx=>5).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.yyy) AND (attributes_nodes.node_id = 5)) LIMIT 1'
+    @c2.new(:id => 1234, :xxx=>5).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.yyy) WHERE (attributes_nodes.node_id = 5) LIMIT 1'
   end
   
   it "should support composite keys" do
     @c2.one_through_one :attribute, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
-    @c2.load(:id => 1234, :x=>5).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.r1 = attributes.id) AND (attributes_nodes.r2 = attributes.y) AND (attributes_nodes.l1 = 1234) AND (attributes_nodes.l2 = 5)) LIMIT 1'
+    @c2.load(:id => 1234, :x=>5).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.r1 = attributes.id) AND (attributes_nodes.r2 = attributes.y)) WHERE ((attributes_nodes.l1 = 1234) AND (attributes_nodes.l2 = 5)) LIMIT 1'
   end
   
   it "should not issue query if not all keys have values" do
@@ -2721,13 +2721,13 @@ describe Sequel::Model, "one_through_one" do
   it "should support a select option" do
     @c2.one_through_one :attribute, :class => @c1, :select => :blah
 
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1'
   end
   
   it "should support an array for the select option" do
     @c2.one_through_one :attribute, :class => @c1, :select => [Sequel::SQL::ColumnAll.new(:attributes), :attribute_nodes__blah2]
 
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1'
   end
   
   it "should accept a block" do
@@ -2737,7 +2737,7 @@ describe Sequel::Model, "one_through_one" do
 
     n = @c2.new(:id => 1234)
     n.xxx = 555
-    n.attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) LIMIT 1'
+    n.attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (xxx = 555)) LIMIT 1'
   end
 
   it "should allow the :order option while accepting a block" do
@@ -2747,7 +2747,7 @@ describe Sequel::Model, "one_through_one" do
 
     n = @c2.new(:id => 1234)
     n.xxx = 555
-    n.attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) ORDER BY blah1, blah2 LIMIT 1'
+    n.attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1234) AND (xxx = 555)) ORDER BY blah1, blah2 LIMIT 1'
   end
 
   it "should support a :dataset option that is used instead of the default" do
@@ -2764,7 +2764,7 @@ describe Sequel::Model, "one_through_one" do
   end
 
   it "should support a :dataset option that accepts the reflection as an argument" do
-    @c2.one_through_one :attribute, :class => @c1, :dataset=>lambda{|opts| opts.associated_dataset.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :select=>nil do |ds|
+    @c2.one_through_one :attribute, :class => @c1, :dataset=>lambda{|opts| opts.associated_class.natural_join(:an).filter(:an__nodeid=>pk)}, :order=> :a, :select=>nil do |ds|
       ds.filter(:xxx => @xxx)
     end
 
@@ -2777,7 +2777,7 @@ describe Sequel::Model, "one_through_one" do
 
   it "should support a :limit option to specify an offset" do
     @c2.one_through_one :attribute, :class => @c1 , :limit=>[nil, 10]
-    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1 OFFSET 10'
+    @c2.new(:id => 1234).attribute_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1 OFFSET 10'
   end
 
   it "should have the :eager option affect the _dataset method" do
@@ -2789,7 +2789,7 @@ describe Sequel::Model, "one_through_one" do
     @c2.one_through_one :attribute, :class => @c1, :join_table => :attribute2node___attributes_nodes
     n = @c2.load(:id => 1234)
     a = @c1.load(:id => 2345)
-    n.attribute_dataset.sql.should == "SELECT attributes.* FROM attributes INNER JOIN attribute2node AS attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1"
+    n.attribute_dataset.sql.should == "SELECT attributes.* FROM attributes INNER JOIN attribute2node AS attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1"
   end
   
   it "should raise an error if the model object doesn't have a valid primary key" do
@@ -2803,7 +2803,7 @@ describe Sequel::Model, "one_through_one" do
     @c2.one_through_one :attribute, :class => @c1
     
     @c2.new(:id => 1234).attribute.should == @c1.load({})
-    DB.sqls.should == ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1']
+    DB.sqls.should == ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1']
   end
 
   it "should populate cache when accessed" do
@@ -2830,7 +2830,7 @@ describe Sequel::Model, "one_through_one" do
     n = @c2.new(:id => 1234)
     n.associations[:attribute] = 42
     n.attribute(true).should_not == 42
-    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 1"]
+    DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1"]
   end
 
   it "should not add associations methods directly to class" do
@@ -2861,7 +2861,7 @@ describe Sequel::Model, "one_through_one" do
 
   it "should support a :distinct option that uses the DISTINCT clause" do
     @c2.one_through_one :attribute, :class => @c1, :distinct=>true
-    @c2.load(:id=>10).attribute_dataset.sql.should == "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 10)) LIMIT 1"
+    @c2.load(:id=>10).attribute_dataset.sql.should == "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 10) LIMIT 1"
   end
 end
 
@@ -3864,9 +3864,9 @@ describe "Sequel::Model Associations with clashing column names" do
     @Foo.first.bar.should == @bar
     @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT * FROM bars WHERE (bars.object_id = 2) LIMIT 1"]
     @Foo.first.mtmbars.should == [@bar]
-    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT bars.* FROM bars INNER JOIN bars_foos ON ((bars_foos.object_id = bars.object_id) AND (bars_foos.foo_id = 2))"]
+    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT bars.* FROM bars INNER JOIN bars_foos ON (bars_foos.object_id = bars.object_id) WHERE (bars_foos.foo_id = 2)"]
     @Bar.first.mtmfoos.should == [@foo]
-    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT foos.* FROM foos INNER JOIN bars_foos ON ((bars_foos.foo_id = foos.object_id) AND (bars_foos.object_id = 2))"]
+    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT foos.* FROM foos INNER JOIN bars_foos ON (bars_foos.foo_id = foos.object_id) WHERE (bars_foos.object_id = 2)"]
   end
 
   it "should have working eager loading methods" do
@@ -3878,10 +3878,10 @@ describe "Sequel::Model Associations with clashing column names" do
     @db.sqls.should == ["SELECT * FROM foos", "SELECT * FROM bars WHERE (bars.object_id IN (2))"]
     @db.fetch = [[{:id=>1, :object_id=>2}], [{:id=>1, :object_id=>2, :x_foreign_key_x=>2}]]
     @Foo.eager(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
-    @db.sqls.should == ["SELECT * FROM foos", "SELECT bars.*, bars_foos.foo_id AS x_foreign_key_x FROM bars INNER JOIN bars_foos ON ((bars_foos.object_id = bars.object_id) AND (bars_foos.foo_id IN (2)))"]
+    @db.sqls.should == ["SELECT * FROM foos", "SELECT bars.*, bars_foos.foo_id AS x_foreign_key_x FROM bars INNER JOIN bars_foos ON (bars_foos.object_id = bars.object_id) WHERE (bars_foos.foo_id IN (2))"]
     @db.fetch = [[{:id=>1, :object_id=>2}], [{:id=>1, :object_id=>2, :x_foreign_key_x=>2}]]
     @Bar.eager(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
-    @db.sqls.should == ["SELECT * FROM bars", "SELECT foos.*, bars_foos.object_id AS x_foreign_key_x FROM foos INNER JOIN bars_foos ON ((bars_foos.foo_id = foos.object_id) AND (bars_foos.object_id IN (2)))"]
+    @db.sqls.should == ["SELECT * FROM bars", "SELECT foos.*, bars_foos.object_id AS x_foreign_key_x FROM foos INNER JOIN bars_foos ON (bars_foos.foo_id = foos.object_id) WHERE (bars_foos.object_id IN (2))"]
   end
 
   it "should have working eager graphing methods" do
@@ -4013,9 +4013,9 @@ describe "Sequel::Model Associations with non-column expression keys" do
     @Foo.first.bar.should == @bar
     @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT * FROM bars WHERE (bars.object_ids[0] = 2) LIMIT 1"]
     @Foo.first.mtmbars.should == [@bar]
-    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT bars.* FROM bars INNER JOIN bars_foos ON ((bars_foos.bar_ids[0] = bars.object_ids[0]) AND (bars_foos.foo_ids[0] = 2))"]
+    @db.sqls.should == ["SELECT * FROM foos LIMIT 1", "SELECT bars.* FROM bars INNER JOIN bars_foos ON (bars_foos.bar_ids[0] = bars.object_ids[0]) WHERE (bars_foos.foo_ids[0] = 2)"]
     @Bar.first.mtmfoos.should == [@foo]
-    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT foos.* FROM foos INNER JOIN bars_foos ON ((bars_foos.foo_ids[0] = foos.object_ids[0]) AND (bars_foos.bar_ids[0] = 2))"]
+    @db.sqls.should == ["SELECT * FROM bars LIMIT 1", "SELECT foos.* FROM foos INNER JOIN bars_foos ON (bars_foos.foo_ids[0] = foos.object_ids[0]) WHERE (bars_foos.bar_ids[0] = 2)"]
   end
 
   it "should have working eager loading methods" do
@@ -4027,10 +4027,10 @@ describe "Sequel::Model Associations with non-column expression keys" do
     @db.sqls.should == ["SELECT * FROM foos", "SELECT * FROM bars WHERE (bars.object_ids[0] IN (2))"]
     @db.fetch = [[{:id=>1, :object_ids=>[2]}], [{:id=>1, :object_ids=>[2], :x_foreign_key_x=>2}]]
     @Foo.eager(:mtmbars).all.map{|o| [o, o.mtmbars]}.should == [[@foo, [@bar]]]
-    @db.sqls.should == ["SELECT * FROM foos", "SELECT bars.*, bars_foos.foo_ids[0] AS x_foreign_key_x FROM bars INNER JOIN bars_foos ON ((bars_foos.bar_ids[0] = bars.object_ids[0]) AND (bars_foos.foo_ids[0] IN (2)))"]
+    @db.sqls.should == ["SELECT * FROM foos", "SELECT bars.*, bars_foos.foo_ids[0] AS x_foreign_key_x FROM bars INNER JOIN bars_foos ON (bars_foos.bar_ids[0] = bars.object_ids[0]) WHERE (bars_foos.foo_ids[0] IN (2))"]
     @db.fetch = [[{:id=>1, :object_ids=>[2]}], [{:id=>1, :object_ids=>[2], :x_foreign_key_x=>2}]]
     @Bar.eager(:mtmfoos).all.map{|o| [o, o.mtmfoos]}.should == [[@bar, [@foo]]]
-    @db.sqls.should == ["SELECT * FROM bars", "SELECT foos.*, bars_foos.bar_ids[0] AS x_foreign_key_x FROM foos INNER JOIN bars_foos ON ((bars_foos.foo_ids[0] = foos.object_ids[0]) AND (bars_foos.bar_ids[0] IN (2)))"]
+    @db.sqls.should == ["SELECT * FROM bars", "SELECT foos.*, bars_foos.bar_ids[0] AS x_foreign_key_x FROM foos INNER JOIN bars_foos ON (bars_foos.foo_ids[0] = foos.object_ids[0]) WHERE (bars_foos.bar_ids[0] IN (2))"]
   end
 
   it "should have working eager graphing methods" do

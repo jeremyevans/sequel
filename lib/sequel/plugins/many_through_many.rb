@@ -101,12 +101,24 @@ module Sequel
           END
         end
 
+        # The alias for the first join table.
+        def join_table_alias
+          final_reverse_edge[:alias]
+        end
+
         # Many through many associations don't have a reciprocal
         def reciprocal
           nil
         end
 
         private
+
+        def _associated_dataset
+          ds = associated_class
+          reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
+          ft = final_reverse_edge
+          ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep)
+        end
 
         # Make sure to use unique table aliases when lazy loading or eager loading
         def calculate_reverse_edge_aliases(reverse_edges)
@@ -156,44 +168,9 @@ module Sequel
           h
         end
 
-        def eager_load_base_dataset(keys)
-          ds = associated_class 
-          reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
-          ft = final_reverse_edge
-          ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + [[predicate_key, keys]], :table_alias=>ft[:alias], :qualify=>:deep)
-        end
-
-        def filter_by_associations_add_conditions_dataset_filter(ds)
-          reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
-          ft = final_reverse_edge
-          k = qualify(ft[:alias], Array(self[:left_key]))
-          ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep).
-            where(Sequel.negate(k.zip([]))).
-            select(*k)
-        end
-
         def filter_by_associations_limit_key
           fe = edges.first
           Array(qualify(fe[:table], fe[:right])) + Array(qualify(associated_class.table_name, associated_class.primary_key))
-        end
-
-        def filter_by_associations_limit_subquery
-          subquery = associated_eager_dataset.unlimited
-          reverse_edges.each{|t| subquery = subquery.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
-          ft = final_reverse_edge
-          subquery.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep)
-        end
-
-        def union_eager_loader_proc
-          proc do |pl, ds|
-            keys = predicate_keys
-            ds = associated_dataset
-            reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
-            ft = final_reverse_edge
-            ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + keys.map{pl.arg}.zip(keys), :table_alias=>ft[:alias], :qualify=>:deep).
-              select_append(*associated_key_array).
-              from_self
-          end
         end
       end
 
@@ -252,18 +229,14 @@ module Sequel
           end
 
           left_key = opts[:left_key] = opts[:through].first[:left]
+          opts[:left_keys] = Array(left_key)
           opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           left_pks = opts[:left_primary_keys] = Array(left_pk)
           lpkc = opts[:left_primary_key_column] ||= left_pk
           lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
-          opts[:dataset] ||= lambda do
-            ds = opts.associated_dataset
-            opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
-            ft = opts.final_reverse_edge
-            ds.join(ft[:table],  Array(ft[:left]).zip(Array(ft[:right])) + opts.predicate_keys.zip(left_pks.map{|k| send(k)}), :table_alias=>ft[:alias], :qualify=>:deep)
-          end
+          opts[:dataset] ||= opts.association_dataset_proc
 
           opts[:left_key_alias] ||= opts.default_associated_key_alias
           opts[:eager_loader] ||= opts.method(:default_eager_loader)

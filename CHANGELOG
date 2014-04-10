@@ -1,5 +1,7 @@
 === HEAD
 
+* AssociationReflection#association_dataset now handles joining tables if necessary (jeremyevans)
+
 * Support drop_view :if_exists option on SQLite, MySQL, H2, and HSQLDB (jeremyevans) (#793)
 
 * Support drop_table :if_exists option on HSQLDB (jeremyevans)

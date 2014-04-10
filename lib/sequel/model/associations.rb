@@ -54,9 +54,10 @@ module Sequel
         end
 
         # The dataset associated via this association, with the non-instance specific
-        # changes already applied.
+        # changes already applied.  This will be a joined dataset if the association
+        # requires joining tables.
         def associated_dataset
-          cached_fetch(:_dataset){apply_dataset_changes(associated_class.dataset.clone)}
+          cached_fetch(:_dataset){apply_dataset_changes(_associated_dataset)}
         end
 
         # Apply all non-instance specific changes to the given dataset and return it.
@@ -179,6 +180,18 @@ module Sequel
           end
         end
 
+        # Return an dataset that will load the appropriate associated objects for
+        # the given object using this association.
+        def association_dataset_for(object)
+          associated_dataset.where(predicate_keys.zip(predicate_key_methods.map{|k| object.send(k)}))
+        end
+
+        ASSOCIATION_DATASET_PROC = proc{|r| r.association_dataset_for(self)}
+        # Proc used to create the association dataset method.
+        def association_dataset_proc
+          ASSOCIATION_DATASET_PROC
+        end
+
         # The eager_graph limit strategy to use for this dataset
         def eager_graph_limit_strategy(strategy)
           if self[:limit] || !returns_array?
@@ -217,7 +230,8 @@ module Sequel
           strategy = eager_limit_strategy
           if strategy == :union && !eo[:eager_block]
             objects = []
-            ds = associated_eager_dataset
+            ds = associated_dataset
+            ds = self[:eager_block].call(ds) if self[:eager_block]
             loader = union_eager_loader
             joiner = " UNION ALL "
             eo[:id_map].keys.each_slice(subqueries_per_union).each do |slice|
@@ -229,7 +243,7 @@ module Sequel
             objects
           else
             strategy = true_eager_graph_limit_strategy if strategy == :union
-            objects = apply_eager_limit_strategy(self[:model].eager_loading_dataset(self, eager_load_base_dataset(eo[:id_map].keys), nil, eo[:associations], eo), strategy).all
+            objects = apply_eager_limit_strategy(eager_loading_dataset(eo), strategy).all
           end
           objects.each(&block)
           apply_ruby_eager_limit_strategy(eo[:rows])
@@ -450,6 +464,12 @@ module Sequel
           end
         end
 
+        # The base dataset used for the association, before any order/conditions
+        # options have been applied.
+        def _associated_dataset
+          associated_class.dataset.clone
+        end
+
         # Apply a limit strategy to the given dataset so that filter by
         # associations works with a limited dataset.
         def apply_filter_by_associations_limit_strategy(ds)
@@ -468,28 +488,57 @@ module Sequel
         # each key is included.
         def apply_filter_by_associations_distinct_on_limit_strategy(ds)
           k = filter_by_associations_limit_key 
-          ds.where(k=>apply_distinct_on_eager_limit_strategy(filter_by_associations_limit_subquery.select(*k)))
+          ds.where(k=>apply_distinct_on_eager_limit_strategy(associated_eager_dataset.select(*k)))
         end
 
         # Apply a distinct on eager limit strategy using IN with a subquery
         # that uses a filter on the row_number window function to ensure
         # that only rows inside the limit are returned.
         def apply_filter_by_associations_window_function_limit_strategy(ds)
-          ds.where(filter_by_associations_limit_key=>apply_window_function_eager_limit_strategy(filter_by_associations_limit_subquery.select(*filter_by_associations_limit_alias_key)).select(*filter_by_associations_limit_aliases))
+          ds.where(filter_by_associations_limit_key=>apply_window_function_eager_limit_strategy(associated_eager_dataset.select(*filter_by_associations_limit_alias_key)).select(*filter_by_associations_limit_aliases))
         end
 
         # The associated_dataset with the eager_block callback already applied.
         def associated_eager_dataset
           cached_fetch(:associated_eager_dataset) do
-            ds = associated_dataset
-            ds = self[:eager_block].call(ds) if self[:eager_block]
+            ds = associated_dataset.unlimited
+            if block = self[:eager_block]
+              ds = block.call(ds)
+            end
             ds
           end
+        end
+
+        # The dataset to use for eager loading associated objects for multiple current objects,
+        # given the hash passed to the eager loader.
+        def eager_loading_dataset(eo)
+          ds = associated_eager_dataset.where(predicate_key=>eo[:id_map].keys)
+          unless (associations = Array(eo[:associations])).empty?
+            ds = ds.eager(associations)
+          end
+          if block = eo[:eager_block]
+            ds = block.call(ds)
+          end
+          if eager_loading_use_associated_key?
+            ds = ds.select_append(*associated_key_array)
+          end
+          if self[:eager_graph]
+            raise(Error, "cannot eagerly load a #{self[:type]} association that uses :eager_graph") if eager_loading_use_associated_key?
+            ds = ds.eager_graph(self[:eager_graph])
+          end
+          ds
         end
 
         # The default eager limit strategy to use for this association
         def default_eager_limit_strategy
           self[:model].default_eager_limit_strategy || :ruby
+        end
+
+        # Add conditions to the dataset to not include NULL values for
+        # the associated keys, and select those keys.
+        def filter_by_associations_add_conditions_dataset_filter(ds)
+          k = filter_by_associations_conditions_associated_keys
+          ds.select(*k).where(Sequel.negate(k.zip([])))
         end
 
         # The conditions to add to the filter by associations conditions
@@ -512,7 +561,7 @@ module Sequel
         # values.
         def filter_by_associations_conditions_dataset
           cached_fetch(:filter_by_associations_conditions_dataset) do
-            ds = associated_eager_dataset.unordered.unlimited
+            ds = associated_eager_dataset.unordered
             ds = filter_by_associations_add_conditions_dataset_filter(ds)
             ds = apply_filter_by_associations_limit_strategy(ds)
             ds
@@ -534,11 +583,6 @@ module Sequel
               true_eager_graph_limit_strategy
             end
           end
-        end
-
-        # The base subquery to use when filtering by limited associations
-        def filter_by_associations_limit_subquery
-          associated_eager_dataset.unlimited
         end
 
         # Whether to limit the associated dataset to a single row.
@@ -598,7 +642,16 @@ module Sequel
         # A placeholder literalizer used to speed up the creation of union queries when eager
         # loading a limited association.
         def union_eager_loader
-          cached_fetch(:union_eager_loader){Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset, &union_eager_loader_proc)}
+          cached_fetch(:union_eager_loader) do
+            Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
+              keys = predicate_keys
+              ds = ds.where(keys.map{pl.arg}.zip(keys))
+              if eager_loading_use_associated_key?
+                ds = ds.select_append(*associated_key_array)
+              end
+              ds.from_self
+            end
+          end
         end
       end
     
@@ -695,9 +748,8 @@ module Sequel
     
         private
     
-        def filter_by_associations_add_conditions_dataset_filter(ds)
-          pk = qualify(associated_class.table_name, primary_keys)
-          ds.select(*pk).where(Sequel.negate(pk.zip([])))
+        def filter_by_associations_conditions_associated_keys
+          qualify(associated_class.table_name, primary_keys)
         end
 
         def filter_by_associations_conditions_key
@@ -710,6 +762,10 @@ module Sequel
           super && self[:key]
         end
         
+        def predicate_key_methods
+          self[:keys]
+        end
+    
         def reciprocal_association?(assoc_reflect)
           super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
@@ -766,7 +822,7 @@ module Sequel
           cached_fetch(:predicate_key){qualify_assoc(self[:key])}
         end
         alias qualified_key predicate_key
-    
+
         # The column in the current table that the key in the associated table references.
         def primary_key
           self[:primary_key]
@@ -827,13 +883,8 @@ module Sequel
           end
         end
 
-        def eager_load_base_dataset(keys)
-          associated_class.where(predicate_key=>keys)
-        end
-
-        def filter_by_associations_add_conditions_dataset_filter(ds)
-          k = qualify(associated_class.table_name, self[:keys])
-          ds.select(*k).where(Sequel.negate(k.zip([])))
+        def filter_by_associations_conditions_associated_keys
+          qualify(associated_class.table_name, self[:keys])
         end
 
         def filter_by_associations_conditions_key
@@ -852,6 +903,10 @@ module Sequel
           qualify(associated_class.table_name, associated_class.primary_key)
         end
 
+        def predicate_key_methods
+          self[:primary_keys]
+        end
+    
         def reciprocal_association?(assoc_reflect)
           super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
@@ -867,17 +922,10 @@ module Sequel
         def true_eager_graph_limit_strategy
           r = super
           ds = associated_dataset
-          if r == :ruby && ds.supports_limits_in_correlated_subqueries? && (Array(associated_class.primary_key).length == 1 || associated_dataset.supports_multiple_column_in?) && (!offset || associated_dataset.supports_offsets_in_correlated_subqueries?)
+          if r == :ruby && ds.supports_limits_in_correlated_subqueries? && (Array(associated_class.primary_key).length == 1 || ds.supports_multiple_column_in?) && (!offset || ds.supports_offsets_in_correlated_subqueries?)
             :correlated_subquery
           else
             r
-          end
-        end
-
-        def union_eager_loader_proc
-          proc do |pl, ds|
-            keys = predicate_keys
-            ds.where(keys.map{pl.arg}.zip(keys)).from_self
           end
         end
       end
@@ -1107,15 +1155,12 @@ module Sequel
 
         private
 
-        def eager_load_base_dataset(keys)
-          associated_class.inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys) + [[predicate_key, keys]], :qualify=>:deep)
+        def _associated_dataset
+          super.inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys), :qualify=>:deep)
         end
 
-        def filter_by_associations_add_conditions_dataset_filter(ds)
-          k = qualify(join_table_alias, self[:left_keys])
-          ds.select(*k).
-            where(Sequel.negate(k.zip([]))).
-            inner_join(self[:join_table], Array(self[:right_keys]).zip(right_primary_keys), :qualify=>:deep)
+        def filter_by_associations_conditions_associated_keys
+          qualify(join_table_alias, self[:left_keys])
         end
 
         def filter_by_associations_conditions_key
@@ -1135,10 +1180,10 @@ module Sequel
           qualify(join_table_alias, self[:left_keys]) + Array(qualify(associated_class.table_name, associated_class.primary_key))
         end
 
-        def filter_by_associations_limit_subquery
-          super.inner_join(self[:join_table], Array(self[:right_keys]).zip(right_primary_keys))
+        def predicate_key_methods
+          self[:left_primary_keys]
         end
-
+    
         def reciprocal_association?(assoc_reflect)
           super && assoc_reflect[:left_keys] == self[:right_keys] &&
             assoc_reflect[:right_keys] == self[:left_keys] &&
@@ -1154,16 +1199,6 @@ module Sequel
         # Split the join table into source and alias parts.
         def split_join_table_alias
           associated_class.dataset.split_alias(self[:join_table])
-        end
-
-        def union_eager_loader_proc
-          proc do |pl, ds|
-            keys = predicate_keys
-            associated_dataset.
-              inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys) + keys.map{pl.arg}.zip(keys), :qualify=>:deep).
-              select_append(*associated_key_array).
-              from_self
-          end
         end
       end
   
@@ -1653,7 +1688,7 @@ module Sequel
           opts[:left_key_alias] ||= opts.default_associated_key_alias
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-          opts[:dataset] ||= proc{opts.associated_dataset.inner_join(join_table, rcks.zip(opts.right_primary_keys) + opts.predicate_keys.zip(lcpks.map{|k| send(k)}), :qualify=>:deep)}
+          opts[:dataset] ||= opts.association_dataset_proc
           opts[:eager_loader] ||= opts.method(:default_eager_loader)
           
           join_type = opts[:graph_join_type]
@@ -1739,9 +1774,7 @@ module Sequel
             (auto_assocs[k] ||= []) << name
           end
 
-          opts[:dataset] ||= proc do
-            opts.associated_dataset.where(opts.predicate_keys.zip(cks.map{|k| send(k)}))
-          end
+          opts[:dataset] ||= opts.association_dataset_proc
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
             keys = h.keys
@@ -1796,9 +1829,7 @@ module Sequel
           pkcs = opts[:primary_key_columns] ||= Array(pkc)
           raise(Error, "mismatched number of keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
-          opts[:dataset] ||= proc do
-            opts.associated_dataset.where(opts.predicate_keys.zip(cpks.map{|k| send(k)}))
-          end
+          opts[:dataset] ||= opts.association_dataset_proc
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
             reciprocal = opts.reciprocal
