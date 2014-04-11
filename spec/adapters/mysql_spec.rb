@@ -520,6 +520,17 @@ describe "A MySQL database" do
     end
   end
 
+  specify "should correctly format ALTER TABLE statements with named foreign keys" do
+    @db.create_table(:items){Integer :id}
+    @db.create_table(:users){primary_key :id}
+    @db.alter_table(:items){add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade, :foreign_key_constraint_name => :pk_items__users }
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer)",
+        "CREATE TABLE `users` (`id` integer PRIMARY KEY AUTO_INCREMENT)",
+        "ALTER TABLE `items` ADD COLUMN `p_id` integer NOT NULL, ADD CONSTRAINT `pk_items__users` FOREIGN KEY (`p_id`) REFERENCES `users`(`id`) ON DELETE CASCADE"]
+    end
+  end
+
   specify "should have rename_column support keep existing options" do
     @db.create_table(:items){String :id, :null=>false, :default=>'blah'}
     @db.alter_table(:items){rename_column :id, :nid}

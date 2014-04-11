@@ -185,7 +185,11 @@ module Sequel
             sql = super
             op[:table] = related
             op[:key] ||= primary_key_from_schema(related)
-            sql << ", ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"
+            sql << ", ADD "
+            if constraint_name = op.delete(:foreign_key_constraint_name)
+              sql << "CONSTRAINT #{quote_identifier(constraint_name)} "
+            end
+            sql << "FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"
           else
             super
           end
