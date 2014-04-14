@@ -1901,46 +1901,46 @@ module Sequel
           ck_nil_hash ={}
           cks.each{|k| ck_nil_hash[k] = nil}
 
-          unless opts[:read_only]
-            save_opts = {:validate=>opts[:validate]}
+          return if opts[:read_only]
 
-            if one_to_one
-              setter = opts[:setter] || proc do |o|
-                up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)})))
-                if o
-                  up_ds = up_ds.exclude(o.pk_hash) unless o.new?
-                  cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
-                end
-                checked_transaction do
-                  up_ds.update(ck_nil_hash)
-                  o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
-                end
-              end
-              association_module_private_def(opts._setter_method, opts, &setter)
-              association_module_def(opts.setter_method, opts){|o| set_one_to_one_associated_object(opts, o)}
-            else 
-              save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
+          save_opts = {:validate=>opts[:validate]}
 
-              adder = opts[:adder] || proc do |o|
+          if one_to_one
+            setter = opts[:setter] || proc do |o|
+              up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)})))
+              if o
+                up_ds = up_ds.exclude(o.pk_hash) unless o.new?
                 cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
-                o.save(save_opts)
               end
-              association_module_private_def(opts._add_method, opts, &adder)
-      
-              remover = opts[:remover] || proc do |o|
-                cks.each{|k| o.send(:"#{k}=", nil)}
-                o.save(save_opts)
+              checked_transaction do
+                up_ds.update(ck_nil_hash)
+                o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
               end
-              association_module_private_def(opts._remove_method, opts, &remover)
-
-              clearer = opts[:clearer] || proc do
-                _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
-              end
-              association_module_private_def(opts._remove_all_method, opts, &clearer)
-
-              def_add_method(opts)
-              def_remove_methods(opts)
             end
+            association_module_private_def(opts._setter_method, opts, &setter)
+            association_module_def(opts.setter_method, opts){|o| set_one_to_one_associated_object(opts, o)}
+          else 
+            save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
+
+            adder = opts[:adder] || proc do |o|
+              cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
+              o.save(save_opts)
+            end
+            association_module_private_def(opts._add_method, opts, &adder)
+    
+            remover = opts[:remover] || proc do |o|
+              cks.each{|k| o.send(:"#{k}=", nil)}
+              o.save(save_opts)
+            end
+            association_module_private_def(opts._remove_method, opts, &remover)
+
+            clearer = opts[:clearer] || proc do
+              _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
+            end
+            association_module_private_def(opts._remove_all_method, opts, &clearer)
+
+            def_add_method(opts)
+            def_remove_methods(opts)
           end
         end
 

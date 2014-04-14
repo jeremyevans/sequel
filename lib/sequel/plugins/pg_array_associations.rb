@@ -328,37 +328,37 @@ module Sequel
 
           def_association_dataset_methods(opts)
 
-          unless opts[:read_only]
-            save_opts = {:validate=>opts[:validate]}
-            save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
+          return if opts[:read_only]
 
-            array_type = opts[:array_type] ||= :integer
-            adder = opts[:adder] || proc do |o|
-              if array = o.send(key)
-                array << send(pk)
-              else
-                o.send("#{key}=", Sequel.pg_array([send(pk)], array_type))
-              end
+          save_opts = {:validate=>opts[:validate]}
+          save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
+
+          array_type = opts[:array_type] ||= :integer
+          adder = opts[:adder] || proc do |o|
+            if array = o.send(key)
+              array << send(pk)
+            else
+              o.send("#{key}=", Sequel.pg_array([send(pk)], array_type))
+            end
+            o.save(save_opts)
+          end
+          association_module_private_def(opts._add_method, opts, &adder)
+  
+          remover = opts[:remover] || proc do |o|
+            if (array = o.send(key)) && !array.empty?
+              array.delete(send(pk))
               o.save(save_opts)
             end
-            association_module_private_def(opts._add_method, opts, &adder)
-    
-            remover = opts[:remover] || proc do |o|
-              if (array = o.send(key)) && !array.empty?
-                array.delete(send(pk))
-                o.save(save_opts)
-              end
-            end
-            association_module_private_def(opts._remove_method, opts, &remover)
-
-            clearer = opts[:clearer] || proc do
-              opts.associated_dataset.where(Sequel.pg_array_op(key).contains([send(pk)])).update(key=>Sequel.function(:array_remove, key, send(pk)))
-            end
-            association_module_private_def(opts._remove_all_method, opts, &clearer)
-
-            def_add_method(opts)
-            def_remove_methods(opts)
           end
+          association_module_private_def(opts._remove_method, opts, &remover)
+
+          clearer = opts[:clearer] || proc do
+            opts.associated_dataset.where(Sequel.pg_array_op(key).contains([send(pk)])).update(key=>Sequel.function(:array_remove, key, send(pk)))
+          end
+          association_module_private_def(opts._remove_all_method, opts, &clearer)
+
+          def_add_method(opts)
+          def_remove_methods(opts)
         end
 
         # Setup the pg_array_to_many-specific datasets, eager loaders, and modification methods.
@@ -430,50 +430,50 @@ module Sequel
 
           def_association_dataset_methods(opts)
 
-          unless opts[:read_only]
-            save_opts = {:validate=>opts[:validate]}
-            save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
-            array_type = opts[:array_type] ||= :integer
+          return if opts[:read_only]
 
-            if opts[:save_after_modify]
-              save_after_modify = proc do |obj|
-                obj.save(save_opts)
-              end
+          save_opts = {:validate=>opts[:validate]}
+          save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
+          array_type = opts[:array_type] ||= :integer
+
+          if opts[:save_after_modify]
+            save_after_modify = proc do |obj|
+              obj.save(save_opts)
             end
+          end
 
-            adder = opts[:adder] || proc do |o|
-              opk = o.send(opts.primary_key) 
-              if array = send(key)
-                modified!(key)
-                array << opk
-              else
-                send("#{key}=", Sequel.pg_array([opk], array_type))
-              end
+          adder = opts[:adder] || proc do |o|
+            opk = o.send(opts.primary_key) 
+            if array = send(key)
+              modified!(key)
+              array << opk
+            else
+              send("#{key}=", Sequel.pg_array([opk], array_type))
+            end
+            save_after_modify.call(self) if save_after_modify
+          end
+          association_module_private_def(opts._add_method, opts, &adder)
+  
+          remover = opts[:remover] || proc do |o|
+            if (array = send(key)) && !array.empty?
+              modified!(key)
+              array.delete(o.send(opts.primary_key))
               save_after_modify.call(self) if save_after_modify
             end
-            association_module_private_def(opts._add_method, opts, &adder)
-    
-            remover = opts[:remover] || proc do |o|
-              if (array = send(key)) && !array.empty?
-                modified!(key)
-                array.delete(o.send(opts.primary_key))
-                save_after_modify.call(self) if save_after_modify
-              end
-            end
-            association_module_private_def(opts._remove_method, opts, &remover)
-
-            clearer = opts[:clearer] || proc do
-              if (array = send(key)) && !array.empty?
-                modified!(key)
-                array.clear
-                save_after_modify.call(self) if save_after_modify
-              end
-            end
-            association_module_private_def(opts._remove_all_method, opts, &clearer)
-
-            def_add_method(opts)
-            def_remove_methods(opts)
           end
+          association_module_private_def(opts._remove_method, opts, &remover)
+
+          clearer = opts[:clearer] || proc do
+            if (array = send(key)) && !array.empty?
+              modified!(key)
+              array.clear
+              save_after_modify.call(self) if save_after_modify
+            end
+          end
+          association_module_private_def(opts._remove_all_method, opts, &clearer)
+
+          def_add_method(opts)
+          def_remove_methods(opts)
         end
       end
 
