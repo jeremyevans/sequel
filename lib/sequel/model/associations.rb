@@ -226,9 +226,16 @@ module Sequel
         # Eager load the associated objects using the hash of eager options,
         # yielding each row to the block.
         def eager_load_results(eo, &block)
-          initialize_association_cache(eo[:rows])
+          rows = eo[:rows]
+          initialize_association_cache(rows)
           strategy = eager_limit_strategy
-          if strategy == :union && !eo[:eager_block]
+          cascade = eo[:associations]
+
+          if eo[:eager_block]
+            strategy = true_eager_graph_limit_strategy if strategy == :union
+            objects = apply_eager_limit_strategy(eager_loading_dataset(eo), strategy).all
+            cascade = nil
+          elsif strategy == :union
             objects = []
             ds = associated_dataset
             ds = self[:eager_block].call(ds) if self[:eager_block]
@@ -237,16 +244,16 @@ module Sequel
             eo[:id_map].keys.each_slice(subqueries_per_union).each do |slice|
               objects.concat(ds.with_sql(slice.map{|k| loader.sql(*k)}.join(joiner)).to_a)
             end
-            if cascade = eo[:associations]
-              associated_eager_dataset.send(:eager_load, objects, associated_dataset.send(:eager_options_for_associations, [cascade]))
-            end
-            objects
           else
-            strategy = true_eager_graph_limit_strategy if strategy == :union
-            objects = apply_eager_limit_strategy(eager_loading_dataset(eo), strategy).all
+            objects = placeholder_eager_loader.all(eo[:id_map].keys)
           end
+
+          if cascade && !(cascade = associated_dataset.send(:eager_options_for_associations, [cascade])).empty?
+            associated_eager_dataset.send(:eager_load, objects, cascade)
+          end
+
           objects.each(&block)
-          apply_ruby_eager_limit_strategy(eo[:rows])
+          apply_ruby_eager_limit_strategy(rows)
         end
 
         # The key to use for the key hash when eager loading
@@ -511,8 +518,11 @@ module Sequel
 
         # The dataset to use for eager loading associated objects for multiple current objects,
         # given the hash passed to the eager loader.
-        def eager_loading_dataset(eo)
-          ds = associated_eager_dataset.where(predicate_key=>eo[:id_map].keys)
+        def eager_loading_dataset(eo=OPTS)
+          ds = associated_eager_dataset
+          if id_map = eo[:id_map]
+            ds = ds.where(predicate_key=>id_map.keys)
+          end
           unless (associations = Array(eo[:associations])).empty?
             ds = ds.eager(associations)
           end
@@ -593,6 +603,15 @@ module Sequel
         # Any offset to use for this association (or nil if there is no offset).
         def offset
           limit_and_offset.last
+        end
+
+        # A placeholder literalizer used to speed up eager loading.
+        def placeholder_eager_loader
+          cached_fetch(:placeholder_eager_loader) do
+            Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
+              apply_eager_limit_strategy(eager_loading_dataset.where(predicate_key=>pl.arg), eager_limit_strategy)
+            end
+          end
         end
 
         # Whether the given association reflection is possible reciprocal

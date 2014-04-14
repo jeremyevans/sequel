@@ -1,5 +1,7 @@
 === HEAD
 
+* Use placeholder literalizer when eager loading for up to 20% speedup (jeremyevans)
+
 * Make Model#marshallable! work correctly when using the tactical_eager_loading plugin (jeremyevans)
 
 * Respect :foreign_key_constraint_name option when adding columns to existing table on MySQL (noah256) (#795)
