@@ -1350,11 +1350,9 @@ module Sequel
           association_reflections.values
         end
         
-        # Given an association reflection and a dataset, apply the
-        # :select, :conditions, :order, :eager, :distinct, and :eager_block
-        # association options to the given dataset and return the dataset
-        # or a modified copy of it.
+        # REMOVE410
         def apply_association_dataset_opts(opts, ds)
+          Deprecation.deprecate("Model.apply_association_dataset_opts/Model.eager_loading_dataset")
           ds = ds.select(*opts.select) if opts.select
           if c = opts[:conditions]
             ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
@@ -1647,7 +1645,7 @@ module Sequel
           opts.eager_load_results(eo, &block)
         end
 
-        # Modify and return eager loading dataset based on association options.
+        # REMOVE410
         def eager_loading_dataset(opts, ds, select, associations, eager_options=OPTS)
           ds = apply_association_dataset_opts(opts, ds)
           ds = ds.select(*select) if select

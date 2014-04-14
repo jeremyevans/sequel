@@ -39,9 +39,7 @@ module Sequel
           super
         end
 
-        # When eagerly loading, if the current dataset has a defined shard and the
-        # dataset that you will be using to get the associated records does not,
-        # use the current dataset's shard for the associated dataset.
+        # REMOVE410
         def eager_loading_dataset(opts, ds, select, associations, eager_options=OPTS)
           ds = super(opts, ds, select, associations, eager_options)
           if !ds.opts[:server] and s = eager_options[:self] and server = s.opts[:server]
