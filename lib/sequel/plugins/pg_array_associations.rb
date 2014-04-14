@@ -136,6 +136,11 @@ module Sequel
     
         private
     
+        # The predicate condition to use for the eager_loader.
+        def eager_loading_predicate_condition(keys)
+          Sequel.pg_array_op(predicate_key).overlaps(keys)
+        end
+
         def filter_by_associations_add_conditions_dataset_filter(ds)
           key = qualify(associated_class.table_name, self[:key])
           ds.select{unnest(key)}.exclude(key=>nil)
@@ -288,12 +293,8 @@ module Sequel
           end
           opts[:eager_loader] ||= proc do |eo|
             id_map = eo[:id_map]
-            rows = eo[:rows]
-            opts.initialize_association_cache(rows)
 
-            klass = opts.associated_class
-            ds = model.eager_loading_dataset(opts, klass.where(Sequel.pg_array_op(opts.predicate_key).overlaps(id_map.keys)), nil, eo[:associations], eo)
-            ds.all do |assoc_record|
+            eager_load_results(opts, eo.merge(:loader=>false)) do |assoc_record|
               if pks ||= assoc_record.send(key)
                 pks.each do |pkv|
                   next unless objects = id_map[pkv]
@@ -303,7 +304,6 @@ module Sequel
                 end
               end
             end
-            opts.apply_ruby_eager_limit_strategy(rows)
           end
 
           join_type = opts[:graph_join_type]
@@ -386,7 +386,6 @@ module Sequel
             rows = eo[:rows]
             id_map = {}
             pkm = opts.primary_key_method
-            opts.initialize_association_cache(rows)
 
             rows.each do |object|
               if associated_pks = object.send(key)
@@ -396,16 +395,13 @@ module Sequel
               end
             end
 
-            klass = opts.associated_class
-            ds = model.eager_loading_dataset(opts, klass.where(opts.predicate_key=>id_map.keys), nil, eo[:associations], eo)
-            ds.all do |assoc_record|
+            eager_load_results(opts, eo.merge(:id_map=>id_map)) do |assoc_record|
               if objects = id_map[assoc_record.send(pkm)]
                 objects.each do |object| 
                   object.associations[name].push(assoc_record)
                 end
               end
             end
-            opts.apply_ruby_eager_limit_strategy(rows)
           end
 
           join_type = opts[:graph_join_type]

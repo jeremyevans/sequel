@@ -231,7 +231,7 @@ module Sequel
           strategy = eager_limit_strategy
           cascade = eo[:associations]
 
-          if eo[:eager_block]
+          if eo[:eager_block] || eo[:loader] == false
             strategy = true_eager_graph_limit_strategy if strategy == :union
             objects = apply_eager_limit_strategy(eager_loading_dataset(eo), strategy).all
             cascade = nil
@@ -538,7 +538,7 @@ module Sequel
         def eager_loading_dataset(eo=OPTS)
           ds = associated_eager_dataset
           if id_map = eo[:id_map]
-            ds = ds.where(predicate_key=>id_map.keys)
+            ds = ds.where(eager_loading_predicate_condition(id_map.keys))
           end
           if associations = eo[:associations]
             ds = ds.eager(associations)
@@ -559,6 +559,11 @@ module Sequel
         # The default eager limit strategy to use for this association
         def default_eager_limit_strategy
           self[:model].default_eager_limit_strategy || :ruby
+        end
+
+        # The predicate condition to use for the eager_loader.
+        def eager_loading_predicate_condition(keys)
+          {predicate_key=>keys}
         end
 
         # Add conditions to the dataset to not include NULL values for
