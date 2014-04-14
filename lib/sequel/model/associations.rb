@@ -183,7 +183,7 @@ module Sequel
         # Return an dataset that will load the appropriate associated objects for
         # the given object using this association.
         def association_dataset_for(object)
-          associated_dataset.where(predicate_keys.zip(predicate_key_methods.map{|k| object.send(k)}))
+          associated_dataset.where(predicate_keys.zip(predicate_key_values(object)))
         end
 
         ASSOCIATION_DATASET_PROC = proc{|r| r.association_dataset_for(self)}
@@ -325,9 +325,26 @@ module Sequel
           false
         end
 
+        # A placeholder literalizer that can be used to lazily load the association. If
+        # one can't be used, returns nil.
+        def placeholder_loader
+          if use_placeholder_loader?
+            cached_fetch(:placeholder_loader) do
+              Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
+                ds.where(*predicate_keys.map{|k| SQL::BooleanExpression.new(:'=', k, pl.arg)})
+              end
+            end
+          end
+        end
+
         # The keys to use for loading of the regular dataset, as an array.
         def predicate_keys
           cached_fetch(:predicate_keys){Array(predicate_key)}
+        end
+
+        # The values that predicate_keys should match for objects to be associated.
+        def predicate_key_values(object)
+          predicate_key_methods.map{|k| object.send(k)}
         end
 
         # Qualify +col+ with the given table name.  If +col+ is an array of columns,
@@ -671,6 +688,11 @@ module Sequel
               ds.from_self
             end
           end
+        end
+
+        # Whether the placeholder loader can be used to load the association.
+        def use_placeholder_loader?
+          !self[:instance_specific] && !self[:eager_graph]
         end
       end
     
@@ -2009,6 +2031,13 @@ module Sequel
           ds
         end
         
+        # A placeholder literalizer that can be used to load the association, or nil to not use one.
+        def _associated_object_loader(opts, dynamic_opts)
+          if !dynamic_opts[:callback] && (loader = opts.placeholder_loader)
+            loader
+          end
+        end
+
         # Return an association dataset for the given association reflection
         def _dataset(opts)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
@@ -2040,7 +2069,11 @@ module Sequel
         # Load the associated objects for the given association reflection and dynamic options
         # as an array.
         def _load_associated_object_array(opts, dynamic_opts)
-          _associated_dataset(opts, dynamic_opts).all
+          if loader = _associated_object_loader(opts, dynamic_opts)
+            loader.all(*opts.predicate_key_values(self))
+          else
+            _associated_dataset(opts, dynamic_opts).all
+          end
         end
 
         # Return the associated objects from the dataset, without association callbacks, reciprocals, and caching.

@@ -70,6 +70,11 @@ module Sequel
           use_server(super)
         end
 
+        # Don't use an associated object loader, as it won't respect the shard used.
+        def _associated_object_loader(opts, dynamic_opts)
+          nil
+        end
+
         # Ensure that the join table for many_to_many associations uses the correct shard.
         def _join_table_dataset(opts)
           use_server(super)

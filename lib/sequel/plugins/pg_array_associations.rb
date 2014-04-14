@@ -154,6 +154,10 @@ module Sequel
         def reciprocal_type
           :pg_array_to_many
         end
+
+        def use_placeholder_loader?
+          false
+        end
       end
 
       # The AssociationReflection subclass for pg_array_to_many associations.
@@ -245,6 +249,10 @@ module Sequel
 
         def reciprocal_type
           :many_to_pg_array
+        end
+
+        def use_placeholder_loader?
+          false
         end
       end
 

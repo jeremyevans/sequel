@@ -1,6 +1,8 @@
 === HEAD
 
-* Use placeholder literalizer when eager loading for up to 20% speedup (jeremyevans)
+* Use placeholder literalizer for regular association loading for up to 85% speedup (jeremyevans)
+
+* Use placeholder literalizer for eager association loading for up to 20% speedup (jeremyevans)
 
 * Make Model#marshallable! work correctly when using the tactical_eager_loading plugin (jeremyevans)
 
