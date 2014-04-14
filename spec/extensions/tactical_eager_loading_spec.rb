@@ -75,4 +75,8 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
     DB.sqls.length.should == 1
   end
+
+  it "#marshallable should make marshalling not fail" do
+    proc{Marshal.dump(@c.all.map{|x| x.marshallable!})}.should_not raise_error
+  end
 end

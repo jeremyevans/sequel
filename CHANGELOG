@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Model#marshallable! work correctly when using the tactical_eager_loading plugin (jeremyevans)
+
+* Respect :foreign_key_constraint_name option when adding columns to existing table on MySQL (noah256) (#795)
+
 * AssociationReflection#association_dataset now handles joining tables if necessary (jeremyevans)
 
 * Support drop_view :if_exists option on SQLite, MySQL, H2, and HSQLDB (jeremyevans) (#793)

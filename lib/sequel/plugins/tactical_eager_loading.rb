@@ -35,6 +35,15 @@ module Sequel
         # reteived via Dataset#all.
         attr_accessor :retrieved_with
 
+        # Remove retrieved_by and retrieved_with when marshalling.  retrieved_by
+        # contains unmarshallable objects, and retrieved_with can be very large
+        # and is not helpful without retrieved_by.
+        def marshallable!
+          @retrieved_by = nil
+          @retrieved_with = nil
+          super
+        end
+
         private
 
         # If there the association is not in the associations cache and the object
