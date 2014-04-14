@@ -24,6 +24,21 @@ module Sequel
           new_using_server(s, values, &block).save
         end
 
+        # Eager load the association with the given eager loader options.
+        def eager_load_results(opts, eo, &block)
+          if (s = eo[:self]) && (server = s.opts[:server])
+            eb = eo[:eager_block]
+            set_server = proc do |ds|
+              ds = eb.call(ds) if eb
+              ds = ds.server(server) unless ds.opts[:server]
+              ds
+            end
+            eo = eo.merge(:eager_block=>set_server)
+          end
+
+          super
+        end
+
         # When eagerly loading, if the current dataset has a defined shard and the
         # dataset that you will be using to get the associated records does not,
         # use the current dataset's shard for the associated dataset.

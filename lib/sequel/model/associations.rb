@@ -1086,7 +1086,7 @@ module Sequel
           left_key_alias = self[:left_key_alias]
           name = self[:name]
 
-          eager_load_results(eo) do |assoc_record|
+          self[:model].eager_load_results(self, eo) do |assoc_record|
             assoc_record.values.delete(delete_rn) if delete_rn
             hash_key = if uses_lcks
               left_key_alias.map{|k| assoc_record.values.delete(k)}
@@ -1627,6 +1627,11 @@ module Sequel
           association_reflections.keys
         end
 
+        # Eager load the association with the given eager loader options.
+        def eager_load_results(opts, eo, &block)
+          opts.eager_load_results(eo, &block)
+        end
+
         # Modify and return eager loading dataset based on association options.
         def eager_loading_dataset(opts, ds, select, associations, eager_options=OPTS)
           ds = apply_association_dataset_opts(opts, ds)
@@ -1826,7 +1831,7 @@ module Sequel
             h = eo[:id_map]
             pk_meths = opts.primary_key_methods
 
-            opts.eager_load_results(eo) do |assoc_record|
+            eager_load_results(opts, eo) do |assoc_record|
               hash_key = uses_cks ? pk_meths.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key_method)
               if objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
@@ -1878,7 +1883,7 @@ module Sequel
             assign_singular = opts.assign_singular?
             delete_rn = opts.delete_row_number_column
 
-            opts.eager_load_results(eo) do |assoc_record|
+            eager_load_results(opts, eo) do |assoc_record|
               assoc_record.values.delete(delete_rn) if delete_rn
               hash_key = uses_cks ? km.map{|k| assoc_record.send(k)} : assoc_record.send(km)
               next unless objects = h[hash_key]
