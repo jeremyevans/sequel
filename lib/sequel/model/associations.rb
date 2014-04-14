@@ -1555,6 +1555,12 @@ module Sequel
 
           opts = orig_opts.merge(:type => type, :name => name, :cache=>{}, :model => self)
           opts[:block] = block if block
+          if block || orig_opts[:block] || orig_opts[:dataset]
+            # It's possible the association is instance specific, in that it depends on
+            # values other than the foreign key value.  This needs to be checked for
+            # in certain places to disable optimizations.
+            opts[:instance_specific] = true
+          end
           opts = assoc_class.new.merge!(opts)
 
           if opts[:clone] && !opts.cloneable?(cloned_assoc)
@@ -1579,7 +1585,7 @@ module Sequel
           
           # Remove :class entry if it exists and is nil, to work with cached_fetch
           opts.delete(:class) unless opts[:class]
-          
+
           send(:"def_#{type}", opts)
       
           orig_opts.delete(:clone)

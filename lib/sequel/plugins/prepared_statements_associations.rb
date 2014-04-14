@@ -22,17 +22,6 @@ module Sequel
       # lambda returns the next integer to use.
       NEXT = lambda{MUTEX.synchronize{i += 1}}
 
-      module ClassMethods
-        # Disable prepared statement use if a block is given, or the :dataset or :conditions
-        # options are used, or you are cloning an association.
-        def associate(type, name, opts = OPTS, &block)
-          if block || opts[:dataset] || (opts[:clone] && association_reflection(opts[:clone])[:prepared_statement] == false)
-            opts = opts.merge(:prepared_statement=>false)
-          end
-          super(type, name, opts, &block)
-        end
-      end
-
       module InstanceMethods
         private
 
@@ -62,17 +51,19 @@ module Sequel
         # instance.  Return false if such a prepared statement cannot be created.
         def association_prepared_statement(opts, assoc_bv)
           opts.send(:cached_fetch, :prepared_statement) do
-            ds, bv = _associated_dataset(opts, {}).unbind
-            if bv.length != assoc_bv.length
-              h = {}
-              bv.each do |k,v|
-                h[k] = v unless assoc_bv.has_key?(k)
+            unless opts[:instance_specific]
+              ds, bv = _associated_dataset(opts, {}).unbind
+              if bv.length != assoc_bv.length
+                h = {}
+                bv.each do |k,v|
+                  h[k] = v unless assoc_bv.has_key?(k)
+                end
+                ds = ds.bind(h)
               end
-              ds = ds.bind(h)
+              ps = ds.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
+              ps.log_sql = true
+              ps
             end
-            ps = ds.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
-            ps.log_sql = true
-            ps
           end
         end
 
