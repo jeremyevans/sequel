@@ -540,7 +540,7 @@ module Sequel
           if id_map = eo[:id_map]
             ds = ds.where(predicate_key=>id_map.keys)
           end
-          unless (associations = Array(eo[:associations])).empty?
+          if associations = eo[:associations]
             ds = ds.eager(associations)
           end
           if block = eo[:eager_block]
@@ -1824,16 +1824,11 @@ module Sequel
           opts[:dataset] ||= opts.association_dataset_proc
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:id_map]
-            keys = h.keys
+            pk_meths = opts.primary_key_methods
 
-            opts.initialize_association_cache(eo[:rows])
-
-            # Skip eager loading if no objects have a foreign key for this association
-            unless keys.empty?
-              klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.where(opts.predicate_key=>keys), nil, eo[:associations], eo).all do |assoc_record|
-                hash_key = uses_cks ? opts.primary_key_methods.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key_method)
-                next unless objects = h[hash_key]
+            opts.eager_load_results(eo) do |assoc_record|
+              hash_key = uses_cks ? pk_meths.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key_method)
+              if objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
               end
             end
