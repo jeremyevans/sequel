@@ -2032,6 +2032,11 @@ module Sequel
           _load_associated_object_array(opts, dynamic_opts).first
         end
 
+        # Return the associated single object using a primary key lookup on the associated class.
+        def _load_associated_object_via_primary_key(opts)
+          opts.associated_class.send(:primary_key_lookup, ((fk = opts[:key]).is_a?(Array) ? fk.map{|c| send(c)} : send(fk)))
+        end
+
         # Load the associated objects for the given association reflection and dynamic options
         # as an array.
         def _load_associated_object_array(opts, dynamic_opts)
@@ -2045,7 +2050,7 @@ module Sequel
             if opts.returns_array?
               _load_associated_object_array(opts, dynamic_opts)
             elsif load_with_primary_key_lookup?(opts, dynamic_opts)
-              opts.associated_class.send(:primary_key_lookup, ((fk = opts[:key]).is_a?(Array) ? fk.map{|c| send(c)} : send(fk)))
+              _load_associated_object_via_primary_key(opts)
             else
               _load_associated_object(opts, dynamic_opts)
             end
