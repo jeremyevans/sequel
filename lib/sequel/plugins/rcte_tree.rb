@@ -204,15 +204,12 @@ module Sequel
             end
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
-          elds = model.eager_loading_dataset(r,
-           model.from(SQL::AliasedExpression.new(t, table_alias)).
-            with_recursive(t, base_case,
-             recursive_case,
-             :args=>((key_aliases + col_aliases) if col_aliases)),
-           r.select,
-           eo[:associations], eo)
-          elds = elds.select_append(ka) unless elds.opts[:select] == nil
-          elds.all do |obj|
+          ds = model.from(SQL::AliasedExpression.new(t, table_alias)).
+            with_recursive(t, base_case, recursive_case,
+             :args=>((key_aliases + col_aliases) if col_aliases))
+          ds = r.apply_eager_dataset_changes(ds)
+          ds = ds.select_append(ka) unless ds.opts[:select] == nil
+          model.eager_load_results(r, eo.merge(:loader=>false, :initalize_rows=>false, :dataset=>ds, :id_map=>nil)) do |obj|
             opk = prkey_conv[obj]
             if parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
@@ -308,13 +305,12 @@ module Sequel
             recursive_case = recursive_case.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, la) + 1, la)).filter(SQL::QualifiedIdentifier.new(t, la) < level - 1)
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
-          elds = model.eager_loading_dataset(r,
-           model.from(SQL::AliasedExpression.new(t, table_alias)).with_recursive(t, base_case, recursive_case,
-            :args=>((key_aliases + col_aliases + (level ? [la] : [])) if col_aliases)),
-           r.select,
-           associations, eo)
-          elds = elds.select_append(ka) unless elds.opts[:select] == nil
-          elds.all do |obj|
+          ds = model.from(SQL::AliasedExpression.new(t, table_alias)).
+            with_recursive(t, base_case, recursive_case,
+              :args=>((key_aliases + col_aliases + (level ? [la] : [])) if col_aliases))
+          ds = r.apply_eager_dataset_changes(ds)
+          ds = ds.select_append(ka) unless ds.opts[:select] == nil
+          model.eager_load_results(r, eo.merge(:loader=>false, :initalize_rows=>false, :dataset=>ds, :id_map=>nil, :associations=>{})) do |obj|
             if level
               no_cache = no_cache_level == obj.values.delete(la)
             end

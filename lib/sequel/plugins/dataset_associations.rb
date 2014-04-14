@@ -99,9 +99,7 @@ module Sequel
           else
             raise Error, "unrecognized association type for association #{name.inspect}: #{r[:type].inspect}"
           end
-          ds = model.apply_association_dataset_opts(r, ds)
-          r[:extend].each{|m| ds.extend(m)}
-          ds
+          r.apply_eager_dataset_changes(ds).unlimited
         end
       end
     end

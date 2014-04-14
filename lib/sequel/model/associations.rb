@@ -77,6 +77,16 @@ module Sequel
           ds
         end
 
+        # Apply all non-instance specific changes and the eager_block option to the given
+        # dataset and return it.
+        def apply_eager_dataset_changes(ds)
+          ds = apply_dataset_changes(ds)
+          if block = self[:eager_block]
+            ds = block.call(ds)
+          end
+          ds
+        end
+
         # Apply the eager graph limit strategy to the dataset to graph into the current dataset, or return
         # the dataset unmodified if no SQL limit strategy is needed.
         def apply_eager_graph_limit_strategy(strategy, ds)
@@ -227,7 +237,7 @@ module Sequel
         # yielding each row to the block.
         def eager_load_results(eo, &block)
           rows = eo[:rows]
-          initialize_association_cache(rows)
+          initialize_association_cache(rows) unless eo[:initialize_rows] == false
           strategy = eager_limit_strategy
           cascade = eo[:associations]
 
@@ -536,7 +546,7 @@ module Sequel
         # The dataset to use for eager loading associated objects for multiple current objects,
         # given the hash passed to the eager loader.
         def eager_loading_dataset(eo=OPTS)
-          ds = associated_eager_dataset
+          ds = eo[:dataset] || associated_eager_dataset
           if id_map = eo[:id_map]
             ds = ds.where(eager_loading_predicate_condition(id_map.keys))
           end
