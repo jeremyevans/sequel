@@ -39,9 +39,9 @@ module Sequel
             association_bound_variable_hash(opts.associated_class.table_name, opts.primary_keys, opts[:keys])
           when :one_to_many, :one_to_one
             association_bound_variable_hash(opts.associated_class.table_name, opts[:keys], opts[:primary_keys])
-          when :many_to_many
+          when :many_to_many, :one_through_one
             association_bound_variable_hash(opts.join_table_alias, opts[:left_keys], opts[:left_primary_keys])
-          when :many_through_many
+          when :many_through_many, :one_through_many
             association_bound_variable_hash(opts.final_reverse_edge[:alias], Array(opts[:left_key]), opts[:left_primary_keys])
           end
         end

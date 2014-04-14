@@ -1,5 +1,7 @@
 === HEAD
 
+* Make prepared_statement_associations plugin handle one_through_one and one_through_many associations (jeremyevans)
+
 * Use placeholder literalizer for regular association loading for up to 85% speedup (jeremyevans)
 
 * Use placeholder literalizer for eager association loading for up to 20% speedup (jeremyevans)
