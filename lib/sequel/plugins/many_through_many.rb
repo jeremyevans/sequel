@@ -270,8 +270,6 @@ module Sequel
               ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, &graph_block)
             end
           end
-
-          def_association_dataset_methods(opts)
         end
 
         # Use def_many_through_many, since they share pretty much the same code.

@@ -1622,6 +1622,7 @@ module Sequel
           opts.delete(:class) unless opts[:class]
 
           send(:"def_#{type}", opts)
+          def_association_instance_methods(opts)
       
           orig_opts.delete(:clone)
           orig_opts.merge!(:class_name=>opts[:class_name], :class=>opts[:class], :block=>opts[:block])
@@ -1709,23 +1710,54 @@ module Sequel
           association_module_def(name, opts, &block)
           association_module(opts).send(:private, name)
         end
-      
-        # Add the add_ instance method 
+
+        # REMOVE410
         def def_add_method(opts)
+          Deprecation.deprecate("Model.def_add_method")
           association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
         end
-      
-        # Adds the association dataset methods to the association methods module.
+
+        # REMOVE410
         def def_association_dataset_methods(opts)
+          Deprecation.deprecate("Model.def_association_dataset_methods")
           association_module_def(opts.dataset_method, opts){_dataset(opts)}
           def_association_method(opts)
         end
-
+      
         # Adds the association method to the association methods module.
         def def_association_method(opts)
           association_module_def(opts.association_method, opts){|*dynamic_opts, &block| load_associated_objects(opts, dynamic_opts[0], &block)}
         end
       
+        # Define all of the association instance methods for this association.
+        def def_association_instance_methods(opts)
+          association_module_def(opts.dataset_method, opts){_dataset(opts)}
+          def_association_method(opts)
+
+          return if opts[:read_only]
+
+          if opts[:setter] && opts[:_setter]
+            # This is backwards due to backwards compatibility
+            association_module_private_def(opts._setter_method, opts, &opts[:setter])
+            association_module_def(opts.setter_method, opts, &opts[:_setter])
+          end
+
+          if opts[:adder]
+            association_module_private_def(opts._add_method, opts, &opts[:adder])
+            association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
+          end
+
+          if opts[:remover]
+            association_module_private_def(opts._remove_method, opts, &opts[:remover]) if opts[:remover]
+            association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
+          end
+
+          if opts[:clearer]
+            association_module_private_def(opts._remove_all_method, opts, &opts[:clearer]) if opts[:clearer]
+            association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
+          end
+        end
+        
         # Configures many_to_many and one_through_one association reflection and adds the related association methods
         def def_many_to_many(opts)
           one_through_one = opts[:type] == :one_through_one
@@ -1785,32 +1817,24 @@ module Sequel
             end
           end
       
-          def_association_dataset_methods(opts)
-      
           return if opts[:read_only] || one_through_one
       
-          adder = opts[:adder] || proc do |o|
+          opts[:adder] ||= proc do |o|
             h = {}
             lcks.zip(lcpks).each{|k, pk| h[k] = send(pk)}
             rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.send(pk)}
             _join_table_dataset(opts).insert(h)
           end
-          association_module_private_def(opts._add_method, opts, &adder) 
 
-          remover = opts[:remover] || proc do |o|
+          opts[:remover] ||= proc do |o|
             _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.send(k)})).delete
           end
-          association_module_private_def(opts._remove_method, opts, &remover)
 
-          clearer = opts[:clearer] || proc do
+          opts[:clearer] ||= proc do
             _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| send(k)})).delete
           end
-          association_module_private_def(opts._remove_all_method, opts, &clearer)
-      
-          def_add_method(opts)
-          def_remove_methods(opts)
         end
-        
+
         # Configures many_to_one association reflection and adds the related association methods
         def def_many_to_one(opts)
           name = opts[:name]
@@ -1864,13 +1888,10 @@ module Sequel
             ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
           end
       
-          def_association_dataset_methods(opts)
-          
           return if opts[:read_only]
       
-          setter = opts[:setter] || proc{|o| cks.zip(opts.primary_key_methods).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
-          association_module_private_def(opts._setter_method, opts, &setter)
-          association_module_def(opts.setter_method, opts){|o| set_associated_object(opts, o)}
+          opts[:setter] ||= proc{|o| cks.zip(opts.primary_key_methods).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
+          opts[:_setter] = proc{|o| set_associated_object(opts, o)}
         end
         
         # Configures one_to_many and one_to_one association reflections and adds the related association methods
@@ -1931,17 +1952,14 @@ module Sequel
             ds
           end
       
-          def_association_dataset_methods(opts)
-          
-          ck_nil_hash ={}
-          cks.each{|k| ck_nil_hash[k] = nil}
-
           return if opts[:read_only]
 
           save_opts = {:validate=>opts[:validate]}
+          ck_nil_hash ={}
+          cks.each{|k| ck_nil_hash[k] = nil}
 
           if one_to_one
-            setter = opts[:setter] || proc do |o|
+            opts[:setter] ||= proc do |o|
               up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)})))
               if o
                 up_ds = up_ds.exclude(o.pk_hash) unless o.new?
@@ -1952,30 +1970,23 @@ module Sequel
                 o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
               end
             end
-            association_module_private_def(opts._setter_method, opts, &setter)
-            association_module_def(opts.setter_method, opts){|o| set_one_to_one_associated_object(opts, o)}
+            opts[:_setter] = proc{|o| set_one_to_one_associated_object(opts, o)}
           else 
             save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
 
-            adder = opts[:adder] || proc do |o|
+            opts[:adder] ||= proc do |o|
               cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
               o.save(save_opts)
             end
-            association_module_private_def(opts._add_method, opts, &adder)
     
-            remover = opts[:remover] || proc do |o|
+            opts[:remover] ||= proc do |o|
               cks.each{|k| o.send(:"#{k}=", nil)}
               o.save(save_opts)
             end
-            association_module_private_def(opts._remove_method, opts, &remover)
 
-            clearer = opts[:clearer] || proc do
+            opts[:clearer] ||= proc do
               _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
             end
-            association_module_private_def(opts._remove_all_method, opts, &clearer)
-
-            def_add_method(opts)
-            def_remove_methods(opts)
           end
         end
 
@@ -1989,12 +2000,13 @@ module Sequel
           def_one_to_many(opts)
         end
         
-        # Add the remove_ and remove_all instance methods
+        # REMOVE410
         def def_remove_methods(opts)
+          Deprecation.deprecate("Model.def_remove_methods")
           association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
           association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
         end
-
+          
         # Return dataset to graph into given the association reflection, applying the :callback option if set.
         def eager_graph_dataset(opts, eager_options)
           ds = opts.associated_class.dataset

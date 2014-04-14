@@ -1,5 +1,7 @@
 === HEAD
 
+* Model.def_{add_method,association_dataset_methods,remove_methods} are now deprecated (jeremyevans)
+
 * Model.eager_loading_dataset and Model.apply_association_dataset_opts are now deprecated (jeremyevans)
 
 * Make prepared_statement_associations plugin handle one_through_one and one_through_many associations (jeremyevans)
