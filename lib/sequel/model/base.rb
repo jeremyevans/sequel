@@ -399,28 +399,59 @@ module Sequel
         end
 
         type = opts.fetch(:type, :first)
-        raise Error, ":type option to Model.finder must be :first, :all, :each, or :get" unless FINDER_TYPES.include?(type)
+        unless prepare = opts[:prepare]
+          raise Error, ":type option to Model.finder must be :first, :all, :each, or :get" unless FINDER_TYPES.include?(type)
+        end
         limit1 = type == :first || type == :get
         meth_name ||= opts[:name] || :"#{type}_#{meth}"
 
-        loader_proc = proc do |model|
-          unless block
-            argn = opts[:arity]
-            block =  lambda do |pl, model2|
-              method = model2.method(meth)
-              argn ||= (method.arity < 0 ? method.arity.abs - 1 : method.arity)
-              args = (0...argn).map{pl.arg}
-              ds = method.call(*args)
+        argn = lambda do |model|
+          if arity = opts[:arity]
+            arity
+          else
+            method = block || model.method(meth)
+            (method.arity < 0 ? method.arity.abs - 1 : method.arity)
+          end
+        end
+
+        loader_proc = if prepare
+          proc do |model|
+            args = prepare_method_args('$a', argn.call(model))
+            ds = if block
+              model.instance_exec(*args, &block)
+            else
+              model.send(meth, *args)
+            end
+            ds = ds.limit(1) if limit1
+            model_name = model.name
+            if model_name.to_s.empty?
+              model_name = model.object_id
+            else
+              model_name = model_name.gsub(/\W/, '_')
+            end
+            ds.prepare(type, :"#{model_name}_#{meth_name}")
+          end
+        else
+          proc do |model|
+            n = argn.call(model)
+            block ||= lambda do |pl, model2|
+              args = (0...n).map{pl.arg}
+              ds = model2.send(meth, *args)
               ds = ds.limit(1) if limit1
               ds
             end
-          end
 
-          Sequel::Dataset::PlaceholderLiteralizer.loader(model, &block) 
+            Sequel::Dataset::PlaceholderLiteralizer.loader(model, &block) 
+          end
         end
+
         Sequel.synchronize{@finder_loaders[meth_name] = loader_proc}
         mod = opts[:mod] || (class << self; self; end)
-        def_finder_method(mod, meth_name, type)
+        if prepare
+          def_prepare_method(mod, meth_name)
+        else
+          def_finder_method(mod, meth_name, type)
+        end
       end
 
       # An alias for calling first on the model's dataset, but with
@@ -573,6 +604,27 @@ module Sequel
         h
       end
   
+      # Similar to finder, but uses a prepared statement instead of a placeholder
+      # literalizer. This makes the SQL used static (cannot vary per call), but
+      # allows binding argument values instead of literalizing them into the SQL
+      # query string.
+      #
+      # If a block is used with this method, it is instance_execed by the model,
+      # and should accept the desired number of placeholder arguments.
+      #
+      # The options are the same as the options for finder, with the following
+      # exception:
+      # :type :: Specifies the type of prepared statement to create
+      def prepared_finder(meth=OPTS, opts=OPTS, &block)
+        if block
+          raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
+          meth = meth.merge(:prepare=>true)
+        else
+          opts = opts.merge(:prepare=>true)
+        end
+        finder(meth, opts, &block)
+      end
+
       # Restrict the setting of the primary key(s) when using mass assignment (e.g. +set+).  Because
       # this is the default, this only make sense to use in a subclass where the
       # parent class has used +unrestrict_primary_key+.
@@ -818,6 +870,12 @@ module Sequel
         mod.send(:define_method, meth){|*args, &block| finder_for(meth).send(type, *args, &block)}
       end
 
+      # Define a prepared_finder method in the given module that will call the associated prepared
+      # statement.
+      def def_prepare_method(mod, meth)
+        mod.send(:define_method, meth){|*args, &block| finder_for(meth).call(prepare_method_arg_hash(args), &block)}
+      end
+
       # Find the finder to use for the give method.  If a finder has not been loaded
       # for the method, load the finder and set correctly in the finders hash, then
       # return the finder.
@@ -948,6 +1006,23 @@ module Sequel
         end
       end
   
+      # An hash of prepared argument values for the given arguments, with keys
+      # starting at a.  Used by the methods created by prepared_finder.
+      def prepare_method_arg_hash(args)
+        h = {}
+        prepare_method_args('a', args.length).zip(args).each{|k, v| h[k] = v}
+        h
+      end
+
+      # An array of prepared statement argument names, of length n and starting with base.
+      def prepare_method_args(base, n)
+        args = (0...n).map do
+          s = base.to_sym
+          base = base.next
+          s
+        end
+      end
+
       # Find the row in the dataset that matches the primary key.  Uses
       # a static SQL optimization if the table and primary key are simple.
       #

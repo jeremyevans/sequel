@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.prepared_finder, similar to .finder but using a prepared statement (jeremyevans)
+
 * Model.def_{add_method,association_dataset_methods,remove_methods} are now deprecated (jeremyevans)
 
 * Model.eager_loading_dataset and Model.apply_association_dataset_opts are now deprecated (jeremyevans)

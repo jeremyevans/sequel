@@ -521,7 +521,125 @@ describe Sequel::Model, ".finder" do
     @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
   end
 
-  specify "should raise error when callign with the wrong arity" do
+  specify "should raise error when calling with the wrong arity" do
+    @c.finder :foo
+    proc{@c.first_foo(1)}.should raise_error
+    proc{@c.first_foo(1,2,3)}.should raise_error
+  end
+end
+
+describe Sequel::Model, ".prepared_finder" do
+  before do
+    @h = {:id=>1}
+    @db = Sequel.mock(:fetch=>@h)
+    @db.extend_datasets do
+      def select_sql
+        sql = super
+        sql << ' -- prepared' if is_a?(Sequel::Dataset::PreparedStatementMethods)
+        sql
+      end
+    end
+    @c = Class.new(Sequel::Model(@db[:items]))
+    @c.instance_eval do
+      def foo(a, b)
+        where(:bar=>a).order(b)
+      end
+    end
+    @o = @c.load(@h)
+    @db.sqls
+  end
+
+  specify "should create a method that calls the method given and returns the first instance" do
+    @c.prepared_finder :foo
+    @c.first_foo(1, 2).should == @o
+    @c.first_foo(3, 4).should == @o
+    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+  end
+
+  specify "should work correctly when subclassing" do
+    @c.prepared_finder(:foo)
+    @sc = Class.new(@c)
+    @sc.set_dataset :foos
+    @db.sqls
+    @sc.first_foo(1, 2).should == @sc.load(@h)
+    @sc.first_foo(3, 4).should == @sc.load(@h)
+    @db.sqls.should == ["SELECT * FROM foos WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+  end
+
+  specify "should work correctly when dataset is modified" do
+    @c.prepared_finder(:foo)
+    @c.first_foo(1, 2).should == @o
+    @c.set_dataset :foos
+    @c.first_foo(3, 4).should == @o
+    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+  end
+
+  specify "should create a method based on the given block if no method symbol provided" do
+    @c.prepared_finder(:name=>:first_foo){|a1| where(:id=>a1).limit(1)}
+    @c.first_foo(1).should == @o
+    @db.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1 -- prepared"]
+  end
+
+  specify "should raise an error if both a block and method symbol given" do
+    proc{@c.prepared_finder(:foo, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise an error if two option hashes are provided" do
+    proc{@c.prepared_finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should support :type option" do
+    @c.prepared_finder :foo, :type=>:all
+    @c.prepared_finder :foo, :type=>:each
+
+    a = []
+    @c.all_foo(1, 2){|r| a << r}.should == [@o]
+    a.should == [@o]
+   
+    a = []
+    @c.each_foo(3, 4){|r| a << r}
+    a.should == [@o]
+
+    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 -- prepared"]
+  end
+
+  specify "should support :name option" do
+    @c.prepared_finder :foo, :name=>:find_foo
+    @c.find_foo(1, 2).should == @o
+    @c.find_foo(3, 4).should == @o
+    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+  end
+
+  specify "should support :arity option" do
+    def @c.foobar(*b)
+      ds = dataset
+      b.each_with_index do |a, i|
+        ds = ds.where(i=>a)
+      end
+      ds
+    end
+    @c.prepared_finder :foobar, :arity=>1, :name=>:find_foobar_1
+    @c.prepared_finder :foobar, :arity=>2, :name=>:find_foobar_2
+    @c.find_foobar_1(:a)
+    @c.find_foobar_2(:a, :b)
+    @db.sqls.should == ["SELECT * FROM items WHERE (0 = a) LIMIT 1 -- prepared", "SELECT * FROM items WHERE ((0 = a) AND (1 = b)) LIMIT 1 -- prepared"]
+  end
+
+  specify "should support :mod option" do
+    m = Module.new
+    @c.prepared_finder :foo, :mod=>m
+    proc{@c.first_foo}.should raise_error
+    @c.extend m
+    @c.first_foo(1, 2).should == @o
+    @c.first_foo(3, 4).should == @o
+    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+  end
+
+  specify "should handle models with names" do
+    def @c.name; 'foobar' end
+    @c.prepared_finder :foo
+    @c.first_foo(1, 2).should == @o
+    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared"]
   end
 end
 

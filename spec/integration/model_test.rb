@@ -22,6 +22,23 @@ describe "Sequel::Model basic support" do
     Item.find(:name=>'J').should == Item.load(:id=>1, :name=>'J')
   end
   
+  specify ".finder should create method that returns first matching item" do
+    def Item.by_name(name) where(:name=>name) end
+    Item.finder :by_name
+    Item.first_by_name('J').should == nil
+    Item.create(:name=>'J')
+    Item.first_by_name('J').should == Item.load(:id=>1, :name=>'J')
+    Item.first_by_name(['J', 'K']).should == Item.load(:id=>1, :name=>'J')
+  end
+  
+  specify ".prepared_finder should create method that returns first matching item" do
+    def Item.by_name(name) where(:name=>name) end
+    Item.prepared_finder :by_name
+    Item.first_by_name('J').should == nil
+    Item.create(:name=>'J')
+    Item.first_by_name('J').should == Item.load(:id=>1, :name=>'J')
+  end
+  
   specify ".find_or_create should return first matching item, or create it if it doesn't exist" do
     Item.all.should == []
     Item.find_or_create(:name=>'J').should == Item.load(:id=>1, :name=>'J')
