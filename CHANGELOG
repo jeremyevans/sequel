@@ -1,6 +1,6 @@
 === HEAD
 
-* Recognize another disconnect error in the postgres adapter (jeremyevans)
+* Recognize additional disconnect errors in the postgres adapter (jeremyevans)
 
 * Make import/multi_insert insert multiple rows in a single query using a UNION on Oracle, DB2, and Firebird (jeremyevans)
 
