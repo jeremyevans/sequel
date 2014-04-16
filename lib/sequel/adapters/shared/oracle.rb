@@ -259,7 +259,7 @@ module Sequel
       BOOL_FALSE = "'N'".freeze
       BOOL_TRUE = "'Y'".freeze
       HSTAR = "H*".freeze
-      DUAL = ['DUAL'.freeze].freeze
+      DUAL = ' FROM DUAL'.freeze
       BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
 
       def complex_expression_sql_append(sql, op, args)
@@ -430,6 +430,10 @@ module Sequel
         TIMESTAMP_FORMAT
       end
 
+      def empty_from_sql
+        DUAL
+      end
+
       # If this dataset is associated with a sequence, return the most recently
       # inserted sequence value.
       def execute_insert(sql, opts=OPTS)
@@ -470,15 +474,6 @@ module Sequel
       # Use the Oracle-specific SQL clauses (no limit, since it is emulated).
       def select_clause_methods
         SELECT_CLAUSE_METHODS
-      end
-
-      # Modify the SQL to add the list of tables to select FROM
-      # Oracle doesn't support select without FROM clause
-      # so add the dummy DUAL table if the dataset doesn't select
-      # from a table.
-      def select_from_sql(sql)
-        sql << FROM
-        source_list_append(sql, @opts[:from] || DUAL)
       end
 
       # Oracle supports quoted function names.

@@ -175,6 +175,10 @@ module Sequel
 
         private
 
+        def empty_from_sql
+          DEFAULT_FROM
+        end
+        
         # Use string in hex format for blob data.
         def literal_blob_append(sql, v)
           sql << BLOB_OPEN << v.unpack(HSTAR).first << APOS
@@ -205,15 +209,6 @@ module Sequel
           SELECT_CLAUSE_METHODS
         end
 
-        # Use a default FROM table if the dataset does not contain a FROM table.
-        def select_from_sql(sql)
-          if @opts[:from]
-            super
-          else
-            sql << DEFAULT_FROM
-          end
-        end
-        
         # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
         def select_with_sql_base
           opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super

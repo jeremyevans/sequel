@@ -187,6 +187,10 @@ module Sequel
 
       private
 
+      def empty_from_sql
+        DEFAULT_FROM
+      end
+
       def insert_clause_methods
         INSERT_CLAUSE_METHODS
       end
@@ -209,15 +213,6 @@ module Sequel
         SELECT_CLAUSE_METHODS
       end
       
-        # Use a default FROM table if the dataset does not contain a FROM table.
-        def select_from_sql(sql)
-          if @opts[:from]
-            super
-          else
-            sql << DEFAULT_FROM
-          end
-        end
-
       def select_limit_sql(sql)
         if l = @opts[:limit]
           sql << FIRST

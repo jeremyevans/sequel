@@ -317,6 +317,10 @@ module Sequel
 
       private
 
+      def empty_from_sql
+        EMPTY_FROM_TABLE
+      end
+
       # DB2 needs the standard workaround to insert all default values into
       # a table with more than one column.
       def insert_supports_empty_values?
@@ -345,11 +349,6 @@ module Sequel
       # DB2 does not require that ROW_NUMBER be ordered.
       def require_offset_order?
         false
-      end
-
-      # Add a fallback table for empty from situation
-      def select_from_sql(sql)
-        @opts[:from] ? super : (sql << EMPTY_FROM_TABLE)
       end
 
       # Modify the sql to limit the number of rows returned

@@ -1148,6 +1148,11 @@ describe "Dataset#from" do
     @dataset.from(:a, @dataset.from(:b).lateral).select_sql.should == "SELECT * FROM a, LATERAL (SELECT * FROM b) AS t1"
   end
 
+  specify "should automatically use a default from table if no from table is present" do
+    def @dataset.empty_from_sql; ' FROM DEFFROM'; end
+    @dataset.select_sql.should == "SELECT * FROM DEFFROM"
+  end
+
   specify "should accept :schema__table___alias symbol format" do
     @dataset.from(:abc__def).select_sql.should == "SELECT * FROM abc.def"
     @dataset.from(:a_b__c).select_sql.should == "SELECT * FROM a_b.c"

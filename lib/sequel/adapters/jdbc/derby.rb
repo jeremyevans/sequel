@@ -257,6 +257,10 @@ module Sequel
           end
         end
         
+        def empty_from_sql
+          DEFAULT_FROM
+        end
+
         # Derby needs a hex string casted to BLOB for blobs.
         def literal_blob_append(sql, v)
           sql << BLOB_OPEN << v.unpack(HSTAR).first << BLOB_CLOSE
@@ -301,15 +305,6 @@ module Sequel
         # Derby doesn't support common table expressions.
         def select_clause_methods
           SELECT_CLAUSE_METHODS
-        end
-
-        # Use a default FROM table if the dataset does not contain a FROM table.
-        def select_from_sql(sql)
-          if @opts[:from]
-            super
-          else
-            sql << DEFAULT_FROM
-          end
         end
 
         # Offset comes before limit in Derby

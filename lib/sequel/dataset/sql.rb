@@ -935,6 +935,19 @@ module Sequel
       sql << DELETE
     end
 
+    def delete_from_sql(sql)
+      if f = @opts[:from]
+        sql << FROM
+        source_list_append(sql, f)
+      end
+    end
+
+    # An SQL FROM clause to use in SELECT statements where the dataset has
+    # no from tables.
+    def empty_from_sql
+      nil
+    end
+
     # Append literalization of array of expressions to SQL string.
     def expression_list_append(sql, columns)
       c = false
@@ -1290,9 +1303,10 @@ module Sequel
       if f = @opts[:from]
         sql << FROM
         source_list_append(sql, f)
+      elsif f = empty_from_sql
+        sql << f
       end
     end
-    alias delete_from_sql select_from_sql
 
     def select_group_sql(sql)
       if group = @opts[:group]
