@@ -2927,6 +2927,15 @@ describe "Dataset#import" do
       "INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6",
       'COMMIT']
   end
+
+  specify "should use correct sql for :union strategy when FROM is required" do
+    def @ds.empty_from_sql; ' FROM foo' end
+    def @ds.multi_insert_sql_strategy; :union end
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
+    @db.sqls.should == ['BEGIN',
+      "INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo UNION ALL SELECT 5, 6 FROM foo",
+      'COMMIT']
+  end
 end
 
 describe "Dataset#multi_insert" do

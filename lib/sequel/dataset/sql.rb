@@ -125,6 +125,7 @@ module Sequel
         c = false
         sql = LiteralString.new('')
         u = UNION_ALL_SELECT
+        f = empty_from_sql
         values.each do |v|
           if c
             sql << u
@@ -133,6 +134,7 @@ module Sequel
             c = true
           end
           expression_list_append(sql, v)
+          sql << f if f
         end
         [insert_sql(columns, sql)]
       else

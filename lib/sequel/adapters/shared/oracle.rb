@@ -471,6 +471,11 @@ module Sequel
         BOOL_TRUE
       end
 
+      # Oracle can insert multiple rows using a UNION
+      def multi_insert_sql_strategy
+        :union
+      end
+
       # Use the Oracle-specific SQL clauses (no limit, since it is emulated).
       def select_clause_methods
         SELECT_CLAUSE_METHODS

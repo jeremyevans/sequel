@@ -208,6 +208,11 @@ module Sequel
         BOOL_TRUE
       end
 
+      # Firebird can insert multiple rows using a UNION
+      def multi_insert_sql_strategy
+        :union
+      end
+
       # The order of clauses in the SELECT SQL statement
       def select_clause_methods
         SELECT_CLAUSE_METHODS

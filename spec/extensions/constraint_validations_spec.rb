@@ -133,7 +133,9 @@ describe "constraint_validations extension" do
     @db.extension(:constraint_validations)
     @db.create_table(:foo){String :name; validate{presence :name}}
     sqls = @db.sqls
-    parse_insert(sqls.slice!(1)).should == {:validation_type=>"presence", :column=>"name", :table=>"foo"}
+    s = sqls.slice!(1)
+    m = /\AINSERT INTO sequel_constraint_validations \((.*)\) SELECT (.*) FROM DUAL\z/.match(s)
+    Hash[*m[1].split(', ').map{|v| v.to_sym}.zip(m[2].split(', ').map{|v| parse_insert_value(v)}).reject{|k, v| v.nil?}.flatten].should == {:validation_type=>"presence", :column=>"name", :table=>"foo"}
     sqls.should == ["BEGIN", "COMMIT", "CREATE TABLE foo (name varchar(255), CHECK ((name IS NOT NULL) AND (trim(name) IS NOT NULL)))"]
   end
 

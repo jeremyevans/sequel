@@ -346,6 +346,11 @@ module Sequel
         end
       end
 
+      # DB2 can insert multiple rows using a UNION
+      def multi_insert_sql_strategy
+        :union
+      end
+
       # DB2 does not require that ROW_NUMBER be ordered.
       def require_offset_order?
         false
