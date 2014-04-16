@@ -52,82 +52,38 @@ module Sequel
           # Grab values from the reflection so that the hash lookup only needs to be
           # done once instead of inside ever method call.
           lk, lpk, rk = opts.values_at(:left_key, :left_primary_key, :right_key)
+          clpk = lpk.is_a?(Array)
+          crk = rk.is_a?(Array)
 
-          # Add 2 separate implementations of the getter method optimized for the
-          # composite and singular left key cases, and 4 separate implementations of the setter
-          # method optimized for each combination of composite and singular keys for both
-          # the left and right keys.
-          if lpk.is_a?(Array)
+          if clpk
             def_association_pks_getter(opts) do
               h = {}
               lk.zip(lpk).each{|k, pk| h[k] = send(pk)}
               _join_table_dataset(opts).filter(h).select_map(rk)
             end
-
-            if rk.is_a?(Array)
-              def_association_pks_setter(opts) do |pks|
-                pks = convert_cpk_array(opts, pks)
-                checked_transaction do
-                  lpkv = lpk.map{|k| send(k)}
-                  ds = _join_table_dataset(opts).filter(lk.zip(lpkv))
-                  ds.exclude(rk=>pks).delete
-                  pks -= ds.select_map(rk)
-                  h = {}
-                  lk.zip(lpkv).each{|k, v| h[k] = v}
-                  pks.each do |pk|
-                    ih = h.dup
-                    rk.zip(pk).each{|k, v| ih[k] = v}
-                    ds.insert(ih)
-                  end
-                end
-              end
-            else
-              def_association_pks_setter(opts) do |pks|
-                pks = convert_pk_array(opts, pks)
-                checked_transaction do
-                  lpkv = lpk.map{|k| send(k)}
-                  ds = _join_table_dataset(opts).filter(lk.zip(lpkv))
-                  ds.exclude(rk=>pks).delete
-                  pks -= ds.select_map(rk)
-                  h = {}
-                  lk.zip(lpkv).each{|k, v| h[k] = v}
-                  pks.each do |pk|
-                    ds.insert(h.merge(rk=>pk))
-                  end
-                end
-              end
-            end
           else
             def_association_pks_getter(opts) do
               _join_table_dataset(opts).filter(lk=>send(lpk)).select_map(rk)
             end
+          end
 
-            if rk.is_a?(Array)
-              def_association_pks_setter(opts) do |pks|
-                pks = convert_cpk_array(opts, pks)
-                checked_transaction do
-                  lpkv = send(lpk)
-                  ds = _join_table_dataset(opts).filter(lk=>lpkv)
-                  ds.exclude(rk=>pks).delete
-                  pks -= ds.select_map(rk)
-                  pks.each do |pk|
-                    h = {lk=>lpkv}
-                    rk.zip(pk).each{|k, v| h[k] = v}
-                    ds.insert(h)
-                  end
-                end
+          def_association_pks_setter(opts) do |pks|
+            pks = send(crk ? :convert_cpk_array : :convert_pk_array, opts, pks)
+            checked_transaction do
+              if clpk
+                lpkv = lpk.map{|k| send(k)}
+                cond = lk.zip(lpkv)
+              else
+                lpkv = send(lpk)
+                cond = {lk=>lpkv}
               end
-            else
-              def_association_pks_setter(opts) do |pks|
-                pks = convert_pk_array(opts, pks)
-                checked_transaction do
-                  lpkv = send(lpk)
-                  ds = _join_table_dataset(opts).filter(lk=>lpkv)
-                  ds.exclude(rk=>pks).delete
-                  pks -= ds.select_map(rk)
-                  pks.each{|pk| ds.insert(lk=>lpkv, rk=>pk)}
-                end
-              end
+              ds = _join_table_dataset(opts).filter(cond)
+              ds.exclude(rk=>pks).delete
+              pks -= ds.select_map(rk)
+              lpkv = Array(lpkv)
+              key_array = crk ? pks.map{|pk| lpkv + pk} : pks.map{|pk| lpkv + [pk]}
+              key_columns = Array(lk) + Array(rk)
+              ds.import(key_columns, key_array)
             end
           end
         end

@@ -89,8 +89,10 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
     sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
-    sqls.length.should == 3
+    sqls[2].should == 'BEGIN'
+    sqls[3].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
+    sqls[4].should == 'COMMIT'
+    sqls.length.should == 5
   end
 
   specify "should return correct right-side associated cpks for one_to_many associations" do
@@ -119,9 +121,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM albums_vocalists WHERE ((album_id = 2) AND ((first, last) NOT IN (('F1', 'L1'), ('F2', 'L2'))))"
     sqls[1].should == 'SELECT first, last FROM albums_vocalists WHERE (album_id = 2)'
-    match = sqls[2].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
+    match = sqls[3].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F1'", "last"=>"'L1'", "album_id"=>"2"}
-    sqls.length.should == 3
+    sqls.length.should == 5
   end
 
   specify "should return correct associated pks for left-side cpks for one_to_many associations" do
@@ -152,9 +154,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM vocalists_instruments WHERE ((first = 'F2') AND (last = 'L2') AND (instrument_id NOT IN (1, 2)))"
     sqls[1].should == "SELECT instrument_id FROM vocalists_instruments WHERE ((first = 'F2') AND (last = 'L2'))"
-    match = sqls[2].match(/INSERT INTO vocalists_instruments \((.*)\) VALUES \((.*)\)/)
+    match = sqls[3].match(/INSERT INTO vocalists_instruments \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F2'", "last"=>"'L2'", "instrument_id"=>"1"}
-    sqls.length.should == 3
+    sqls.length.should == 5
   end
 
   specify "should return correct right-side associated cpks for left-side cpks for one_to_many associations" do
@@ -185,9 +187,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"
     sqls[1].should == "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
-    match = sqls[2].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
+    match = sqls[3].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F2'", "last"=>"'L2'", "year"=>"1997", "week"=>"1"}
-    sqls.length.should == 3
+    sqls.length.should == 5
   end
 
   specify "should use transactions if the object is configured to use transactions" do
@@ -231,8 +233,8 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
     sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
-    sqls.length.should == 3
+    sqls[3].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
+    sqls.length.should == 5
   end
 
   specify "should not automatically convert keys to numbers if the primary key is an integer for many_to_many associations" do
@@ -241,9 +243,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN ('1', '3')))"
     sqls[1].should == 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '1'|'1', 2)\)/
-    sqls[3].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '3'|'3', 2)\)/
-    sqls.length.should == 4
+    sqls[3].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '1'|'1', 2)\)/
+    sqls[4].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '3'|'3', 2)\)/
+    sqls.length.should == 6
   end
 
   specify "should automatically convert keys to numbers for appropriate integer primary key for composite key associations" do
@@ -254,9 +256,9 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2') AND ((year, week) NOT IN ((1997, 1), (1997, 2))))"
     sqls[1].should == "SELECT year, week FROM vocalists_hits WHERE ((first = 'F2') AND (last = 'L2'))"
-    match = sqls[2].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
+    match = sqls[3].match(/INSERT INTO vocalists_hits \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"'F2'", "last"=>"'L2'", "year"=>"1997", "week"=>"1"}
-    sqls.length.should == 3
+    sqls.length.should == 5
 
     @Vocalist.db_schema[:first][:type] = :integer
     @Vocalist.db_schema[:last][:type] = :integer
@@ -270,10 +272,10 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].should == "DELETE FROM albums_vocalists WHERE ((album_id = 2) AND ((first, last) NOT IN ((11, 11), (12, 12))))"
     sqls[1].should == 'SELECT first, last FROM albums_vocalists WHERE (album_id = 2)'
-    match = sqls[2].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
-    Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"11", "last"=>"11", "album_id"=>"2"}
     match = sqls[3].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
+    Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"11", "last"=>"11", "album_id"=>"2"}
+    match = sqls[4].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].should == {"first"=>"12", "last"=>"12", "album_id"=>"2"}
-    sqls.length.should == 4
+    sqls.length.should == 6
   end
 end

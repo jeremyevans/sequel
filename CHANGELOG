@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up association_pks many_to_many setter method by using Dataset#import (jeremyevans)
+
 * Add Model.prepared_finder, similar to .finder but using a prepared statement (jeremyevans)
 
 * Model.def_{add_method,association_dataset_methods,remove_methods} are now deprecated (jeremyevans)
