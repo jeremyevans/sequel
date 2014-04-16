@@ -49,6 +49,9 @@ module Sequel
         # a setter that deletes from or inserts into the join table.
         def def_many_to_many(opts)
           super
+
+          return if opts[:type] == :one_through_one
+
           # Grab values from the reflection so that the hash lookup only needs to be
           # done once instead of inside ever method call.
           lk, lpk, rk = opts.values_at(:left_key, :left_primary_key, :right_key)
