@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize another disconnect error in the postgres adapter (jeremyevans)
+
 * Make import/multi_insert insert multiple rows in a single query using a UNION on Oracle, DB2, and Firebird (jeremyevans)
 
 * Speed up association_pks many_to_many setter method by using Dataset#import (jeremyevans)

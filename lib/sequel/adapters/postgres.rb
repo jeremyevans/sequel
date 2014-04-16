@@ -108,7 +108,7 @@ module Sequel
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
-      DISCONNECT_ERROR_RE = /\Acould not receive data from server/
+      DISCONNECT_ERROR_RE = /\Acould not receive data from server|no connection to the server/
       
       self.translate_results = false if respond_to?(:translate_results=)
       
