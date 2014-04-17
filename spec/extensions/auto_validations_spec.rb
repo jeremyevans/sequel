@@ -15,6 +15,7 @@ describe "Sequel::Plugins::AutoValidations" do
     end
     def db.supports_index_parsing?() true end
     def db.indexes(t, *)
+      raise if t.is_a?(Sequel::Dataset)
       return [] if t != :test
       {:a=>{:columns=>[:name, :num], :unique=>true}, :b=>{:columns=>[:num], :unique=>false}}
     end
@@ -48,6 +49,11 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.model.send(:setup_auto_validations)
     @m.set(:d=>Date.today, :num=>1, :name=>'1')
     @m.valid?.should == true
+  end
+
+  it "should handle models that select from subqueries" do
+    @c.set_dataset @c.dataset.from_self
+    proc{@c.send(:setup_auto_validations)}.should_not raise_error
   end
 
   it "should support :not_null=>:presence option" do

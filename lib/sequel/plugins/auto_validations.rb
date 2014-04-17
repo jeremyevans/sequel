@@ -107,8 +107,9 @@ module Sequel
           @auto_validate_not_null_columns = not_null_cols - Array(primary_key)
           explicit_not_null_cols += Array(primary_key)
           @auto_validate_explicit_not_null_columns = explicit_not_null_cols.uniq
-          @auto_validate_unique_columns = if db.supports_index_parsing?
-            db.indexes(dataset.first_source_table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns]}
+          table = dataset.first_source_table
+          @auto_validate_unique_columns = if db.supports_index_parsing? && [Symbol, SQL::QualifiedIdentifier, SQL::Identifier, String].any?{|c| table.is_a?(c)}
+            db.indexes(table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns]}
           else
             []
           end
