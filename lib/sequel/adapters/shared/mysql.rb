@@ -145,6 +145,14 @@ module Sequel
         super && (server_version <= 50512 || server_version >= 50523)
       end
 
+      # Support fractional timestamps on MySQL 5.6.5+ if the :fractional_seconds
+      # Database option is used.  Technically, MySQL 5.6.4+ supports them, but
+      # automatic initialization of datetime values wasn't supported to 5.6.5+,
+      # and this is related to that.
+      def supports_timestamp_usecs?
+        @supports_timestamp_usecs ||= server_version >= 50605 && typecast_value_boolean(opts[:fractional_seconds])
+      end
+
       # MySQL supports transaction isolation levels
       def supports_transaction_isolation_levels?
         true
@@ -505,7 +513,9 @@ module Sequel
       # MySQL has both datetime and timestamp classes, most people are going
       # to want datetime
       def type_literal_generic_datetime(column)
-        if column[:default] == Sequel::CURRENT_TIMESTAMP
+        if supports_timestamp_usecs?
+          :'datetime(6)'
+        elsif column[:default] == Sequel::CURRENT_TIMESTAMP
           :timestamp
         else
           :datetime
@@ -513,9 +523,17 @@ module Sequel
       end
 
       # MySQL has both datetime and timestamp classes, most people are going
-      # to want datetime
+      # to want datetime.
       def type_literal_generic_time(column)
-        column[:only_time] ? :time : type_literal_generic_datetime(column)
+        if column[:only_time]
+          if supports_timestamp_usecs?
+            :'time(6)'
+          else
+            :time
+          end
+        else
+          type_literal_generic_datetime(column)
+        end
       end
 
       # MySQL doesn't have a true boolean class, so it uses tinyint(1)
@@ -575,6 +593,7 @@ module Sequel
       BLOB_START = "0x".freeze
       EMPTY_BLOB = "''".freeze
       HSTAR = "H*".freeze
+      CURRENT_TIMESTAMP_56 = 'CURRENT_TIMESTAMP(6)'.freeze
 
       # Comes directly from MySQL's documentation, used for queries with limits without offsets
       ONLY_OFFSET = ",18446744073709551615".freeze
@@ -622,6 +641,18 @@ module Sequel
         end
       end
       
+      # MySQL's CURRENT_TIMESTAMP does not use fractional seconds,
+      # even if the database itself supports fractional seconds. If
+      # MySQL 5.6.4+ is being used, use a value that will return
+      # fractional seconds.
+      def constant_sql_append(sql, constant)
+        if constant == :CURRENT_TIMESTAMP && supports_timestamp_usecs?
+          sql << CURRENT_TIMESTAMP_56
+        else
+          super
+        end
+      end
+
       # Use GROUP BY instead of DISTINCT ON if arguments are provided.
       def distinct(*args)
         args.empty? ? super : group(*args)
@@ -764,7 +795,7 @@ module Sequel
       # ignores them.  Also, using them seems to cause problems on 1.9.  Since
       # they are ignored anyway, not using them is probably best.
       def supports_timestamp_usecs?
-        false
+        db.supports_timestamp_usecs?
       end
       
       # Sets up the update methods to use UPDATE IGNORE.
