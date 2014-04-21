@@ -465,6 +465,12 @@ module Sequel
         end
       end
 
+      # Split DROP INDEX ops on MySQL 5.6+, as dropping them in the same
+      # statement as dropping a related foreign key causes an error.
+      def split_alter_table_op?(op)
+        server_version >= 50600 && (op[:op] == :drop_index || (op[:op] == :drop_constraint && op[:type] == :unique))
+      end
+
       # MySQL can combine multiple alter table ops into a single query.
       def supports_combining_alter_table_ops?
         true

@@ -1,5 +1,7 @@
 === HEAD
 
+* Work around MySQL 5.6+ bug when combining DROP FOREIGN KEY and DROP INDEX in same ALTER TABLE statement (jeremyevans)
+
 * Make auto_validations plugin handle models that select from subqueries (jeremyevans)
 
 * Recognize additional disconnect errors in the postgres adapter (jeremyevans)
