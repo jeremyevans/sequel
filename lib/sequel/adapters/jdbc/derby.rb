@@ -185,7 +185,6 @@ module Sequel
         BOOL_FALSE_OLD = '(1 = 0)'.freeze
         BOOL_TRUE = 'TRUE'.freeze
         BOOL_FALSE = 'FALSE'.freeze
-        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
         EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}
 
         # Derby doesn't support an expression between CASE and WHEN,
@@ -300,11 +299,6 @@ module Sequel
         # Derby supports multiple rows in INSERT.
         def multi_insert_sql_strategy
           :values
-        end
-
-        # Derby doesn't support common table expressions.
-        def select_clause_methods
-          SELECT_CLAUSE_METHODS
         end
 
         # Offset comes before limit in Derby

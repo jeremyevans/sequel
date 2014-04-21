@@ -44,7 +44,7 @@ module Sequel
     # If given, +type+ can be :select, :insert, :update, or :delete, in which case it
     # determines whether WITH is supported for the respective statement type.
     def supports_cte?(type=:select)
-      send(:"#{type}_clause_methods").include?(:"#{type}_with_sql")
+      false
     end
 
     # Whether the dataset supports common table expressions (the WITH clause)
@@ -140,7 +140,7 @@ module Sequel
     # Whether the RETURNING clause is supported for the given type of query.
     # +type+ can be :insert, :update, or :delete.
     def supports_returning?(type)
-      send(:"#{type}_clause_methods").include?(:"#{type}_returning_sql")
+      false
     end
 
     # Whether the database supports SELECT *, column FROM table

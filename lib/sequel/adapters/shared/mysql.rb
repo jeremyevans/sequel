@@ -549,10 +549,6 @@ module Sequel
       COMMA_SEPARATOR = ', '.freeze
       FOR_SHARE = ' LOCK IN SHARE MODE'.freeze
       SQL_CALC_FOUND_ROWS = ' SQL_CALC_FOUND_ROWS'.freeze
-      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'delete from where order limit')
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert ignore into columns values on_duplicate_key_update')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct calc_found_rows columns from join where group having compounds order limit lock')
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update ignore table set where order limit')
       APOS = Dataset::APOS
       APOS_RE = Dataset::APOS_RE
       DOUBLE_APOS = Dataset::DOUBLE_APOS
@@ -597,6 +593,11 @@ module Sequel
 
       # Comes directly from MySQL's documentation, used for queries with limits without offsets
       ONLY_OFFSET = ",18446744073709551615".freeze
+
+      Dataset.def_sql_method(self, :delete, %w'delete from where order limit')
+      Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update')
+      Dataset.def_sql_method(self, :select, %w'select distinct calc_found_rows columns from join where group having compounds order limit lock')
+      Dataset.def_sql_method(self, :update, %w'update ignore table set where order limit')
 
       include Sequel::Dataset::Replace
 
@@ -810,11 +811,6 @@ module Sequel
       
       private
 
-      # MySQL supports the ORDER BY and LIMIT clauses for DELETE statements
-      def delete_clause_methods
-        DELETE_CLAUSE_METHODS
-      end
-      
       # Consider the first table in the joined dataset is the table to delete
       # from, but include the others for the purposes of selecting rows.
       def delete_from_sql(sql)
@@ -828,12 +824,6 @@ module Sequel
           super
         end
       end
-
-      # MySQL supports the IGNORE and ON DUPLICATE KEY UPDATE clauses for INSERT statements
-      def insert_clause_methods
-        INSERT_CLAUSE_METHODS
-      end
-      alias replace_clause_methods insert_clause_methods
 
       # MySQL doesn't use the SQL standard DEFAULT VALUES.
       def insert_columns_sql(sql)
@@ -951,11 +941,6 @@ module Sequel
         :values
       end
 
-      # MySQL does not support the SQL WITH clause for SELECT statements
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
-      end
-      
       def select_only_offset_sql(sql)
         sql << LIMIT
         literal_append(sql, @opts[:offset])
@@ -970,11 +955,6 @@ module Sequel
       # MySQL specific SQL_CALC_FOUND_ROWS option
       def select_calc_found_rows_sql(sql)
         sql << SQL_CALC_FOUND_ROWS if opts[:calc_found_rows]
-      end
-
-      # MySQL supports the ORDER BY and LIMIT clauses for UPDATE statements
-      def update_clause_methods
-        UPDATE_CLAUSE_METHODS
       end
 
       # MySQL uses WITH ROLLUP syntax.

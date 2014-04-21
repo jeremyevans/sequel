@@ -128,12 +128,6 @@ module Sequel
       class Dataset < JDBC::Dataset
         BOOL_TRUE = 'TRUE'.freeze
         BOOL_FALSE = 'FALSE'.freeze
-        # HSQLDB does support common table expressions, but the support is broken.
-        # CTEs operate more like temprorary tables or views, lasting longer than the duration of the expression.
-        # CTEs in earlier queries might take precedence over CTEs with the same name in later queries.
-        # Also, if any CTE is recursive, all CTEs must be recursive.
-        # If you want to use CTEs with HSQLDB, you'll have to manually modify the dataset to allow it.
-        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
         SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
         APOS = Dataset::APOS
         HSTAR = "H*".freeze
@@ -161,6 +155,15 @@ module Sequel
         # HSQLDB requires SQL standard datetimes in some places.
         def requires_sql_standard_datetimes?
           true
+        end
+
+        # HSQLDB does support common table expressions, but the support is broken.
+        # CTEs operate more like temprorary tables or views, lasting longer than the duration of the expression.
+        # CTEs in earlier queries might take precedence over CTEs with the same name in later queries.
+        # Also, if any CTE is recursive, all CTEs must be recursive.
+        # If you want to use CTEs with HSQLDB, you'll have to manually modify the dataset to allow it.
+        def supports_cte?(type=:select)
+          false
         end
 
         # HSQLDB does not support IS TRUE.
@@ -202,11 +205,6 @@ module Sequel
         # HSQLDB supports multiple rows in INSERT.
         def multi_insert_sql_strategy
           :values
-        end
-
-        # HSQLDB does not support CTEs well enough for Sequel to enable support for them.
-        def select_clause_methods
-          SELECT_CLAUSE_METHODS
         end
 
         # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive

@@ -490,16 +490,14 @@ module Sequel
     end
   
     module DatasetMethods
+      include(Module.new do
+        Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from lock join where group having order compounds')
+      end)
       include EmulateOffsetWithRowNumber
 
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with delete from output from2 where')
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with insert into columns output values')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct limit columns into from lock join where group having order compounds')
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with update limit table set output from where')
-      UPDATE_CLAUSE_METHODS_2000 = Dataset.clause_methods(:update, %w'update table set output from where')
       NOLOCK = ' WITH (NOLOCK)'.freeze
       UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
@@ -542,7 +540,11 @@ module Sequel
       ROWS_ONLY = " ROWS ONLY".freeze
       FETCH_NEXT = " FETCH NEXT ".freeze
 
-      Sequel::Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
+      Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
+      Dataset.def_sql_method(self, :delete, %w'with delete from output from2 where')
+      Dataset.def_sql_method(self, :insert, %w'with insert into columns output values')
+      Dataset.def_sql_method(self, :update, [['if is_2005_or_later?', %w'with update limit table set output from where'], ['else', %w'update table set output from where']])
+
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_writer :mssql_unicode_strings
@@ -696,6 +698,10 @@ module Sequel
         db.server_version(@opts[:server])
       end
 
+      def supports_cte?(type=:select)
+        is_2005_or_later?
+      end
+
       # MSSQL 2005+ supports GROUP BY CUBE.
       def supports_group_cube?
         is_2005_or_later?
@@ -804,12 +810,6 @@ module Sequel
         DEFAULT_TIMESTAMP_FORMAT
       end
 
-      # MSSQL supports the OUTPUT clause for DELETE statements.
-      # It also allows prepending a WITH clause.
-      def delete_clause_methods
-        DELETE_CLAUSE_METHODS
-      end
-
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
         sql << FROM
@@ -841,12 +841,6 @@ module Sequel
       # fields.
       def format_timestamp_usec(usec)
         sprintf(TIMESTAMP_USEC_FORMAT, usec/1000)
-      end
-
-      # MSSQL supports the OUTPUT clause for INSERT statements.
-      # It also allows prepending a WITH clause.
-      def insert_clause_methods
-        INSERT_CLAUSE_METHODS
       end
 
       # Use OUTPUT INSERTED.* to return all columns of the inserted row,
@@ -903,12 +897,6 @@ module Sequel
       # can use UNION.
       def multi_insert_sql_strategy
         is_2008_or_later? ? :values : :union
-      end
-
-      # MSSQL adds the limit before the columns, except on 2012+ when using
-      # offsets on ordered queries.
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
       end
 
       def select_into_sql(sql)
@@ -985,17 +973,6 @@ module Sequel
       end
       alias delete_output_sql output_sql
       alias update_output_sql output_sql
-
-      # MSSQL supports the OUTPUT and TOP clause for UPDATE statements.
-      # It also allows prepending a WITH clause.  For MSSQL 2000
-      # and below, exclude WITH and TOP.
-      def update_clause_methods
-        if is_2005_or_later?
-          UPDATE_CLAUSE_METHODS
-        else
-          UPDATE_CLAUSE_METHODS_2000
-        end
-      end
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)

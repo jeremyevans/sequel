@@ -88,9 +88,11 @@ module Sequel
     end
   
     module DatasetMethods
+      include(Module.new do
+        Dataset.def_sql_method(self, :select, %w'select distinct limit columns into from join where group order having compounds')
+      end)
       include EmulateOffsetWithReverseAndCount
 
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct limit columns into from join where group order having compounds')
       DATE_FORMAT = '#%Y-%m-%d#'.freeze
       TIMESTAMP_FORMAT = '#%Y-%m-%d %H:%M:%S#'.freeze
       TOP = " TOP ".freeze
@@ -294,11 +296,6 @@ module Sequel
       # Access uses [] for quoting identifiers
       def quoted_identifier_append(sql, v)
         sql << BRACKET_OPEN << v.to_s << BRACKET_CLOSE
-      end
-
-      # Access requires the limit clause come before other clauses
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
       end
     end
   end

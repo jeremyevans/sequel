@@ -1094,27 +1094,19 @@ module Sequel
       BOOL_FALSE = 'false'.freeze
       BOOL_TRUE = 'true'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'delete from using where returning')
-      DELETE_CLAUSE_METHODS_91 = Dataset.clause_methods(:delete, %w'with delete from using where returning')
       EXCLUSIVE = 'EXCLUSIVE'.freeze
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'insert into columns values returning')
-      INSERT_CLAUSE_METHODS_91 = Dataset.clause_methods(:insert, %w'with insert into columns values returning')
       NULL = LiteralString.new('NULL').freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit lock')
-      SELECT_CLAUSE_METHODS_84 = Dataset.clause_methods(:select, %w'with select distinct columns from join where group having window compounds order limit lock')
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'update table set from where returning')
-      UPDATE_CLAUSE_METHODS_91 = Dataset.clause_methods(:update, %w'with update table set from where returning')
       SPACE = Dataset::SPACE
       FROM = Dataset::FROM
       APOS = Dataset::APOS
@@ -1132,6 +1124,11 @@ module Sequel
       WINDOW = " WINDOW ".freeze
       EMPTY_STRING = ''.freeze
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each{|s| s.freeze}
+
+      Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
+      Dataset.def_sql_method(self, :insert, [['if server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
+      Dataset.def_sql_method(self, :select, [['if server_version >= 80400', %w'with select distinct columns from join where group having window compounds order limit lock'], ['else', %w'select distinct columns from join where group having compounds order limit lock']])
+      Dataset.def_sql_method(self, :update, [['if server_version >= 90100', %w'with update table set from where returning'], ['else', %w'update table set from where returning']])
 
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
@@ -1279,6 +1276,14 @@ module Sequel
         nil
       end
 
+      def supports_cte?(type=:select)
+        if type == :select
+          server_version >= 80400
+        else
+          server_version >= 90100
+        end
+      end
+
       # PostgreSQL supports using the WITH clause in subqueries if it
       # supports using WITH at all (i.e. on PostgreSQL 8.4+).
       def supports_cte_in_subqueries?
@@ -1386,15 +1391,6 @@ module Sequel
         raise(InvalidOperation, "Joined datasets cannot be truncated") if opts[:join]
       end
 
-      # PostgreSQL allows deleting from joined datasets
-      def delete_clause_methods
-        if server_version >= 90100
-          DELETE_CLAUSE_METHODS_91
-        else
-          DELETE_CLAUSE_METHODS
-        end
-      end
-
       # Only include the primary table in the main delete clause
       def delete_from_sql(sql)
         sql << FROM
@@ -1404,15 +1400,6 @@ module Sequel
       # Use USING to specify additional tables in a delete query
       def delete_using_sql(sql)
         join_from_sql(:USING, sql)
-      end
-
-      # PostgreSQL allows a RETURNING clause.
-      def insert_clause_methods
-        if server_version >= 90100
-          INSERT_CLAUSE_METHODS_91
-        else
-          INSERT_CLAUSE_METHODS
-        end
       end
 
       # Return the primary key to use for RETURNING in an INSERT statement
@@ -1477,11 +1464,6 @@ module Sequel
         :values
       end
 
-      # The order of clauses in the SELECT SQL statement
-      def select_clause_methods
-        server_version >= 80400 ? SELECT_CLAUSE_METHODS_84 : SELECT_CLAUSE_METHODS
-      end
-
       # PostgreSQL requires parentheses around compound datasets if they use
       # CTEs, and using them in other places doesn't hurt.
       def compound_dataset_sql_append(sql, ds)
@@ -1533,15 +1515,6 @@ module Sequel
         cols = cols.zip([SPACE] * cols.length).flatten
         cols.pop
         SQL::StringExpression.new(:'||', *cols)
-      end
-
-      # PostgreSQL splits the main table from the joined tables
-      def update_clause_methods
-        if server_version >= 90100
-          UPDATE_CLAUSE_METHODS_91
-        else
-          UPDATE_CLAUSE_METHODS
-        end
       end
 
       # Use FROM to specify additional tables in an update query

@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up dataset literalization by up to 100% (jeremyevans)
+
 * Support :fractional_seconds Database option on MySQL 5.6.5+ to support fractional seconds by default (jeremyevans) (#797)
 
 * Work around MySQL 5.6+ bug when combining DROP FOREIGN KEY and DROP INDEX in same ALTER TABLE statement (jeremyevans)

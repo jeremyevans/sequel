@@ -270,6 +270,10 @@ module Sequel
         end
       end
 
+      def supports_cte?(type=:select)
+        type == :select
+      end
+
       # DB2 supports GROUP BY CUBE
       def supports_group_cube?
         true

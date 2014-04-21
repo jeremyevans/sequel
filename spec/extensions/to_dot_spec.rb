@@ -25,6 +25,7 @@ END
   end
 
   it "should handle WITH" do
+    def @ds.supports_cte?(*) true end
     a = dot(@ds.with(:a, @ds))
     a[0..3].should == ["1 -> 2 [label=\"with\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Hash\"];"]
     [["3 -> 4 [label=\"dataset\"];", "4 [label=\"Dataset\"];", "3 -> 5 [label=\"name\"];", "5 [label=\":a\"];"],

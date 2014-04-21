@@ -25,20 +25,17 @@ module Sequel
     end
     
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select limit distinct columns from join where having group compounds order')
       FIRST = " FIRST ".freeze
       SKIP = " SKIP ".freeze
 
-      private
+      Dataset.def_sql_method(self, :select, %w'select limit distinct columns from join where having group compounds order')
 
       # Informix does not support INTERSECT or EXCEPT
       def supports_intersect_except?
         false
       end
 
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
-      end
+      private
 
       def select_limit_sql(sql)
         if o = @opts[:offset]

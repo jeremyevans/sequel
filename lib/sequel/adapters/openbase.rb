@@ -29,7 +29,7 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
+      def_sql_method(self, :select, %w'select distinct columns from join where group having compounds order limit')
 
       Database::DatasetClass = self
       
@@ -47,12 +47,6 @@ module Sequel
           end
         end
         self
-      end
-      
-      private
-      
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
       end
     end
   end

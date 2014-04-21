@@ -10,7 +10,7 @@ module Sequel
     end
   
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'select limit distinct columns from join where group order having compounds')
+      Dataset.def_sql_method(self, :select, %w'select limit distinct columns from join where group order having compounds')
 
       # Progress requires SQL standard datetimes
       def requires_sql_standard_datetimes?
@@ -23,10 +23,6 @@ module Sequel
       end
 
       private
-
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
-      end
 
       # Progress uses TOP for limit, but it is only supported in Progress 10.
       # The Progress adapter targets Progress 9, so it silently ignores the option.

@@ -165,7 +165,6 @@ module Sequel
     end
     
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Sequel::Dataset.clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
       COMMA = Sequel::Dataset::COMMA
       LIMIT = Sequel::Dataset::LIMIT
       BOOL_FALSE = '0'.freeze
@@ -208,11 +207,6 @@ module Sequel
         :values
       end
 
-      # CUBRID doesn't support CTEs or FOR UPDATE.
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
-      end
-
       # CUBRID requires a limit to use an offset,
       # and requires a FROM table if a limit is used.
       def select_limit_sql(sql)
@@ -233,6 +227,10 @@ module Sequel
             literal_append(sql, l)
           end
         end
+      end
+
+      # CUBRID doesn't support FOR UPDATE.
+      def select_lock_sql(sql)
       end
     end
   end

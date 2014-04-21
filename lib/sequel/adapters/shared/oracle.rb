@@ -247,7 +247,6 @@ module Sequel
     end
 
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with select distinct columns from join where group having compounds order lock')
       ROW_NUMBER_EXPRESSION = LiteralString.new('ROWNUM').freeze
       SPACE = Dataset::SPACE
       APOS = Dataset::APOS
@@ -261,6 +260,10 @@ module Sequel
       HSTAR = "H*".freeze
       DUAL = ' FROM DUAL'.freeze
       BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
+
+      include(Module.new do
+        Dataset.def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order lock')
+      end)
 
       def complex_expression_sql_append(sql, op, args)
         case op
@@ -364,6 +367,10 @@ module Sequel
       # Oracle requires recursive CTEs to have column aliases.
       def recursive_cte_requires_column_aliases?
         true
+      end
+
+      def supports_cte?(type=:select)
+        type == :select
       end
 
       # Oracle supports GROUP BY CUBE
@@ -474,11 +481,6 @@ module Sequel
       # Oracle can insert multiple rows using a UNION
       def multi_insert_sql_strategy
         :union
-      end
-
-      # Use the Oracle-specific SQL clauses (no limit, since it is emulated).
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
       end
 
       # Oracle supports quoted function names.

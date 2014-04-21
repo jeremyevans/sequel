@@ -5,6 +5,7 @@ describe Sequel::Model, "class dataset methods"  do
     @db = Sequel.mock
     @c = Class.new(Sequel::Model(@db[:items]))
     @d = @c.dataset
+    def @d.supports_cte?(*) true end
     @d._fetch = {:id=>1}
     @d.autoid = 1
     @d.numrows = 0

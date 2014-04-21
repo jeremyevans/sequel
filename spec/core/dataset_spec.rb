@@ -2258,7 +2258,9 @@ describe "Dataset#join_table" do
   specify "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
     meta_def(@d, :supports_cte?){true}
     meta_def(@d, :supports_cte_in_subselect?){false}
-    @d.join(Sequel.mock.dataset.from(:categories).with(:a, Sequel.mock.dataset.from(:b)), [:id]).sql.should == 'WITH "a" AS (SELECT * FROM b) SELECT * FROM "items" INNER JOIN (SELECT * FROM categories) AS "t1" USING ("id")'
+    ds = Sequel.mock.dataset.from(:categories)
+    meta_def(ds, :supports_cte?){true}
+    @d.join(ds.with(:a, Sequel.mock.dataset.from(:b)), [:id]).sql.should == 'WITH "a" AS (SELECT * FROM b) SELECT * FROM "items" INNER JOIN (SELECT * FROM categories) AS "t1" USING ("id")'
   end
 
   specify "should raise an error if using an array of symbols with a block" do
@@ -3759,6 +3761,7 @@ describe "Sequel::Dataset #with and #with_recursive" do
   before do
     @db = Sequel::Database.new
     @ds = @db[:t]
+    def @ds.supports_cte?(*) true end
   end
   
   specify "#with should take a name and dataset and use a WITH clause" do
@@ -3797,9 +3800,10 @@ describe "Sequel::Dataset #with and #with_recursive" do
   end
 
   specify "#with should work on insert, update, and delete statements if they support it" do
-    [:insert, :update, :delete].each do |m|
-      meta_def(@ds, :"#{m}_clause_methods"){[:"#{m}_with_sql"] + super()}
-    end
+    sc = class << @ds; self; end
+    Sequel::Dataset.def_sql_method(sc, :delete, %w'with delete from where')
+    Sequel::Dataset.def_sql_method(sc, :insert, %w'with insert into columns values')
+    Sequel::Dataset.def_sql_method(sc, :update, %w'with update table set where')
     @ds.with(:t, @db[:x]).insert_sql(1).should == 'WITH t AS (SELECT * FROM x) INSERT INTO t VALUES (1)'
     @ds.with(:t, @db[:x]).update_sql(:foo=>1).should == 'WITH t AS (SELECT * FROM x) UPDATE t SET foo = 1'
     @ds.with(:t, @db[:x]).delete_sql.should == 'WITH t AS (SELECT * FROM x) DELETE FROM t'
@@ -4349,9 +4353,11 @@ describe "Dataset#returning" do
   before do
     @ds = Sequel.mock(:fetch=>proc{|s| {:foo=>s}})[:t].returning(:foo)
     @pr = proc do
-      [:insert, :update, :delete].each do |m|
-        meta_def(@ds, :"#{m}_clause_methods"){super() + [:"#{m}_returning_sql"]}
-      end
+      def @ds.supports_returning?(*) true end
+      sc = class << @ds; self; end
+      Sequel::Dataset.def_sql_method(sc, :delete, %w'delete from where returning')
+      Sequel::Dataset.def_sql_method(sc, :insert, %w'insert into columns values returning')
+      Sequel::Dataset.def_sql_method(sc, :update, %w'update table set where returning')
     end
   end
   
@@ -4752,6 +4758,7 @@ end
 describe "Dataset mutation methods" do
   def m(&block)
     ds = Sequel.mock[:t]
+    def ds.supports_cte?(*) true end
     ds.instance_exec(&block)
     ds.sql
   end

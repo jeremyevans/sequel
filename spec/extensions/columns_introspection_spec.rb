@@ -74,6 +74,7 @@ describe "columns_introspection extension" do
 
   specify "should issue a database query when common table expressions are used" do
     @db.instance_variable_set(:@schemas, "a"=>[[:x, {}]])
+    def @ds.supports_cte?(*) true end
     @ds.with(:a, @ds).columns
     @db.sqls.length.should == 1
   end

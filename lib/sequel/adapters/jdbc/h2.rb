@@ -142,13 +142,12 @@ module Sequel
       
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'select distinct columns from join where group having compounds order limit')
         APOS = Dataset::APOS
         HSTAR = "H*".freeze
         ILIKE_PLACEHOLDER = ["CAST(".freeze, " AS VARCHAR_IGNORECASE)".freeze].freeze
         TIME_FORMAT = "'%H:%M:%S'".freeze
         ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
-        
+
         # Emulate the case insensitive LIKE operator and the bitwise operators.
         def complex_expression_sql_append(sql, op, args)
           case op
@@ -215,15 +214,11 @@ module Sequel
           :values
         end
 
-        def select_clause_methods
-          SELECT_CLAUSE_METHODS
-        end
-
         def select_only_offset_sql(sql)
           sql << ONLY_OFFSET
           literal_append(sql, @opts[:offset])
         end
-  
+
         # H2 supports quoted function names.
         def supports_quoted_function_names?
           true
