@@ -577,8 +577,10 @@ end
 
 describe Sequel::Model, ".[] optimization" do
   before do
-    @db = DB.clone
+    @db = Sequel.mock
     @db.quote_identifiers = true
+    def @db.schema(*) [[:id, {:primary_key=>true}]] end
+    def @db.supports_schema_parsing?() true end
     @c = Class.new(Sequel::Model(@db))
   end
 
