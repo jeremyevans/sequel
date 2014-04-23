@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up Sequel.split_symbol 10-20x by caching results, speeding up dataset literalization up to 80% or more (jeremyevans)
+
 * Speed up dataset literalization by up to 100% (jeremyevans)
 
 * Support :fractional_seconds Database option on MySQL 5.6.5+ to support fractional seconds by default (jeremyevans) (#797)
