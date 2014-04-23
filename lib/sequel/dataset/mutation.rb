@@ -58,6 +58,7 @@ module Sequel
     # Set the method to call on identifiers going into the database for this dataset
     def identifier_input_method=(v)
       raise_if_frozen!
+      @no_symbol_cache = true
       @identifier_input_method = v
     end
     
@@ -77,6 +78,7 @@ module Sequel
     # Set whether to quote identifiers for this dataset
     def quote_identifiers=(v)
       raise_if_frozen!
+      @no_symbol_cache = true
       @quote_identifiers = v
     end
 

@@ -131,6 +131,7 @@ module Sequel
       @dataset_class = dataset_class_default
       @cache_schema = typecast_value_boolean(@opts.fetch(:cache_schema, true))
       @dataset_modules = []
+      @symbol_literal_cache = {}
       @schema_type_classes = SCHEMA_TYPE_CLASSES.dup
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       @pool = ConnectionPool.get_pool(self, @opts)
@@ -233,6 +234,17 @@ module Sequel
     #   DB.literal('a') # 'a'
     def literal(v)
       schema_utility_dataset.literal(v)
+    end
+
+    # Return the literalized version of the symbol if cached, or
+    # nil if it is not cached.
+    def literal_symbol(sym)
+      Sequel.synchronize{@symbol_literal_cache[sym]}
+    end
+
+    # Set the cached value of the literal symbol.
+    def literal_symbol_set(sym, lit)
+      Sequel.synchronize{@symbol_literal_cache[sym] = lit}
     end
 
     # Synchronize access to the prepared statements cache.

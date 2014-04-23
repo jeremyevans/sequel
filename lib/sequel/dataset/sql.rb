@@ -58,7 +58,16 @@ module Sequel
     def literal_append(sql, v)
       case v
       when Symbol
-        literal_symbol_append(sql, v)
+        if @no_symbol_cache
+          literal_symbol_append(sql, v)
+        else 
+          unless l = db.literal_symbol(v)
+            l = ''
+            literal_symbol_append(l, v)
+            db.literal_symbol_set(v, l)
+          end
+          sql << l
+        end
       when String
         case v
         when LiteralString

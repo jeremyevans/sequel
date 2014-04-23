@@ -137,6 +137,7 @@ module Sequel
     # create datasets.  Usually done after changes to the identifier
     # mangling methods.
     def reset_default_dataset
+      Sequel.synchronize{@symbol_literal_cache.clear}
       @default_dataset = dataset
     end
 

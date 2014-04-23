@@ -259,6 +259,7 @@ module Sequel
     # PreparedStatementMethods, setting the type and modify values.
     def to_prepared_statement(type, values=nil)
       ps = bind
+      ps.instance_variable_set(:@no_symbol_cache, true)
       ps.extend(PreparedStatementMethods)
       ps.orig_dataset = self
       ps.prepared_type = type
