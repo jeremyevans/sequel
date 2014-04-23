@@ -130,7 +130,8 @@ module Sequel
           h = @prepared_statements[type]
           Sequel.synchronize do
             if v = h[subtype]
-              return v end
+              return v
+            end
           end
           ps = yield
           Sequel.synchronize{h[subtype] = ps}

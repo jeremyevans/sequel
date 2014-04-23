@@ -182,7 +182,8 @@ module Sequel
         # keys for all of their descendant classes.
         def sti_subclass_added(key)
           if sti_key_array
-            Sequel.synchronize{sti_key_array.push(*Array(key))}
+            key_array = Array(key)
+            Sequel.synchronize{sti_key_array.push(*key_array)}
             superclass.sti_subclass_added(key)
           end
         end

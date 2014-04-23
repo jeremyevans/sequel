@@ -42,7 +42,7 @@ module Sequel
 
         # All descendent classes of this model.
         def descendents
-          Sequel.synchronize{_descendents}
+          Sequel.synchronize{subclasses.dup}.map{|x| [x] + x.send(:descendents)}.flatten
         end
 
         Plugins.inherited_instance_variables(self, :@subclasses=>lambda{|v| []}, :@on_subclass=>nil)
@@ -54,14 +54,6 @@ module Sequel
           super
           Sequel.synchronize{subclasses << subclass}
           on_subclass.call(subclass) if on_subclass
-        end
-
-        private
-
-        # Recursive, non-thread safe version of descendents, since
-        # the mutex Sequel uses isn't reentrant.
-        def _descendents
-          subclasses.map{|x| [x] + x.send(:_descendents)}.flatten
         end
       end
     end
