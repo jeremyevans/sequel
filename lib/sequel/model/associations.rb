@@ -1352,7 +1352,7 @@ module Sequel
         
         # REMOVE410
         def apply_association_dataset_opts(opts, ds)
-          Deprecation.deprecate("Model.apply_association_dataset_opts/Model.eager_loading_dataset")
+          Deprecation.deprecate("Model.apply_association_dataset_opts/Model.eager_loading_dataset", "Use AssociationReflection#apply_dataset_changes/Association#reflection#apply_eager_dataset_changes instead.")
           ds = ds.select(*opts.select) if opts.select
           if c = opts[:conditions]
             ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
@@ -1713,13 +1713,13 @@ module Sequel
 
         # REMOVE410
         def def_add_method(opts)
-          Deprecation.deprecate("Model.def_add_method")
+          Deprecation.deprecate("Model.def_add_method", "The Model.associate method now sets up the add method you if an :adder association reflection entry is present.")
           association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
         end
 
         # REMOVE410
         def def_association_dataset_methods(opts)
-          Deprecation.deprecate("Model.def_association_dataset_methods")
+          Deprecation.deprecate("Model.def_association_dataset_methods", "The Model.associate method now sets up the association dataset methods.")
           association_module_def(opts.dataset_method, opts){_dataset(opts)}
           def_association_method(opts)
         end
@@ -2002,7 +2002,7 @@ module Sequel
         
         # REMOVE410
         def def_remove_methods(opts)
-          Deprecation.deprecate("Model.def_remove_methods")
+          Deprecation.deprecate("Model.def_remove_methods", "The Model.associate method now sets up the remove/remove_all methods for you if a :remover or :clearer association reflection entry is present.")
           association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
           association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
         end
