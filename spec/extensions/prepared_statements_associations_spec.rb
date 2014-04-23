@@ -93,6 +93,8 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
   specify "should run a regular query if there is a callback" do
     @Artist.load(:id=>1).albums(proc{|ds| ds})
     @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @Artist.load(:id=>1).album(proc{|ds| ds})
+    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
   end
 
   specify "should run a regular query if :prepared_statement=>false option is used for the association" do

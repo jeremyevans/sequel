@@ -400,6 +400,14 @@ describe Sequel::Model::Associations::AssociationReflection, "#filter_by_associa
   end
 end
 
+describe Sequel::Model::Associations::AssociationReflection, "#apply_eager_dataset_changes" do
+  it "should apply the eager block as well as the association options to the dataset" do
+    @c = Class.new(Sequel::Model(:foo))
+    @c.one_to_many :cs, :class=>@c, :select=>:a, :order=>:b do |ds| ds.where(:c) end
+    @c.association_reflection(:cs).apply_eager_dataset_changes(@c.dataset).sql.should == 'SELECT a FROM foo WHERE c ORDER BY b'
+  end
+end
+
 describe Sequel::Model, " association reflection methods" do
   before do
     @c1 = Class.new(Sequel::Model(:nodes)) do
