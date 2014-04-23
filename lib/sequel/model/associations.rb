@@ -1742,18 +1742,18 @@ module Sequel
             association_module_def(opts.setter_method, opts, &opts[:_setter])
           end
 
-          if opts[:adder]
-            association_module_private_def(opts._add_method, opts, &opts[:adder])
+          if adder = opts[:adder]
+            association_module_private_def(opts._add_method, opts, &adder)
             association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
           end
 
-          if opts[:remover]
-            association_module_private_def(opts._remove_method, opts, &opts[:remover]) if opts[:remover]
+          if remover = opts[:remover]
+            association_module_private_def(opts._remove_method, opts, &remover)
             association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
           end
 
-          if opts[:clearer]
-            association_module_private_def(opts._remove_all_method, opts, &opts[:clearer]) if opts[:clearer]
+          if clearer = opts[:clearer]
+            association_module_private_def(opts._remove_all_method, opts, &clearer)
             association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
           end
         end
