@@ -165,6 +165,12 @@ module Sequel
         @opts[:bind_vars].has_key?(k)
       end
 
+      # The symbol cache should always be skipped, since placeholders
+      # are symbols.
+      def skip_symbol_cache?
+        true
+      end
+
       # Use a clone of the dataset extended with prepared statement
       # support and using the same argument hash so that you can use
       # bind variables/prepared arguments in subselects.
@@ -259,7 +265,6 @@ module Sequel
     # PreparedStatementMethods, setting the type and modify values.
     def to_prepared_statement(type, values=nil)
       ps = bind
-      ps.instance_variable_set(:@no_symbol_cache, true)
       ps.extend(PreparedStatementMethods)
       ps.orig_dataset = self
       ps.prepared_type = type

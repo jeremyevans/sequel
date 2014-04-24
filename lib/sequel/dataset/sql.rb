@@ -58,7 +58,7 @@ module Sequel
     def literal_append(sql, v)
       case v
       when Symbol
-        if @no_symbol_cache
+        if skip_symbol_cache?
           literal_symbol_append(sql, v)
         else 
           unless l = db.literal_symbol(v)
@@ -1417,6 +1417,16 @@ module Sequel
     # The base keyword to use for the SQL WITH clause
     def select_with_sql_base
       SQL_WITH
+    end
+
+    # Whether the symbol cache should be skipped when literalizing the dataset
+    def skip_symbol_cache?
+      @skip_symbol_cache
+    end
+
+    # Set the dataset to skip the symbol cache
+    def skip_symbol_cache!
+      @skip_symbol_cache = true
     end
 
     # Append literalization of array of sources/tables to SQL string, raising an Error if there
