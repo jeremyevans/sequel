@@ -892,7 +892,7 @@ module Sequel
     #   DB[:items].with(:items, DB[:syx].where(:name.like('A%')))
     #   # WITH items AS (SELECT * FROM syx WHERE (name LIKE 'A%')) SELECT * FROM items
     def with(name, dataset, opts=OPTS)
-      raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
+      raise(Error, 'This dataset does not support common table expressions') unless supports_cte?
       if hoist_cte?(dataset)
         s, ds = hoist_cte(dataset)
         s.with(name, ds, opts)
