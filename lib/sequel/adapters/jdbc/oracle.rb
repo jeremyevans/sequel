@@ -3,6 +3,21 @@ Sequel.require 'adapters/jdbc/transactions'
 
 module Sequel
   module JDBC
+    class TypeConvertor
+      JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
+
+      def OracleDecimal(r, i)
+        if v = r.getBigDecimal(i)
+          i = v.long_value
+          if v == JAVA_BIG_DECIMAL_CONSTRUCTOR.call(i)
+            i
+          else
+            BigDecimal.new(v.to_string)
+          end
+        end
+      end 
+    end
+
     # Database and Dataset support for Oracle databases accessed via JDBC.
     module Oracle
       # Instance methods for Oracle Database objects accessed via JDBC.
@@ -81,50 +96,31 @@ module Sequel
         def supports_releasing_savepoints?
           false
         end
+
+        def setup_type_convertor_map
+          super
+          @type_convertor_map[:OracleDecimal] = TypeConvertor::INSTANCE.method(:OracleDecimal)
+        end
       end
       
       # Dataset class for Oracle datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Oracle::DatasetMethods
 
-        private
+        NUMERIC_TYPE = Java::JavaSQL::Types::NUMERIC
+        TIMESTAMP_TYPE = Java::JavaSQL::Types::TIMESTAMP
+        TIMESTAMPTZ_TYPES = [Java::oracle.jdbc.OracleTypes::TIMESTAMPTZ, Java::oracle.jdbc.OracleTypes::TIMESTAMPLTZ]
 
-        JAVA_BIG_DECIMAL = ::Sequel::JDBC::Dataset::JAVA_BIG_DECIMAL
-        JAVA_BIG_DECIMAL_CONSTRUCTOR = java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)
-
-        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          def oracle_decimal(v)
-            if v.scale == 0
-              i = v.long_value
-              if v.equals(JAVA_BIG_DECIMAL_CONSTRUCTOR.call(i))
-                i
-              else
-                decimal(v)
-              end
+        def type_convertor(map, meta, type, i)
+          case type
+          when NUMERIC_TYPE
+            if meta.getScale(i) == 0
+              map[:OracleDecimal]
             else
-              decimal(v)
+              super
             end
-          end
-        end
-
-        ORACLE_DECIMAL_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:oracle_decimal)
-
-        def convert_type_oracle_timestamp(v)
-          db.to_application_timestamp(v.to_string)
-        end
-      
-        def convert_type_oracle_timestamptz(v)
-          convert_type_oracle_timestamp(db.synchronize(@opts[:server]){|c| v.timestampValue(c)})
-        end
-      
-        def convert_type_proc(v, ctn=nil)
-          case v
-          when JAVA_BIG_DECIMAL
-            ORACLE_DECIMAL_METHOD
-          when Java::OracleSql::TIMESTAMPTZ
-            method(:convert_type_oracle_timestamptz)
-          when Java::OracleSql::TIMESTAMP
-            method(:convert_type_oracle_timestamp)
+          when *TIMESTAMPTZ_TYPES
+            map[TIMESTAMP_TYPE]
           else
             super
           end

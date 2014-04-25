@@ -182,23 +182,6 @@ module Sequel
 
         private
 
-        #JAVA_H2_CLOB = Java::OrgH2Jdbc::JdbcClob
-
-        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          def h2_clob(v) v.getSubString(1, v.length) end
-        end
-
-        H2_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:h2_clob)
-      
-        # Handle H2 specific clobs as strings.
-        def convert_type_proc(v, ctn=nil)
-          if v.is_a?(Java::OrgH2Jdbc::JdbcClob)
-            H2_CLOB_METHOD
-          else
-            super
-          end
-        end
-        
         # H2 expects hexadecimal strings for blob values
         def literal_blob_append(sql, v)
           sql << APOS << v.unpack(HSTAR).first << APOS

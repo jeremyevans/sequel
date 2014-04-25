@@ -4,6 +4,26 @@ module Sequel
   Postgres::CONVERTED_EXCEPTIONS << NativeException
   
   module JDBC
+    class TypeConvertor
+      # Return PostgreSQL array types as ruby Arrays instead of
+      # JDBC PostgreSQL driver-specific array type. Only used if the
+      # database does not have a conversion proc for the type.
+      def RubyPGArray(r, i)
+        if v = r.getArray(i)
+          v.array.to_ary
+        end
+      end 
+
+      # Return PostgreSQL hstore types as ruby Hashes instead of
+      # Java HashMaps.  Only used if the database does not have a
+      # conversion proc for the type.
+      def RubyPGHstore(r, i)
+        if v = r.getObject(i)
+          v.to_hash
+        end
+      end 
+    end
+
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via JDBC.
     module Postgres
@@ -12,7 +32,7 @@ module Sequel
       module DatabaseMethods
         extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Postgres::DatabaseMethods
-        
+
         # Add the primary_keys and primary_key_sequences instance variables,
         # so we can get the correct return values for inserted rows.
         def self.extended(db)
@@ -81,8 +101,30 @@ module Sequel
           end
         end
 
+        def oid_convertor_proc(oid)
+          if (conv = Sequel.synchronize{@oid_convertor_map[oid]}).nil?
+            conv = if pr = conversion_procs[oid]
+              lambda do |r, i|
+                if v = r.getString(i)
+                  pr.call(v)
+                end
+              end
+            else
+              false
+            end
+             Sequel.synchronize{@oid_convertor_map[oid] = conv}
+          end
+          conv
+        end
+
         private
         
+        # Clear oid convertor map cache when conversion procs are updated.
+        def conversion_procs_updated
+          super
+          Sequel.synchronize{@oid_convertor_map = {}}
+        end
+
         def disconnect_error?(exception, opts)
           super || exception.message =~ /\AThis connection has been closed\.\z|\AFATAL: terminating connection due to administrator command\z/
         end
@@ -101,6 +143,13 @@ module Sequel
           end
           conn
         end
+
+        def setup_type_convertor_map
+          super
+          @oid_convertor_map = {}
+          @type_convertor_map[:RubyPGArray] = TypeConvertor::INSTANCE.method(:RubyPGArray)
+          @type_convertor_map[:RubyPGHstore] = TypeConvertor::INSTANCE.method(:RubyPGHstore)
+        end
       end
       
       # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
@@ -108,53 +157,6 @@ module Sequel
         include Sequel::Postgres::DatasetMethods
         APOS = Dataset::APOS
         
-        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          # Convert Java::OrgPostgresqlUtil::PGobject to ruby strings
-          def pg_object(v)
-            v.to_string
-          end
-        end
-
-        # Handle conversions of PostgreSQL array instances
-        class PGArrayConverter
-          # Set the method that will return the correct conversion
-          # proc for elements of this array.
-          def initialize(meth)
-            @conversion_proc_method = meth
-            @conversion_proc = nil
-          end
-          
-          # Convert Java::OrgPostgresqlJdbc4::Jdbc4Array to ruby arrays
-          def call(v)
-            _pg_array(v.array)
-          end
-
-          private
-
-          # Handle multi-dimensional Java arrays by recursively mapping them
-          # to ruby arrays of ruby values.
-          def _pg_array(v)
-            v.to_ary.map do |i|
-              if i.respond_to?(:to_ary)
-                _pg_array(i)
-              elsif i
-                if @conversion_proc.nil?
-                  @conversion_proc = @conversion_proc_method.call(i)
-                end
-                if @conversion_proc
-                  @conversion_proc.call(i)
-                else
-                  i
-                end
-              else
-                i
-              end
-            end
-          end
-        end
-
-        PG_OBJECT_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:pg_object)
-      
         # Add the shared PostgreSQL prepared statement methods
         def prepare(type, name=nil, *values)
           ps = to_prepared_statement(type, values)
@@ -169,54 +171,34 @@ module Sequel
 
         private
         
-        # Handle PostgreSQL array and object types. Object types are just
-        # turned into strings, similarly to how the native adapter treats
-        # the types.
-        def convert_type_proc(v, ctn=nil)
-          case v
-          when Java::OrgPostgresqlJdbc4::Jdbc4Array
-            if pr = db.conversion_procs[ctn]
-              lambda{|x| pr.call(PG_OBJECT_METHOD.call(x))}
-            else
-              PGArrayConverter.new(method(:convert_type_proc))
-            end
-          when Java::OrgPostgresqlUtil::PGobject
-            if pr = db.conversion_procs[ctn]
-              lambda{|x| pr.call(PG_OBJECT_METHOD.call(x))}
-            else
-              PG_OBJECT_METHOD
-            end
-          when String
-            if pr = db.conversion_procs[ctn]
+        # Literalize strings similar to the native postgres adapter
+        def literal_string_append(sql, v)
+          sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
+        end
+
+        STRING_TYPE = Java::JavaSQL::Types::VARCHAR
+        ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
+        PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]
+        HSTORE_TYPE = 'hstore'.freeze
+
+        def type_convertor(map, meta, type, i)
+          case type
+          when *PG_SPECIFIC_TYPES
+            oid = meta.field(i).oid
+            if pr = db.oid_convertor_proc(oid)
               pr
+            elsif type == ARRAY_TYPE
+              map[:RubyPGArray]
+            elsif oid == 2950 # UUID
+              map[STRING_TYPE]
+            elsif meta.getPGType(i) == HSTORE_TYPE
+              map[:RubyPGHstore]
             else
-              false
-            end
-          when JAVA_HASH_MAP
-            if Sequel.respond_to?(:hstore)
-              lambda{|x| Sequel.hstore(HASH_MAP_METHOD.call(x))}
-            else
-              HASH_MAP_METHOD
+              super
             end
           else
             super
           end
-        end
-        
-        # The jdbc/postgresql adapter uses column type oids when determining
-        # conversion procs.
-        def convert_type_proc_uses_column_info?
-          true
-        end
-
-        # Use the column type oid as the database specific column info value.
-        def convert_type_proc_column_info(meta, i)
-          meta.field(i).oid
-        end
-      
-        # Literalize strings similar to the native postgres adapter
-        def literal_string_append(sql, v)
-          sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
         end
       end
     end

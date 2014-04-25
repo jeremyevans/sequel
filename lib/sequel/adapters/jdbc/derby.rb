@@ -239,23 +239,6 @@ module Sequel
 
         private
 
-        JAVA_SQL_CLOB         = Java::JavaSQL::Clob
-
-        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          def derby_clob(v) v.getSubString(1, v.length) end
-        end
-
-        DERBY_CLOB_METHOD = TYPE_TRANSLATOR_INSTANCE.method(:derby_clob)
-      
-        # Handle clobs on Derby as strings.
-        def convert_type_proc(v, ctn=nil)
-          if v.is_a?(JAVA_SQL_CLOB)
-            DERBY_CLOB_METHOD
-          else
-            super
-          end
-        end
-        
         def empty_from_sql
           DEFAULT_FROM
         end

@@ -59,6 +59,13 @@ module Sequel
           end
           conn
         end
+
+        # Use getLong instead of getInt for converting integers on SQLite, since SQLite does not enforce a limit of 2**32.
+        def setup_type_convertor_map
+          super
+          @type_convertor_map[Java::JavaSQL::Types::INTEGER] = @type_convertor_map[Java::JavaSQL::Types::BIGINT]
+          @basic_type_convertor_map[Java::JavaSQL::Types::INTEGER] = @basic_type_convertor_map[Java::JavaSQL::Types::BIGINT]
+        end
       end
     end
   end

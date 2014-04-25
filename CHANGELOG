@@ -1,5 +1,7 @@
 === HEAD
 
+* Refactor type conversion in the jdbc adapter, for up to a 20% speedup (jeremyevans)
+
 * Add Dataset#with_fetch_size to jdbc adapter, for setting fetch size for JDBC ResultSets (jeremyevans)
 
 * Default to a fetch_size of 100 in the jdbc/oracle adapter, similar to the oci8-based oracle adapter (jeremyevans)

@@ -3,6 +3,14 @@ Sequel.require 'adapters/jdbc/transactions'
 
 module Sequel
   module JDBC
+    class TypeConvertor
+      def SqlAnywhereBoolean(r, i)
+        if v = Short(r, i)
+          v != 0
+        end
+      end
+    end
+
     module SqlAnywhere
       # Database instance methods for Sybase databases accessed via JDBC.
       module DatabaseMethods
@@ -23,6 +31,11 @@ module Sequel
             rs.getInt(1)
           end
         end
+
+        def setup_type_convertor_map
+          super
+          @type_convertor_map[:SqlAnywhereBoolean] = TypeConvertor::INSTANCE.method(:SqlAnywhereBoolean)
+        end
       end
 
       #Dataset class for Sybase datasets accessed via JDBC.
@@ -31,25 +44,14 @@ module Sequel
 
         private
 
-        class ::Sequel::JDBC::Dataset::TYPE_TRANSLATOR
-          def sqla_boolean(i) i != 0 end
-        end
+        SMALLINT_TYPE = Java::JavaSQL::Types::SMALLINT
 
-        BOOLEAN_METHOD =  TYPE_TRANSLATOR_INSTANCE.method(:sqla_boolean)
-
-        def convert_type_proc(v, ctn=nil)
-          case
-          when ctn && ctn =~ SqlAnywhere::DatabaseMethods::SMALLINT_RE
-            BOOLEAN_METHOD
+        def type_convertor(map, meta, type, i)
+          if convert_smallint_to_bool && type == SMALLINT_TYPE
+            map[:SqlAnywhereBoolean]
           else
-            super(v, ctn)
+            super
           end
-        end
-
-        # SQLAnywhere needs the column info if it is converting smallint to bool,
-        # since the JDBC adapter always returns smallint as integer.
-        def convert_type_proc_uses_column_info?
-          convert_smallint_to_bool
         end
       end
     end

@@ -19,39 +19,19 @@ module Sequel
         # than getObject() for this column avoids the problem.
         # Reference: http://social.msdn.microsoft.com/Forums/en/sqldataaccess/thread/20df12f3-d1bf-4526-9daa-239a83a8e435
         module MetadataDatasetMethods
-          def process_result_set_convert(cols, result)
-            while result.next
-              row = {}
-              cols.each do |n, i, ctn, p|
-                v = (n == :is_autoincrement ? result.getString(i) : result.getObject(i))
-                row[n] = if v
-                  if p
-                    p.call(v)
-                  elsif p.nil?
-                    cols[i-1][3] = p = convert_type_proc(v, ctn)
-                    if p
-                      p.call(v)
-                    else
-                      v
-                    end
-                  else
-                    v
-                  end
-                else
-                  v
-                end
-              end
-              yield row
+          def type_convertor(map, meta, type, i)
+            if output_identifier(meta.getColumnLabel(i)) == :is_autoincrement
+              map[Java::JavaSQL::Types::VARCHAR]
+            else
+              super
             end
           end
 
-          def process_result_set_no_convert(cols, result)
-            while result.next
-              row = {}
-              cols.each do |n, i|
-                row[n] = (n == :is_autoincrement ? result.getString(i) : result.getObject(i))
-              end
-              yield row
+          def basic_type_convertor(map, meta, type, i)
+            if output_identifier(meta.getColumnLabel(i)) == :is_autoincrement
+              map[Java::JavaSQL::Types::VARCHAR]
+            else
+              super
             end
           end
         end
