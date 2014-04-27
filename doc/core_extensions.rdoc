@@ -170,7 +170,7 @@ Alternative: Sequel.like:
 
   Sequel.like(:a, 'b%')
 
-==== like
+==== ilike
 
 Symbol#ilike returns a case insensitive LIKE expression between the identifier and the given argument:
 
