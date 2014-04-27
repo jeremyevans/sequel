@@ -288,8 +288,10 @@ module Sequel
           key_column = opts[:key_column] ||= opts[:key]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           slice_range = opts.slice_range
+          array_type  = opts[:array_type] ||= :integer
           opts[:dataset] ||= lambda do
-            opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains([send(pk)]))
+	    pk_as_array = Sequel.pg_array([send(pk)], array_type)
+            opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains(pk_as_array))
           end
           opts[:eager_loader] ||= proc do |eo|
             id_map = eo[:id_map]
