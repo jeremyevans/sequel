@@ -35,7 +35,7 @@ module Sequel
     # Methods that return modified datasets
     QUERY_METHODS = (<<-METHS).split.map{|x| x.to_sym} + JOIN_METHODS
       add_graph_aliases and distinct except exclude exclude_having exclude_where
-      filter for_update from from_self graph grep group group_and_count group_by having intersect invert
+      filter for_update from from_self graph grep group group_and_count group_by having igrep intersect invert
       limit lock_style naked offset or order order_append order_by order_more order_prepend qualify
       reverse reverse_order select select_all select_append select_group select_more server
       set_graph_aliases unfiltered ungraphed ungrouped union
@@ -324,6 +324,11 @@ module Sequel
     #   # SELECT * FROM items GROUP BY sum HAVING (sum = 10)
     def having(*cond, &block)
       _filter(:having, *cond, &block)
+    end
+    
+    # Same as +grep+ with :case_insensitive=true
+    def igrep(columns, patterns, opts=OPTS)
+      grep(columns, patterns, opts.merge({:case_insensitive=>true}))
     end
     
     # Adds an INTERSECT clause using a second dataset object.
