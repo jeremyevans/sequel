@@ -196,6 +196,10 @@ module Sequel
       # fetching rows.
       attr_accessor :convert_types
 
+      # The fetch size to use for JDBC Statement objects created by this database.
+      # By default, this is nil so a fetch size is not set explicitly.
+      attr_accessor :fetch_size
+
       # Execute the given stored procedure with the give name. If a block is
       # given, the stored procedure should return rows.
       def call_sproc(name, opts = OPTS)
@@ -277,6 +281,9 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           statement(conn) do |stmt|
             if block
+              if size = fetch_size
+                stmt.setFetchSize(size)
+              end
               yield log_yield(sql){stmt.executeQuery(sql)}
             else
               case opts[:type]
@@ -374,6 +381,7 @@ module Sequel
       def adapter_initialize
         @connection_prepared_statements = {}
         @connection_prepared_statements_mutex = Mutex.new
+        @fetch_size = @opts[:fetch_size] ? typecast_value_integer(@opts[:fetch_size]) : default_fetch_size
         @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
         raise(Error, "No connection string specified") unless uri
         
@@ -439,6 +447,9 @@ module Sequel
           else
             log_yield("CLOSE #{name}"){cps[1].close} if cps
             cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){prepare_jdbc_statement(conn, sql, opts)}
+            if size = fetch_size
+              cps.setFetchSize(size)
+            end
             cps_sync(conn){|cpsh| cpsh[name] = [sql, cps]} if name
           end
           i = 0
@@ -479,6 +490,12 @@ module Sequel
       # Execute the insert SQL using the statement
       def execute_statement_insert(stmt, sql)
         stmt.executeUpdate(sql)
+      end
+
+      # The default fetch size to use for statements.  Nil by default, so that the
+      # default for the JDBC driver is used.
+      def default_fetch_size
+        nil
       end
       
       # Gets the connection from JNDI.
