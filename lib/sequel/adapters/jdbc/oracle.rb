@@ -31,6 +31,11 @@ module Sequel
           super || exception.message =~ /\AClosed Connection/
         end
 
+        # Default the fetch size for statements to 100, similar to the oci8-based oracle adapter.
+        def default_fetch_size
+          100
+        end
+        
         def last_insert_id(conn, opts)
           unless sequence = opts[:sequence]
             if t = opts[:table]

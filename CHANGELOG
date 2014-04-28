@@ -1,5 +1,7 @@
 === HEAD
 
+* Default to a fetch_size of 100 in the jdbc/oracle adapter, similar to the oci8-based oracle adapter (jeremyevans)
+
 * Add Database#fetch_size accessor and :fetch_size option to jdbc adapter, for setting JDBC Statement fetch size (jeremyevans)
 
 * Automatically determine array type in pg_array_associations plugin, explicitly cast arrays in more places (jeremyevans, maccman) (#800)
