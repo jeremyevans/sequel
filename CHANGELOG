@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#with_fetch_size to jdbc adapter, for setting fetch size for JDBC ResultSets (jeremyevans)
+
 * Default to a fetch_size of 100 in the jdbc/oracle adapter, similar to the oci8-based oracle adapter (jeremyevans)
 
 * Add Database#fetch_size accessor and :fetch_size option to jdbc adapter, for setting JDBC Statement fetch size (jeremyevans)

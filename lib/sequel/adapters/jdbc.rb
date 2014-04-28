@@ -746,6 +746,11 @@ module Sequel
         end
         ps
       end
+
+      # Set the fetch size on JDBC ResultSets created from this dataset.
+      def with_fetch_size(size)
+        clone(:fetch_size=>size)
+      end
       
       private
 
@@ -852,6 +857,9 @@ module Sequel
       def process_result_set(result, &block)
         # get column names
         meta = result.getMetaData
+        if fetch_size = opts[:fetch_size]
+          result.setFetchSize(fetch_size)
+        end
         cols = []
         i = 0
         ct = @convert_types

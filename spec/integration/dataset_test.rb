@@ -157,6 +157,14 @@ describe "Simple Dataset operations" do
     rows = []
     @ds.order(Sequel.*(:number, 2)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, :filter_values=>proc{|row, _| [row[:number] * 2]}){|row| rows << row}
     rows.should == (1..100).map{|i| {:id=>i, :number=>i*10}}
+
+    if DB.adapter_scheme == :jdbc
+      # check retrival with varying fetch sizes
+      array = (1..100).to_a
+      [1, 2, 5, 10, 33, 50, 100, 1000].each do |i|
+        @ds.with_fetch_size(i).select_order_map(:id).should == array
+      end
+    end
   end
 
   specify "should fetch all results correctly" do
