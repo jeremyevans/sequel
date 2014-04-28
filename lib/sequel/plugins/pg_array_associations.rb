@@ -47,11 +47,9 @@ module Sequel
     #
     # They support some additional options specific to this plugin:
     #
-    # :array_type :: This allows you to specify the type of the array.  This
-    #                is only necessary to set in very narrow circumstances,
-    #                such as when this plugin needs to create an array type,
-    #                and typecasting is turned off or not setup correctly
-    #                for the model object.
+    # :array_type :: This overrides the type of the array.  By default, the type
+    #                is determined by looking at the db_schema for the model, and if that fails,
+    #                it defaults to :integer.
     # :raise_on_save_failure :: Do not raise exceptions for hook or validation failures when saving associated
     #                           objects in the add/remove methods (return nil instead).
     # :save_after_modify :: For pg_array_to_many associations, this makes the
@@ -76,6 +74,16 @@ module Sequel
       # The AssociationReflection subclass for many_to_pg_array associations.
       class ManyToPgArrayAssociationReflection < Sequel::Model::Associations::AssociationReflection
         Sequel::Model::Associations::ASSOCIATION_TYPES[:many_to_pg_array] = self
+
+        def array_type
+          cached_fetch(:array_type) do
+            if (sch = associated_class.db_schema) && (s = sch[self[:key]]) && (t = s[:db_type])
+              t
+            else
+              :integer
+            end
+          end
+        end
 
         # The array column in the associated model containing foreign keys to
         # the current model.
@@ -138,7 +146,7 @@ module Sequel
     
         # The predicate condition to use for the eager_loader.
         def eager_loading_predicate_condition(keys)
-          Sequel.pg_array_op(predicate_key).overlaps(keys)
+          Sequel.pg_array_op(predicate_key).overlaps(Sequel.pg_array(keys, array_type))
         end
 
         def filter_by_associations_add_conditions_dataset_filter(ds)
@@ -168,6 +176,16 @@ module Sequel
       # The AssociationReflection subclass for pg_array_to_many associations.
       class PgArrayToManyAssociationReflection < Sequel::Model::Associations::AssociationReflection
         Sequel::Model::Associations::ASSOCIATION_TYPES[:pg_array_to_many] = self
+
+        def array_type
+          cached_fetch(:array_type) do
+            if (sch = self[:model].db_schema) && (s = sch[self[:key]]) && (t = s[:db_type])
+              t
+            else
+              :integer
+            end
+          end
+        end
 
         # An array containing the primary key for the associated model.
         def associated_object_keys
@@ -288,10 +306,8 @@ module Sequel
           key_column = opts[:key_column] ||= opts[:key]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           slice_range = opts.slice_range
-          array_type  = opts[:array_type] ||= :integer
           opts[:dataset] ||= lambda do
-	    pk_as_array = Sequel.pg_array([send(pk)], array_type)
-            opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains(pk_as_array))
+            opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains(Sequel.pg_array([send(pk)], opts.array_type)))
           end
           opts[:eager_loader] ||= proc do |eo|
             id_map = eo[:id_map]
@@ -341,12 +357,11 @@ module Sequel
           save_opts = {:validate=>opts[:validate]}
           save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
 
-          array_type = opts[:array_type] ||= :integer
           opts[:adder] ||= proc do |o|
             if array = o.send(key)
               array << send(pk)
             else
-              o.send("#{key}=", Sequel.pg_array([send(pk)], array_type))
+              o.send("#{key}=", Sequel.pg_array([send(pk)], opts.array_type))
             end
             o.save(save_opts)
           end
@@ -430,7 +445,6 @@ module Sequel
 
           save_opts = {:validate=>opts[:validate]}
           save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
-          array_type = opts[:array_type] ||= :integer
 
           if opts[:save_after_modify]
             save_after_modify = proc do |obj|
@@ -444,7 +458,7 @@ module Sequel
               modified!(key)
               array << opk
             else
-              send("#{key}=", Sequel.pg_array([opk], array_type))
+              send("#{key}=", Sequel.pg_array([opk], opts.array_type))
             end
             save_after_modify.call(self) if save_after_modify
           end
@@ -497,11 +511,11 @@ module Sequel
           expr = case obj
           when Sequel::Model
             if pkv = obj.send(ref.primary_key_method)
-              Sequel.pg_array_op(key).contains([pkv])
+              Sequel.pg_array_op(key).contains(Sequel.pg_array([pkv], ref.array_type))
             end
           when Array
             if (pkvs = obj.map{|o| o.send(ref.primary_key_method)}.compact) && !pkvs.empty?
-              Sequel.pg_array(key).overlaps(pkvs)
+              Sequel.pg_array(key).overlaps(Sequel.pg_array(pkvs, ref.array_type))
             end
           when Sequel::Dataset
             Sequel.function(:coalesce, Sequel.pg_array_op(key).overlaps(obj.select{array_agg(ref.qualify(obj.model.table_name, ref.primary_key))}), Sequel::SQL::Constants::FALSE)

@@ -1,5 +1,7 @@
 === HEAD
 
+* Automatically determine array type in pg_array_associations plugin, explicitly cast arrays in more places (jeremyevans, maccman) (#800)
+
 * Speed up Dataset#literal for symbols 60% by caching results, speeding up dataset literalization up to 40% or more (jeremyevans)
 
 * Speed up Sequel.split_symbol 10-20x by caching results, speeding up dataset literalization up to 80% or more (jeremyevans)
