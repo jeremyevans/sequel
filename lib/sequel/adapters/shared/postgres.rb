@@ -410,6 +410,8 @@ module Sequel
       # any named types.
       def reset_conversion_procs
         @conversion_procs = get_conversion_procs
+        conversion_procs_updated
+        @conversion_procs
       end
 
       # Reset the primary key sequence for the given table, basing it on the
@@ -540,6 +542,7 @@ module Sequel
           convert_named_procs_to_procs(named_procs).each do |oid, pr|
             procs[oid] ||= pr
           end
+          conversion_procs_updated
         end
       end
 
@@ -658,6 +661,11 @@ module Sequel
         end
       end
 
+      # Callback used when conversion procs are updated.
+      def conversion_procs_updated
+        nil
+      end
+
       # Convert the hash of named conversion procs into a hash a oid conversion procs. 
       def convert_named_procs_to_procs(named_procs)
         h = {}
@@ -674,6 +682,7 @@ module Sequel
         oids.each do |oid|
           procs[oid] = PG_TYPES[oid]
         end
+        conversion_procs_updated
       end
 
       EXCLUSION_CONSTRAINT_SQL_STATE = '23P01'.freeze

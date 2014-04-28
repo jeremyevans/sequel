@@ -196,15 +196,14 @@ module Sequel
         def self.extended(db)
           db.instance_eval do
             @pg_array_schema_types ||= {}
+            procs = conversion_procs
+            procs[1115] = Creator.new("timestamp without time zone", procs[1114])
+            procs[1185] = Creator.new("timestamp with time zone", procs[1184])
             copy_conversion_procs([1009, 1007, 1016, 1231, 1022, 1000, 1001, 1182, 1183, 1270, 1005, 1028, 1021, 1014, 1015])
             [:string_array, :integer_array, :decimal_array, :float_array, :boolean_array, :blob_array, :date_array, :time_array, :datetime_array].each do |v|
               @schema_type_classes[v] = PGArray
             end
           end
-
-          procs = db.conversion_procs
-          procs[1115] = Creator.new("timestamp without time zone", procs[1114])
-          procs[1185] = Creator.new("timestamp with time zone", procs[1184])
         end
 
         # Handle arrays in bound variables
@@ -232,6 +231,7 @@ module Sequel
           end
           PGArray.register(db_type, opts, &block)
           @schema_type_classes[:"#{opts[:type_symbol] || db_type}_array"] = PGArray
+          conversion_procs_updated
         end
 
         # Return PGArray if this type matches any supported array type.

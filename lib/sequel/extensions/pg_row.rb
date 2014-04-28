@@ -499,6 +499,7 @@ module Sequel
             private meth
           end
 
+          conversion_procs_updated
           nil
         end
 
