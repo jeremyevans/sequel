@@ -108,7 +108,8 @@ begin
     desc "#{d} with -w, some warnings filtered"
     task "#{name}_w" do
       ENV['RUBYOPT'] ? (ENV['RUBYOPT'] += " -w") : (ENV['RUBYOPT'] = '-w')
-      sh "#{FileUtils::RUBY} -S rake #{name} 2>&1 | egrep -v \"(spec/.*: warning: (possibly )?useless use of == in void context|: warning: instance variable @.* not initialized|: warning: method redefined; discarding old|: warning: previous definition of)|rspec\""
+      rake = ENV['RAKE'] || "#{FileUtils::RUBY} -S rake"
+      sh "#{rake} #{name} 2>&1 | egrep -v \"(spec/.*: warning: (possibly )?useless use of == in void context|: warning: instance variable @.* not initialized|: warning: method redefined; discarding old|: warning: previous definition of)|rspec\""
     end
 
     desc d
