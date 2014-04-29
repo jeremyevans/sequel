@@ -305,7 +305,6 @@ module Sequel
           key = opts[:key]
           key_column = opts[:key_column] ||= opts[:key]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-          slice_range = opts.slice_range
           opts[:dataset] ||= lambda do
             opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains(Sequel.pg_array([send(pk)], opts.array_type)))
           end
@@ -381,13 +380,11 @@ module Sequel
         # Setup the pg_array_to_many-specific datasets, eager loaders, and modification methods.
         def def_pg_array_to_many(opts)
           name = opts[:name]
-          model = self
           opts[:key] = opts.default_key unless opts.has_key?(:key)
           key = opts[:key]
           key_column = opts[:key_column] ||= key
           opts[:eager_loader_key] = nil
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-          slice_range = opts.slice_range
           opts[:dataset] ||= lambda do
             opts.associated_dataset.where(opts.predicate_key=>send(key).to_a)
           end

@@ -210,8 +210,6 @@ module Sequel
         # Create the association methods and :eager_loader and :eager_grapher procs.
         def def_many_through_many(opts)
           one_through_many = opts[:type] == :one_through_many
-          name = opts[:name]
-          model = self
           opts[:read_only] = true
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:cartesian_product_number] ||= one_through_many ? 0 : 2
@@ -233,7 +231,7 @@ module Sequel
           opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
-          left_pks = opts[:left_primary_keys] = Array(left_pk)
+          opts[:left_primary_keys] = Array(left_pk)
           lpkc = opts[:left_primary_key_column] ||= left_pk
           lpkcs = opts[:left_primary_key_columns] ||= Array(lpkc)
           opts[:dataset] ||= opts.association_dataset_proc

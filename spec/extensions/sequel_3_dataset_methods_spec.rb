@@ -71,7 +71,6 @@ describe "Dataset#opts=" do
   specify "should change the dataset's opts" do
     db = Sequel.mock
     ds = db[:items].extension(:sequel_3_dataset_methods)
-    db2 = Sequel.mock
     ds.sql.should == 'SELECT * FROM items'
     ds.opts = {}
     ds.sql.should == 'SELECT *'

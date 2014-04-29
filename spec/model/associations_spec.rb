@@ -2062,7 +2062,6 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1
     
     n = @c2.load(:id => 1234)
-    a = @c1.load(:id => 2345)
     @c1.dataset._fetch = []
     proc{n.add_attribute(2345)}.should raise_error(Sequel::NoMatchingRow)
     DB.sqls.should == ["SELECT * FROM attributes WHERE id = 2345"]
@@ -2788,14 +2787,12 @@ describe Sequel::Model, "one_through_one" do
   it "should handle an aliased join table" do
     @c2.one_through_one :attribute, :class => @c1, :join_table => :attribute2node___attributes_nodes
     n = @c2.load(:id => 1234)
-    a = @c1.load(:id => 2345)
     n.attribute_dataset.sql.should == "SELECT attributes.* FROM attributes INNER JOIN attribute2node AS attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1"
   end
   
   it "should raise an error if the model object doesn't have a valid primary key" do
     @c2.one_through_one :attribute, :class => @c1 
     a = @c2.new
-    n = @c1.load(:id=>123)
     proc{a.attribute_dataset}.should raise_error(Sequel::Error)
   end
   

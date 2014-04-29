@@ -1016,7 +1016,7 @@ module Sequel
 
       # An array of prepared statement argument names, of length n and starting with base.
       def prepare_method_args(base, n)
-        args = (0...n).map do
+        (0...n).map do
           s = base.to_sym
           base = base.next
           s

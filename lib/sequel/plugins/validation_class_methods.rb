@@ -67,7 +67,7 @@ module Sequel
         # Instructs the model to skip validations defined in superclasses
         def skip_superclass_validations
           superclass.validations.each do |att, procs|
-            if ps = @validations[att]
+            if @validations[att]
               @validations[att] -= procs
             end
           end

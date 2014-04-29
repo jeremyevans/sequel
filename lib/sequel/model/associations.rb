@@ -1762,8 +1762,6 @@ module Sequel
         def def_many_to_many(opts)
           one_through_one = opts[:type] == :one_through_one
           opts[:read_only] = true if one_through_one
-          name = opts[:name]
-          model = self
           left = (opts[:left_key] ||= opts.default_left_key)
           lcks = opts[:left_keys] = Array(left)
           right = (opts[:right_key] ||= opts.default_right_key)
@@ -1838,7 +1836,6 @@ module Sequel
         # Configures many_to_one association reflection and adds the related association methods
         def def_many_to_one(opts)
           name = opts[:name]
-          model = self
           opts[:key] = opts.default_key unless opts.has_key?(:key)
           key = opts[:key]
           opts[:eager_loader_key] = key unless opts.has_key?(:eager_loader_key)
@@ -1898,7 +1895,6 @@ module Sequel
         def def_one_to_many(opts)
           one_to_one = opts[:type] == :one_to_one
           name = opts[:name]
-          model = self
           key = (opts[:key] ||= opts.default_key)
           km = opts[:key_method] ||= opts[:key]
           cks = opts[:keys] = Array(key)
@@ -2587,7 +2583,6 @@ END
               associations = assoc.is_a?(Array) ? assoc : [assoc]
             end
           end
-          orig_ds = ds
           local_opts = ds.opts[:eager_graph][:local]
           limit_strategy = r.eager_graph_limit_strategy(local_opts[:limit_strategy])
           ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])

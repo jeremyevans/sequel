@@ -213,7 +213,6 @@ module Sequel
     # Start a new database transaction or a new savepoint on the given connection.
     def begin_transaction(conn, opts=OPTS)
       if supports_savepoints?
-        th = _trans(conn)
         depth = savepoint_level(conn)
         if depth > 1
           log_connection_execute(conn, begin_savepoint_sql(depth-1))
