@@ -78,7 +78,7 @@ module Sequel
           @argn = -1
           @args = []
           ds = yield self, dataset
-          sql = ds.sql
+          sql = ds.clone(:placeholder_literalizer=>self).sql
 
           last_offset = 0
           fragments = @args.map do |used_sql, offset, arg, t|
@@ -154,8 +154,12 @@ module Sequel
         ds = @dataset
         @fragments.each do |sql, i, transformer|
           s << sql
-          v = args.fetch(i)
-          v = transformer.call(v) if transformer
+          if i.is_a?(Integer)
+            v = args.fetch(i)
+            v = transformer.call(v) if transformer
+          else
+            v = i.call
+          end
           ds.literal_append(s, v)
         end
         if sql = @final_sql

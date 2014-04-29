@@ -515,7 +515,11 @@ module Sequel
     # Append literalization of delayed evaluation to SQL string,
     # causing the delayed evaluation proc to be evaluated.
     def delayed_evaluation_sql_append(sql, callable)
-      literal_append(sql, callable.call)
+      if recorder = @opts[:placeholder_literalizer]
+        recorder.use(sql, callable, nil)
+      else
+        literal_append(sql, callable.call)
+      end
     end
 
     # Append literalization of emulated function call to SQL string.

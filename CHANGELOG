@@ -1,5 +1,7 @@
 === HEAD
 
+* Dataset::PlaceholderLiteralizer now handles DelayedEvaluations correctly (jeremyevans)
+
 * Refactor type conversion in the jdbc adapter, for up to a 20% speedup (jeremyevans)
 
 * Add Dataset#with_fetch_size to jdbc adapter, for setting fetch size for JDBC ResultSets (jeremyevans)
