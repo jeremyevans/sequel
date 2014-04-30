@@ -473,7 +473,7 @@ module Sequel
 
       # Clear the setter_methods cache when a module is included, as it
       # may contain setter methods.
-      def include(mod)
+      def include(*mods)
         clear_setter_methods_cache
         super
       end

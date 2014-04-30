@@ -733,3 +733,14 @@ describe "Model datasets #with_pk with #with_pk!" do
     DB.sqls.should == ["SELECT * FROM a WHERE (foo) LIMIT 1"]
   end
 end
+
+describe "Model::include" do
+  it "shouldn't change the signature of Module::include" do
+    mod1 = Module.new
+    mod2 = Module.new
+    including_class = Class.new(Sequel::Model(:items)) do
+      include(mod1, mod2)
+    end
+    including_class.included_modules.should include(mod1, mod2)
+  end
+end
