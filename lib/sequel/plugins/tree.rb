@@ -107,6 +107,13 @@ module Sequel
         def root?
           !new? && possible_root?
         end
+        
+        # Returns list of self and ancestors, starting from self until root.
+        #
+        #   subchild1.self_and_ancestors # => [subchild1, child1, root]
+        def self_and_ancestors
+          ancestors.unshift(self)
+        end
 
         # Returns all siblings and a reference to the current node.
         #
