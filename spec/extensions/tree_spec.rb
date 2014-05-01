@@ -88,6 +88,15 @@ describe Sequel::Model, "tree plugin" do
       "SELECT * FROM nodes WHERE (nodes.parent_id = 4)"]
   end
 
+  it "should have self_and_descendants return current node and it descendants" do
+    @ds._fetch = [[{:id=>3, :parent_id=>2, :name=>'r'}, {:id=>4, :parent_id=>2, :name=>'r2'}], [{:id=>5, :parent_id=>4, :name=>'r3'}], []]
+    @o.self_and_descendants.should == [@c.load(:id=>2, :parent_id=>1, :name=>'AA', :i=>3, :pi=>4), @c.load(:id=>3, :parent_id=>2, :name=>'r'), @c.load(:id=>4, :parent_id=>2, :name=>'r2'), @c.load(:id=>5, :parent_id=>4, :name=>'r3')] 
+    @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.parent_id = 2)",
+      "SELECT * FROM nodes WHERE (nodes.parent_id = 3)",
+      "SELECT * FROM nodes WHERE (nodes.parent_id = 5)",
+      "SELECT * FROM nodes WHERE (nodes.parent_id = 4)"]
+  end
+
   it "should have root return the root of the current node" do
     @ds._fetch = [[{:id=>1, :parent_id=>5, :name=>'r'}], [{:id=>5, :parent_id=>nil, :name=>'r2'}]]
     @o.root.should == @c.load(:id=>5, :parent_id=>nil, :name=>'r2')
