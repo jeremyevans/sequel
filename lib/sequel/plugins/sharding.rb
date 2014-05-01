@@ -39,15 +39,6 @@ module Sequel
           super
         end
 
-        # REMOVE410
-        def eager_loading_dataset(opts, ds, select, associations, eager_options=OPTS)
-          ds = super(opts, ds, select, associations, eager_options)
-          if !ds.opts[:server] and s = eager_options[:self] and server = s.opts[:server]
-            ds = ds.server(server)
-          end
-          ds
-        end
-
         # Return a newly instantiated object that is tied to the given
         # shard s.  When the object is saved, a record will be inserted
         # on shard s.

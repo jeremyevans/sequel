@@ -1350,20 +1350,6 @@ module Sequel
           association_reflections.values
         end
         
-        # REMOVE410
-        def apply_association_dataset_opts(opts, ds)
-          Deprecation.deprecate("Model.apply_association_dataset_opts/Model.eager_loading_dataset", "Use AssociationReflection#apply_dataset_changes/Association#reflection#apply_eager_dataset_changes instead.")
-          ds = ds.select(*opts.select) if opts.select
-          if c = opts[:conditions]
-            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
-          end
-          ds = ds.order(*opts[:order]) if opts[:order]
-          ds = ds.eager(opts[:eager]) if opts[:eager]
-          ds = ds.distinct if opts[:distinct]
-          ds = opts[:eager_block].call(ds) if opts[:eager_block]
-          ds
-        end
-
         # Associates a related model with the current model. The following types are
         # supported:
         #
@@ -1646,22 +1632,6 @@ module Sequel
           opts.eager_load_results(eo, &block)
         end
 
-        # REMOVE410
-        def eager_loading_dataset(opts, ds, select, associations, eager_options=OPTS)
-          ds = apply_association_dataset_opts(opts, ds)
-          ds = ds.select(*select) if select
-          if opts[:eager_graph]
-            raise(Error, "cannot eagerly load a #{opts[:type]} association that uses :eager_graph") if opts.eager_loading_use_associated_key?
-            ds = ds.eager_graph(opts[:eager_graph])
-          end
-          ds = ds.eager(associations) unless Array(associations).empty?
-          ds = eager_options[:eager_block].call(ds) if eager_options[:eager_block]
-          if opts.eager_loading_use_associated_key?
-            ds = ds.select_append(*opts.associated_key_array)
-          end
-          ds
-        end
-
         # Shortcut for adding a many_to_many association, see #associate
         def many_to_many(name, opts=OPTS, &block)
           associate(:many_to_many, name, opts, &block)
@@ -1711,19 +1681,6 @@ module Sequel
           association_module(opts).send(:private, name)
         end
 
-        # REMOVE410
-        def def_add_method(opts)
-          Deprecation.deprecate("Model.def_add_method", "The Model.associate method now sets up the add method you if an :adder association reflection entry is present.")
-          association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
-        end
-
-        # REMOVE410
-        def def_association_dataset_methods(opts)
-          Deprecation.deprecate("Model.def_association_dataset_methods", "The Model.associate method now sets up the association dataset methods.")
-          association_module_def(opts.dataset_method, opts){_dataset(opts)}
-          def_association_method(opts)
-        end
-      
         # Adds the association method to the association methods module.
         def def_association_method(opts)
           association_module_def(opts.association_method, opts){|*dynamic_opts, &block| load_associated_objects(opts, dynamic_opts[0], &block)}
@@ -1996,13 +1953,6 @@ module Sequel
           def_one_to_many(opts)
         end
         
-        # REMOVE410
-        def def_remove_methods(opts)
-          Deprecation.deprecate("Model.def_remove_methods", "The Model.associate method now sets up the remove/remove_all methods for you if a :remover or :clearer association reflection entry is present.")
-          association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
-          association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
-        end
-          
         # Return dataset to graph into given the association reflection, applying the :callback option if set.
         def eager_graph_dataset(opts, eager_options)
           ds = opts.associated_class.dataset

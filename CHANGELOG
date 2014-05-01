@@ -1,3 +1,7 @@
+=== HEAD
+
+* Remove methods deprecated in 4.10.0 (jeremyevans)
+
 === 4.10.0 (2014-05-01)
 
 * Make Model.include API same as Module.include (ged) (#803)
