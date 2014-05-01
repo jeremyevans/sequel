@@ -88,9 +88,9 @@ module Sequel
           nodes
         end
 
-        # Returns list of ancestors, starting from parent until root.
+        # Returns list of descendants
         #
-        #   subchild1.ancestors # => [child1, root]
+        #   node.descendants # => [child1, child2, subchild1_1, subchild1_2, subchild2_1, subchild2_2]
         def descendants
           nodes = children.dup
           children.each{|child| nodes.concat(child.descendants)}
