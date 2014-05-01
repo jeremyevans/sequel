@@ -46,6 +46,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a target="docwin" href="#method-i-marshallable-21">marshallable!</a></li>
               <li><a target="docwin" href="#attribute-i-retrieved_by">retrieved_by</a></li>
               <li><a target="docwin" href="#attribute-i-retrieved_with">retrieved_with</a></li>
             </ol>
@@ -80,6 +81,34 @@
                     </td>
                   </tr>
                 </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-marshallable-21'>
+                <a name='method-i-marshallable-21'></a>
+                <div class='synopsis'>
+                  <span class='name'>marshallable!</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Remove <a
+                  href="InstanceMethods.html#attribute-i-retrieved_by">#retrieved_by</a> and
+                  <a
+                  href="InstanceMethods.html#attribute-i-retrieved_with">#retrieved_with</a>
+                  when marshalling.  <a
+                  href="InstanceMethods.html#attribute-i-retrieved_by">#retrieved_by</a>
+                  contains unmarshallable objects, and <a
+                  href="InstanceMethods.html#attribute-i-retrieved_with">#retrieved_with</a>
+                  can be very large and is not helpful without retrieved_by.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-marshallable-21-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-marshallable-21-source'><span class="ruby-comment"># File lib/sequel/plugins/tactical_eager_loading.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">marshallable!</span>&#x000A;  <span class="ruby-ivar">@retrieved_by</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-ivar">@retrieved_with</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

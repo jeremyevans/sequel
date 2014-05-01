@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+          <span class='datetime'>2014-04-09 15:04:48 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -115,6 +115,12 @@
             transaction to explicitly use a savepoint (if the database supports it):</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
+            
+            <p>You can use the <code>:auto_savepoint =&gt; true</code> option in the outer
+            transaction to explicitly use a savepoint in the inner transaction (if the
+            database supports it):</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">auto_savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
             
             <p>If a <a href="../../classes/Sequel/Rollback.html">Sequel::Rollback</a>
             exception is raised inside the savepoint block, it will only rollback to

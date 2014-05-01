@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-03-27 07:59:03 -0700</span>
+          <span class='datetime'>2014-04-21 10:43:37 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -405,6 +405,12 @@
             </dd><dt>:encoding 
             <dd>
             <p>Specify the encoding/character set to use for the connection.</p>
+            </dd><dt>:fractional_seconds 
+            <dd>
+            <p>On MySQL 5.6.5+, this option is recognized and will include fractional
+            seconds in time/timestamp values, as well as have the schema method create
+            columns that can contain fractional seconds by deafult.  This option is
+            also supported on other adapters that connect to MySQL.</p>
             </dd><dt>:socket 
             <dd>
             <p>Can be used to specify a Unix socket file to connect to instead of a TCP
@@ -598,7 +604,11 @@
             details.</p>
             
             <p>Other <a href="../../classes/Sequel.html">Sequel</a> specific options:</p>
-            <dl class="rdoc-list note-list"><dt>:textsize 
+            <dl class="rdoc-list note-list"><dt>:server_version 
+            <dd>
+            <p>Override the server version to use (9000000 = SQL Server 2005). This also
+            works on any other adapter that connects to Microsoft SQL Server.</p>
+            </dd><dt>:textsize 
             <dd>
             <p>Override the default TEXTSIZE setting for this connection.  The FreeTDS
             default is small (around 64000 bytes), but can be set up to around 2GB.

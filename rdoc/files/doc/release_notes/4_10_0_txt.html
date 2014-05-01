@@ -1,0 +1,265 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.10.0.txt</title>
+    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.10.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.10.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2014-05-01 08:02:17 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-Performance+Enhancements">Performance Enhancements</h1>
+            <ul><li>
+            <p>Dataset literalization for simple datasets is now faster by creating a
+            per-adapter SQL literalization method instead of having all adapters share
+            a generic method with higher overhead. <a
+            href="../../../classes/Sequel.html#method-c-split_symbol">Sequel.split_symbol</a>
+            now caches results globally. <a
+            href="../../../classes/Symbol.html">Symbol</a> literalization is now cached
+            per Database.</p>
+            
+            <p>Combining these three optimizations, here are the performance increases
+            compared to 4.9.0 for a couple example datasets:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds1</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>]&#x000A;<span class="ruby-identifier">ds2</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">d</span>, :<span class="ruby-identifier">e</span>)&#x000A;&#x000A;        .<span class="ruby-identifier">sql</span>     .<span class="ruby-identifier">all</span> (<span class="ruby-value">1</span> <span class="ruby-identifier">row</span>)&#x000A;<span class="ruby-identifier">ds1</span>     <span class="ruby-value">140</span><span class="ruby-operator">%</span>     <span class="ruby-value">11</span><span class="ruby-operator">%</span>&#x000A;<span class="ruby-identifier">ds2</span>     <span class="ruby-value">187</span><span class="ruby-operator">%</span>     <span class="ruby-value">32</span><span class="ruby-operator">%</span></pre>
+            </li><li>
+            <p>Regular association loading now uses a placeholder literalizer in most
+            cases, for up to an 85% improvement when loading simple associations.</p>
+            </li><li>
+            <p>Eager loading associations using Dataset#eager now uses a placeholder
+            literalizer in most cases, for up to a 20% improvement when eager loading
+            simple associations.</p>
+            </li><li>
+            <p>Eager loading associations with limits using Dataset#eager now uses a
+            UNION-based strategy by default.  After extensive testing, this was found
+            to be the fastest strategy if the key columns are indexed.  Unfortunately,
+            it is a much slower strategy if the key columns are not indexed.  You can
+            override the default UNION strategy by using the :eager_limit_strategy
+            association option.</p>
+            
+            <p>On some databases, execution time of UNION queries with n subqueries
+            increases faster than O(n).  Also, there are limits on the number of
+            subqueries supported in a single UNION query.  <a
+            href="../../../classes/Sequel.html">Sequel</a> chooses a default limit of
+            40 subqueries per UNION query.  You can increase this via the
+            :subqueries_per_union association option.</p>
+            </li><li>
+            <p>Dataset#import and multi_insert can now insert multiple rows in a single
+            query on H2, HSQLDB, Derby, SQLAnywhere, CUBRID, SQLite, Oracle, DB2, and
+            Firebird, which should be significantly faster than previous versions that
+            issued a separate INSERT query per row.</p>
+            </li><li>
+            <p>The many_to_many setter method in the association_pks plugin now uses
+            Dataset#import to insert many rows at once, instead of using a seperate
+            query per insert.</p>
+            </li><li>
+            <p>The jdbc adapter&#39;s type conversion has been rewritten to be more
+            similar to the other adapters, setting up the type conversion procs before
+            iterating over results.  This increases performance up to 20%.</p>
+            </li><li>
+            <p>The jdbc/oracle adapter now defaults to a fetch_size of 100, similar to the
+            oci8-based oracle adapter, significantly improving performance for large
+            datasets.</p>
+            </li></ul>
+            
+            <h1 id="label-New+Features">New Features</h1>
+            <ul><li>
+            <p>Database#transaction now supports an :auto_savepoint option.  This option
+            makes it so that transactions inside the transaction block automatically
+            use savepoints unless they use the :savepoint=&gt;false option.  This
+            should make testing transactional behavior easier.</p>
+            </li><li>
+            <p>Model.prepared_finder has been added.  This has an API similar to
+            Model.finder, but it uses a prepared statement instead of a placeholder
+            literalizer.  It is less flexible than Model.finder as prepared statements
+            have fixed SQL, but it may perform better.</p>
+            </li><li>
+            <p>Common table expressions (WITH clauses) are now supported on SQLite 3.8.3+.</p>
+            </li><li>
+            <p>:correlated_subquery has been added as an eager_graph and filter by
+            association limit strategy for one_to_one and one_to_many associations.  In
+            certain cases it was found that this is faster than the :window_function
+            limit strategy.  It is the default filter by associations limit strategy on
+            databases that do not support window functions.</p>
+            
+            <p>Filtering by limited associations using a correlated subquery strategy does
+            not work in all cases, but it should handle most cases correctly.</p>
+            </li><li>
+            <p>The prepared_statement_associations plugin now handles one_through_one and
+            one_through_many associations.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now emulates support for
+            offsets without limits on MySQL, SQLite, H2, SQLAnywhere, and CUBRID.</p>
+            </li><li>
+            <p>In the jdbc adapter, the Database#fetch_size accessor and :fetch_size
+            option can be used to automatically set the JDBC fetch size for JDBC
+            Statement objects created by the database.</p>
+            </li><li>
+            <p>Dataset#with_fetch_size has been added to jdbc adapter datasets, setting
+            the fetch size to use on ResultSets generated by the dataset.  This
+            generally has the effect of overriding the Database fetch_size setting.</p>
+            </li><li>
+            <p>On MySQL 5.6.5+, <a href="../../../classes/Sequel.html">Sequel</a> supports
+            a :fractional_seconds Database option, which will use fractional seconds
+            for timestamp values, and have the schema modification code create
+            timestamp columns that accept fractional timestamps by default.</p>
+            </li><li>
+            <p>Database#call_mssql_sproc on Microsoft SQL Server now handles named
+            parameters:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">call_mssql_sproc</span>(:<span class="ruby-identifier">sproc_name</span>, :<span class="ruby-identifier">args</span> =<span class="ruby-operator">&gt;</span> {&#x000A;  <span class="ruby-string">&#39;input_arg1_name&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;input arg1 value&#39;</span>,&#x000A;  <span class="ruby-string">&#39;input_arg2_name&#39;</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;input arg2 value&#39;</span>,&#x000A;  <span class="ruby-string">&#39;output_arg_name&#39;</span> =<span class="ruby-operator">&gt;</span> [:<span class="ruby-identifier">output</span>, <span class="ruby-string">&#39;int&#39;</span>, <span class="ruby-string">&#39;result key name&#39;</span>]&#x000A;})</pre>
+            </li><li>
+            <p>Database#drop_view now supports an :if_exists option on SQLite, MySQL, H2,
+            and HSQLDB.</p>
+            </li><li>
+            <p>Database#drop_table now supports an :if_exists option on HSQLDB.</p>
+            </li><li>
+            <p>A :filter_limit_strategy association option has been added, for choosing
+            the strategy that will be used when filtering/excluding by associations
+            with limits.  For backwards compatibility, <a
+            href="../../../classes/Sequel.html">Sequel</a> will fallback to looking at
+            the :eager_limit_strategy option.</p>
+            </li><li>
+            <p>A :server_version Database option is now supported on Microsoft SQL Server,
+            which will use the value given instead of querying for it.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <ul><li>
+            <p>Dataset::PlaceholderLiteralizer arguments are how handled correctly when
+            emulating offsets via the row_number window function on DB2, MSSQL
+            &lt;=2012, and Oracle.</p>
+            </li><li>
+            <p>Dataset::PlaceholderLiteralizer now handles DelayedEvaluation objects
+            correctly.</p>
+            </li><li>
+            <p>Offset emulation is skipped if static SQL is used on Access, DB2, and MSSQL
+            &lt;=2008.</p>
+            </li><li>
+            <p>Additional disconnect errors are now recognized in the postgres adapter.</p>
+            </li><li>
+            <p>The :foreign_key_constraint_name option is now respected when adding a
+            foreign key column to an existing table on MySQL.</p>
+            </li><li>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now attempts to work
+            around a bug on MySQL 5.6+ when combining DROP FOREIGN KEY and DROP INDEX
+            in the same ALTER TABLE statement.</p>
+            </li><li>
+            <p>Dataset#for_update is now respected on H2.</p>
+            </li><li>
+            <p>Timestamp with local time zone types are now returned as Time/DateTime
+            objects on jdbc/oracle.</p>
+            </li><li>
+            <p>Model.include now has the same API as Module.include.</p>
+            </li><li>
+            <p>Model#marshallable! now works correctly when using the
+            tactical_eager_loading plugin.</p>
+            </li><li>
+            <p>The pg_array_associations plugin now attempts to automatically determine
+            the correct array type to use, and explicitly casts to that array type in
+            more places.</p>
+            </li><li>
+            <p>The auto_validations plugin now handles models that select from subqueries.</p>
+            </li><li>
+            <p>The association_pks plugin does no longer creates getter and setter methods
+            for one_through_one associations.</p>
+            </li><li>
+            <p>bin/sequel now uses the <a href="../../../classes/Sequel.html">Sequel</a>
+            code in the related lib directory. This makes it easier to use from a
+            repository checkout.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <ul><li>
+            <p>AssociationReflection#associated_dataset now returns a joined dataset for
+            associations that require joins (e.g. many_to_many). Anyone using this
+            directly for associations that require joins probably needs to update their
+            code.</p>
+            </li><li>
+            <p>Model.associate now adds the association instance methods instead of
+            relying on the def_#{association_type} method doing so.  Anyone using
+            custom association types probably needs to update their code.</p>
+            </li><li>
+            <p>Model.eager_loading_dataset, .apply_association_dataset_opts, and
+            .def_{add_method,association_dataset_methods,remove_methods} are now
+            deprecated.</p>
+            </li><li>
+            <p>Key conditions for associations requiring joins have been moved from the
+            JOIN ON clause to the WHERE clause.  This should be optimized the same by
+            the database, but it can break tests that expect specific SQL.</p>
+            </li><li>
+            <p>Dataset#_insert_sql and #_update_sql are now private instead of protected.</p>
+            </li><li>
+            <p>The install/uninstall rake tasks have been removed.</p>
+            </li><li>
+            <p>Model association and association reflection internals have changed
+            significantly, if you were relying on them, you&#39;ll probably need to
+            update your code.</p>
+            </li><li>
+            <p>Database transaction internals have changed significantly, if you were
+            relying on them, you&#39;ll probably need to update your code.</p>
+            </li><li>
+            <p>Dataset literalization internals have changed significantly, with the
+            Dataset#*_clause_methods private methods being removed. Custom adapters
+            that used these methods should switch to using the new
+            Dataset.def_sql_method method.</p>
+            </li><li>
+            <p>Common table expressions are no longer enabled by default in <a
+            href="../../../classes/Sequel.html">Sequel</a>.  External adapters for
+            databases that support common table expressions should define
+            Dataset#supports_cte?(type) to return true.</p>
+            </li><li>
+            <p>Support for RETURNING is no longer determined via introspection. External
+            adapters for databases that support RETURNING should define
+            Dataset#supports_returning?(type) to return true.</p>
+            </li><li>
+            <p>The new jdbc adapter type conversion code may not be completely compatible
+            with the previous code.  The currently known case where it is different is
+            on jdbc/postgresql, when using an array type where no conversion proc
+            exists, the returned object will be a ruby array containing java objects,
+            instead of a ruby array containing ruby objects.  It is recommended that
+            jdbc/postgresql users using array types use the pg_array extension to avoid
+            this issue.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

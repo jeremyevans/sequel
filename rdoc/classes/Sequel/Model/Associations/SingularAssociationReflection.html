@@ -52,6 +52,7 @@
             <ol>
               <li><a target="docwin" href="#method-i-assign_singular-3F">assign_singular?</a></li>
               <li><a target="docwin" href="#method-i-filter_by_associations_add_conditions-3F">filter_by_associations_add_conditions?</a></li>
+              <li><a target="docwin" href="#method-i-limit_and_offset">limit_and_offset</a></li>
               <li><a target="docwin" href="#method-i-returns_array-3F">returns_array?</a></li>
             </ol>
           </div>
@@ -77,7 +78,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-assign_singular-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-assign_singular-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 758</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">assign_singular?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">eager_limit_strategy</span> <span class="ruby-operator">!=</span> <span class="ruby-value">:ruby</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">slice_range</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-assign_singular-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 995</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">assign_singular?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">eager_limit_strategy</span> <span class="ruby-operator">!=</span> <span class="ruby-value">:ruby</span> <span class="ruby-operator">||</span> <span class="ruby-operator">!</span><span class="ruby-identifier">slice_range</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-filter_by_associations_add_conditions-3F'>
@@ -95,7 +96,24 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-filter_by_associations_add_conditions-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-filter_by_associations_add_conditions-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 764</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_associations_add_conditions?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:order</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-filter_by_associations_add_conditions-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1001</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_associations_add_conditions?</span>&#x000A;  <span class="ruby-keyword">super</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:order</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:eager_limit_strategy</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:filter_limit_strategy</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-limit_and_offset'>
+                <a name='method-i-limit_and_offset'></a>
+                <div class='synopsis'>
+                  <span class='name'>limit_and_offset</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Make sure singular associations always have 1 as the limit</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-limit_and_offset-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-limit_and_offset-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1006</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">limit_and_offset</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">r</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    [<span class="ruby-value">1</span>, <span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>]]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-returns_array-3F'>
@@ -112,7 +130,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-returns_array-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-returns_array-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 769</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">returns_array?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-returns_array-3F-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1016</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">returns_array?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

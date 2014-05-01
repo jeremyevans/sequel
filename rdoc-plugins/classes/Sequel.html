@@ -844,10 +844,6 @@
             cloned dataset that will never issue a query to the database.  It
             implements the null object pattern for datasets.</p>
             
-            <p>To load the extension:</p>
-            
-            <pre>Sequel.extension :null_dataset</pre>
-            
             <p>The most common usage is probably in a method that must return a dataset,
             where the method knows the dataset shouldn&#39;t return anything.  With
             standard <a href="Sequel.html">Sequel</a>, you&#39;d probably just add a
@@ -865,6 +861,14 @@
             new dataset with the same options to get the columns.</p>
             
             <p>This extension uses Object#extend at runtime, which can hurt performance.</p>
+            
+            <p>To add the nullify method to a single dataset:</p>
+            
+            <pre>ds = ds.extension(:null_dataset)</pre>
+            
+            <p>To add the nullify method to all datasets on a single database:</p>
+            
+            <pre>DB.extension(:null_dataset)</pre>
             
             <p>The pagination extension adds the Sequel::Dataset#paginate and each_page
             methods, which return paginated (limited and offset) datasets with some

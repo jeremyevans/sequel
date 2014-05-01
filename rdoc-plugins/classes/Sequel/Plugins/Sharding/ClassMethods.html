@@ -47,6 +47,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#method-i-create_using_server">create_using_server</a></li>
+              <li><a target="docwin" href="#method-i-eager_load_results">eager_load_results</a></li>
               <li><a target="docwin" href="#method-i-eager_loading_dataset">eager_loading_dataset</a></li>
               <li><a target="docwin" href="#method-i-new_using_server">new_using_server</a></li>
             </ol>
@@ -73,6 +74,23 @@
                   <pre id='method-i-create_using_server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">create_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>={}, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>, &amp;<span class="ruby-identifier">block</span>).<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-eager_load_results'>
+                <a name='method-i-eager_load_results'></a>
+                <div class='synopsis'>
+                  <span class='name'>eager_load_results</span>
+                  <span class='arguments'>(opts, eo, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Eager load the association with the given eager loader options.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-eager_load_results-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-eager_load_results-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 28</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_load_results</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">eo</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">s</span> = <span class="ruby-identifier">eo</span>[<span class="ruby-value">:self</span>]) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">server</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>])&#x000A;    <span class="ruby-identifier">eb</span> = <span class="ruby-identifier">eo</span>[<span class="ruby-value">:eager_block</span>]&#x000A;    <span class="ruby-identifier">set_server</span> = <span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">eb</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">eb</span>&#x000A;      <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]&#x000A;      <span class="ruby-identifier">ds</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">eo</span> = <span class="ruby-identifier">eo</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:eager_block=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">set_server</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-eager_loading_dataset'>
                 <a name='method-i-eager_loading_dataset'></a>
                 <div class='synopsis'>
@@ -81,15 +99,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>When eagerly loading, if the current dataset has a defined shard and the
-                  dataset that you will be using to get the associated records does not, use
-                  the current dataset&#39;s shard for the associated dataset.</p>
+                  <p>REMOVE410</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eager_loading_dataset-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-eager_loading_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_loading_dataset</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">select</span>, <span class="ruby-identifier">associations</span>, <span class="ruby-identifier">eager_options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">super</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">select</span>, <span class="ruby-identifier">associations</span>, <span class="ruby-identifier">eager_options</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-keyword">and</span> <span class="ruby-identifier">s</span> = <span class="ruby-identifier">eager_options</span>[<span class="ruby-value">:self</span>] <span class="ruby-keyword">and</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-eager_loading_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_loading_dataset</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">select</span>, <span class="ruby-identifier">associations</span>, <span class="ruby-identifier">eager_options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">super</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">ds</span>, <span class="ruby-identifier">select</span>, <span class="ruby-identifier">associations</span>, <span class="ruby-identifier">eager_options</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>] <span class="ruby-keyword">and</span> <span class="ruby-identifier">s</span> = <span class="ruby-identifier">eager_options</span>[<span class="ruby-value">:self</span>] <span class="ruby-keyword">and</span> <span class="ruby-identifier">server</span> = <span class="ruby-identifier">s</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">server</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-new_using_server'>
@@ -107,7 +123,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-new_using_server-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-new_using_server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">new_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>={}, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">values</span>, &amp;<span class="ruby-identifier">block</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-new_using_server-source'><span class="ruby-comment"># File lib/sequel/plugins/sharding.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">new_using_server</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">values</span>={}, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">values</span>, &amp;<span class="ruby-identifier">block</span>).<span class="ruby-identifier">set_server</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

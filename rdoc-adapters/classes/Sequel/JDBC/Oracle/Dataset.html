@@ -47,6 +47,13 @@
             href="../Oracle.html">Oracle</a> datasets accessed via <a
             href="../../JDBC.html">JDBC</a>.</p>
           </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-type_convertor">type_convertor</a></li>
+            </ol>
+          </div>
           <div id='context'>
             <div id='includes'>
               <h2>Included modules</h2>
@@ -61,27 +68,46 @@
               <div class='name-list'>
                 <table summary='Constants'>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>JAVA_BIG_DECIMAL</td>
+                    <td class='context-item-name'>NUMERIC_TYPE</td>
                     <td>=</td>
-                    <td class='context-item-value'>::Sequel::JDBC::Dataset::JAVA_BIG_DECIMAL</td>
+                    <td class='context-item-value'>Java::JavaSQL::Types::NUMERIC</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>JAVA_BIG_DECIMAL_CONSTRUCTOR</td>
+                    <td class='context-item-name'>TIMESTAMPTZ_TYPES</td>
                     <td>=</td>
-                    <td class='context-item-value'>java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)</td>
+                    <td class='context-item-value'>[Java::oracle.jdbc.OracleTypes::TIMESTAMPTZ, Java::oracle.jdbc.OracleTypes::TIMESTAMPLTZ]</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>ORACLE_DECIMAL_METHOD</td>
+                    <td class='context-item-name'>TIMESTAMP_TYPE</td>
                     <td>=</td>
-                    <td class='context-item-value'>TYPE_TRANSLATOR_INSTANCE.method(:oracle_decimal)</td>
+                    <td class='context-item-value'>Java::JavaSQL::Types::TIMESTAMP</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                 </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-type_convertor'>
+                <a name='method-i-type_convertor'></a>
+                <div class='synopsis'>
+                  <span class='name'>type_convertor</span>
+                  <span class='arguments'>(map, meta, type, i)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-type_convertor-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">NUMERIC_TYPE</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getScale</span>(<span class="ruby-identifier">i</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;      <span class="ruby-identifier">map</span>[<span class="ruby-value">:OracleDecimal</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> *<span class="ruby-constant">TIMESTAMPTZ_TYPES</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">TIMESTAMP_TYPE</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

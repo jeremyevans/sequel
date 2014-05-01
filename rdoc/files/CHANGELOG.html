@@ -31,12 +31,128 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-01 10:01:57 -0700</span>
+          <span class='datetime'>2014-05-01 08:02:17 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.10.0+%282014-05-01%29">4.10.0 (2014-05-01)</h3>
+            <ul><li>
+            <p>Make Model.include API same as Module.include (ged) (#803)</p>
+            </li><li>
+            <p>Dataset::PlaceholderLiteralizer now handles DelayedEvaluations correctly
+            (jeremyevans)</p>
+            </li><li>
+            <p>Refactor type conversion in the jdbc adapter, for up to a 20% speedup
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_fetch_size to jdbc adapter, for setting fetch size for
+            JDBC ResultSets (jeremyevans)</p>
+            </li><li>
+            <p>Default to a fetch_size of 100 in the jdbc/oracle adapter, similar to the
+            oci8-based oracle adapter (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#fetch_size accessor and :fetch_size option to jdbc adapter,
+            for setting JDBC Statement fetch size (jeremyevans)</p>
+            </li><li>
+            <p>Automatically determine array type in pg_array_associations plugin,
+            explicitly cast arrays in more places (jeremyevans, maccman) (#800)</p>
+            </li><li>
+            <p>Speed up Dataset#literal for symbols 60% by caching results, speeding up
+            dataset literalization up to 40% or more (jeremyevans)</p>
+            </li><li>
+            <p>Speed up <a
+            href="../classes/Sequel.html#method-c-split_symbol">Sequel.split_symbol</a>
+            10-20x by caching results, speeding up dataset literalization up to 80% or
+            more (jeremyevans)</p>
+            </li><li>
+            <p>Speed up dataset literalization for simple datasets by up to 100%
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support :fractional_seconds Database option on MySQL 5.6.5+ to support
+            fractional seconds by default (jeremyevans) (#797)</p>
+            </li><li>
+            <p>Work around MySQL 5.6+ bug when combining DROP FOREIGN KEY and DROP INDEX
+            in same ALTER TABLE statement (jeremyevans)</p>
+            </li><li>
+            <p>Make auto_validations plugin handle models that select from subqueries
+            (jeremyevans)</p>
+            </li><li>
+            <p>Recognize additional disconnect errors in the postgres adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make import/multi_insert insert multiple rows in a single query using a
+            UNION on Oracle, DB2, and Firebird (jeremyevans)</p>
+            </li><li>
+            <p>Speed up association_pks many_to_many setter method by using Dataset#import
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Model.prepared_finder, similar to .finder but using a prepared
+            statement (jeremyevans)</p>
+            </li><li>
+            <p>Model.def_{add_method,association_dataset_methods,remove_methods} are now
+            deprecated (jeremyevans)</p>
+            </li><li>
+            <p>Model.eager_loading_dataset and Model.apply_association_dataset_opts are
+            now deprecated (jeremyevans)</p>
+            </li><li>
+            <p>Make prepared_statement_associations plugin handle one_through_one and
+            one_through_many associations (jeremyevans)</p>
+            </li><li>
+            <p>Use placeholder literalizer for regular association loading for up to 85%
+            speedup (jeremyevans)</p>
+            </li><li>
+            <p>Use placeholder literalizer for eager association loading for up to 20%
+            speedup (jeremyevans)</p>
+            </li><li>
+            <p>Make Model#marshallable! work correctly when using the
+            tactical_eager_loading plugin (jeremyevans)</p>
+            </li><li>
+            <p>Respect :foreign_key_constraint_name option when adding columns to existing
+            table on MySQL (noah256) (#795)</p>
+            </li><li>
+            <p>AssociationReflection#association_dataset now handles joining tables if
+            necessary (jeremyevans)</p>
+            </li><li>
+            <p>Support drop_view :if_exists option on SQLite, MySQL, H2, and HSQLDB
+            (jeremyevans) (#793)</p>
+            </li><li>
+            <p>Support drop_table :if_exists option on HSQLDB (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#transaction :auto_savepoint option, for automatically using a
+            savepoint in nested transactions (jeremyevans)</p>
+            </li><li>
+            <p>Add :server_version Database option on Microsoft SQL Server, instead of
+            querying the database for it (jeremyevans)</p>
+            </li><li>
+            <p>Support :correlated_subquery as an eager_graph and filter by associations
+            limit strategy for one_to_* associations (jeremyevans)</p>
+            </li><li>
+            <p>Support named paramters in call_mssql_sproc on Microsoft SQL Server
+            (y.zemlyanukhin, jeremyevans) (#792)</p>
+            </li><li>
+            <p>Handle placeholder literalizer arguments when emulating offsets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t attempt to emulate offsets if the dataset uses literal SQL
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use a UNION-based strategy by default to eagerly load limited associations
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support offsets without limits on MySQL, SQLite, H2, SQLAnywhere and CUBRID
+            (jeremyevans)</p>
+            </li><li>
+            <p>Remove the install/uninstall rake tasks (jeremyevans)</p>
+            </li><li>
+            <p>Use INSERT VALUES with multiple rows for Dataset#import and multi_insert on
+            more databases (jeremyevans)</p>
+            </li><li>
+            <p>Support common table expressions (WITH clause) on SQLite &gt;=3.8.3
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.9.0+%282014-04-01%29">4.9.0 (2014-04-01)</h3>
             <ul><li>
@@ -4711,7 +4827,7 @@
             <p>Optimize Model.[] by using static sql when possible, for a 30-40% speed
             increase (jeremyevans)</p>
             </li><li>
-            <p>Add Dataset#with_sql, which returns a clone of the datatset with static SQL
+            <p>Add Dataset#with_sql, which returns a clone of the dataset with static SQL
             (jeremyevans)</p>
             </li><li>
             <p>Refactor Dataset#literal so it doesn&#39;t need to be overridden in

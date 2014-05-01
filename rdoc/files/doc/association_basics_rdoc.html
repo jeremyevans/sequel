@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-03-30 21:56:17 -0700</span>
+          <span class='datetime'>2014-04-08 15:54:32 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -1380,34 +1380,17 @@
             group of associated records, not a LIMIT on the total number of records
             returned by the dataset.</p>
             
-            <p>By default, if a *_to_many association uses a limit or offset, or a
-            one_*_one association uses an offset or an order, <a
-            href="../../classes/Sequel.html">Sequel</a> will choose to use an eager
-            limit strategy.  The default strategy depends on the database being used. 
-            For databases which support window functions, a window function will be
-            used.  Other databases will just have an ruby array slice done on the
-            entire record set.</p>
-            
-            <p>For one_*_one associations without an offset or order, no strategy is used
-            by default because none is needed for a true one-to-one association (since
-            there is only one associated record per current record).  However, if you
-            are using a one_to_one association where the relationship is really
-            one_to_many, and using an order to pick the first matching row, then if you
-            don&#39;t use an limit strategy, you&#39;ll be loading all related rows
-            just to have <a href="../../classes/Sequel.html">Sequel</a> ignore all rows
-            after the first.  By using a strategy to change the query to only return
-            one associated record per current record, you can get much better database
-            performance.</p>
-            
             <p>In general, <a href="../../classes/Sequel.html">Sequel</a> picks an
-            appropriate strategy, so it is not usually necessary to specify a specific
-            strategy.</p>
-            
-            <p>You can specify true for this option to have <a
+            appropriate strategy, so it is not usually necessary to specify a strategy.
+            You can specify true for this option to have <a
             href="../../classes/Sequel.html">Sequel</a> choose which strategy to use
             (this is the default).  You can specify a symbol to manually choose a
             strategy.  The available strategies are:</p>
-            <dl class="rdoc-list note-list"><dt>:distinct_on 
+            <dl class="rdoc-list note-list"><dt>:union 
+            <dd>
+            <p>Uses one or more UNION queries with a subquery for each record you are
+            eagerly loading for (this is the default strategy).</p>
+            </dd><dt>:distinct_on 
             <dd>
             <p>Uses DISTINCT ON to ensure only the first matching record is loaded (only
             used for one_*_one associations without offsets on PostgreSQL).</p>
@@ -1419,6 +1402,21 @@
             <dd>
             <p>Uses ruby array slicing to emulate database limiting/offsetting.</p>
             </dd></dl>
+            
+            <h4 id="label-%3Asubqueries_per_union">:subqueries_per_union</h4>
+            
+            <p>The number of subqueries per union query to use when eager loading for a
+            limited association using a union strategy.  This defaults to 40, but the
+            optimum number depends on the database in use and the latency between the
+            database and the application.</p>
+            
+            <h4 id="label-%3Afilter_limit_strategy">:filter_limit_strategy</h4>
+            
+            <p>The strategy to use when filtering by limited associations.  In general <a
+            href="../../classes/Sequel.html">Sequel</a> will choose either a
+            :distinct_on, :window_function, or :correlated_subquery strategy based on
+            the association type and what the database supports, but you can override
+            that if necessary using this option.</p>
           </div>
           <div id='context'>
           </div>

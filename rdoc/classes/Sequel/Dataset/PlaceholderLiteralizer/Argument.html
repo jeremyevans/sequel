@@ -99,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-ivar">@recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-ivar">@transformer</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:placeholder_literal_null</span>]&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:literal_append</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-ivar">@transformer</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-transform'>
@@ -117,7 +117,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-transform-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-transform-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">transform</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@recorder</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-transform-source'><span class="ruby-comment"># File lib/sequel/dataset/placeholder_literalizer.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">transform</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">Argument</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@recorder</span>, <span class="ruby-ivar">@pos</span>, <span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

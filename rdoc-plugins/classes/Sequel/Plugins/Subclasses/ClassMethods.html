@@ -98,7 +98,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-descendents-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">descendents</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">_descendents</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">descendents</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-inherited'>

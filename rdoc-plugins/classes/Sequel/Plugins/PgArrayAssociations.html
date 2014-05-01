@@ -73,10 +73,9 @@
             <p>They support some additional options specific to this plugin:</p>
             <dl class="rdoc-list note-list"><dt>:array_type 
             <dd>
-            <p>This allows you to specify the type of the array.  This is only necessary
-            to set in very narrow circumstances, such as when this plugin needs to
-            create an array type, and typecasting is turned off or not setup correctly
-            for the model object.</p>
+            <p>This overrides the type of the array.  By default, the type is determined
+            by looking at the db_schema for the model, and if that fails, it defaults
+            to :integer.</p>
             </dd><dt>:raise_on_save_failure 
             <dd>
             <p>Do not raise exceptions for hook or validation failures when saving
