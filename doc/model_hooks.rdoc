@@ -81,6 +81,15 @@ If you aren't using transactions when saving or destroying model objects, and th
 
 The purpose of these hooks is dealing with external systems that are interacting with the same database.  For example, let's say you have a model that stores a picture, and you have a background job library that makes thumbnails of all of the pictures.  So when a model object is created, you want to add a background job that will create the thumbnail for the picture.  If you used after_save for this and transactions are being used, you are subject to a race condition where the background job library will check the database table for the record before the transaction that saved the record commits, and it won't be able to see the record's data.  Using after_commit, you are guaranteed that the background job library will not get notified of the record until after the transaction commits and the data is viewable.
 
+Note that when using the after_commit or after_rollback hooks, you don't know whether the saved object was newly created or updated.  If you only want to run an action after commit of a newly created record, you need to use the Database's after_commit inside the model's after_create hook:
+
+  class Album < Sequel::Model
+    def after_create
+      super
+      db.after_commit{update_external_cache}
+    end
+  end
+
 == Running Hooks
 
 Sequel does not provide a simple way to turn off the running of save/create/update hooks.  If you attempt to save a model object, the save hooks are always called.  All model instance methods that modify the database call save in some manner, so you can be sure that if you define the hooks, they will be called when you save the object.
