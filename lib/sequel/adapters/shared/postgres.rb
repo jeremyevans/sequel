@@ -1227,15 +1227,23 @@ module Sequel
       #           contains all of the words in terms.  This ignores search operators in terms.
       # :phrase :: Similar to :plain, but also adding an ILIKE filter to ensure that
       #            returned rows also include the exact phrase used.
+      # :rank :: Set to true to order by the rank, so that closer matches are returned first.
       def full_text_search(cols, terms, opts = OPTS)
-        lang = opts[:language] || 'simple'
+        lang = Sequel.cast(opts[:language] || 'simple', :regconfig)
         terms = terms.join(' | ') if terms.is_a?(Array)
-        to_tsquery = (opts[:phrase] || opts[:plain]) ? 'plainto_tsquery' : 'to_tsquery'
+        columns = full_text_string_join(cols)
+        query_func = (opts[:phrase] || opts[:plain]) ? :plainto_tsquery : :to_tsquery
+        vector = Sequel.function(:to_tsvector, lang, columns)
+        query = Sequel.function(query_func, lang, terms)
 
-        ds = where(Sequel.lit(["(to_tsvector(", "::regconfig, ", ") @@ #{to_tsquery}(", "::regconfig, ", "))"], lang, full_text_string_join(cols), lang, terms))
+        ds = where(Sequel.lit(["(", " @@ ", ")"], vector, query))
 
         if opts[:phrase]
           ds = ds.grep(cols, "%#{escape_like(terms)}%", :case_insensitive=>true)
+        end
+
+        if opts[:rank]
+          ds = ds.order{ts_rank_cd(vector, query)}
         end
 
         ds

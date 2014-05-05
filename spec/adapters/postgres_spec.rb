@@ -848,28 +848,14 @@ describe "A PostgreSQL database" do
 
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french', :index_type=>:gist}
-    check_sqls do
-      @db.sqls.should == [
-        %{CREATE TABLE "posts" ("title" text, "body" text)},
-        %{CREATE INDEX "posts_title_body_index" ON "posts" USING gin (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))))},
-        %{CREATE INDEX "posts_title_index" ON "posts" USING gist (to_tsvector('french'::regconfig, (COALESCE("title", ''))))}
-      ]
-    end
 
     @db[:posts].insert(:title=>'ruby rails', :body=>'yowsa')
     @db[:posts].insert(:title=>'sequel', :body=>'ruby')
     @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
-    @db.sqls.clear
 
     @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.should == [:title=>'ruby rails', :body=>'yowsa']
     @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.should == [{:title=>'ruby scooby', :body=>'x'}]
-    check_sqls do
-      @db.sqls.should == [
-        %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('simple'::regconfig, 'rails'))},
-        %{SELECT * FROM "posts" WHERE (to_tsvector('simple'::regconfig, (COALESCE("title", '') || ' ' || COALESCE("body", ''))) @@ to_tsquery('simple'::regconfig, 'yowsa | rails'))},
-        %{SELECT * FROM "posts" WHERE (to_tsvector('french'::regconfig, (COALESCE("title", ''))) @@ to_tsquery('french'::regconfig, 'scooby'))}]
-    end
 
     @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
@@ -880,6 +866,13 @@ describe "A PostgreSQL database" do
     @db[:posts].full_text_search(:title, 'jruby maglev', :phrase=>true).select_order_map(:title).should == ['ruby jruby maglev mri rubinius iron']
     @db[:posts].full_text_search(:title, 'rubinius ruby', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
     @db[:posts].full_text_search(:title, 'jruby maglev', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
+
+    @db[:posts].delete
+    t1 = "bork " * 1000 + "ruby sequel"
+    t2 = "ruby sequel " * 1000
+    @db[:posts].insert(:title=>t1)
+    @db[:posts].insert(:title=>t2)
+    @db[:posts].full_text_search(:title, 'ruby & sequel', :rank=>true).select_map(:title).should == [t1, t2]
   end
 
   specify "should support spatial indexes" do
