@@ -1,5 +1,7 @@
 === HEAD
 
+* Make :read_only transaction option be per-savepoint on PostgreSQL (jeremyevans) (#807)
+
 * Add :rank option to Dataset#full_text_search on PostgreSQL, to order by the ranking (jeremyevans) (#809)
 
 * Remove methods deprecated in 4.10.0 (jeremyevans)

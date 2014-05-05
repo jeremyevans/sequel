@@ -588,6 +588,15 @@ module Sequel
         end
       end
       
+      # Set the READ ONLY transaction setting per savepoint, as PostgreSQL supports that.
+      def begin_savepoint(conn, opts)
+        super
+
+        unless (read_only = opts[:read_only]).nil?
+          log_connection_execute(conn, "SET TRANSACTION READ #{read_only ? 'ONLY' : 'WRITE'}")
+        end
+      end
+
       # Handle PostgreSQL specific default format.
       def column_schema_normalize_default(default, type)
         if m = POSTGRES_DEFAULT_RE.match(default)

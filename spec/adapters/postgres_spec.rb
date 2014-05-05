@@ -170,6 +170,14 @@ describe "A PostgreSQL database" do
     @db.server_version.should > 70000
   end
 
+  specify "should respect the :read_only option per-savepoint" do
+    proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].insert}}}.should raise_error(Sequel::DatabaseError)
+    proc{@db.transaction(:auto_savepoint=>true, :read_only=>true){@db.transaction(:read_only=>false){@db[:public__testfk].insert}}}.should raise_error(Sequel::DatabaseError)
+    proc{@db.transaction{@db[:public__testfk].insert; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}}.should_not raise_error
+    proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){}; @db[:public__testfk].insert}}.should_not raise_error
+    proc{@db.transaction{@db[:public__testfk].all; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}}.should_not raise_error
+  end
+
   specify "should support disable_insert_returning" do
     ds = @db[:public__testfk].disable_insert_returning
     ds.delete

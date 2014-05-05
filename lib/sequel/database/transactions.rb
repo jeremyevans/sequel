@@ -198,7 +198,12 @@ module Sequel
     def already_in_transaction?(conn, opts)
       _trans(conn) && (!supports_savepoints? || !opts[:savepoint])
     end
-    
+
+    # Issue query to begin a new savepoint.
+    def begin_savepoint(conn, opts)
+      log_connection_execute(conn, begin_savepoint_sql(savepoint_level(conn)-1))
+    end
+
     # SQL to start a new savepoint
     def begin_savepoint_sql(depth)
       SQL_SAVEPOINT % depth
@@ -213,9 +218,8 @@ module Sequel
     # Start a new database transaction or a new savepoint on the given connection.
     def begin_transaction(conn, opts=OPTS)
       if supports_savepoints?
-        depth = savepoint_level(conn)
-        if depth > 1
-          log_connection_execute(conn, begin_savepoint_sql(depth-1))
+        if savepoint_level(conn) > 1
+          begin_savepoint(conn, opts)
         else
           begin_new_transaction(conn, opts)
         end
