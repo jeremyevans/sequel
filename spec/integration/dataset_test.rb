@@ -907,6 +907,11 @@ describe "Sequel::Dataset#import and #multi_insert" do
     @ids.import([:i], [[10], [20], [30]], :slice_size=>3)
     @ids.all.should == [{:i=>10}, {:i=>20}, {:i=>30}]
   end
+
+  it "should import many rows at once" do
+    @ids.import([:i], (1..1000).to_a.map{|x| [x]})
+    @ids.select_order_map(:i).should == (1..1000).to_a
+  end
 end
 
 describe "Sequel::Dataset#import and #multi_insert :return=>:primary_key " do

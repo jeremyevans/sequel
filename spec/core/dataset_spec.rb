@@ -2894,11 +2894,32 @@ describe "Dataset#import" do
       'COMMIT']
   end
 
-  specify "should accept a columns array and a values array with :commit_every option" do
-    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :commit_every => 3)
+  specify "should slice based on the default_import_slice option" do
+    def @ds.default_import_slice; 2 end
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
     @db.sqls.should == ['BEGIN',
       "INSERT INTO items (x, y) VALUES (1, 2)",
       "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT']
+
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>nil)
+    @db.sqls.should == ['BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT']
+  end
+
+  specify "should accept a columns array and a values array with :commit_every option" do
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :commit_every => 2)
+    @db.sqls.should == ['BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT',
+      'BEGIN',
       "INSERT INTO items (x, y) VALUES (5, 6)",
       'COMMIT']
   end
@@ -2920,6 +2941,14 @@ describe "Dataset#import" do
     @db.sqls.should == ['BEGIN',
       "INSERT INTO items (x, y) VALUES (1, 2), (3, 4), (5, 6)",
       'COMMIT']
+
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>2)
+    @db.sqls.should == ['BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2), (3, 4)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT']
   end
 
   specify "should use correct sql for :union strategy" do
@@ -2927,6 +2956,14 @@ describe "Dataset#import" do
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
     @db.sqls.should == ['BEGIN',
       "INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6",
+      'COMMIT']
+
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>2)
+    @db.sqls.should == ['BEGIN',
+      "INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) SELECT 5, 6",
       'COMMIT']
   end
 
@@ -2936,6 +2973,14 @@ describe "Dataset#import" do
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
     @db.sqls.should == ['BEGIN',
       "INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo UNION ALL SELECT 5, 6 FROM foo",
+      'COMMIT']
+
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice=>2)
+    @db.sqls.should == ['BEGIN',
+      "INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) SELECT 5, 6 FROM foo",
       'COMMIT']
   end
 end

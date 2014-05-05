@@ -666,6 +666,11 @@ module Sequel
         end
       end
 
+      # SQLite supports a maximum of 500 rows in a VALUES clause.
+      def default_import_slice
+        500
+      end
+
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
         columns.map{|i| quote_identifier(i)}.join(COMMA)

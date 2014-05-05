@@ -1,5 +1,7 @@
 === HEAD
 
+* Support a default Dataset#import slice size, set to 500 on SQLite (jeremyevans) (#810)
+
 * Make :read_only transaction option be per-savepoint on PostgreSQL (jeremyevans) (#807)
 
 * Add :rank option to Dataset#full_text_search on PostgreSQL, to order by the ranking (jeremyevans) (#809)

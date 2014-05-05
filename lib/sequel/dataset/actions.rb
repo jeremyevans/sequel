@@ -279,7 +279,7 @@ module Sequel
       raise(Error, IMPORT_ERROR_MSG) if columns.empty?
       ds = opts[:server] ? server(opts[:server]) : self
       
-      if slice_size = opts[:commit_every] || opts[:slice]
+      if slice_size = opts.fetch(:commit_every, opts.fetch(:slice, default_import_slice))
         offset = 0
         rows = []
         while offset < values.length
@@ -887,6 +887,12 @@ module Sequel
       else
         SQL::AliasedExpression.new(v, :v)
       end
+    end
+
+    # The default number of rows that can be inserted in a single INSERT statement via import.
+    # The default is for no limit.
+    def default_import_slice
+      nil
     end
 
     # Set the server to use to :default unless it is already set in the passed opts
