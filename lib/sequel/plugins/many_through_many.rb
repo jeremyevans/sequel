@@ -9,14 +9,13 @@ module Sequel
     # The many_through_many plugin would allow this:
     #
     #    Artist.plugin :many_through_many
-    #    Artist.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    #    Artist.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums_tags, :album_id, :tag_id]]
     #
     # Which will give you the tags for all of the artist's albums.
     #
     # Let's break down the 2nd argument of the many_through_many call:
     #
     #   [[:albums_artists, :artist_id, :album_id],
-    #    [:albums, :id, :id],
     #    [:albums_tags, :album_id, :tag_id]]
     #
     # This argument is an array of arrays with three elements.  Each entry in the main array represents a JOIN in SQL:
@@ -29,8 +28,7 @@ module Sequel
     #
     #   FROM artists
     #   JOIN albums_artists ON (artists.id = albums_artists.artist_id)
-    #   JOIN albums ON (albums_artists.album_id = albums.id)
-    #   JOIN albums_tags ON (albums.id = albums_tag.album_id)
+    #   JOIN albums_tags ON (albums_artists.album_id = albums_tag.album_id)
     #   JOIN tags ON (albums_tags.tag_id = tags.id)
     #
     # The "artists.id" and "tags.id" criteria come from other association options (defaulting to the primary keys of the current and
@@ -42,20 +40,20 @@ module Sequel
     #   Artist.many_through_many :albums, [[:albums_artists, :artist_id, :album_id]]
     #
     #   # All artists that are associated to any album that this artist is associated to
-    #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]]
+    #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums_artists, :album_id, :artist_id]]
     #
     #   # All albums by artists that are associated to any album that this artist is associated to
-    #   Artist.many_through_many :artist_albums, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], \
-    #    [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]], \
+    #   Artist.many_through_many :artist_albums, [[:albums_artists, :artist_id, :album_id], \
+    #    [:albums_artists, :album_id, :artist_id], [:albums_artists, :artist_id, :album_id]], \
     #    :class=>:Album
     #
-    #   # All tracks on albums by this artist
-    #   Artist.many_through_many :tracks, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id]], \
+    #   # All tracks on albums by this artist (also could be a many_to_many)
+    #   Artist.many_through_many :tracks, [[:albums_artists, :artist_id, :album_id]], \
     #    :right_primary_key=>:album_id
     #
     # Often you don't want the current object to appear in the array of associated objects.  This is easiest to handle via an :after_load hook:
     # 
-    #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
+    #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums_artists, :album_id, :artist_id]],
     #     :after_load=>proc{|artist, associated_artists| associated_artists.delete(artist)}
     #
     # You can also handle it by adding a dataset block that excludes the current record (so it won't be retrieved at all), but
