@@ -32,7 +32,8 @@ module Sequel
     #   JOIN tags ON (albums_tags.tag_id = tags.id)
     #
     # The "artists.id" and "tags.id" criteria come from other association options (defaulting to the primary keys of the current and
-    # associated tables), but hopefully you can see how each argument in the array is used in the JOIN clauses.
+    # associated tables), but hopefully you can see how each argument in the array is used in the JOIN clauses. Note that you do
+    # not need to add an entry for the final table (tags in this example), as that comes from the associated class.
     #
     # Here are some more examples:
     #
