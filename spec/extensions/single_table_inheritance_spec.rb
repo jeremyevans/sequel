@@ -70,19 +70,27 @@ describe Sequel::Model, "single table inheritance plugin" do
     called.should == false
   end
 
-  it "should add a before_create hook that sets the model class name for the key" do
+  it "should set the model class name when saving" do
     StiTest.new.save
     StiTestSub1.new.save
     StiTestSub2.new.save
     DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 10)) LIMIT 1"]
   end
 
-  it "should have the before_create hook not override an existing value" do
+  it "should handle validations on the type column field" do
+    o = StiTestSub1.new
+    def o.validate
+      errors.add(:kind, 'not present') unless kind
+    end
+    o.valid?.should == true
+  end
+
+  it "should override an existing value in the class name field" do
     StiTest.create(:kind=>'StiTestSub1')
     DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
   end
 
-  it "should have the before_create hook handle columns with the same name as existing method names" do
+  it "should handle type column with the same name as existing method names" do
     StiTest.plugin :single_table_inheritance, :type
     StiTest.columns :id, :type
     StiTest.create

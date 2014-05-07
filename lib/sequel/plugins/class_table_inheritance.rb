@@ -196,8 +196,10 @@ module Sequel
 
       module InstanceMethods
         # Set the cti_key column to the name of the model.
-        def before_create
-          send("#{model.cti_key}=", model.name.to_s) if model.cti_key
+        def before_validation
+          if new? && model.cti_key
+            send("#{model.cti_key}=", model.name.to_s)
+          end
           super
         end
         

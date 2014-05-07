@@ -216,8 +216,10 @@ module Sequel
 
       module InstanceMethods
         # Set the sti_key column based on the sti_key_map.
-        def before_create
-          send("#{model.sti_key}=", model.sti_key_chooser.call(self)) unless self[model.sti_key]
+        def before_validation
+          if new? && !self[model.sti_key]
+            send("#{model.sti_key}=", model.sti_key_chooser.call(self))
+          end
           super
         end
       end

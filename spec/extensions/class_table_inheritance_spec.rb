@@ -104,19 +104,19 @@ describe "class_table_inheritance plugin" do
     Manager.all.collect{|x| x.class}.should == [Manager, Executive, Manager]
   end
 
-  it "should add a before_create hook that sets the model class name for the key" do
+  it "should sets the model class name for the key when creating new parent class records" do
     Employee.create
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Employee')"]
   end
   
-  it "should add a before_create hook that sets the model class name for the key in subclasses" do
+  it "should sets the model class name for the key when creating new subclass records" do
     Executive.create
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Executive')",
       "INSERT INTO managers (id) VALUES (1)",
       "INSERT INTO executives (id) VALUES (1)"]
   end
 
-  it "should ignore existing cti_key value" do
+  it "should ignore existing cti_key value when creating new records" do
     Employee.create(:kind=>'Manager')
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Employee')"]
   end
@@ -125,6 +125,14 @@ describe "class_table_inheritance plugin" do
     Manager.create(:kind=>'Executive')
     @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Manager')",
       "INSERT INTO managers (id) VALUES (1)"]
+  end
+
+  it "should handle validations on the type column field" do
+    o = Employee.new
+    def o.validate
+      errors.add(:kind, 'not present') unless kind
+    end
+    o.valid?.should == true
   end
 
   it "should raise an error if attempting to create an anonymous subclass" do
