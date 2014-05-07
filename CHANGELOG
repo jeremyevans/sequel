@@ -1,6 +1,6 @@
 === HEAD
 
-* Make inheritance plugins set class column before validation, works better with auto_validations (jeremyevans)
+* Make multiple plugins and set values before validation instead of before create, works better with auto_validations (jeremyevans)
 
 * Support a default Dataset#import slice size, set to 500 on SQLite (jeremyevans) (#810)
 

@@ -58,8 +58,8 @@ module Sequel
 
       module InstanceMethods
         # Set the create timestamp when creating
-        def before_create
-          set_create_timestamp
+        def before_validation
+          set_create_timestamp if new?
           super
         end
         

@@ -22,6 +22,16 @@ describe "Sequel::Plugins::Timestamps" do
     Sequel.datetime_class = Time
   end
   
+  it "should handle validations on the timestamp fields for new objects" do
+    @c.plugin :timestamps, :update_on_create=>true
+    o = @c.new
+    def o.validate
+      errors.add(model.create_timestamp_field, 'not present') unless send(model.create_timestamp_field)
+      errors.add(model.update_timestamp_field, 'not present') unless send(model.update_timestamp_field)
+    end
+    o.valid?.should == true
+  end
+
   it "should set the create timestamp field on creation" do
     o = @c.create
     @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
