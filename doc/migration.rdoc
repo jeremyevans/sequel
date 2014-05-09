@@ -23,6 +23,9 @@ you generally need to run Sequel's migrator with <tt>bin/sequel -m</tt>:
 
   sequel -m path/to/migrations postgres://host/database
 
+Note: The files containing the migrations should be prefixed with a number
+greater than zero, e.g. <tt>001_initial_migration.rb</tt>.
+
 Migrations in Sequel use a very simple DSL via the <tt>Sequel.migration</tt>
 method, and inside the DSL, use the <tt>Sequel::Database</tt> schema
 modification methods such as +create_table+ and +alter_table+.
