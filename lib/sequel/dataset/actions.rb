@@ -572,13 +572,13 @@ module Sequel
     # Returns a hash with key_column values as keys and an array of value_column values.
     # Similar to to_hash_groups, but only selects the columns given.
     #
-    #   DB[:table].select_hash(:name, :id) # SELECT id, name FROM table
+    #   DB[:table].select_hash_groups(:name, :id) # SELECT id, name FROM table
     #   # => {'a'=>[1, 4, ...], 'b'=>[2, ...], ...}
     #
     # You can also provide an array of column names for either the key_column,
     # the value column, or both:
     #
-    #   DB[:table].select_hash([:first, :middle], [:last, :id]) # SELECT * FROM table
+    #   DB[:table].select_hash_groups([:first, :middle], [:last, :id]) # SELECT * FROM table
     #   # {['a', 'b']=>[['c', 1], ['d', 2], ...], ...}
     #
     # When using this method, you must be sure that each expression has an alias
@@ -708,19 +708,19 @@ module Sequel
     # array of column values. If the value_column is not given or nil, uses
     # the entire hash as the value.
     #
-    #   DB[:table].to_hash(:name, :id) # SELECT * FROM table
+    #   DB[:table].to_hash_groups(:name, :id) # SELECT * FROM table
     #   # {'Jim'=>[1, 4, 16, ...], 'Bob'=>[2], ...}
     #
-    #   DB[:table].to_hash(:name) # SELECT * FROM table
+    #   DB[:table].to_hash_groups(:name) # SELECT * FROM table
     #   # {'Jim'=>[{:id=>1, :name=>'Jim'}, {:id=>4, :name=>'Jim'}, ...], 'Bob'=>[{:id=>2, :name=>'Bob'}], ...}
     #
     # You can also provide an array of column names for either the key_column,
     # the value column, or both:
     #
-    #   DB[:table].to_hash([:first, :middle], [:last, :id]) # SELECT * FROM table
+    #   DB[:table].to_hash_groups([:first, :middle], [:last, :id]) # SELECT * FROM table
     #   # {['Jim', 'Bob']=>[['Smith', 1], ['Jackson', 4], ...], ...}
     #
-    #   DB[:table].to_hash([:first, :middle]) # SELECT * FROM table
+    #   DB[:table].to_hash_groups([:first, :middle]) # SELECT * FROM table
     #   # {['Jim', 'Bob']=>[{:id=>1, :first=>'Jim', :middle=>'Bob', :last=>'Smith'}, ...], ...}
     def to_hash_groups(key_column, value_column = nil)
       h = {}
