@@ -909,8 +909,8 @@ shared_examples_for "All connection pools classes" do
   
   specify "should have respect an :after_connect proc that is called with each newly created connection" do
     x = nil
-    @class.new(mock_db.call{123}, :after_connect=>proc{|c| x = [c, c]}).hold{}
-    x.should == [123, 123]
+    @class.new(mock_db.call{123}, :after_connect=>proc{|c, s| x = [c, s]}).hold{}
+    x.should == [123, :default]
   end
   
   specify "should raise a DatabaseConnectionError if the connection raises an exception" do

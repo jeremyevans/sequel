@@ -94,7 +94,7 @@ class Sequel::ConnectionPool
   def make_new(server)
     begin
       conn = @db.connect(server)
-      @after_connect.call(conn) if @after_connect
+      @after_connect.call(conn, server) if @after_connect
     rescue Exception=>exception
       raise Sequel.convert_exception_class(exception, Sequel::DatabaseConnectionError)
     end
