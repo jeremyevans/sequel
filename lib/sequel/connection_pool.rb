@@ -69,9 +69,9 @@ class Sequel::ConnectionPool
   # with a single symbol (specifying the server/shard to use) every time a new
   # connection is needed.  The following options are respected for all connection
   # pools:
-  # :after_connect :: The proc called after each new connection is made, with the
-  #                   connection object, useful for customizations that you want to apply to all
-  #                   connections.
+  # :after_connect :: A callable object called after each new connection is made, with the
+  #                   connection object (and server argument if the callable accepts 2 arguments),
+  #                   useful for customizations that you want to apply to all connections.
   def initialize(db, opts=OPTS)
     @db = db
     @after_connect = opts[:after_connect]
@@ -94,7 +94,13 @@ class Sequel::ConnectionPool
   def make_new(server)
     begin
       conn = @db.connect(server)
-      @after_connect.call(conn, server) if @after_connect
+      if ac = @after_connect
+        if ac.arity == 2
+          ac.call(conn, server)
+        else
+          ac.call(conn)
+        end
+      end
     rescue Exception=>exception
       raise Sequel.convert_exception_class(exception, Sequel::DatabaseConnectionError)
     end

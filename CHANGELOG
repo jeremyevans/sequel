@@ -1,6 +1,8 @@
 === HEAD
 
-* Make multiple plugins and set values before validation instead of before create, works better with auto_validations (jeremyevans)
+* Call the :after_connect Database option proc with both the connection and server/shard if it accepts 2 arguments (pedro, jeremyevans) (#813)
+
+* Make multiple plugins set values before validation instead of before create, works better with auto_validations (jeremyevans)
 
 * Support a default Dataset#import slice size, set to 500 on SQLite (jeremyevans) (#810)
 
