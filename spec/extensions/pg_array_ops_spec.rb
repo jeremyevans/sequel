@@ -63,6 +63,10 @@ describe "Sequel::Postgres::ArrayOp" do
     @db.literal(@a.unshift(:b)).should == "(b || a)"
   end
 
+  it "#cardinality should use the cardinality function" do
+    @db.literal(@a.cardinality).should == "cardinality(a)"
+  end
+
   it "#dims should use the array_dims function" do
     @db.literal(@a.dims).should == "array_dims(a)"
   end

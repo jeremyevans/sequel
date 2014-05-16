@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Postgres::ArrayOp#cardinality to the pg_array_ops extension (jeremyevans)
+
 * Add :check option to Database#create_view for WITH [LOCAL] CHECK OPTION support (jeremyevans)
 
 * Add :concurrently option to Database#refresh_view on PostgreSQL to support concurrent refresh of materialized views (jeremyevans)

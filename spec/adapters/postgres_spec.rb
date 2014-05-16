@@ -2247,6 +2247,11 @@ describe 'PostgreSQL array handling' do
       @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([1])).should == false
       @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([4])).should == true
     end
+    if @db.server_version >= 90400
+      @ds.get(Sequel.pg_array(:i).cardinality).should == 3
+      @ds.get(Sequel.pg_array(:i4).cardinality).should == 4
+      @ds.get(Sequel.pg_array(:i5).cardinality).should == 3
+    end
 
     if @native
       @ds.get(Sequel.pg_array(:i).push(4)).should == [1, 2, 3, 4]

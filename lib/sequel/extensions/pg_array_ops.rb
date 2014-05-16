@@ -41,6 +41,7 @@
 #
 #   ia.any             # ANY(int_array_column)
 #   ia.all             # ALL(int_array_column)
+#   ia.cardinality     # cardinality(int_array_column)
 #   ia.dims            # array_dims(int_array_column)
 #   ia.hstore          # hstore(int_array_column)
 #   ia.hstore(:a)      # hstore(int_array_column, a)
@@ -109,6 +110,13 @@ module Sequel
       #   # WHERE (1 = ANY(array))
       def any
         function(:ANY)
+      end
+
+      # Call the cardinality method:
+      #
+      #   array_op.cardinality # cardinality(array)
+      def cardinality
+        function(:cardinality)
       end
 
       # Use the contains (@>) operator:
