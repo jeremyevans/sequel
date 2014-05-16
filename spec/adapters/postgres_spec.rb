@@ -2251,6 +2251,8 @@ describe 'PostgreSQL array handling' do
       @ds.get(Sequel.pg_array(:i).cardinality).should == 3
       @ds.get(Sequel.pg_array(:i4).cardinality).should == 4
       @ds.get(Sequel.pg_array(:i5).cardinality).should == 3
+
+      @ds.from{Sequel.pg_array([1,2,3]).op.unnest([4,5,6], [7,8]).as(Sequel.lit('t1(a, b, c)'))}.select_order_map([:a, :b, :c]).should == [[1, 4, 7], [2, 5, 8], [3, 6, nil]]
     end
 
     if @native

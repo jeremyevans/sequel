@@ -99,6 +99,8 @@ describe "Sequel::Postgres::ArrayOp" do
 
   it "#unnest should use the unnest function" do
     @db.literal(@a.unnest).should == "unnest(a)"
+    @db.literal(@a.unnest(:b, :c)).should == "unnest(a, b, c)"
+    @db.literal(@a.unnest([1])).should == "unnest(a, ARRAY[1])"
   end
 
   it "#pg_array should return self" do

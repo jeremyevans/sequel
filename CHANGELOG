@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Postgres::ArrayOp#unnest to accept arguments in the pg_array_ops extension (jeremyevans)
+
 * Add Postgres::ArrayOp#cardinality to the pg_array_ops extension (jeremyevans)
 
 * Add :check option to Database#create_view for WITH [LOCAL] CHECK OPTION support (jeremyevans)

@@ -53,6 +53,7 @@
 #   ia.join(':')       # array_to_string(int_array_column, ':', NULL)
 #   ia.join(':', ' ')  # array_to_string(int_array_column, ':', ' ')
 #   ia.unnest          # unnest(int_array_column)
+#   ia.unnest(:b)      # unnest(int_array_column, b)
 # 
 # See the PostgreSQL array function and operator documentation for more
 # details on what these functions and operators do.
@@ -223,8 +224,8 @@ module Sequel
       # Call the unnest method:
       #
       #   array_op.unnest # unnest(array)
-      def unnest
-        function(:unnest)
+      def unnest(*args)
+        function(:unnest, *args.map{|a| wrap_array(a)})
       end
       
       # Use the concatentation (||) operator, reversing the order:
