@@ -1105,6 +1105,11 @@ module Sequel
           :text
         end
       end
+
+      # PostgreSQL 9.4+ supports views with check option.
+      def view_with_check_option_support
+        :local if server_version >= 90400
+      end
     end
 
     # Instance methods for datasets that connect to a PostgreSQL database.

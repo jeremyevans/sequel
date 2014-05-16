@@ -1399,6 +1399,13 @@ describe "Database#create_view" do
     @db.sqls.should == ['CREATE VIEW test (d, e) AS SELECT a, b FROM items ORDER BY c']
   end
 
+  specify "should handle :check option" do
+    @db.create_view :test, @db[:items].select(:a, :b).order(:c), :check=>true
+    @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c WITH CHECK OPTION']
+    @db.create_view :test, @db[:items].select(:a, :b).order(:c), :check=>:local
+    @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c WITH LOCAL CHECK OPTION']
+  end
+
   specify "should handle create_or_replace_view" do
     @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
     @db.sqls.should == ['DROP VIEW sch.test', 'CREATE VIEW sch.test AS SELECT * FROM xyz']

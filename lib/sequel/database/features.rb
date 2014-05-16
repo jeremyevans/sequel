@@ -94,6 +94,16 @@ module Sequel
       false
     end
 
+    # Whether CREATE VIEW ... WITH CHECK OPTION is supported, false by default.
+    def supports_views_with_check_option?
+      !!view_with_check_option_support
+    end
+
+    # Whether CREATE VIEW ... WITH LOCAL CHECK OPTION is supported, false by default.
+    def supports_views_with_local_check_option?
+      view_with_check_option_support == :local
+    end
+
     private
 
     # Whether the database supports combining multiple alter table
@@ -114,6 +124,11 @@ module Sequel
     # if the column constraints have names.
     def supports_named_column_constraints?
       true
+    end
+
+    # Don't advertise support for WITH CHECK OPTION by default.
+    def view_with_check_option_support
+      nil
     end
   end
 end

@@ -222,6 +222,11 @@ module Sequel
       def uses_clob_for_text?
         true
       end
+
+      # DB2 supports views with check option.
+      def view_with_check_option_support
+        :local
+      end
     end
 
     module DatasetMethods

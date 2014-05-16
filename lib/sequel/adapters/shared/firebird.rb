@@ -146,6 +146,11 @@ module Sequel
       def type_literal_generic_string(column)
         column[:text] ? :"BLOB SUB_TYPE TEXT" : super
       end
+
+      # Firebird supports views with check option, but not local.
+      def view_with_check_option_support
+        true
+      end
     end
 
     module DatasetMethods

@@ -129,12 +129,12 @@ module Sequel
         true
       end
       
-      # MySQL supports prepared transactions (two-phase commit) using XA
+      # MySQL 5+ supports prepared transactions (two-phase commit) using XA
       def supports_prepared_transactions?
         server_version >= 50000
       end
 
-      # MySQL supports savepoints
+      # MySQL 5+ supports savepoints
       def supports_savepoints?
         server_version >= 50000
       end
@@ -539,6 +539,11 @@ module Sequel
       # MySQL doesn't have a true boolean class, so it uses tinyint(1)
       def type_literal_generic_trueclass(column)
         :'tinyint(1)'
+      end
+
+      # MySQL 5.0.2+ supports views with check option.
+      def view_with_check_option_support
+        :local if server_version >= 50002
       end
     end
   

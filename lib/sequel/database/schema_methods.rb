@@ -241,16 +241,30 @@ module Sequel
     # Creates a view based on a dataset or an SQL string:
     #
     #   DB.create_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
-    #   DB.create_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
+    #   # CREATE VIEW cheap_items AS
+    #   # SELECT * FROM items WHERE price < 100
+    #
+    #   DB.create_view(:ruby_items, DB[:items].where(:category => 'ruby'))
+    #   # CREATE VIEW ruby_items AS
+    #   # SELECT * FROM items WHERE (category = 'ruby')
+    #
+    #   DB.create_view(:checked_items, DB[:items].where(:foo), :check=>true)
+    #   # CREATE VIEW checked_items AS
+    #   # SELECT * FROM items WHERE foo
+    #   # WITH CHECK OPTION
     #
     # Options:
     # :columns :: The column names to use for the view.  If not given,
     #             automatically determined based on the input dataset.
+    # :check :: Adds a WITH CHECK OPTION clause, so that attempting to modify 
+    #           rows in the underlying table that would not be returned by the
+    #           view is not allowed.  This can be set to :local to use WITH
+    #           LOCAL CHECK OPTION.
     #
     # PostgreSQL/SQLite specific option:
     # :temp :: Create a temporary view, automatically dropped on disconnect.
     #
-    # PostgreSQL specific option:
+    # PostgreSQL specific options:
     # :materialized :: Creates a materialized view, similar to a regular view,
     #                  but backed by a physical table.
     # :recursive :: Creates a recursive view.  As columns must be specified for
@@ -683,7 +697,11 @@ module Sequel
     # DDL statement for creating a view.
     def create_view_sql(name, source, options)
       source = source.sql if source.is_a?(Dataset)
-      "#{create_view_prefix_sql(name, options)} AS #{source}"
+      sql = "#{create_view_prefix_sql(name, options)} AS #{source}"
+      if check = options[:check]
+        sql << " WITH#{' LOCAL' if check == :local} CHECK OPTION"
+      end
+      sql
     end
 
     # Append the column list to the SQL, if a column list is given.

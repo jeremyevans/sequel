@@ -272,12 +272,14 @@ describe "Database schema modifiers" do
 
   describe "views" do
     before do
+      @db.drop_view(:items_view2) rescue nil
       @db.drop_view(:items_view) rescue nil
       @db.create_table(:items){Integer :number}
       @ds.insert(:number=>1)
       @ds.insert(:number=>2)
     end
     after do
+      @db.drop_view(:items_view2) rescue nil
       @db.drop_view(:items_view) rescue nil
     end
 
@@ -285,6 +287,31 @@ describe "Database schema modifiers" do
       @db.create_view(:items_view, @ds.where(:number=>1))
       @db[:items_view].map(:number).should == [1]
     end
+
+    specify "should create views with check options correctly" do
+      @db.create_view(:items_view, @ds.where{number > 2}, :check=>true)
+      proc{@db[:items_view].insert(1)}.should raise_error(Sequel::DatabaseError)
+      @db[:items_view].insert(3)
+      @db[:items_view].select_order_map(:number).should == [3]
+      @db.create_view(:items_view2, @db[:items_view].where{number > 1}, :check=>true)
+      proc{@db[:items_view2].insert(1)}.should raise_error(Sequel::DatabaseError)
+      proc{@db[:items_view2].insert(2)}.should raise_error(Sequel::DatabaseError)
+      @db[:items_view2].insert(4)
+      @db[:items_view2].select_order_map(:number).should == [3, 4]
+      @ds.select_order_map(:number).should == [1, 2, 3, 4]
+    end if DB.supports_views_with_check_option?
+
+    specify "should create views with local check options correctly" do
+      @db.create_view(:items_view, @ds.where{number > 2})
+      @db[:items_view].insert(3)
+      @db[:items_view].select_order_map(:number).should == [3]
+      @db.create_view(:items_view2, @db[:items_view].where{number > 1}, :check=>:local)
+      proc{@db[:items_view2].insert(1)}.should raise_error(Sequel::DatabaseError)
+      @db[:items_view2].insert(2)
+      @db[:items_view2].insert(4)
+      @db[:items_view2].select_order_map(:number).should == [3, 4]
+      @ds.select_order_map(:number).should == [1, 2, 2, 3, 4]
+    end if DB.supports_views_with_local_check_option?
 
     cspecify "should create views with explicit columns correctly", :sqlite do
       @db.create_view(:items_view, @ds.where(:number=>1), :columns=>[:n])

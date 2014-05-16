@@ -162,6 +162,11 @@ module Sequel
       def uses_clob_for_text?
         true
       end
+
+      # CUBRID supports views with check option, but not local.
+      def view_with_check_option_support
+        true
+      end
     end
     
     module DatasetMethods

@@ -301,7 +301,7 @@ module Sequel
       def begin_transaction_sql
         SQL_BEGIN
       end
-      
+
       # Handle MSSQL specific default format.
       def column_schema_normalize_default(default, type)
         if m = MSSQL_DEFAULT_RE.match(default)
@@ -486,6 +486,11 @@ module Sequel
       # MSSQL uses varbinary(max) type for blobs
       def type_literal_generic_file(column)
         :'varbinary(max)'
+      end
+      
+      # MSSQL supports views with check option, but not local.
+      def view_with_check_option_support
+        true
       end
     end
   

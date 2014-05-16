@@ -2184,6 +2184,18 @@ describe "Database#supports_savepoints?" do
   end
 end
 
+describe "Database#supports_views_with_check_option?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_views_with_check_option?.should == false
+  end
+end
+
+describe "Database#supports_views_with_local_check_option?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_views_with_local_check_option?.should == false
+  end
+end
+
 describe "Database#supports_savepoints_in_prepared_transactions?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_savepoints_in_prepared_transactions?.should == false
