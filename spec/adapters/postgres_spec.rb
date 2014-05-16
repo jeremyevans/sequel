@@ -117,8 +117,8 @@ end
 describe "PostgreSQL views" do
   before do
     @db = DB
-    @db.drop_view(:items_view, :cascade=>true, :if_exists=>true)
-    @db.create_table!(:items){Integer :number}
+    @db.drop_table?(:items, :cascade=>true)
+    @db.create_table(:items){Integer :number}
     @db[:items].insert(10)
     @db[:items].insert(20)
   end
@@ -151,6 +151,15 @@ describe "PostgreSQL views" do
     @db.refresh_view(:items_view)
     @db[:items_view].select_order_map(:number).should == [10, 15, 20]
   end if DB.server_version >= 90300
+
+  specify "should support refreshing materialized views concurrently" do
+    @opts = {:materialized=>true}
+    @db.create_view(:items_view, @db[:items].where{number >= 10}, @opts)
+    @db.refresh_view(:items_view)
+    proc{@db.refresh_view(:items_view, :concurrently=>true)}.should raise_error(Sequel::DatabaseError)
+    @db.add_index :items_view, :number, :unique=>true
+    proc{@db.refresh_view(:items_view, :concurrently=>true)}.should_not raise_error
+  end if DB.server_version >= 90400
 
   specify "should support :if_exists=>true for not raising an error if the view does not exist" do
     proc{@db.drop_view(:items_view, :if_exists=>true)}.should_not raise_error
