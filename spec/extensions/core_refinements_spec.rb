@@ -483,6 +483,10 @@ describe "Postgres extensions integration" do
     @db.literal([1].pg_json).should == "'[1]'::json"
   end
 
+  it "Array#pg_jsonb should return a JSONBArray" do
+    @db.literal([1].pg_jsonb).should == "'[1]'::jsonb"
+  end
+
   it "Array#pg_row should return a ArrayRow" do
     @db.literal([1].pg_row).should == "ROW(1)"
   end
@@ -493,6 +497,10 @@ describe "Postgres extensions integration" do
 
   it "Hash#pg_json should return an JSONHash" do
     @db.literal({'a'=>'b'}.pg_json).should == "'{\"a\":\"b\"}'::json"
+  end
+
+  it "Hash#pg_jsonb should return an JSONBHash" do
+    @db.literal({'a'=>'b'}.pg_jsonb).should == "'{\"a\":\"b\"}'::jsonb"
   end
 
   it "Range#pg_range should return an PGRange" do

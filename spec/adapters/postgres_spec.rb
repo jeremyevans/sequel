@@ -2532,58 +2532,76 @@ describe 'PostgreSQL json type' do
     @db.drop_table?(:items)
   end
 
-  specify 'insert and retrieve json values' do
-    @db.create_table!(:items){json :j}
-    @ds.insert(Sequel.pg_json(@h))
-    @ds.count.should == 1
-    if @native
-      rs = @ds.all
-      v = rs.first[:j]
-      v.should_not be_a_kind_of(Hash)
-      v.to_hash.should be_a_kind_of(Hash)
-      v.should == @h
-      v.to_hash.should == @h
+  json_types = [:json]
+  json_types << :jsonb if DB.server_version >= 90400
+  json_types.each do |json_type|
+    json_array_type = "#{json_type}[]"
+    pg_json = lambda{|v| Sequel.send(:"pg_#{json_type}", v)}
+
+    specify 'insert and retrieve json values' do
+      @db.create_table!(:items){column :j, json_type}
+      @ds.insert(pg_json.call(@h))
+      @ds.count.should == 1
+      if @native
+        rs = @ds.all
+        v = rs.first[:j]
+        v.should_not be_a_kind_of(Hash)
+        v.to_hash.should be_a_kind_of(Hash)
+        v.should == @h
+        v.to_hash.should == @h
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+      end
+
       @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.insert(pg_json.call(@a))
+      @ds.count.should == 1
+      if @native
+        rs = @ds.all
+        v = rs.first[:j]
+        v.should_not be_a_kind_of(Array)
+        v.to_a.should be_a_kind_of(Array)
+        v.should == @a
+        v.to_a.should == @a
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+      end
     end
 
-    @ds.delete
-    @ds.insert(Sequel.pg_json(@a))
-    @ds.count.should == 1
-    if @native
-      rs = @ds.all
-      v = rs.first[:j]
-      v.should_not be_a_kind_of(Array)
-      v.to_a.should be_a_kind_of(Array)
-      v.should == @a
-      v.to_a.should == @a
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.should == rs
+    specify 'insert and retrieve json[] values' do
+      @db.create_table!(:items){column :j, json_array_type}
+      j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])])
+      @ds.insert(j)
+      @ds.count.should == 1
+      if @native
+        rs = @ds.all
+        v = rs.first[:j]
+        v.should_not be_a_kind_of(Array)
+        v.to_a.should be_a_kind_of(Array)
+        v.should == j
+        v.to_a.should == j
+        @ds.delete
+        @ds.insert(rs.first)
+        @ds.all.should == rs
+      end
     end
-  end
 
-  specify 'insert and retrieve json[] values' do
-    @db.create_table!(:items){column :j, 'json[]'}
-    j = Sequel.pg_array([Sequel.pg_json('a'=>1), Sequel.pg_json(['b', 2])])
-    @ds.insert(j)
-    @ds.count.should == 1
-    if @native
-      rs = @ds.all
-      v = rs.first[:j]
-      v.should_not be_a_kind_of(Array)
-      v.to_a.should be_a_kind_of(Array)
-      v.should == j
-      v.to_a.should == j
-      @ds.delete
-      @ds.insert(rs.first)
-      @ds.all.should == rs
+    specify 'with models' do
+      @db.create_table!(:items) do
+        primary_key :id
+        column :h, json_type
+      end
+      c = Class.new(Sequel::Model(@db[:items]))
+      c.plugin :pg_typecast_on_load, :h unless @native
+      c.create(:h=>pg_json.call(@h)).h.should == @h
+      c.create(:h=>pg_json.call(@a)).h.should == @a
     end
   end
 
   specify 'use json in bound variables' do
-    @db.create_table!(:items){json :i}
+    @db.create_table!(:items){column :i, :json}
     @ds.call(:insert, {:i=>Sequel.pg_json(@h)}, {:i=>:$i})
     @ds.get(:i).should == @h
     @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>Sequel.pg_json(@h)).should == {:i=>@h}
@@ -2606,17 +2624,6 @@ describe 'PostgreSQL json type' do
     @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>j).should == {:i=>j}
     @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>Sequel.pg_array([])).should == nil
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
-
-  specify 'with models' do
-    @db.create_table!(:items) do
-      primary_key :id
-      json :h
-    end
-    c = Class.new(Sequel::Model(@db[:items]))
-    c.plugin :pg_typecast_on_load, :h unless @native
-    c.create(:h=>Sequel.pg_json(@h)).h.should == @h
-    c.create(:h=>Sequel.pg_json(@a)).h.should == @a
-  end
 
   specify 'operations/functions with pg_json_ops' do
     Sequel.extension :pg_json_ops

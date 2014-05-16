@@ -64,42 +64,74 @@ Sequel.require 'adapters/utils/pg_types'
 module Sequel
   module Postgres
     CAST_JSON = '::json'.freeze
+    CAST_JSONB = '::jsonb'.freeze
 
-    # Class representating PostgreSQL JSON column array values.
-    class JSONArray < DelegateClass(Array)
+    # Class representing PostgreSQL JSON/JSONB column array values.
+    class JSONArrayBase < DelegateClass(Array)
       include Sequel::SQL::AliasMethods
+      include Sequel::SQL::CastMethods
 
-      # Convert the array to a json string, append a
-      # literalized version of the string to the sql, and explicitly
-      # cast the string to json.
+      # Convert the array to a json string and append a
+      # literalized version of the string to the sql.
       def sql_literal_append(ds, sql)
         ds.literal_append(sql, Sequel.object_to_json(self))
+      end
+    end
+
+    class JSONArray < JSONArrayBase
+      # Cast as json
+      def sql_literal_append(ds, sql)
+        super
         sql << CAST_JSON
       end
     end
 
-    # Class representating PostgreSQL JSON column hash/object values.
-    class JSONHash < DelegateClass(Hash)
-      include Sequel::SQL::AliasMethods
+    class JSONBArray < JSONArrayBase
+      # Cast as jsonb
+      def sql_literal_append(ds, sql)
+        super
+        sql << CAST_JSONB
+      end
+    end
 
-      # Convert the hash to a json string, append a
-      # literalized version of the string to the sql, and explicitly
-      # cast the string to json.
+    # Class representing PostgreSQL JSON/JSONB column hash/object values.
+    class JSONHashBase < DelegateClass(Hash)
+      include Sequel::SQL::AliasMethods
+      include Sequel::SQL::CastMethods
+
+      # Convert the hash to a json string and append a
+      # literalized version of the string to the sql.
       def sql_literal_append(ds, sql)
         ds.literal_append(sql, Sequel.object_to_json(self))
-        sql << CAST_JSON
       end
 
       # Return the object being delegated to.
       alias to_hash __getobj__
     end
 
+    class JSONHash < JSONHashBase
+      # Cast as json
+      def sql_literal_append(ds, sql)
+        super
+        sql << CAST_JSON
+      end
+    end
+
+    class JSONBHash < JSONHashBase
+      # Cast as jsonb
+      def sql_literal_append(ds, sql)
+        super
+        sql << CAST_JSONB
+      end
+    end
+
     # Methods enabling Database object integration with the json type.
     module JSONDatabaseMethods
       def self.extended(db)
         db.instance_eval do
-          copy_conversion_procs([114, 199])
+          copy_conversion_procs([114, 199, 3802, 3807])
           @schema_type_classes[:json] = [JSONHash, JSONArray]
+          @schema_type_classes[:jsonb] = [JSONBHash, JSONBArray]
         end
       end
 
@@ -113,10 +145,18 @@ module Sequel
         parse_json("[#{s}]").first
       end
 
+      # Same as db_parse_json, but consider the input as jsonb.
+      def self.db_parse_jsonb(s)
+        parse_json(s, true)
+      rescue Sequel::InvalidValue
+        raise unless s.is_a?(String)
+        parse_json("[#{s}]").first
+      end
+
       # Parse the given string as json, returning either a JSONArray
       # or JSONHash instance, and raising an error if the JSON
       # parsing does not yield an array or hash.
-      def self.parse_json(s)
+      def self.parse_json(s, jsonb=false)
         begin
           value = Sequel.parse_json(s)
         rescue Sequel.json_parser_error_class => e
@@ -125,9 +165,9 @@ module Sequel
 
         case value
         when Array
-          JSONArray.new(value)
+          (jsonb ? JSONBArray : JSONArray).new(value)
         when Hash 
-          JSONHash.new(value)
+          (jsonb ? JSONBHash : JSONHash).new(value)
         else
           raise Sequel::InvalidValue, "unhandled json value: #{value.inspect} (from #{s.inspect})"
         end
@@ -136,7 +176,7 @@ module Sequel
       # Handle JSONArray and JSONHash in bound variables
       def bound_variable_arg(arg, conn)
         case arg
-        when JSONArray, JSONHash
+        when JSONArrayBase, JSONHashBase
           Sequel.object_to_json(arg)
         else
           super
@@ -148,7 +188,7 @@ module Sequel
       # Handle json[] types in bound variables.
       def bound_variable_array(a)
         case a
-        when JSONHash, JSONArray
+        when JSONHashBase, JSONArrayBase
           "\"#{Sequel.object_to_json(a).gsub('"', '\\"')}\""
         else
           super
@@ -160,17 +200,14 @@ module Sequel
         case db_type
         when 'json'
           :json
+        when 'jsonb'
+          :jsonb
         else
           super
         end
       end
 
-      # Given a value to typecast to the json column
-      # * If given a JSONArray or JSONHash, just return the value
-      # * If given an Array, return a JSONArray
-      # * If given a Hash, return a JSONHash
-      # * If given a String, parse it as would be done during
-      #   database retrieval.
+      # Convert the value given to a JSONArray or JSONHash
       def typecast_value_json(value)
         case value
         when JSONArray, JSONHash
@@ -179,17 +216,43 @@ module Sequel
           JSONArray.new(value)
         when Hash 
           JSONHash.new(value)
+        when JSONBArray
+          JSONArray.new(value.to_a)
+        when JSONBHash
+          JSONHash.new(value.to_hash)
         when String
           JSONDatabaseMethods.parse_json(value)
         else
           raise Sequel::InvalidValue, "invalid value for json: #{value.inspect}"
         end
       end
+
+      # Convert the value given to a JSONBArray or JSONBHash
+      def typecast_value_jsonb(value)
+        case value
+        when JSONBArray, JSONBHash
+          value
+        when Array
+          JSONBArray.new(value)
+        when Hash 
+          JSONBHash.new(value)
+        when JSONArray
+          JSONBArray.new(value.to_a)
+        when JSONHash
+          JSONBHash.new(value.to_hash)
+        when String
+          JSONDatabaseMethods.parse_json(value, true)
+        else
+          raise Sequel::InvalidValue, "invalid value for jsonb: #{value.inspect}"
+        end
+      end
     end
 
     PG_TYPES[114] = JSONDatabaseMethods.method(:db_parse_json)
+    PG_TYPES[3802] = JSONDatabaseMethods.method(:db_parse_jsonb)
     if defined?(PGArray) && PGArray.respond_to?(:register)
       PGArray.register('json', :oid=>199, :scalar_oid=>114)
+      PGArray.register('jsonb', :oid=>3807, :scalar_oid=>3802)
     end
   end
 
@@ -203,6 +266,28 @@ module Sequel
         Postgres::JSONArray.new(v)
       when Hash
         Postgres::JSONHash.new(v)
+      when Postgres::JSONBArray
+        Postgres::JSONArray.new(v.to_a)
+      when Postgres::JSONBHash
+        Postgres::JSONHash.new(v.to_hash)
+      else
+        Sequel.pg_json_op(v)
+      end
+    end
+
+    # Wrap the array or hash in a Postgres::JSONArray or Postgres::JSONHash.
+    def pg_jsonb(v)
+      case v
+      when Postgres::JSONBArray, Postgres::JSONBHash
+        v
+      when Array
+        Postgres::JSONBArray.new(v)
+      when Hash
+        Postgres::JSONBHash.new(v)
+      when Postgres::JSONArray
+        Postgres::JSONBArray.new(v.to_a)
+      when Postgres::JSONHash
+        Postgres::JSONBHash.new(v.to_hash)
       else
         Sequel.pg_json_op(v)
       end
@@ -221,6 +306,13 @@ if Sequel.core_extensions?
     def pg_json
       Sequel::Postgres::JSONArray.new(self)
     end
+
+    # Return a Sequel::Postgres::JSONArray proxy to the receiver.
+    # This is mostly useful as a short cut for creating JSONArray
+    # objects that didn't come from the database.
+    def pg_jsonb
+      Sequel::Postgres::JSONBArray.new(self)
+    end
   end
 
   class Hash
@@ -229,6 +321,13 @@ if Sequel.core_extensions?
     # objects that didn't come from the database.
     def pg_json
       Sequel::Postgres::JSONHash.new(self)
+    end
+
+    # Return a Sequel::Postgres::JSONHash proxy to the receiver.
+    # This is mostly useful as a short cut for creating JSONHash
+    # objects that didn't come from the database.
+    def pg_jsonb
+      Sequel::Postgres::JSONBHash.new(self)
     end
   end
 end
@@ -239,11 +338,19 @@ if defined?(Sequel::CoreRefinements)
       def pg_json
         Sequel::Postgres::JSONArray.new(self)
       end
+
+      def pg_jsonb
+        Sequel::Postgres::JSONBArray.new(self)
+      end
     end
 
     refine Hash do
       def pg_json
         Sequel::Postgres::JSONHash.new(self)
+      end
+
+      def pg_jsonb
+        Sequel::Postgres::JSONBHash.new(self)
       end
     end
   end

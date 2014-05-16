@@ -1,5 +1,7 @@
 === HEAD
 
+* Support PostgreSQL 9.4+ jsonb type in the pg_json extension (jeremyevans)
+
 * Allow Postgres::ArrayOp#unnest to accept arguments in the pg_array_ops extension (jeremyevans)
 
 * Add Postgres::ArrayOp#cardinality to the pg_array_ops extension (jeremyevans)
