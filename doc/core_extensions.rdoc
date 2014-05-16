@@ -164,7 +164,7 @@ Note the reversed order of the arguments.  For the Symbol#qualify method, the ar
 
 Symbol#like returns a case sensitive LIKE expression between the identifier and the given argument:
 
-  :a.like('b%') # SQL: a LIKE 'b%'
+  :a.like('b%') # SQL: a LIKE 'b%' ESCAPE '\'
 
 Alternative: Sequel.like:
 
@@ -174,7 +174,7 @@ Alternative: Sequel.like:
 
 Symbol#ilike returns a case insensitive LIKE expression between the identifier and the given argument:
 
-  :a.ilike('b%') # SQL: a ILIKE 'b%'
+  :a.ilike('b%') # SQL: a ILIKE 'b%' ESCAPE '\'
 
 Alternative: Sequel.ilike:
 

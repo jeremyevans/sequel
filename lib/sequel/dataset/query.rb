@@ -237,19 +237,23 @@ module Sequel
     # Examples:
     #
     #   dataset.grep(:a, '%test%')
-    #   # SELECT * FROM items WHERE (a LIKE '%test%')
+    #   # SELECT * FROM items WHERE (a LIKE '%test%' ESCAPE '\')
     #
     #   dataset.grep([:a, :b], %w'%test% foo')
-    #   # SELECT * FROM items WHERE ((a LIKE '%test%') OR (a LIKE 'foo') OR (b LIKE '%test%') OR (b LIKE 'foo'))
+    #   # SELECT * FROM items WHERE ((a LIKE '%test%' ESCAPE '\') OR (a LIKE 'foo' ESCAPE '\')
+    #   #   OR (b LIKE '%test%' ESCAPE '\') OR (b LIKE 'foo' ESCAPE '\'))
     #
     #   dataset.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true)
-    #   # SELECT * FROM a WHERE (((a LIKE '%foo%') OR (b LIKE '%foo%')) AND ((a LIKE '%bar%') OR (b LIKE '%bar%')))
+    #   # SELECT * FROM a WHERE (((a LIKE '%foo%' ESCAPE '\') OR (b LIKE '%foo%' ESCAPE '\'))
+    #   #   AND ((a LIKE '%bar%' ESCAPE '\') OR (b LIKE '%bar%' ESCAPE '\')))
     #
     #   dataset.grep([:a, :b], %w'%foo% %bar%', :all_columns=>true)
-    #   # SELECT * FROM a WHERE (((a LIKE '%foo%') OR (a LIKE '%bar%')) AND ((b LIKE '%foo%') OR (b LIKE '%bar%')))
+    #   # SELECT * FROM a WHERE (((a LIKE '%foo%' ESCAPE '\') OR (a LIKE '%bar%' ESCAPE '\'))
+    #   #   AND ((b LIKE '%foo%' ESCAPE '\') OR (b LIKE '%bar%' ESCAPE '\')))
     #
     #   dataset.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true, :all_columns=>true)
-    #   # SELECT * FROM a WHERE ((a LIKE '%foo%') AND (b LIKE '%foo%') AND (a LIKE '%bar%') AND (b LIKE '%bar%'))
+    #   # SELECT * FROM a WHERE ((a LIKE '%foo%' ESCAPE '\') AND (b LIKE '%foo%' ESCAPE '\')
+    #   #   AND (a LIKE '%bar%' ESCAPE '\') AND (b LIKE '%bar%' ESCAPE '\'))
     def grep(columns, patterns, opts=OPTS)
       if opts[:all_patterns]
         conds = Array(patterns).map do |pat|
@@ -890,7 +894,7 @@ module Sequel
     # :recursive :: Specify that this is a recursive CTE
     #
     #   DB[:items].with(:items, DB[:syx].where(:name.like('A%')))
-    #   # WITH items AS (SELECT * FROM syx WHERE (name LIKE 'A%')) SELECT * FROM items
+    #   # WITH items AS (SELECT * FROM syx WHERE (name LIKE 'A%' ESCAPE '\')) SELECT * FROM items
     def with(name, dataset, opts=OPTS)
       raise(Error, 'This dataset does not support common table expressions') unless supports_cte?
       if hoist_cte?(dataset)

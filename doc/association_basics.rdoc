@@ -360,7 +360,7 @@ it can be further filtered, ordered, etc.:
    order(:copies_sold).
    limit(10)
   # SELECT * FROM albums
-  # WHERE ((artist_id = 20) AND (name LIKE 'A%'))
+  # WHERE ((artist_id = 20) AND (name LIKE 'A%' ESCAPE '\'))
   # ORDER BY copies_sold LIMIT 10
 
 Records retrieved using the +_dataset+ method are not cached in the

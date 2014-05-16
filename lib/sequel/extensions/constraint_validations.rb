@@ -70,8 +70,8 @@
 # length_range 3...5 :: CHECK char_length(column) >= 3 AND char_length(column) < 5
 # format /foo\\d+/ :: CHECK column ~ 'foo\\d+'
 # format /foo\\d+/i :: CHECK column ~* 'foo\\d+'
-# like 'foo%' :: CHECK column LIKE 'foo%'
-# ilike 'foo%' :: CHECK column ILIKE 'foo%'
+# like 'foo%' :: CHECK column LIKE 'foo%' ESCAPE '\'
+# ilike 'foo%' :: CHECK column ILIKE 'foo%' ESCAPE '\'
 # includes ['a', 'b'] :: CHECK column IN ('a', 'b')
 # includes [1, 2] :: CHECK column IN (1, 2)
 # includes 3..5 :: CHECK column >= 3 AND column <= 5

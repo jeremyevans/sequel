@@ -63,7 +63,7 @@ Any options you pass to +first+ will be used as a filter:
   => #<Artist @values={:name=>"YJM", :id=>1}>
   
   artist = Artist.first(Sequel.like(:name, 'Y%'))
-  # SELECT * FROM artists WHERE (name LIKE 'Y%') LIMIT 1
+  # SELECT * FROM artists WHERE (name LIKE 'Y%' ESCAPE '\') LIMIT 1
   => #<Artist @values={:name=>"YJM", :id=>1}>
   
 If there is no matching row, +first+ will return nil.  If you want to
@@ -273,7 +273,7 @@ Let's say we are only interested in the artists whose names
 start with "A":
 
   ds2 = ds1.where(Sequel.like(:name, 'A%'))
-  # SELECT * FROM artists WHERE name LIKE 'A%'
+  # SELECT * FROM artists WHERE name LIKE 'A%' ESCAPE '\'
 
 Here we see that +where+ returns a dataset that adds a +WHERE+
 clause to the query.  It's important to note that +where+ does
@@ -282,7 +282,7 @@ not modify the receiver:
   ds1
   # SELECT * FROM artists
   ds2
-  # SELECT * FROM artists WHERE name LIKE 'A%'
+  # SELECT * FROM artists WHERE name LIKE 'A%' ESCAPE '\'
  
 In Sequel, most dataset methods that you will be using will
 not modify the dataset itself, so you can freely use the dataset in multiple
@@ -293,7 +293,7 @@ Let's say we only want to select the id and name columns, and that
 we want to order by name:
 
   ds3 = ds.order(:name).select(:id, :name)
-  # SELECT id, name FROM artists WHERE name LIKE 'A%' ORDER BY name
+  # SELECT id, name FROM artists WHERE name LIKE 'A%' ESCAPE '\' ORDER BY name
   
 Note how you don't need to assign the returned value of order to a variable,
 and then call select on that.  Because order just returns a dataset, you can
@@ -403,7 +403,7 @@ expressions are instances of subclasses of Sequel::SQL::Expression. You've
 already seen an example earlier:
 
   Artist.where(Sequel.like(:name, 'Y%'))
-  # SELECT * FROM artists WHERE name LIKE 'Y%'
+  # SELECT * FROM artists WHERE name LIKE 'Y%' ESCAPE '\'
 
 In this case Sequel.like returns a Sequel::SQL::BooleanExpression object,
 which is used directly in the filter.
@@ -415,7 +415,7 @@ object.  In most cases, the SQL::Expression returned supports the & operator for
 +AND+, the | operator for +OR+, and the ~ operator for inversion:
 
   Artist.where(Sequel.like(:name, 'Y%') & (Sequel.expr(:b=>1) | Sequel.~(:c=>3)))
-  # SELECT * FROM artists WHERE name LIKE 'Y%' AND (b = 1 OR c != 3)
+  # SELECT * FROM artists WHERE name LIKE 'Y%' ESCAPE '\' AND (b = 1 OR c != 3)
 
 You can combine these expression operators with the virtual row support:
 
@@ -493,7 +493,7 @@ So to do a NOT IN with an array:
 Or to use the NOT LIKE operator:
 
   Artist.exclude(Sequel.like(:name, '%J%'))
-  # SELECT * FROM artists WHERE name NOT LIKE '%J%'
+  # SELECT * FROM artists WHERE name NOT LIKE '%J%' ESCAPE '\'
  
 === Removing
 
@@ -982,7 +982,7 @@ If you just want to know whether the current dataset would return any rows, use 
   => true
 
   Album.where(Sequel.like(:name, 'R%')).empty?
-  # SELECT 1 FROM albums WHERE name LIKE 'R%' LIMIT 1
+  # SELECT 1 FROM albums WHERE name LIKE 'R%' ESCAPE '\' LIMIT 1
   => false
 
 == Aggregate Calculations

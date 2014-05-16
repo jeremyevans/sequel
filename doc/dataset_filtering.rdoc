@@ -143,12 +143,12 @@ Or against SQL functions:
 You can search SQL strings in a case sensitive manner using the Sequel.like method:
 
   items.where(Sequel.like(:name, 'Acme%')).sql
-  #=> "SELECT * FROM items WHERE (name LIKE 'Acme%')"
+  #=> "SELECT * FROM items WHERE (name LIKE 'Acme%' ESCAPE '\')"
 
 You can search SQL strings in a case insensitive manner using the Sequel.ilike method:
 
   items.where(Sequel.ilike(:name, 'Acme%')).sql
-  #=> "SELECT * FROM items WHERE (name ILIKE 'Acme%')"
+  #=> "SELECT * FROM items WHERE (name ILIKE 'Acme%' ESCAPE '\')"
 
 You can specify a Regexp as a like argument, but this will probably only work
 on PostgreSQL and MySQL:
@@ -159,19 +159,19 @@ on PostgreSQL and MySQL:
 Like can also take more than one argument:
 
   items.where(Sequel.like(:name, 'Acme%', /Beta.*/)).sql
-  #=> "SELECT * FROM items WHERE ((name LIKE 'Acme%') OR (name ~ 'Beta.*'))"
+  #=> "SELECT * FROM items WHERE ((name LIKE 'Acme%' ESCAPE '\') OR (name ~ 'Beta.*'))"
 
 == String concatenation
 
 You can concatenate SQL strings using Sequel.join: 
 
   items.where(Sequel.join([:name, :comment]).like('%acme%')).sql
-  #=> "SELECT * FROM items WHERE ((name || comment) LIKE 'Acme%')"
+  #=> "SELECT * FROM items WHERE ((name || comment) LIKE 'Acme%' ESCAPE '\')"
 
 Sequel.join also takes a join argument:
 
   items.filter(Sequel.join([:name, :comment], ' ').like('%acme%')).sql
-  #=> "SELECT * FROM items WHERE ((name || ' ' || comment) LIKE 'Acme%')"
+  #=> "SELECT * FROM items WHERE ((name || ' ' || comment) LIKE 'Acme%' ESCAPE '\')"
 
 == Filtering using sub-queries
 

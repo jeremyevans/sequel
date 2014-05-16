@@ -555,7 +555,7 @@ module Sequel
       # Create a <tt>BooleanExpression</tt> case insensitive (if the database supports it) pattern match of the receiver with
       # the given patterns.  See <tt>SQL::StringExpression.like</tt>.
       #
-      #   Sequel.ilike(:a, 'A%') # "a" ILIKE 'A%'
+      #   Sequel.ilike(:a, 'A%') # "a" ILIKE 'A%' ESCAPE '\'
       def ilike(*args)
         SQL::StringExpression.like(*(args << {:case_insensitive=>true}))
       end
@@ -563,7 +563,7 @@ module Sequel
       # Create a <tt>SQL::BooleanExpression</tt> case sensitive (if the database supports it) pattern match of the receiver with
       # the given patterns.  See <tt>SQL::StringExpression.like</tt>.
       #
-      #   Sequel.like(:a, 'A%') # "a" LIKE 'A%'
+      #   Sequel.like(:a, 'A%') # "a" LIKE 'A%' ESCAPE '\'
       def like(*args)
         SQL::StringExpression.like(*args)
       end
@@ -887,7 +887,7 @@ module Sequel
       # Create a +BooleanExpression+ case insensitive pattern match of the receiver
       # with the given patterns.  See <tt>StringExpression.like</tt>.
       #
-      #   :a.ilike('A%') # "a" ILIKE 'A%'
+      #   :a.ilike('A%') # "a" ILIKE 'A%' ESCAPE '\'
       def ilike(*ces)
         StringExpression.like(self, *(ces << {:case_insensitive=>true}))
       end
@@ -895,7 +895,7 @@ module Sequel
       # Create a +BooleanExpression+ case sensitive (if the database supports it) pattern match of the receiver with
       # the given patterns.  See <tt>StringExpression.like</tt>.
       #
-      #   :a.like('A%') # "a" LIKE 'A%'
+      #   :a.like('A%') # "a" LIKE 'A%' ESCAPE '\'
       def like(*ces)
         StringExpression.like(self, *ces)
       end
@@ -1486,9 +1486,9 @@ module Sequel
       # if a case insensitive regular expression is used (//i), that particular
       # pattern which will always be case insensitive.
       #
-      #   StringExpression.like(:a, 'a%') # "a" LIKE 'a%'
-      #   StringExpression.like(:a, 'a%', :case_insensitive=>true) # "a" ILIKE 'a%'
-      #   StringExpression.like(:a, 'a%', /^a/i) # "a" LIKE 'a%' OR "a" ~* '^a' 
+      #   StringExpression.like(:a, 'a%') # "a" LIKE 'a%' ESCAPE '\'
+      #   StringExpression.like(:a, 'a%', :case_insensitive=>true) # "a" ILIKE 'a%' ESCAPE '\'
+      #   StringExpression.like(:a, 'a%', /^a/i) # "a" LIKE 'a%' ESCAPE '\' OR "a" ~* '^a'
       def self.like(l, *ces)
         l, lre, lci = like_element(l)
         lci = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive] ? true : lci

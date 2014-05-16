@@ -452,19 +452,19 @@ Just like ruby's <tt>String#join</tt>, you can provide an argument for a string 
 
 For the LIKE operator, Sequel defines the +like+ and +ilike+ methods on most Sequel-specific expression objects:
 
-  Sequel.expr(:name).like('A%') # ("name" LIKE 'A%') 
-  Sequel.expr(:name).ilike('A%') # ("name" ILIKE 'A%') 
+  Sequel.expr(:name).like('A%') # ("name" LIKE 'A%' ESCAPE '\') 
+  Sequel.expr(:name).ilike('A%') # ("name" ILIKE 'A%' ESCAPE '\') 
 
 You can also use the <tt>Sequel.like</tt> and <tt>Sequel.ilike</tt> methods:
 
-  Sequel.like(:name, 'A%') # ("name" LIKE 'A%') 
-  Sequel.ilike(:name, 'A%') # ("name" ILIKE 'A%') 
+  Sequel.like(:name, 'A%') # ("name" LIKE 'A%' ESCAPE '\') 
+  Sequel.ilike(:name, 'A%') # ("name" ILIKE 'A%' ESCAPE '\') 
 
 Note the above syntax for ilike, while Sequel's default, is specific to PostgreSQL.  However, most other adapters override the behavior.  For example, on MySQL, Sequel uses LIKE BINARY for +like+, and LIKE for +ilike+.  If the database supports both case sensitive and case insensitive LIKE, then +like+ will use a case sensitive LIKE, and +ilike+ will use a case insensitive LIKE.
 
 Inverting the LIKE operator works like other inversions:
 
-  ~Sequel.like(:name, 'A%') # ("name" NOT LIKE 'A%')
+  ~Sequel.like(:name, 'A%') # ("name" NOT LIKE 'A%' ESCAPE '\')
 
 Sequel also supports SQL regular expressions on MySQL and PostgreSQL.  You can use these by passing a ruby regular expression to +like+ or +ilike+, or by making the regular expression a hash value:
 
@@ -553,12 +553,12 @@ If you don't want to select from any FROM tables, just call dataset:
 Once you have your dataset object, you build queries by chaining methods, usually with one method per clause in the query:
 
   DB[:albums].select(:id, :name).where(Sequel.like(:name, 'A%')).order(:name)
-  # SELECT id, name FROM albums WHERE (name LIKE 'A%') ORDER BY name
+  # SELECT id, name FROM albums WHERE (name LIKE 'A%' ESCAPE '\') ORDER BY name
 
 Note that the order of your method chain is not usually important unless you have multiple methods that affect the same clause:
 
   DB[:albums].order(:name).where(Sequel.like(:name, 'A%')).select(:id, :name)
-  # SELECT id, name FROM albums WHERE (name LIKE 'A%') ORDER BY name
+  # SELECT id, name FROM albums WHERE (name LIKE 'A%' ESCAPE '\') ORDER BY name
 
 === Using the Same Dataset for SELECT, INSERT, UPDATE, and DELETE
 
