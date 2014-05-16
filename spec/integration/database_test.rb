@@ -21,7 +21,7 @@ describe Sequel::Database do
   end
 
   specify "should raise Sequel::DatabaseError on invalid SQL" do
-    proc{@db << "SELECT"}.should raise_error(Sequel::DatabaseError)
+    proc{@db << "S"}.should raise_error(Sequel::DatabaseError)
   end
 
   specify "should have Sequel::DatabaseError#sql give the SQL causing the error" do
