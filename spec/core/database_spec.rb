@@ -488,12 +488,22 @@ describe "Database#disconnect_connection" do
 end
 
 describe "Database#valid_connection?" do
+  before do
+    @db = Sequel.mock
+  end
+
   specify "should issue a query to validate the connection" do
-    db = Sequel.mock
-    db.synchronize{|c| db.valid_connection?(c)}.should == true
-    db.synchronize do |c|
+    @db.synchronize{|c| @db.valid_connection?(c)}.should == true
+    @db.synchronize do |c|
       def c.execute(*) raise Sequel::DatabaseError, "error" end
-      db.valid_connection?(c)
+      @db.valid_connection?(c)
+    end.should == false
+  end
+
+  specify "should return false when a connection times out" do
+    @db.synchronize do |c|
+      def c.execute(*) raise Timeout::Error, "error" end
+      @db.valid_connection?(c)
     end.should == false
   end
 end
