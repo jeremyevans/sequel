@@ -253,7 +253,7 @@ module Sequel
       sql = valid_connection_sql
       begin
         log_connection_execute(conn, sql)
-      rescue Sequel::DatabaseError, *database_error_classes
+      rescue Timeout::Error, Sequel::DatabaseError, *database_error_classes
         false
       else
         true
