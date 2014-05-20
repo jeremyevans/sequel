@@ -333,6 +333,7 @@ module Sequel
     VALUES = " VALUES ".freeze
     V190 = '1.9.0'.freeze
     WHERE = " WHERE ".freeze
+    WITH_ORDINALITY = " WITH ORDINALITY".freeze
     WITHIN_GROUP = " WITHIN GROUP (ORDER BY ".freeze
 
     [:literal, :quote_identifier, :quote_schema_table].each do |meth|
@@ -590,6 +591,10 @@ module Sequel
       if window = opts[:over]
         sql << OVER
         window_sql_append(sql, window.opts)
+      end
+
+      if opts[:with_ordinality]
+        sql << WITH_ORDINALITY
       end
     end
 

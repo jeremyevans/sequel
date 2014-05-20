@@ -549,6 +549,10 @@ describe Sequel::SQL::VirtualRow do
     @d.l{mode{}.within_group(:a).filter(:a=>1)}.should == 'mode() WITHIN GROUP (ORDER BY "a") FILTER (WHERE ("a" = 1))' 
   end
 
+  it "should handle function calls with ordinality" do
+    @d.l{foo{}.with_ordinality}.should == 'foo() WITH ORDINALITY' 
+  end
+
   it "should support function method on identifiers to create functions" do
     @d.l{rank.function}.should == 'rank()' 
     @d.l{sum.function(c)}.should == 'sum("c")'

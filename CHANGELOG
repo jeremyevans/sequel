@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL::Function#with_ordinality for creating set returning functions WITH ORDINALITY (jeremyevans)
+
 * Add SQL::Function#filter for creating filtered aggregate function calls (jeremyevans)
 
 * Add SQL::Function#within_group for creating ordered-set and hypothetical-set aggregate functions (jeremyevans)

@@ -1304,6 +1304,14 @@ module Sequel
         with_opts(:quoted=>false)
       end
 
+      # Return a new function that will use WITH ORDINALITY to also return
+      # a row number for every row the function returns:
+      #
+      #   Sequel.function(:foo).with_ordinality # foo() WITH ORDINALITY
+      def with_ordinality
+        with_opts(:with_ordinality=>true)
+      end
+
       # Return a new function that uses WITHIN GROUP ordered by the given expression,
       # useful for ordered-set and hypothetical-set aggregate functions:
       #
