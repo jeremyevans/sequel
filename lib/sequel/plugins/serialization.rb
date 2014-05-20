@@ -163,7 +163,10 @@ module Sequel
                 end
               end
               define_method("#{column}=") do |v| 
-                changed_columns << column unless changed_columns.include?(column)
+                if !changed_columns.include?(column) && (new? || send(column) != v)
+                  changed_columns << column
+                end
+
                 deserialized_values[column] = v
               end
             end

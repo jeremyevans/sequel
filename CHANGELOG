@@ -1,5 +1,7 @@
 === HEAD
 
+* Only modify changed_columns if deserialized value changes in the serialization plugin (jeremyevans) (#818)
+
 * Support PostgreSQL 9.4+ jsonb type in the pg_json extension (jeremyevans)
 
 * Allow Postgres::ArrayOp#unnest to accept arguments in the pg_array_ops extension (jeremyevans)

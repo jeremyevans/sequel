@@ -300,4 +300,23 @@ describe "Serialization plugin" do
     o.dup.deserialized_values.should == o.deserialized_values
     o.dup.deserialized_values.should_not equal(o.deserialized_values)
   end
+
+  it "should have changed_columns include serialized columns if those columns have changed" do
+    @c.plugin :serialization, :yaml, :abc, :def
+    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    o = @c.first
+    o.changed_columns.should == []
+    o.abc = 1
+    o.changed_columns.should == []
+    o.abc = 1
+    o.changed_columns.should == []
+    o.abc = 2
+    o.changed_columns.should == [:abc]
+    o.def = 'hello'
+    o.changed_columns.should == [:abc]
+    o.def = 'hello'
+    o.changed_columns.should == [:abc]
+    o.def = 'hello2'
+    o.changed_columns.should == [:abc, :def]
+  end
 end
