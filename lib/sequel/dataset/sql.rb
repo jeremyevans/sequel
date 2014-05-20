@@ -332,6 +332,7 @@ module Sequel
     VALUES = " VALUES ".freeze
     V190 = '1.9.0'.freeze
     WHERE = " WHERE ".freeze
+    WITHIN_GROUP = " WITHIN GROUP (ORDER BY ".freeze
 
     [:literal, :quote_identifier, :quote_schema_table].each do |meth|
       class_eval(<<-END, __FILE__, __LINE__ + 1)
@@ -572,6 +573,12 @@ module Sequel
         expression_list_append(sql, f.args)
       end
       sql << PAREN_CLOSE
+
+      if group = opts[:within_group]
+        sql << WITHIN_GROUP
+        expression_list_append(sql, group)
+        sql << PAREN_CLOSE
+      end
 
       if window = opts[:over]
         sql << OVER

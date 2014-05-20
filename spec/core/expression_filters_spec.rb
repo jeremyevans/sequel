@@ -533,6 +533,11 @@ describe Sequel::SQL::VirtualRow do
     @d.l{rank{}.lateral}.should == 'LATERAL rank()' 
   end
 
+  it "should handle ordered-set and hypothetical-set function calls" do
+    @d.l{mode{}.within_group(:a)}.should == 'mode() WITHIN GROUP (ORDER BY "a")' 
+    @d.l{mode{}.within_group(:a, :b)}.should == 'mode() WITHIN GROUP (ORDER BY "a", "b")' 
+  end
+
   it "should support function method on identifiers to create functions" do
     @d.l{rank.function}.should == 'rank()' 
     @d.l{sum.function(c)}.should == 'sum("c")'

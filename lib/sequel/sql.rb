@@ -1295,6 +1295,15 @@ module Sequel
         with_opts(:quoted=>false)
       end
 
+      # Return a new function that uses WITHIN GROUP ordered by the given expression,
+      # useful for ordered-set and hypothetical-set aggregate functions:
+      #
+      #   Sequel.function(:rank, :a).within_group(:b, :c)
+      #   # rank(a) WITHIN GROUP (ORDER BY b, c)
+      def within_group(*expressions)
+        with_opts(:within_group=>expressions)
+      end
+
       to_s_method :function_sql
 
       private
