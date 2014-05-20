@@ -543,19 +543,23 @@ module Sequel
 
       case name
       when SQL::Identifier
-        if supports_quoted_function_names?
+        if supports_quoted_function_names? && opts[:quoted] != false
           literal_append(sql, name)
         else
           sql << name.value.to_s
         end
       when SQL::QualifiedIdentifier
-        if supports_quoted_function_names?
+        if supports_quoted_function_names? && opts[:quoted] != false
           literal_append(sql, name)
         else
           sql << split_qualifiers(name).join(DOT)
         end
       else
-        sql << name.to_s
+        if supports_quoted_function_names? && opts[:quoted]
+          quote_identifier_append(sql, name)
+        else
+          sql << name.to_s
+        end
       end
 
       sql << PAREN_OPEN

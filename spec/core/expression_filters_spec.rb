@@ -548,6 +548,18 @@ describe Sequel::SQL::VirtualRow do
     @d.l{sch__rank.function}.should == '"sch"."rank"()' 
   end
 
+  it "should quote function names if a quoted function is used and database supports quoted function names" do
+    def @d.supports_quoted_function_names?; true; end
+    @d.l{rank{}.quoted}.should == '"rank"()' 
+    @d.l{sch__rank{}.quoted}.should == '"sch__rank"()' 
+  end
+
+  it "should not quote function names if an unquoted function is used" do
+    def @d.supports_quoted_function_names?; true; end
+    @d.l{rank.function.unquoted}.should == 'rank()' 
+    @d.l{sch__rank.function.unquoted}.should == 'sch.rank()' 
+  end
+
   it "should deal with classes without requiring :: prefix" do
     @d.l{date < Date.today}.should == "(\"date\" < '#{Date.today}')"
     @d.l{date < Sequel::CURRENT_DATE}.should == "(\"date\" < CURRENT_DATE)"

@@ -1272,6 +1272,22 @@ module Sequel
         with_opts(:over=>window)
       end
 
+      # Return a new function where the function name will be quoted if the database supports
+      # quoted functions:
+      #
+      #   Sequel.function(:foo).quoted # "foo"()
+      def quoted
+        with_opts(:quoted=>true)
+      end
+
+      # Return a new function where the function name will not be quoted even
+      # if the database supports quoted functions:
+      #
+      #   Sequel.expr(:foo).function.unquoted # foo()
+      def unquoted
+        with_opts(:quoted=>false)
+      end
+
       to_s_method :function_sql
 
       private
