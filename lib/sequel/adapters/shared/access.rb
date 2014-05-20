@@ -112,6 +112,7 @@ module Sequel
       TIME_FUNCTION = 'Time()'.freeze
       CAST_TYPES = {String=>:CStr, Integer=>:CLng, Date=>:CDate, Time=>:CDate, DateTime=>:CDate, Numeric=>:CDec, BigDecimal=>:CDec, File=>:CStr, Float=>:CDbl, TrueClass=>:CBool, FalseClass=>:CBool}
 
+      EMULATED_FUNCTION_MAP = {:char_length=>:len}
       EXTRACT_MAP = {:year=>"'yyyy'", :month=>"'m'", :day=>"'d'", :hour=>"'h'", :minute=>"'n'", :second=>"'s'"}
       COMMA = Dataset::COMMA
       DATEPART_OPEN = "datepart(".freeze
@@ -189,15 +190,6 @@ module Sequel
         clone(:from=>@opts[:from] + [table])
       end
 
-      def emulated_function_sql_append(sql, f)
-        case f.f
-        when :char_length
-          literal_append(sql, SQL::Function.new(:len, f.args.first))
-        else
-          super
-        end
-      end
-      
       # Access uses [] to escape metacharacters, instead of backslashes.
       def escape_like(string)
         string.gsub(/[\\*#?\[]/){|m| "[#{m}]"}

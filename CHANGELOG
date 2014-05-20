@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Dataset#{window,emulated,}_function_sql_append (jeremyevans)
+
+* Deprecate SQL::WindowFunction and SQL::EmulatedFunction classes, switch to using options on SQL::Function (jeremyevans)
+
 * Only modify changed_columns if deserialized value changes in the serialization plugin (jeremyevans) (#818)
 
 * Support PostgreSQL 9.4+ jsonb type in the pg_json extension (jeremyevans)

@@ -95,8 +95,8 @@ local variable access.  This is mostly useful in instance_evaled procs:
 
 == VirtualRow Methods
 
-VirtualRow is a class that returns SQL::Identifiers, SQL::QualifiedIdentifiers,
-SQL::Functions, or SQL::WindowFunctions depending on how it is called.
+VirtualRow is a class that returns SQL::Identifiers, SQL::QualifiedIdentifiers, or
+SQL::Functions depending on how it is called.
 
 == SQL::Identifiers - Regular columns
 
@@ -165,10 +165,9 @@ distinct method on the returned Function:
   ds.select{count(col1, col2).distinct}
   # SELECT count(DISTINCT col1, col2)
   
-== SQL::WindowFunctions - SQL window function calls
+== SQL::Functions with windows - SQL window function calls
 
-SQL::WindowFunctions can be thought of as calls to SQL window functions.  Not
-all databases support them, but they are very helpful for certain types of
+Not all databases support window functions, but they are very helpful for certain types of
 queries.  To use them, you should just call the over method on the Function
 object returned, with the options for the window:
 

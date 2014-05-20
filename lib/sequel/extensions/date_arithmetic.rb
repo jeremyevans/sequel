@@ -82,7 +82,7 @@ module Sequel
             each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
               args << "#{value} #{sql_unit}"
             end
-            return _function_sql_append(sql, :datetime, args)
+            return function_sql_append(sql, Sequel.function(:datetime, *args))
           when :mysql, :hsqldb, :cubrid
             if db_type == :hsqldb
               # HSQLDB requires 2.2.9+ for the DATE_ADD function

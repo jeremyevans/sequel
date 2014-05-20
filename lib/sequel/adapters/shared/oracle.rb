@@ -300,20 +300,6 @@ module Sequel
         end
       end
 
-      # Oracle treats empty strings like NULL values, and doesn't support
-      # char_length, so make char_length use length with a nonempty string.
-      # Unfortunately, as Oracle treats the empty string as NULL, there is
-      # no way to get trim to return an empty string instead of nil if
-      # the string only contains spaces.
-      def emulated_function_sql_append(sql, f)
-        case f.f
-        when :char_length
-          literal_append(sql, Sequel::SQL::Function.new(:length, Sequel.join([f.args.first, 'x'])) - 1)
-        else
-          super
-        end
-      end
-      
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, opts=OPTS)
         raise(Sequel::Error, "EXCEPT ALL not supported") if opts[:all]
@@ -446,6 +432,25 @@ module Sequel
         DUAL
       end
 
+      # There is no function on Microsoft SQL Server that does character length
+      # and respects trailing spaces (datalength respects trailing spaces, but
+      # counts bytes instead of characters).  Use a hack to work around the
+      # trailing spaces issue.
+      def emulate_function?(name)
+        name == :char_length
+      end
+
+      # Oracle treats empty strings like NULL values, and doesn't support
+      # char_length, so make char_length use length with a nonempty string.
+      # Unfortunately, as Oracle treats the empty string as NULL, there is
+      # no way to get trim to return an empty string instead of nil if
+      # the string only contains spaces.
+      def emulate_function_sql_append(sql, f)
+        if f.name == :char_length
+          literal_append(sql, Sequel::SQL::Function.new(:length, Sequel.join([f.args.first, 'x'])) - 1)
+        end
+      end
+      
       # If this dataset is associated with a sequence, return the most recently
       # inserted sequence value.
       def execute_insert(sql, opts=OPTS)

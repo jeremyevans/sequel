@@ -391,7 +391,7 @@ module Sequel
       #   Sequel.char_length(:a) # char_length(a) -- Most databases
       #   Sequel.char_length(:a) # length(a) -- SQLite
       def char_length(arg)
-        SQL::EmulatedFunction.new(:char_length, arg)
+        SQL::Function.new!(:char_length, [arg], :emulate=>true)
       end
 
       # Do a deep qualification of the argument using the qualifier.  This recurses into
@@ -648,7 +648,7 @@ module Sequel
       #   Sequel.trim(:a) # trim(a) -- Most databases
       #   Sequel.trim(:a) # ltrim(rtrim(a)) -- Microsoft SQL Server
       def trim(arg)
-        SQL::EmulatedFunction.new(:trim, arg)
+        SQL::Function.new!(:trim, [arg], :emulate=>true)
       end
 
       # Return a <tt>SQL::ValueList</tt> created from the given array.  Used if the array contains
@@ -1222,44 +1222,73 @@ module Sequel
       COMMA_ARRAY = [LiteralString.new(', ').freeze].freeze
 
       # The SQL function to call
-      attr_reader :f
+      attr_reader :name
+      alias f name
       
       # The array of arguments to pass to the function (may be blank)
       attr_reader :args
 
-      # Set the functions and args to the given arguments
-      def initialize(f, *args)
-        @f, @args = f, args
+      # Options for this function
+      attr_reader :opts
+
+      # Set the name and args for the function
+      def initialize(name, *args)
+        @name = name
+        @args = args
+        @opts = OPTS
+      end
+
+      def self.new!(name, args, opts)
+        f = new(name, *args)
+        f.instance_variable_set(:@opts, opts)
+        f
       end
 
       # If no arguments are given, return a new function with the wildcard prepended to the arguments.
       #
       #   Sequel.function(:count).*  # count(*)
-      #   Sequel.function(:count, 1).*  # count(*, 1)
       def *(ce=(arg=false;nil))
         if arg == false
-          Function.new(f, WILDCARD, *args)
+          raise Error, "Cannot apply * to functions with arguments" unless args.empty?
+          with_opts(:"*"=>true)
         else
           super(ce)
         end
       end
 
       # Return a new function with DISTINCT before the method arguments.
+      #
+      #   Sequel.function(:count, :col).distinct # count(DISTINCT col)
       def distinct
-        Function.new(f, PlaceholderLiteralString.new(DISTINCT + COMMA_ARRAY * (args.length-1), args))
+        with_opts(:distinct=>true)
       end
 
-      # Create a WindowFunction using the receiver and the appropriate options for the window.
-      def over(opts=OPTS)
-        WindowFunction.new(self, Window.new(opts))
+      # Return a new function with an OVER clause (making it a window function).
+      #
+      #   Sequel.function(:row_number).over(:partition=>:col) # row_number() OVER (PARTITION BY col)
+      def over(window=OPTS)
+        raise Error, "function already has a window applied to it" if opts[:over]
+        window = Window.new(window) unless window.is_a?(Window)
+        with_opts(:over=>window)
       end
 
       to_s_method :function_sql
+
+      private
+
+      # Return a new function call with the given opts merged into the current opts.
+      def with_opts(opts)
+        self.class.new!(name, args, @opts.merge(opts))
+      end
     end
 
-    # Represents an SQL function call that is translated/emulated
-    # on databases that lack support for such a function.
+    # REMOVE411
     class EmulatedFunction < Function
+      def self.new(name, *args)
+        Deprecation.deprecate("Sequel::SQL::EmulatedFunction", "Please use Sequel::SQL::Function.new!(name, args, :emulate=>true) to create an emulated SQL function")
+        Function.new!(name, args, :emulate=>true)
+      end
+
       to_s_method :emulated_function_sql
     end
     
@@ -1568,7 +1597,7 @@ module Sequel
     # If the block doesn't take an argument, the block is instance_execed in the context of
     # an instance of this class.
     #
-    # +VirtualRow+ uses +method_missing+ to return either an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, 
+    # +VirtualRow+ uses +method_missing+ to return either an +Identifier+, +QualifiedIdentifier+, or +Function+
     # depending on how it is called.
     #
     # If a block is _not_ given, creates one of the following objects:
@@ -1579,16 +1608,15 @@ module Sequel
     #                          table being the part before __, and the column being the part after.
     # +Identifier+ :: Returned otherwise, using the method name.
     #
-    # If a block is given, it returns either a +Function+ or +WindowFunction+, depending on the first
-    # argument to the method.  Note that the block is currently not called by the code, though
+    # If a block is given, it returns a +Function+.  Note that the block is currently not called by the code, though
     # this may change in a future version.  If the first argument is:
     #
     # no arguments given :: creates a +Function+ with no arguments.
     # :* :: creates a +Function+ with a literal wildcard argument (*), mostly useful for COUNT.
     # :distinct :: creates a +Function+ that prepends DISTINCT to the rest of the arguments, mostly
     #              useful for aggregate functions.
-    # :over :: creates a +WindowFunction+.  If a second argument is provided, it should be a hash
-    #          of options which are passed to Window (with possible keys :window, :partition, :order, and :frame).  The
+    # :over :: creates a +Function+ with a window.  If a second argument is provided, it should be a hash
+    #          of options which are used to create the +Window+ (with possible keys :window, :partition, :order, and :frame).  The
     #          arguments to the function itself should be specified as <tt>:*=>true</tt> for a wildcard, or via
     #          the <tt>:args</tt> option.
     #
@@ -1657,7 +1685,7 @@ module Sequel
         Sequel::LiteralString.new(s)
       end
 
-      # Return an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, depending
+      # Return an +Identifier+, +QualifiedIdentifier+, or +Function+, depending
       # on arguments and whether a block is provided.  Does not currently call the block.
       # See the class level documentation.
       def method_missing(m, *args, &block)
@@ -1690,9 +1718,7 @@ module Sequel
       Sequel::VIRTUAL_ROW = new
     end
 
-    # A +Window+ is part of a window function specifying the window over which the function operates.
-    # It is separated from the +WindowFunction+ class because it also can be used separately on
-    # some databases.
+    # A +Window+ is part of a window function specifying the window over which a window function operates.
     class Window < Expression
       # The options for this window.  Options currently supported:
       # :frame :: if specified, should be :all, :rows, or a String that is used literally. :all always operates over all rows in the
@@ -1711,7 +1737,7 @@ module Sequel
       to_s_method :window_sql, '@opts'
     end
 
-    # A +WindowFunction+ is a grouping of a +Function+ with a +Window+ over which it operates.
+    # REMOVE411
     class WindowFunction < GenericExpression
       # The function to use, should be an <tt>SQL::Function</tt>.
       attr_reader :function
@@ -1719,8 +1745,14 @@ module Sequel
       # The window to use, should be an <tt>SQL::Window</tt>.
       attr_reader :window
 
+      def self.new(function, window)
+        Deprecation.deprecate("Sequel::SQL::WindowFunction", "Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function")
+        function.over(window)
+      end
+
       # Set the function and window.
       def initialize(function, window)
+        Deprecation.deprecate("Sequel::SQL::WindowFunction", "Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function")
         @function, @window = function, window
       end
 

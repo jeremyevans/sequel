@@ -40,7 +40,7 @@ describe "eval_inspect extension" do
       Sequel::SQL::QualifiedIdentifier.new(:b, :a),
       Sequel::SQL::Subscript.new(:a, [1, 2]),
       Sequel::SQL::Window.new(:order=>:a, :partition=>:b),
-      Sequel::SQL::WindowFunction.new(Sequel::SQL::Function.new(:a, :b, :c), Sequel::SQL::Window.new(:order=>:a, :partition=>:b)),
+      Sequel::SQL::Function.new(:a, :b, :c).over(:order=>:a, :partition=>:b),
       Sequel::SQL::Wrapper.new(:a),
       
       # Objects with components where eval(inspect) != self

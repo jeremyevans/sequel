@@ -614,21 +614,6 @@ module Sequel
         string.gsub(/[\\%_\[\]]/){|m| "\\#{m}"}
       end
    
-      # There is no function on Microsoft SQL Server that does character length
-      # and respects trailing spaces (datalength respects trailing spaces, but
-      # counts bytes instead of characters).  Use a hack to work around the
-      # trailing spaces issue.
-      def emulated_function_sql_append(sql, f)
-        case f.f
-        when :char_length
-          literal_append(sql, SQL::Function.new(:len, Sequel.join([f.args.first, 'x'])) - 1)
-        when :trim
-          literal_append(sql, SQL::Function.new(:ltrim, SQL::Function.new(:rtrim, f.args.first)))
-        else
-          super
-        end
-      end
-      
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = OPTS)
         terms = "\"#{terms.join('" OR "')}\"" if terms.is_a?(Array)
@@ -830,6 +815,23 @@ module Sequel
       end
       alias update_from_sql delete_from2_sql
 
+      # There is no function on Microsoft SQL Server that does character length
+      # and respects trailing spaces (datalength respects trailing spaces, but
+      # counts bytes instead of characters).  Use a hack to work around the
+      # trailing spaces issue.
+      def emulate_function?(name)
+        name == :char_length || name == :trim
+      end
+
+      def emulate_function_sql_append(sql, f)
+        case f.name
+        when :char_length
+          literal_append(sql, SQL::Function.new(:len, Sequel.join([f.args.first, 'x'])) - 1)
+        when :trim
+          literal_append(sql, SQL::Function.new(:ltrim, SQL::Function.new(:rtrim, f.args.first)))
+        end
+      end
+      
       # Microsoft SQL Server 2012 has native support for offsets, but only for ordered datasets.
       def emulate_offset_with_row_number?
         super && !(is_2012_or_later? && @opts[:order])

@@ -41,11 +41,13 @@ module Sequel
       when SQL::Cast
         SQL::Cast.new(v(o.expr), o.type)
       when SQL::Function
-        SQL::Function.new(o.f, *v(o.args))
+        h = {}
+        o.opts.each do |k, val|
+          h[k] = v(val)
+        end
+        SQL::Function.new!(o.name, v(o.args), h)
       when SQL::Subscript
         SQL::Subscript.new(v(o.f), v(o.sub))
-      when SQL::WindowFunction
-        SQL::WindowFunction.new(v(o.function), v(o.window))
       when SQL::Window
         opts = o.opts.dup
         opts[:partition] = v(opts[:partition]) if opts[:partition]

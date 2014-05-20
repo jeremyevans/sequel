@@ -284,7 +284,7 @@ module Sequel
     FRAME_ALL = "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING".freeze
     FRAME_ROWS = "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW".freeze
     FROM = ' FROM '.freeze
-    FUNCTION_EMPTY = '()'.freeze
+    FUNCTION_DISTINCT = "DISTINCT ".freeze
     GROUP_BY = " GROUP BY ".freeze
     HAVING = " HAVING ".freeze
     INSERT = "INSERT".freeze
@@ -522,18 +522,55 @@ module Sequel
       end
     end
 
-    # Append literalization of emulated function call to SQL string.
-    # By default, assumes just the function name may need to
-    # be emulated, adapters should set an EMULATED_FUNCTION_MAP
-    # hash mapping emulated functions to native functions in
-    # their dataset class to setup the emulation.
+    # REMOVE411
     def emulated_function_sql_append(sql, f)
       _function_sql_append(sql, native_function_name(f.f), f.args)
     end
 
     # Append literalization of function call to SQL string.
     def function_sql_append(sql, f)
-      _function_sql_append(sql, f.f, f.args)
+      name = f.name
+      opts = f.opts
+
+      if opts[:emulate]
+        if emulate_function?(name)
+          emulate_function_sql_append(sql, f)
+          return
+        end
+
+        name = native_function_name(name) 
+      end
+
+      case name
+      when SQL::Identifier
+        if supports_quoted_function_names?
+          literal_append(sql, name)
+        else
+          sql << name.value.to_s
+        end
+      when SQL::QualifiedIdentifier
+        if supports_quoted_function_names?
+          literal_append(sql, name)
+        else
+          sql << split_qualifiers(name).join(DOT)
+        end
+      else
+        sql << name.to_s
+      end
+
+      sql << PAREN_OPEN
+      if opts[:*]
+        sql << WILDCARD
+      else
+        sql << FUNCTION_DISTINCT if opts[:distinct]
+        expression_list_append(sql, f.args)
+      end
+      sql << PAREN_CLOSE
+
+      if window = opts[:over]
+        sql << OVER
+        window_sql_append(sql, window.opts)
+      end
     end
 
     # Append literalization of JOIN clause without ON or USING to SQL string.
@@ -765,8 +802,9 @@ module Sequel
       sql << PAREN_CLOSE
     end
 
-    # Append literalization of window function calls to SQL string.
+    # REMOVE411
     def window_function_sql_append(sql, function, window)
+      Deprecation.deprecate("Dataset#window_function_sql_append", "Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function")
       literal_append(sql, function)
       sql << OVER
       literal_append(sql, window)
@@ -782,8 +820,9 @@ module Sequel
     
     private
 
-    # Backbone of function_sql_append and emulated_function_sql_append.
+    # REMOVE411
     def _function_sql_append(sql, name, args)
+      Deprecation.deprecate("Dataset#emulated_function_sql_append and #_function_sql_append", "Please use Sequel::SQL::Function.new!(name, args, :emulate=>true) to create an emulated SQL function")
       case name
       when SQL::Identifier
         if supports_quoted_function_names?
@@ -958,6 +997,12 @@ module Sequel
     # no from tables.
     def empty_from_sql
       nil
+    end
+
+    # Whether to emulate the function with the given name.  This should only be true
+    # if the emulation goes beyond choosing a function with a different name.
+    def emulate_function?(name)
+      false
     end
 
     # Append literalization of array of expressions to SQL string.

@@ -3705,7 +3705,7 @@ describe "Sequel::Dataset#qualify" do
     @ds.filter(Sequel::SQL::Wrapper.new(:a)).qualify.sql.should == 'SELECT t.* FROM t WHERE t.a'
   end
 
-  specify "should handle SQL::WindowFunctions" do
+  specify "should handle SQL::Functions with windows" do
     meta_def(@ds, :supports_window_functions?){true}
     @ds.select{sum(:a).over(:partition=>:b, :order=>:c)}.qualify.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
   end

@@ -390,6 +390,22 @@ describe "Blockless Ruby Filters" do
   it "should handled emulated trim function" do
     @d.lit(Sequel.trim(:a)).should == 'trim(a)'
   end
+
+  it "should handled emulated function where only name is emulated" do
+    dsc = Class.new(Sequel::Dataset)
+    dsc::EMULATED_FUNCTION_MAP[:trim] = :foo
+    dsc.new(@d.db).literal(Sequel.trim(:a)).should == 'foo(a)'
+  end
+
+  it "should handled emulated function needing full emulation" do
+    dsc = Class.new(Sequel::Dataset) do
+      def emulate_function?(n) n == :trim end
+      def emulate_function_sql_append(sql, f)
+        sql << "#{f.name}FOO(lower(#{f.args.first}))"
+      end
+    end
+    dsc.new(@d.db).literal(Sequel.trim(:a)).should == 'trimFOO(lower(a))'
+  end
 end
 
 describe Sequel::SQL::VirtualRow do
@@ -419,15 +435,17 @@ describe Sequel::SQL::VirtualRow do
     @d.l{version{}}.should == 'version()'
   end
 
-  it "should treat methods with a block and a leading argument :* as a function call starting with the SQL wildcard" do
+  it "should treat methods with a block and a leading argument :* as a function call with the SQL wildcard" do
     @d.l{count(:*){}}.should == 'count(*)'
-    @d.l{count(:*, 1){}}.should == 'count(*, 1)'
   end
 
-  it "should support * method on functions to add * as the first argument" do
+  it "should support * method on functions to raise error if function already has an argument" do
+    proc{@d.l{count(1).*}}.should raise_error(Sequel::Error)
+  end
+
+  it "should support * method on functions to use * as the argument" do
     @d.l{count{}.*}.should == 'count(*)'
-    @d.l{count(1).*}.should == 'count(*, 1)'
-    @d.literal(Sequel.expr{count(1) * 2}).should == '(count(1) * 2)'
+    @d.literal(Sequel.expr{sum(1) * 2}).should == '(sum(1) * 2)'
   end
 
   it "should treat methods with a block and a leading argument :distinct as a function call with DISTINCT and the additional method arguments" do
@@ -494,6 +512,14 @@ describe Sequel::SQL::VirtualRow do
   it "should support over method on functions to create window functions" do
     @d.l{rank{}.over}.should == 'rank() OVER ()'
     @d.l{sum(c).over(:partition=>a, :order=>b, :window=>:win, :frame=>:rows)}.should == 'sum("c") OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should support over method with a Window argument" do
+    @d.l{sum(c).over(Sequel::SQL::Window.new(:partition=>a, :order=>b, :window=>:win, :frame=>:rows))}.should == 'sum("c") OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
+  end
+
+  it "should raise error if over is called on a function that already has a window " do
+    proc{@d.l{rank{}.over.over}}.should raise_error(Sequel::Error)
   end
 
   it "should raise an error if window functions are not supported" do

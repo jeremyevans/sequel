@@ -534,7 +534,7 @@ These objects are usually not instantiated manually.  See the
 
 === Sequel::SQL::Window
 
-Sequel::SQL::Window objects represent the windows used by Sequel::SQL::WindowFunction.
+Sequel::SQL::Window objects represent the windows used by Sequel::SQL::Function.
 They use a hash-based API, supporting the :frame, :order, :partition, and :window
 options:
 
@@ -543,17 +543,6 @@ options:
 
   Sequel::SQL::Window.new(:parition=>:a, :frame=>:all)
   # (PARTITION BY "a" ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
-
-=== Sequel::SQL::WindowFunction
-
-Sequel::SQL::WindowFunction objects represent SQL window function calls.  These
-just combine a Sequel::SQL::Function with a Sequel::SQL::Window:
-
-  function = Sequel::SQL::Function.new(:f, 1)
-  window = Sequel::SQL::Window.new(:order=>:a)
-  Sequel::SQL::WindowFunction.new(function, window) # f(1) OVER (ORDER BY "a")
-
-Virtual rows offer a shortcut for creating Sequel::SQL::Window objects.
 
 === Sequel::SQL::Wrapper
 

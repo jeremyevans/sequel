@@ -102,18 +102,16 @@ module Sequel
         v(e.expr, :expr)
         v(e.type, :type)
       when SQL::Function
-        dot "Function: #{e.f}"
+        dot "Function: #{e.name}"
         e.args.each_with_index do |val, j|
           v(val, j)
         end
+        v(e.args, :args)
+        v(e.opts, :opts)
       when SQL::Subscript 
         dot "Subscript"
         v(e.f, :f)
         v(e.sub, :sub)
-      when SQL::WindowFunction
-        dot "WindowFunction"
-        v(e.function, :function)
-        v(e.window, :window)
       when SQL::Window
         dot "Window"
         v(e.opts, :opts)

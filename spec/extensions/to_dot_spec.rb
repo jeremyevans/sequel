@@ -117,15 +117,15 @@ END
   end
 
   it "should handle SQL::Function" do
-    dot(@ds.select{a(b)}).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Function: a\"];", "3 -> 4 [label=\"0\"];", "4 [label=\"Identifier\"];", "4 -> 5 [label=\"value\"];", "5 [label=\":b\"];"]
+    dot(@ds.select{a(b)}).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Function: a\"];", "3 -> 4 [label=\"0\"];", "4 [label=\"Identifier\"];", "4 -> 5 [label=\"value\"];", "5 [label=\":b\"];", "3 -> 6 [label=\"args\"];", "6 [label=\"Array\"];", "6 -> 7 [label=\"0\"];", "7 [label=\"Identifier\"];", "7 -> 8 [label=\"value\"];", "8 [label=\":b\"];", "3 -> 9 [label=\"opts\"];", "9 [label=\"Hash\"];"]
   end
 
   it "should handle SQL::Subscript" do
     dot(@ds.select(Sequel.subscript(:a, 1))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Subscript\"];", "3 -> 4 [label=\"f\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"sub\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"1\"];"]
   end
 
-  it "should handle SQL::WindowFunction" do
-    dot(@ds.select{sum{}.over(:partition=>:a)}).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"WindowFunction\"];", "3 -> 4 [label=\"function\"];", "4 [label=\"Function: sum\"];", "3 -> 5 [label=\"window\"];", "5 [label=\"Window\"];", "5 -> 6 [label=\"opts\"];", "6 [label=\"Hash\"];", "6 -> 7 [label=\"partition\"];", "7 [label=\":a\"];"]
+  it "should handle SQL::Function with a window" do
+    dot(@ds.select{sum{}.over(:partition=>:a)}).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Function: sum\"];", "3 -> 4 [label=\"args\"];", "4 [label=\"Array\"];", "3 -> 5 [label=\"opts\"];", "5 [label=\"Hash\"];", "5 -> 6 [label=\"over\"];", "6 [label=\"Window\"];", "6 -> 7 [label=\"opts\"];", "7 [label=\"Hash\"];", "7 -> 8 [label=\"partition\"];", "8 [label=\":a\"];"]
   end
 
   it "should handle SQL::PlaceholderLiteralString" do

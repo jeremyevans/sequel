@@ -74,7 +74,7 @@ module Sequel
             Sequel.eval_inspect(send(arg))
           end
         end
-        "#{klass}.new(#{args.join(', ')})"
+        "#{klass}.#{inspect_new_method}(#{args.join(', ')})"
       end
 
       private
@@ -82,6 +82,11 @@ module Sequel
       # Which attribute values to use in the inspect string.
       def inspect_args
         self.class.comparison_attrs
+      end
+
+      # Use the new method by default for creating new objects.
+      def inspect_new_method
+        :new
       end
     end
 
@@ -127,9 +132,10 @@ module Sequel
     class Function
       private
 
-      # Function's initializer uses a splat for the function arguments.
-      def inspect_args
-        [:f, "*args"]
+      # Function uses a new! method for creating functions with options,
+      # since Function.new does not allow for an options hash.
+      def inspect_new_method
+        :new!
       end
     end
 
