@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL::Function#lateral, for creating set returning functions that will be preceded by LATERAL (jeremyevans)
+
 * Add SQL::Function#quoted and #unquoted methods, to enable/disable quoting of function names (jeremyevans)
 
 * Deprecate Dataset#{window,emulated,}_function_sql_append (jeremyevans)

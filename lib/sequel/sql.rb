@@ -1263,6 +1263,13 @@ module Sequel
         with_opts(:distinct=>true)
       end
 
+      # Return a function which will use LATERAL when literalized:
+      #
+      #   Sequel.function(:foo, :col).lateral # LATERAL foo(col)
+      def lateral
+        with_opts(:lateral=>true)
+      end
+
       # Return a new function with an OVER clause (making it a window function).
       #
       #   Sequel.function(:row_number).over(:partition=>:col) # row_number() OVER (PARTITION BY col)

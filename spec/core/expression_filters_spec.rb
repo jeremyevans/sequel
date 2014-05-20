@@ -529,6 +529,10 @@ describe Sequel::SQL::VirtualRow do
     proc{Sequel.mock.dataset.filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.should raise_error(Sequel::Error)
   end
   
+  it "should handle lateral function calls" do
+    @d.l{rank{}.lateral}.should == 'LATERAL rank()' 
+  end
+
   it "should support function method on identifiers to create functions" do
     @d.l{rank.function}.should == 'rank()' 
     @d.l{sum.function(c)}.should == 'sum("c")'

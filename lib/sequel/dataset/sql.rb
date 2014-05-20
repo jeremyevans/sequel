@@ -541,6 +541,8 @@ module Sequel
         name = native_function_name(name) 
       end
 
+      sql << LATERAL if opts[:lateral]
+
       case name
       when SQL::Identifier
         if supports_quoted_function_names? && opts[:quoted] != false
