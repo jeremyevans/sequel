@@ -351,6 +351,10 @@ describe "A PostgreSQL dataset" do
     @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{mode{}.within_group(:a)}.should == 1
   end if DB.server_version >= 90400
 
+  specify "should support filtered aggregate functions" do
+    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{count(:a).filter(:a=>1)}.should == 2
+  end if DB.server_version >= 90400
+
   specify "#lock should lock tables and yield if a block is given" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end

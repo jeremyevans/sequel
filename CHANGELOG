@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL::Function#filter for creating filtered aggregate function calls (jeremyevans)
+
 * Add SQL::Function#within_group for creating ordered-set and hypothetical-set aggregate functions (jeremyevans)
 
 * Add SQL::Function#lateral, for creating set returning functions that will be preceded by LATERAL (jeremyevans)

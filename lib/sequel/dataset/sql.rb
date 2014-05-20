@@ -274,6 +274,7 @@ module Sequel
     ESCAPE = " ESCAPE ".freeze
     EXTRACT = 'extract('.freeze
     EXISTS = ['EXISTS '.freeze].freeze
+    FILTER = " FILTER (WHERE ".freeze
     FOR_UPDATE = ' FOR UPDATE'.freeze
     FORMAT_DATE = "'%Y-%m-%d'".freeze
     FORMAT_DATE_STANDARD = "DATE '%Y-%m-%d'".freeze
@@ -577,6 +578,12 @@ module Sequel
       if group = opts[:within_group]
         sql << WITHIN_GROUP
         expression_list_append(sql, group)
+        sql << PAREN_CLOSE
+      end
+
+      if filter = opts[:filter]
+        sql << FILTER
+        literal_append(sql, filter_expr(filter, &opts[:filter_block]))
         sql << PAREN_CLOSE
       end
 

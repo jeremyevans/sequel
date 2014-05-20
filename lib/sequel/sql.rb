@@ -1263,6 +1263,15 @@ module Sequel
         with_opts(:distinct=>true)
       end
 
+      # Return a new function with FILTER added to it, for filtered
+      # aggregate functions:
+      #
+      #   Sequel.function(:foo, :col).filter(:a=>1) # foo(col) FILTER (WHERE a = 1)
+      def filter(*args, &block)
+        args = args.first if args.length == 1
+        with_opts(:filter=>args, :filter_block=>block)
+      end
+
       # Return a function which will use LATERAL when literalized:
       #
       #   Sequel.function(:foo, :col).lateral # LATERAL foo(col)

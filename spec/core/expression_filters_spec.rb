@@ -538,6 +538,17 @@ describe Sequel::SQL::VirtualRow do
     @d.l{mode{}.within_group(:a, :b)}.should == 'mode() WITHIN GROUP (ORDER BY "a", "b")' 
   end
 
+  it "should handle filtered aggregate function calls" do
+    @d.l{count{}.*.filter(:a, :b)}.should == 'count(*) FILTER (WHERE ("a" AND "b"))' 
+    @d.l{count{}.*.filter(:a=>1)}.should == 'count(*) FILTER (WHERE ("a" = 1))'
+    @d.l{count{}.*.filter{b > 1}}.should == 'count(*) FILTER (WHERE ("b" > 1))'
+    @d.l{count{}.*.filter(:a=>1){b > 1}}.should == 'count(*) FILTER (WHERE (("a" = 1) AND ("b" > 1)))'
+  end
+
+  it "should handle fitlered ordered-set and hypothetical-set function calls" do
+    @d.l{mode{}.within_group(:a).filter(:a=>1)}.should == 'mode() WITHIN GROUP (ORDER BY "a") FILTER (WHERE ("a" = 1))' 
+  end
+
   it "should support function method on identifiers to create functions" do
     @d.l{rank.function}.should == 'rank()' 
     @d.l{sum.function(c)}.should == 'sum("c")'
