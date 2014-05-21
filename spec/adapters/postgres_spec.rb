@@ -1473,6 +1473,18 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
   end
 
+  specify "#create_extension and #drop_extension should create and drop extensions" do
+    @d.send(:create_extension_sql, :citext).should == 'CREATE EXTENSION "citext"'
+    @d.send(:create_extension_sql, :citext, :if_not_exists => true, :version => 1234, :from => 'unpackaged', :schema => 'other').should == 'CREATE EXTENSION IF NOT EXISTS "citext" SCHEMA "other" VERSION "1234" FROM "unpackaged"'
+    if @d.server_version >= 90100
+      @d.create_extension(:citext, :if_not_exists => true)
+      proc{@d.create_extension(:citext)}.should raise_error(Sequel::DatabaseError)
+      @d.send(:drop_extension_sql, :citext).should == 'DROP EXTENSION "citext"'
+      @d.drop_extension(:citext, :if_exists => true)
+      proc{@d.drop_extension(:citext)}.should raise_error(Sequel::DatabaseError)
+    end
+  end
+
   specify "#create_schema and #drop_schema should create and drop schemas" do
     @d.send(:create_schema_sql, :sequel).should == 'CREATE SCHEMA "sequel"'
     @d.send(:create_schema_sql, :sequel, :if_not_exists=>true, :owner=>:foo).should == 'CREATE SCHEMA IF NOT EXISTS "sequel" AUTHORIZATION "foo"'
