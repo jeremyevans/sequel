@@ -432,9 +432,9 @@ module Sequel
           stmt.num_fields.times do |i|
             k = stmt.field_name i
             key = output_identifier(k)
-            type = stmt.field_type(k).downcase.to_sym
+            type = stmt.field_type(i).downcase.to_sym
             # decide if it is a smallint from precision
-            type = :boolean  if type == :int && convert && stmt.field_precision(k) < 8
+            type = :boolean  if type == :int && convert && stmt.field_precision(i) < 8
             type = :blob if type == :clob && Sequel::DB2.use_clob_as_blob
             columns << [key, cps[type]]
           end
