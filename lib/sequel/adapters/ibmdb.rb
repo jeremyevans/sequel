@@ -43,8 +43,13 @@ module Sequel
       end
 
       # Create the underlying IBM_DB connection.
-      def initialize(connection_string)
-        @conn = IBM_DB.connect(connection_string, '', '')
+      def initialize(connection_param)
+        if connection_param.class == String
+          @conn = IBM_DB.connect(connection_param, '', '')
+        elsif connection_param.class == Array  # connect using catalog 
+          @conn = IBM_DB.connect(*connection_param)
+        end
+
         self.autocommit = true
         @prepared_statements = {}
       end
@@ -193,19 +198,24 @@ module Sequel
       # Create a new connection object for the given server.
       def connect(server)
         opts = server_opts(server)
-        
-        # use uncataloged connection so that host and port can be supported
-        connection_string = ( \
-            'Driver={IBM DB2 ODBC DRIVER};' \
-            "Database=#{opts[:database]};" \
-            "Hostname=#{opts[:host]};" \
-            "Port=#{opts[:port] || 50000};" \
-            'Protocol=TCPIP;' \
-            "Uid=#{opts[:user]};" \
-            "Pwd=#{opts[:password]};" \
-        )
 
-        Connection.new(connection_string)
+        # use a cataloged connection
+        if opts[:host].nil? && opts[:port].nil? && opts[:database]
+          connection_param = [ opts[:database], opts[:user], opts[:password] ]
+        else
+          # use uncataloged connection so that host and port can be supported
+          connection_param = ( \
+              'Driver={IBM DB2 ODBC DRIVER};' \
+              "Database=#{opts[:database]};" \
+              "Hostname=#{opts[:host]};" \
+              "Port=#{opts[:port] || 50000};" \
+              'Protocol=TCPIP;' \
+              "Uid=#{opts[:user]};" \
+              "Pwd=#{opts[:password]};" \
+          )
+        end 
+
+        Connection.new(connection_param)
       end
 
       # Execute the given SQL on the database.
