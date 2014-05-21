@@ -195,6 +195,10 @@ module Sequel
         self << create_language_sql(name, opts)
       end
 
+      def create_extension(name, opts=OPTS)
+        self << create_extension_sql(name, opts)
+      end
+
       # Create a schema in the database. Arguments:
       # * name : Name of the schema (e.g. admin)
       # * opts : options hash:
@@ -241,6 +245,10 @@ module Sequel
       #   * :if_exists : Don't raise an error if the function doesn't exist.
       def drop_function(name, opts=OPTS)
         self << drop_function_sql(name, opts)
+      end
+
+      def drop_extension(name, opts=OPTS)
+        self << drop_extension_sql(name, opts)
       end
 
       # Drops a procedural language from the database.  Arguments:
@@ -782,6 +790,16 @@ module Sequel
         "CREATE#{' OR REPLACE' if opts[:replace] && server_version >= 90000}#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
       end
 
+      def create_extension_sql(name, opts=OPTS)
+        "CREATE EXTENSION ".tap do |sql|
+          sql << 'IF NOT EXISTS ' if opts[:if_not_exists]
+          sql << quote_identifier(name)
+          sql << " SCHEMA #{quote_identifier(opts[:schema])}" if opts[:schema]
+          sql << " VERSION #{quote_identifier(opts[:version])}" if opts[:version]
+          sql << " FROM #{quote_identifier(opts[:from])}" if opts[:from]
+        end
+      end
+
       # SQL for creating a schema.
       def create_schema_sql(name, opts=OPTS)
         "CREATE SCHEMA #{'IF NOT EXISTS ' if opts[:if_not_exists]}#{quote_identifier(name)}#{" AUTHORIZATION #{literal(opts[:owner])}" if opts[:owner]}"
@@ -857,6 +875,15 @@ module Sequel
       # SQL for dropping a procedural language from the database.
       def drop_language_sql(name, opts=OPTS)
         "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
+      end
+
+      # SQL for dropping an extension from the database.
+      def drop_extension_sql(name, opts=OPTS)
+        "DROP EXTENSION ".tap do |sql|
+          sql << 'IF EXISTS ' if opts[:if_exists]
+          sql << quote_identifier(name)
+          sql << ' CASCADE' if opts[:cascade]
+        end
       end
 
       # SQL for dropping a schema from the database.
