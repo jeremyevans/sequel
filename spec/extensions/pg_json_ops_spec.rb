@@ -6,6 +6,7 @@ describe "Sequel::Postgres::JSONOp" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @j = Sequel.pg_json_op(:j)
+    @jb = Sequel.pg_jsonb_op(:j)
     @l = proc{|o| @db.literal(o)}
   end
 
@@ -48,77 +49,98 @@ describe "Sequel::Postgres::JSONOp" do
 
   it "should have #array_length use the json_array_length function" do
     @l[@j.array_length].should == "json_array_length(j)"
+    @l[@jb.array_length].should == "jsonb_array_length(j)"
   end
 
   it "should have #array_length return a numeric expression" do
     @l[@j.array_length & 1].should == "(json_array_length(j) & 1)"
+    @l[@jb.array_length & 1].should == "(jsonb_array_length(j) & 1)"
   end
 
   it "should have #each use the json_each function" do
     @l[@j.each].should == "json_each(j)"
+    @l[@jb.each].should == "jsonb_each(j)"
   end
 
   it "should have #each_text use the json_each_text function" do
     @l[@j.each_text].should == "json_each_text(j)"
+    @l[@jb.each_text].should == "jsonb_each_text(j)"
   end
 
   it "should have #extract use the json_extract_path function" do
     @l[@j.extract('a')].should == "json_extract_path(j, 'a')"
     @l[@j.extract('a', 'b')].should == "json_extract_path(j, 'a', 'b')"
+    @l[@jb.extract('a')].should == "jsonb_extract_path(j, 'a')"
+    @l[@jb.extract('a', 'b')].should == "jsonb_extract_path(j, 'a', 'b')"
   end
 
   it "should have #extract return a JSONOp" do
     @l[@j.extract('a')[1]].should == "(json_extract_path(j, 'a') -> 1)"
+    @l[@jb.extract('a')[1]].should == "(jsonb_extract_path(j, 'a') -> 1)"
   end
 
   it "should have #extract_text use the json_extract_path_text function" do
     @l[@j.extract_text('a')].should == "json_extract_path_text(j, 'a')"
     @l[@j.extract_text('a', 'b')].should == "json_extract_path_text(j, 'a', 'b')"
+    @l[@jb.extract_text('a')].should == "jsonb_extract_path_text(j, 'a')"
+    @l[@jb.extract_text('a', 'b')].should == "jsonb_extract_path_text(j, 'a', 'b')"
   end
 
   it "should have #extract_text return an SQL::StringExpression" do
     @l[@j.extract_text('a') + 'a'].should == "(json_extract_path_text(j, 'a') || 'a')"
+    @l[@jb.extract_text('a') + 'a'].should == "(jsonb_extract_path_text(j, 'a') || 'a')"
   end
 
   it "should have #keys use the json_object_keys function" do
     @l[@j.keys].should == "json_object_keys(j)"
+    @l[@jb.keys].should == "jsonb_object_keys(j)"
   end
 
   it "should have #array_elements use the json_array_elements function" do
     @l[@j.array_elements].should == "json_array_elements(j)"
+    @l[@jb.array_elements].should == "jsonb_array_elements(j)"
   end
 
   it "should have #populate use the json_populate_record function" do
     @l[@j.populate(:a)].should == "json_populate_record(a, j)"
+    @l[@jb.populate(:a)].should == "jsonb_populate_record(a, j)"
   end
 
   it "should have #populate_set use the json_populate_record function" do
     @l[@j.populate_set(:a)].should == "json_populate_recordset(a, j)"
+    @l[@jb.populate_set(:a)].should == "jsonb_populate_recordset(a, j)"
   end
 
   it "#pg_json should return self" do
     @j.pg_json.should equal(@j)
+    @jb.pg_jsonb.should equal(@jb)
   end
 
   it "Sequel.pg_json_op should return arg for JSONOp" do
     Sequel.pg_json_op(@j).should equal(@j)
+    Sequel.pg_jsonb_op(@jb).should equal(@jb)
   end
 
   it "should be able to turn expressions into json ops using pg_json" do
     @db.literal(Sequel.qualify(:b, :a).pg_json[1]).should == "(b.a -> 1)"
     @db.literal(Sequel.function(:a, :b).pg_json[1]).should == "(a(b) -> 1)"
+    @db.literal(Sequel.qualify(:b, :a).pg_jsonb[1]).should == "(b.a -> 1)"
+    @db.literal(Sequel.function(:a, :b).pg_jsonb[1]).should == "(a(b) -> 1)"
   end
 
   it "should be able to turn literal strings into json ops using pg_json" do
     @db.literal(Sequel.lit('a').pg_json[1]).should == "(a -> 1)"
+    @db.literal(Sequel.lit('a').pg_jsonb[1]).should == "(a -> 1)"
   end
 
   it "should be able to turn symbols into json ops using Sequel.pg_json_op" do
     @db.literal(Sequel.pg_json_op(:a)[1]).should == "(a -> 1)"
+    @db.literal(Sequel.pg_jsonb_op(:a)[1]).should == "(a -> 1)"
   end
 
   it "should be able to turn symbols into json ops using Sequel.pg_json" do
     @db.literal(Sequel.pg_json(:a)[1]).should == "(a -> 1)"
+    @db.literal(Sequel.pg_jsonb(:a)[1]).should == "(a -> 1)"
   end
 
   it "should allow transforming JSONArray instances into ArrayOp instances" do
@@ -127,5 +149,13 @@ describe "Sequel::Postgres::JSONOp" do
 
   it "should allow transforming JSONHash instances into ArrayOp instances" do
     @db.literal(Sequel.pg_json('a'=>1).op['a']).should == "('{\"a\":1}'::json -> 'a')"
+  end
+
+  it "should allow transforming JSONBArray instances into ArrayOp instances" do
+    @db.literal(Sequel.pg_jsonb([1,2]).op[1]).should == "('[1,2]'::jsonb -> 1)"
+  end
+
+  it "should allow transforming JSONBHash instances into ArrayOp instances" do
+    @db.literal(Sequel.pg_jsonb('a'=>1).op['a']).should == "('{\"a\":1}'::jsonb -> 'a')"
   end
 end

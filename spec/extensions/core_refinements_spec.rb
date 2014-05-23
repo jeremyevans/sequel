@@ -468,6 +468,12 @@ describe "Postgres extensions integration" do
 
   it "Symbol#pg_json should return an JSONOp" do
     @db.literal(:a.pg_json[%w'a b']).should == "(a #> ARRAY['a','b'])"
+    @db.literal(:a.pg_json.extract('a')).should == "json_extract_path(a, 'a')"
+  end
+
+  it "Symbol#pg_jsonb should return an JSONBOp" do
+    @db.literal(:a.pg_jsonb[%w'a b']).should == "(a #> ARRAY['a','b'])"
+    @db.literal(:a.pg_jsonb.extract('a')).should == "jsonb_extract_path(a, 'a')"
   end
 
   it "Symbol#pg_range should return a RangeOp" do
