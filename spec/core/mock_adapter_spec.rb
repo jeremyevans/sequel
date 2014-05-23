@@ -424,6 +424,7 @@ describe "Sequel Mock Adapter" do
       class Sequel::Database; @identifier_input_method=nil; end
       class Sequel::Database; @identifier_output_method=nil; end
       Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.should == 'SELECT #2011-12-13#'
+      Sequel.mock(:host=>'cubrid').from(:a).offset(1).sql.should == 'SELECT * FROM "a" LIMIT 1,4294967295'
       Sequel.mock(:host=>'db2').select(1).sql.should == 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
       Sequel.mock(:host=>'firebird')[:a].distinct.limit(1, 2).sql.should == 'SELECT DISTINCT FIRST 1 SKIP 2 * FROM "A"'
       Sequel.mock(:host=>'informix')[:a].distinct.limit(1, 2).sql.should == 'SELECT SKIP 2 FIRST 1 DISTINCT * FROM A'
@@ -431,6 +432,7 @@ describe "Sequel Mock Adapter" do
       Sequel.mock(:host=>'mysql')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM `a` WHERE (MATCH (`b`) AGAINST ('c'))"
       Sequel.mock(:host=>'oracle')[:a].limit(1).sql.should == 'SELECT * FROM (SELECT * FROM "A") "T1" WHERE (ROWNUM <= 1)'
       Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').sql.should == "SELECT * FROM \"a\" WHERE (to_tsvector(CAST('simple' AS regconfig), (COALESCE(\"b\", ''))) @@ to_tsquery(CAST('simple' AS regconfig), 'c'))"
+      Sequel.mock(:host=>'sqlanywhere').from(:a).offset(1).sql.should == 'SELECT TOP 2147483647 START AT (1 + 1) * FROM "A"'
       Sequel.mock(:host=>'sqlite')[:a___b].sql.should == "SELECT * FROM `a` AS 'b'"
     ensure
       Sequel.quote_identifiers = qi

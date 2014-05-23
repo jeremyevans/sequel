@@ -34,6 +34,7 @@ module Sequel
       # mock adapters for specific database types.
       SHARED_ADAPTERS = {
         'access'=>'Access',
+        'cubrid'=>'Cubrid',
         'db2'=>'DB2',
         'firebird'=>'Firebird',
         'informix'=>'Informix',
@@ -41,6 +42,7 @@ module Sequel
         'mysql'=>'MySQL',
         'oracle'=>'Oracle',
         'postgres'=>'Postgres',
+        'sqlanywhere'=>'SqlAnywhere',
         'sqlite'=>'SQLite'
       }
 
