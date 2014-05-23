@@ -2614,32 +2614,22 @@ describe 'PostgreSQL json type' do
       c.create(:h=>pg_json.call(@h)).h.should == @h
       c.create(:h=>pg_json.call(@a)).h.should == @a
     end
+
+    specify 'use json in bound variables' do
+      @db.create_table!(:items){column :i, json_type}
+      @ds.call(:insert, {:i=>pg_json.call(@h)}, {:i=>:$i})
+      @ds.get(:i).should == @h
+
+      @ds.delete
+      @ds.call(:insert, {:i=>pg_json.call('a'=>nil)}, {:i=>:$i})
+      @ds.get(:i).should == pg_json.call('a'=>nil)
+
+      @db.create_table!(:items){column :i, json_array_type}
+      j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])], json_type)
+      @ds.call(:insert, {:i=>j}, {:i=>:$i})
+      @ds.get(:i).should == j
+    end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
   end
-
-  specify 'use json in bound variables' do
-    @db.create_table!(:items){column :i, :json}
-    @ds.call(:insert, {:i=>Sequel.pg_json(@h)}, {:i=>:$i})
-    @ds.get(:i).should == @h
-    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>Sequel.pg_json(@h)).should == {:i=>@h}
-    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>Sequel.pg_json({})).should == nil
-    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:delete, :i=>Sequel.pg_json(@h)).should == 1
-
-    @ds.call(:insert, {:i=>Sequel.pg_json(@a)}, {:i=>:$i})
-    @ds.get(:i).should == @a
-    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>Sequel.pg_json(@a)).should == {:i=>@a}
-    @ds.filter(Sequel.cast(:i, String)=>:$i).call(:first, :i=>Sequel.pg_json([])).should == nil
-
-    @ds.delete
-    @ds.call(:insert, {:i=>Sequel.pg_json('a'=>nil)}, {:i=>:$i})
-    @ds.get(:i).should == Sequel.pg_json('a'=>nil)
-
-    @db.create_table!(:items){column :i, 'json[]'}
-    j = Sequel.pg_array([Sequel.pg_json('a'=>1), Sequel.pg_json(['b', 2])], :text)
-    @ds.call(:insert, {:i=>j}, {:i=>:$i})
-    @ds.get(:i).should == j
-    @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>j).should == {:i=>j}
-    @ds.filter(Sequel.cast(:i, 'text[]')=>:$i).call(:first, :i=>Sequel.pg_array([])).should == nil
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
   specify 'operations/functions with pg_json_ops' do
     Sequel.extension :pg_json_ops
