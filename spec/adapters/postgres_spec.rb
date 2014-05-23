@@ -2653,6 +2653,14 @@ describe 'PostgreSQL json type' do
       @db.get(ja.array_length).should == 3
       @db.from(ja.array_elements.as(:v)).select_map(:v).should == [2, 3, %w'a b']
 
+      if DB.server_version >= 90400 
+        @db.get(jo.typeof).should == 'object'
+        @db.get(ja.typeof).should == 'array'
+        @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.should == ['2', '3', '["a","b"]']
+        @db.from(jo.to_record(true).as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).should == [1]
+        @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).should == [1]
+      end
+
       @db.from(jo.keys.as(:k)).select_order_map(:k).should == %w'a b'
       @db.from(jo.each).select_order_map(:key).should == %w'a b'
       @db.from(jo.each).order(:key).select_map(:value).should == [1, {'c'=>2, 'd'=>{'e'=>3}}]

@@ -101,6 +101,30 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.array_elements].should == "jsonb_array_elements(j)"
   end
 
+  it "should have #array_elements use the json_array_elements_text function" do
+    @l[@j.array_elements_text].should == "json_array_elements_text(j)"
+    @l[@jb.array_elements_text].should == "jsonb_array_elements_text(j)"
+  end
+
+  it "should have #typeof use the json_typeof function" do
+    @l[@j.typeof].should == "json_typeof(j)"
+    @l[@jb.typeof].should == "jsonb_typeof(j)"
+  end
+
+  it "should have #to_record use the json_to_record function" do
+    @l[@j.to_record].should == "json_to_record(j, false)"
+    @l[@jb.to_record].should == "jsonb_to_record(j, false)"
+    @l[@j.to_record(true)].should == "json_to_record(j, true)"
+    @l[@jb.to_record(true)].should == "jsonb_to_record(j, true)"
+  end
+
+  it "should have #to_recordset use the json_to_recordsetfunction" do
+    @l[@j.to_recordset].should == "json_to_recordset(j, false)"
+    @l[@jb.to_recordset].should == "jsonb_to_recordset(j, false)"
+    @l[@j.to_recordset(true)].should == "json_to_recordset(j, true)"
+    @l[@jb.to_recordset(true)].should == "jsonb_to_recordset(j, true)"
+  end
+
   it "should have #populate use the json_populate_record function" do
     @l[@j.populate(:a)].should == "json_populate_record(a, j)"
     @l[@jb.populate(:a)].should == "jsonb_populate_record(a, j)"

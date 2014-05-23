@@ -45,12 +45,16 @@
 #
 #   j.array_length           # json_array_length(json_column)
 #   j.array_elements         # json_array_elements(json_column)
+#   j.array_elements_text    # json_array_elements_text(json_column)
 #   j.each                   # json_each(json_column)
 #   j.each_text              # json_each_text(json_column)
 #   j.keys                   # json_object_keys(json_column)
+#   j.typeof                 # json_typeof(json_column)
 #
 #   j.populate(:a)           # json_populate_record(:a, json_column)
 #   j.populate_set(:a)       # json_populate_recordset(:a, json_column)
+#   j.to_record              # json_to_record(json_column)
+#   j.to_recordset           # json_to_recordset(json_column)
 #
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
@@ -93,9 +97,16 @@ module Sequel
 
       # Returns a set of json values for the elements in the json array.
       #
-      #   json_op.array_elements # json_oarray_elements(json)
+      #   json_op.array_elements # json_array_elements(json)
       def array_elements
         function(:array_elements)
+      end
+
+      # Returns a set of text values for the elements in the json array.
+      #
+      #   json_op.array_elements_text # json_array_elements_text(json)
+      def array_elements_text
+        function(:array_elements_text)
       end
 
       # Get the length of the outermost json array.
@@ -170,6 +181,29 @@ module Sequel
       #   json_op.populate_set(arg) # json_populate_recordset(arg, json)
       def populate_set(arg)
         SQL::Function.new(function_name(:populate_recordset), arg, self)
+      end
+
+      # Builds arbitrary record from json object.  You need to define the
+      # structure of the record using #as on the resulting object:
+      #
+      #   json_op.to_record.as(:x, [Sequel.lit('a integer'), Sequel.lit('b text')]) # json_to_record(json) AS x(a integer, b text)
+      def to_record(nested_as_text=false)
+        function(:to_record, nested_as_text)
+      end
+
+      # Builds arbitrary set of records from json array of objects.  You need to define the
+      # structure of the records using #as on the resulting object:
+      #
+      #   json_op.to_recordset.as(:x, [Sequel.lit('a integer'), Sequel.lit('b text')]) # json_to_recordset(json) AS x(a integer, b text)
+      def to_recordset(nested_as_text=false)
+        function(:to_recordset, nested_as_text)
+      end
+
+      # Returns the type of the outermost json value as text.
+      #
+      #   json_op.typeof # json_typeof(json)
+      def typeof
+        function(:typeof)
       end
 
       private

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for new json/jsonb functions added in PostgreSQL 9.4 to the pg_json_ops extension (jeremyevans)
+
 * Add support for the PostgreSQL 9.4+ jsonb type to the pg_json_ops extension (jeremyevans)
 
 * Add support for derived column lists to Sequel.as and SQL::AliasMethods#as (jeremyevans)
