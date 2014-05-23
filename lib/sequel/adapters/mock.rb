@@ -51,7 +51,7 @@ module Sequel
       SHARED_ADAPTER_SETUP = {
         'postgres' => lambda do |db|
           db.instance_eval do
-            @server_version = 90103
+            @server_version = 90400
             initialize_postgres_adapter
           end
           db.extend(Module.new do
@@ -69,9 +69,19 @@ module Sequel
             @primary_key_sequences = {}
           end
         end,
+        'mysql' => lambda do |db|
+          db.instance_eval do
+            @server_version = 50617
+          end
+        end,
         'mssql' => lambda do |db|
           db.instance_eval do
-            @server_version = 10000000
+            @server_version = 11000000
+          end
+        end,
+        'sqlite' => lambda do |db|
+          db.instance_eval do
+            @sqlite_version = 30804
           end
         end
       }

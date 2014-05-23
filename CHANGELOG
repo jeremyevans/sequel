@@ -1,5 +1,7 @@
 === HEAD
 
+* Set version when using for MySQL/SQLite emulation in the mock adapter (jeremyevans)
+
 * Add support for CUBRID/SQLAnywhere emulation to the mock adapter (jeremyevans)
 
 * Add support for the jsonb operators added in PostgreSQL 9.4 to the pg_json_ops extension (jeremyevans)
