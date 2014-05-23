@@ -108,6 +108,10 @@ END
     dot(@ds.from(Sequel.as(:a, :b))).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"AliasedExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"alias\"];", "5 [label=\":b\"];"]
   end
 
+  it "should handle SQL::AliasedExpressions with column aliases" do
+    dot(@ds.from(Sequel.as(:a, :b, [:c, :d]))).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"AliasedExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"alias\"];", "5 [label=\":b\"];", "3 -> 6 [label=\"columns\"];", "6 [label=\"Array\"];", "6 -> 7 [label=\"0\"];", "7 [label=\":c\"];", "6 -> 8 [label=\"1\"];", "8 [label=\":d\"];"]
+  end
+
   it "should handle SQL::CaseExpressions" do
     dot(@ds.select(Sequel.case({:a=>:b}, :c, :d))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"CaseExpression\"];", "3 -> 4 [label=\"expression\"];", "4 [label=\":d\"];", "3 -> 5 [label=\"conditions\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"Array\"];", "6 -> 7 [label=\"0\"];", "7 [label=\":a\"];", "6 -> 8 [label=\"1\"];", "8 [label=\":b\"];", "3 -> 9 [label=\"default\"];", "9 [label=\":c\"];"]
   end
@@ -137,7 +141,7 @@ END
   end
 
   it "should handle JOIN USING" do
-    dot(@ds.from(:a).join(:d, [:c], :table_alias=>:c)).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\":a\"];", "1 -> 4 [label=\"join\"];", "4 [label=\"Array\"];", "4 -> 5 [label=\"0\"];", "5 [label=\"INNER JOIN USING\"];", "5 -> 6 [label=\"table\"];", "6 [label=\":d\"];", "5 -> 7 [label=\"alias\"];", "7 [label=\":c\"];", "5 -> 8 [label=\"using\"];", "8 [label=\"Array\"];", "8 -> 9 [label=\"0\"];", "9 [label=\":c\"];"]
+    dot(@ds.from(:a).join(:d, [:c], :table_alias=>:c)).should == ["1 -> 2 [label=\"from\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\":a\"];", "1 -> 4 [label=\"join\"];", "4 [label=\"Array\"];", "4 -> 5 [label=\"0\"];", "5 [label=\"INNER JOIN USING\"];", "5 -> 6 [label=\"table\"];", "6 [label=\"AliasedExpression\"];", "6 -> 7 [label=\"expression\"];", "7 [label=\":d\"];", "6 -> 8 [label=\"alias\"];", "8 [label=\":c\"];", "5 -> 9 [label=\"using\"];", "9 [label=\"Array\"];", "9 -> 10 [label=\"0\"];", "10 [label=\":c\"];"]
   end
 
   it "should handle other types" do

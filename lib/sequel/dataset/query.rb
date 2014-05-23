@@ -213,10 +213,13 @@ module Sequel
     #
     #   ds.from_self(:alias=>:foo)
     #   # SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS foo
+    #
+    #   ds.from_self(:alias=>:foo, :column_aliases=>[:c1, :c2])
+    #   # SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS foo(c1, c2)
     def from_self(opts=OPTS)
       fs = {}
       @opts.keys.each{|k| fs[k] = nil unless NON_SQL_OPTIONS.include?(k)}
-      clone(fs).from(opts[:alias] ? as(opts[:alias]) : self)
+      clone(fs).from(opts[:alias] ? as(opts[:alias], opts[:column_aliases]) : self)
     end
 
     # Match any of the columns to any of the patterns. The terms can be
@@ -449,23 +452,33 @@ module Sequel
       last_alias = options[:implicit_qualifier]
       qualify_type = options[:qualify]
 
-      if table.is_a?(Dataset)
+      if table.is_a?(SQL::AliasedExpression)
+        table_expr = if table_alias
+          SQL::AliasedExpression.new(table.expression, table_alias, table.columns)
+        else
+          table
+        end
+        table = table_expr.expression
+        table_name = table_alias = table_expr.alias
+      elsif table.is_a?(Dataset)
         if table_alias.nil?
           table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
           table_alias = dataset_alias(table_alias_num)
         end
         table_name = table_alias
+        table_expr = SQL::AliasedExpression.new(table, table_alias)
       else
         table, implicit_table_alias = split_alias(table)
         table_alias ||= implicit_table_alias
         table_name = table_alias || table
+        table_expr = table_alias ? SQL::AliasedExpression.new(table, table_alias) : table
       end
 
       join = if expr.nil? and !block
-        SQL::JoinClause.new(type, table, table_alias)
+        SQL::JoinClause.new(type, table_expr)
       elsif using_join
         raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block
-        SQL::JoinUsingClause.new(expr, type, table, table_alias)
+        SQL::JoinUsingClause.new(expr, type, table_expr)
       else
         last_alias ||= @opts[:last_joined_table] || first_source_alias
         if Sequel.condition_specifier?(expr)
@@ -489,7 +502,7 @@ module Sequel
           expr2 = yield(table_name, last_alias, @opts[:join] || [])
           expr = expr ? SQL::BooleanExpression.new(:AND, expr, expr2) : expr2
         end
-        SQL::JoinOnClause.new(expr, type, table, table_alias)
+        SQL::JoinOnClause.new(expr, type, table_expr)
       end
 
       opts = {:join => (@opts[:join] || []) + [join], :last_joined_table => table_name}

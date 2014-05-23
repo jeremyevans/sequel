@@ -870,6 +870,7 @@ describe "Dataset#as" do
   specify "should set up an alias" do
     dataset = Sequel.mock.dataset.from(:test)
     dataset.select(dataset.limit(1).select(:name).as(:n)).sql.should == 'SELECT (SELECT name FROM test LIMIT 1) AS n FROM test'
+    dataset.select(dataset.limit(1).select(:name).as(:n, [:nm])).sql.should == 'SELECT (SELECT name FROM test LIMIT 1) AS n(nm) FROM test'
   end
 end
 
@@ -2046,6 +2047,10 @@ describe "Dataset#from_self" do
     @ds.from_self(:alias=>:some_name).sql.should == 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name'
   end
   
+  specify "should use the user-specified column aliases" do
+    @ds.from_self(:alias=>:some_name, :column_aliases=>[:c1, :c2]).sql.should == 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name(c1, c2)'
+  end
+  
   specify "should use the user-specified alias for joins" do
     @ds.from_self(:alias=>:some_name).inner_join(:posts, :alias=>:name).sql.should == \
       'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name INNER JOIN posts ON (posts.alias = some_name.name)'
@@ -2152,6 +2157,10 @@ describe "Dataset#join_table" do
   
   specify "should support aliased tables using an implicit alias" do
     @d.from('stats').join(Sequel.expr(:players).as(:p), {:id => :player_id}).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
+  end
+  
+  specify "should support aliased tables with an implicit column aliases" do
+    @d.from('stats').join(Sequel.expr(:players).as(:p, [:c1, :c2]), {:id => :player_id}).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" AS "p"("c1", "c2") ON ("p"."id" = "stats"."player_id")'
   end
   
   specify "should support using an alias for the FROM when doing the first join with unqualified condition columns" do
@@ -3667,6 +3676,7 @@ describe "Sequel::Dataset#qualify" do
 
   specify "should handle SQL::AliasedExpressions" do
     @ds.select(Sequel.expr(:a).as(:b)).qualify.sql.should == 'SELECT t.a AS b FROM t'
+    @ds.select(Sequel.expr(:a).as(:b, [:c, :d])).qualify.sql.should == 'SELECT t.a AS b(c, d) FROM t'
   end
 
   specify "should handle SQL::CaseExpressions" do
@@ -4390,7 +4400,7 @@ describe "Custom ASTTransformer" do
     end.new
     ds = Sequel.mock.dataset.from(:t).cross_join(:a___g).join(:b___h, [:c]).join(:d___i, :e=>:f)
     ds.sql.should == 'SELECT * FROM t CROSS JOIN a AS g INNER JOIN b AS h USING (c) INNER JOIN d AS i ON (i.e = h.f)'
-    ds.clone(:from=>c.transform(ds.opts[:from]), :join=>c.transform(ds.opts[:join])).sql.should == 'SELECT * FROM tt CROSS JOIN aa AS gg INNER JOIN bb AS hh USING (cc) INNER JOIN dd AS ii ON (ii.ee = hh.ff)'
+    ds.clone(:from=>c.transform(ds.opts[:from]), :join=>c.transform(ds.opts[:join])).sql.should == 'SELECT * FROM tt CROSS JOIN aa AS g INNER JOIN bb AS h USING (cc) INNER JOIN dd AS i ON (ii.ee = hh.ff)'
   end
 end
 

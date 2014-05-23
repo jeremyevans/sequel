@@ -291,12 +291,17 @@ The following shortcuts exist for creating Sequel::SQL::QualifiedIdentifier obje
 Sequel::SQL::AliasedExpression objects represent aliased expressions in SQL.  The alias
 is treated as an identifier, but the expression can be an arbitrary Sequel expression:
 
-  Sequel::SQL::AliasedExpression.new(:column, :alias) # "column" AS "alias"
+  Sequel::SQL::AliasedExpression.new(:column, :alias)
+  # "column" AS "alias"
+
+  Sequel::SQL::AliasedExpression.new(:table, :alias, [:column_alias1, :column_alias2])
+  # "table" AS "alias"("column_alias1", "column_alias2")
 
 The following shortcuts exist for creating Sequel::SQL::AliasedExpression objects:
 
   Sequel.expr(:column___alias)
   Sequel.as(:column, :alias)
+  Sequel.as(:column, :alias, [:column_alias1, :column_alias2])
   :column.as(:alias) # core_extensions extension
   
 === Sequel::SQL::ComplexExpression

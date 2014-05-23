@@ -293,6 +293,10 @@ describe "Simple Dataset operations" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
 
+  specify "should support table aliases with column aliases" do
+    DB.from(@ds.as(:i, [:x, :n])).first.should == {:x=>1, :n=>10}
+  end if DB.dataset.supports_derived_column_lists?
+
   specify "should handle true/false properly" do
     @ds.filter(Sequel::TRUE).select_map(:number).should == [10]
     @ds.filter(Sequel::FALSE).select_map(:number).should == []

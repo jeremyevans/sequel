@@ -92,6 +92,7 @@ module Sequel
         dot "AliasedExpression"
         v(e.expression, :expression)
         v(e.alias, :alias)
+        v(e.columns, :columns) if e.columns
       when SQL::CaseExpression
         dot "CaseExpression"
         v(e.expression, :expression) if e.expression
@@ -128,8 +129,7 @@ module Sequel
           str << " USING"
         end
         dot str
-        v(e.table, :table)
-        v(e.table_alias, :alias) if e.table_alias
+        v(e.table_expr, :table)
         if e.is_a?(SQL::JoinOnClause)
           v(e.on, :on) 
         elsif e.is_a?(SQL::JoinUsingClause)

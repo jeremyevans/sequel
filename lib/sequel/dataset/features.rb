@@ -54,6 +54,13 @@ module Sequel
       false
     end
 
+    # Whether the database supports derived column lists (e.g.
+    # "table_expr AS table_alias(column_alias1, column_alias2, ...)"), true by
+    # default.
+    def supports_derived_column_lists?
+      true
+    end
+
     # Whether the dataset supports or can emulate the DISTINCT ON clause, false by default.
     def supports_distinct_on?
       false

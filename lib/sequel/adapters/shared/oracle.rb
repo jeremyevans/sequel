@@ -364,6 +364,11 @@ module Sequel
         type == :select
       end
 
+      # Oracle does not support derived column lists
+      def supports_derived_column_lists?
+        false
+      end
+
       # Oracle supports GROUP BY CUBE
       def supports_group_cube?
         true
@@ -418,7 +423,8 @@ module Sequel
 
       # Oracle doesn't support the use of AS when aliasing a dataset.  It doesn't require
       # the use of AS anywhere, so this disables it in all cases.
-      def as_sql_append(sql, aliaz)
+      def as_sql_append(sql, aliaz, column_aliases=nil)
+        raise Error, "oracle does not support derived column lists" if column_aliases
         sql << SPACE
         quote_identifier_append(sql, aliaz)
       end

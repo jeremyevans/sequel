@@ -178,6 +178,10 @@ You can also use the <tt>Sequel.as</tt> method to create an alias, and the +as+ 
   Sequel.as(:column, :alias) # "column" AS "alias"
   Sequel.qualify(:table, :column).as(:alias) # "table"."column" AS "alias"
 
+If you want to use a derived column list, you can provide an array of column aliases:
+
+  Sequel.as(:table, :alias, [:c1, :c2]) # "table" AS "alias"("c1", "c2")
+
 === Functions
 
 The easiest way to use SQL functions is via a virtual row:

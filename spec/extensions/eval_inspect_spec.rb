@@ -13,6 +13,7 @@ describe "eval_inspect extension" do
     [
       # Objects with components where eval(inspect) == self
       Sequel::SQL::AliasedExpression.new(:b, :a),
+      Sequel::SQL::AliasedExpression.new(:b, :a, [:c, :d]),
       Sequel::SQL::CaseExpression.new({:b=>:a}, :c),
       Sequel::SQL::CaseExpression.new({:b=>:a}, :c, :d),
       Sequel::SQL::Cast.new(:a, :b),
@@ -28,9 +29,12 @@ describe "eval_inspect extension" do
       Sequel::NOTNULL,
       Sequel::SQL::Function.new(:a, :b, :c),
       Sequel::SQL::Identifier.new(:a),
-      Sequel::SQL::JoinClause.new(:inner, :b, :c),
-      Sequel::SQL::JoinOnClause.new({:d=>:a}, :inner, :b, :c),
-      Sequel::SQL::JoinUsingClause.new([:a], :inner, :b, :c),
+      Sequel::SQL::JoinClause.new(:inner, :b),
+      Sequel::SQL::JoinOnClause.new({:d=>:a}, :inner, :b),
+      Sequel::SQL::JoinUsingClause.new([:a], :inner, :b),
+      Sequel::SQL::JoinClause.new(:inner, Sequel.as(:b, :c, [:d, :e])),
+      Sequel::SQL::JoinOnClause.new({:d=>:a}, :inner, Sequel.as(:b, :c, [:d, :e])),
+      Sequel::SQL::JoinUsingClause.new([:a], :inner, Sequel.as(:b, :c, [:d, :e])),
       Sequel::SQL::PlaceholderLiteralString.new('? = ?', [:a, :b]),
       Sequel::SQL::PlaceholderLiteralString.new(':a = :b', [{:a=>:b, :b=>42}]),
       Sequel::SQL::OrderedExpression.new(:a),

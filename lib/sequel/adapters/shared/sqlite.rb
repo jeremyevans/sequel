@@ -613,6 +613,11 @@ module Sequel
         db.sqlite_version >= 30803
       end
 
+      # SQLite does not support table aliases with column aliases
+      def supports_derived_column_lists?
+        false
+      end
+
       # SQLite does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false
@@ -643,7 +648,8 @@ module Sequel
       private
       
       # SQLite uses string literals instead of identifiers in AS clauses.
-      def as_sql_append(sql, aliaz)
+      def as_sql_append(sql, aliaz, column_aliases=nil)
+        raise Error, "sqlite does not support derived column lists" if column_aliases
         aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
         sql << AS
         literal_append(sql, aliaz.to_s)

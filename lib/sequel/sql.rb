@@ -251,8 +251,9 @@ module Sequel
       # Create an SQL alias (+AliasedExpression+) of the receiving column or expression to the given alias.
       #
       #   Sequel.function(:func).as(:alias) # func() AS "alias"
-      def as(aliaz)
-        AliasedExpression.new(self, aliaz)
+      #   Sequel.function(:func).as(:alias, [:col_alias1, :col_alias2]) # func() AS "alias"("col_alias1", "col_alias2")
+      def as(aliaz, columns=nil)
+        AliasedExpression.new(self, aliaz, columns)
       end
     end
 
@@ -320,8 +321,9 @@ module Sequel
       # Create an SQL::AliasedExpression for the given expression and alias.
       #
       #   Sequel.as(:column, :alias) # "column" AS "alias"
-      def as(exp, aliaz)
-        SQL::AliasedExpression.new(exp, aliaz)
+      #   Sequel.as(:column, :alias, [:col_alias1, :col_alias2]) # "column" AS "alias"("col_alias1", "col_alias2")
+      def as(exp, aliaz, columns=nil)
+        SQL::AliasedExpression.new(exp, aliaz, columns)
       end
 
       # Order the given argument ascending.
@@ -940,9 +942,15 @@ module Sequel
       attr_reader :aliaz
       alias_method :alias, :aliaz
 
+      # The columns aliases to use, for when the aliased expression is
+      # a record or set of records (such as a dataset). 
+      attr_reader :columns
+
       # Create an object with the given expression and alias.
-      def initialize(expression, aliaz)
-        @expression, @aliaz = expression, aliaz
+      def initialize(expression, aliaz, columns=nil)
+        @expression = expression
+        @aliaz = aliaz
+        @columns = columns
       end
 
       to_s_method :aliased_expression_sql
@@ -1381,15 +1389,48 @@ module Sequel
       # The type of join to do
       attr_reader :join_type
 
-      # The actual table to join
-      attr_reader :table
+      # The expression representing the table/set related to the JOIN.
+      # Is an AliasedExpression if the JOIN uses an alias.
+      attr_reader :table_expr
 
-      # The table alias to use for the join, if any
-      attr_reader :table_alias
-
-      # Create an object with the given join_type, table, and table alias
+      # Create an object with the given join_type and table expression.
       def initialize(join_type, table, table_alias = nil)
-        @join_type, @table, @table_alias = join_type, table, table_alias
+        @join_type = join_type
+
+        @table_expr = if table.is_a?(AliasedExpression)
+          table
+        # REMOVE411
+        elsif table_alias
+          Deprecation.deprecate("The table_alias argument to Sequel::SQL::JoinClause#initialize", "Please use a Sequel::SQL::AliasedExpression as the table argument instead.")
+          AliasedExpression.new(table, table_alias)
+        else
+          table
+        end
+      end
+
+      # The table/set related to the JOIN, without any alias.
+      def table
+        if @table_expr.is_a?(AliasedExpression)
+          @table_expr.expression
+        else
+          @table_expr
+        end
+      end
+
+      # The table alias to use for the JOIN , or nil if the
+      # JOIN does not alias the table.
+      def table_alias
+        if @table_expr.is_a?(AliasedExpression)
+          @table_expr.alias
+        end
+      end
+
+      # The column aliases to use for the JOIN , or nil if the
+      # JOIN does not use a derived column list.
+      def column_aliases
+        if @table_expr.is_a?(AliasedExpression)
+          @table_expr.columns
+        end
       end
 
       to_s_method :join_clause_sql

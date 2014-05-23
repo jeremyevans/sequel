@@ -200,6 +200,11 @@ module Sequel
         clone(:into => table)
       end
 
+      # Access does not support derived column lists.
+      def supports_derived_column_lists?
+        false
+      end
+
       # Access doesn't support INTERSECT or EXCEPT
       def supports_intersect_except?
         false

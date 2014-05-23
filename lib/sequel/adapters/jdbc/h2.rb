@@ -160,6 +160,11 @@ module Sequel
           end
         end
         
+        # H2 does not support derived column lists
+        def supports_derived_column_lists?
+          false
+        end
+
         # H2 requires SQL standard datetimes
         def requires_sql_standard_datetimes?
           true

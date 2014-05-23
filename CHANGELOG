@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for derived column lists to Sequel.as and SQL::AliasMethods#as (jeremyevans)
+
 * Support connecting to a DB2 catalog name in the ibmdb adapter (calh) (#821)
 
 * Fix warnings in some cases in the ibmdb adapter (calh) (#820)

@@ -349,7 +349,7 @@ module Sequel
     # Append literalization of aliased expression to SQL string.
     def aliased_expression_sql_append(sql, ae)
       literal_append(sql, ae.expression)
-      as_sql_append(sql, ae.alias)
+      as_sql_append(sql, ae.alias, ae.columns)
     end
 
     # Append literalization of array to SQL string.
@@ -602,10 +602,10 @@ module Sequel
     def join_clause_sql_append(sql, jc)
       table = jc.table
       table_alias = jc.table_alias
-      table_alias = nil if table == table_alias
+      table_alias = nil if table == table_alias && !jc.column_aliases
       sql << SPACE << join_type_sql(jc.join_type) << SPACE
       identifier_append(sql, table)
-      as_sql_append(sql, table_alias) if table_alias
+      as_sql_append(sql, table_alias, jc.column_aliases) if table_alias
     end
 
     # Append literalization of JOIN ON clause to SQL string.
@@ -921,9 +921,15 @@ module Sequel
     end
 
     # Append aliasing expression to SQL string.
-    def as_sql_append(sql, aliaz)
+    def as_sql_append(sql, aliaz, column_aliases=nil)
       sql << AS
       quote_identifier_append(sql, aliaz)
+      if column_aliases
+        raise Error, "#{db.database_type} does not support derived column lists" unless supports_derived_column_lists?
+        sql << PAREN_OPEN
+        identifier_list_append(sql, column_aliases)
+        sql << PAREN_CLOSE
+      end
     end
     
     # Raise an InvalidOperation exception if deletion is not allowed

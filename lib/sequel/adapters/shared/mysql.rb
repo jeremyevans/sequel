@@ -760,6 +760,11 @@ module Sequel
         sql << BACKTICK << c.to_s.gsub(BACKTICK_RE, DOUBLE_BACKTICK) << BACKTICK
       end
 
+      # MySQL does not support derived column lists
+      def supports_derived_column_lists?
+        false
+      end
+
       # MySQL can emulate DISTINCT ON with its non-standard GROUP BY implementation,
       # though the rows returned cannot be made deterministic through ordering.
       def supports_distinct_on?
