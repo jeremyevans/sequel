@@ -135,6 +135,51 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.populate_set(:a)].should == "jsonb_populate_recordset(a, j)"
   end
 
+  it "#contain_all should use the ?& operator" do
+    @l[@jb.contain_all(:h1)].should == "(j ?& h1)"
+  end
+
+  it "#contain_all handle arrays" do
+    @l[@jb.contain_all(%w'h1')].should == "(j ?& ARRAY['h1'])"
+  end
+
+  it "#contain_any should use the ?| operator" do
+    @l[@jb.contain_any(:h1)].should == "(j ?| h1)"
+  end
+
+  it "#contain_any should handle arrays" do
+    @l[@jb.contain_any(%w'h1')].should == "(j ?| ARRAY['h1'])"
+  end
+
+  it "#contains should use the @> operator" do
+    @l[@jb.contains(:h1)].should == "(j @> h1)"
+  end
+
+  it "#contains should handle hashes" do
+    @l[@jb.contains('a'=>'b')].should == "(j @> '{\"a\":\"b\"}'::jsonb)"
+  end
+
+  it "#contains should handle arrays" do
+    @l[@jb.contains([1, 2])].should == "(j @> '[1,2]'::jsonb)"
+  end
+
+  it "#contained_by should use the <@ operator" do
+    @l[@jb.contained_by(:h1)].should == "(j <@ h1)"
+  end
+
+  it "#contained_by should handle hashes" do
+    @l[@jb.contained_by('a'=>'b')].should == "(j <@ '{\"a\":\"b\"}'::jsonb)"
+  end
+
+  it "#contained_by should handle arrays" do
+    @l[@jb.contained_by([1, 2])].should == "(j <@ '[1,2]'::jsonb)"
+  end
+
+  it "#has_key? and aliases should use the ? operator" do
+    @l[@jb.has_key?('a')].should == "(j ? 'a')"
+    @l[@jb.include?('a')].should == "(j ? 'a')"
+  end
+
   it "#pg_json should return self" do
     @j.pg_json.should equal(@j)
     @jb.pg_jsonb.should equal(@jb)

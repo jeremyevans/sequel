@@ -2659,6 +2659,34 @@ describe 'PostgreSQL json type' do
         @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.should == ['2', '3', '["a","b"]']
         @db.from(jo.to_record(true).as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).should == [1]
         @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).should == [1]
+
+        if json_type == :jsonb
+          @db.get(jo.has_key?('a')).should == true
+          @db.get(jo.has_key?('c')).should == false
+          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('2')).should == true
+          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('4')).should == false
+
+          @db.get(jo.contain_all(['a', 'b'])).should == true
+          @db.get(jo.contain_all(['a', 'c'])).should == false
+          @db.get(jo.contain_all(['d', 'c'])).should == false
+          @db.get(jo.contain_any(['a', 'b'])).should == true
+          @db.get(jo.contain_any(['a', 'c'])).should == true
+          @db.get(jo.contain_any(['d', 'c'])).should == false
+
+          @db.get(jo.contains(jo)).should == true
+          @db.get(jo.contained_by(jo)).should == true
+          @db.get(jo.contains('a'=>1)).should == true
+          @db.get(jo.contained_by('a'=>1)).should == false
+          @db.get(pg_json.call('a'=>1).op.contains(jo)).should == false
+          @db.get(pg_json.call('a'=>1).op.contained_by(jo)).should == true
+
+          @db.get(ja.contains(ja)).should == true
+          @db.get(ja.contained_by(ja)).should == true
+          @db.get(ja.contains([2,3])).should == true
+          @db.get(ja.contained_by([2,3])).should == false
+          @db.get(pg_json.call([2,3]).op.contains(ja)).should == false
+          @db.get(pg_json.call([2,3]).op.contained_by(ja)).should == true
+        end
       end
 
       @db.from(jo.keys.as(:k)).select_order_map(:k).should == %w'a b'

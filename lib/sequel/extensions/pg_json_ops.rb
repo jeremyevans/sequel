@@ -251,14 +251,84 @@ module Sequel
       end
     end
 
-    # JSONBaseOp subclass for the jsonb type
+    # JSONBaseOp subclass for the jsonb type.
+    #
+    # In the method documentation examples, assume that:
+    #
+    #   jsonb_op = Sequel.pg_jsonb(:jsonb)
     class JSONBOp < JSONBaseOp
+      CONTAIN_ALL = ["(".freeze, " ?& ".freeze, ")".freeze].freeze
+      CONTAIN_ANY = ["(".freeze, " ?| ".freeze, ")".freeze].freeze
+      CONTAINS = ["(".freeze, " @> ".freeze, ")".freeze].freeze
+      CONTAINED_BY = ["(".freeze, " <@ ".freeze, ")".freeze].freeze
+      HAS_KEY = ["(".freeze, " ? ".freeze, ")".freeze].freeze
+
+      # Check if the receiver contains all of the keys in the given array:
+      #
+      #   jsonb_op.contain_all(:a) # (jsonb ?& a)
+      def contain_all(other)
+        bool_op(CONTAIN_ALL, wrap_input_array(other))
+      end
+
+      # Check if the receiver contains any of the keys in the given array:
+      #
+      #   jsonb_op.contain_any(:a) # (jsonb ?| a)
+      def contain_any(other)
+        bool_op(CONTAIN_ANY, wrap_input_array(other))
+      end
+
+      # Check if the receiver contains all entries in the other jsonb:
+      #
+      #   jsonb_op.contains(:h) # (jsonb @> h)
+      def contains(other)
+        bool_op(CONTAINS, wrap_input_jsonb(other))
+      end
+
+      # Check if the other jsonb contains all entries in the receiver:
+      #
+      #   jsonb_op.contained_by(:h) # (jsonb <@ h)
+      def contained_by(other)
+        bool_op(CONTAINED_BY, wrap_input_jsonb(other))
+      end
+
+      # Check if the receiver contains the given key:
+      #
+      #   jsonb_op.has_key?('a') # (jsonb ? 'a')
+      def has_key?(key)
+        bool_op(HAS_KEY, key)
+      end
+      alias include? has_key?
+
       # Return the receiver, since it is already a JSONBOp.
       def pg_jsonb
         self
       end
 
       private
+
+      # Return a placeholder literal with the given str and args, wrapped
+      # in a boolean expression, used by operators that return booleans.
+      def bool_op(str, other)
+        Sequel::SQL::BooleanExpression.new(:NOOP, Sequel::SQL::PlaceholderLiteralString.new(str, [value, other]))
+      end
+
+      # Wrap argument in a PGArray if it is an array
+      def wrap_input_array(obj)
+        if obj.is_a?(Array) && Sequel.respond_to?(:pg_array) 
+          Sequel.pg_array(obj)
+        else
+          obj
+        end
+      end
+
+      # Wrap argument in a JSONBArray or JSONBHash if it is an array or hash.
+      def wrap_input_jsonb(obj)
+        if Sequel.respond_to?(:pg_jsonb) && (obj.is_a?(Array) || obj.is_a?(Hash))
+          Sequel.pg_jsonb(obj)
+        else
+          obj
+        end
+      end
 
       # The jsonb type functions are prefixed with jsonb_
       def function_name(name)
