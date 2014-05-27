@@ -440,7 +440,7 @@ module Sequel
     #
     #   DB[:table].one!(id: 1) # SELECT * FROM table LIMIT 2
     #   # => {:id=>1}
-    def one!(args={})
+    def one(args={})
       records = where(args).clone(:limit => 2).to_a
       if records.empty?
         nil

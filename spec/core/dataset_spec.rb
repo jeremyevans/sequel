@@ -2542,22 +2542,22 @@ describe "Dataset #first!" do
   end
 end
 
-describe "Dataset #one!" do
+describe "Dataset #one" do
   before do
     @db = Sequel.mock(:fetch=>proc{|s| {:s=>s}})
     @d = @db[:test]
   end
 
   specify "should return the matching record" do
-    @d.one!.should == {:s=>'SELECT * FROM test LIMIT 2'}
+    @d.one.should == {:s=>'SELECT * FROM test LIMIT 2'}
   end
 
   specify "should use argument filters and return the matching record" do
-    @d.one!(:x=>17, :y=>25).should == {:s=>'SELECT * FROM test WHERE ((x = 17) AND (y = 25)) LIMIT 2'}
+    @d.one(:x=>17, :y=>25).should == {:s=>'SELECT * FROM test WHERE ((x = 17) AND (y = 25)) LIMIT 2'}
   end
 
   specify "should return nil if no rows match" do
-    Sequel.mock[:t].one! == nil
+    Sequel.mock[:t].one == nil
   end
 end
   
