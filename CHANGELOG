@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :model_map option to class_table_inheritance plugin so class names don't need to be stored in the database (jeremyevans)
+
 * Set version when using for MySQL/SQLite emulation in the mock adapter (jeremyevans)
 
 * Add support for CUBRID/SQLAnywhere emulation to the mock adapter (jeremyevans)

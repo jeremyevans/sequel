@@ -71,7 +71,9 @@ module Sequel
     #   # You can also set options when loading the plugin:
     #   # :kind :: column to hold the class name
     #   # :table_map :: map of class name symbols to table name symbols
-    #   Employee.plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
+    #   # :model_map :: map of column values to class name symbols
+    #   Employee.plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff},
+    #     :model_map=>{1=>:Employee, 2=>:Manager, 3=>:Executive, 4=>:Staff}
     module ClassTableInheritance
       # The class_table_inheritance plugin requires the lazy_attributes plugin
       # to handle lazily-loaded attributes for subclass instances returned
@@ -83,25 +85,26 @@ module Sequel
       # Initialize the per-model data structures and set the dataset's row_proc
       # to check for the :key option column for the type of class when loading objects.
       # Options:
-      # * :key - The column symbol holding the name of the model class this
-      #   is an instance of.  Necessary if you want to call model methods
-      #   using the superclass, but have them return subclass instances.
-      # * :table_map - Hash with class name symbol keys and table name symbol
-      #   values.  Necessary if the implicit table name for the model class
-      #   does not match the database table name
+      # :key :: The column symbol holding the name of the model class this
+      #         is an instance of.  Necessary if you want to call model methods
+      #         using the superclass, but have them return subclass instances.
+      # :table_map :: Hash with class name symbol keys and table name symbol
+      #               values.  Necessary if the implicit table name for the model class
+      #               does not match the database table name
+      # :model_map :: Hash with keys being values of the cti_key column, and values
+      #               being class name strings or symbols.  Used if you don't want to
+      #               store class names in the database.  If you use this option, you
+      #               are responsible for setting the values of the cti_key column
+      #               manually (usually in a before_create hook).
       def self.configure(model, opts=OPTS)
         model.instance_eval do
-          m = method(:constantize)
           @cti_base_model = self
           @cti_key = key = opts[:key] 
           @cti_tables = [table_name]
           @cti_columns = {table_name=>columns}
           @cti_table_map = opts[:table_map] || {}
-          dataset.row_proc = if key
-            lambda{|r| (m.call(r[key]) rescue model).call(r)}
-          else
-            model
-          end
+          @cti_model_map = opts[:model_map]
+          set_dataset_cti_row_proc
         end
       end
 
@@ -119,6 +122,11 @@ module Sequel
         # return instances of subclasses when calling the superclass's
         # load method.
         attr_reader :cti_key
+        
+        # A hash with keys being values of the cti_key column, and values
+        # being class name strings or symbols.  Used if you don't want to
+        # store class names in the database.
+        attr_reader :cti_model_map
         
         # An array of table symbols that back this model.  The first is
         # cti_base_model table symbol, and the last is the current model
@@ -139,6 +147,7 @@ module Sequel
           ct = cti_tables.dup
           ctm = cti_table_map.dup
           cbm = cti_base_model
+          cmm = cti_model_map
           pk = primary_key
           ds = dataset
           subclass.instance_eval do
@@ -150,6 +159,7 @@ module Sequel
             @cti_columns = cc.merge(table=>columns)
             @cti_table_map = ctm
             @cti_base_model = cbm
+            @cti_model_map = cmm
             # Need to set dataset and columns before calling super so that
             # the main column accessor module is included in the class before any
             # plugin accessor modules (such as the lazy attributes accessor module).
@@ -158,12 +168,7 @@ module Sequel
           end
           super
           subclass.instance_eval do
-            m = method(:constantize)
-            dataset.row_proc = if cti_key
-              lambda{|r| (m.call(r[ck]) rescue subclass).call(r)}
-            else
-              subclass
-            end
+            set_dataset_cti_row_proc
             (columns - [cbm.primary_key]).each{|a| define_lazy_attribute_getter(a)}
             cti_tables.reverse.each do |table|
               db.schema(table).each{|k,v| db_schema[k] = v}
@@ -192,12 +197,33 @@ module Sequel
           ds.row_proc = @dataset.row_proc if @dataset
         end
 
+        # Set the row_proc for the model's dataset appropriately
+        # based on the cti key and model map.
+        def set_dataset_cti_row_proc
+          m = method(:constantize)
+          dataset.row_proc = if ck = cti_key
+            if model_map = cti_model_map
+              lambda do |r|
+                mod = if name = model_map[r[ck]]
+                  m.call(name)
+                else
+                  self
+                end
+                mod.call(r)
+              end
+            else
+              lambda{|r| (m.call(r[ck]) rescue self).call(r)}
+            end
+          else
+            self
+          end
+        end
       end
 
       module InstanceMethods
         # Set the cti_key column to the name of the model.
         def before_validation
-          if new? && model.cti_key
+          if new? && model.cti_key && !model.cti_model_map
             send("#{model.cti_key}=", model.name.to_s)
           end
           super

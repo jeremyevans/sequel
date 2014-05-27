@@ -94,6 +94,18 @@ describe "class_table_inheritance plugin" do
     Manager.all.collect{|x| x.class}.should == [Manager, Manager]
   end
   
+  it "should handle a model map with integer values" do
+    Employee.plugin(:class_table_inheritance, :key=>:kind, :model_map=>{0=>:Employee, 1=>:Manager, 2=>:Executive})
+    Object.send(:remove_const, :Executive)
+    Object.send(:remove_const, :Manager)
+    class ::Manager < Employee; end 
+    class ::Executive < Manager; end 
+    Employee.dataset._fetch = [{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}]
+    Employee.all.collect{|x| x.class}.should == [Employee, Employee, Manager, Executive]
+    Manager.dataset._fetch = [{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}]
+    Manager.all.collect{|x| x.class}.should == [Manager, Employee, Manager, Executive]
+  end
+  
   it "should fallback to the main class if the given class does not exist" do
     @ds._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Blah'}, {:kind=>'Staff'}]
     Employee.all.collect{|x| x.class}.should == [Employee, Manager, Employee, Staff]
