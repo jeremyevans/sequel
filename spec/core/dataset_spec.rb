@@ -2556,8 +2556,8 @@ describe "Dataset #one!" do
     @d.one!(:x=>17, :y=>25).should == {:s=>'SELECT * FROM test WHERE ((x = 17) AND (y = 25)) LIMIT 2'}
   end
 
-  specify "should raise a NoMatchingRow exception if no rows match" do
-    proc{Sequel.mock[:t].one!}.should raise_error(Sequel::NoMatchingRow)
+  specify "should return nil if no rows match" do
+    Sequel.mock[:t].one! == nil
   end
 end
   

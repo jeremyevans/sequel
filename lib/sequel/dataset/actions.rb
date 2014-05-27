@@ -433,9 +433,8 @@ module Sequel
 
     # Find the record matching the specified arguments.
     #
-    # If there are no records in the dataset, a NoMatchingRow exception is
-    # raised.  If more than one record matches the arguments a TooManyRows
-    # exception is raised.
+    # If there are no records in the dataset, nil is returned.  If more than
+    # one record matches the arguments a TooManyRows exception is raised.
     #
     # Examples:
     #
@@ -444,11 +443,11 @@ module Sequel
     def one!(args={})
       records = where(args).clone(:limit => 2).to_a
       if records.empty?
-        raise(Sequel::NoMatchingRow)
+        nil
       elsif records.length > 1
         raise(Sequel::TooManyRows)
       else
-        return records.first
+        records.first
       end
     end
 
