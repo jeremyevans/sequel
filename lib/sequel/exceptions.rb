@@ -54,6 +54,10 @@ module Sequel
   # method, and the dataset does not yield any rows.
   class NoMatchingRow < Error; end
 
+  # Error raised when the user requests a record via the one! method, and the
+  # dataset yields more than one row.
+  class TooManyRows < Error; end
+
   # Error raised when the connection pool cannot acquire a database connection
   # before the timeout.
   class PoolTimeout < Error; end

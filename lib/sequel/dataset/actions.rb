@@ -11,8 +11,9 @@ module Sequel
     ACTION_METHODS = (<<-METHS).split.map{|x| x.to_sym}
       << [] all avg count columns columns! delete each
       empty? fetch_rows first first! get import insert interval last
-      map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
-      single_record single_value sum to_hash to_hash_groups truncate update
+      map max min multi_insert one paged_each range select_hash
+      select_hash_groups select_map select_order_map single_record
+      single_value sum to_hash to_hash_groups truncate update
     METHS
 
     # Inserts the given argument into the database.  Returns self so it
@@ -428,6 +429,26 @@ module Sequel
       return if hashes.empty?
       columns = hashes.first.keys
       import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
+    end
+
+    # Find the record matching the specified arguments.
+    #
+    # If there are no records in the dataset, nil is returned.  If more than
+    # one record matches the arguments a TooManyRows exception is raised.
+    #
+    # Examples:
+    #
+    #   DB[:table].one(id: 1) # SELECT * FROM table LIMIT 2
+    #   # => {:id=>1}
+    def one(args={})
+      records = where(args).clone(:limit => 2).to_a
+      if records.empty?
+        nil
+      elsif records.length > 1
+        raise(Sequel::TooManyRows)
+      else
+        records.first
+      end
     end
 
     # Yields each row in the dataset, but interally uses multiple queries as needed to
