@@ -132,9 +132,9 @@ allows you do create an unlogged table by specifying the <tt>:unlogged=>true</tt
   DB.create_table(:table, :unlogged=>true){Integer :i}
   # CREATE UNLOGGED TABLE "table" ("i" integer)
 
-=== Creating/Dropping Schemas, Languages, Functions, and Triggers
+=== Creating/Dropping Schemas, Languages, Functions, Triggers, and Extensions
 
-Sequel has built in support for creating and dropping PostgreSQL schemas, procedural languages, functions, and triggers:
+Sequel has built in support for creating and dropping PostgreSQL schemas, procedural languages, functions, triggers, and extensions:
 
   DB.create_schema(:s)
   # CREATE SCHEMA "s"
@@ -164,6 +164,11 @@ Sequel has built in support for creating and dropping PostgreSQL schemas, proced
   # CREATE TRIGGER trg_updated_at BEFORE INSERT OR UPDATE ON "table" FOR EACH ROW EXECUTE PROCEDURE set_updated_at()
   DB.drop_trigger(:table, :trg_updated_at)
   # DROP TRIGGER trg_updated_at ON "table"
+  
+  DB.create_extension(:hstore)
+  # CREATE EXTENSION hstore
+  DB.drop_extension(:hstore)
+  # DROP EXTENSION hstore
 
 == PostgreSQL-specific DML Support
 

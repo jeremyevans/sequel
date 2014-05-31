@@ -1434,6 +1434,24 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
     @d.drop_table?(:test)
   end
+  
+  specify '#create_extension and #drop_extension should create and drop extensions' do
+    @d.send(:create_extension_sql, :hstore).should == 'CREATE EXTENSION hstore'
+    @d.send(:create_extension_sql, :hstore, :if_not_exists => true).should == 'CREATE EXTENSION IF NOT EXISTS hstore'
+    @d.send(:create_extension_sql, :hstore, :schema => :public, :old_version => :unpackaged).should == 'CREATE EXTENSION hstore SCHEMA "public" FROM unpackaged'
+    
+    @d.create_extension(:hstore, :if_not_exists => true)
+    proc { @d.create_extension(:hstore) } .should raise_error(Sequel::DatabaseError)
+    
+    @d.send(:drop_extension_sql, :hstore).should == 'DROP EXTENSION hstore'
+    @d.send(:drop_extension_sql, :hstore, :if_exists => true).should == 'DROP EXTENSION IF EXISTS hstore'
+    @d.send(:drop_extension_sql, :hstore, :cascade => true).should == 'DROP EXTENSION hstore CASCADE'
+    @d.send(:drop_extension_sql, :hstore, :if_exists => true, :cascade => true).should == 'DROP EXTENSION IF EXISTS hstore CASCADE'
+    
+    @d.drop_extension(:hstore, :cascade => true)
+    proc { @d.drop_extension(:hstore) } .should raise_error(Sequel::DatabaseError)
+    @d.drop_extension(:hstore, :if_exists => true)
+  end
 
   specify "#create_function and #drop_function should create and drop functions" do
     proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
