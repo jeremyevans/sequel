@@ -11,7 +11,7 @@
 # or Sequel.pg_jsonb_op:
 #
 #   j = Sequel.pg_json_op(:json_column)
-#   jb = Sequel.pg_json_op(:jsonb_column)
+#   jb = Sequel.pg_jsonb_op(:jsonb_column)
 #
 # If you have also loaded the pg_json extension, you can use
 # Sequel.pg_json or Sequel.pg_jsonb as well:
