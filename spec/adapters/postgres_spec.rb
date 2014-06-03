@@ -257,6 +257,14 @@ describe "A PostgreSQL database" do
     ds.insert(:id=>1)
     ds.select_map(:id).should == [1]
   end
+
+  if SEQUEL_POSTGRES_USES_PG
+    specify "should set notice receiver when connecting" do
+      receiver = proc {}
+      db = Sequel.connect(DB.opts.merge(:notice_receiver=>receiver))
+      db.synchronize { |conn| conn.set_notice_receiver }.should == receiver
+    end
+  end
 end
 
 describe "A PostgreSQL database with domain types" do
