@@ -204,7 +204,7 @@ module Sequel
       # if the pg driver is used.
       def connect(server)
         opts = server_opts(server)
-        conn = if SEQUEL_POSTGRES_USES_PG
+        if SEQUEL_POSTGRES_USES_PG
           connection_params = {
             :host => opts[:host],
             :port => opts[:port] || 5432,
@@ -214,9 +214,15 @@ module Sequel
             :connect_timeout => opts[:connect_timeout] || 20,
             :sslmode => opts[:sslmode]
           }.delete_if { |key, value| blank_object?(value) }
-          Adapter.connect(connection_params)
+          conn = Adapter.connect(connection_params)
+
+          conn.instance_variable_set(:@prepared_statements, {})
+
+          if receiver = opts[:notice_receiver]
+            conn.set_notice_receiver(&receiver)
+          end
         else
-          Adapter.connect(
+          conn = Adapter.connect(
             (opts[:host] unless blank_object?(opts[:host])),
             opts[:port] || 5432,
             nil, '',
@@ -225,9 +231,9 @@ module Sequel
             opts[:password]
           )
         end
-        if receiver = opts[:notice_receiver]
-          conn.set_notice_receiver(&receiver) if SEQUEL_POSTGRES_USES_PG
-        end
+
+        conn.instance_variable_set(:@db, self)
+
         if encoding = opts[:encoding] || opts[:charset]
           if conn.respond_to?(:set_client_encoding)
             conn.set_client_encoding(encoding)
@@ -235,8 +241,7 @@ module Sequel
             conn.async_exec("set client_encoding to '#{encoding}'")
           end
         end
-        conn.instance_variable_set(:@db, self)
-        conn.instance_variable_set(:@prepared_statements, {}) if SEQUEL_POSTGRES_USES_PG
+
         connection_configuration_sqls.each{|sql| conn.execute(sql)}
         conn
       end

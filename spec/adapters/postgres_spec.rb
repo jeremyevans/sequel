@@ -258,13 +258,11 @@ describe "A PostgreSQL database" do
     ds.select_map(:id).should == [1]
   end
 
-  if SEQUEL_POSTGRES_USES_PG
-    specify "should set notice receiver when connecting" do
-      receiver = proc {}
-      db = Sequel.connect(DB.opts.merge(:notice_receiver=>receiver))
-      db.synchronize { |conn| conn.set_notice_receiver }.should == receiver
-    end
-  end
+  specify "should have notice receiver receive notices" do
+    a = nil
+    Sequel.connect(DB.opts.merge(:notice_receiver=>proc{|r| a = r.result_error_message})){|db| db.do("BEGIN\nRAISE WARNING 'foo';\nEND;")}
+    a.should == "WARNING:  foo\n"
+  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
 end
 
 describe "A PostgreSQL database with domain types" do

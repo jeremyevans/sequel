@@ -373,9 +373,12 @@ The following additional options are supported:
                                 conversion is done, so an error is raised if you attempt to retrieve an infinite
                                 timestamp/date.  You can set this to :nil to convert to nil, :string to leave
                                 as a string, or :float to convert to an infinite float.
-:encoding :: Set the client_encoding to the given string
 :connect_timeout :: Set the number of seconds to wait for a connection (default 20, only respected
                     if using the pg library).
+:encoding :: Set the client_encoding to the given string
+:notice_receiver :: A proc that be called with the PGresult objects that have notice or warning messages.
+                    The default notice receiver just prints the messages to stderr, but this can be used
+                    to handle notice/warning messages differently.  Only respected if using the pg library).
 :sslmode :: Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL (only
             respected if using the pg library)
 :use_iso_date_format :: This can be set to false to not force the ISO date format.  Sequel forces

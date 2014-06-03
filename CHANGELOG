@@ -1,3 +1,7 @@
+=== HEAD
+
+* Support :notice_receiver Database option when postgres adapter is used with pg driver (jeltz, jeremyevans) (#825)
+
 === 4.11.0 (2014-06-03)
 
 * Add :model_map option to class_table_inheritance plugin so class names don't need to be stored in the database (jeremyevans)
