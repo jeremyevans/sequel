@@ -540,10 +540,10 @@
             <p>CHECK column ~* &#39;foo\d+&#39;</p>
             </dd><dt>like &#39;foo%&#39; 
             <dd>
-            <p>CHECK column LIKE &#39;foo%&#39;</p>
+            <p>CHECK column LIKE &#39;foo%&#39; ESCAPE &#39;'</p>
             </dd><dt>ilike &#39;foo%&#39; 
             <dd>
-            <p>CHECK column ILIKE &#39;foo%&#39;</p>
+            <p>CHECK column ILIKE &#39;foo%&#39; ESCAPE &#39;'</p>
             </dd><dt>includes [&#39;a&#39;, &#39;b&#39;] 
             <dd>
             <p>CHECK column IN (&#39;a&#39;, &#39;b&#39;)</p>
@@ -918,7 +918,7 @@
             href="Sequel/Postgres/ArrayOp.html">Sequel::Postgres::ArrayOp</a> object
             that can be used for easier querying:</p>
             
-            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.hstore          # hstore(int_array_column)&#x000A;ia.hstore(:a)      # hstore(int_array_column, a)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)</pre>
+            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.cardinality     # cardinality(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.hstore          # hstore(int_array_column)&#x000A;ia.hstore(:a)      # hstore(int_array_column, a)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)&#x000A;ia.unnest(:b)      # unnest(int_array_column, b)</pre>
             
             <p>See the PostgreSQL array function and operator documentation for more
             details on what these functions and operators do.</p>
@@ -985,44 +985,49 @@
             
             <p>The pg_json_ops extension adds support to Sequel&#39;s DSL to make it
             easier to call PostgreSQL JSON functions and operators (added first in
-            PostgreSQL 9.3).</p>
+            PostgreSQL 9.3).  It also supports the JSONB functions and operators added
+            in PostgreSQL 9.4).</p>
             
             <p>To load the extension:</p>
             
             <pre>Sequel.extension :pg_json_ops</pre>
             
-            <p>The most common usage is passing an expression to Sequel.pg_json_op:</p>
+            <p>The most common usage is passing an expression to Sequel.pg_json_op or
+            Sequel.pg_jsonb_op:</p>
             
-            <pre>j = Sequel.pg_json_op(:json_column)</pre>
+            <pre>j = Sequel.pg_json_op(:json_column)&#x000A;jb = Sequel.pg_jsonb_op(:jsonb_column)</pre>
             
             <p>If you have also loaded the pg_json extension, you can use Sequel.pg_json
-            as well:</p>
+            or Sequel.pg_jsonb as well:</p>
             
-            <pre>j = Sequel.pg_json(:json_column)</pre>
+            <pre>j = Sequel.pg_json(:json_column)&#x000A;jb = Sequel.pg_jsonb(:jsonb_column)</pre>
             
             <p>Also, on most <a href="Sequel.html">Sequel</a> expression objects, you can
-            call the pg_json method:</p>
+            call the pg_json or pg_jsonb # method:</p>
             
-            <pre>j = Sequel.expr(:json_column).pg_json</pre>
+            <pre>j = Sequel.expr(:json_column).pg_json&#x000A;jb = Sequel.expr(:jsonb_column).pg_jsonb</pre>
             
             <p>If you have loaded the <a
             href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>
             or you have loaded the core_refinements extension and have activated
             refinements for the file, you can also use <a
-            href="Sequel/Postgres/JSONOpMethods.html#method-i-pg_json">Sequel::Postgres::JSONOpMethods#pg_json</a>:</p>
+            href="Sequel/Postgres/JSONOpMethods.html#method-i-pg_json">Sequel::Postgres::JSONOpMethods#pg_json</a>
+            or <a
+            href="Sequel/Postgres/JSONOpMethods.html#method-i-pg_jsonb">Sequel::Postgres::JSONOpMethods#pg_jsonb</a>:</p>
             
-            <pre>j = :json_column.pg_json</pre>
+            <pre>j = :json_column.pg_json&#x000A;jb = :jsonb_column.pg_jsonb</pre>
             
             <p>This creates a <a
-            href="Sequel/Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a> object that
-            can be used for easier querying:</p>
+            href="Sequel/Postgres/JSONOp.html">Sequel::Postgres::JSONOp</a> or <a
+            href="Sequel/Postgres/JSONBOp.html">Sequel::Postgres::JSONBOp</a> object
+            that can be used for easier querying:</p>
             
-            <pre>j[1]                     # (json_column -&gt; 1)&#x000A;j[%w&#39;a b&#39;]               # (json_column #&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])&#x000A;j.get_text(1)            # (json_column -&gt;&gt; 1)&#x000A;j.get_text(%w&#39;a b&#39;)      # (json_column #&gt;&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])&#x000A;j.extract(&#39;a&#39;, &#39;b&#39;)      # json_extract_path(json_column, &#39;a&#39;, &#39;b&#39;)&#x000A;j.extract_text(&#39;a&#39;, &#39;b&#39;) # json_extract_path_text(json_column, &#39;a&#39;, &#39;b&#39;)&#x000A;j.array_length           # json_array_length(json_column)&#x000A;j.array_elements         # json_array_elements(json_column)&#x000A;j.each                   # json_each(json_column)&#x000A;j.each_text              # json_each_text(json_column)&#x000A;j.keys                   # json_object_keys(json_column)&#x000A;&#x000A;j.populate(:a)           # json_populate_record(:a, json_column)&#x000A;j.populate_set(:a)       # json_populate_recordset(:a, json_column)</pre>
+            <pre>j[1]                     # (json_column -&gt; 1)&#x000A;j[%w&#39;a b&#39;]               # (json_column #&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])&#x000A;j.get_text(1)            # (json_column -&gt;&gt; 1)&#x000A;j.get_text(%w&#39;a b&#39;)      # (json_column #&gt;&gt; ARRAY[&#39;a&#39;,&#39;b&#39;])&#x000A;j.extract(&#39;a&#39;, &#39;b&#39;)      # json_extract_path(json_column, &#39;a&#39;, &#39;b&#39;)&#x000A;j.extract_text(&#39;a&#39;, &#39;b&#39;) # json_extract_path_text(json_column, &#39;a&#39;, &#39;b&#39;)&#x000A;j.array_length           # json_array_length(json_column)&#x000A;j.array_elements         # json_array_elements(json_column)&#x000A;j.array_elements_text    # json_array_elements_text(json_column)&#x000A;j.each                   # json_each(json_column)&#x000A;j.each_text              # json_each_text(json_column)&#x000A;j.keys                   # json_object_keys(json_column)&#x000A;j.typeof                 # json_typeof(json_column)&#x000A;&#x000A;j.populate(:a)           # json_populate_record(:a, json_column)&#x000A;j.populate_set(:a)       # json_populate_recordset(:a, json_column)&#x000A;j.to_record              # json_to_record(json_column)&#x000A;j.to_recordset           # json_to_recordset(json_column)</pre>
             
             <p>If you are also using the pg_json extension, you should load it before
-            loading this extension.  Doing so will allow you to use JSONHash#op and
-            JSONArray#op to get a JSONOp, allowing you to perform json operations on
-            json literals.</p>
+            loading this extension.  Doing so will allow you to use the op method on
+            JSONHash, JSONHarray, JSONBHash, and JSONBArray, allowing you to perform
+            json/jsonb operations on json/jsonb literals.</p>
             
             <p>In order to get the automatic conversion from a ruby array to a PostgreSQL
             array (as shown in the #[] and get_text examples above), you need to load

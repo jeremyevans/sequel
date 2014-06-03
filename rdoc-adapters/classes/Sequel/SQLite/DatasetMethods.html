@@ -59,6 +59,7 @@
               <li><a target="docwin" href="#method-i-quoted_identifier_append">quoted_identifier_append</a></li>
               <li><a target="docwin" href="#method-i-select">select</a></li>
               <li><a target="docwin" href="#method-i-supports_cte-3F">supports_cte?</a></li>
+              <li><a target="docwin" href="#method-i-supports_derived_column_lists-3F">supports_derived_column_lists?</a></li>
               <li><a target="docwin" href="#method-i-supports_intersect_except_all-3F">supports_intersect_except_all?</a></li>
               <li><a target="docwin" href="#method-i-supports_is_true-3F">supports_is_true?</a></li>
               <li><a target="docwin" href="#method-i-supports_multiple_column_in-3F">supports_multiple_column_in?</a></li>
@@ -389,6 +390,24 @@
                   <pre id='method-i-supports_cte-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 612</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">sqlite_version</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">30803</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-supports_derived_column_lists-3F'>
+                <a name='method-i-supports_derived_column_lists-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_derived_column_lists?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="../SQLite.html">SQLite</a> does not support table aliases with
+                  column aliases</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_derived_column_lists-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_derived_column_lists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 617</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_derived_column_lists?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-supports_intersect_except_all-3F'>
                 <a name='method-i-supports_intersect_except_all-3F'></a>
                 <div class='synopsis'>
@@ -404,7 +423,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_intersect_except_all-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_intersect_except_all-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 617</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_intersect_except_all?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_intersect_except_all-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 622</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_intersect_except_all?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -421,7 +440,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_is_true-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 622</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 627</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
@@ -439,7 +458,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_multiple_column_in-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 627</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 632</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_timestamp_timezones-3F'>
@@ -459,7 +478,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_timestamp_timezones-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 634</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_timestamp_timezones?</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 639</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_timestamp_timezones?</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_where_true-3F'>
@@ -476,7 +495,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_where_true-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_where_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 639</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_where_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_where_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 644</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_where_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

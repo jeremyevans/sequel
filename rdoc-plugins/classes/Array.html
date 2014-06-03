@@ -67,6 +67,7 @@
               <li><a target="docwin" href="#method-i-case">case</a></li>
               <li><a target="docwin" href="#method-i-pg_array">pg_array</a></li>
               <li><a target="docwin" href="#method-i-pg_json">pg_json</a></li>
+              <li><a target="docwin" href="#method-i-pg_jsonb">pg_jsonb</a></li>
               <li><a target="docwin" href="#method-i-pg_row">pg_row</a></li>
               <li><a target="docwin" href="#method-i-sql_expr">sql_expr</a></li>
               <li><a target="docwin" href="#method-i-sql_negate">sql_negate</a></li>
@@ -149,7 +150,27 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_json-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 221</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 306</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-pg_jsonb'>
+                <a name='method-i-pg_jsonb'></a>
+                <div class='synopsis'>
+                  <span class='name'>pg_jsonb</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a <a
+                  href="Sequel/Postgres/JSONArray.html">Sequel::Postgres::JSONArray</a> proxy
+                  to the receiver. This is mostly useful as a short cut for creating
+                  JSONArray objects that didn&#39;t come from the database.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_jsonb-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 313</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_row'>

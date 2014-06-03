@@ -43,12 +43,37 @@
         <div id='text'>
           <div id='description'>
             
-            <p>Represents an <a href="../SQL.html">SQL</a> function call that is
-            translated/emulated on databases that lack support for such a function.</p>
+            <p>REMOVE411</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
           </div>
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(name, *args)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1344</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">name</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::SQL::EmulatedFunction&quot;</span>, <span class="ruby-string">&quot;Please use Sequel::SQL::Function.new!(name, args, :emulate=&gt;true) to create an emulated SQL function&quot;</span>)&#x000A;  <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new!</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>, <span class="ruby-value">:emulate=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

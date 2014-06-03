@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-18 10:59:05 -0800</span>
+          <span class='datetime'>2014-05-23 13:28:32 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -252,6 +252,11 @@
             the <code>as</code> method on most Sequel-specific expression objects:</p>
             
             <pre>Sequel.as(:column, :alias) # &quot;column&quot; AS &quot;alias&quot;&#x000A;Sequel.qualify(:table, :column).as(:alias) # &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</pre>
+            
+            <p>If you want to use a derived column list, you can provide an array of
+            column aliases:</p>
+            
+            <pre>Sequel.as(:table, :alias, [:c1, :c2]) # &quot;table&quot; AS &quot;alias&quot;(&quot;c1&quot;, &quot;c2&quot;)</pre>
             
             <h3 id="label-Functions">Functions</h3>
             
@@ -543,12 +548,12 @@
             defines the <code>like</code> and <code>ilike</code> methods on most
             Sequel-specific expression objects:</p>
             
-            <pre>Sequel.expr(:name).like(&#39;A%&#39;) # (&quot;name&quot; LIKE &#39;A%&#39;) &#x000A;Sequel.expr(:name).ilike(&#39;A%&#39;) # (&quot;name&quot; ILIKE &#39;A%&#39;)</pre>
+            <pre>Sequel.expr(:name).like(&#39;A%&#39;) # (&quot;name&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;) &#x000A;Sequel.expr(:name).ilike(&#39;A%&#39;) # (&quot;name&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</pre>
             
             <p>You can also use the <code>Sequel.like</code> and <code>Sequel.ilike</code>
             methods:</p>
             
-            <pre>Sequel.like(:name, &#39;A%&#39;) # (&quot;name&quot; LIKE &#39;A%&#39;) &#x000A;Sequel.ilike(:name, &#39;A%&#39;) # (&quot;name&quot; ILIKE &#39;A%&#39;)</pre>
+            <pre>Sequel.like(:name, &#39;A%&#39;) # (&quot;name&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;) &#x000A;Sequel.ilike(:name, &#39;A%&#39;) # (&quot;name&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</pre>
             
             <p>Note the above syntax for ilike, while Sequel&#39;s default, is specific to
             PostgreSQL.  However, most other adapters override the behavior.  For
@@ -560,7 +565,7 @@
             
             <p>Inverting the LIKE operator works like other inversions:</p>
             
-            <pre>~Sequel.like(:name, &#39;A%&#39;) # (&quot;name&quot; NOT LIKE &#39;A%&#39;)</pre>
+            <pre>~Sequel.like(:name, &#39;A%&#39;) # (&quot;name&quot; NOT LIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</pre>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> also supports SQL regular
             expressions on MySQL and PostgreSQL.  You can use these by passing a ruby
@@ -662,12 +667,12 @@
             <p>Once you have your dataset object, you build queries by chaining methods,
             usually with one method per clause in the query:</p>
             
-            <pre>DB[:albums].select(:id, :name).where(Sequel.like(:name, &#39;A%&#39;)).order(:name)&#x000A;# SELECT id, name FROM albums WHERE (name LIKE &#39;A%&#39;) ORDER BY name</pre>
+            <pre>DB[:albums].select(:id, :name).where(Sequel.like(:name, &#39;A%&#39;)).order(:name)&#x000A;# SELECT id, name FROM albums WHERE (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;) ORDER BY name</pre>
             
             <p>Note that the order of your method chain is not usually important unless
             you have multiple methods that affect the same clause:</p>
             
-            <pre>DB[:albums].order(:name).where(Sequel.like(:name, &#39;A%&#39;)).select(:id, :name)&#x000A;# SELECT id, name FROM albums WHERE (name LIKE &#39;A%&#39;) ORDER BY name</pre>
+            <pre>DB[:albums].order(:name).where(Sequel.like(:name, &#39;A%&#39;)).select(:id, :name)&#x000A;# SELECT id, name FROM albums WHERE (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;) ORDER BY name</pre>
             
             <h3 id="label-Using+the+Same+Dataset+for+SELECT%2C+INSERT%2C+UPDATE%2C+and+DELETE">Using the Same Dataset for SELECT, INSERT, UPDATE, and DELETE</h3>
             

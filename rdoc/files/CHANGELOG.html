@@ -31,12 +31,94 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-01 08:02:17 -0700</span>
+          <span class='datetime'>2014-06-03 12:31:24 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.11.0+%282014-06-03%29">4.11.0 (2014-06-03)</h3>
+            <ul><li>
+            <p>Add :model_map option to class_table_inheritance plugin so class names
+            don&#39;t need to be stored in the database (jeremyevans)</p>
+            </li><li>
+            <p>Set version when using for MySQL/SQLite emulation in the mock adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add support for CUBRID/SQLAnywhere emulation to the mock adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add support for the jsonb operators added in PostgreSQL 9.4 to the
+            pg_json_ops extension (jeremyevans)</p>
+            </li><li>
+            <p>Add support for new json/jsonb functions added in PostgreSQL 9.4 to the
+            pg_json_ops extension (jeremyevans)</p>
+            </li><li>
+            <p>Add support for the PostgreSQL 9.4+ jsonb type to the pg_json_ops extension
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add support for derived column lists to Sequel.as and SQL::AliasMethods#as
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support connecting to a DB2 catalog name in the ibmdb adapter (calh) (#821)</p>
+            </li><li>
+            <p>Fix warnings in some cases in the ibmdb adapter (calh) (#820)</p>
+            </li><li>
+            <p>Add SQL::Function#with_ordinality for creating set returning functions WITH
+            ORDINALITY (jeremyevans)</p>
+            </li><li>
+            <p>Add SQL::Function#filter for creating filtered aggregate function calls
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add SQL::Function#within_group for creating ordered-set and
+            hypothetical-set aggregate functions (jeremyevans)</p>
+            </li><li>
+            <p>Add SQL::Function#lateral, for creating set returning functions that will
+            be preceded by LATERAL (jeremyevans)</p>
+            </li><li>
+            <p>Add SQL::Function#quoted and unquoted methods, to enable/disable quoting of
+            function names (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate Dataset#{window,emulated,}_function_sql_append (jeremyevans)</p>
+            </li><li>
+            <p>Deprecate SQL::WindowFunction and SQL::EmulatedFunction classes, switch to
+            using options on SQL::Function (jeremyevans)</p>
+            </li><li>
+            <p>Only modify changed_columns if deserialized value changes in the
+            serialization plugin (jeremyevans) (#818)</p>
+            </li><li>
+            <p>Support PostgreSQL 9.4+ jsonb type in the pg_json extension (jeremyevans)</p>
+            </li><li>
+            <p>Allow Postgres::ArrayOp#unnest to accept arguments in the pg_array_ops
+            extension (jeremyevans)</p>
+            </li><li>
+            <p>Add Postgres::ArrayOp#cardinality to the pg_array_ops extension
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add :check option to Database#create_view for WITH [LOCAL] CHECK OPTION
+            support (jeremyevans)</p>
+            </li><li>
+            <p>Add :concurrently option to Database#refresh_view on PostgreSQL to support
+            concurrent refresh of materialized views (jeremyevans)</p>
+            </li><li>
+            <p>Call the :after_connect Database option proc with both the connection and
+            server/shard if it accepts 2 arguments (pedro, jeremyevans) (#813)</p>
+            </li><li>
+            <p>Make multiple plugins set values before validation instead of before
+            create, works better with auto_validations (jeremyevans)</p>
+            </li><li>
+            <p>Support a default Dataset#import slice size, set to 500 on SQLite
+            (jeremyevans) (#810)</p>
+            </li><li>
+            <p>Make :read_only transaction option be per-savepoint on PostgreSQL
+            (jeremyevans) (#807)</p>
+            </li><li>
+            <p>Add :rank option to Dataset#full_text_search on PostgreSQL, to order by the
+            ranking (jeremyevans) (#809)</p>
+            </li><li>
+            <p>Remove methods deprecated in 4.10.0 (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.10.0+%282014-05-01%29">4.10.0 (2014-05-01)</h3>
             <ul><li>

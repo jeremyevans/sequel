@@ -62,7 +62,7 @@
                 <a name='method-i-as'></a>
                 <div class='synopsis'>
                   <span class='name'>as</span>
-                  <span class='arguments'>(aliaz)</span>
+                  <span class='arguments'>(aliaz, columns=nil)</span>
                 </div>
                 <div class='description'>
                   
@@ -70,13 +70,13 @@
                   (<code>AliasedExpression</code>) of the receiving column or expression to
                   the given alias.</p>
                   
-                  <pre>Sequel.function(:func).as(:alias) # func() AS &quot;alias&quot;</pre>
+                  <pre>Sequel.function(:func).as(:alias) # func() AS &quot;alias&quot;&#x000A;Sequel.function(:func).as(:alias, [:col_alias1, :col_alias2]) # func() AS &quot;alias&quot;(&quot;col_alias1&quot;, &quot;col_alias2&quot;)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-as-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-as-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 254</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">as</span>(<span class="ruby-identifier">aliaz</span>)&#x000A;  <span class="ruby-constant">AliasedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">aliaz</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-as-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 255</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">as</span>(<span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">AliasedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

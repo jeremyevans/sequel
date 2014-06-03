@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-06 13:15:21 -0800</span>
+          <span class='datetime'>2014-05-16 16:27:33 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -71,7 +71,7 @@
             href="../../../../classes/Sequel/Postgres/ArrayOp.html">Sequel::Postgres::ArrayOp</a>
             object that can be used for easier querying:</p>
             
-            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.hstore          # hstore(int_array_column)&#x000A;ia.hstore(:a)      # hstore(int_array_column, a)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)</pre>
+            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.cardinality     # cardinality(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.hstore          # hstore(int_array_column)&#x000A;ia.hstore(:a)      # hstore(int_array_column, a)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)&#x000A;ia.unnest(:b)      # unnest(int_array_column, b)</pre>
             
             <p>See the PostgreSQL array function and operator documentation for more
             details on what these functions and operators do.</p>

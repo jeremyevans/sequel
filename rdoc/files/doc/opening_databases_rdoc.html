@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-21 10:43:37 -0700</span>
+          <span class='datetime'>2014-05-13 08:21:01 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -156,8 +156,10 @@
             internal connection pool.</p>
             <dl class="rdoc-list note-list"><dt>:after_connect 
             <dd>
-            <p>A proc called after a new connection is made, with the connection object
-            (default: nil)</p>
+            <p>A callable object called after each new connection is made, with the
+            connection object (and server argument if the callable accepts 2
+            arguments), useful for customizations that you want to apply to all
+            connections (default: nil).</p>
             </dd><dt>:max_connections 
             <dd>
             <p>The maximum size of the connection pool (default: 4 connections on most

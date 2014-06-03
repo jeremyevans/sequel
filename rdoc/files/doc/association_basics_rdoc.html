@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-08 15:54:32 -0700</span>
+          <span class='datetime'>2014-05-16 09:40:34 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -262,7 +262,7 @@
             href="../../classes/Sequel.html">Sequel</a> dataset, in that it can be
             further filtered, ordered, etc.:</p>
             
-            <pre>@artist.albums_dataset.&#x000A; where(Sequel.like(:name, &#39;A%&#39;)).&#x000A; order(:copies_sold).&#x000A; limit(10)&#x000A;# SELECT * FROM albums&#x000A;# WHERE ((artist_id = 20) AND (name LIKE &#39;A%&#39;))&#x000A;# ORDER BY copies_sold LIMIT 10</pre>
+            <pre>@artist.albums_dataset.&#x000A; where(Sequel.like(:name, &#39;A%&#39;)).&#x000A; order(:copies_sold).&#x000A; limit(10)&#x000A;# SELECT * FROM albums&#x000A;# WHERE ((artist_id = 20) AND (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;))&#x000A;# ORDER BY copies_sold LIMIT 10</pre>
             
             <p>Records retrieved using the <code>_dataset</code> method are not cached in
             the associations cache.</p>

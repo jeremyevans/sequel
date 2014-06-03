@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-06-02 13:49:43 -0700</span>
+          <span class='datetime'>2014-05-02 08:01:22 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -219,6 +219,14 @@
             record&#39;s data.  Using after_commit, you are guaranteed that the
             background job library will not get notified of the record until after the
             transaction commits and the data is viewable.</p>
+            
+            <p>Note that when using the after_commit or after_rollback hooks, you
+            don&#39;t know whether the saved object was newly created or updated.  If
+            you only want to run an action after commit of a newly created record, you
+            need to use the Database&#39;s after_commit inside the model&#39;s
+            after_create hook:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">after_create</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">update_external_cache</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h2 id="label-Running+Hooks">Running Hooks</h2>
             

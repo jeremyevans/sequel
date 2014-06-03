@@ -74,7 +74,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cloneable-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cloneable-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">ref</span>)&#x000A;  <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:many_through_many</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:one_through_many</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cloneable-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">ref</span>)&#x000A;  <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:many_through_many</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">ref</span>[<span class="ruby-value">:type</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:one_through_many</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-default_associated_key_alias'>
@@ -92,7 +92,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-default_associated_key_alias-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-default_associated_key_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_associated_key_alias</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:uses_left_composite_keys</span>] <span class="ruby-operator">?</span> (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-keyword">self</span>[<span class="ruby-value">:through</span>].<span class="ruby-identifier">first</span>[<span class="ruby-value">:left</span>].<span class="ruby-identifier">length</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-value">:&quot;x_foreign_key_#{i}_x&quot;</span>} <span class="ruby-operator">:</span> <span class="ruby-value">:x_foreign_key_x</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-default_associated_key_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 91</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_associated_key_alias</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:uses_left_composite_keys</span>] <span class="ruby-operator">?</span> (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-keyword">self</span>[<span class="ruby-value">:through</span>].<span class="ruby-identifier">first</span>[<span class="ruby-value">:left</span>].<span class="ruby-identifier">length</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-value">:&quot;x_foreign_key_#{i}_x&quot;</span>} <span class="ruby-operator">:</span> <span class="ruby-value">:x_foreign_key_x</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-join_table_alias'>
@@ -109,7 +109,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-join_table_alias-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-join_table_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 105</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">join_table_alias</span>&#x000A;  <span class="ruby-identifier">final_reverse_edge</span>[<span class="ruby-value">:alias</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-join_table_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 104</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">join_table_alias</span>&#x000A;  <span class="ruby-identifier">final_reverse_edge</span>[<span class="ruby-value">:alias</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-reciprocal'>
@@ -126,7 +126,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-reciprocal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-reciprocal-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 110</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-reciprocal-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -71,7 +71,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_save-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 176</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;  <span class="ruby-identifier">serialize_deserialized_values</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 179</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;  <span class="ruby-identifier">serialize_deserialized_values</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-deserialized_values'>
@@ -89,7 +89,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-deserialized_values-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-deserialized_values-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 182</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">deserialized_values</span>&#x000A;  <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-deserialized_values-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 185</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">deserialized_values</span>&#x000A;  <span class="ruby-ivar">@deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-dup'>
@@ -106,7 +106,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-dup-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-dup-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 187</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">dv</span> = <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-keyword">super</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@deserialized_values</span> = <span class="ruby-identifier">dv</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-dup-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 190</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">dv</span> = <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-keyword">super</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@deserialized_values</span> = <span class="ruby-identifier">dv</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-freeze'>
@@ -123,7 +123,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 196</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 199</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

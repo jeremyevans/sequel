@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-01-18 11:01:41 -0800</span>
+          <span class='datetime'>2014-05-20 15:40:47 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -125,8 +125,7 @@
             <h2 id="label-VirtualRow+Methods">VirtualRow Methods</h2>
             
             <p>VirtualRow is a class that returns SQL::Identifiers,
-            SQL::QualifiedIdentifiers, SQL::Functions, or SQL::WindowFunctions
-            depending on how it is called.</p>
+            SQL::QualifiedIdentifiers, or SQL::Functions depending on how it is called.</p>
             
             <h2 id="label-SQL%3A%3AIdentifiers+-+Regular+columns">SQL::Identifiers - Regular columns</h2>
             
@@ -178,12 +177,11 @@
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1)</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1, col2)</span></pre>
             
-            <h2 id="label-SQL%3A%3AWindowFunctions+-+SQL+window+function+calls">SQL::WindowFunctions - SQL window function calls</h2>
+            <h2 id="label-SQL%3A%3AFunctions+with+windows+-+SQL+window+function+calls">SQL::Functions with windows - SQL window function calls</h2>
             
-            <p>SQL::WindowFunctions can be thought of as calls to SQL window functions. 
-            Not all databases support them, but they are very helpful for certain types
-            of queries.  To use them, you should just call the over method on the
-            Function object returned, with the options for the window:</p>
+            <p>Not all databases support window functions, but they are very helpful for
+            certain types of queries.  To use them, you should just call the over
+            method on the Function object returned, with the options for the window:</p>
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT rank() OVER ()</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.*.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.*.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT count(*) OVER ()</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">o</span>.<span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-comment"># SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)</span></pre>
             

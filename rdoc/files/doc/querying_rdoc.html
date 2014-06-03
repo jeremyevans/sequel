@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-05-16 09:40:34 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -104,7 +104,7 @@
             
             <p>Any options you pass to <code>first</code> will be used as a filter:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39;) LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;) LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
             <p>If there is no matching row, <code>first</code> will return nil.  If you
             want to raise an exception instead, use <code>first!</code>.</p>
@@ -279,13 +279,13 @@
             <p>Let&#39;s say we are only interested in the artists whose names start with
             "A":</p>
             
-            <pre>ds2 = ds1.where(Sequel.like(:name, &#39;A%&#39;))&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;A%&#39;</pre>
+            <pre>ds2 = ds1.where(Sequel.like(:name, &#39;A%&#39;))&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</pre>
             
             <p>Here we see that <code>where</code> returns a dataset that adds a
             <code>WHERE</code> clause to the query.  It&#39;s important to note that
             <code>where</code> does not modify the receiver:</p>
             
-            <pre>ds1&#x000A;# SELECT * FROM artists&#x000A;ds2&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;A%&#39;</pre>
+            <pre>ds1&#x000A;# SELECT * FROM artists&#x000A;ds2&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</pre>
             
             <p>In <a href="../../classes/Sequel.html">Sequel</a>, most dataset methods
             that you will be using will not modify the dataset itself, so you can
@@ -296,7 +296,7 @@
             <p>Let&#39;s say we only want to select the id and name columns, and that we
             want to order by name:</p>
             
-            <pre>ds3 = ds.order(:name).select(:id, :name)&#x000A;# SELECT id, name FROM artists WHERE name LIKE &#39;A%&#39; ORDER BY name</pre>
+            <pre>ds3 = ds.order(:name).select(:id, :name)&#x000A;# SELECT id, name FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39; ORDER BY name</pre>
             
             <p>Note how you don&#39;t need to assign the returned value of order to a
             variable, and then call select on that.  Because order just returns a
@@ -400,7 +400,7 @@
             href="../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>.
             You&#39;ve already seen an example earlier:</p>
             
-            <pre>Artist.where(Sequel.like(:name, &#39;Y%&#39;))&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;Y%&#39;</pre>
+            <pre>Artist.where(Sequel.like(:name, &#39;Y%&#39;))&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;</pre>
             
             <p>In this case Sequel.like returns a <a
             href="../../classes/Sequel/SQL/BooleanExpression.html">Sequel::SQL::BooleanExpression</a>
@@ -414,7 +414,7 @@
             operator for <code>AND</code>, the | operator for <code>OR</code>, and the
             ~ operator for inversion:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>) &amp; (<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; AND (b = 1 OR c != 3)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>) &amp; (<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39; AND (b = 1 OR c != 3)</span></pre>
             
             <p>You can combine these expression operators with the virtual row support:</p>
             
@@ -480,7 +480,7 @@
             
             <p>Or to use the NOT LIKE operator:</p>
             
-            <pre>Artist.exclude(Sequel.like(:name, &#39;%J%&#39;))&#x000A;# SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39;</pre>
+            <pre>Artist.exclude(Sequel.like(:name, &#39;%J%&#39;))&#x000A;# SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</pre>
             
             <h3 id="label-Removing">Removing</h3>
             
@@ -899,7 +899,7 @@
             <p>If you just want to know whether the current dataset would return any rows,
             use <code>empty?</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE id = 0 LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;R%&#39;</span>)).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE name LIKE &#39;R%&#39; LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE id = 0 LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;R%&#39;</span>)).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE name LIKE &#39;R%&#39; ESCAPE &#39;\&#39; LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span></pre>
             
             <h2 id="label-Aggregate+Calculations">Aggregate Calculations</h2>
             

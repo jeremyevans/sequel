@@ -189,8 +189,9 @@
                   connection pools:</p>
                   <dl class="rdoc-list note-list"><dt>:<a href="ConnectionPool.html#attribute-i-after_connect">#after_connect</a> 
                   <dd>
-                  <p>The proc called after each new connection is made, with the connection
-                  object, useful for customizations that you want to apply to all
+                  <p>A callable object called after each new connection is made, with the
+                  connection object (and server argument if the callable accepts 2
+                  arguments), useful for customizations that you want to apply to all
                   connections.</p>
                   </dd></dl>
                 </div>

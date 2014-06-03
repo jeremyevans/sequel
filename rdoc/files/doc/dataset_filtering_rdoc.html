@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-05-16 09:40:34 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -157,12 +157,12 @@
             <p>You can search SQL strings in a case sensitive manner using the Sequel.like
             method:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE (name LIKE &#39;Acme%&#39;)&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE (name LIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;)&quot;</span></pre>
             
             <p>You can search SQL strings in a case insensitive manner using the
             Sequel.ilike method:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE (name ILIKE &#39;Acme%&#39;)&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE (name ILIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;)&quot;</span></pre>
             
             <p>You can specify a Regexp as a like argument, but this will probably only
             work on PostgreSQL and MySQL:</p>
@@ -171,17 +171,17 @@
             
             <p>Like can also take more than one argument:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>, <span class="ruby-regexp">/Beta.*/</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((name LIKE &#39;Acme%&#39;) OR (name ~ &#39;Beta.*&#39;))&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>, <span class="ruby-regexp">/Beta.*/</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((name LIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;) OR (name ~ &#39;Beta.*&#39;))&quot;</span></pre>
             
             <h2 id="label-String+concatenation"><a href="../../classes/String.html">String</a> concatenation</h2>
             
             <p>You can concatenate SQL strings using Sequel.join:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">comment</span>]).<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((name || comment) LIKE &#39;Acme%&#39;)&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">comment</span>]).<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((name || comment) LIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;)&quot;</span></pre>
             
             <p>Sequel.join also takes a join argument:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">comment</span>], <span class="ruby-string">&#39; &#39;</span>).<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((name || &#39; &#39; || comment) LIKE &#39;Acme%&#39;)&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">comment</span>], <span class="ruby-string">&#39; &#39;</span>).<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%acme%&#39;</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((name || &#39; &#39; || comment) LIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;)&quot;</span></pre>
             
             <h2 id="label-Filtering+using+sub-queries">Filtering using sub-queries</h2>
             

@@ -43,13 +43,13 @@
         <div id='text'>
           <div id='description'>
             
-            <p>A <code>WindowFunction</code> is a grouping of a <code>Function</code> with
-            a <code>Window</code> over which it operates.</p>
+            <p>REMOVE411</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
               <li><a target="docwin" href="#method-c-new">new</a></li>
             </ol>
             <h3>Public Instance</h3>
@@ -98,13 +98,29 @@
                 </div>
                 <div class='description'>
                   
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1838</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>, <span class="ruby-identifier">window</span>)&#x000A;  <span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::SQL::WindowFunction&quot;</span>, <span class="ruby-string">&quot;Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function&quot;</span>)&#x000A;  <span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>(<span class="ruby-identifier">window</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(function, window)</span>
+                </div>
+                <div class='description'>
+                  
                   <p>Set the function and window.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1723</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">function</span>, <span class="ruby-identifier">window</span>)&#x000A;  <span class="ruby-ivar">@function</span>, <span class="ruby-ivar">@window</span> = <span class="ruby-identifier">function</span>, <span class="ruby-identifier">window</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1844</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">function</span>, <span class="ruby-identifier">window</span>)&#x000A;  <span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::SQL::WindowFunction&quot;</span>, <span class="ruby-string">&quot;Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function&quot;</span>)&#x000A;  <span class="ruby-ivar">@function</span>, <span class="ruby-ivar">@window</span> = <span class="ruby-identifier">function</span>, <span class="ruby-identifier">window</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

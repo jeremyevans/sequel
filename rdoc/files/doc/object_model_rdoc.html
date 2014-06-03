@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-05-23 13:28:32 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -367,13 +367,13 @@
             identifier, but the expression can be an arbitrary <a
             href="../../classes/Sequel.html">Sequel</a> expression:</p>
             
-            <pre>Sequel::SQL::AliasedExpression.new(:column, :alias) # &quot;column&quot; AS &quot;alias&quot;</pre>
+            <pre>Sequel::SQL::AliasedExpression.new(:column, :alias)&#x000A;# &quot;column&quot; AS &quot;alias&quot;&#x000A;Sequel::SQL::AliasedExpression.new(:table, :alias, [:column_alias1, :column_alias2])&#x000A;# &quot;table&quot; AS &quot;alias&quot;(&quot;column_alias1&quot;, &quot;column_alias2&quot;)</pre>
             
             <p>The following shortcuts exist for creating <a
             href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a>
             objects:</p>
             
-            <pre>Sequel.expr(:column___alias)&#x000A;Sequel.as(:column, :alias)&#x000A;:column.as(:alias) # core_extensions extension</pre>
+            <pre>Sequel.expr(:column___alias)&#x000A;Sequel.as(:column, :alias)&#x000A;Sequel.as(:column, :alias, [:column_alias1, :column_alias2])&#x000A;:column.as(:alias) # core_extensions extension</pre>
             
             <h3 id="label-Sequel%3A%3ASQL%3A%3AComplexExpression"><a href="../../classes/Sequel/SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a></h3>
             
@@ -611,25 +611,11 @@
             
             <p><a href="../../classes/Sequel/SQL/Window.html">Sequel::SQL::Window</a>
             objects represent the windows used by <a
-            href="../../classes/Sequel/SQL/WindowFunction.html">Sequel::SQL::WindowFunction</a>.
+            href="../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a>.
             They use a hash-based API, supporting the :frame, :order, :partition, and
             :window options:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (ORDER BY &quot;a&quot;)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">parition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (PARTITION BY &quot;a&quot;)</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">parition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">frame=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">all</span>)&#x000A;<span class="ruby-comment"># (PARTITION BY &quot;a&quot; ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)</span></pre>
-            
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AWindowFunction"><a href="../../classes/Sequel/SQL/WindowFunction.html">Sequel::SQL::WindowFunction</a></h3>
-            
-            <p><a
-            href="../../classes/Sequel/SQL/WindowFunction.html">Sequel::SQL::WindowFunction</a>
-            objects represent SQL window function calls.  These just combine a <a
-            href="../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a>
-            with a Sequel::SQL::Window:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">function</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">f</span>, <span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">window</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">WindowFunction</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>, <span class="ruby-identifier">window</span>) <span class="ruby-comment"># f(1) OVER (ORDER BY &quot;a&quot;)</span></pre>
-            
-            <p>Virtual rows offer a shortcut for creating <a
-            href="../../classes/Sequel/SQL/Window.html">Sequel::SQL::Window</a>
-            objects.</p>
             
             <h3 id="label-Sequel%3A%3ASQL%3A%3AWrapper"><a href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a></h3>
             

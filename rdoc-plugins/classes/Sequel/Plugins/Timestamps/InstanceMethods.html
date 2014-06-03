@@ -46,8 +46,8 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-before_create">before_create</a></li>
               <li><a target="docwin" href="#method-i-before_update">before_update</a></li>
+              <li><a target="docwin" href="#method-i-before_validation">before_validation</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -55,23 +55,6 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-before_create'>
-                <a name='method-i-before_create'></a>
-                <div class='synopsis'>
-                  <span class='name'>before_create</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the create timestamp when creating</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_create-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-before_create-source'><span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_create</span>&#x000A;  <span class="ruby-identifier">set_create_timestamp</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-before_update'>
                 <a name='method-i-before_update'></a>
                 <div class='synopsis'>
@@ -87,6 +70,23 @@
                     [show source]
                   </a>
                   <pre id='method-i-before_update-source'><span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_update</span>&#x000A;  <span class="ruby-identifier">set_update_timestamp</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-before_validation'>
+                <a name='method-i-before_validation'></a>
+                <div class='synopsis'>
+                  <span class='name'>before_validation</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set the create timestamp when creating</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_validation-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-before_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_validation</span>&#x000A;  <span class="ruby-identifier">set_create_timestamp</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

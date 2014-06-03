@@ -54,6 +54,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#attribute-i-aliaz">aliaz</a></li>
+              <li><a target="docwin" href="#attribute-i-columns">columns</a></li>
               <li><a target="docwin" href="#attribute-i-expression">expression</a></li>
             </ol>
           </div>
@@ -88,6 +89,17 @@
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>
+                      <a name='attribute-i-columns'>columns</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The columns aliases to use, for when the aliased expression is a record or
+                      set of records (such as a dataset).</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
                       <a name='attribute-i-expression'>expression</a>
                     </td>
                     <td class='context-item-value'>[R]</td>
@@ -105,7 +117,7 @@
                 <a name='method-c-new'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
-                  <span class='arguments'>(expression, aliaz)</span>
+                  <span class='arguments'>(expression, aliaz, columns=nil)</span>
                 </div>
                 <div class='description'>
                   
@@ -115,7 +127,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 944</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">aliaz</span>)&#x000A;  <span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@aliaz</span> = <span class="ruby-identifier">expression</span>, <span class="ruby-identifier">aliaz</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 950</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">aliaz</span>, <span class="ruby-identifier">columns</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@expression</span> = <span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-ivar">@aliaz</span> = <span class="ruby-identifier">aliaz</span>&#x000A;  <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

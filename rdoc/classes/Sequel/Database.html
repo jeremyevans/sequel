@@ -196,6 +196,8 @@
               <li><a target="docwin" href="#method-i-supports_transaction_isolation_levels-3F">supports_transaction_isolation_levels?</a></li>
               <li><a target="docwin" href="#method-i-supports_transactional_ddl-3F">supports_transactional_ddl?</a></li>
               <li><a target="docwin" href="#method-i-supports_view_listing-3F">supports_view_listing?</a></li>
+              <li><a target="docwin" href="#method-i-supports_views_with_check_option-3F">supports_views_with_check_option?</a></li>
+              <li><a target="docwin" href="#method-i-supports_views_with_local_check_option-3F">supports_views_with_local_check_option?</a></li>
               <li><a target="docwin" href="#method-i-synchronize">synchronize</a></li>
               <li><a target="docwin" href="#method-i-table_exists-3F">table_exists?</a></li>
               <li><a target="docwin" href="#method-i-test_connection">test_connection</a></li>
@@ -1000,13 +1002,18 @@
                   
                   <p>Creates a view based on a dataset or an <a href="SQL.html">SQL</a> string:</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">cheap_items</span>, <span class="ruby-string">&quot;SELECT * FROM items WHERE price &lt; 100&quot;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">ruby_items</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">category</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;ruby&#39;</span>))</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">cheap_items</span>, <span class="ruby-string">&quot;SELECT * FROM items WHERE price &lt; 100&quot;</span>)&#x000A;<span class="ruby-comment"># CREATE VIEW cheap_items AS</span>&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE price &lt; 100</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">ruby_items</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">category</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;ruby&#39;</span>))&#x000A;<span class="ruby-comment"># CREATE VIEW ruby_items AS</span>&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE (category = &#39;ruby&#39;)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">checked_items</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>), :<span class="ruby-identifier">check=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># CREATE VIEW checked_items AS</span>&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE foo</span>&#x000A;<span class="ruby-comment"># WITH CHECK OPTION</span></pre>
                   
                   <p>Options:</p>
                   <dl class="rdoc-list note-list"><dt>:columns 
                   <dd>
                   <p>The column names to use for the view.  If not given, automatically
                   determined based on the input dataset.</p>
+                  </dd><dt>:check 
+                  <dd>
+                  <p>Adds a WITH CHECK OPTION clause, so that attempting to modify  rows in the
+                  underlying table that would not be returned by the view is not allowed. 
+                  This can be set to :local to use WITH LOCAL CHECK OPTION.</p>
                   </dd></dl>
                   
                   <p>PostgreSQL/SQLite specific option:</p>
@@ -1015,7 +1022,7 @@
                   <p>Create a temporary view, automatically dropped on disconnect.</p>
                   </dd></dl>
                   
-                  <p>PostgreSQL specific option:</p>
+                  <p>PostgreSQL specific options:</p>
                   <dl class="rdoc-list note-list"><dt>:materialized 
                   <dd>
                   <p>Creates a materialized view, similar to a regular view, but backed by a
@@ -1034,7 +1041,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_view-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-create_view-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 262</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">create_view</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">create_view_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>))&#x000A;  <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-create_view-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 276</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">create_view</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">create_view_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">source</span>, <span class="ruby-identifier">options</span>))&#x000A;  <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-drop_column'>
@@ -1055,7 +1062,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_column-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-drop_column-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 273</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_column</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">drop_column</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-drop_column-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_column</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">drop_column</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-drop_index'>
@@ -1076,7 +1083,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_index-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-drop_index-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 283</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_index</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>){<span class="ruby-identifier">drop_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-drop_index-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 297</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_index</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>){<span class="ruby-identifier">drop_index</span>(<span class="ruby-identifier">columns</span>, <span class="ruby-identifier">options</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-drop_join_table'>
@@ -1096,7 +1103,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_join_table-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-drop_join_table-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 292</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_join_table</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">join_table_name</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>), <span class="ruby-identifier">options</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-drop_join_table-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 306</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_join_table</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">join_table_name</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">options</span>), <span class="ruby-identifier">options</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-drop_table'>
@@ -1115,7 +1122,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_table-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-drop_table-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 301</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_table</span>(*<span class="ruby-identifier">names</span>)&#x000A;  <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_table_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))&#x000A;    <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-drop_table-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 315</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_table</span>(*<span class="ruby-identifier">names</span>)&#x000A;  <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_table_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))&#x000A;    <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-drop_table-3F'>
@@ -1135,7 +1142,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_table-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-drop_table-3F-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 316</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_table?</span>(*<span class="ruby-identifier">names</span>)&#x000A;  <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">supports_drop_table_if_exists?</span>&#x000A;    <span class="ruby-identifier">options</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:if_exists=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">table_exists?</span>(<span class="ruby-identifier">name</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-drop_table-3F-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 330</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_table?</span>(*<span class="ruby-identifier">names</span>)&#x000A;  <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">supports_drop_table_if_exists?</span>&#x000A;    <span class="ruby-identifier">options</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:if_exists=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;    <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">options</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">table_exists?</span>(<span class="ruby-identifier">name</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-drop_view'>
@@ -1169,7 +1176,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_view-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-drop_view-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 343</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_view</span>(*<span class="ruby-identifier">names</span>)&#x000A;  <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_view_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))&#x000A;    <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-drop_view-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 357</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">drop_view</span>(*<span class="ruby-identifier">names</span>)&#x000A;  <span class="ruby-identifier">options</span> = <span class="ruby-identifier">names</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">names</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">drop_view_sql</span>(<span class="ruby-identifier">n</span>, <span class="ruby-identifier">options</span>))&#x000A;    <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">n</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-rename_column'>
@@ -1191,7 +1198,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-rename_column-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-rename_column-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 369</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rename_column</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">rename_column</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-rename_column-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 383</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rename_column</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">rename_column</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-rename_table'>
@@ -1210,7 +1217,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-rename_table-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-rename_table-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 357</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rename_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)&#x000A;  <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">rename_table_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>))&#x000A;  <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-rename_table-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 371</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rename_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>)&#x000A;  <span class="ruby-identifier">execute_ddl</span>(<span class="ruby-identifier">rename_table_sql</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">new_name</span>))&#x000A;  <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_default'>
@@ -1231,7 +1238,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_default-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_default-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 378</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_default</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_default</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_default-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 392</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_default</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_default</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_type'>
@@ -1252,7 +1259,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_type-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 387</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_type</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_type</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_type-source'><span class="ruby-comment"># File lib/sequel/database/schema_methods.rb, line 401</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_type</span>(<span class="ruby-identifier">table</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">table</span>) {<span class="ruby-identifier">set_column_type</span>(*<span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -3309,6 +3316,41 @@
                     [show source]
                   </a>
                   <pre id='method-i-supports_view_listing-3F-source'><span class="ruby-comment"># File lib/sequel/database/features.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_view_listing?</span>&#x000A;  <span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:views</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_views_with_check_option-3F'>
+                <a name='method-i-supports_views_with_check_option-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_views_with_check_option?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Whether CREATE VIEW ... WITH CHECK OPTION is supported, false by default.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_views_with_check_option-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_views_with_check_option-3F-source'><span class="ruby-comment"># File lib/sequel/database/features.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_views_with_check_option?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-operator">!</span><span class="ruby-identifier">view_with_check_option_support</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_views_with_local_check_option-3F'>
+                <a name='method-i-supports_views_with_local_check_option-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_views_with_local_check_option?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Whether CREATE VIEW ... WITH LOCAL CHECK OPTION is supported, false by
+                  default.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_views_with_local_check_option-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_views_with_local_check_option-3F-source'><span class="ruby-comment"># File lib/sequel/database/features.rb, line 103</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_views_with_local_check_option?</span>&#x000A;  <span class="ruby-identifier">view_with_check_option_support</span> <span class="ruby-operator">==</span> <span class="ruby-value">:local</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

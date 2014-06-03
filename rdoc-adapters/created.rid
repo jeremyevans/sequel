@@ -1,4 +1,4 @@
-Thu, 01 May 2014 08:12:21 -0700
+Tue, 03 Jun 2014 13:04:15 -0700
 lib/sequel/adapters/ado.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/ado/access.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/ado/mssql.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -11,7 +11,7 @@ lib/sequel/adapters/do/mysql.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/do/postgres.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/do/sqlite.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/firebird.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/adapters/ibmdb.rb	Fri, 08 Nov 2013 20:52:43 -0800
+lib/sequel/adapters/ibmdb.rb	Wed, 21 May 2014 09:47:32 -0700
 lib/sequel/adapters/informix.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/jdbc.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/adapters/jdbc/as400.rb	Mon, 23 Sep 2013 08:21:41 -0700
@@ -19,8 +19,8 @@ lib/sequel/adapters/jdbc/cubrid.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/jdbc/db2.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/adapters/jdbc/derby.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/adapters/jdbc/firebird.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/adapters/jdbc/h2.rb	Tue, 29 Apr 2014 11:53:53 -0700
-lib/sequel/adapters/jdbc/hsqldb.rb	Tue, 22 Apr 2014 10:09:17 -0700
+lib/sequel/adapters/jdbc/h2.rb	Fri, 23 May 2014 13:28:32 -0700
+lib/sequel/adapters/jdbc/hsqldb.rb	Fri, 16 May 2014 16:27:33 -0700
 lib/sequel/adapters/jdbc/informix.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/jdbc/jtds.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/adapters/jdbc/mssql.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -32,27 +32,27 @@ lib/sequel/adapters/jdbc/sqlanywhere.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/adapters/jdbc/sqlite.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/adapters/jdbc/sqlserver.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/adapters/jdbc/transactions.rb	Wed, 09 Apr 2014 15:04:48 -0700
-lib/sequel/adapters/mock.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/adapters/mock.rb	Fri, 23 May 2014 13:54:16 -0700
 lib/sequel/adapters/mysql.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/adapters/mysql2.rb	Wed, 05 Mar 2014 09:51:37 -0800
+lib/sequel/adapters/mysql2.rb	Thu, 15 May 2014 12:09:28 -0700
 lib/sequel/adapters/odbc.rb	Tue, 18 Feb 2014 10:01:42 -0800
 lib/sequel/adapters/odbc/mssql.rb	Tue, 18 Feb 2014 10:01:42 -0800
 lib/sequel/adapters/openbase.rb	Tue, 22 Apr 2014 10:09:17 -0700
 lib/sequel/adapters/oracle.rb	Mon, 23 Dec 2013 12:09:17 -0800
 lib/sequel/adapters/postgres.rb	Wed, 16 Apr 2014 12:44:50 -0700
-lib/sequel/adapters/shared/access.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/cubrid.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/db2.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/firebird.rb	Tue, 22 Apr 2014 10:09:17 -0700
+lib/sequel/adapters/shared/access.rb	Fri, 23 May 2014 13:28:32 -0700
+lib/sequel/adapters/shared/cubrid.rb	Fri, 16 May 2014 16:27:33 -0700
+lib/sequel/adapters/shared/db2.rb	Fri, 16 May 2014 16:27:33 -0700
+lib/sequel/adapters/shared/firebird.rb	Fri, 16 May 2014 16:27:33 -0700
 lib/sequel/adapters/shared/informix.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/mssql.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/mysql.rb	Tue, 22 Apr 2014 10:09:17 -0700
+lib/sequel/adapters/shared/mssql.rb	Tue, 20 May 2014 15:40:47 -0700
+lib/sequel/adapters/shared/mysql.rb	Fri, 23 May 2014 13:28:32 -0700
 lib/sequel/adapters/shared/mysql_prepared_statements.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/adapters/shared/oracle.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/postgres.rb	Tue, 29 Apr 2014 11:53:53 -0700
+lib/sequel/adapters/shared/oracle.rb	Fri, 23 May 2014 13:28:32 -0700
+lib/sequel/adapters/shared/postgres.rb	Fri, 16 May 2014 16:27:33 -0700
 lib/sequel/adapters/shared/progress.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/sqlanywhere.rb	Tue, 22 Apr 2014 10:09:17 -0700
-lib/sequel/adapters/shared/sqlite.rb	Tue, 22 Apr 2014 10:09:17 -0700
+lib/sequel/adapters/shared/sqlanywhere.rb	Fri, 16 May 2014 16:27:33 -0700
+lib/sequel/adapters/shared/sqlite.rb	Fri, 23 May 2014 13:28:32 -0700
 lib/sequel/adapters/sqlanywhere.rb	Mon, 14 Oct 2013 14:37:37 -0700
 lib/sequel/adapters/sqlite.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/swift.rb	Thu, 19 Sep 2013 07:06:56 -0700
