@@ -44,7 +44,7 @@ EOF
   s.requirements = 'FoundationDB SQL Layer version 1.9.5'
   s.required_ruby_version = '>= 1.9.3'
 
-  s.add_dependency 'Sequel', '~> 4.11.0'
+  s.add_dependency 'Sequel', '~> 4.11'
 
   # TODO for development dependencies
   # s.add_development_dependency 'rake', '>= 10'
