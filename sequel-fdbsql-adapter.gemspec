@@ -46,6 +46,5 @@ EOF
 
   s.add_dependency 'sequel', '~> 4.11'
 
-  # TODO for development dependencies
-  # s.add_development_dependency 'rake', '>= 10'
+  s.add_development_dependency 'rspec', '~> 2.14'
 end
