@@ -23,10 +23,9 @@ module Sequel
     # block from the method call.
     CONDITIONED_JOIN_TYPES = [:inner, :full_outer, :right_outer, :left_outer, :full, :right, :left]
 
-    # These symbols have _join methods created (e.g. natural_join) that
-    # call join_table with the symbol.  They only accept a single table
-    # argument which is passed to join_table, and they raise an error
-    # if called with a block.
+    # These symbols have _join methods created (e.g. natural_join).
+    # They accept a table argument and options hash which is passed to join_table,
+    # and they raise an error if called with a block.
     UNCONDITIONED_JOIN_TYPES = [:natural, :natural_left, :natural_right, :natural_full, :cross]
     
     # All methods that return modified datasets with a joined table added.
@@ -520,7 +519,13 @@ module Sequel
       class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end", __FILE__, __LINE__)
     end
     UNCONDITIONED_JOIN_TYPES.each do |jtype|
-      class_eval("def #{jtype}_join(table); raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if block_given?; join_table(:#{jtype}, table) end", __FILE__, __LINE__)
+      class_eval(<<-END, __FILE__, __LINE__+1)
+        def #{jtype}_join(table, opts=Sequel::OPTS)
+          raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if block_given?
+          raise(Sequel::Error, '#{jtype}_join 2nd argument should be an options hash, not conditions') unless opts.is_a?(Hash)
+          join_table(:#{jtype}, table, nil, opts)
+        end
+      END
     end
 
     # Marks this dataset as a lateral dataset.  If used in another dataset's FROM

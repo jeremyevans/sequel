@@ -2127,12 +2127,20 @@ describe "Dataset#join_table" do
     @d.cross_join(:categories).sql.should == 'SELECT * FROM "items" CROSS JOIN "categories"'
   end
   
-  specify "should raise an error if additional arguments are provided to join methods that don't take conditions" do
-    proc{@d.natural_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
-    proc{@d.natural_left_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
-    proc{@d.natural_right_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
-    proc{@d.natural_full_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
-    proc{@d.cross_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
+  specify "should support options hashes for join methods that don't take conditions" do
+    @d.natural_join(:categories, :table_alias=>:a).sql.should == 'SELECT * FROM "items" NATURAL JOIN "categories" AS "a"'
+    @d.natural_left_join(:categories, :table_alias=>:a).sql.should == 'SELECT * FROM "items" NATURAL LEFT JOIN "categories" AS "a"'
+    @d.natural_right_join(:categories, :table_alias=>:a).sql.should == 'SELECT * FROM "items" NATURAL RIGHT JOIN "categories" AS "a"'
+    @d.natural_full_join(:categories, :table_alias=>:a).sql.should == 'SELECT * FROM "items" NATURAL FULL JOIN "categories" AS "a"'
+    @d.cross_join(:categories, :table_alias=>:a).sql.should == 'SELECT * FROM "items" CROSS JOIN "categories" AS "a"'
+  end
+
+  specify "should raise an error if non-hash arguments are provided to join methods that don't take conditions" do
+    proc{@d.natural_join(:categories, nil)}.should raise_error(Sequel::Error)
+    proc{@d.natural_left_join(:categories, nil)}.should raise_error(Sequel::Error)
+    proc{@d.natural_right_join(:categories, nil)}.should raise_error(Sequel::Error)
+    proc{@d.natural_full_join(:categories, nil)}.should raise_error(Sequel::Error)
+    proc{@d.cross_join(:categories, nil)}.should raise_error(Sequel::Error)
   end
 
   specify "should raise an error if blocks are provided to join methods that don't pass them" do
