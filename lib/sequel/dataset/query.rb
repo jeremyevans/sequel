@@ -387,37 +387,42 @@ module Sequel
     #
     # Takes the following arguments:
     #
-    # * type - The type of join to do (e.g. :inner)
-    # * table - Depends on type:
-    #   * Dataset - a subselect is performed with an alias of tN for some value of N
-    #   * String, Symbol: table
-    # * expr - specifies conditions, depends on type:
-    #   * Hash, Array of two element arrays - Assumes key (1st arg) is column of joined table (unless already
-    #     qualified), and value (2nd arg) is column of the last joined or primary table (or the
-    #     :implicit_qualifier option).
-    #     To specify multiple conditions on a single joined table column, you must use an array.
-    #     Uses a JOIN with an ON clause.
-    #   * Array - If all members of the array are symbols, considers them as columns and 
-    #     uses a JOIN with a USING clause.  Most databases will remove duplicate columns from
-    #     the result set if this is used.
-    #   * nil - If a block is not given, doesn't use ON or USING, so the JOIN should be a NATURAL
-    #     or CROSS join. If a block is given, uses an ON clause based on the block, see below.
-    #   * Everything else - pretty much the same as a using the argument in a call to where,
-    #     so strings are considered literal, symbols specify boolean columns, and Sequel
-    #     expressions can be used. Uses a JOIN with an ON clause.
-    # * options - a hash of options, with any of the following keys:
-    #   * :table_alias - the name of the table's alias when joining, necessary for joining
-    #     to the same table more than once.  No alias is used by default.
-    #   * :implicit_qualifier - The name to use for qualifying implicit conditions.  By default,
-    #     the last joined or primary table is used.
-    #   * :qualify - Can be set to false to not do any implicit qualification.  Can be set
-    #     to :deep to use the Qualifier AST Transformer, which will attempt to qualify
-    #     subexpressions of the expression tree.  Can be set to :symbol to only qualify
-    #     symbols. Defaults to the value of default_join_table_qualification.
-    # * block - The block argument should only be given if a JOIN with an ON clause is used,
-    #   in which case it yields the table alias/name for the table currently being joined,
-    #   the table alias/name for the last joined (or first table), and an array of previous
-    #   SQL::JoinClause. Unlike +where+, this block is not treated as a virtual row block.
+    # type :: The type of join to do (e.g. :inner)
+    # table :: table to join into the current dataset.  Generally one of the following types:
+    #          String, Symbol :: identifier used as table or view name
+    #          Dataset :: a subselect is performed with an alias of tN for some value of N
+    #          SQL::Function :: set returning function
+    #          SQL::AliasedExpression :: already aliased expression.  Uses given alias unless
+    #                                    overridden by the :table_alias option.
+    # expr :: conditions used when joining, depends on type:
+    #         Hash, Array of pairs :: Assumes key (1st arg) is column of joined table (unless already
+    #                                 qualified), and value (2nd arg) is column of the last joined or
+    #                                 primary table (or the :implicit_qualifier option).
+    #                                 To specify multiple conditions on a single joined table column,
+    #                                 you must use an array.  Uses a JOIN with an ON clause.
+    #         Array :: If all members of the array are symbols, considers them as columns and 
+    #                  uses a JOIN with a USING clause.  Most databases will remove duplicate columns from
+    #                  the result set if this is used.
+    #         nil :: If a block is not given, doesn't use ON or USING, so the JOIN should be a NATURAL
+    #                or CROSS join. If a block is given, uses an ON clause based on the block, see below.
+    #         otherwise :: Treats the argument as a filter expression, so strings are considered literal, symbols
+    #                      specify boolean columns, and Sequel expressions can be used. Uses a JOIN with an ON clause.
+    # options :: a hash of options, with the following keys supported:
+    #            :table_alias :: Override the table alias used when joining.  In general you shouldn't use this
+    #                            option, you should provide the appropriate SQL::AliasedExpression as the table
+    #                            argument.
+    #            :implicit_qualifier :: The name to use for qualifying implicit conditions.  By default,
+    #                                   the last joined or primary table is used.
+    #            :reset_implicit_qualifier :: Can set to false to ignore this join when future joins determine qualifier
+    #                                         for implicit conditions.
+    #            :qualify :: Can be set to false to not do any implicit qualification.  Can be set
+    #                        to :deep to use the Qualifier AST Transformer, which will attempt to qualify
+    #                        subexpressions of the expression tree.  Can be set to :symbol to only qualify
+    #                        symbols. Defaults to the value of default_join_table_qualification.
+    # block :: The block argument should only be given if a JOIN with an ON clause is used,
+    #          in which case it yields the table alias/name for the table currently being joined,
+    #          the table alias/name for the last joined (or first table), and an array of previous
+    #          SQL::JoinClause. Unlike +where+, this block is not treated as a virtual row block.
     #
     # Examples:
     #
@@ -505,7 +510,8 @@ module Sequel
         SQL::JoinOnClause.new(expr, type, table_expr)
       end
 
-      opts = {:join => (@opts[:join] || []) + [join], :last_joined_table => table_name}
+      opts = {:join => (@opts[:join] || []) + [join]}
+      opts[:last_joined_table] = table_name unless options[:reset_implicit_qualifier] == false
       opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
     end

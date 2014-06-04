@@ -2184,6 +2184,10 @@ describe "Dataset#join_table" do
     @d.from('stats').join('players', {:id => :player_id}, :implicit_qualifier=>:p).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" ON ("players"."id" = "p"."player_id")'
   end
   
+  specify "should support the :reset_implicit_qualifier option" do
+    @d.from(:stats).join(:a, [:b], :reset_implicit_qualifier=>false).join(:players, {:id => :player_id}).sql.should == 'SELECT * FROM "stats" INNER JOIN "a" USING ("b") INNER JOIN "players" ON ("players"."id" = "stats"."player_id")'
+  end
+  
   specify "should default :qualify option to default_join_table_qualification" do
     def @d.default_join_table_qualification; false; end
     @d.from('stats').join(:players, :id => :player_id).sql.should == 'SELECT * FROM "stats" INNER JOIN "players" ON ("id" = "player_id")'

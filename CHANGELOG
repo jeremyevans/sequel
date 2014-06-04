@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :reset_implicit_qualifier option to Dataset#join_table, to set false to not reset the implicit qualifier (jeremyevans)
+
 * Support :notice_receiver Database option when postgres adapter is used with pg driver (jeltz, jeremyevans) (#825)
 
 === 4.11.0 (2014-06-03)
