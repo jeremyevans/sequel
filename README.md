@@ -38,7 +38,7 @@ This project currently supports Sequel v4.11.0
 
 If you would like to contribute a feature or fix, thanks! Please make
 sure any changes come with new tests to ensure acceptance. Please read
-the `test/RUNNING_UNIT_TESTS.md` file for more details.
+the `spec/RUNNING_UNIT_TESTS.md` file for more details.
 
 ### Contact
 
