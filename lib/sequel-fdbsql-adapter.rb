@@ -21,6 +21,6 @@
 # THE SOFTWARE.
 #
 
-require 'sequel/adapters/fdbsql_adapter'
+require 'sequel/adapters/fdbsql'
 
 Sequel::Database::ADAPTERS << 'fdbsql'
