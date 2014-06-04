@@ -21,6 +21,8 @@
 # THE SOFTWARE.
 #
 
+
+require 'sequel'
 require 'sequel/adapters/fdbsql'
 
 Sequel::Database::ADAPTERS << 'fdbsql'
