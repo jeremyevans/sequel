@@ -31,6 +31,14 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         puts "Connecting #{opts}"
+        "TODO a real connection"
+      end
+
+      def execute(sql, opts = {}, &block)
+        res = nil
+        synchronize(opts[:server]) do |conn|
+          raise "Execute anything"
+        end
       end
 
     end
