@@ -21,6 +21,9 @@
 # THE SOFTWARE.
 #
 
+
+require 'sequel/adapters/fdbsql/connection'
+
 module Sequel
   module Fdbsql
 
@@ -31,7 +34,8 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         puts "Connecting #{opts}"
-        "TODO a real connection"
+
+        Connection.new(apply_default_options(opts))
       end
 
       def execute(sql, opts = {}, &block)
@@ -48,6 +52,31 @@ module Sequel
       # the sql layer supports DROP TABLE IF EXISTS
       def supports_drop_table_if_exists?
         true
+      end
+
+
+      private
+
+
+      CONNECTION_DEFAULTS = {
+        :host => 'localhost',
+        :port => 15432,
+        :username => 'fdbsql',
+        :password => '',
+      }
+
+      def apply_default_options(sequel_options)
+        config = CONNECTION_DEFAULTS.merge(sequel_options)
+        config[:encoding] =
+          config[:charset] || 'UTF8'    unless config[:encoding]
+
+        if config.key?(:database)
+          database = config[:database]
+        else
+          raise ArgumentError, "No database specified. Missing config option: database"
+        end
+
+        return config
       end
 
     end
