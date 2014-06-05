@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove methods/class deprecated in 4.11.0 (jeremyevans)
+
 * Allow Dataset#natural_join/cross_join and related methods to take a options hash passed to join_table (jeremyevans)
 
 * Add :reset_implicit_qualifier option to Dataset#join_table, to set false to not reset the implicit qualifier (jeremyevans)

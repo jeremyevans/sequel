@@ -1339,16 +1339,6 @@ module Sequel
       end
     end
 
-    # REMOVE411
-    class EmulatedFunction < Function
-      def self.new(name, *args)
-        Deprecation.deprecate("Sequel::SQL::EmulatedFunction", "Please use Sequel::SQL::Function.new!(name, args, :emulate=>true) to create an emulated SQL function")
-        Function.new!(name, args, :emulate=>true)
-      end
-
-      to_s_method :emulated_function_sql
-    end
-    
     class GenericExpression
       include AliasMethods
       include BooleanMethods
@@ -1394,18 +1384,9 @@ module Sequel
       attr_reader :table_expr
 
       # Create an object with the given join_type and table expression.
-      def initialize(join_type, table, table_alias = nil)
+      def initialize(join_type, table_expr)
         @join_type = join_type
-
-        @table_expr = if table.is_a?(AliasedExpression)
-          table
-        # REMOVE411
-        elsif table_alias
-          Deprecation.deprecate("The table_alias argument to Sequel::SQL::JoinClause#initialize", "Please use a Sequel::SQL::AliasedExpression as the table argument instead.")
-          AliasedExpression.new(table, table_alias)
-        else
-          table
-        end
+        @table_expr = table_expr
       end
 
       # The table/set related to the JOIN, without any alias.
@@ -1825,28 +1806,6 @@ module Sequel
       end
 
       to_s_method :window_sql, '@opts'
-    end
-
-    # REMOVE411
-    class WindowFunction < GenericExpression
-      # The function to use, should be an <tt>SQL::Function</tt>.
-      attr_reader :function
-
-      # The window to use, should be an <tt>SQL::Window</tt>.
-      attr_reader :window
-
-      def self.new(function, window)
-        Deprecation.deprecate("Sequel::SQL::WindowFunction", "Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function")
-        function.over(window)
-      end
-
-      # Set the function and window.
-      def initialize(function, window)
-        Deprecation.deprecate("Sequel::SQL::WindowFunction", "Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function")
-        @function, @window = function, window
-      end
-
-      to_s_method :window_function_sql, '@function, @window'
     end
 
     # A +Wrapper+ is a simple way to wrap an existing object so that it supports

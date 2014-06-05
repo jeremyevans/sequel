@@ -525,11 +525,6 @@ module Sequel
       end
     end
 
-    # REMOVE411
-    def emulated_function_sql_append(sql, f)
-      _function_sql_append(sql, native_function_name(f.f), f.args)
-    end
-
     # Append literalization of function call to SQL string.
     def function_sql_append(sql, f)
       name = f.name
@@ -827,14 +822,6 @@ module Sequel
       sql << PAREN_CLOSE
     end
 
-    # REMOVE411
-    def window_function_sql_append(sql, function, window)
-      Deprecation.deprecate("Dataset#window_function_sql_append", "Please use Sequel::SQL::Function.new(name, *args).over(...) to create an SQL window function")
-      literal_append(sql, function)
-      sql << OVER
-      literal_append(sql, window)
-    end
-
     protected
 
     # Return a from_self dataset if an order or limit is specified, so it works as expected
@@ -844,32 +831,6 @@ module Sequel
     end
     
     private
-
-    # REMOVE411
-    def _function_sql_append(sql, name, args)
-      Deprecation.deprecate("Dataset#emulated_function_sql_append and #_function_sql_append", "Please use Sequel::SQL::Function.new!(name, args, :emulate=>true) to create an emulated SQL function")
-      case name
-      when SQL::Identifier
-        if supports_quoted_function_names?
-          literal_append(sql, name)
-        else
-          sql << name.value.to_s
-        end
-      when SQL::QualifiedIdentifier
-        if supports_quoted_function_names?
-          literal_append(sql, name)
-        else
-          sql << split_qualifiers(name).join(DOT)
-        end
-      else
-        sql << name.to_s
-      end
-      if args.empty?
-        sql << FUNCTION_EMPTY
-      else
-        literal_append(sql, args)
-      end
-    end
 
     # Formats the truncate statement.  Assumes the table given has already been
     # literalized.
