@@ -13,7 +13,7 @@ task :default => :spec
 desc 'Run specs'
 RSpec::Core::RakeTask.new('spec_integration') do |t|
   t.pattern = "#{SEQUEL_PATH}/spec/integration/*_test.rb"
-  t.ruby_opts = '-r sequel-fdbsql-adapter'
+  t.ruby_opts = '-Ilib'
   raise 'ENV[SEQUEL_INTEGRATION_URL] must be set for spec_integration' unless ENV['SEQUEL_INTEGRATION_URL']
   if URI.parse(ENV['SEQUEL_INTEGRATION_URL']).scheme != 'fdbsql'
     raise "SEQUEL_INTEGRATION_URL is not an fdbsql uri, so these tests won't test against the sql-layer"
