@@ -45,6 +45,7 @@ EOF
   s.required_ruby_version = '>= 1.9.3'
 
   s.add_dependency 'sequel', '~> 4.11'
+  s.add_dependency 'pg', '~> 0.17'
 
   s.add_development_dependency 'rspec', '~> 2.14'
 end

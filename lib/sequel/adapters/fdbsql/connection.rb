@@ -23,7 +23,7 @@
 
 
 # FoundationDB SQL Layer currently uses the Postgres protocol
-# require 'pg'
+require 'pg'
 
 module Sequel
   module Fdbsql
@@ -32,12 +32,39 @@ module Sequel
 
       def initialize(opts)
         @config = opts
+        @connection_hash = {
+          :host => @config[:host],
+          :port => @config[:port],
+          :dbname => @config[:database],
+          :user => @config[:username],
+          :password => @config[:password]
+        }
+        # the below comments were in the activerecord adapter, not sure what's needed here
+        # @prepared_statements = config.fetch(:prepared_statements) { true }
+        # if @prepared_statements
+        #   @visitor = Arel::Visitors::FdbSql.new self
+        # else
+        #   @visitor = BindSubstitution.new self
+        # end
+        connect
+        # @statements = FdbSqlStatementPool.new(@connection, config.fetch(:statement_limit) { 1000 })
       end
 
       def close
-        puts "Connection.close was called"
+        @connection.close
       end
 
+
+      private
+
+      def connect
+        @connection = PG::Connection.new(@connection_hash)
+        configure_connection
+      end
+
+      def configure_connection
+        # TODO this exists in activerecord adapter, go back and see what's needed here
+      end
     end
   end
 end
