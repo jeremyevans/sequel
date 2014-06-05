@@ -54,6 +54,10 @@ module Sequel
         @connection.close
       end
 
+      def query(sql)
+        @connection.query(sql)
+      end
+
 
       private
 

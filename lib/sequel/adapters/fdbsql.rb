@@ -42,10 +42,11 @@ module Sequel
         res = nil
         synchronize(opts[:server]) do |conn|
           if (sql.start_with? 'DROP TABLE IF EXISTS')
-            puts 'DROP_TABLE was called'
+            res = log_yield(sql) { conn.query(sql) }
           else
             raise "Execute anything"
           end
+          raise "block_given..." if block_given?
         end
       end
 
