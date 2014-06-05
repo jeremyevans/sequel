@@ -37,8 +37,17 @@ module Sequel
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
-          raise "Execute anything"
+          if (sql.start_with? 'DROP TABLE IF EXISTS')
+            puts 'DROP_TABLE was called'
+          else
+            raise "Execute anything"
+          end
         end
+      end
+
+      # the sql layer supports DROP TABLE IF EXISTS
+      def supports_drop_table_if_exists?
+        true
       end
 
     end
