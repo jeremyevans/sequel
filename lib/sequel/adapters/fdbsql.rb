@@ -33,26 +33,56 @@ module Sequel
 
       def connect(server)
         opts = server_opts(server)
-        puts "Connecting #{opts}"
-
         Connection.new(apply_default_options(opts))
       end
 
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
-          if (sql.start_with? 'DROP TABLE IF EXISTS')
+          if (sql =~ /^DROP TABLE IF EXISTS|^CREATE TABLE|^SELECT NULL AS "NIL" FROM "\w*" LIMIT 1|^SELECT [\w," *]+ FROM information_schema.columns WHERE/i)
             res = log_yield(sql) { conn.query(sql) }
+            res.each(&block)
+            res
           else
-            raise "Execute anything"
+            raise "Support for execute: #{sql}"
           end
-          raise "block_given..." if block_given?
         end
       end
 
       # the sql layer supports DROP TABLE IF EXISTS
       def supports_drop_table_if_exists?
         true
+      end
+
+      def supports_schema_parsing?
+        true
+      end
+
+      # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
+      def identifier_input_method_default
+        nil
+      end
+
+      # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
+      def identifier_output_method_default
+        nil
+      end
+
+      def schema_parse_table(table_name, options = {})
+        schema = options[:schema]
+
+        # Use literal here to wrap in quotes, still need to figure out casing
+        dataset = metadata_dataset.with_sql(
+                                            'SELECT column_name, is_nullable AS allow_null, column_default AS "default", data_type AS db_type ' +
+                                            'FROM information_schema.columns ' +
+                                            "WHERE table_name = #{literal(table_name)} " +
+                                            (schema ? " AND table_schema = #{literal(schema)} " : ''))
+
+        dataset.map do |row|
+          row[:default] = nil if blank_object?(row[:default])
+          row[:type] = schema_column_type(row[:db_type])
+          [row.delete(:column_name).to_sym, row]
+        end
       end
 
 
@@ -82,5 +112,16 @@ module Sequel
 
     end
 
+
+    # TODO put in own file if this becomes more than 5 lines
+    class Dataset < Sequel::Dataset
+      Sequel::Fdbsql::Database::DatasetClass = self
+
+      def fetch_rows(sql)
+        execute(sql) do |row|
+          yield row
+        end
+      end
+    end
   end
 end
