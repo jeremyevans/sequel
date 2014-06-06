@@ -64,6 +64,24 @@ module Sequel
         nil
       end
 
+      # like PostgreSQL fdbsql uses SERIAL psuedo-type instead of AUTOINCREMENT for
+      # managing incrementing primary keys.
+      def serial_primary_key_options
+        {:primary_key => true, :serial => true, :type=>Integer}
+      end
+
+      # Handle bigserial type if :serial option is present
+      def type_literal_generic_bignum(column)
+        # TODO bigserial or BGSERIAL, the docs say bgserial, but that seems wrong
+        column[:serial] ? :bigserial : super
+      end
+
+      # Handle serial type if :serial option is present
+      def type_literal_generic_integer(column)
+        column[:serial] ? :serial : super
+      end
+
+
       def schema_parse_table(table_name, options = {})
         schema = options[:schema]
 
