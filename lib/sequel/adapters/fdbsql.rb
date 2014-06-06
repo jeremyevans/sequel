@@ -39,15 +39,9 @@ module Sequel
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
-          if (sql =~ Regexp.new('^DROP TABLE IF EXISTS|^CREATE TABLE|^SELECT NULL AS "NIL" FROM "\w*" LIMIT 1|' +
-                      '^SELECT [\w," *]+ FROM information_schema.columns WHERE|' +
-                      '^INSERT INTO |', Regexp::IGNORECASE))
             res = log_yield(sql) { conn.query(sql) }
             yield res if block_given?
             res
-          else
-            raise "Support for execute: #{sql}"
-          end
         end
       end
 
