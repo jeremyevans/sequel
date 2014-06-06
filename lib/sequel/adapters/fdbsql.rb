@@ -39,9 +39,11 @@ module Sequel
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
-          if (sql =~ /^DROP TABLE IF EXISTS|^CREATE TABLE|^SELECT NULL AS "NIL" FROM "\w*" LIMIT 1|^SELECT [\w," *]+ FROM information_schema.columns WHERE/i)
+          if (sql =~ Regexp.new('^DROP TABLE IF EXISTS|^CREATE TABLE|^SELECT NULL AS "NIL" FROM "\w*" LIMIT 1|' +
+                      '^SELECT [\w," *]+ FROM information_schema.columns WHERE|' +
+                      '^INSERT INTO |', Regexp::IGNORECASE))
             res = log_yield(sql) { conn.query(sql) }
-            res.each(&block)
+            yield res if block_given?
             res
           else
             raise "Support for execute: #{sql}"
@@ -117,9 +119,39 @@ module Sequel
     class Dataset < Sequel::Dataset
       Sequel::Fdbsql::Database::DatasetClass = self
 
+      def columns
+        return @columns if @columns
+        ds = unfiltered.unordered.clone(:distinct => nil, :limit => 0, :offset => nil)
+        res = @db.execute(ds.select_sql)
+        set_columns(res)
+      end
+
       def fetch_rows(sql)
-        execute(sql) do |row|
-          yield row
+        execute(sql) do |res|
+          set_columns(res) unless @columns
+          res.each do |row|
+            yield symbolize_keys(row)
+          end
+        end
+      end
+
+      private
+
+      def symbolize_keys(hash)
+        result = {}
+        hash.each_pair do |key, value|
+          begin
+            result[key.to_sym] = value
+          rescue
+            result[key] = value
+          end
+        end
+        result
+      end
+
+      def set_columns(fetch_result)
+        @columns = fetch_result.fields.map do |column|
+          output_identifier(column)
         end
       end
     end
