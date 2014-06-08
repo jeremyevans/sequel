@@ -67,7 +67,7 @@ module Sequel
       # Creates callable objects that convert strings into ActiveSupport::Duration instances.
       class Parser
         # Regexp that parses the full range of PostgreSQL interval type output.
-        PARSER = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d\d):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/o
+        PARSER = /\A([+-]?\d+ years?\s?)?([+-]?\d+ mons?\s?)?([+-]?\d+ days?\s?)?(?:(?:([+-])?(\d{2,10}):(\d\d):(\d\d(\.\d+)?))|([+-]?\d+ hours?\s?)?([+-]?\d+ mins?\s?)?([+-]?\d+(\.\d+)? secs?\s?)?)?\z/o
 
         # Parse the interval input string into an ActiveSupport::Duration instance.
         def call(string)

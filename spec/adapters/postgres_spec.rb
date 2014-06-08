@@ -3028,6 +3028,7 @@ describe 'PostgreSQL interval types' do
       ['1 second', '00:00:01', 1, [[:seconds, 1]]],
       ['1 minute', '00:01:00', 60, [[:seconds, 60]]],
       ['1 hour', '01:00:00', 3600, [[:seconds, 3600]]],
+      ['123000 hours', '123000:00:00', 442800000, [[:seconds, 442800000]]],
       ['1 day', '1 day', 86400, [[:days, 1]]],
       ['1 week', '7 days', 86400*7, [[:days, 7]]],
       ['1 month', '1 mon', 86400*30, [[:months, 1]]],
