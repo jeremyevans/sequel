@@ -58,6 +58,13 @@ module Sequel
         @connection.query(sql)
       end
 
+      # Execute the given SQL with this connection.  If a block is given,
+      # yield the results, otherwise, return the number of changed rows.
+      def execute(sql, args=nil)
+        raise 'fdbsql Connection.execute args are not supported' unless args.nil?
+        block_given? ? yield(query(sql)) : query(sql)
+      end
+
 
       private
 
