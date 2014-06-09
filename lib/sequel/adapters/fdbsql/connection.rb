@@ -29,6 +29,8 @@ module Sequel
   module Fdbsql
 
     class Connection
+      CONNECTION_OK = -1
+      DISCONNECT_ERROR_RE = /\A(?:could not receive data from server|no connection to the server|connection not open|connection is closed)/
 
       def initialize(opts)
         @config = opts
@@ -59,7 +61,7 @@ module Sequel
       end
 
       def query(sql)
-        @connection.query(sql)
+        check_disconnect_errors{@connection.query(sql)}
       end
 
       # Execute the given SQL with this connection.  If a block is given,
@@ -81,6 +83,33 @@ module Sequel
       def configure_connection
         # TODO this exists in activerecord adapter, go back and see what's needed here
       end
+
+      def status
+        CONNECTION_OK
+      end
+
+      # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and
+      # the connection status cannot be determined or it is not OK.
+      def check_disconnect_errors
+        begin
+          yield
+        rescue PGError => e
+          disconnect = false
+          begin
+            s = status
+          rescue PGError
+            disconnect = true
+          end
+          status_ok = (s == CONNECTION_OK)
+          disconnect ||= !status_ok
+          disconnect ||= e.message =~ DISCONNECT_ERROR_RE
+          disconnect ? raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)) : raise
+        rescue IOError, Errno::EPIPE, Errno::ECONNRESET => e
+          disconnect = true
+          raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
+        end
+      end
+
     end
   end
 end
