@@ -29,6 +29,8 @@ module Sequel
   module Fdbsql
     CONVERTED_EXCEPTIONS  = [PGError]
 
+    class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
+
     class Database < Sequel::Database
 
 
@@ -69,6 +71,21 @@ module Sequel
       # Like PostgreSQL fdbsql folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
       def identifier_output_method_default
         nil
+      end
+
+      DATABASE_ERROR_REGEXPS = [
+        # Add this check first, since otherwise it's possible for users to control
+        # which exception class is generated.
+        [/invalid input syntax/, DatabaseError],
+        [/[dD]uplicate key violates unique constraint/, UniqueConstraintViolation],
+        [/violates foreign key constraint/, ForeignKeyConstraintViolation],
+        [/violates check constraint/, CheckConstraintViolation],
+        [/violates not-null constraint/, NotNullConstraintViolation],
+        [/conflicting key value violates exclusion constraint/, ExclusionConstraintViolation],
+        [/could not serialize access/, SerializationFailure],
+      ].freeze
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
       end
 
       # like PostgreSQL fdbsql uses SERIAL psuedo-type instead of AUTOINCREMENT for
