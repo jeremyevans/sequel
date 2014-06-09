@@ -84,14 +84,15 @@ module Sequel
 
 
       def schema_parse_table(table_name, options = {})
-        schema = options[:schema]
+        # CURRENT_SCHEMA evaluates to the currently chosen schema
+        schema = schema ? literal(options[:schema]) : 'CURRENT_SCHEMA'
 
         # Use literal here to wrap in quotes, still need to figure out casing
         dataset = metadata_dataset.with_sql(
                                             'SELECT column_name, is_nullable AS allow_null, column_default AS "default", data_type AS db_type ' +
                                             'FROM information_schema.columns ' +
                                             "WHERE table_name = #{literal(table_name)} " +
-                                            (schema ? " AND table_schema = #{literal(schema)} " : ''))
+                                            "AND table_schema = #{schema} ")
 
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
