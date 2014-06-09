@@ -51,7 +51,11 @@ module Sequel
       end
 
       def close
-        @connection.close
+        # Just like postgres, ignore any errors here
+        begin
+          @connection.close
+        rescue PGError, IOError
+        end
       end
 
       def query(sql)
