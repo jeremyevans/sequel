@@ -41,7 +41,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
             res = log_yield(sql) { conn.query(sql) }
             yield res if block_given?
-            res
+            res.cmd_tuples
         end
       end
 

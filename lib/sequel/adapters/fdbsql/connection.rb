@@ -62,7 +62,8 @@ module Sequel
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
         raise 'fdbsql Connection.execute args are not supported' unless args.nil?
-        block_given? ? yield(query(sql)) : query(sql)
+        q = query(sql)
+        block_given? ? yield(q) : q.cmd_tuples
       end
 
 
