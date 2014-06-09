@@ -133,15 +133,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       Sequel::Fdbsql::Database::DatasetClass = self
 
-      def columns
-        # Note: @columns is used for Sequel::Dataset for something else, so we have to
-        # have a different name here
-        return @column_names if @column_names
-        ds = unfiltered.unordered.clone(:distinct => nil, :limit => 0, :offset => nil)
-        @db.execute(ds.select_sql) {|res| set_columns(res) }
-        @column_names
-      end
-
       def fetch_rows(sql)
         execute(sql) do |res|
           columns = set_columns(res)
@@ -185,7 +176,7 @@ module Sequel
         res.nfields.times do |fieldnum|
           cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
         end
-        @column_names = cols.map{|c| c[2]}
+        @columns = cols.map{|c| c[2]}
         cols
       end
     end
