@@ -147,6 +147,19 @@ module Sequel
         end
       end
 
+      Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
+
+      # Returning is always supported.
+      def supports_returning?(type)
+        true
+      end
+
+      # Insert a record returning the record inserted.  Always returns nil without
+      # inserting a query if disable_insert_returning is used.
+      def insert_select(*values)
+        returning.insert(*values){|r| return r} unless @opts[:disable_insert_returning]
+      end
+
       private
 
       def symbolize_keys(hash)
