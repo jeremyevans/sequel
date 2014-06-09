@@ -27,8 +27,10 @@ require 'sequel/adapters/utils/pg_types'
 
 module Sequel
   module Fdbsql
+    CONVERTED_EXCEPTIONS  = [PGError]
 
     class Database < Sequel::Database
+
 
       set_adapter_scheme :fdbsql
 
@@ -40,9 +42,13 @@ module Sequel
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
-            res = log_yield(sql) { conn.query(sql) }
-            yield res if block_given?
-            res.cmd_tuples
+          res = log_yield(sql) do
+            check_database_errors do
+              conn.query(sql)
+            end
+          end
+          yield res if block_given?
+          res.cmd_tuples
         end
       end
 
@@ -124,6 +130,15 @@ module Sequel
         end
 
         return config
+      end
+
+      # Convert exceptions raised from the block into DatabaseErrors.
+      def check_database_errors
+        begin
+          yield
+        rescue => e
+          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
+        end
       end
 
     end
