@@ -23,6 +23,7 @@
 
 
 require 'sequel/adapters/fdbsql/connection'
+require 'sequel/adapters/utils/pg_types'
 
 module Sequel
   module Fdbsql
@@ -134,16 +135,13 @@ module Sequel
       def columns
         return @columns if @columns
         ds = unfiltered.unordered.clone(:distinct => nil, :limit => 0, :offset => nil)
-        res = @db.execute(ds.select_sql)
-        set_columns(res)
+        @db.execute(ds.select_sql) {|res| set_columns(res) }
       end
 
       def fetch_rows(sql)
         execute(sql) do |res|
-          set_columns(res) unless @columns
-          res.each do |row|
-            yield symbolize_keys(row)
-          end
+          columns = set_columns(res)
+          yield_hash_rows(res, columns) {|h| yield h}
         end
       end
 
@@ -162,22 +160,29 @@ module Sequel
 
       private
 
-      def symbolize_keys(hash)
-        result = {}
-        hash.each_pair do |key, value|
-          begin
-            result[key.to_sym] = value
-          rescue
-            result[key] = value
+
+      # For each row in the result set, yield a hash with column name symbol
+      # keys and typecasted values.
+      def yield_hash_rows(res, cols)
+        res.ntuples.times do |recnum|
+          converted_rec = {}
+          cols.each do |fieldnum, type_proc, fieldsym|
+            value = res.getvalue(recnum, fieldnum)
+            converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
           end
+          yield converted_rec
         end
-        result
       end
 
-      def set_columns(fetch_result)
-        @columns = fetch_result.fields.map do |column|
-          output_identifier(column)
+
+      def set_columns(res)
+        cols = []
+        procs = Sequel::Postgres::PG_TYPES
+        res.nfields.times do |fieldnum|
+          cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
         end
+        @columns = cols.map{|c| c[2]}
+        cols
       end
     end
   end
