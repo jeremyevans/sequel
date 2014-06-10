@@ -73,13 +73,39 @@ module Sequel
         nil
       end
 
+      def database_exception_sqlstate(exception, opts)
+        if exception.respond_to?(:result) && (result = exception.result)
+          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+        end
+      end
+
+
+      NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
+      FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
+      UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
+      SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each{|s| s.freeze}
+      # Given the SQLState, return the appropriate DatabaseError subclass.
+      def database_specific_error_class_from_sqlstate(sqlstate)
+        # There is also a CheckConstraintViolation in Sequel, but the sql layer doesn't support check constraints
+        case sqlstate
+        when *NOT_NULL_CONSTRAINT_SQLSTATES
+          NotNullConstraintViolation
+        when *FOREIGN_KEY_CONSTRAINT_SQLSTATES
+          ForeignKeyConstraintViolation
+        when *UNIQUE_CONSTRAINT_SQLSTATES
+          UniqueConstraintViolation
+        when *SERIALIZATION_CONSTRAINT_SQLSTATES
+          SerializationFailure
+        end
+      end
+
       DATABASE_ERROR_REGEXPS = [
         # Add this check first, since otherwise it's possible for users to control
         # which exception class is generated.
         [/invalid input syntax/, DatabaseError],
+        # the rest of these are backups in case the sqlstate fails
         [/[dD]uplicate key violates unique constraint/, UniqueConstraintViolation],
         [/due to foreign key constraint/, ForeignKeyConstraintViolation],
-        [/violates check constraint/, CheckConstraintViolation],
         [/violates not-null constraint/, NotNullConstraintViolation],
         [/conflicting key value violates exclusion constraint/, ExclusionConstraintViolation],
         [/could not serialize access/, SerializationFailure],
