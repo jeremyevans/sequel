@@ -78,7 +78,7 @@ module Sequel
         # which exception class is generated.
         [/invalid input syntax/, DatabaseError],
         [/[dD]uplicate key violates unique constraint/, UniqueConstraintViolation],
-        [/violates foreign key constraint/, ForeignKeyConstraintViolation],
+        [/due to foreign key constraint/, ForeignKeyConstraintViolation],
         [/violates check constraint/, CheckConstraintViolation],
         [/violates not-null constraint/, NotNullConstraintViolation],
         [/conflicting key value violates exclusion constraint/, ExclusionConstraintViolation],
