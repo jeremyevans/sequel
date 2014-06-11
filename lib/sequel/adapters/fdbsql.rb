@@ -33,8 +33,11 @@ module Sequel
 
     class Database < Sequel::Database
 
-
       set_adapter_scheme :fdbsql
+
+      def adapter_initialize
+        @primary_keys = {}
+      end
 
       def connect(server)
         opts = server_opts(server)
@@ -114,6 +117,42 @@ module Sequel
         DATABASE_ERROR_REGEXPS
       end
 
+      # Remove the cached entries for primary keys and sequences when a table is
+      # changed.
+      def remove_cached_schema(table)
+        tab = quote_schema_table(table)
+        Sequel.synchronize do
+          @primary_keys.delete(tab)
+        end
+        super
+      end
+
+      # Return primary key for the given table.
+      def primary_key(table_name, opts=OPTS)
+        # CURRENT_SCHEMA evaluates to the currently chosen schema
+        quoted_table = quote_schema_table(table_name)
+        Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
+        schema = schema ? literal(opts[:schema]) : 'CURRENT_SCHEMA'
+        sql =
+          'SELECT kc.column_name ' +
+          'FROM information_schema.table_constraints tc ' +
+          'INNER JOIN information_schema.key_column_usage kc ' +
+          '  ON  tc.table_schema = kc.table_schema ' +
+          '  AND tc.table_name = kc.table_name ' +
+          '  AND tc.constraint_name = kc.constraint_name ' +
+          'LEFT JOIN information_schema.columns c ' +
+          '  ON kc.table_schema = c.table_schema ' +
+          '  AND kc.table_name = c.table_name ' +
+          '  AND kc.column_name = c.column_name ' +
+          "WHERE tc.table_schema = #{schema} " +
+          # Symbols get quoted with double quotes, strings get quoted with single quotes
+          # since this is a column value, we want to ensure that it's a string
+          "  AND tc.table_name = #{literal(table_name.to_s)} " +
+          "  AND tc.constraint_type = 'PRIMARY KEY' "
+        value = fetch(sql).single_value
+        Sequel.synchronize{@primary_keys[quoted_table] = value}
+      end
+
       # like PostgreSQL fdbsql uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
@@ -139,9 +178,10 @@ module Sequel
         dataset = metadata_dataset.with_sql(
                                             'SELECT column_name, is_nullable AS allow_null, column_default AS "default", data_type AS db_type ' +
                                             'FROM information_schema.columns ' +
-                                            "WHERE table_name = #{literal(table_name)} " +
+                                            # Symbols get quoted with double quotes, strings get quoted with single quotes
+                                            # since this is a column value, we want to ensure that it's a string
+                                            "WHERE table_name = #{literal(table_name.to_s)} " +
                                             "AND table_schema = #{schema} ")
-
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
@@ -204,6 +244,23 @@ module Sequel
         true
       end
 
+      # Insert given values into the database.
+      def insert(*values)
+        if @opts[:returning]
+          # Already know which columns to return, let the standard code handle it
+          super
+        elsif @opts[:sql] || @opts[:disable_insert_returning]
+          # Raw SQL used or RETURNING disabled, just use the default behavior
+          # and return nil since sequence is not known.
+          super
+          nil
+        else
+          # Force the use of RETURNING with the primary key value,
+          # unless it has been disabled.
+          returning(insert_pk).insert(*values){|r| return r.values.first}
+        end
+      end
+
       # Insert a record returning the record inserted.  Always returns nil without
       # inserting a query if disable_insert_returning is used.
       def insert_select(*values)
@@ -236,6 +293,19 @@ module Sequel
         @columns = cols.map{|c| c[2]}
         cols
       end
+
+      # Return the primary key to use for RETURNING in an INSERT statement
+      def insert_pk
+        if (f = opts[:from]) && !f.empty?
+          case t = f.first
+          when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
+            if pk = db.primary_key(t)
+              Sequel::SQL::Identifier.new(pk)
+            end
+          end
+        end
+      end
+
     end
   end
 end
