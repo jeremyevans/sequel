@@ -33,7 +33,9 @@ module Sequel
         end
       end
 
+      Dataset.def_sql_method(self, :delete, %w'with delete from using where returning')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
+      Dataset.def_sql_method(self, :update, %w'with update table set from where returning')
 
       # Returning is always supported.
       def supports_returning?(type)
@@ -63,6 +65,27 @@ module Sequel
         returning.insert(*values){|r| return r} unless @opts[:disable_insert_returning]
       end
 
+      # For multiple table support, PostgreSQL requires at least
+      # two from tables, with joins allowed.
+      def join_from_sql(type, sql)
+        if(from = @opts[:from][1..-1]).empty?
+          raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
+        else
+          sql << SPACE << type.to_s << SPACE
+          source_list_append(sql, from)
+          select_join_sql(sql)
+        end
+      end
+
+      # Use FROM to specify additional tables in an update query
+      def update_from_sql(sql)
+        join_from_sql(:FROM, sql)
+      end
+
+      # Use USING to specify additional tables in a delete query
+      def delete_using_sql(sql)
+        join_from_sql(:USING, sql)
+      end
 
       # fdbsql does not support FOR UPDATE, because it's unnecessary with the transaction model
       def select_lock_sql(sql)
