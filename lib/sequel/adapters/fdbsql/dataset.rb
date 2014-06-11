@@ -63,6 +63,12 @@ module Sequel
         returning.insert(*values){|r| return r} unless @opts[:disable_insert_returning]
       end
 
+
+      # fdbsql does not support FOR UPDATE, because it's unnecessary with the transaction model
+      def select_lock_sql(sql)
+        @opts[:lock] == :update ? sql : super
+      end
+
       private
 
 
