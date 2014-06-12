@@ -221,6 +221,13 @@ module Sequel
         end
       end
 
+      def column_schema_normalize_default(default, type)
+        # some other dbs throw quotes around string-like things,
+        # but if there's no quotes sequel just throws the string default out
+        # this overrides that to not expect the quotes
+        return default
+      end
+
 
       private
 
