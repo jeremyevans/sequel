@@ -192,9 +192,11 @@ module Sequel
       end
 
 
-      def schema_parse_table(table_name, options = {})
+      def schema_parse_table(table_name, opts = {})
+        out_identifier = output_identifier_meth(opts[:dataset])
+        in_identifier = input_identifier_meth(opts[:dataset])
         # CURRENT_SCHEMA evaluates to the currently chosen schema
-        schema = schema ? literal(options[:schema]) : 'CURRENT_SCHEMA'
+        schema = schema ? literal(in_identifier.call(opts[:schema])) : 'CURRENT_SCHEMA'
         # sample output from postgres
         # [:id2, {:oid=>23, :db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}],
         dataset = metadata_dataset.with_sql(<<-EOSQL)
@@ -209,13 +211,13 @@ module Sequel
             ON tc.table_schema = c.table_schema
             AND tc.table_name = c.table_name
             AND tc.constraint_name = kc.constraint_name
-          WHERE c.table_name = #{literal(table_name.to_s)}
+          WHERE c.table_name = #{literal(in_identifier.call(table_name.to_s))}
           AND c.table_schema = #{schema}
         EOSQL
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
-          [row.delete(:column_name).to_sym, row]
+          [out_identifier.call(row.delete(:column_name)), row]
         end
       end
 
