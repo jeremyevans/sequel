@@ -93,6 +93,16 @@ module Sequel
         @opts[:lock] == :update ? sql : super
       end
 
+      # Emulate the case insensitive LIKE operator and the bitwise operators.
+      def complex_expression_sql_append(sql, op, args)
+        case op
+        when :&, :|, :^, :<<, :>>, :'B~'
+          complex_expression_emulate_append(sql, op, args)
+        else
+          super
+        end
+      end
+
       private
 
 
