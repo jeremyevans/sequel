@@ -24,6 +24,7 @@
 
 require 'sequel/adapters/fdbsql/connection'
 require 'sequel/adapters/fdbsql/dataset'
+require 'sequel/adapters/fdbsql/create_table_generator'
 require 'sequel/adapters/utils/pg_types'
 
 module Sequel
@@ -34,6 +35,10 @@ module Sequel
 
     class Database < Sequel::Database
       DatasetClass = Dataset
+      # Use a PostgreSQL-specific create table generator
+      def create_table_generator_class
+        CreateTableGenerator
+      end
 
       set_adapter_scheme :fdbsql
 
