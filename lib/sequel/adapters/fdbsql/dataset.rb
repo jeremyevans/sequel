@@ -103,6 +103,15 @@ module Sequel
         end
       end
 
+      # FDBSQL uses a preceding x for hex escaping strings
+      def literal_blob_append(sql, v)
+        if v.empty?
+          sql << "''"
+        else
+          sql << "x'#{v.unpack('H*').first}'"
+        end
+      end
+
       private
 
 
