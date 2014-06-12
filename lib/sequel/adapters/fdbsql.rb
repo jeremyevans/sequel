@@ -161,6 +161,20 @@ module Sequel
         {:primary_key => true, :serial => true, :type=>Integer}
       end
 
+      # Add null/not null SQL fragment to column creation SQL.
+      # FDBSQL 1.9.5 doesn't implicitly set NOT NULL for primary keys
+      # this may be changed in the future, but for now we need to
+      # set it at the sequel layer
+      def column_definition_null_sql(sql, column)
+        if (column[:primary_key])
+          null = false
+        else
+          null = column.fetch(:null, column[:allow_null])
+        end
+        sql << NOT_NULL if null == false
+        sql << NULL if null == true
+      end
+
       # Handle bigserial type if :serial option is present
       def type_literal_generic_bignum(column)
         # TODO bigserial or BGSERIAL, the docs say bgserial, but that seems wrong
