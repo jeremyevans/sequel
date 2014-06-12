@@ -195,14 +195,23 @@ module Sequel
       def schema_parse_table(table_name, options = {})
         # CURRENT_SCHEMA evaluates to the currently chosen schema
         schema = schema ? literal(options[:schema]) : 'CURRENT_SCHEMA'
-
-        dataset = metadata_dataset.with_sql(
-                                            'SELECT column_name, is_nullable AS allow_null, column_default AS "default", data_type AS db_type ' +
-                                            'FROM information_schema.columns ' +
-                                            # Symbols get quoted with double quotes, strings get quoted with single quotes
-                                            # since this is a column value, we want to ensure that it's a string
-                                            "WHERE table_name = #{literal(table_name.to_s)} " +
-                                            "AND table_schema = #{schema} ")
+        # sample output from postgres
+        # [:id2, {:oid=>23, :db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}],
+        dataset = metadata_dataset.with_sql(<<-EOSQL)
+          SELECT c.column_name, c.is_nullable AS allow_null, c.column_default AS "default", c.data_type AS db_type,
+            (tc.constraint_type = 'PRIMARY KEY') AS primary_key
+          FROM information_schema.columns c
+          LEFT JOIN information_schema.key_column_usage kc
+            ON kc.table_name = c.table_name
+            AND kc.table_schema = c.table_schema
+            AND kc.column_name = c.column_name
+          LEFT JOIN information_schema.table_constraints tc
+            ON tc.table_schema = c.table_schema
+            AND tc.table_name = c.table_name
+            AND tc.constraint_name = kc.constraint_name
+          WHERE c.table_name = #{literal(table_name.to_s)}
+          AND c.table_schema = #{schema}
+        EOSQL
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
