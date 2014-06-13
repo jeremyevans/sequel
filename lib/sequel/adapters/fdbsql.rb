@@ -180,6 +180,18 @@ module Sequel
         sql << NULL if null == true
       end
 
+      def alter_table_op_sql(table, op)
+        quoted_name = quote_identifier(op[:name]) if op[:name]
+        case op[:op]
+        when :set_column_type
+          "ALTER COLUMN #{quoted_name} SET DATA TYPE #{type_literal(op)}"
+        when :set_column_null
+          "ALTER COLUMN #{quoted_name} #{op[:null] ? '' : 'NOT'} NULL"
+        else
+          super
+        end
+      end
+
       # Handle bigserial type if :serial option is present
       def type_literal_generic_bignum(column)
         # TODO bigserial or BGSERIAL, the docs say bgserial, but that seems wrong
