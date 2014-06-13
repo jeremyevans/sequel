@@ -48,6 +48,11 @@ module Sequel
         false
       end
 
+      # FDBSQL truncates all seconds
+      def supports_timestamp_usecs?
+        false
+      end
+
       # Insert given values into the database.
       def insert(*values)
         if @opts[:returning]
