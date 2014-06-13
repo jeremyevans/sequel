@@ -202,15 +202,16 @@ module Sequel
         dataset = metadata_dataset.with_sql(<<-EOSQL)
           SELECT c.column_name, (c.is_nullable = 'YES') AS allow_null, c.column_default AS "default", c.data_type AS db_type,
             c.numeric_scale, (tc.constraint_type = 'PRIMARY KEY') AS primary_key
-          FROM information_schema.columns c
-          LEFT JOIN information_schema.key_column_usage kc
-            ON kc.table_name = c.table_name
-            AND kc.table_schema = c.table_schema
-            AND kc.column_name = c.column_name
-          LEFT JOIN information_schema.table_constraints tc
-            ON tc.table_schema = c.table_schema
-            AND tc.table_name = c.table_name
+          FROM information_schema.key_column_usage kc
+          INNER JOIN information_schema.table_constraints tc
+            ON tc.constraint_type = 'PRIMARY KEY'
+            AND tc.table_name = kc.table_name
+            AND tc.table_schema = kc.table_schema
             AND tc.constraint_name = kc.constraint_name
+          RIGHT JOIN information_schema.columns c
+            ON c.table_name = tc.table_name
+            AND c.table_schema = tc.table_schema
+            AND c.column_name = kc.column_name
           WHERE c.table_name = #{literal(in_identifier.call(table_name.to_s))}
           AND c.table_schema = #{schema}
         EOSQL
