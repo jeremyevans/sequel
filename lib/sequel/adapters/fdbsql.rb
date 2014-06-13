@@ -201,7 +201,7 @@ module Sequel
         # [:id2, {:oid=>23, :db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}],
         dataset = metadata_dataset.with_sql(<<-EOSQL)
           SELECT c.column_name, (c.is_nullable = 'YES') AS allow_null, c.column_default AS "default", c.data_type AS db_type,
-            (tc.constraint_type = 'PRIMARY KEY') AS primary_key
+            c.numeric_scale, (tc.constraint_type = 'PRIMARY KEY') AS primary_key
           FROM information_schema.columns c
           LEFT JOIN information_schema.key_column_usage kc
             ON kc.table_name = c.table_name
@@ -216,7 +216,7 @@ module Sequel
         EOSQL
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
-          row[:type] = schema_column_type(row[:db_type])
+          row[:type] = schema_column_type(normalize_decimal_to_integer(row[:db_type], row[:numeric_scale]))
           [out_identifier.call(row.delete(:column_name)), row]
         end
       end
@@ -228,6 +228,13 @@ module Sequel
         return default
       end
 
+      def normalize_decimal_to_integer(type, scale)
+        if (type == 'DECIMAL' and scale == 0)
+          'integer'
+        else
+          type
+        end
+      end
 
       private
 
