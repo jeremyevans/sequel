@@ -26,6 +26,7 @@ require 'sequel/adapters/fdbsql/connection'
 require 'sequel/adapters/fdbsql/dataset'
 require 'sequel/adapters/fdbsql/create_table_generator'
 require 'sequel/adapters/utils/pg_types'
+require 'sequel/adapters/fdbsql/date_arithmetic'
 
 module Sequel
   module Fdbsql
