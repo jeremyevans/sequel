@@ -43,6 +43,11 @@ module Sequel
         true
       end
 
+      # FDBQSL does not support timezones in literal timestamps
+      def supports_timestamp_timezones?
+        false
+      end
+
       # Insert given values into the database.
       def insert(*values)
         if @opts[:returning]
@@ -128,15 +133,9 @@ module Sequel
         end
       end
 
-      # Postgres supports named types in the db, if we want to support anything that's not built in, this
-      # will have to be changed to not be a constant
-      CONVERSION_PROCS = Sequel::Postgres::PG_TYPES.dup
-      CONVERSION_PROCS[16] = Proc.new {|s| s == 'true'}
-      CONVERSION_PROCS.freeze
-
       def set_columns(res)
         cols = []
-        procs = CONVERSION_PROCS
+        procs = db.conversion_procs
         res.nfields.times do |fieldnum|
           cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
         end

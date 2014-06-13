@@ -42,8 +42,16 @@ module Sequel
 
       set_adapter_scheme :fdbsql
 
+      attr_reader :conversion_procs
+
       def adapter_initialize
         @primary_keys = {}
+        # Postgres supports named types in the db, if we want to support anything that's not built in, this
+        # will have to be changed to not be a constant
+        @conversion_procs = Sequel::Postgres::PG_TYPES.dup
+        @conversion_procs[16] = Proc.new {|s| s == 'true'}
+        @conversion_procs[1184] = @conversion_procs[1114] = method(:to_application_timestamp)
+        @conversion_procs.freeze
       end
 
       def connect(server)
