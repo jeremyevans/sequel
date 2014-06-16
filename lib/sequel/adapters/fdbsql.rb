@@ -205,6 +205,12 @@ module Sequel
         end
       end
 
+
+      # FDBSQL requires parens around the SELECT, and the WITH DATA syntax.
+      def create_table_as_sql(name, sql, options)
+        "#{create_table_prefix_sql(name, options)} AS (#{sql}) WITH DATA"
+      end
+
       # Handle bigserial type if :serial option is present
       def type_literal_generic_bignum(column)
         # TODO bigserial or BGSERIAL, the docs say bgserial, but that seems wrong
