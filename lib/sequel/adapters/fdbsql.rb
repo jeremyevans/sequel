@@ -33,9 +33,10 @@ module Sequel
     CONVERTED_EXCEPTIONS  = [PGError]
 
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
+    class RetryError < Sequel::DatabaseError; end
+    class NotCommittedError < RetryError; end
 
     class Database < Sequel::Database
-      NUMBER_OF_NOT_COMMITTED_RETRIES = 10
       DatasetClass = Dataset
       # Use a PostgreSQL-specific create table generator
       def create_table_generator_class
@@ -106,7 +107,7 @@ module Sequel
       SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each{|s| s.freeze}
       # These sql states are used to indicate that fdbvql should automatically
       # retry the statement if it's not in a transaction
-      RETRY_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
+      NOT_COMMITTED_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
       # Given the SQLState, return the appropriate DatabaseError subclass.
       def database_specific_error_class_from_sqlstate(sqlstate)
         # There is also a CheckConstraintViolation in Sequel, but the sql layer doesn't support check constraints
@@ -119,6 +120,8 @@ module Sequel
           UniqueConstraintViolation
         when *SERIALIZATION_CONSTRAINT_SQLSTATES
           SerializationFailure
+        when *NOT_COMMITTED_SQLSTATES
+          NotCommittedError
         end
       end
 
@@ -268,6 +271,29 @@ module Sequel
         end
       end
 
+      def begin_transaction(conn, opts=OPTS)
+        super
+        conn.in_transaction = true
+      end
+
+      def commit_transaction(conn, opts=OPTS)
+        super
+      ensure
+        conn.in_transaction = false
+      end
+
+      def rollback_transaction(conn, opts=OPTS)
+        super
+      ensure
+        conn.in_transaction = false
+      end
+
+      def remove_transaction(conn, committed)
+        conn.in_transaction = false
+      ensure
+        super
+      end
+
       private
 
 
@@ -294,14 +320,8 @@ module Sequel
 
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
-        retries = NUMBER_OF_NOT_COMMITTED_RETRIES
         begin
           yield
-        rescue PG::TRIntegrityConstraintViolation => e
-          if (!in_transaction? and RETRY_SQLSTATES.include? database_exception_sqlstate(e, :classes=>CONVERTED_EXCEPTIONS))
-            retry if (retries -= 1) > 0
-          end
-          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         rescue => e
           raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         end

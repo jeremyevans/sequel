@@ -32,6 +32,14 @@ module Sequel
       CONNECTION_OK = -1
       DISCONNECT_ERROR_RE = /\A(?:could not receive data from server|no connection to the server|connection not open|connection is closed)/
 
+      # These sql states are used to indicate that fdbvql should automatically
+      # retry the statement if it's not in a transaction
+      RETRY_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
+
+      NUMBER_OF_NOT_COMMITTED_RETRIES = 10
+
+      attr_accessor :in_transaction
+
       def initialize(opts)
         @config = opts
         @connection_hash = {
@@ -61,7 +69,11 @@ module Sequel
       end
 
       def query(sql)
-        check_disconnect_errors{@connection.query(sql)}
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.query(sql)
+          end
+        end
       end
 
       # Execute the given SQL with this connection.  If a block is given,
@@ -86,6 +98,24 @@ module Sequel
 
       def status
         CONNECTION_OK
+      end
+
+      def database_exception_sqlstate(exception, opts)
+        if exception.respond_to?(:result) && (result = exception.result)
+          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+        end
+      end
+
+      def retry_on_not_committed
+        retries = NUMBER_OF_NOT_COMMITTED_RETRIES
+        begin
+          yield
+        rescue PG::TRIntegrityConstraintViolation => e
+          if (!in_transaction and RETRY_SQLSTATES.include? database_exception_sqlstate(e, :classes=>CONVERTED_EXCEPTIONS))
+            retry if (retries -= 1) > 0
+          end
+          raise
+        end
       end
 
       # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and

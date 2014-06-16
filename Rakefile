@@ -9,6 +9,7 @@ SEQUEL_PATH = Gem.loaded_specs['sequel'].full_gem_path
 desc 'Default: run specs.'
 task :default => :spec
 
+RSpec::Core::RakeTask.new('spec')
 
 desc 'Run specs'
 RSpec::Core::RakeTask.new('spec_integration') do |t|
