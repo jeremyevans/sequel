@@ -9,9 +9,10 @@ SEQUEL_PATH = Gem.loaded_specs['sequel'].full_gem_path
 desc 'Default: run specs.'
 task :default => :spec
 
+desc 'Run our specs unique to fdbsql'
 RSpec::Core::RakeTask.new('spec')
 
-desc 'Run specs'
+desc 'Run the integration specs from sequel main on fdbsql'
 RSpec::Core::RakeTask.new('spec_integration') do |t|
   t.pattern = "#{SEQUEL_PATH}/spec/integration/*_test.rb"
   t.ruby_opts = "-Ilib -C#{SEQUEL_PATH}"
