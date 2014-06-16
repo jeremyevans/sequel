@@ -2472,14 +2472,11 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h2.merge(h3).keys.length).should == 2
     @ds.get(h1.merge(h3).keys.length).should == 3
 
-    unless [:do].include?(@db.adapter_scheme)
-      # Broken DataObjects thinks operators with ? represent placeholders
-      @ds.get(h1.contain_all(%w'a c')).should == true
-      @ds.get(h1.contain_all(%w'a d')).should == false
+    @ds.get(h1.contain_all(%w'a c')).should == true
+    @ds.get(h1.contain_all(%w'a d')).should == false
 
-      @ds.get(h1.contain_any(%w'a d')).should == true
-      @ds.get(h1.contain_any(%w'e d')).should == false
-    end
+    @ds.get(h1.contain_any(%w'a d')).should == true
+    @ds.get(h1.contain_any(%w'e d')).should == false
 
     @ds.get(h1.contains(h2)).should == true
     @ds.get(h1.contains(h3)).should == false
@@ -2497,18 +2494,16 @@ describe 'PostgreSQL hstore handling' do
 
     @ds.from(Sequel.hstore('a'=>'b', 'c'=>nil).op.each).order(:key).all.should == [{:key=>'a', :value=>'b'}, {:key=>'c', :value=>nil}]
 
-    unless [:do].include?(@db.adapter_scheme)
-      @ds.get(h1.has_key?('c')).should == true
-      @ds.get(h1.include?('c')).should == true
-      @ds.get(h1.key?('c')).should == true
-      @ds.get(h1.member?('c')).should == true
-      @ds.get(h1.exist?('c')).should == true
-      @ds.get(h1.has_key?('d')).should == false
-      @ds.get(h1.include?('d')).should == false
-      @ds.get(h1.key?('d')).should == false
-      @ds.get(h1.member?('d')).should == false
-      @ds.get(h1.exist?('d')).should == false
-    end
+    @ds.get(h1.has_key?('c')).should == true
+    @ds.get(h1.include?('c')).should == true
+    @ds.get(h1.key?('c')).should == true
+    @ds.get(h1.member?('c')).should == true
+    @ds.get(h1.exist?('c')).should == true
+    @ds.get(h1.has_key?('d')).should == false
+    @ds.get(h1.include?('d')).should == false
+    @ds.get(h1.key?('d')).should == false
+    @ds.get(h1.member?('d')).should == false
+    @ds.get(h1.exist?('d')).should == false
 
     @ds.get(h1.hstore.hstore.hstore.keys.length).should == 2
     @ds.get(h1.keys.length).should == 2
