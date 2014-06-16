@@ -63,5 +63,86 @@ describe 'Fdbsql' do
       end
       @conn.in_transaction.should be_false
     end
+
+  end
+
+  describe 'schema_parsing' do
+    after do
+      @db.drop_table?(:test)
+    end
+
+    specify 'without primary key' do
+      @db.create_table(:test) do
+        text :name
+        int :value
+      end
+      schema = DB.schema(:test, reload: true)
+      schema.count.should eq 2
+      schema[0][0].should eq :name
+      schema[1][0].should eq :value
+      schema.each {|col| col[1][:primary_key].should be_false}
+    end
+
+    specify 'with one primary key' do
+      @db.create_table(:test) do
+        text :name
+        primary_key :id
+      end
+      schema = DB.schema(:test, reload: true)
+      schema.count.should eq 2
+      id_col = schema[0]
+      name_col = schema[1]
+      name_col[0].should eq :name
+      id_col[0].should eq :id
+      name_col[1][:primary_key].should be_false
+      id_col[1][:primary_key].should be_true
+    end
+
+    specify 'with multiple primary keys' do
+      @db.create_table(:test) do
+        Integer :id
+        Integer :id2
+        primary_key [:id, :id2]
+      end
+      schema = DB.schema(:test, reload: true)
+      schema.count.should eq 2
+      id2_col = schema[1]
+      id_col = schema[0]
+      id_col[0].should eq :id
+      id2_col[0].should eq :id2
+      id_col[1][:primary_key].should be_true
+      id2_col[1][:primary_key].should be_true
+    end
+
+    specify 'with other constraints' do
+      @db.create_table(:test) do
+        primary_key :id
+        Integer :unique, unique: true
+      end
+      schema = DB.schema(:test, reload: true)
+      schema.count.should eq 2
+      id_col = schema[0]
+      unique_col = schema[1]
+      id_col[0].should eq :id
+      unique_col[0].should eq :unique
+      id_col[1][:primary_key].should be_true
+      unique_col[1][:primary_key].should be_false
+    end
+    after do
+      @db.drop_table?(:other_table)
+    end
+    specify 'with other tables' do
+      @db.create_table(:test) do
+        Integer :id
+        text :name
+      end
+      @db.create_table(:other_table) do
+        primary_key :id
+        varchar :name, unique: true
+      end
+      schema = DB.schema(:test, reload: true)
+      schema.count.should eq 2
+      schema.each {|col| col[1][:primary_key].should be_false}
+    end
   end
 end
