@@ -9,7 +9,7 @@ This project provides connection adapter integration for [Sequel](http://sequel.
 
 ### Supported SQL Layer Versions
 
-Version 1.9.5 is the minimum recommended release for use with this adapter.
+Version 1.9.6 is the minimum recommended release for use with this adapter.
 
 All previous releases are unsupported.
 
