@@ -4,19 +4,9 @@ require 'sequel'
 SEQUEL_PATH = Gem.loaded_specs['sequel'].full_gem_path
 require File.join("#{SEQUEL_PATH}",'spec','adapters','spec_helper.rb')
 
-def DB.sqls
-  (@sqls ||= [])
-end
-logger = Object.new
-def logger.method_missing(m, msg)
-  DB.sqls << msg
-end
-DB.loggers << logger
-
 describe 'Fdbsql' do
-  before do
+  before(:all) do
     @db = DB
-    DB.sqls.clear
   end
 
   describe 'automatic NotCommitted retry' do
@@ -42,13 +32,13 @@ describe 'Fdbsql' do
   end
 
   describe 'connection.in_transaction' do
-    before do
+    before(:all) do
       raise 'too many servers' if @db.servers.count > 1
       @db.drop_table?(:some_table)
       @db.create_table(:some_table) {text :name; primary_key :id}
       @conn = @db.pool.hold(@db.servers.first) {|conn| conn}
     end
-    after do
+    after(:all) do
       @db.drop_table?(:some_table)
     end
 
