@@ -35,6 +35,7 @@ module Sequel
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
 
     class Database < Sequel::Database
+      NUMBER_OF_NOT_COMMITTED_RETRIES = 10
       DatasetClass = Dataset
       # Use a PostgreSQL-specific create table generator
       def create_table_generator_class
@@ -103,6 +104,9 @@ module Sequel
       FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
       UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
       SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each{|s| s.freeze}
+      # These sql states are used to indicate that fdbvql should automatically
+      # retry the statement if it's not in a transaction
+      RETRY_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
       # Given the SQLState, return the appropriate DatabaseError subclass.
       def database_specific_error_class_from_sqlstate(sqlstate)
         # There is also a CheckConstraintViolation in Sequel, but the sql layer doesn't support check constraints
@@ -284,8 +288,14 @@ module Sequel
 
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
+        retries = NUMBER_OF_NOT_COMMITTED_RETRIES
         begin
           yield
+        rescue PG::TRIntegrityConstraintViolation => e
+          if (!in_transaction? and RETRY_SQLSTATES.include? database_exception_sqlstate(e, :classes=>CONVERTED_EXCEPTIONS))
+            retry if (retries -= 1) > 0
+          end
+          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         rescue => e
           raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         end
