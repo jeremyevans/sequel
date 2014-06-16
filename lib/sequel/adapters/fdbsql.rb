@@ -38,7 +38,7 @@ module Sequel
 
     class Database < Sequel::Database
       DatasetClass = Dataset
-      # Use a PostgreSQL-specific create table generator
+      # Use a FDBSQL-specific create table generator
       def create_table_generator_class
         CreateTableGenerator
       end
@@ -105,8 +105,6 @@ module Sequel
       FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
       UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
       SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each{|s| s.freeze}
-      # These sql states are used to indicate that fdbvql should automatically
-      # retry the statement if it's not in a transaction
       NOT_COMMITTED_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
       # Given the SQLState, return the appropriate DatabaseError subclass.
       def database_specific_error_class_from_sqlstate(sqlstate)
@@ -226,13 +224,13 @@ module Sequel
       end
 
 
+      # returns an array of column information with each column being of the form:
+      # [:column_name, {:db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}]
       def schema_parse_table(table_name, opts = {})
         out_identifier = output_identifier_meth(opts[:dataset])
         in_identifier = input_identifier_meth(opts[:dataset])
         # CURRENT_SCHEMA evaluates to the currently chosen schema
         schema = schema ? literal(in_identifier.call(opts[:schema])) : 'CURRENT_SCHEMA'
-        # sample output from postgres
-        # [:id2, {:oid=>23, :db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}],
         dataset = metadata_dataset.with_sql(<<-EOSQL)
           SELECT c.column_name, (c.is_nullable = 'YES') AS allow_null, c.column_default AS "default", c.data_type AS db_type,
             c.numeric_scale, (tc.constraint_type = 'PRIMARY KEY') AS primary_key
@@ -257,9 +255,10 @@ module Sequel
       end
 
       def column_schema_normalize_default(default, type)
-        # some other dbs throw quotes around string-like things,
-        # but if there's no quotes sequel just throws the string default out
-        # this overrides that to not expect the quotes
+        # the default value returned by schema parsing is not escaped or quoted
+        # in any way, it's just the value of the string
+        # the base implementation assumes it would come back "'my ''default'' value'"
+        # fdbsql returns "my 'default' value" (Not including double quotes for either)
         return default
       end
 

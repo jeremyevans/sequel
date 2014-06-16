@@ -103,7 +103,7 @@ module Sequel
         @opts[:lock] == :update ? sql : super
       end
 
-      # Emulate the case insensitive LIKE operator and the bitwise operators.
+      # Emulate the bitwise operators.
       def complex_expression_sql_append(sql, op, args)
         case op
         when :&, :|, :^, :<<, :>>, :'B~'
@@ -113,20 +113,20 @@ module Sequel
         end
       end
 
-        # Append the SQL fragment for the DateAdd expression to the SQL query.
-        def date_add_sql_append(sql, da)
-          h = da.interval
-          expr = da.expr
-          interval = ""
-          each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
-            interval << "#{value} #{sql_unit} "
-          end
-          if interval.empty?
-            return literal_append(sql, Sequel.cast(expr, Time))
-          else
-            return complex_expression_sql_append(sql, :+, [Sequel.cast(expr, Time), Sequel.cast(interval, :interval)])
-          end
+      # Append the SQL fragment for the DateAdd expression to the SQL query.
+      def date_add_sql_append(sql, da)
+        h = da.interval
+        expr = da.expr
+        interval = ""
+        each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
+          interval << "#{value} #{sql_unit} "
         end
+        if interval.empty?
+          return literal_append(sql, Sequel.cast(expr, Time))
+        else
+          return complex_expression_sql_append(sql, :+, [Sequel.cast(expr, Time), Sequel.cast(interval, :interval)])
+        end
+      end
 
       # FDBSQL uses a preceding x for hex escaping strings
       def literal_blob_append(sql, v)
