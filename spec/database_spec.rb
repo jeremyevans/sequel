@@ -40,4 +40,38 @@ describe 'Fdbsql' do
       end.should raise_error(PG::TRIntegrityConstraintViolation)
     end
   end
+
+  describe 'connection.in_transaction' do
+    before do
+      raise 'too many servers' if @db.servers.count > 1
+      @db.drop_table?(:some_table)
+      @db.create_table(:some_table) {text :name; primary_key :id}
+      @conn = @db.pool.hold(@db.servers.first) {|conn| conn}
+    end
+    after do
+      @db.drop_table?(:some_table)
+    end
+
+    specify 'is unset by default' do
+      @conn.in_transaction.should be_false
+    end
+    specify 'is set in a transaction' do
+      @db.transaction do
+        @conn.in_transaction.should be_true
+      end
+    end
+    specify 'is unset after a commit' do
+      @db.transaction do
+        @db[:some_table].insert(name: 'a')
+        @conn.in_transaction.should be_true
+      end
+      @conn.in_transaction.should be_false
+    end
+    specify 'is unset after a rollback' do
+      @db.transaction do
+        raise Sequel::Rollback.new
+      end
+      @conn.in_transaction.should be_false
+    end
+  end
 end

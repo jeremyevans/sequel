@@ -276,18 +276,6 @@ module Sequel
         conn.in_transaction = true
       end
 
-      def commit_transaction(conn, opts=OPTS)
-        super
-      ensure
-        conn.in_transaction = false
-      end
-
-      def rollback_transaction(conn, opts=OPTS)
-        super
-      ensure
-        conn.in_transaction = false
-      end
-
       def remove_transaction(conn, committed)
         conn.in_transaction = false
       ensure
