@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle intervals containing more than 100 hours in the pg_interval extension's parser (will) (#827)
+
 * Remove methods/class deprecated in 4.11.0 (jeremyevans)
 
 * Allow Dataset#natural_join/cross_join and related methods to take a options hash passed to join_table (jeremyevans)
