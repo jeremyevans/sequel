@@ -762,6 +762,15 @@ describe Sequel::Model, "#eager" do
     a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
     DB.sqls.should == []
   end
+
+  it "should respect the :limit option on a one_to_many association with an association block" do
+    EagerAlbum.one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id, :order=>:name, :limit=>2 do |ds| ds.where(:a=>1) end
+    a = EagerAlbum.eager(:tracks).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM (SELECT * FROM tracks WHERE ((a = 1) AND (1 = tracks.album_id)) ORDER BY name LIMIT 2) AS t1']
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.should == []
+  end
   
   it "should respect the :limit option on a one_to_many association using the :window_function strategy" do
     def (EagerTrack.dataset).supports_window_functions?() true end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix eager loading limited associations via a UNION when an association block is used (jeremyevans)
+
 * Associate reciprocal object before saving associated object when creating new objects in nested_attributes (chanks, jeremyevans) (#831)
 
 * Handle intervals containing more than 100 hours in the pg_interval extension's parser (will) (#827)

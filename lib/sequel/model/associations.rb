@@ -248,7 +248,6 @@ module Sequel
           elsif strategy == :union
             objects = []
             ds = associated_dataset
-            ds = self[:eager_block].call(ds) if self[:eager_block]
             loader = union_eager_loader
             joiner = " UNION ALL "
             eo[:id_map].keys.each_slice(subqueries_per_union).each do |slice|
@@ -695,6 +694,7 @@ module Sequel
         def union_eager_loader
           cached_fetch(:union_eager_loader) do
             Sequel::Dataset::PlaceholderLiteralizer.loader(associated_dataset) do |pl, ds|
+              ds = self[:eager_block].call(ds) if self[:eager_block]
               keys = predicate_keys
               ds = ds.where(keys.map{pl.arg}.zip(keys))
               if eager_loading_use_associated_key?
