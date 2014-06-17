@@ -49,15 +49,7 @@ module Sequel
           :user => @config[:username],
           :password => @config[:password]
         }
-        # the below comments were in the activerecord adapter, not sure what's needed here
-        # @prepared_statements = config.fetch(:prepared_statements) { true }
-        # if @prepared_statements
-        #   @visitor = Arel::Visitors::FdbSql.new self
-        # else
-        #   @visitor = BindSubstitution.new self
-        # end
         connect
-        # @statements = FdbSqlStatementPool.new(@connection, config.fetch(:statement_limit) { 1000 })
       end
 
       def close
