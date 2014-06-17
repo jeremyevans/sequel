@@ -1,5 +1,7 @@
 === HEAD
 
+* Associate reciprocal object before saving associated object when creating new objects in nested_attributes (chanks, jeremyevans) (#831)
+
 * Handle intervals containing more than 100 hours in the pg_interval extension's parser (will) (#827)
 
 * Remove methods/class deprecated in 4.11.0 (jeremyevans)

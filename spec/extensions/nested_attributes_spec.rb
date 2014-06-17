@@ -118,11 +118,12 @@ describe "NestedAttributes plugin" do
   end
   
   it "should add new objects to the cached association array as soon as the *_attributes= method is called" do
-    a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:name=>'Al', :tags_attributes=>[{:name=>'T'}]}]})
+    a = @Artist.new({:name=>'Ar', :first_album_attributes=>{:name=>'B'}, :albums_attributes=>[{:name=>'Al', :tags_attributes=>[{:name=>'T'}]}]})
     a.albums.should == [@Album.new(:name=>'Al')]
     a.albums.first.artist.should == a
     a.albums.first.tags.should == [@Tag.new(:name=>'T')]
-    a.albums.first.tags.first.albums.should == [@Album.new(:name=>'Al')]
+    a.first_album.should == @Album.new(:name=>'B')
+    a.first_album.artist.should == a
   end
   
   it "should support creating new objects with composite primary keys" do
