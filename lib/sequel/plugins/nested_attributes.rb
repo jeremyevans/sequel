@@ -156,6 +156,13 @@ module Sequel
         # Returns the object created.
         def nested_attributes_create(reflection, attributes)
           obj = reflection.associated_class.new
+          if r = reflection.reciprocal
+            if reflection.reciprocal_array?
+              obj.send(r) << self
+            else
+              obj.associations[r] = self
+            end
+          end
           nested_attributes_set_attributes(reflection, obj, attributes)
           after_validation_hook{validate_associated_object(reflection, obj)}
           if reflection.returns_array?

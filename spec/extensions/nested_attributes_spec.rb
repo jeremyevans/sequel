@@ -38,6 +38,7 @@ describe "NestedAttributes plugin" do
     @Artist.one_to_one :first_album, :class=>@Album, :key=>:artist_id
     @Album.many_to_one :artist, :class=>@Artist, :reciprocal=>:albums
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
+    @Tag.many_to_many :albums, :class=>@Album, :left_key=>:tag_id, :right_key=>:album_id, :join_table=>:at
     @Artist.nested_attributes :albums, :first_album, :destroy=>true, :remove=>true
     @Artist.nested_attributes :concerts, :destroy=>true, :remove=>true
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
@@ -119,7 +120,9 @@ describe "NestedAttributes plugin" do
   it "should add new objects to the cached association array as soon as the *_attributes= method is called" do
     a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:name=>'Al', :tags_attributes=>[{:name=>'T'}]}]})
     a.albums.should == [@Album.new(:name=>'Al')]
+    a.albums.first.artist.should == a
     a.albums.first.tags.should == [@Tag.new(:name=>'T')]
+    a.albums.first.tags.first.albums.should == [@Album.new(:name=>'Al')]
   end
   
   it "should support creating new objects with composite primary keys" do
