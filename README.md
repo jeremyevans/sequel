@@ -9,7 +9,7 @@ This project provides connection adapter integration for [Sequel](http://sequel.
 
 ### Supported SQL Layer Versions
 
-Version 1.9.5 is the minimum recommended release for use with this adapter.
+Version 1.9.6 is the minimum recommended release for use with this adapter.
 
 All previous releases are unsupported.
 
@@ -27,7 +27,18 @@ This project currently supports Sequel v4.11.0
 
 # TODO
 
+1. Add *one* the following lines to `Gemfile`:
+    - Unreleased development version:
+        - `gem 'sequel-fdbsql-adapter', github: 'FoundationDB/sql-layer-adapter-sequel`
+2. Install the new gem
+    - `$ bundle install`
+3. Connect
+    ```
+    require 'sequel'
+    require 'sequel-fdbsql-adapter'
 
+    DB = Sequel.connect('fdbsql://user@localhost:15432/database_name')
+    ```
 
 ### Contributing
 
@@ -38,7 +49,7 @@ This project currently supports Sequel v4.11.0
 
 If you would like to contribute a feature or fix, thanks! Please make
 sure any changes come with new tests to ensure acceptance. Please read
-the `test/RUNNING_UNIT_TESTS.md` file for more details.
+the `RUNNING_UNIT_TESTS.md` file for more details.
 
 ### Contact
 
