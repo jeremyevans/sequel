@@ -104,7 +104,6 @@ module Sequel
       NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
       FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
       UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
-      SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each{|s| s.freeze}
       NOT_COMMITTED_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
       # Given the SQLState, return the appropriate DatabaseError subclass.
       def database_specific_error_class_from_sqlstate(sqlstate)
@@ -116,23 +115,21 @@ module Sequel
           ForeignKeyConstraintViolation
         when *UNIQUE_CONSTRAINT_SQLSTATES
           UniqueConstraintViolation
-        when *SERIALIZATION_CONSTRAINT_SQLSTATES
-          SerializationFailure
         when *NOT_COMMITTED_SQLSTATES
           NotCommittedError
         end
       end
 
+      # This is a fallback used by the base class if the sqlstate fails to figure out
+      # what error type it is.
       DATABASE_ERROR_REGEXPS = [
         # Add this check first, since otherwise it's possible for users to control
         # which exception class is generated.
         [/invalid input syntax/, DatabaseError],
         # the rest of these are backups in case the sqlstate fails
         [/[dD]uplicate key violates unique constraint/, UniqueConstraintViolation],
-        [/due to foreign key constraint/, ForeignKeyConstraintViolation],
-        [/violates not-null constraint/, NotNullConstraintViolation],
-        [/conflicting key value violates exclusion constraint/, ExclusionConstraintViolation],
-        [/could not serialize access/, SerializationFailure],
+        [/due (?:to|for) foreign key constraint/, ForeignKeyConstraintViolation],
+        [/NULL value not permitted/, NotNullConstraintViolation],
       ].freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
