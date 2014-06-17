@@ -211,7 +211,6 @@ module Sequel
 
       # Handle bigserial type if :serial option is present
       def type_literal_generic_bignum(column)
-        # TODO bigserial or BGSERIAL, the docs say bgserial, but that seems wrong
         column[:serial] ? :bigserial : super
       end
 
