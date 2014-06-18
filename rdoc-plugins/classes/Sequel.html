@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -46,6 +46,12 @@
             <a target="docwin" href="../files/lib/sequel/extensions/constraint_validations_rb.html">lib/sequel/extensions/constraint_validations.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/core_extensions_rb.html">lib/sequel/extensions/core_extensions.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/core_refinements_rb.html">lib/sequel/extensions/core_refinements.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/current_datetime_timestamp_rb.html">lib/sequel/extensions/current_datetime_timestamp.rb</a>
           </li>
           <li class='other'>
@@ -71,6 +77,9 @@
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/hash_aliases_rb.html">lib/sequel/extensions/hash_aliases.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/inflector_rb.html">lib/sequel/extensions/inflector.rb</a>
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/looser_typecasting_rb.html">lib/sequel/extensions/looser_typecasting.rb</a>
@@ -145,6 +154,9 @@
             <a target="docwin" href="../files/lib/sequel/extensions/query_literals_rb.html">lib/sequel/extensions/query_literals.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">lib/sequel/extensions/ruby18_symbol_extensions.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/schema_caching_rb.html">lib/sequel/extensions/schema_caching.rb</a>
           </li>
           <li class='other'>
@@ -164,6 +176,9 @@
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/split_array_nil_rb.html">lib/sequel/extensions/split_array_nil.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/string_date_time_rb.html">lib/sequel/extensions/string_date_time.rb</a>
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/thread_local_timezones_rb.html">lib/sequel/extensions/thread_local_timezones.rb</a>
@@ -358,10 +373,6 @@
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../files/lib/sequel/plugins/xml_serializer_rb.html">xml_serializer.rb</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -369,7 +380,7 @@
             
             <p>This _pretty_table extension is only for internal use. It adds the <a
             href="Sequel/PrettyTable.html">Sequel::PrettyTable</a> class without
-            modifying  <a href="Sequel/Dataset.html">Sequel::Dataset</a>.</p>
+            modifying  Sequel::Dataset.</p>
             
             <p>To load the extension:</p>
             
@@ -377,8 +388,7 @@
             
             <p>The arbitrary_servers extension allows you to connect to arbitrary
             servers/shards that were not defined when you created the database. To use
-            it, you first load the extension into the <a
-            href="Sequel/Database.html">Database</a> object:</p>
+            it, you first load the extension into the Database object:</p>
             
             <pre>DB.extension :arbitrary_servers</pre>
             
@@ -406,7 +416,7 @@
             may want to do the following to so that you don&#39;t need to call
             synchronize separately:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(*)&#x000A;  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Note that this extension only works with the sharded threaded connection
             pool.  If you are using the sharded single connection pool, you need to
@@ -514,7 +524,7 @@
             <dl class="rdoc-list note-list"><dt>All constraints except unique unless :allow_nil is true 
             <dd>
             <p>CHECK column IS NOT NULL</p>
-            </dd><dt>presence (<a href="String.html">String</a> column) 
+            </dd><dt>presence (String column) 
             <dd>
             <p>CHECK trim(column) != &#39;&#39;</p>
             </dd><dt>exact_length 5 
@@ -529,7 +539,7 @@
             </dd><dt>length_range 3..5 
             <dd>
             <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt;= 5</p>
-            </dd><dt>length_range 3...5 
+            </dd><dt>length_range 3…5 
             <dd>
             <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt; 5</p>
             </dd><dt>format /foo\d+/ 
@@ -540,10 +550,10 @@
             <p>CHECK column ~* &#39;foo\d+&#39;</p>
             </dd><dt>like &#39;foo%&#39; 
             <dd>
-            <p>CHECK column LIKE &#39;foo%&#39; ESCAPE &#39;'</p>
+            <p>CHECK column LIKE &#39;foo%&#39; ESCAPE &#39;&#39;</p>
             </dd><dt>ilike &#39;foo%&#39; 
             <dd>
-            <p>CHECK column ILIKE &#39;foo%&#39; ESCAPE &#39;'</p>
+            <p>CHECK column ILIKE &#39;foo%&#39; ESCAPE &#39;&#39;</p>
             </dd><dt>includes [&#39;a&#39;, &#39;b&#39;] 
             <dd>
             <p>CHECK column IN (&#39;a&#39;, &#39;b&#39;)</p>
@@ -553,7 +563,7 @@
             </dd><dt>includes 3..5 
             <dd>
             <p>CHECK column &gt;= 3 AND column &lt;= 5</p>
-            </dd><dt>includes 3...5 
+            </dd><dt>includes 3…5 
             <dd>
             <p>CHECK column &gt;= 3 AND column &lt; 5</p>
             </dd><dt>unique 
@@ -684,12 +694,11 @@
             
             <pre class="ruby"><span class="ruby-keyword">begin</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&quot;Invalid SQL&quot;</span>&#x000A;<span class="ruby-keyword">rescue</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># &quot;Invalid SQL&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>On some databases, the error message contains part or all of the <a
-            href="Sequel/SQL.html">SQL</a> used, but on other databases, none of the <a
-            href="Sequel/SQL.html">SQL</a> used is displayed in the error message, so
-            it can be difficult to track down what is causing the error without using a
-            logger.  This extension should hopefully make debugging easier on databases
-            that have bad error messages.</p>
+            <p>On some databases, the error message contains part or all of the SQL used,
+            but on other databases, none of the SQL used is displayed in the error
+            message, so it can be difficult to track down what is causing the error
+            without using a logger.  This extension should hopefully make debugging
+            easier on databases that have bad error messages.</p>
             
             <p>This extension may not work correctly in the following cases:</p>
             <ul><li>
@@ -706,9 +715,8 @@
             
             <pre>DB.extension :error_sql</pre>
             
-            <p>The eval_inspect extension changes inspect for <a
-            href="Sequel/SQL/Expression.html">Sequel::SQL::Expression</a> subclasses to
-            return a string suitable for ruby&#39;s eval, such that</p>
+            <p>The eval_inspect extension changes inspect for Sequel::SQL::Expression
+            subclasses to return a string suitable for ruby&#39;s eval, such that</p>
             
             <pre>eval(obj.inspect) == obj</pre>
             
@@ -801,11 +809,10 @@
             <pre>DB.extension :looser_typecasting</pre>
             
             <p>The meta_def extension is designed for backwards compatibility with older
-            <a href="Sequel.html">Sequel</a> code that uses the meta_def method on <a
-            href="Sequel/Database.html">Database</a>, <a
-            href="Sequel/Dataset.html">Dataset</a>, and <a
-            href="Sequel/Model.html">Model</a> classes and/or instances.  It is not
-            recommended for usage in new code.  To load this extension:</p>
+            <a href="Sequel.html">Sequel</a> code that uses the meta_def method on
+            Database, Dataset, and <a href="Sequel/Model.html">Model</a> classes and/or
+            instances.  It is not recommended for usage in new code.  To load this
+            extension:</p>
             
             <pre>Sequel.extension :meta_def</pre>
             
@@ -821,12 +828,11 @@
             <p>The mssql_emulate_lateral_with_apply extension converts queries that use
             LATERAL into queries that use CROSS/OUTER APPLY, allowing code that works
             on databases that support LATERAL via Dataset#lateral to run on Microsoft
-            <a href="Sequel/SQL.html">SQL</a> Server and Sybase SQLAnywhere.</p>
+            SQL Server and Sybase SQLAnywhere.</p>
             
             <p>This is available as a separate extension instead of integrated into the
-            Microsoft <a href="Sequel/SQL.html">SQL</a> Server and Sybase SQLAnywhere
-            support because few people need it and there is a performance hit to code
-            that doesn&#39;t use it.</p>
+            Microsoft SQL Server and Sybase SQLAnywhere support because few people need
+            it and there is a performance hit to code that doesn&#39;t use it.</p>
             
             <p>It is possible there are cases where this emulation does not work.  Users
             should probably verify that correct results are returned when using this
@@ -907,9 +913,9 @@
             <pre>ia = Sequel.expr(:int_array_column).pg_array</pre>
             
             <p>If you have loaded the <a
-            href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../files/doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="Sequel/Postgres/ArrayOpMethods.html#method-i-pg_array">Sequel::Postgres::ArrayOpMethods#pg_array</a>:</p>
             
             <pre>ia = :int_array_column.pg_array</pre>
@@ -937,9 +943,8 @@
             
             <pre>Sequel.extension :pg_hstore_ops</pre>
             
-            <p>The most common usage is taking an object that represents an <a
-            href="Sequel/SQL.html">SQL</a> expression (such as a :symbol), and calling
-            Sequel.hstore_op with it:</p>
+            <p>The most common usage is taking an object that represents an SQL expression
+            (such as a :symbol), and calling Sequel.hstore_op with it:</p>
             
             <pre>h = Sequel.hstore_op(:hstore_column)</pre>
             
@@ -954,10 +959,9 @@
             <pre>h = Sequel.expr(:hstore_column).hstore</pre>
             
             <p>If you have loaded the <a
-            href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
-            href="Sequel/Postgres/HStoreOpMethods.html#method-i-hstore">Sequel::Postgres::HStoreOpMethods#hstore</a>:</p>
+            href="../files/doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use Symbol#hstore:</p>
             
             <pre>h = :hstore_column.hstore</pre>
             
@@ -1008,9 +1012,9 @@
             <pre>j = Sequel.expr(:json_column).pg_json&#x000A;jb = Sequel.expr(:jsonb_column).pg_jsonb</pre>
             
             <p>If you have loaded the <a
-            href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../files/doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="Sequel/Postgres/JSONOpMethods.html#method-i-pg_json">Sequel::Postgres::JSONOpMethods#pg_json</a>
             or <a
             href="Sequel/Postgres/JSONOpMethods.html#method-i-pg_jsonb">Sequel::Postgres::JSONOpMethods#pg_jsonb</a>:</p>
@@ -1030,7 +1034,7 @@
             json/jsonb operations on json/jsonb literals.</p>
             
             <p>In order to get the automatic conversion from a ruby array to a PostgreSQL
-            array (as shown in the #[] and get_text examples above), you need to load
+            array (as shown in the [] and get_text examples above), you need to load
             the pg_array extension.</p>
             
             <p>The pg_loose_count extension looks at the table statistics in the
@@ -1072,9 +1076,9 @@
             <pre>r = Sequel.expr(:range).pg_range</pre>
             
             <p>If you have loaded the <a
-            href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../files/doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="Sequel/Postgres/RangeOpMethods.html#method-i-pg_range">Sequel::Postgres::RangeOpMethods#pg_range</a>:</p>
             
             <pre>r = :range.pg_range</pre>
@@ -1114,9 +1118,9 @@
             <pre>r = Sequel.expr(:row_column).pg_row</pre>
             
             <p>If you have loaded the <a
-            href="../files/doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../files/doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="Sequel/Postgres/PGRowOp/ExpressionMethods.html#method-i-pg_row">Sequel::Postgres::PGRowOp::ExpressionMethods#pg_row</a>:</p>
             
             <pre>r = :row_column.pg_row</pre>
@@ -1204,9 +1208,8 @@
             <ul><li>
             <p>PostgreSQL 9.0+</p>
             </li><li>
-            <p>Listening <a href="Sequel/Database.html">Database</a> object must be using
-            the postgres adapter with the pg driver (the model classes do not have to
-            use the same <a href="Sequel/Database.html">Database</a>).</p>
+            <p>Listening Database object must be using the postgres adapter with the pg
+            driver (the model classes do not have to use the same Database).</p>
             </li><li>
             <p>Must be using a thread-safe connection pool (the default).</p>
             </li></ul>
@@ -1273,12 +1276,11 @@
             
             <pre>DB.extension(:query_literals)</pre>
             
-            <p>The schema_caching extension adds a few methods to <a
-            href="Sequel/Database.html">Sequel::Database</a> that make it easy to dump
-            the parsed schema information to a file, and load it from that file. 
-            Loading the schema information from a dumped file is faster than parsing it
-            from the database, so this can save bootup time for applications with large
-            numbers of models.</p>
+            <p>The schema_caching extension adds a few methods to Sequel::Database that
+            make it easy to dump the parsed schema information to a file, and load it
+            from that file.  Loading the schema information from a dumped file is
+            faster than parsing it from the database, so this can save bootup time for
+            applications with large numbers of models.</p>
             
             <p>Basic usage in application code:</p>
             
@@ -1400,11 +1402,10 @@
             
             <pre>SELECT * FROM table WHERE (column IN (1, NULL))</pre>
             
-            <p>However, because NULL = NULL is not true in <a
-            href="Sequel/SQL.html">SQL</a> (it is NULL), this will not return rows in
-            the table where the column is NULL.  This extension allows for an
-            alternative behavior more similar to ruby, which will return rows in the
-            table where the column is NULL, using a query like:</p>
+            <p>However, because NULL = NULL is not true in SQL (it is NULL), this will not
+            return rows in the table where the column is NULL.  This extension allows
+            for an alternative behavior more similar to ruby, which will return rows in
+            the table where the column is NULL, using a query like:</p>
             
             <pre>SELECT * FROM table WHERE ((column IN (1)) OR (column IS NULL)))</pre>
             
@@ -1566,7 +1567,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-migration-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-migration-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 280</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">migration</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-migration-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 280</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

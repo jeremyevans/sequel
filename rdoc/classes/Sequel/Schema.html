@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Schema</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -33,11 +33,13 @@
           <li>
             <a target="docwin" href="../../files/lib/sequel/database/schema_generator_rb.html">lib/sequel/database/schema_generator.rb</a>
           </li>
+          <li class='other'>
+            <a target="docwin" href="../../files/lib/sequel/database/schema_methods_rb.html">lib/sequel/database/schema_methods.rb</a>
+          </li>
+          <li>
+            <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
+          </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -67,9 +69,24 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>Alias of <a
-                      href="Schema/CreateTableGenerator.html">CreateTableGenerator</a> for
-                      backwards compatibility.</p>
+                      <p><a href="Schema/CreateTableGenerator.html">Schema::CreateTableGenerator</a>
+                      is an internal class that the user is not expected to instantiate directly.
+                      Instances are created by <a
+                      href="Database.html#method-i-create_table">Sequel::Database#create_table</a>.
+                      It is used to specify table creation parameters.  It takes a <a
+                      href="Database.html">Database</a> object and a block of
+                      column/index/constraint specifications, and gives the <a
+                      href="Database.html">Database</a> a table description, which the database
+                      uses to create a table.</p>
+                      
+                      <p><a href="Schema/CreateTableGenerator.html">Schema::CreateTableGenerator</a>
+                      has some methods but also includes method_missing, allowing users to
+                      specify column type as a method instead of using the column method, which
+                      makes for a nicer DSL.</p>
+                      
+                      <p>For more information on Sequel&#39;s support for schema modification, see
+                      the <a href="../../files/doc/schema_modification_rdoc.html">“Schema
+                      Modification” guide</a>.</p>
                     </td>
                   </tr>
                 </table>

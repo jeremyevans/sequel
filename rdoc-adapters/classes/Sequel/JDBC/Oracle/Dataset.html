@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::JDBC::Oracle::Dataset</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Oracle.html">Oracle</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -106,7 +106,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-type_convertor-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">NUMERIC_TYPE</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getScale</span>(<span class="ruby-identifier">i</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;      <span class="ruby-identifier">map</span>[<span class="ruby-value">:OracleDecimal</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> *<span class="ruby-constant">TIMESTAMPTZ_TYPES</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">TIMESTAMP_TYPE</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">NUMERIC_TYPE</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getScale</span>(<span class="ruby-identifier">i</span>) <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;      <span class="ruby-identifier">map</span>[<span class="ruby-value">:OracleDecimal</span>]&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">TIMESTAMPTZ_TYPES</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">TIMESTAMP_TYPE</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

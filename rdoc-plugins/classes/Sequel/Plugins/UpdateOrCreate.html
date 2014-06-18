@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::UpdateOrCreate</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/plugins/update_or_create_rb.html">lib/sequel/plugins/update_or_create.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -57,8 +53,8 @@
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">update_or_create</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Hello&#39;</span>}, {:<span class="ruby-identifier">num_copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1000</span>})</pre>
             
             <p>In both cases, this will check the database to find the album with the name
-            "Hello". If such an album exists, it will be updated to set num_copies_sold
-            to 1000.  If no such album exists, an album with the name "Hello" and
+            “Hello”. If such an album exists, it will be updated to set num_copies_sold
+            to 1000.  If no such album exists, an album with the name “Hello” and
             num_copies_sold 1000 will be created.</p>
             
             <p>The second method is find_or_new, which returns the object from the

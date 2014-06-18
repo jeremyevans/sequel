@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.8.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now supports database
             stored procedures similar to its support for prepared statements.  The API
@@ -118,7 +118,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>There were many improvements related to using schemas in databases. Using
             schema-qualified tables should work in most if not all cases now.  Model
@@ -141,7 +141,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT 1; SELECT 2&#39;</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment">#=&gt; [{:&quot;1&quot;=&gt;1, :&quot;2&quot;=&gt;2}]</span></pre>
             
-            <p>This may fix issues if you&#39;ve seen a MySQL "commands out of sync"
+            <p>This may fix issues if you&#39;ve seen a MySQL “commands out of sync”
             message.  Note that this doesn&#39;t work if you are connecting to MySQL
             via JDBC.</p>
             </li><li>
@@ -173,7 +173,7 @@
             </li></ul>
             
             <p>Backwards Compatibilty</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The hash returned by Database#schema when no table name is provided uses
             quoted strings instead of symbols as keys.  The hash has a default proc, so

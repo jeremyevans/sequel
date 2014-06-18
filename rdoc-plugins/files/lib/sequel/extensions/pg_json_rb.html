@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>pg_json.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -56,10 +56,9 @@
             JSONArray and JSONHash are DelegateClasses of <a
             href="../../../../classes/Array.html">Array</a> and <a
             href="../../../../classes/Hash.html">Hash</a>, so they mostly act the same,
-            but not completely (json_array.is_a?(<a
-            href="../../../../classes/Array.html">Array</a>) is false).  If you want
-            the actual array for a JSONArray, call JSONArray#to_a.  If you want the
-            actual hash for a JSONHash, call JSONHash#to_hash. This is done so that <a
+            but not completely (json_array.is_a?(Array) is false).  If you want the
+            actual array for a JSONArray, call JSONArray#to_a.  If you want the actual
+            hash for a JSONHash, call JSONHash#to_hash. This is done so that <a
             href="../../../../classes/Sequel.html">Sequel</a> does not treat JSONArray
             and JSONHash like <a href="../../../../classes/Array.html">Array</a> and <a
             href="../../../../classes/Hash.html">Hash</a> by default, which would cause
@@ -72,9 +71,9 @@
             <pre>Sequel.pg_json(array)&#x000A;Sequel.pg_json(hash)</pre>
             
             <p>If you have loaded the <a
-            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="../../../../classes/Array.html#method-i-pg_json">Array#pg_json</a>
             and <a
             href="../../../../classes/Hash.html#method-i-pg_json">Hash#pg_json</a>:</p>

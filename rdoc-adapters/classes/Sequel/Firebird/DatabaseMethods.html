@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Firebird::DatabaseMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/shared/firebird_rb.html">lib/sequel/adapters/shared/firebird.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Firebird.html">Firebird</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -96,7 +92,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-clear_primary_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-clear_primary_key-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">clear_primary_key</span>(*<span class="ruby-identifier">tables</span>)&#x000A;  <span class="ruby-identifier">tables</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@primary_keys</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:input_identifier</span>, <span class="ruby-identifier">t</span>))}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-clear_primary_key-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">clear_primary_key</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">tables</span>)&#x000A;  <span class="ruby-identifier">tables</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">t</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@primary_keys</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:input_identifier</span>, <span class="ruby-identifier">t</span>))}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-create_trigger'>
@@ -112,7 +108,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_trigger-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-create_trigger-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">create_trigger</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_trigger_sql</span>(*<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-create_trigger-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">create_trigger</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">create_trigger_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-database_type'>
@@ -177,7 +173,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-restart_sequence-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-restart_sequence-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">restart_sequence</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">restart_sequence_sql</span>(*<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-restart_sequence-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">restart_sequence</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">restart_sequence_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sequences'>

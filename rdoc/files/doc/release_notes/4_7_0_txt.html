@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>4.7.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,11 +38,11 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Alternatives for the more complex virtual row method calls have been added:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Window Functions using SQL::Function#over</span>&#x000A;<span class="ruby-comment"># before: select{sum(:over, :args=&gt;:col1, :partition=&gt;:col2){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">col2</span>)}&#x000A;&#x000A;<span class="ruby-comment"># count(*) using SQL::Function#*</span>&#x000A;<span class="ruby-comment"># before: select{count(:*){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>{}.*}&#x000A;&#x000A;<span class="ruby-comment"># count(distinct col) using SQL::Function#distinct</span>&#x000A;<span class="ruby-comment"># before: select{count(:distinct, :col){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">col</span>).<span class="ruby-identifier">distinct</span>}</pre>
+            <pre class="ruby"><span class="ruby-comment"># Window Functions using SQL::Function#over</span>&#x000A;<span class="ruby-comment"># before: select{sum(:over, :args=&gt;:col1, :partition=&gt;:col2){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">col2</span>)}&#x000A;&#x000A;<span class="ruby-comment"># count(*) using SQL::Function#*</span>&#x000A;<span class="ruby-comment"># before: select{count(:*){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>{}.<span class="ruby-operator">*</span>}&#x000A;&#x000A;<span class="ruby-comment"># count(distinct col) using SQL::Function#distinct</span>&#x000A;<span class="ruby-comment"># before: select{count(:distinct, :col){}}</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">col</span>).<span class="ruby-identifier">distinct</span>}</pre>
             
             <p>Additionally, schema qualified functions are now supported via
             SQL::QualifiedIdentifier#function, and quoted functions are now supported
@@ -84,7 +84,7 @@
             inheritance.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now automatically rolls
             back transactions in killed threads on ruby 2.0+.  It is still impossible
@@ -119,7 +119,7 @@
             date).</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The odbc adapter&#39;s :driver option is no longer deprecated, as reports
             were received that it still works.</p>

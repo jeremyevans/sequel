@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::JDBC::HSQLDB::DatabaseMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/adapters/jdbc/hsqldb_rb.html">lib/sequel/adapters/jdbc/hsqldb.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../HSQLDB.html">HSQLDB</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -128,7 +124,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-db_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-db_version-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_version</span>&#x000A;  <span class="ruby-ivar">@db_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">get</span>{<span class="ruby-constant">DATABASE_VERSION</span>(){}}&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>&#x000A;      <span class="ruby-node">$1</span>.<span class="ruby-identifier">to_i</span> * <span class="ruby-value">10000</span> <span class="ruby-operator">+</span> <span class="ruby-node">$2</span>.<span class="ruby-identifier">to_i</span> * <span class="ruby-value">100</span> <span class="ruby-operator">+</span> <span class="ruby-node">$3</span>.<span class="ruby-identifier">to_i</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-db_version-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_version</span>&#x000A;  <span class="ruby-ivar">@db_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">get</span>{<span class="ruby-constant">DATABASE_VERSION</span>(){}}&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>&#x000A;      <span class="ruby-node">$1</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">10000</span> <span class="ruby-operator">+</span> <span class="ruby-node">$2</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">+</span> <span class="ruby-node">$3</span>.<span class="ruby-identifier">to_i</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-serial_primary_key_options'>

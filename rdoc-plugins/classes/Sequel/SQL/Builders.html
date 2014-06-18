@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::SQL::Builders</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -67,10 +67,6 @@
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../SQL.html">SQL</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -82,17 +78,10 @@
               <li><a target="docwin" href="#method-i-date_add">date_add</a></li>
               <li><a target="docwin" href="#method-i-date_sub">date_sub</a></li>
               <li><a target="docwin" href="#method-i-hstore">hstore</a></li>
-              <li><a target="docwin" href="#method-i-hstore_op">hstore_op</a></li>
-              <li><a target="docwin" href="#method-i-pg_array">pg_array</a></li>
-              <li><a target="docwin" href="#method-i-pg_array_op">pg_array_op</a></li>
               <li><a target="docwin" href="#method-i-pg_json">pg_json</a></li>
-              <li><a target="docwin" href="#method-i-pg_json_op">pg_json_op</a></li>
               <li><a target="docwin" href="#method-i-pg_jsonb">pg_jsonb</a></li>
-              <li><a target="docwin" href="#method-i-pg_jsonb_op">pg_jsonb_op</a></li>
               <li><a target="docwin" href="#method-i-pg_range">pg_range</a></li>
-              <li><a target="docwin" href="#method-i-pg_range_op">pg_range_op</a></li>
               <li><a target="docwin" href="#method-i-pg_row">pg_row</a></li>
-              <li><a target="docwin" href="#method-i-pg_row_op">pg_row_op</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -144,68 +133,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Return a <a href="../Postgres/HStore.html">Postgres::HStore</a> proxy for
-                  the given hash.</p>
+                  <p>Return a Postgres::HStore proxy for the given hash.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-hstore-source'); return false">
                     [show source]
                   </a>
                   <pre id='method-i-hstore-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 319</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hstore</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStore</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># May not be defined unless the pg_hstore_ops extension is used</span>&#x000A;    <span class="ruby-identifier">hstore_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-hstore_op'>
-                <a name='method-i-hstore_op'></a>
-                <div class='synopsis'>
-                  <span class='name'>hstore_op</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the object wrapped in an <a
-                  href="../Postgres/HStoreOp.html">Postgres::HStoreOp</a>.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-hstore_op-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-hstore_op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 315</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hstore_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStoreOp</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pg_array'>
-                <a name='method-i-pg_array'></a>
-                <div class='synopsis'>
-                  <span class='name'>pg_array</span>
-                  <span class='arguments'>(v, array_type=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return a <a href="../Postgres/PGArray.html">Postgres::PGArray</a> proxy for
-                  the given array and database array type.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_array-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pg_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 546</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">array_type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">array_type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">array_type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">array_type</span>&#x000A;      <span class="ruby-identifier">v</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_a</span>, <span class="ruby-identifier">array_type</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">array_type</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># May not be defined unless the pg_array_ops extension is used</span>&#x000A;    <span class="ruby-identifier">pg_array_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pg_array_op'>
-                <a name='method-i-pg_array_op'></a>
-                <div class='synopsis'>
-                  <span class='name'>pg_array_op</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the object wrapped in an <a
-                  href="../Postgres/ArrayOp.html">Postgres::ArrayOp</a>.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_array_op-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pg_array_op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 290</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_array_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayOp</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_json'>
@@ -227,24 +161,6 @@
                   <pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 261</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>, <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONHash</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONHash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_a</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBHash</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONHash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_hash</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-method-i-pg_json_op'>
-                <a name='method-i-pg_json_op'></a>
-                <div class='synopsis'>
-                  <span class='name'>pg_json_op</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the object wrapped in an <a
-                  href="../Postgres/JSONOp.html">Postgres::JSONOp</a>.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_json_op-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pg_json_op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 390</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-pg_jsonb'>
                 <a name='method-i-pg_jsonb'></a>
                 <div class='synopsis'>
@@ -264,24 +180,6 @@
                   <pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json.rb, line 279</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>, <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBHash</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Hash</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBHash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONArray</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_a</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONHash</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBHash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_hash</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-method-i-pg_jsonb_op'>
-                <a name='method-i-pg_jsonb_op'></a>
-                <div class='synopsis'>
-                  <span class='name'>pg_jsonb_op</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the object wrapped in an <a
-                  href="../Postgres/JSONBOp.html">Postgres::JSONBOp</a>.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_jsonb_op-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pg_jsonb_op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 400</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">JSONBOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-pg_range'>
                 <a name='method-i-pg_range'></a>
                 <div class='synopsis'>
@@ -290,32 +188,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Convert the object to a <a
-                  href="../Postgres/PGRange.html">Postgres::PGRange</a>.</p>
+                  <p>Convert the object to a Postgres::PGRange.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_range-source'); return false">
                     [show source]
                   </a>
                   <pre id='method-i-pg_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 504</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">db_type</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">db_type</span>&#x000A;      <span class="ruby-identifier">v</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">begin</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">end</span>, <span class="ruby-value">:exclude_begin=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">exclude_begin?</span>, <span class="ruby-value">:exclude_end=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">exclude_end?</span>, <span class="ruby-value">:db_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">db_type</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Range</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-identifier">v</span>, <span class="ruby-identifier">db_type</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># May not be defined unless the pg_range_ops extension is used</span>&#x000A;    <span class="ruby-identifier">pg_range_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pg_range_op'>
-                <a name='method-i-pg_range_op'></a>
-                <div class='synopsis'>
-                  <span class='name'>pg_range_op</span>
-                  <span class='arguments'>(v)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return the expression wrapped in the <a
-                  href="../Postgres/RangeOp.html">Postgres::RangeOp</a>.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_range_op-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pg_range_op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range_ops.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_range_op</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">RangeOp</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">RangeOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_row'>
@@ -335,23 +214,6 @@
                     [show source]
                   </a>
                   <pre id='method-i-pg_row-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 582</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_row</span>(<span class="ruby-identifier">expr</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">expr</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Array</span>&#x000A;    <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayRow</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">expr</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Will only work if pg_row_ops extension is loaded</span>&#x000A;    <span class="ruby-identifier">pg_row_op</span>(<span class="ruby-identifier">expr</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-pg_row_op'>
-                <a name='method-i-pg_row_op'></a>
-                <div class='synopsis'>
-                  <span class='name'>pg_row_op</span>
-                  <span class='arguments'>(expr)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Return a PGRowOp wrapping the given expression.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_row_op-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-pg_row_op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row_ops.rb, line 165</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_row_op</span>(<span class="ruby-identifier">expr</span>)&#x000A;  <span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRowOp</span>.<span class="ruby-identifier">wrap</span>(<span class="ruby-identifier">expr</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

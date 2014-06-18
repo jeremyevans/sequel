@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::ManyThroughMany</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/plugins/many_through_many_rb.html">lib/sequel/plugins/many_through_many.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -70,12 +66,12 @@
             next table.</p>
             </li></ul>
             
-            <p>So the "Artist.many_through_many :tags" is translated into something
+            <p>So the “Artist.many_through_many :tags” is translated into something
             similar to:</p>
             
             <pre>FROM artists&#x000A;JOIN albums_artists ON (artists.id = albums_artists.artist_id)&#x000A;JOIN albums_tags ON (albums_artists.album_id = albums_tag.album_id)&#x000A;JOIN tags ON (albums_tags.tag_id = tags.id)</pre>
             
-            <p>The "artists.id" and "tags.id" criteria come from other association options
+            <p>The “artists.id” and “tags.id” criteria come from other association options
             (defaulting to the primary keys of the current and associated tables), but
             hopefully you can see how each argument in the array is used in the JOIN
             clauses. Note that you do not need to add an entry for the final table

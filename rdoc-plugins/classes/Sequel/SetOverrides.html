@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::SetOverrides</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/extensions/set_overrides_rb.html">lib/sequel/extensions/set_overrides.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -71,7 +67,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert_sql-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert_sql-source'><span class="ruby-comment"># File lib/sequel/extensions/set_overrides.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_sql</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">vals</span> = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">merge_defaults_overrides</span>(<span class="ruby-identifier">vals</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert_sql-source'><span class="ruby-comment"># File lib/sequel/extensions/set_overrides.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">values</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">vals</span> = <span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>).<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">merge_defaults_overrides</span>(<span class="ruby-identifier">vals</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_defaults'>

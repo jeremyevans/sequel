@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::NestedAttributes</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/plugins/nested_attributes_rb.html">lib/sequel/plugins/nested_attributes.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -103,7 +99,7 @@
             
             <p>Your web stack will probably parse that into a nested hash similar to:</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">albums_attributes</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-value">0</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">}</span>, <span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">name</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">}</span>}}}</pre>
+            <pre class="ruby">{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">albums_attributes</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-value">0</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">?}</span>, <span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">name</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?}</span>}}}</pre>
             
             <p>Then you can do:</p>
             

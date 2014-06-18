@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.7.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>Performance Optimizations</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Fetching a large number of records with the PostgreSQL adapter is
             significantly faster (up to 3-4 times faster than before).</p>
@@ -50,7 +50,7 @@
             </li></ul>
             
             <p>New Association Options</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The :eager_grapher option has been added allowing you to supply your own
             block to implement eager loading via eager_graph.</p>
@@ -67,7 +67,7 @@
             </li></ul>
             
             <p>Other New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#set_graph_aliases now allows you to supply a third argument for
             each column you want graph into the dataset, allowing you to use arbitrary
@@ -111,7 +111,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Instance methods added by creating associations are added to an anonymous
             module included by the class, so they can be overridden in the class while
@@ -152,7 +152,7 @@
             </li></ul>
             
             <p>Backwards Compatibilty</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The first argument to Model#initialize must be a hash, you can no longer
             use nil.  For example, the following code will break if :album is not in

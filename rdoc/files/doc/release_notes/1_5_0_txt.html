@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>1.5.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -67,9 +67,9 @@
             <pre class="ruby"><span class="ruby-comment"># Artist.one_to_many :albums</span>&#x000A;<span class="ruby-comment"># Album.one_to_many :tracks</span>&#x000A;<span class="ruby-comment"># Track.many_to_one :genre</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">tracks=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">genre</span>}).<span class="ruby-identifier">filter</span>(    :<span class="ruby-identifier">tracks_name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Firewire&quot;</span>).<span class="ruby-identifier">all</span></pre>
             
             <p>This will give you all artists have have an album with a track named
-            "Firewire", and calling .albums on one of those artists will only return
-            albums that have a track named "Firewire", and calling .tracks on one of
-            those albums will return only the track(s) named "Firewire".</p>
+            “Firewire”, and calling .albums on one of those artists will only return
+            albums that have a track named “Firewire”, and calling .tracks on one of
+            those albums will return only the track(s) named “Firewire”.</p>
             
             <p>You can use set_graph_aliases to select specific columns:</p>
             

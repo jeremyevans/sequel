@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Mock::Dataset</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Mock.html">Mock</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -56,20 +56,6 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DatasetClass</td>
-                    <td>=</td>
-                    <td class='context-item-value'>self</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
@@ -118,14 +104,14 @@
                 <div class='description'>
                   
                   <p>If arguments are provided, use them to set the columns for this dataset and
-                  return self.  Otherwise, use the default <a
-                  href="../../Sequel.html">Sequel</a> behavior and return the columns.</p>
+                  return self.  Otherwise, use the default Sequel behavior and return the
+                  columns.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 362</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>(*<span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 362</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -141,7 +127,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 371</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 371</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

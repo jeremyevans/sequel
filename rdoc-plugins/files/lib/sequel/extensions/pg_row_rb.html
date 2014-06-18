@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>pg_row.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -48,13 +48,11 @@
             custom type.  HashRow and ArrayRow are DelegateClasses of of <a
             href="../../../../classes/Hash.html">Hash</a> and <a
             href="../../../../classes/Array.html">Array</a>, so they mostly act like a
-            hash or array, but not completely (is_a?(<a
-            href="../../../../classes/Hash.html">Hash</a>) and is_a?(<a
-            href="../../../../classes/Array.html">Array</a>) are false).  If you want
-            the actual hash for a HashRow, call HashRow#to_hash, and if you want the
-            actual array for an ArrayRow, call ArrayRow#to_a.  This is done so that <a
-            href="../../../../classes/Sequel.html">Sequel</a> does not treat a values
-            like an <a href="../../../../classes/Array.html">Array</a> or <a
+            hash or array, but not completely (is_a?(Hash) and is_a?(Array) are false).
+            If you want the actual hash for a HashRow, call HashRow#to_hash, and if you
+            want the actual array for an ArrayRow, call ArrayRow#to_a.  This is done so
+            that <a href="../../../../classes/Sequel.html">Sequel</a> does not treat a
+            values like an <a href="../../../../classes/Array.html">Array</a> or <a
             href="../../../../classes/Hash.html">Hash</a> by default, which would cause
             issues.</p>
             
@@ -75,9 +73,9 @@
             <pre>Sequel.pg_row(array)</pre>
             
             <p>If you have loaded the <a
-            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="../../../../classes/Array.html#method-i-pg_row">Array#pg_row</a>:</p>
             
             <pre>array.pg_row</pre>

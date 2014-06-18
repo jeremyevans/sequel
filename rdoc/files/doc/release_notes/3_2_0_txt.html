@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.2.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Common table expressions (CTEs) are now supported.  CTEs use the SQL WITH
             clause, and specify inline views that queries can use. They also support a
@@ -90,7 +90,7 @@
             <p>If the first argument is :over, the second argument, if provided, should be
             a hash of options to pass to SQL::Window.  The options hash can also
             contain :*=&gt;true to use a wildcard argument as the function argument, or
-            :args=&gt;... to specify an array of arguments to use as the function
+            :args=&gt;… to specify an array of arguments to use as the function
             arguments.</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">t</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">rank</span>(:<span class="ruby-identifier">over</span>){}} <span class="ruby-comment"># SELECT rank() OVER ()</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">t</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">over</span>, :<span class="ruby-operator">*=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){}} <span class="ruby-comment"># SELECT count(*) OVER ()</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">t</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">over</span>, :<span class="ruby-identifier">args=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col1</span>,&#x000A;              :<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col3</span>){}}&#x000A;<span class="ruby-comment"># SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)</span></pre>
@@ -112,7 +112,7 @@
             is recommended.</p>
             
             <p>Additionally, you can now set :from_self=&gt;false to not wrap the returned
-            dataset in a "SELECT * FROM (...)".</p>
+            dataset in a “SELECT * FROM (…)”.</p>
             </li><li>
             <p>Dataset#ungraphed was added that removes the graphing information from the
             dataset.  This allows you to use Dataset#graph for the automatic aliasing,
@@ -190,7 +190,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>MySQL native adapter SELECT is much faster than before, up to 75% faster.</p>
             </li><li>
@@ -234,7 +234,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#table_exists? has been removed, since it never worked perfectly. 
             Use Database#table_exists? instead.</p>

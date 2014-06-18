@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>advanced_associations.rdoc</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,12 +38,12 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Advanced+Associations">Advanced Associations</h1>
+            <h1 id="label-Advanced+Associations">Advanced Associations<span><a href="#label-Advanced+Associations">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p><a href="../../classes/Sequel/Model.html">Sequel::Model</a> has the most
             powerful and flexible associations of any ruby ORM.</p>
             
-            <h2 id="label-Background%3A+Sequel%3A%3AModel+association+options">Background: <a href="../../classes/Sequel/Model.html">Sequel::Model</a> association options</h2>
+            <h2 id="label-Background%3A+Sequel%3A%3AModel+association+options">Background: <a href="../../classes/Sequel/Model.html">Sequel::Model</a> association options<span><a href="#label-Background%3A+Sequel%3A%3AModel+association+options">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>There are a bunch of advanced association options that are available to
             handle more complex cases.  First we&#39;ll go over some of the simpler
@@ -104,7 +104,7 @@
             
             <pre>albums = Artist.&#x000A;  eager_graph(:albums).&#x000A;  where(Sequel.like(:albums__name, &#39;A%&#39;)).&#x000A;  order(:albums__name).&#x000A;  all</pre>
             
-            <p>For lazy loading (e.g. <a target="_top" href="http://1">Model</a>.association), the
+            <p>For lazy loading (e.g. <a href="1">Model</a>.association), the
             <code>:dataset</code> option can be used to specify an arbitrary dataset
             (one that uses different keys, multiple keys, joins to other tables, etc.).</p>
             
@@ -194,7 +194,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">tracks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">track</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">albums</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">track</span>.<span class="ruby-identifier">album_id</span>]&#x000A;    <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">tracks</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">track</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-Two+basic+example+eager+loaders">Two basic example eager loaders</h3>
+            <h3 id="label-Two+basic+example+eager+loaders">Two basic example eager loaders<span><a href="#label-Two+basic+example+eager+loaders">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Putting the code in the above examples together, you almost have enough for
             a basic working eager loader.  The main important thing that is missing is
@@ -246,7 +246,7 @@
             href="../../classes/Sequel.html">Sequel</a> doesn&#39;t natively support
             such eager loading.</p>
             
-            <h2 id="label-Limited+Associations">Limited Associations</h2>
+            <h2 id="label-Limited+Associations">Limited Associations<span><a href="#label-Limited+Associations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports specifying limits
             and/or offsets for associations:</p>
@@ -258,7 +258,7 @@
             
             <pre>artist.first_10_albums&#x000A;# SELECT * FROM albums WHERE (artist_id = 1) LIMIT 10</pre>
             
-            <h3 id="label-Eager+Loading+via+eager">Eager Loading via eager</h3>
+            <h3 id="label-Eager+Loading+via+eager">Eager Loading via eager<span><a href="#label-Eager+Loading+via+eager">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>However, if you want to eagerly load an association, you must use a
             different approach.  <a href="../../classes/Sequel.html">Sequel</a> has 4
@@ -289,7 +289,7 @@
             retrieving all records, and then will slice the resulting array to get the
             first 10 after retrieval.</p>
             
-            <h3 id="label-Eager+Loading+via+eager_graph_with_options">Eager Loading via eager_graph_with_options</h3>
+            <h3 id="label-Eager+Loading+via+eager_graph_with_options">Eager Loading via eager_graph_with_options<span><a href="#label-Eager+Loading+via+eager_graph_with_options">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>When eager loading an association via eager_graph (which uses JOINs), the
             situation is similar.  While the UNION-based strategy cannot be used as you
@@ -330,7 +330,7 @@
             benchmarked it against the default behavior and found it is faster for your
             use case.</p>
             
-            <h3 id="label-Filtering+By+Associations">Filtering By Associations</h3>
+            <h3 id="label-Filtering+By+Associations">Filtering By Associations<span><a href="#label-Filtering+By+Associations">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>In order to return correct results, <a
             href="../../classes/Sequel.html">Sequel</a> automatically uses a limit
@@ -359,7 +359,7 @@
             composite keys on databases that don&#39;t support window functions and
             don&#39;t support multiple columns in IN.</p>
             
-            <h2 id="label-Additional+Association+Types">Additional Association Types</h2>
+            <h2 id="label-Additional+Association+Types">Additional Association Types<span><a href="#label-Additional+Association+Types">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>While the above examples for limited associations showed one_to_many and
             one_to_one associations, it&#39;s just because those are the simplest
@@ -369,13 +369,13 @@
             one_through_many associations that are added by the many_through_many
             plugin.</p>
             
-            <h2 id="label-ActiveRecord+associations">ActiveRecord associations</h2>
+            <h2 id="label-ActiveRecord+associations">ActiveRecord associations<span><a href="#label-ActiveRecord+associations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports all of associations
             that ActiveRecord supports, though some require different approaches or
             custom <code>:eager_loader</code> options.</p>
             
-            <h3 id="label-Association+callbacks">Association callbacks</h3>
+            <h3 id="label-Association+callbacks">Association callbacks<span><a href="#label-Association+callbacks">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports the same callbacks
             that ActiveRecord does for <code>one_to_many</code> and
@@ -401,7 +401,7 @@
             <code>Sequel::BeforeHookFailed</code> (the default), or returns false (if
             <code>raise_on_save_failure</code> is false).</p>
             
-            <h3 id="label-Association+extensions">Association extensions</h3>
+            <h3 id="label-Association+extensions">Association extensions<span><a href="#label-Association+extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>All associations come with an <code><em>association</em>_dataset</code>
             method that can be further filtered or otherwise modified:</p>
@@ -416,7 +416,7 @@
             
             <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">FindOrCreate</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">find_or_create</span>(<span class="ruby-identifier">vals</span>)&#x000A;    <span class="ruby-identifier">first</span>(<span class="ruby-identifier">vals</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">vals</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">association_reflection</span>[:<span class="ruby-identifier">key</span>]=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">model_object</span>.<span class="ruby-identifier">id</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Author</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">authorships</span>, :<span class="ruby-identifier">extend=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">FindOrCreate</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Author</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">authorships_dataset</span>.<span class="ruby-identifier">find_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Blah&#39;</span>, :<span class="ruby-identifier">number=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10</span>)</pre>
             
-            <h3 id="label-has_many+%3Athrough+associations"><code>has_many :through</code> associations</h3>
+            <h3 id="label-has_many+%3Athrough+associations"><code>has_many :through</code> associations<span><a href="#label-has_many+%3Athrough+associations">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><code>many_to_many</code> handles the usual case of a <code>has_many&#x000A;:through</code> with a <code>belongs_to</code> in the associated model.  It
             doesn&#39;t break on the case where the join table is a model table, unlike
@@ -446,7 +446,7 @@
             many_through_many plugin that ships with <a
             href="../../classes/Sequel.html">Sequel</a>.</p>
             
-            <h3 id="label-Polymorphic+Associations">Polymorphic Associations</h3>
+            <h3 id="label-Polymorphic+Associations">Polymorphic Associations<span><a href="#label-Polymorphic+Associations">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> discourages the use of
             polymorphic associations, which is the reason they are not supported by
@@ -473,9 +473,9 @@
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Asset</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">attachable</span>, :<span class="ruby-identifier">reciprocal=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">assets</span>,&#x000A;    :<span class="ruby-identifier">setter=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">attachable</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-keyword">self</span>[:<span class="ruby-identifier">attachable_id</span>] = (<span class="ruby-identifier">attachable</span>.<span class="ruby-identifier">pk</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">attachable</span>)&#x000A;      <span class="ruby-keyword">self</span>[:<span class="ruby-identifier">attachable_type</span>] = (<span class="ruby-identifier">attachable</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">attachable</span>)&#x000A;    <span class="ruby-keyword">end</span>),&#x000A;    :<span class="ruby-identifier">dataset=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">klass</span> = <span class="ruby-identifier">attachable_type</span>.<span class="ruby-identifier">constantize</span>&#x000A;      <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">klass</span>.<span class="ruby-identifier">primary_key</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">attachable_id</span>)&#x000A;    <span class="ruby-keyword">end</span>),&#x000A;    :<span class="ruby-identifier">eager_loader=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">id_map</span> = {}&#x000A;      <span class="ruby-identifier">eo</span>[:<span class="ruby-identifier">rows</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">asset</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">asset</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">attachable</span>] = <span class="ruby-keyword">nil</span> &#x000A;        ((<span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">asset</span>.<span class="ruby-identifier">attachable_type</span>] <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">asset</span>.<span class="ruby-identifier">attachable_id</span>] <span class="ruby-operator">||=</span> []) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">asset</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">klass_name</span>, <span class="ruby-identifier">id_map</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">klass</span> = <span class="ruby-identifier">klass_name</span>.<span class="ruby-identifier">constantize</span>&#x000A;        <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">klass</span>.<span class="ruby-identifier">primary_key</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">attach</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">attach</span>.<span class="ruby-identifier">pk</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">asset</span><span class="ruby-operator">|</span>&#x000A;            <span class="ruby-identifier">asset</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">attachable</span>] = <span class="ruby-identifier">attach</span>&#x000A;          <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span> &#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">assets</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">attachable_id</span>, :<span class="ruby-identifier">reciprocal=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">attachable</span>, :<span class="ruby-identifier">conditions=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Post&#39;</span>},&#x000A;    :<span class="ruby-identifier">adder=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">asset</span><span class="ruby-operator">|</span> <span class="ruby-identifier">asset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">attachable_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pk</span>, :<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Post&#39;</span>)},&#x000A;    :<span class="ruby-identifier">remover=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">asset</span><span class="ruby-operator">|</span> <span class="ruby-identifier">asset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">attachable_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)},&#x000A;    :<span class="ruby-identifier">clearer=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-identifier">assets_dataset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">attachable_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)}&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Note</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">assets</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">attachable_id</span>, :<span class="ruby-identifier">reciprocal=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">attachable</span>, :<span class="ruby-identifier">conditions=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Note&#39;</span>},&#x000A;    :<span class="ruby-identifier">adder=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">asset</span><span class="ruby-operator">|</span> <span class="ruby-identifier">asset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">attachable_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pk</span>, :<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Note&#39;</span>)},&#x000A;    :<span class="ruby-identifier">remover=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">asset</span><span class="ruby-operator">|</span> <span class="ruby-identifier">asset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">attachable_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)},&#x000A;    :<span class="ruby-identifier">clearer=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-identifier">assets_dataset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">attachable_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">attachable_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)}&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-ivar">@asset</span>.<span class="ruby-identifier">attachable</span> = <span class="ruby-ivar">@post</span>&#x000A;<span class="ruby-ivar">@asset</span>.<span class="ruby-identifier">attachable</span> = <span class="ruby-ivar">@note</span></pre>
             
-            <h2 id="label-Other+advanced+associations">Other advanced associations</h2>
+            <h2 id="label-Other+advanced+associations">Other advanced associations<span><a href="#label-Other+advanced+associations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <h3 id="label-Joining+on+multiple+keys">Joining on multiple keys</h3>
+            <h3 id="label-Joining+on+multiple+keys">Joining on multiple keys<span><a href="#label-Joining+on+multiple+keys">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Let&#39;s say you have two tables that are associated with each other with
             multiple keys.  This can be handled using Sequel&#39;s built in composite
@@ -483,7 +483,7 @@
             
             <pre class="ruby"><span class="ruby-comment"># Both of these models have an album_id, number, and disc_number fields.</span>&#x000A;<span class="ruby-comment"># All FavoriteTracks have an associated track, but not all tracks have an</span>&#x000A;<span class="ruby-comment"># associated favorite track</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Track</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">favorite_track</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">disc_number</span>, :<span class="ruby-identifier">number</span>, :<span class="ruby-identifier">album_id</span>], :<span class="ruby-identifier">primary_key=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">disc_number</span>, :<span class="ruby-identifier">number</span>, :<span class="ruby-identifier">album_id</span>]&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">FavoriteTrack</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_one</span> :<span class="ruby-identifier">tracks</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">disc_number</span>, :<span class="ruby-identifier">number</span>, :<span class="ruby-identifier">album_id</span>], :<span class="ruby-identifier">primary_key=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">disc_number</span>, :<span class="ruby-identifier">number</span>, :<span class="ruby-identifier">album_id</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-Tree+-+All+Ancestors+and+Descendents">Tree - All Ancestors and Descendents</h3>
+            <h3 id="label-Tree+-+All+Ancestors+and+Descendents">Tree - All Ancestors and Descendents<span><a href="#label-Tree+-+All+Ancestors+and+Descendents">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Let&#39;s say you want to store a tree relationship in your database,
             it&#39;s pretty simple:</p>
@@ -512,7 +512,7 @@
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">rcte_tree</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-Joining+multiple+keys+to+a+single+key%2C+through+a+third+table">Joining multiple keys to a single key, through a third table</h3>
+            <h3 id="label-Joining+multiple+keys+to+a+single+key%2C+through+a+third+table">Joining multiple keys to a single key, through a third table<span><a href="#label-Joining+multiple+keys+to+a+single+key%2C+through+a+third+table">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Let&#39;s say you have a database of songs, lyrics, and artists.  Each song
             may or may not have a lyric (most songs are instrumental).  The lyric can
@@ -528,7 +528,7 @@
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">songs</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">songs__name</span>,      :<span class="ruby-identifier">dataset=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-constant">Song</span>.<span class="ruby-identifier">select_all</span>(:<span class="ruby-identifier">songs</span>).<span class="ruby-identifier">join</span>(<span class="ruby-constant">Lyric</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">lyric_id</span>, <span class="ruby-identifier">id</span>=<span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">composer_id</span>, :<span class="ruby-identifier">arranger_id</span>, :<span class="ruby-identifier">vocalist_id</span>, :<span class="ruby-identifier">lyricist_id</span>])},      :<span class="ruby-identifier">eager_loader=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">h</span> = <span class="ruby-identifier">eo</span>[:<span class="ruby-identifier">id_map</span>]&#x000A;      <span class="ruby-identifier">ids</span> = <span class="ruby-identifier">h</span>.<span class="ruby-identifier">keys</span>&#x000A;      <span class="ruby-identifier">eo</span>[:<span class="ruby-identifier">rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">songs</span>] = []}&#x000A;      <span class="ruby-constant">Song</span>.<span class="ruby-identifier">select_all</span>(:<span class="ruby-identifier">songs</span>).&#x000A;        <span class="ruby-identifier">select_append</span>(:<span class="ruby-identifier">lyrics__composer_id</span>, :<span class="ruby-identifier">lyrics__arranger_id</span>, :<span class="ruby-identifier">lyrics__vocalist_id</span>, :<span class="ruby-identifier">lyrics__lyricist_id</span>).&#x000A;        <span class="ruby-identifier">join</span>(<span class="ruby-constant">Lyric</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">lyric_id</span>){<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(:<span class="ruby-identifier">composer_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ids</span>, :<span class="ruby-identifier">arranger_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ids</span>, :<span class="ruby-identifier">vocalist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ids</span>, :<span class="ruby-identifier">lyricist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ids</span>)}.&#x000A;        <span class="ruby-identifier">order</span>(:<span class="ruby-identifier">songs__name</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">song</span><span class="ruby-operator">|</span>&#x000A;        [:<span class="ruby-identifier">composer_id</span>, :<span class="ruby-identifier">arranger_id</span>, :<span class="ruby-identifier">vocalist_id</span>, :<span class="ruby-identifier">lyricist_id</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">recs</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">song</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">x</span>)]&#x000A;          <span class="ruby-identifier">recs</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">songs</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">song</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">recs</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">eo</span>[:<span class="ruby-identifier">rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">songs</span>].<span class="ruby-identifier">uniq!</span>}&#x000A;    <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-Statistics+Associations+%28Sum+of+Associated+Table+Column%29">Statistics Associations (Sum of Associated Table Column)</h3>
+            <h3 id="label-Statistics+Associations+%28Sum+of+Associated+Table+Column%29">Statistics Associations (Sum of Associated Table Column)<span><a href="#label-Statistics+Associations+%28Sum+of+Associated+Table+Column%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>In addition to getting associated records, you can use Sequel&#39;s
             association support to get aggregate information for columns in associated

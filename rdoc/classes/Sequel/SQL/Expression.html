@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::SQL::Expression</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../SQL.html">SQL</a></strong>
+          Superclass:
+          <strong>Object</strong>
         </div>
       </div>
       <div id='content'>
@@ -49,15 +49,15 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a target="docwin" href="#method-c-attr_reader">attr_reader</a></li>
               <li><a target="docwin" href="#attribute-c-comparison_attrs">comparison_attrs</a></li>
-              <li><a target="docwin" href="#method-c-inherited">inherited</a></li>
             </ol>
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#method-i-3D-3D">==</a></li>
+              <li><a target="docwin" href="#method-i-attr_reader">attr_reader</a></li>
               <li><a target="docwin" href="#method-i-eql-3F">eql?</a></li>
               <li><a target="docwin" href="#method-i-hash">hash</a></li>
+              <li><a target="docwin" href="#method-i-inherited">inherited</a></li>
               <li><a target="docwin" href="#method-i-inspect">inspect</a></li>
               <li><a target="docwin" href="#method-i-lit">lit</a></li>
               <li><a target="docwin" href="#method-i-sql_literal">sql_literal</a></li>
@@ -84,47 +84,6 @@
               </div>
             </div>
             <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-attr_reader'>
-                <a name='method-c-attr_reader'></a>
-                <div class='synopsis'>
-                  <span class='name'>attr_reader</span>
-                  <span class='arguments'>(*args)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="Expression.html">Expression</a> objects are assumed to be value
-                  objects, where their attribute values can&#39;t change after assignment. 
-                  In order to make it easy to define equality and hash methods, subclass
-                  instances assume that the only values that affect the results of such
-                  methods are the values of the object&#39;s attributes.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-attr_reader-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-attr_reader-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">attr_reader</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-class' id='method-method-c-inherited'>
-                <a name='method-c-inherited'></a>
-                <div class='synopsis'>
-                  <span class='name'>inherited</span>
-                  <span class='arguments'>(subclass)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Copy the <a
-                  href="Expression.html#attribute-c-comparison_attrs">::comparison_attrs</a>
-                  into the subclass.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-inherited-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-inherited-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comparison_attrs</span>, <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">dup</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-3D-3D'>
                 <a name='method-i-3D-3D'></a>
@@ -141,6 +100,27 @@
                     [show source]
                   </a>
                   <pre id='method-i-3D-3D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 112</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">==</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-attr_reader'>
+                <a name='method-i-attr_reader'></a>
+                <div class='synopsis'>
+                  <span class='name'>attr_reader</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p><a href="Expression.html">Expression</a> objects are assumed to be value
+                  objects, where their attribute values can&#39;t change after assignment. 
+                  In order to make it easy to define equality and hash methods, subclass
+                  instances assume that the only values that affect the results of such
+                  methods are the values of the object&#39;s attributes.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-attr_reader-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-attr_reader-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">attr_reader</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-eql-3F'>
@@ -176,6 +156,25 @@
                     [show source]
                   </a>
                   <pre id='method-i-hash-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hash</span>&#x000A;  ([<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>] <span class="ruby-operator">+</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">x</span>)}).<span class="ruby-identifier">hash</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-inherited'>
+                <a name='method-i-inherited'></a>
+                <div class='synopsis'>
+                  <span class='name'>inherited</span>
+                  <span class='arguments'>(subclass)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Copy the <a
+                  href="Expression.html#attribute-c-comparison_attrs">::comparison_attrs</a>
+                  into the subclass.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-inherited-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comparison_attrs</span>, <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">dup</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-inspect'>

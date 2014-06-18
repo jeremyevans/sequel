@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.30.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Dataset+Literalization+Refactoring">Dataset Literalization Refactoring</h1>
+            <h1 id="label-Dataset+Literalization+Refactoring">Dataset Literalization Refactoring<span><a href="#label-Dataset+Literalization+Refactoring">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>As warned about in the 3.29.0 release notes, dataset literalization has
             been completely refactored.  It now uses an append-only design which is
@@ -60,7 +60,7 @@
             please ask on the Google Group or the IRC channel.</p>
             </li></ul>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Model#set_server has been added to the base support (it was previously only
             in the sharding plugin), which allows you to set the shard on which to
@@ -92,7 +92,7 @@
             using the pg driver.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Type conversion of Java to Ruby types in the JDBC adapter has been made
             much faster, as conversion method lookup is now O(number of columns)
@@ -142,7 +142,7 @@
             <p>The plugin/extension specs were cleaned up using the mock adapter.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>In addition to the previously mentioned dataset literalization changes, any
             custom adapters that overrode *_clause_methods methods need to be modified

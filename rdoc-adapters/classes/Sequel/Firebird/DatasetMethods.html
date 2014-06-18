@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Firebird::DatasetMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/shared/firebird_rb.html">lib/sequel/adapters/shared/firebird.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Firebird.html">Firebird</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -123,7 +119,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 168</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 168</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-insert_select'>
@@ -140,7 +136,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert_select-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_select</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/firebird.rb, line 177</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-requires_sql_standard_datetimes-3F'>

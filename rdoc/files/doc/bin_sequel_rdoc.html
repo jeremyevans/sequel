@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>bin_sequel.rdoc</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,9 +38,9 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-bin%2Fsequel">bin/sequel</h1>
+            <h1 id="label-bin%2Fsequel">bin/sequel<span><a href="#label-bin%2Fsequel">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
-            <p>bin/sequel is the name used to refer to the "sequel" command line tool that
+            <p>bin/sequel is the name used to refer to the “sequel” command line tool that
             ships with the sequel gem.  By default, bin/sequel provides an IRB shell
             with the <code>DB</code> constant set to a <a
             href="../../classes/Sequel/Database.html">Sequel::Database</a> object
@@ -54,9 +54,9 @@
             environment, since the in-memory SQLite database is destroyed when the
             program exits.</p>
             
-            <h2 id="label-Running+from+a+git+checkout">Running from a git checkout</h2>
+            <h2 id="label-Running+from+a+git+checkout">Running from a git checkout<span><a href="#label-Running+from+a+git+checkout">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <p>If you&#39;ve installed the sequel gem, then just running "sequel" should
+            <p>If you&#39;ve installed the sequel gem, then just running “sequel” should
             load the program, since rubygems should place the sequel binary in your
             load path.  However, if you want to run bin/sequel from the root of a
             repository checkout, you should probably do:</p>
@@ -66,9 +66,9 @@
             <p>The -I lib makes sure that you are using the repository checkout&#39;s
             code.</p>
             
-            <h2 id="label-Choosing+the+Database+to+Connect+to">Choosing the Database to Connect to</h2>
+            <h2 id="label-Choosing+the+Database+to+Connect+to">Choosing the Database to Connect to<span><a href="#label-Choosing+the+Database+to+Connect+to">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <h3 id="label-Connection+String">Connection <a href="../../classes/String.html">String</a></h3>
+            <h3 id="label-Connection+String">Connection <a href="../../classes/String.html">String</a><span><a href="#label-Connection+String">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>In general, you probably want to provide a connection string argument to
             bin/sequel, indicating the adapter and database connection information you
@@ -79,7 +79,7 @@
             <p>See the <a href="opening_databases_rdoc.html">Connecting to a database
             guide</a> for more details about and examples of connection strings.</p>
             
-            <h3 id="label-YAML+Connection+File">YAML Connection File</h3>
+            <h3 id="label-YAML+Connection+File">YAML Connection File<span><a href="#label-YAML+Connection+File">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Instead of specifying the database connection using a connection string,
             you can provide the path to a YAML configuration file containing the
@@ -94,7 +94,7 @@
             <p>Note that bin/sequel does not directly support ActiveRecord YAML
             configuration files, as they use different names for some options.</p>
             
-            <h3 id="label-Mock+Connection">Mock Connection</h3>
+            <h3 id="label-Mock+Connection">Mock Connection<span><a href="#label-Mock+Connection">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>If you don&#39;t provide a connection string or YAML connection file, <a
             href="../../classes/Sequel.html">Sequel</a> will start with a mock
@@ -112,11 +112,11 @@
             
             <pre>sequel mock://postgres</pre>
             
-            <h2 id="label-Not+Just+an+IRB+shell">Not Just an IRB shell</h2>
+            <h2 id="label-Not+Just+an+IRB+shell">Not Just an IRB shell<span><a href="#label-Not+Just+an+IRB+shell">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>bin/sequel is not just an IRB shell, it can also do far more.</p>
             
-            <h3 id="label-Execute+Code">Execute Code</h3>
+            <h3 id="label-Execute+Code">Execute Code<span><a href="#label-Execute+Code">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>bin/sequel can also be used to execute other ruby files with
             <code>DB</code> preset to the database given on the command line:</p>
@@ -137,7 +137,7 @@
             
             <pre>echo &quot;p DB.tables&quot; | sequel postgres://host/database_name</pre>
             
-            <h3 id="label-Migrate+Databases">Migrate Databases</h3>
+            <h3 id="label-Migrate+Databases">Migrate Databases<span><a href="#label-Migrate+Databases">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>With -m option, <a href="../../classes/Sequel.html">Sequel</a> will migrate
             the database given using the migration directory provided by -m:</p>
@@ -151,7 +151,7 @@
             <p>See the <a href="migration_rdoc.html">migration guide</a> for more details
             about migrations.</p>
             
-            <h3 id="label-Dump+Schemas">Dump Schemas</h3>
+            <h3 id="label-Dump+Schemas">Dump Schemas<span><a href="#label-Dump+Schemas">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Using the -d or -D options, <a href="../../classes/Sequel.html">Sequel</a>
             will dump the database&#39;s schema in <a
@@ -174,7 +174,7 @@
             
             <pre>sequel -S /path/to/schema_cache.db postgres://host/database</pre>
             
-            <h3 id="label-Copy+Databases">Copy Databases</h3>
+            <h3 id="label-Copy+Databases">Copy Databases<span><a href="#label-Copy+Databases">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Using the -C option, <a href="../../classes/Sequel.html">Sequel</a> can
             copy the contents of one database to another, even between different
@@ -186,48 +186,48 @@
             <p>This copies the table structure, table data, indexes, and foreign keys from
             the MySQL database to the PostgreSQL database.</p>
             
-            <h2 id="label-Other+Options">Other Options</h2>
+            <h2 id="label-Other+Options">Other Options<span><a href="#label-Other+Options">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Other options not mentioned above are explained briefly here.</p>
             
-            <h3 id="label--E">-E</h3>
+            <h3 id="label--E">-E<span><a href="#label--E">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-E logs all SQL queries to the standard output, so you can see all SQL that
             <a href="../../classes/Sequel.html">Sequel</a> is sending the database.</p>
             
-            <h3 id="label--I+include_directory">-I include_directory</h3>
+            <h3 id="label--I+include_directory">-I include_directory<span><a href="#label--I+include_directory">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-I is similar to ruby -I, and specifies an additional $LOAD_PATH directory.</p>
             
-            <h3 id="label--l+log_file">-l log_file</h3>
+            <h3 id="label--l+log_file">-l log_file<span><a href="#label--l+log_file">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-l is similar to -E, but logs all SQL queries to the given file.</p>
             
-            <h3 id="label--L+load_directory">-L load_directory</h3>
+            <h3 id="label--L+load_directory">-L load_directory<span><a href="#label--L+load_directory">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-L loads all *.rb files under the given directory.  This is usually used to
             load <a href="../../classes/Sequel/Model.html">Sequel::Model</a> classes
             into bin/sequel.</p>
             
-            <h3 id="label--N">-N</h3>
+            <h3 id="label--N">-N<span><a href="#label--N">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-N skips testing the connection when creating the Database object.  This is
             rarely needed.</p>
             
-            <h3 id="label--r+require_lib">-r require_lib</h3>
+            <h3 id="label--r+require_lib">-r require_lib<span><a href="#label--r+require_lib">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-r is similar to ruby -r, requiring the given library.</p>
             
-            <h3 id="label--t">-t</h3>
+            <h3 id="label--t">-t<span><a href="#label--t">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-t tells bin/sequel to output full backtraces in the case of an error,
             which can aid in debugging.</p>
             
-            <h3 id="label--h">-h</h3>
+            <h3 id="label--h">-h<span><a href="#label--h">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-h prints the usage information for bin/sequel.</p>
             
-            <h3 id="label--v">-v</h3>
+            <h3 id="label--v">-v<span><a href="#label--v">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>-v prints the <a href="../../classes/Sequel.html">Sequel</a> version in
             use.</p>

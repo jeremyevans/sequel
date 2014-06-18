@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.1.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Plugins</p>
-            <hr style="height: 9px">
+            <hr>
             
             <p>3 new plugins were added that implement features supported by DataMapper:
             identity_map, tactical_eager_loading, and lazy_attributes.  These plugins
@@ -53,7 +53,7 @@
             objects to database rows via a temporary thread-local identity map.  It
             makes the following statment true:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>) &amp; (<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>)}.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">object_id</span> <span class="ruby-operator">==</span>      <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">object_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">with_identity_map</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>)}.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">object_id</span> <span class="ruby-operator">==</span>      <span class="ruby-constant">Album</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">object_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>As the code above implies, you need to use the with_identity_map method
             with a block to use the identity mapping feature.</p>
@@ -121,7 +121,7 @@
             </li></ul>
             
             <p>New bin/sequel Features</p>
-            <hr style="height: 10px">
+            <hr>
             
             <p>The bin/sequel command line tool now supports the following options:</p>
             <ul><li>
@@ -145,7 +145,7 @@
             having it load model files from multiple directory trees.</p>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#qualify_to and qualify_to_first_source were added.  They allow you
             to qualify unqualified columns in the current dataset to the given table or
@@ -235,20 +235,20 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
-            <p>MySQL "commands out of sync" errors should no longer occur unless you are
+            <p>MySQL “commands out of sync” errors should no longer occur unless you are
             nesting queries (calling Dataset#each inside Dataset#each). A bug dating at
             least to 2007 and possibly since the initial creation of the <a
             href="../../../classes/Sequel.html">Sequel</a> MySQL adapter was the cause.
             Before, SQL that caused a result set that was sent using a method where <a
             href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t yield a result
-            set would cause the "commands out of sync" error on the following query. 
+            set would cause the “commands out of sync” error on the following query. 
             For example, the following code would cause the error:</p>
             
             <pre>DB &lt;&lt; &quot;SHOW DATABASES&quot;</pre>
             
-            <p>If for some reason a "commands out of sync" error does occur, <a
+            <p>If for some reason a “commands out of sync” error does occur, <a
             href="../../../classes/Sequel.html">Sequel</a> will disconnect the
             connection from the connection pool, so it won&#39;t continually stay in
             the pool and raise errors every time it is used.</p>
@@ -271,9 +271,8 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].&#x000A;  <span class="ruby-identifier">graph</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>}, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)</pre>
             
-            <p>Before, the filter on <a target="_top" href="http://:artists">DB</a> would be dropped. 
-            Now, <a href="../../../classes/Sequel.html">Sequel</a> correctly uses a
-            subselect.</p>
+            <p>Before, the filter on <a href=":artists">DB</a> would be dropped.  Now, <a
+            href="../../../classes/Sequel.html">Sequel</a> correctly uses a subselect.</p>
             </li><li>
             <p>You can now specify serialization formats per column in the serialization
             plugin, either by calling the plugin multiple times or by using the new
@@ -318,8 +317,8 @@
             <p>An error is no longer raised if you attempt to load a plugin that has a
             DatasetMethods module but no public dataset methods.</p>
             </li><li>
-            <p>The check for <a target="_top" href="http://n">dataset</a> where n is an integer was
-            fixed.  It now raises an error inside of returning a limited dataset.</p>
+            <p>The check for <a href="n">dataset</a> where n is an integer was fixed.  It
+            now raises an error inside of returning a limited dataset.</p>
             </li><li>
             <p>On PostgreSQL, Dataset#insert with static SQL now works correctly.</p>
             </li><li>
@@ -345,7 +344,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>A plugin&#39;s apply method is now only called the first time a plugin is
             loaded.  Plugins can now have a configure method that is called every time

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Mock::Database</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Mock.html">Mock</a></strong>
+          Superclass:
+          <strong>Sequel::Database</strong>
         </div>
       </div>
       <div id='content'>
@@ -70,6 +70,13 @@
               <h2>Constants</h2>
               <div class='name-list'>
                 <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatasetClass</td>
+                    <td>=</td>
+                    <td class='context-item-value'>self</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>SHARED_ADAPTERS</td>
                     <td>=</td>
@@ -349,7 +356,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 157</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)} &#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 157</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)} &#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_dui'>

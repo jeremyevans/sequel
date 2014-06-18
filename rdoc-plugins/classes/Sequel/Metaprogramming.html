@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Metaprogramming</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/extensions/meta_def_rb.html">lib/sequel/extensions/meta_def.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -75,7 +71,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-meta_def-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-meta_def-source'><span class="ruby-comment"># File lib/sequel/extensions/meta_def.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">meta_def</span>(<span class="ruby-identifier">name</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  (<span class="ruby-keyword">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">self</span>; <span class="ruby-keyword">self</span> <span class="ruby-keyword">end</span>).<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">name</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-meta_def-source'><span class="ruby-comment"># File lib/sequel/extensions/meta_def.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">meta_def</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  (<span class="ruby-keyword">class</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-keyword">self</span>; <span class="ruby-keyword">self</span> <span class="ruby-keyword">end</span>).<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

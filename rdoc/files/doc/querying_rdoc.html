@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>querying.rdoc</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,12 +38,12 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Querying+in+Sequel">Querying in <a href="../../classes/Sequel.html">Sequel</a></h1>
+            <h1 id="label-Querying+in+Sequel">Querying in <a href="../../classes/Sequel.html">Sequel</a><span><a href="#label-Querying+in+Sequel">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p>This guide is based on <a
             href="http://guides.rubyonrails.org/active_record_querying.html">guides.rubyonrails.org/active_record_querying.html</a></p>
             
-            <h2 id="label-Purpose+of+this+Guide">Purpose of this Guide</h2>
+            <h2 id="label-Purpose+of+this+Guide">Purpose of this Guide<span><a href="#label-Purpose+of+this+Guide">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> is a simple to use, very
             flexible, and powerful database library that supports a wide variety of
@@ -55,10 +55,10 @@
             you get from using <a href="../../classes/Sequel.html">Sequel</a> is
             Sequel&#39;s ability to abstract SQL from you and give you a much nicer
             interface. <a href="../../classes/Sequel.html">Sequel</a> also ships with a
-            <a href="core_extensions_rdoc.html">core_extensions extension</a> which
+            <a href="core_extensions_rdoc.html">core_extensions extension</a>, which
             better integrates Sequel&#39;s DSL into the ruby language.</p>
             
-            <h2 id="label-Retrieving+Objects">Retrieving Objects</h2>
+            <h2 id="label-Retrieving+Objects">Retrieving Objects<span><a href="#label-Retrieving+Objects">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> provides a few separate
             methods for retrieving objects from the database.  The underlying method is
@@ -69,19 +69,19 @@
             However, while Dataset#each can and often is used directly, in many cases
             there is a more convenient retrieval method you can use.</p>
             
-            <h3 id="label-Sequel%3A%3ADataset"><a href="../../classes/Sequel/Dataset.html">Sequel::Dataset</a></h3>
+            <h3 id="label-Sequel%3A%3ADataset"><a href="../../classes/Sequel/Dataset.html">Sequel::Dataset</a><span><a href="#label-Sequel%3A%3ADataset">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>If you are new to <a href="../../classes/Sequel.html">Sequel</a> and
             aren&#39;t familiar with <a href="../../classes/Sequel.html">Sequel</a>,
-            you should probably read the <a href="dataset_basics_rdoc.html">"Dataset
-            Basics" guide</a> then come back here.</p>
+            you should probably read the <a href="dataset_basics_rdoc.html">“Dataset
+            Basics” guide</a>, then come back here.</p>
             
-            <h3 id="label-Retrieving+a+Single+Object">Retrieving a Single Object</h3>
+            <h3 id="label-Retrieving+a+Single+Object">Retrieving a Single Object<span><a href="#label-Retrieving+a+Single+Object">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> offers quite a few ways to
             to retrieve a single object.</p>
             
-            <h4 id="label-Using+a+Primary+Key+%5BSequel%3A%3AModel%5D">Using a Primary Key [Sequel::Model]</h4>
+            <h4 id="label-Using+a+Primary+Key+%5BSequel%3A%3AModel%5D">Using a Primary Key [Sequel::Model]<span><a href="#label-Using+a+Primary+Key+%5BSequel%3A%3AModel%5D">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>The <code>Sequel::Model.[]</code> is the easiest method to use to find a
             model instance by its primary key value:</p>
@@ -94,7 +94,7 @@
             
             <pre>artist = Artist.with_pk!(1)</pre>
             
-            <h4 id="label-Using+first">Using <code>first</code></h4>
+            <h4 id="label-Using+first">Using <code>first</code><span><a href="#label-Using+first">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>If you just want the first record in the dataset,
             <code>Sequel::Dataset#first</code> is probably the most obvious method to
@@ -117,7 +117,7 @@
             <p>Note that while Model.[] allows you to pass a primary key directly,
             Dataset#[] does not (unless it is a model dataset).</p>
             
-            <h4 id="label-Using+last">Using <code>last</code></h4>
+            <h4 id="label-Using+last">Using <code>last</code><span><a href="#label-Using+last">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>If you want the last record in the dataset,
             <code>Sequel::Dataset#last</code> is an obvious method to use.  Note that
@@ -136,7 +136,7 @@
             <p>Note that <code>last</code> is not necessarily going to give you the last
             record in the dataset unless you give the dataset an unambiguous order.</p>
             
-            <h4 id="label-Retrieving+a+Single+Column+Value">Retrieving a Single Column Value</h4>
+            <h4 id="label-Retrieving+a+Single+Column+Value">Retrieving a Single Column Value<span><a href="#label-Retrieving+a+Single+Column+Value">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>Sometimes, instead of wanting an entire row, you only want the value of a
             specific column.  For this <code>Sequel::Dataset#get</code> is the method
@@ -144,9 +144,9 @@
             
             <pre class="ruby"><span class="ruby-identifier">artist_name</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;YJM&quot;</span></pre>
             
-            <h3 id="label-Retrieving+Multiple+Objects">Retrieving Multiple Objects</h3>
+            <h3 id="label-Retrieving+Multiple+Objects">Retrieving Multiple Objects<span><a href="#label-Retrieving+Multiple+Objects">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
-            <h4 id="label-As+an+Array+of+Hashes+or+Model+Objects">As an <a href="../../classes/Array.html">Array</a> of Hashes or Model Objects</h4>
+            <h4 id="label-As+an+Array+of+Hashes+or+Model+Objects">As an <a href="../../classes/Array.html">Array</a> of Hashes or Model Objects<span><a href="#label-As+an+Array+of+Hashes+or+Model+Objects">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>In many cases, you want an array of all of the rows associated with the
             dataset, in which case <code>Sequel::Dataset#all</code> is the method you
@@ -154,7 +154,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;,</span>&#x000A;    <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;AS&quot;, :id=&gt;2}&gt;]</span></pre>
             
-            <h4 id="label-Using+an+Enumerable+Interface">Using an Enumerable Interface</h4>
+            <h4 id="label-Using+an+Enumerable+Interface">Using an Enumerable Interface<span><a href="#label-Using+an+Enumerable+Interface">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p><code>Sequel::Dataset</code> uses an Enumerable Interface, so it provides a
             method named each that yields hashes or model objects as they are retrieved
@@ -167,7 +167,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&quot;YJM&quot;</span>, <span class="ruby-string">&quot;AS&quot;</span>]</pre>
             
-            <h4 id="label-As+an+Array+of+Column+Values">As an <a href="../../classes/Array.html">Array</a> of Column Values</h4>
+            <h4 id="label-As+an+Array+of+Column+Values">As an <a href="../../classes/Array.html">Array</a> of Column Values<span><a href="#label-As+an+Array+of+Column+Values">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> also has an extended
             <code>map</code> method that takes an argument.  If you provide an argument
@@ -199,7 +199,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_map</span>([:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>])&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [[<span class="ruby-value">1</span>, <span class="ruby-string">&quot;YJM&quot;</span>], [<span class="ruby-value">2</span>, <span class="ruby-string">&quot;AS&quot;</span>]]</pre>
             
-            <h4 id="label-As+a+Hash">As a <a href="../../classes/Hash.html">Hash</a></h4>
+            <h4 id="label-As+a+Hash">As a <a href="../../classes/Hash.html">Hash</a><span><a href="#label-As+a+Hash">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to take an SQL
             query and return it as a ruby hash, using the <code>to_hash</code> method:</p>
@@ -252,7 +252,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_hash_groups</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT name, id FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-string">&quot;YJM&quot;</span>=<span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">10</span>, <span class="ruby-operator">...</span>], <span class="ruby-string">&quot;AS&quot;</span>=<span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">20</span>, <span class="ruby-operator">...</span>]}</pre>
             
-            <h2 id="label-Modifying+datasets+">Modifying datasets </h2>
+            <h2 id="label-Modifying+datasets+">Modifying datasets <span><a href="#label-Modifying+datasets+">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Note that the retrieval methods discussed above just return the row(s)
             included in the existing dataset.  In most cases, you aren&#39;t interested
@@ -277,7 +277,7 @@
             <pre>ds1 = DB[:artists]&#x000A;# SELECT * FROM artists</pre>
             
             <p>Let&#39;s say we are only interested in the artists whose names start with
-            "A":</p>
+            “A”:</p>
             
             <pre>ds2 = ds1.where(Sequel.like(:name, &#39;A%&#39;))&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</pre>
             
@@ -308,7 +308,7 @@
             clause, then the SELECT clause was modified.  This makes for a flexible
             API, where you can modify any part of the query at any time.</p>
             
-            <h2 id="label-Filters">Filters</h2>
+            <h2 id="label-Filters">Filters<span><a href="#label-Filters">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Filtering is probably the most common dataset modifying action done in <a
             href="../../classes/Sequel.html">Sequel</a>. Both the <code>where</code>
@@ -316,7 +316,7 @@
             dataset&#39;s WHERE clause.  Both accept a wide variety of input formats,
             discussed below.</p>
             
-            <h3 id="label-Hashes">Hashes</h3>
+            <h3 id="label-Hashes">Hashes<span><a href="#label-Hashes">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>The most common format for providing filters is via a hash.  In general, <a
             href="../../classes/Sequel.html">Sequel</a> treats conditions specified
@@ -363,7 +363,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1 AND name ~ &#39;JM$&#39;</span></pre>
             
-            <h3 id="label-Array+of+Two+Element+Arrays"><a href="../../classes/Array.html">Array</a> of Two Element Arrays</h3>
+            <h3 id="label-Array+of+Two+Element+Arrays"><a href="../../classes/Array.html">Array</a> of Two Element Arrays<span><a href="#label-Array+of+Two+Element+Arrays">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>If you use an array of two element arrays, it is treated as a hash.  The
             only advantage to using an array of two element arrays is that it allows
@@ -371,28 +371,28 @@
             
             <pre>Artist.where([[:name, /JM$/], [:name, /^YJ/]])&#x000A;# SELECT * FROM artists WHERE name ~ &#39;JM$&#39; AND name ~ &#39;^YJ&#39;</pre>
             
-            <h3 id="label-Virtual+Row+Blocks">Virtual Row Blocks</h3>
+            <h3 id="label-Virtual+Row+Blocks">Virtual Row Blocks<span><a href="#label-Virtual+Row+Blocks">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>If a block is passed to a filter, it is treated as a virtual row block:</p>
             
             <pre>Artist.where{id &gt; 5}&#x000A;# SELECT * FROM artists WHERE id &gt; 5</pre>
             
             <p>You can learn more about virtual row blocks in the <a
-            href="virtual_rows_rdoc.html">"Virtual Rows" guide</a></p>
+            href="virtual_rows_rdoc.html">“Virtual Rows” guide</a>.</p>
             
             <p>You can provide both regular arguments and a block, in which case the
             results will be ANDed together:</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">...</span><span class="ruby-string">&#39;M&#39;</span>){<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name &gt;= &#39;A&#39; AND name &lt; &#39;M&#39; AND id &gt; 5</span></pre>
             
-            <h3 id="label-Symbols">Symbols</h3>
+            <h3 id="label-Symbols">Symbols<span><a href="#label-Symbols">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>If you have a boolean column in the database, and you want only true
             values, you can just provide the column symbol to filter:</p>
             
             <pre>Artist.where(:retired)&#x000A;# SELECT * FROM artists WHERE retired</pre>
             
-            <h3 id="label-SQL%3A%3AExpression">SQL::Expression</h3>
+            <h3 id="label-SQL%3A%3AExpression">SQL::Expression<span><a href="#label-SQL%3A%3AExpression">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> has a DSL that allows easily
             creating SQL expressions.  These SQL expressions are instances of
@@ -414,7 +414,7 @@
             operator for <code>AND</code>, the | operator for <code>OR</code>, and the
             ~ operator for inversion:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>) &amp; (<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39; AND (b = 1 OR c != 3)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">c=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39; AND (b = 1 OR c != 3)</span></pre>
             
             <p>You can combine these expression operators with the virtual row support:</p>
             
@@ -425,7 +425,7 @@
             
             <pre>Artist.where{a &gt; 1 &amp; ~(b(c) &lt; 1 | d)}&#x000A;# Raises a TypeError, as it calls Integer#| with a Sequel::SQL::Identifier</pre>
             
-            <h3 id="label-Strings+with+Placeholders">Strings with Placeholders</h3>
+            <h3 id="label-Strings+with+Placeholders">Strings with Placeholders<span><a href="#label-Strings+with+Placeholders">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Assuming you want to get your hands dirty and write some SQL, <a
             href="../../classes/Sequel.html">Sequel</a> allows you to use strings using
@@ -455,7 +455,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-node">&quot;id = #{params[:id]}&quot;</span>) <span class="ruby-comment"># Don&#39;t do this!</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;id = ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>]) <span class="ruby-comment"># Do this instead</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>].<span class="ruby-identifier">to_i</span>) <span class="ruby-comment"># Even better</span></pre>
             
-            <h3 id="label-Inverting">Inverting</h3>
+            <h3 id="label-Inverting">Inverting<span><a href="#label-Inverting">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>You may be wondering how to specify a not equals condition in <a
             href="../../classes/Sequel.html">Sequel</a>, or the NOT IN operator.  <a
@@ -482,13 +482,13 @@
             
             <pre>Artist.exclude(Sequel.like(:name, &#39;%J%&#39;))&#x000A;# SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</pre>
             
-            <h3 id="label-Removing">Removing</h3>
+            <h3 id="label-Removing">Removing<span><a href="#label-Removing">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>To remove all existing filters, use <code>unfiltered</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">unfiltered</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
-            <h2 id="label-Ordering">Ordering</h2>
+            <h2 id="label-Ordering">Ordering<span><a href="#label-Ordering">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> offers quite a few methods
             to manipulate the SQL ORDER BY clause.  The most basic of these is
@@ -513,7 +513,7 @@
             
             <pre>Artist.order(:id).order_prepend(:name)&#x000A;# SELECT * FROM artists ORDER BY name, id</pre>
             
-            <h3 id="label-Reversing">Reversing</h3>
+            <h3 id="label-Reversing">Reversing<span><a href="#label-Reversing">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Just like you can invert an existing filter, you can reverse an existing
             order, using <code>reverse</code>:</p>
@@ -530,14 +530,14 @@
             
             <pre>Artist.order(:name, Sequel.desc(:id))&#x000A;# SELECT FROM artists ORDER BY name, id DESC</pre>
             
-            <h3 id="label-Removing">Removing</h3>
+            <h3 id="label-Removing">Removing<span><a href="#label-Removing">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Just like you can remove filters with <code>unfiltered</code>, you can
             remove orders with <code>unordered</code>:</p>
             
             <pre>Artist.order(:name).unordered&#x000A;# SELECT * FROM artists</pre>
             
-            <h2 id="label-Selected+Columns">Selected Columns</h2>
+            <h2 id="label-Selected+Columns">Selected Columns<span><a href="#label-Selected+Columns">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> offers a few methods to
             manipulate the columns selected.  As you may be able to guess, the main
@@ -577,7 +577,7 @@
             
             <pre>Artist.select_all(:artists)&#x000A;# SELECT artists.* FROM artists</pre>
             
-            <h3 id="label-Distinct">Distinct</h3>
+            <h3 id="label-Distinct">Distinct<span><a href="#label-Distinct">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>To treat duplicate rows as a single row when retrieving the records, use
             <code>distinct</code>:</p>
@@ -587,7 +587,7 @@
             <p>Note that DISTINCT is a separate SQL clause, it&#39;s not a function that
             you pass to select.</p>
             
-            <h2 id="label-Limit+and+Offset">Limit and Offset</h2>
+            <h2 id="label-Limit+and+Offset">Limit and Offset<span><a href="#label-Limit+and+Offset">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>You can limit the dataset to a given number of rows using
             <code>limit</code>:</p>
@@ -610,7 +610,7 @@
             
             <pre>Artist.limit(5, 10).unlimited&#x000A;# SELECT * FROM artists</pre>
             
-            <h2 id="label-Grouping">Grouping</h2>
+            <h2 id="label-Grouping">Grouping<span><a href="#label-Grouping">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>The SQL GROUP BY clause is used to combine multiple rows based on the
             values of a given group of columns.</p>
@@ -642,7 +642,7 @@
             
             <pre>Album.select_group(:artist_id).select_append{sum(num_tracks).as(tracks)}&#x000A;# SELECT artist_id, sum(num_tracks) AS tracks FROM albums GROUP BY artist_id</pre>
             
-            <h2 id="label-Having">Having</h2>
+            <h2 id="label-Having">Having<span><a href="#label-Having">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>The SQL HAVING clause is similar to the WHERE clause, except that filters
             the results after the grouping has been applied, instead of before.  One
@@ -656,7 +656,7 @@
             
             <pre>Album.group_and_count(:artist_id).having{count(:*){} &gt;= 10}.&#x000A; where(:name.like(&#39;A%&#39;)).unfiltered&#x000A;# SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id</pre>
             
-            <h2 id="label-Joins">Joins</h2>
+            <h2 id="label-Joins">Joins<span><a href="#label-Joins">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it very easy to join a
             dataset to another table or dataset. The underlying method used is
@@ -675,7 +675,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">left_join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># LEFT JOIN artists ON artists.id = albums.artist_id</span></pre>
             
-            <h3 id="label-Table%2FDataset+to+Join">Table/Dataset to Join</h3>
+            <h3 id="label-Table%2FDataset+to+Join">Table/Dataset to Join<span><a href="#label-Table%2FDataset+to+Join">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>For all of these specialized join methods, the first argument is generally
             the name of the table to which you are joining.  However, you can also
@@ -687,13 +687,13 @@
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;A&#39;</span>}, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN (SELECT * FROM artists WHERE (name &lt; &#39;A&#39;)) AS t1</span>&#x000A;<span class="ruby-comment">#  ON (t1.id = albums.artist_id)</span></pre>
             
-            <h3 id="label-Join+Conditions">Join Conditions</h3>
+            <h3 id="label-Join+Conditions">Join Conditions<span><a href="#label-Join+Conditions">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>The second argument to the specialized join methods is the conditions  to
             use when joining, which is similar to a filter expression, with a few minor
             exceptions.</p>
             
-            <h4 id="label-Implicit+Qualification">Implicit Qualification</h4>
+            <h4 id="label-Implicit+Qualification">Implicit Qualification<span><a href="#label-Implicit+Qualification">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>A hash used as the join conditions operates similarly to a filter, except
             that unqualified symbol keys are automatically qualified with the table
@@ -749,7 +749,7 @@
             Starting in <a href="../../classes/Sequel.html">Sequel</a> 4, the
             <code>:qualify=&gt;:deep</code> option is going to become the default.</p>
             
-            <h4 id="label-USING+Joins">USING Joins</h4>
+            <h4 id="label-USING+Joins">USING Joins<span><a href="#label-USING+Joins">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>The most common type of join conditions is a JOIN ON, as displayed above. 
             However, the SQL standard allows for join conditions to be specified with
@@ -766,7 +766,7 @@
             
             <p>See here how you specify the USING columns as an array of symbols.</p>
             
-            <h4 id="label-NATURAL+Joins">NATURAL Joins</h4>
+            <h4 id="label-NATURAL+Joins">NATURAL Joins<span><a href="#label-NATURAL+Joins">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>NATURAL Joins take it one step further than USING joins, by assuming that
             all columns with the same names in both tables should be used for joining:</p>
@@ -775,7 +775,7 @@
             
             <p>In this case, you don&#39;t even need to specify any conditions.</p>
             
-            <h4 id="label-Join+Blocks">Join Blocks</h4>
+            <h4 id="label-Join+Blocks">Join Blocks<span><a href="#label-Join+Blocks">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>You can provide a block to any of the join methods that accept conditions. 
             This block should accept 3 arguments, the table alias for the table
@@ -794,7 +794,7 @@
             href="../../classes/Sequel.html">Sequel</a>, you need to use a block and
             qualify the tables manually.</p>
             
-            <h2 id="label-From">From</h2>
+            <h2 id="label-From">From<span><a href="#label-From">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>In general, the FROM table is the first clause populated when creating a
             dataset.  For a standard <a
@@ -817,7 +817,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artists</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artists__id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums__artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums, artists WHERE artists.id = albums.artist_id</span></pre>
             
-            <h3 id="label-Using+the+current+dataset+in+a+subselect">Using the current dataset in a subselect</h3>
+            <h3 id="label-Using+the+current+dataset+in+a+subselect">Using the current dataset in a subselect<span><a href="#label-Using+the+current+dataset+in+a+subselect">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>In some cases, you may want to wrap the current dataset in a subselect.
             Here&#39;s an example using <code>from_self</code>:</p>
@@ -836,7 +836,7 @@
             grouping. So if the artist with the lowest id had 100 albums, you&#39;d get
             1 result, not 100.</p>
             
-            <h2 id="label-Locking+for+Update">Locking for Update</h2>
+            <h2 id="label-Locking+for+Update">Locking for Update<span><a href="#label-Locking+for+Update">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> allows you to easily add a
             FOR UPDATE clause to your queries so that the records returned can&#39;t be
@@ -848,7 +848,7 @@
             <p>This will ensure that no other connection modifies the row between when you
             select it and when the transaction ends.</p>
             
-            <h3 id="label-Optimistic+Locking">Optimistic Locking</h3>
+            <h3 id="label-Optimistic+Locking">Optimistic Locking<span><a href="#label-Optimistic+Locking">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>One of the model plugins that ships with <a
             href="../../classes/Sequel.html">Sequel</a> is an optimistic locking
@@ -857,7 +857,7 @@
             for things like web forms where you cannot keep a transaction open while
             the user is looking at the form, because of the web&#39;s stateless nature.</p>
             
-            <h2 id="label-Custom+SQL">Custom SQL</h2>
+            <h2 id="label-Custom+SQL">Custom SQL<span><a href="#label-Custom+SQL">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to use custom
             SQL by providing it to the <code>Database#[]</code> method as a string:</p>
@@ -894,14 +894,14 @@
             <p>That way Sequel&#39;s method chaining still works, and it increases
             Sequel&#39;s ability to introspect the code.</p>
             
-            <h2 id="label-Checking+for+Records">Checking for Records</h2>
+            <h2 id="label-Checking+for+Records">Checking for Records<span><a href="#label-Checking+for+Records">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>If you just want to know whether the current dataset would return any rows,
             use <code>empty?</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE id = 0 LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;R%&#39;</span>)).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE name LIKE &#39;R%&#39; ESCAPE &#39;\&#39; LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span></pre>
             
-            <h2 id="label-Aggregate+Calculations">Aggregate Calculations</h2>
+            <h2 id="label-Aggregate+Calculations">Aggregate Calculations<span><a href="#label-Aggregate+Calculations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>The SQL standard defines a few helpful methods to get aggreate information
             about datasets, such as <code>count</code>, <code>sum</code>,

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>pg_hstore_ops.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -61,10 +61,9 @@
             <pre>h = Sequel.expr(:hstore_column).hstore</pre>
             
             <p>If you have loaded the <a
-            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
-            href="../../../../classes/Sequel/Postgres/HStoreOpMethods.html#method-i-hstore">Sequel::Postgres::HStoreOpMethods#hstore</a>:</p>
+            href="../../../doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use Symbol#hstore:</p>
             
             <pre>h = :hstore_column.hstore</pre>
             

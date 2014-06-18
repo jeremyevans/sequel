@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::MSSQL</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/adapters/shared/mssql_rb.html">lib/sequel/adapters/shared/mssql.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -555,7 +551,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert_select-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb, line 624</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_select</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>&#x000A;  <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-identifier">default_server_opts</span>(<span class="ruby-value">:sql=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">output</span>(<span class="ruby-keyword">nil</span>, [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:inserted</span>)]).<span class="ruby-identifier">insert_sql</span>(*<span class="ruby-identifier">values</span>))).<span class="ruby-identifier">single_record</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mssql.rb, line 624</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">supports_insert_select?</span>&#x000A;  <span class="ruby-identifier">naked</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-identifier">default_server_opts</span>(<span class="ruby-value">:sql=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">output</span>(<span class="ruby-keyword">nil</span>, [<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:inserted</span>)]).<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>))).<span class="ruby-identifier">single_record</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-into'>
@@ -566,7 +562,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Specify a table for a SELECT ... <a href="MSSQL.html#INTO">INTO</a> query.</p>
+                  <p>Specify a table for a SELECT … <a href="MSSQL.html#INTO">INTO</a> query.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-into-source'); return false">
@@ -602,8 +598,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Allows you to do a dirty read of uncommitted data using WITH (<a
-                  href="MSSQL.html#NOLOCK">NOLOCK</a>).</p>
+                  <p>Allows you to do a dirty read of uncommitted data using WITH (NOLOCK).</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-nolock-source'); return false">

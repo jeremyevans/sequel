@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Sequel3DatasetMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/extensions/sequel_3_dataset_methods_rb.html">lib/sequel/extensions/sequel_3_dataset_methods.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -84,9 +80,8 @@
                     <td class='context-item-value'>[W]</td>
                     <td class='context-item-desc'>
                       
-                      <p>The database related to this dataset.  This is the <a
-                      href="Database.html">Database</a> instance that will execute all of this
-                      dataset&#39;s queries.</p>
+                      <p>The database related to this dataset.  This is the Database instance that
+                      will execute all of this dataset&#39;s queries.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -135,16 +130,16 @@
                   <p>Inserts multiple values. If a block is given it is invoked for each item in
                   the given array before inserting it.  See <code>multi_insert</code> as a
                   possibly faster version that may be able to insert multiple records in one
-                  <a href="SQL.html">SQL</a> statement (if supported by the database).
-                  Returns an array of primary keys of inserted rows.</p>
+                  SQL statement (if supported by the database). Returns an array of primary
+                  keys of inserted rows.</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert_multiple</span>([{:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, {:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}])&#x000A;<span class="ruby-comment"># =&gt; [4, 5]</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x) VALUES (1)</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x) VALUES (2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert_multiple</span>([{:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, {:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}]){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[:<span class="ruby-identifier">y</span>] = <span class="ruby-identifier">row</span>[:<span class="ruby-identifier">x</span>] * <span class="ruby-value">2</span>; <span class="ruby-identifier">row</span> }&#x000A;<span class="ruby-comment"># =&gt; [6, 7]</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x, y) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x, y) VALUES (2, 4)</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert_multiple</span>([{:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, {:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}])&#x000A;<span class="ruby-comment"># =&gt; [4, 5]</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x) VALUES (1)</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x) VALUES (2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert_multiple</span>([{:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, {:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}]){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-identifier">row</span>[:<span class="ruby-identifier">y</span>] = <span class="ruby-identifier">row</span>[:<span class="ruby-identifier">x</span>] <span class="ruby-operator">*</span> <span class="ruby-value">2</span>; <span class="ruby-identifier">row</span> }&#x000A;<span class="ruby-comment"># =&gt; [6, 7]</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x, y) VALUES (1, 2)</span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x, y) VALUES (2, 4)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert_multiple-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert_multiple-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_multiple</span>(<span class="ruby-identifier">array</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>))}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">i</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert_multiple-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 56</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_multiple</span>(<span class="ruby-identifier">array</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>))}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">i</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-qualify_to'>
@@ -205,7 +200,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">update</span>(*<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">update</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_csv'>

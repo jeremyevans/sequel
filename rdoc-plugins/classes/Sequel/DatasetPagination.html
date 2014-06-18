@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::DatasetPagination</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/extensions/pagination_rb.html">lib/sequel/extensions/pagination.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -91,7 +87,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-paginate-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-paginate-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paginate</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;You cannot paginate a dataset that already has a limit&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]&#x000A;  <span class="ruby-identifier">paginated</span> = <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">page_size</span>, (<span class="ruby-identifier">page_no</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) * <span class="ruby-identifier">page_size</span>)&#x000A;  <span class="ruby-identifier">paginated</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Pagination</span>)&#x000A;  <span class="ruby-identifier">paginated</span>.<span class="ruby-identifier">set_pagination_info</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">count</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-paginate-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paginate</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;You cannot paginate a dataset that already has a limit&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]&#x000A;  <span class="ruby-identifier">paginated</span> = <span class="ruby-identifier">limit</span>(<span class="ruby-identifier">page_size</span>, (<span class="ruby-identifier">page_no</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">page_size</span>)&#x000A;  <span class="ruby-identifier">paginated</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">Pagination</span>)&#x000A;  <span class="ruby-identifier">paginated</span>.<span class="ruby-identifier">set_pagination_info</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">count</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

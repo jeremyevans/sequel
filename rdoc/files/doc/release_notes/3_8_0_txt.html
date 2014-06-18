@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.8.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#each_server was added, allowing you to run the same query (most
             likely insert/update/delete) on all shards.  This is useful if you have a
@@ -105,7 +105,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The single-threaded connection pool now raises DatabaseConnectionErrors if
             unable to connect, so it now operates more similarly to the default
@@ -152,7 +152,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset::FROM_SELF_KEEP_OPTS was merged into Dataset::NON_SQL_OPTIONS. 
             While used in different places, they were used for the same purpose, and

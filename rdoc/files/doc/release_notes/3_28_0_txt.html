@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.28.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Adapter+Support">New Adapter Support</h1>
+            <h1 id="label-New+Adapter+Support">New Adapter Support<span><a href="#label-New+Adapter+Support">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now has much better
             support for the DB2 database.</p>
@@ -59,7 +59,7 @@
             databases from JRuby.</p>
             </li></ul>
             
-            <h1 id="label-New+PostgreSQL+9.1+Features">New PostgreSQL 9.1 Features</h1>
+            <h1 id="label-New+PostgreSQL+9.1+Features">New PostgreSQL 9.1 Features<span><a href="#label-New+PostgreSQL+9.1+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset#returning has been added for using the RETURNING clause on
             INSERT/UPDATE/DELETE queries.  RETURNING allows such queries to return
@@ -91,7 +91,7 @@
             9.1.</p>
             </li></ul>
             
-            <h1 id="label-Other+New+Features">Other New Features</h1>
+            <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The :limit option is now respected when eager loading via either eager or
             eager_graph.  By default, <a href="../../../classes/Sequel.html">Sequel</a>
@@ -139,14 +139,14 @@
             
             <pre>:x &amp; 1</pre>
             
-            <p>Previously, this did "x AND 1", now it does "x &amp; 1".  Using a logical
+            <p>Previously, this did “x AND 1”, now it does “x &amp; 1”.  Using a logical
             operator on an integer doesn&#39;t make sense, but it&#39;s possible people
             did so if the database uses 1/0 for true/false. Likewise:</p>
             
             <pre>:x + &#39;foo&#39;</pre>
             
-            <p>Previously, this did "x + &#39;foo&#39;" (addition), now it does "x ||
-            &#39;foo&#39;" (string concatenation).</p>
+            <p>Previously, this did “x + &#39;foo&#39;” (addition), now it does “x ||
+            &#39;foo&#39;” (string concatenation).</p>
             </li><li>
             <p>The sql_string, sql_number, and sql_boolean methods are now available on
             SQL::ComplexExpressions, so you can do:</p>
@@ -225,12 +225,12 @@
             with a CTE is used in a JOIN, the CTE is moved from the subquery to the
             main query.</p>
             </li><li>
-            <p>Dataset#supports_select_all_and_column has been added for seeing if "SELECT
-            *, foo ..." style queries are supported.  This is false on DB2, which
+            <p>Dataset#supports_select_all_and_column has been added for seeing if “SELECT
+            *, foo …” style queries are supported.  This is false on DB2, which
             doesn&#39;t allow such queries.  When it is false, using select_append on a
             dataset that doesn&#39;t specifically select columns will now change the
-            query to do "SELECT table.*, foo ..." instead, working around the
-            limitation on DB2.</p>
+            query to do “SELECT table.*, foo …” instead, working around the limitation
+            on DB2.</p>
             </li><li>
             <p>Dataset#supports_ordered_distinct_on? has been added.  Currently, this is
             only true on PostgreSQL.  MySQL can emulate DISTINCT ON using GROUP BY, but
@@ -243,7 +243,7 @@
             1) or something similar.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> 3.27.0 was negatively
             affected by a serious bug in ActiveSupport&#39;s Time.=== that has still
@@ -272,7 +272,7 @@
             correctly handles fractional seconds on ruby 1.9.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset#insert_returning_sql has been changed to a private method in the
             PostgreSQL and Firebird adapters, and it operates differently than it did
@@ -308,7 +308,7 @@
             
             <pre>:x &amp; 1</pre>
             
-            <p>and wanting "x AND 1", you have to switch to:</p>
+            <p>and wanting “x AND 1”, you have to switch to:</p>
             
             <pre>:x.sql_boolean &amp; 1</pre>
             
@@ -316,7 +316,7 @@
             
             <pre>:x + &#39;foo&#39;</pre>
             
-            <p>and wanting "x + &#39;foo&#39;", you need to switch to:</p>
+            <p>and wanting “x + &#39;foo&#39;”, you need to switch to:</p>
             
             <pre>:x.sql_number + &#39;foo&#39;</pre>
             </li><li>

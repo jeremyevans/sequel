@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>extensions.rdoc</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,12 +38,12 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Sequel+Extensions"><a href="../../classes/Sequel.html">Sequel</a> Extensions</h1>
+            <h1 id="label-Sequel+Extensions"><a href="../../classes/Sequel.html">Sequel</a> Extensions<span><a href="#label-Sequel+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> has an official extension
             system, for adding global, Database, and Dataset extensions.</p>
             
-            <h2 id="label-Global+Extensions">Global Extensions</h2>
+            <h2 id="label-Global+Extensions">Global Extensions<span><a href="#label-Global+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Global extensions can add or modify the behavior of any part of <a
             href="../../classes/Sequel.html">Sequel</a>.  Technically, they are not
@@ -64,7 +64,7 @@
             consistent way to require code that modifies <a
             href="../../classes/Sequel.html">Sequel</a>.</p>
             
-            <h2 id="label-Database+Extensions">Database Extensions</h2>
+            <h2 id="label-Database+Extensions">Database Extensions<span><a href="#label-Database+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database extensions should add or modify the behavior of a single
             <code>Sequel::Database</code> instance.  They are loaded via
@@ -87,7 +87,7 @@
             <p>All future <code>Sequel::Database</code> instances created afterward will
             then automatically have the server_block extension loaded.</p>
             
-            <h2 id="label-Dataset+Extensions">Dataset Extensions</h2>
+            <h2 id="label-Dataset+Extensions">Dataset Extensions<span><a href="#label-Dataset+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Dataset extensions should add or modify the behavior of a single
             <code>Sequel::Dataset</code> instance.  They are loaded via
@@ -125,7 +125,7 @@
             
             <pre>Sequel::Database.extension :columns_introspection</pre>
             
-            <h2 id="label-Creating+Global+Extensions">Creating Global Extensions</h2>
+            <h2 id="label-Creating+Global+Extensions">Creating Global Extensions<span><a href="#label-Creating+Global+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>If you want to create a global extension, you just need to store your code
             so that you can require it via
@@ -136,7 +136,7 @@
             <p>It is recommended you only create a global extension if what you want to do
             would not work as a Database or Dataset extension.</p>
             
-            <h2 id="label-Creating+Database+Extensions">Creating Database Extensions</h2>
+            <h2 id="label-Creating+Database+Extensions">Creating Database Extensions<span><a href="#label-Creating+Database+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Creating Database extensions is similar to global extensions in terms of
             creating the file.  However, somewhere in the file, you need to call
@@ -158,7 +158,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">arbitrary_servers</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ArbitraryServers</span>)}</pre>
             
-            <h2 id="label-Creating+Dataset+Extensions">Creating Dataset Extensions</h2>
+            <h2 id="label-Creating+Dataset+Extensions">Creating Dataset Extensions<span><a href="#label-Creating+Dataset+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Creating Dataset extensions is very similar to creating Database
             extensions, but instead of calling

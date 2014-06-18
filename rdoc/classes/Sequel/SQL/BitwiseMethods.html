@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::SQL::BitwiseMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,19 +34,14 @@
             <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../SQL.html">SQL</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
             
             <p>This defines the bitwise methods: &amp;, |, ^, ~, &lt;&lt;, and &gt;&gt;. 
-            Because these methods overlap with the standard +<a
-            href="BooleanMethods.html">BooleanMethods</a> methods+, and they only make
-            sense for integers, they are only included in
+            Because these methods overlap with the standard +BooleanMethods methods+,
+            and they only make sense for integers, they are only included in
             <code>NumericExpression</code>.</p>
             
             <pre>:a.sql_number &amp; :b # &quot;a&quot; &amp; &quot;b&quot;&#x000A;:a.sql_number | :b # &quot;a&quot; | &quot;b&quot;&#x000A;:a.sql_number ^ :b # &quot;a&quot; ^ &quot;b&quot;&#x000A;:a.sql_number &lt;&lt; :b # &quot;a&quot; &lt;&lt; &quot;b&quot;&#x000A;:a.sql_number &gt;&gt; :b # &quot;a&quot; &gt;&gt; &quot;b&quot;&#x000A;~:a.sql_number # ~&quot;a&quot;</pre>

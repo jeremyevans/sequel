@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.10.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,14 +39,14 @@
           <div id='description'>
             
             <p>New Supported Adapters and Databases</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>A DataObjects adapter was added that supports PostgreSQL, MySQL, and
             SQLite.  DataObjects is the underlying database library used by DataMapper,
             and has potential performance advantages by doing all typecasting in C.</p>
             </li><li>
             <p>A Firebird Adapter was added, it requires the modified Ruby Fb adapter
-            found at <a target="_top" href="http://github.com/wishdev/fb.">github.com/wishdev/fb.</a></p>
+            found at <a target="_top" href="http://github.com/wishdev/fb">github.com/wishdev/fb</a>.</p>
             </li><li>
             <p>An H2 JDBC subadapter was added, based on the code used in JotBot. H2 is an
             embeddable Java database, and may be preferable to using SQLite on JDBC
@@ -54,7 +54,7 @@
             </li></ul>
             
             <p>New Core Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now has database
             independent migrations.  Before, column types in migrations were not
@@ -147,7 +147,7 @@
             </li></ul>
             
             <p>New Model Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>A new validates_not_string validation was added for <a
             href="../../../classes/Sequel.html">Sequel</a> Models. It is intended to be
@@ -199,7 +199,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now longer overwrites the
             following <a href="../../../classes/Symbol.html">Symbol</a> instance
@@ -238,9 +238,9 @@
             <p>Using the block argument makes for a nicer API, though, so I recommend
             using it when possible.</p>
             
-            <p>Note that if you are running ruby 1.8 or jruby without the --1.9 flag, you
-            don&#39;t need to worry.  If you are running ruby 1.9 or jruby --1.9, or
-            you plan to at some point in the future, you should inspect your code for
+            <p>Note that if you are running ruby 1.8 or jruby without the –1.9 flag, you
+            don&#39;t need to worry.  If you are running ruby 1.9 or jruby –1.9, or you
+            plan to at some point in the future, you should inspect your code for
             existing uses of these methods. Here are a couple command lines that should
             find most uses:</p>
             
@@ -279,7 +279,7 @@
             </li></ul>
             
             <p>Backwards Compatibilty</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>If you were previously using a database that returned uppercase
             identifiers, it will probably return lowercase identifiers by default now. 
@@ -320,11 +320,10 @@
             wouldn&#39;t have worked as methods before, it is unlikely that anyone used
             this.</p>
             </li><li>
-            <p>The meaning of #<a href="../../../classes/String.html">String</a>,
-            #Integer, and #Float inside Sequel::SQL::Generator (i.e. inside a
-            Database#create_table block) has changed.  Before, these used to call
-            private Kernel methods, now, they set up columns with the appropriate
-            database type.</p>
+            <p>The meaning of #String, #Integer, and #Float inside Sequel::SQL::Generator
+            (i.e. inside a Database#create_table block) has changed.  Before, these
+            used to call private Kernel methods, now, they set up columns with the
+            appropriate database type.</p>
             </li><li>
             <p>The Database#lowercase method in the DBI adapter was removed, as its use
             case is now met by the identifier_output_method support.</p>

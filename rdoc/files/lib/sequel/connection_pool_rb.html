@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>connection_pool.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -46,13 +46,13 @@
             <p>Initialize using the passed <a
             href="../../../classes/Sequel/Database.html">Sequel::Database</a> object
             and options hash.</p>
-            </dd><dt>hold(<a href="../../../classes/Symbol.html">Symbol</a>, &amp;block) 
+            </dd><dt>hold(Symbol, &amp;block) 
             <dd>
             <p>Yield a connection object (obtained from calling the block passed to
             <code>initialize</code>) to the current block. For sharded connection
             pools, the <a href="../../../classes/Symbol.html">Symbol</a> passed is the
             shard/server to use.</p>
-            </dd><dt>disconnect(<a href="../../../classes/Symbol.html">Symbol</a>) 
+            </dd><dt>disconnect(Symbol) 
             <dd>
             <p>Disconnect the connection object.  For sharded connection pools, the <a
             href="../../../classes/Symbol.html">Symbol</a> passed is the shard/server
@@ -68,10 +68,10 @@
             </dd></dl>
             
             <p>For sharded connection pools, the sharded API adds the following methods:</p>
-            <dl class="rdoc-list note-list"><dt>add_servers(<a href="../../../classes/Array.html">Array</a> of Symbols) 
+            <dl class="rdoc-list note-list"><dt>add_servers(Array of Symbols) 
             <dd>
             <p>start recognizing all shards/servers specified by the array of symbols.</p>
-            </dd><dt>remove_servers(<a href="../../../classes/Array.html">Array</a> of Symbols) 
+            </dd><dt>remove_servers(Array of Symbols) 
             <dd>
             <p>no longer recognize all shards/servers specified by the array of symbols.</p>
             </dd></dl>

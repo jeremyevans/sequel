@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::ADO::Access::DatabaseMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/adapters/ado/access_rb.html">lib/sequel/adapters/ado/access.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Access.html">Access</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -103,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-alter_table-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-alter_table-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">name</span>, *)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-alter_table-source'><span class="ruby-comment"># File lib/sequel/adapters/ado/access.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">alter_table</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">remove_cached_schema</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-disconnect_connection'>

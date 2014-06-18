@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::IBMDB::Database</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../IBMDB.html">IBMDB</a></strong>
+          Superclass:
+          <strong>Sequel::Database</strong>
         </div>
       </div>
       <div id='content'>
@@ -64,6 +64,20 @@
             </div>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatasetClass</td>
+                    <td>=</td>
+                    <td class='context-item-value'>self</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
@@ -92,8 +106,8 @@
                 <div class='description'>
                   
                   <p>REORG the related table whenever it is altered.  This is not always
-                  required, but it is necessary for compatibilty with other <a
-                  href="../../Sequel.html">Sequel</a> code in many cases.</p>
+                  required, but it is necessary for compatibilty with other Sequel code in
+                  many cases.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-alter_table-source'); return false">
@@ -133,7 +147,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 220</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 220</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sql</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">Connection</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-identifier">raise_error</span>(<span class="ruby-identifier">e</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_insert'>
@@ -168,7 +182,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_prepared_statement-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_prepared_statement-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 246</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:arguments</span>]&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">prepared_statement</span>(<span class="ruby-identifier">ps_name</span>)&#x000A;  <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">ps_name</span>, []).<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">sql</span>&#x000A;      <span class="ruby-identifier">log_yield</span>(<span class="ruby-node">&quot;PREPARE #{ps_name}: #{sql}&quot;</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ps_name</span>)}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">prepared_statement_arg</span>(<span class="ruby-identifier">v</span>)}&#x000A;    <span class="ruby-identifier">log_sql</span> = <span class="ruby-node">&quot;EXECUTE #{ps_name}&quot;</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">log_sql</span>&#x000A;      <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; (&quot;</span>&#x000A;      <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>&#x000A;      <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">stmt</span> = <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">log_sql</span>, <span class="ruby-identifier">args</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_prepared</span>(<span class="ruby-identifier">ps_name</span>, *<span class="ruby-identifier">args</span>)}&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;        <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">stmt</span>)&#x000A;      <span class="ruby-keyword">else</span>  &#x000A;        <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">affected</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">ensure</span>&#x000A;      <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">free_result</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_prepared_statement-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 246</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:arguments</span>]&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">prepared_statement</span>(<span class="ruby-identifier">ps_name</span>)&#x000A;  <span class="ruby-identifier">sql</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepared_statements</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">ps_name</span>, []).<span class="ruby-identifier">first</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">sql</span>&#x000A;      <span class="ruby-identifier">log_yield</span>(<span class="ruby-node">&quot;PREPARE #{ps_name}: #{sql}&quot;</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ps_name</span>)}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">nil</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">prepared_statement_arg</span>(<span class="ruby-identifier">v</span>)}&#x000A;    <span class="ruby-identifier">log_sql</span> = <span class="ruby-node">&quot;EXECUTE #{ps_name}&quot;</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">log_sql</span>&#x000A;      <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; (&quot;</span>&#x000A;      <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">sql</span>&#x000A;      <span class="ruby-identifier">log_sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">stmt</span> = <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">log_sql</span>, <span class="ruby-identifier">args</span>){<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">execute_prepared</span>(<span class="ruby-identifier">ps_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;        <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">stmt</span>)&#x000A;      <span class="ruby-keyword">else</span>  &#x000A;        <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">affected</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">ensure</span>&#x000A;      <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">free_result</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">stmt</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-table_exists-3F'>
@@ -179,9 +193,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>On <a href="../DB2.html">DB2</a>, a table might need to be REORGed if you
-                  are testing existence of it.  This REORGs automatically if the database
-                  raises a specific error that indicates it should be REORGed.</p>
+                  <p>On DB2, a table might need to be REORGed if you are testing existence of
+                  it.  This REORGs automatically if the database raises a specific error that
+                  indicates it should be REORGed.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-table_exists-3F-source'); return false">

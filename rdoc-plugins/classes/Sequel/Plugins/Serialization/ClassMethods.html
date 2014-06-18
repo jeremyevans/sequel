@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::Serialization::ClassMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/serialization_rb.html">lib/sequel/plugins/serialization.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Serialization.html">Serialization</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -113,7 +109,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-serialize_attributes-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-serialize_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, *<span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">format</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-identifier">format</span> = <span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>]&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported serialization format: #{format} (valid formats: #{REGISTERED_FORMATS.keys.map{|k| k.inspect}.join})&quot;</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span> = <span class="ruby-identifier">format</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No columns given.  The serialization plugin requires you specify which columns to serialize&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">define_serialized_attribute_accessor</span>(<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>, *<span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-serialize_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">format</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    <span class="ruby-keyword">unless</span> <span class="ruby-identifier">format</span> = <span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>]&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Unsupported serialization format: #{format} (valid formats: #{REGISTERED_FORMATS.keys.map{|k| k.inspect}.join})&quot;</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span> = <span class="ruby-identifier">format</span>&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No columns given.  The serialization plugin requires you specify which columns to serialize&quot;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;  <span class="ruby-identifier">define_serialized_attribute_accessor</span>(<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-serialized_columns'>

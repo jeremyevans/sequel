@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::SQLTime</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+          Superclass:
+          <strong>Time</strong>
         </div>
       </div>
       <div id='content'>
@@ -95,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_s-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_s-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_s</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%H:%M:%S&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Superclass may have defined a method that takes a format string,</span>&#x000A;    <span class="ruby-comment"># and we shouldn&#39;t override in that case.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_s-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_s</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">strftime</span>(<span class="ruby-string">&#39;%H:%M:%S&#39;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Superclass may have defined a method that takes a format string,</span>&#x000A;    <span class="ruby-comment"># and we shouldn&#39;t override in that case.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

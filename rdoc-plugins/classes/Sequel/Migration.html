@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Migration</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="../Object.html">Object</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -191,7 +191,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-method_missing-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method_sym</span>, *<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method_sym</span>, *<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method_sym</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method_sym</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-respond_to_missing-3F'>

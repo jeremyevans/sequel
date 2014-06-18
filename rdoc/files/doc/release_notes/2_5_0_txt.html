@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.5.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The values that are used to insert/update records can now be scoped similar
             to how filter expressions can be scoped. set_defaults is used to set
@@ -67,8 +67,8 @@
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">project_id</span>, :<span class="ruby-identifier">projects</span>, :<span class="ruby-identifier">on_update</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">cascade</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             </li><li>
             <p>When connecting to a PostgreSQL server version 8.2 and higher, <a
-            href="../../../classes/Sequel.html">Sequel</a> now uses the INSERT ...
-            RETURNING ... syntax, which should speed up row inserts on PostgreSQL.  In
+            href="../../../classes/Sequel.html">Sequel</a> now uses the INSERT …
+            RETURNING … syntax, which should speed up row inserts on PostgreSQL.  In
             addition, <a href="../../../classes/Sequel.html">Sequel</a> Models use
             RETURNING * to speed up model object creation.</p>
             </li><li>
@@ -89,7 +89,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset methods insert_sql, delete_sql, and update_sql respect the :sql
             option, allowing you to do things such as:</p>
@@ -127,7 +127,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The SQLite adapter now raises <a
             href="../../../classes/Sequel/DatabaseError.html">Sequel::DatabaseError</a>

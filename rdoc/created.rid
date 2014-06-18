@@ -1,6 +1,6 @@
-Tue, 03 Jun 2014 13:03:20 -0700
+Tue, 17 Jun 2014 20:46:44 -0700
 README.rdoc	Fri, 04 Apr 2014 15:34:16 -0700
-CHANGELOG	Tue, 03 Jun 2014 12:31:24 -0700
+CHANGELOG	Tue, 17 Jun 2014 20:46:14 -0700
 MIT-LICENSE	Thu, 24 Apr 2014 08:56:47 -0700
 lib/sequel.rb	Thu, 11 Feb 2010 00:27:07 -0800
 lib/sequel/ast_transformer.rb	Fri, 23 May 2014 13:28:32 -0700
@@ -12,7 +12,7 @@ lib/sequel/deprecated.rb	Fri, 30 Aug 2013 11:15:04 -0700
 lib/sequel/exceptions.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/model.rb	Tue, 18 Mar 2014 14:41:16 -0700
 lib/sequel/no_core_ext.rb	Sun, 02 Jun 2013 13:49:44 -0700
-lib/sequel/sql.rb	Fri, 23 May 2014 13:28:32 -0700
+lib/sequel/sql.rb	Tue, 17 Jun 2014 20:46:14 -0700
 lib/sequel/timezones.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/version.rb	Tue, 03 Jun 2014 12:31:24 -0700
 lib/sequel/connection_pool/sharded_single.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -36,9 +36,9 @@ lib/sequel/dataset/misc.rb	Mon, 24 Mar 2014 11:22:25 -0700
 lib/sequel/dataset/mutation.rb	Thu, 24 Apr 2014 08:56:47 -0700
 lib/sequel/dataset/placeholder_literalizer.rb	Tue, 29 Apr 2014 12:46:21 -0700
 lib/sequel/dataset/prepared_statements.rb	Thu, 24 Apr 2014 08:56:47 -0700
-lib/sequel/dataset/query.rb	Fri, 23 May 2014 13:28:32 -0700
-lib/sequel/dataset/sql.rb	Fri, 23 May 2014 13:28:32 -0700
-lib/sequel/model/associations.rb	Thu, 01 May 2014 10:35:59 -0700
+lib/sequel/dataset/query.rb	Tue, 17 Jun 2014 20:46:14 -0700
+lib/sequel/dataset/sql.rb	Tue, 17 Jun 2014 20:46:14 -0700
+lib/sequel/model/associations.rb	Tue, 17 Jun 2014 20:46:14 -0700
 lib/sequel/model/base.rb	Wed, 30 Apr 2014 08:18:43 -0700
 lib/sequel/model/dataset_module.rb	Mon, 19 Nov 2012 16:49:32 -0800
 lib/sequel/model/default_inflections.rb	Sat, 13 Feb 2010 10:36:31 -0800
@@ -62,7 +62,7 @@ doc/model_hooks.rdoc	Fri, 02 May 2014 08:01:22 -0700
 doc/model_plugins.rdoc	Fri, 06 Sep 2013 13:38:06 -0700
 doc/mssql_stored_procedures.rdoc	Thu, 02 Jan 2014 10:46:37 -0800
 doc/object_model.rdoc	Fri, 23 May 2014 13:28:32 -0700
-doc/opening_databases.rdoc	Tue, 13 May 2014 08:21:01 -0700
+doc/opening_databases.rdoc	Tue, 17 Jun 2014 20:46:14 -0700
 doc/postgresql.rdoc	Wed, 05 Mar 2014 09:51:37 -0800
 doc/prepared_statements.rdoc	Sat, 06 Jul 2013 16:17:44 -0700
 doc/querying.rdoc	Fri, 16 May 2014 09:40:34 -0700

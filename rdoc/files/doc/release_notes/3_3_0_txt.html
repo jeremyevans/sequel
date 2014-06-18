@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.3.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>An association_proxies plugin has been added.  This is not a full-blown
             proxy implementation, but it allows you to write code such as:</p>
@@ -82,7 +82,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Microsoft SQL Server support is much, much better in <a
             href="../../../classes/Sequel.html">Sequel</a> 3.3.0 than in previous
@@ -145,7 +145,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The convert_tinyint_to_bool setting moved from the main <a
             href="../../../classes/Sequel.html">Sequel</a> module to the Sequel::MySQL
@@ -189,7 +189,7 @@
             href="../../../classes/Sequel.html">Sequel</a> will use &#39;untitled&#39;
             as the identifier.  This can break backwards compatibility if the adapter
             previously used another default and you were relying on that default.  This
-            was necessary to fix any possible "interning empty string" exceptions.</p>
+            was necessary to fix any possible “interning empty string” exceptions.</p>
             </li><li>
             <p>On MSSQL, <a href="../../../classes/Sequel.html">Sequel</a> now uses the
             datetime type instead of the timestamp type for generic DateTimes.  It now

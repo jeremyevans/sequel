@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.32.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Prepared statements now support :map and :to_hash prepared statement types.
             The main reason for this is that certain extensions (e.g. sequel_pg)
@@ -75,7 +75,7 @@
             query optimizer.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The filtering/excluding by associations code now uses qualified identifiers
             instead of unqualified identifiers, which allows it to avoid ambiguous
@@ -153,7 +153,7 @@
             <p>Transaction related queries are no longer logged twice in the mock adapter.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Sequel&#39;s default handling of NOT IN operators with an empty array of
             values has changed, which can change which rows are returned for such
@@ -170,12 +170,12 @@
             hand argument is NULL, the filter returns NULL instead of true.  This has
             the potential to change query results.</p>
             
-            <p>"Correct" here is really an opinion and not a fact, as there are valid
+            <p>“Correct” here is really an opinion and not a fact, as there are valid
             arguments for the alternative behavior:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (1 = 0)</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM a WHERE (1 = 1)</span></pre>
             
-            <p>The difference is that the "correct" NULL behavior is more consistent with
+            <p>The difference is that the “correct” NULL behavior is more consistent with
             the non-empty array cases.  For example, if b is NULL:</p>
             
             <pre class="ruby"><span class="ruby-comment"># &quot;Correct&quot; NULL handling</span>&#x000A;<span class="ruby-comment">#  Empty array: where(:b=&gt;[])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">b</span>) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> = <span class="ruby-identifier">b</span>) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-comment">#  Non-empty array: where(:b=&gt;[1, 2])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span>&#x000A;&#x000A;<span class="ruby-comment"># Static boolean handling</span>&#x000A;<span class="ruby-comment">#  Empty array: where(:b=&gt;[])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-value">1</span> = <span class="ruby-value">0</span>) <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-value">1</span> = <span class="ruby-value">1</span>) <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-comment">#  Non-empty array: where(:b=&gt;[1, 2])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span></pre>
@@ -190,7 +190,7 @@
             argument is NULL.</p>
             
             <p>As there really isn&#39;t a truly correct answer in this case, <a
-            href="../../../classes/Sequel.html">Sequel</a> defaults to the "correct"
+            href="../../../classes/Sequel.html">Sequel</a> defaults to the “correct”
             NULL handling, and allows you to switch to the static boolean handling via:</p>
             
             <pre>Sequel.empty_array_handle_nulls = false</pre>

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::PgTypecastOnLoad::ClassMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/pg_typecast_on_load_rb.html">lib/sequel/plugins/pg_typecast_on_load.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../PgTypecastOnLoad.html">PgTypecastOnLoad</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -88,7 +84,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_pg_typecast_on_load_columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-add_pg_typecast_on_load_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_typecast_on_load.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_pg_typecast_on_load_columns</span>(*<span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-ivar">@pg_typecast_on_load_columns</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-add_pg_typecast_on_load_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_typecast_on_load.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_pg_typecast_on_load_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-ivar">@pg_typecast_on_load_columns</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">columns</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-call'>
@@ -115,9 +111,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Lookup the conversion proc for the column&#39;s oid in the <a
-                  href="../../Database.html">Database</a> object, and use it to convert the
-                  value.</p>
+                  <p>Lookup the conversion proc for the column&#39;s oid in the Database object,
+                  and use it to convert the value.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-load_typecast_pg-source'); return false">

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/model/plugins_rb.html">lib/sequel/model/plugins.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -98,7 +94,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-after_set_dataset-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-after_set_dataset-source'><span class="ruby-comment"># File lib/sequel/model/plugins.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">after_set_dataset</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-value">:set_dataset</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span>*<span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>(*<span class="ruby-identifier">a</span>)&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>)&#x000A;    <span class="ruby-identifier">r</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-after_set_dataset-source'><span class="ruby-comment"># File lib/sequel/model/plugins.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">after_set_dataset</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-value">:set_dataset</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span> = <span class="ruby-keyword">super</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>)&#x000A;    <span class="ruby-identifier">r</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-def_dataset_methods'>

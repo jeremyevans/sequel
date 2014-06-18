@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.4.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Plugins</p>
-            <hr style="height: 9px">
+            <hr>
             <ul><li>
             <p>A nested_attributes plugin was added allowing you to modify associated
             objects directly through a model object, similar to ActiveRecord&#39;s
@@ -114,7 +114,7 @@
             </li></ul>
             
             <p>Other New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now has support for
             converting Time/DateTime to local or UTC time upon storage, retrieval, or
@@ -195,7 +195,7 @@
             
             <p>Rack will parse that into:</p>
             
-            <pre class="ruby">{<span class="ruby-string">&#39;date&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;year&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-string">&#39;month&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">,</span> <span class="ruby-string">&#39;day&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">}</span>}</pre>
+            <pre class="ruby">{<span class="ruby-string">&#39;date&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;year&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-string">&#39;month&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-string">&#39;day&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?}</span>}</pre>
             
             <p>So then you can do:</p>
             
@@ -228,8 +228,8 @@
             <pre>DB[:events].filter{date &lt; ::Sequel::CURRENT_DATE}&#x000A;# or:&#x000A;include Sequel::SQL::Constants&#x000A;DB[:events].filter{date &lt; ::CURRENT_DATE}</pre>
             </li><li>
             <p>Database#run was added for executing arbitrary SQL on a database. It&#39;s
-            an alias for Database#&lt;&lt;, but it allows for a nicer API inside
-            migrations, since you can now do:</p>
+            an alias for Database#<<, but it allows for a nicer API inside migrations,
+            since you can now do:</p>
             
             <pre>run &#39;SQL&#39;</pre>
             
@@ -264,7 +264,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The serialization and lazy_attribute plugins now add accessor methods to a
             module included in the class, instead of to the model class itself.  This
@@ -298,7 +298,7 @@
             contain the information on JDBC.</p>
             </li><li>
             <p>Datasets without tables now work correctly on Oracle, so things like
-            DB.get(...) now work.</p>
+            DB.get(…) now work.</p>
             </li><li>
             <p>A descriptive error message is given if you attempt to use <a
             href="../../../classes/Sequel.html">Sequel</a> with the mysql.rb driver
@@ -318,7 +318,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now includes fractional
             seconds in timestamps for all adapters except MySQL.  It&#39;s possible
@@ -344,8 +344,8 @@
             GROUP or JOIN settings and generate bad SQL if there were multiple FROM
             tables.</p>
             </li><li>
-            <p>Database#&lt;&lt; now always returns nil.  Before, the return value was
-            adapter dependent.</p>
+            <p>Database#<< now always returns nil.  Before, the return value was adapter
+            dependent.</p>
             </li><li>
             <p>ODBC::Time and ODBC::DateTime values are now converted to the <a
             href="../../../classes/Sequel.html#attribute-c-datetime_class">Sequel.datetime_class</a>.

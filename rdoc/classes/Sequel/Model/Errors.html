@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Model::Errors</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Model.html">Model</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="../../Hash.html">Hash</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -153,7 +153,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-full_messages-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-full_messages-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">full_messages</span>&#x000A;  <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span> &#x000A;    <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = *<span class="ruby-identifier">kv</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(ATTRIBUTE_JOINER)} #{e}&quot;</span>)}&#x000A;    <span class="ruby-identifier">m</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-full_messages-source'><span class="ruby-comment"># File lib/sequel/model/errors.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">full_messages</span>&#x000A;  <span class="ruby-identifier">inject</span>([]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">kv</span><span class="ruby-operator">|</span> &#x000A;    <span class="ruby-identifier">att</span>, <span class="ruby-identifier">errors</span> = <span class="ruby-operator">*</span><span class="ruby-identifier">kv</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">each</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">e</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span> <span class="ruby-operator">&lt;&lt;</span> (<span class="ruby-identifier">e</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">LiteralString</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">e</span> <span class="ruby-operator">:</span> <span class="ruby-node">&quot;#{Array(att).join(ATTRIBUTE_JOINER)} #{e}&quot;</span>)}&#x000A;    <span class="ruby-identifier">m</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-on'>

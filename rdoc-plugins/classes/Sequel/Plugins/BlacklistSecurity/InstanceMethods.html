@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::BlacklistSecurity::InstanceMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/blacklist_security_rb.html">lib/sequel/plugins/blacklist_security.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../BlacklistSecurity.html">BlacklistSecurity</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -80,7 +76,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_except-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_except</span>(<span class="ruby-identifier">hash</span>, *<span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-update_except'>
@@ -102,7 +98,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-update_except-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-update_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_except</span>(<span class="ruby-identifier">hash</span>, *<span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-update_except-source'><span class="ruby-comment"># File lib/sequel/plugins/blacklist_security.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_except</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">except</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-constant">ExceptionList</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">except</span>.<span class="ruby-identifier">flatten</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

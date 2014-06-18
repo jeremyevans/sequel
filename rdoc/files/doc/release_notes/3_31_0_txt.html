@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.31.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The serialization plugin can now support custom serialization formats, by
             supplying a serializer/deserializer pair of callable objects.  You can also
@@ -103,7 +103,7 @@
             in seconds.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset#exists can now be used with prepared statement placeholders.</p>
             </li><li>
@@ -136,7 +136,7 @@
             <p>The mock adapter no longer defaults to downcasing identifiers on output.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset#exists now returns a PlaceholderLiteralString instead of a
             LiteralString, which could potentially break some code.  If you would like
@@ -145,11 +145,11 @@
             
             <pre>dataset.literal(dataset.exists)</pre>
             </li><li>
-            <p>Dataset#from no longer handles :a__b__c___d as "a.b.c AS d".  This was not
+            <p>Dataset#from no longer handles :a__b__c___d as “a.b.c AS d”.  This was not
             the intended behavior, and nowhere else in <a
             href="../../../classes/Sequel.html">Sequel</a> is a symbol treated that
             way.  Now, Dataset#from is consistent with the rest of <a
-            href="../../../classes/Sequel.html">Sequel</a>, using "a.b__c AS d".  This
+            href="../../../classes/Sequel.html">Sequel</a>, using “a.b__c AS d”.  This
             should only affect people in very rare cases, as most databases don&#39;t
             use three level qualified tables.  One exception is Microsoft SQL Server,
             which can use three level qualified tables for cross-database access.</p>

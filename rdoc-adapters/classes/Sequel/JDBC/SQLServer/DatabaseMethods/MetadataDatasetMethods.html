@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::JDBC::SQLServer::DatabaseMethods::MetadataDatasetMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../../files/lib/sequel/adapters/jdbc/sqlserver_rb.html">lib/sequel/adapters/jdbc/sqlserver.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../DatabaseMethods.html">DatabaseMethods</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -47,8 +43,8 @@
             Driver 3.0, where the metadata for the getColumns result set specifies an
             incorrect type for the IS_AUTOINCREMENT column. The column is a string, but
             the type is specified as a short. This causes getObject() to throw a
-            com.microsoft.sqlserver.jdbc.SQLServerException: "The conversion from char
-            to SMALLINT is unsupported." Using getString() rather than getObject() for
+            com.microsoft.sqlserver.jdbc.SQLServerException: “The conversion from char
+            to SMALLINT is unsupported.” Using getString() rather than getObject() for
             this column avoids the problem. Reference: <a
             href="http://social.msdn.microsoft.com/Forums/en/sqldataaccess/thread/20df12f3-d1bf-4526-9daa-239a83a8e435">social.msdn.microsoft.com/Forums/en/sqldataaccess/thread/20df12f3-d1bf-4526-9daa-239a83a8e435</a></p>
           </div>

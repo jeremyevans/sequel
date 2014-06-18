@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::Dirty::InstanceMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/dirty_rb.html">lib/sequel/plugins/dirty.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Dirty.html">Dirty</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -249,7 +245,7 @@
                   <p>Manually specify that a column will change.  This should only be used if
                   you plan to modify a column value in place, which is not recommended.</p>
                   
-                  <pre class="ruby"><span class="ruby-identifier">will_change_column</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">name</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/i/</span>, <span class="ruby-string">&#39;o&#39;</span>)&#x000A;<span class="ruby-identifier">column_change</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># =&gt; [&#39;Initial&#39;, &#39;onotoal&#39;]</span></pre>
+                  <pre class="ruby"><span class="ruby-identifier">will_change_column</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">name</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-regexp">/i/i</span>, <span class="ruby-string">&#39;o&#39;</span>)&#x000A;<span class="ruby-identifier">column_change</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># =&gt; [&#39;Initial&#39;, &#39;onotoal&#39;]</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-will_change_column-source'); return false">

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::MssqlOptimisticLocking</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,19 +34,15 @@
             <a target="docwin" href="../../../files/lib/sequel/plugins/mssql_optimistic_locking_rb.html">lib/sequel/plugins/mssql_optimistic_locking.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
             
-            <p>This plugin implements optimistic locking mechanism on Microsoft <a
-            href="../SQL.html">SQL</a> Server using a timestamp/rowversion column to
-            ensure that concurrent updates are detected and previous changes are not
-            automatically overridden. This is best implemented by a code example:</p>
+            <p>This plugin implements optimistic locking mechanism on Microsoft SQL Server
+            using a timestamp/rowversion column to ensure that concurrent updates are
+            detected and previous changes are not automatically overridden. This is
+            best implemented by a code example:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Person</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">mssql_optimistic_locking</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">p1</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">p2</span> = <span class="ruby-constant">Person</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">p1</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># works</span>&#x000A;<span class="ruby-identifier">p2</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># raises Sequel::NoExistingObject</span></pre>
             

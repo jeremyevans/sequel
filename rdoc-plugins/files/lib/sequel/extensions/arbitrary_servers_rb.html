@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>arbitrary_servers.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -68,7 +68,7 @@
             may want to do the following to so that you don&#39;t need to call
             synchronize separately:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(*)&#x000A;  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-keyword">super</span>{<span class="ruby-identifier">synchronize</span>{<span class="ruby-keyword">yield</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Note that this extension only works with the sharded threaded connection
             pool.  If you are using the sharded single connection pool, you need to

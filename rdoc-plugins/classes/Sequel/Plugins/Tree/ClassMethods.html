@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::Tree::ClassMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/tree_rb.html">lib/sequel/plugins/tree.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Tree.html">Tree</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -120,7 +116,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-roots_dataset-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-roots_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">roots_dataset</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(*<span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">tree_order</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-roots_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">roots_dataset</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">tree_order</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

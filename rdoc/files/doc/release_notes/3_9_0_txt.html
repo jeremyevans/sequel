@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.9.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The ConnectionPool classes were refactored from 2 separate classes to a 5
             class hierarchy, with one main class and 4  subclasses, one for each
@@ -96,15 +96,15 @@
             <p>bin/sequel now works without an argument, which is useful for testing SQL
             generation (and not much else).</p>
             </li><li>
-            <p>Support SELECT ... INTO in the MSSQL adapter, using Dataset#into, which
-            takes a table argument.</p>
+            <p>Support SELECT … INTO in the MSSQL adapter, using Dataset#into, which takes
+            a table argument.</p>
             </li><li>
             <p>You can now provide your own connection pool class via the :pool_class
             option when instantiating the database.</p>
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>IN/NOT IN constructs with an empty array are now handled properly.</p>
             
@@ -214,7 +214,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>If you plan on using sharding at any point, you now must pass a :servers
             option when connecting to the database, even if it is an empty hash.  You
@@ -260,11 +260,11 @@
             </li></ul>
             
             <p>Other News</p>
-            <hr style="height: 8px">
+            <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now has an official blog
             at <a
-            href="http://sequel.jeremyevans.net/blog.html.">sequel.jeremyevans.net/blog.html.</a></p>
+            href="http://sequel.jeremyevans.net/blog.html">sequel.jeremyevans.net/blog.html</a>.</p>
             </li></ul>
           </div>
           <div id='context'>

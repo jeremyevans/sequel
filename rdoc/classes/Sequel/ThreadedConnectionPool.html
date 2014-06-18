@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::ThreadedConnectionPool</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="ConnectionPool.html">ConnectionPool</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -174,11 +174,9 @@
                   connection to the given block. This method has the effect of  disconnecting
                   from the database, assuming that no connections are currently being used. 
                   If you want to be able to disconnect connections that are currently in use,
-                  use the <a
-                  href="ShardedThreadedConnectionPool.html">ShardedThreadedConnectionPool</a>,
-                  which can do that. This connection pool does not, for performance reasons.
-                  To use the sharded pool, pass the <code>:servers=&gt;{}</code> option when
-                  connecting to the database.</p>
+                  use the ShardedThreadedConnectionPool, which can do that. This connection
+                  pool does not, for performance reasons. To use the sharded pool, pass the
+                  <code>:servers=&gt;{}</code> option when connecting to the database.</p>
                   
                   <p>Once a connection is requested using <a
                   href="ThreadedConnectionPool.html#method-i-hold">hold</a>, the connection

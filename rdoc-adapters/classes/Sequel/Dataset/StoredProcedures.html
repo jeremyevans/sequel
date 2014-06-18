@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Dataset::StoredProcedures</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/utils/stored_procedures_rb.html">lib/sequel/adapters/utils/stored_procedures.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -70,7 +66,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-call_sproc-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-call_sproc-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">prepare_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>).<span class="ruby-identifier">call</span>(*<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-call_sproc-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">prepare_sproc</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>).<span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prepare_sproc'>

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>String::Inflections</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/extensions/inflector_rb.html">lib/sequel/extensions/inflector.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../String.html">String</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -47,7 +43,7 @@
             href="../String.html#method-c-inflections">String.inflections</a>, which is
             used to override or specify additional inflection rules. Examples:</p>
             
-            <pre class="ruby"><span class="ruby-constant">String</span>.<span class="ruby-identifier">inflections</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">inflect</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">plural</span> <span class="ruby-regexp">/^(ox)$/</span>, <span class="ruby-string">&#39;\1\2en&#39;</span>&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">singular</span> <span class="ruby-regexp">/^(ox)en/</span>, <span class="ruby-string">&#39;\1&#39;</span>&#x000A;&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;octopus&#39;</span>, <span class="ruby-string">&#39;octopi&#39;</span>&#x000A;&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;equipment&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">String</span>.<span class="ruby-identifier">inflections</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">inflect</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">plural</span> <span class="ruby-regexp">/^(ox)$/i</span>, <span class="ruby-string">&#39;\1\2en&#39;</span>&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">singular</span> <span class="ruby-regexp">/^(ox)en/i</span>, <span class="ruby-string">&#39;\1&#39;</span>&#x000A;&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">irregular</span> <span class="ruby-string">&#39;octopus&#39;</span>, <span class="ruby-string">&#39;octopi&#39;</span>&#x000A;&#x000A;  <span class="ruby-identifier">inflect</span>.<span class="ruby-identifier">uncountable</span> <span class="ruby-string">&quot;equipment&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>New rules are added at the top. So in the example above, the irregular rule
             for octopus will now be the first of the pluralization and singularization
@@ -226,7 +222,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-uncountable-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-uncountable-source'><span class="ruby-comment"># File lib/sequel/extensions/inflector.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">uncountable</span>(*<span class="ruby-identifier">words</span>)&#x000A;  (<span class="ruby-ivar">@uncountables</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">words</span>).<span class="ruby-identifier">flatten!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-uncountable-source'><span class="ruby-comment"># File lib/sequel/extensions/inflector.rb, line 90</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">uncountable</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">words</span>)&#x000A;  (<span class="ruby-ivar">@uncountables</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">words</span>).<span class="ruby-identifier">flatten!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

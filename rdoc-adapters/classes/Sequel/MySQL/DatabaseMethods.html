@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::MySQL::DatabaseMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/shared/mysql_rb.html">lib/sequel/adapters/shared/mysql.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../MySQL.html">MySQL</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -278,7 +274,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-server_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 120</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">get</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:version</span>)))&#x000A;    (<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">to_i</span> * <span class="ruby-value">10000</span>) <span class="ruby-operator">+</span> (<span class="ruby-identifier">m</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">to_i</span> * <span class="ruby-value">100</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">3</span>].<span class="ruby-identifier">to_i</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql.rb, line 120</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">get</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:version</span>)))&#x000A;    (<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">10000</span>) <span class="ruby-operator">+</span> (<span class="ruby-identifier">m</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">3</span>].<span class="ruby-identifier">to_i</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_create_table_if_not_exists-3F'>

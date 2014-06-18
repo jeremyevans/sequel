@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::MySQL::Database</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../MySQL.html">MySQL</a></strong>
+          Superclass:
+          <strong>Sequel::Database</strong>
         </div>
       </div>
       <div id='content'>
@@ -44,8 +44,7 @@
           <div id='description'>
             
             <p><a href="Database.html">Database</a> class for <a
-            href="../MySQL.html">MySQL</a> databases used with <a
-            href="../../Sequel.html">Sequel</a>.</p>
+            href="../MySQL.html">MySQL</a> databases used with Sequel.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -88,6 +87,13 @@
                       update statement.</p>
                     </td>
                   </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatasetClass</td>
+                    <td>=</td>
+                    <td class='context-item-value'>self</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
                 </table>
               </div>
             </div>
@@ -112,10 +118,10 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      <p>By default, <a href="../../Sequel.html">Sequel</a> raises an exception if
-                      in invalid date or time is used. However, if this is set to nil or :nil,
-                      the adapter treats dates like 0000-00-00 and times like 838:00:00 as nil
-                      values.  If set to :string, it returns the strings as is.</p>
+                      <p>By default, Sequel raises an exception if in invalid date or time is used.
+                      However, if this is set to nil or :nil, the adapter treats dates like
+                      0000-00-00 and times like 838:00:00 as nil values.  If set to :string, it
+                      returns the strings as is.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -195,7 +201,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-convert_invalid_date_time-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-convert_invalid_date_time-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_invalid_date_time=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">m0</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:string_to_time</span>)&#x000A;  <span class="ruby-ivar">@conversion_procs</span>[<span class="ruby-value">11</span>] = (<span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>) <span class="ruby-operator">?</span>  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">convert_date_time</span>(<span class="ruby-identifier">v</span>, &amp;<span class="ruby-identifier">m0</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">m0</span>&#x000A;  <span class="ruby-identifier">m1</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:string_to_date</span>) &#x000A;  <span class="ruby-identifier">m</span> = (<span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">convert_date_time</span>(<span class="ruby-identifier">v</span>, &amp;<span class="ruby-identifier">m1</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">m1</span>&#x000A;  [<span class="ruby-value">10</span>, <span class="ruby-value">14</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@conversion_procs</span>[<span class="ruby-identifier">i</span>] = <span class="ruby-identifier">m</span>}&#x000A;  <span class="ruby-identifier">m2</span> = <span class="ruby-identifier">method</span>(<span class="ruby-value">:to_application_timestamp</span>)&#x000A;  <span class="ruby-identifier">m</span> = (<span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">convert_date_time</span>(<span class="ruby-identifier">v</span>, &amp;<span class="ruby-identifier">m2</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">m2</span>&#x000A;  [<span class="ruby-value">7</span>, <span class="ruby-value">12</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@conversion_procs</span>[<span class="ruby-identifier">i</span>] = <span class="ruby-identifier">m</span>}&#x000A;  <span class="ruby-ivar">@convert_invalid_date_time</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-convert_invalid_date_time-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_invalid_date_time=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">m0</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:string_to_time</span>)&#x000A;  <span class="ruby-ivar">@conversion_procs</span>[<span class="ruby-value">11</span>] = (<span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>) <span class="ruby-operator">?</span>  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">convert_date_time</span>(<span class="ruby-identifier">v</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">m0</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">m0</span>&#x000A;  <span class="ruby-identifier">m1</span> = <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">method</span>(<span class="ruby-value">:string_to_date</span>) &#x000A;  <span class="ruby-identifier">m</span> = (<span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">convert_date_time</span>(<span class="ruby-identifier">v</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">m1</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">m1</span>&#x000A;  [<span class="ruby-value">10</span>, <span class="ruby-value">14</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@conversion_procs</span>[<span class="ruby-identifier">i</span>] = <span class="ruby-identifier">m</span>}&#x000A;  <span class="ruby-identifier">m2</span> = <span class="ruby-identifier">method</span>(<span class="ruby-value">:to_application_timestamp</span>)&#x000A;  <span class="ruby-identifier">m</span> = (<span class="ruby-identifier">v</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">convert_date_time</span>(<span class="ruby-identifier">v</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">m2</span>)} <span class="ruby-operator">:</span> <span class="ruby-identifier">m2</span>&#x000A;  [<span class="ruby-value">7</span>, <span class="ruby-value">12</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@conversion_procs</span>[<span class="ruby-identifier">i</span>] = <span class="ruby-identifier">m</span>}&#x000A;  <span class="ruby-ivar">@convert_invalid_date_time</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-convert_tinyint_to_bool-3D'>

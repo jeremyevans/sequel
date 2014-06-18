@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.48.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Deprecation+Warnings">Deprecation Warnings</h1>
+            <h1 id="label-Deprecation+Warnings">Deprecation Warnings<span><a href="#label-Deprecation+Warnings">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p>The main change in <a href="../../../classes/Sequel.html">Sequel</a> 3.48.0
             is the deprecation of <a href="../../../classes/Sequel.html">Sequel</a>
@@ -47,7 +47,7 @@
             these changes, please review the commits logs at <a
             href="https://github.com/jeremyevans/sequel-4-plans/commits/master">github.com/jeremyevans/sequel-4-plans/commits/master</a></p>
             
-            <h2 id="label-Deprecation+Logging">Deprecation Logging</h2>
+            <h2 id="label-Deprecation+Logging">Deprecation Logging<span><a href="#label-Deprecation+Logging">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>If you use a deprecated method or feature, <a
             href="../../../classes/Sequel.html">Sequel</a> will by default print a
@@ -58,21 +58,17 @@
             
             <pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Turn off all deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span>&#x000A;&#x000A;<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> = <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-comment"># Select which backtrace lines to output</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtrace_filter</span> =    <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">line</span>, <span class="ruby-identifier">line_no</span><span class="ruby-operator">|</span> <span class="ruby-identifier">line_no</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">3</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">line</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/my_app/</span>}</pre>
             
-            <h2 id="label-Major+Change">Major Change</h2>
+            <h2 id="label-Major+Change">Major Change<span><a href="#label-Major+Change">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>
             <p>The core extensions will no longer be loaded by default. You will have to
-            use `<a
-            href="../../../classes/Sequel.html#method-c-extension">Sequel.extension</a>
-            :<a href="../core_extensions_rdoc.html">core_extensions</a>` to load the
-            core extensions.</p>
+            use `Sequel.extension :core_extensions` to load the core extensions.</p>
             </li><li>
             <p>The Symbol#[] and Symbol#{&lt;,&gt;,&lt;=,&gt;=} methods will no longer be
-            provided by the core extensions on ruby 1.8. You will have to use `<a
-            href="../../../classes/Sequel.html#method-c-extension">Sequel.extension</a>
-            :ruby18_symbol_extensions` to use them.</p>
+            provided by the core extensions on ruby 1.8. You will have to use
+            `Sequel.extension :ruby18_symbol_extensions` to use them.</p>
             </li></ul>
             
-            <h2 id="label-Core+Behavior+Changes">Core Behavior Changes</h2>
+            <h2 id="label-Core+Behavior+Changes">Core Behavior Changes<span><a href="#label-Core+Behavior+Changes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>
             <p>Dataset#filter becomes an alias for where, and exclude becomes an alias for
             exclude_where. You will have to use `DB.extension :filter_having` to get
@@ -154,7 +150,7 @@
             <p>Database#reset_schema_utility_dataset will be removed.</p>
             </li></ul>
             
-            <h2 id="label-Adapter+Behavior+Changes">Adapter Behavior Changes</h2>
+            <h2 id="label-Adapter+Behavior+Changes">Adapter Behavior Changes<span><a href="#label-Adapter+Behavior+Changes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>
             <p>The Database#do method will be removed from the ado, db2, dbi, informix,
             odbc, openbase, and oracle adapters.</p>
@@ -173,7 +169,7 @@
             implicit casting via :$x__type.</p>
             </li></ul>
             
-            <h2 id="label-Extension+Behavior+Changes">Extension Behavior Changes</h2>
+            <h2 id="label-Extension+Behavior+Changes">Extension Behavior Changes<span><a href="#label-Extension+Behavior+Changes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>
             <p>The following extensions will no longer make global changes to the Database
             and Dataset classes: null_dataset, pagination, pretty_table, query,
@@ -189,13 +185,13 @@
             pg_range_ops extension.</p>
             </li></ul>
             
-            <h2 id="label-Model+Behavior+Changes">Model Behavior Changes</h2>
+            <h2 id="label-Model+Behavior+Changes">Model Behavior Changes<span><a href="#label-Model+Behavior+Changes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>
             <p>Model#initialize will accept only one argument.</p>
             </li><li>
             <p>The after_initialize hook will be moved to a plugin.</p>
             </li><li>
-            <p>Move blacklist-based security methods (set_except, update_except,
+            <p>Move blacklist-based security methods (#set_except, update_except,
             .set_restricted_columns) to a plugin.</p>
             </li><li>
             <p>The :eager_loader and :eager_grapher association option procs will always
@@ -244,7 +240,7 @@
             <p>The :one_to_one option check for one_to_many associations will be removed.</p>
             </li></ul>
             
-            <h2 id="label-Plugin+Behavior+Changes">Plugin Behavior Changes</h2>
+            <h2 id="label-Plugin+Behavior+Changes">Plugin Behavior Changes<span><a href="#label-Plugin+Behavior+Changes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>
             <p>Public dataset methods will no longer have class methods automatically
             added.</p>
@@ -276,7 +272,7 @@
             <p>The identity_map plugin will be removed.</p>
             </li></ul>
             
-            <h2 id="label-Internal+Changes">Internal Changes</h2>
+            <h2 id="label-Internal+Changes">Internal Changes<span><a href="#label-Internal+Changes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>
             <p>The sequel_core.rb and sequel_model.rb files will be removed.</p>
             </li><li>
@@ -284,7 +280,7 @@
             identifier_input_method} will assume Database implements the methods.</p>
             </li></ul>
             
-            <h1 id="label-Forwards+Compatibility">Forwards Compatibility</h1>
+            <h1 id="label-Forwards+Compatibility">Forwards Compatibility<span><a href="#label-Forwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p>Not all changes planned in <a
             href="../../../classes/Sequel.html">Sequel</a> 4 have deprecation warnings.
@@ -352,7 +348,7 @@
             default database for the adapter or integration specs.</p>
             </li></ul>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>You can now choose which Errors class to use on a per model basis by
             overriding Model#errors_class.</p>
@@ -421,7 +417,7 @@
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;adapters/utils/emulate_offset_with_reverse_and_count&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">EmulateOffsetWithReverseAndCount</span></pre>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset#clone is now faster.</p>
             </li><li>
@@ -458,7 +454,7 @@
             <p>The bin/sequel command line tool now has specs.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now uses aliases for many
             internal Dataset#get calls, such as those used by table_exists? and max.</p>
@@ -491,11 +487,10 @@
             </li><li>
             <p>Dataset#count now uses a lowercase count function in the SQL.</p>
             </li><li>
-            <p>Passing a non-<a href="../../../classes/String.html">String</a> or <a
-            href="../../../classes/Hash.html">Hash</a> as the first argument to an
-            adapter method (e.g. Sequel.postgres(1)) now raises an error.  Before, this
-            used to work on some adapters that implicitly converted the database name
-            to a string.</p>
+            <p>Passing a non-String or <a href="../../../classes/Hash.html">Hash</a> as
+            the first argument to an adapter method (e.g. Sequel.postgres(1)) now
+            raises an error.  Before, this used to work on some adapters that
+            implicitly converted the database name to a string.</p>
             </li><li>
             <p>The stats and dcov rake tasks were removed.</p>
             </li></ul>

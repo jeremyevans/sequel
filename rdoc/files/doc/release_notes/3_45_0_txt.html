@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.45.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Database#transaction now recognizes a :retry_on option, which should
             contain an exception class or array of exception classes. If the
@@ -52,8 +52,7 @@
             change the number of retries with the :num_retries option.</p>
             
             <p>Users of the :disconnect=&gt;:retry option are encouraged to switch to
-            :retry_on=&gt;<a
-            href="../../../classes/Sequel/DatabaseDisconnectError.html">Sequel::DatabaseDisconnectError</a>.</p>
+            :retry_on=&gt;Sequel::DatabaseDisconnectError.</p>
             </li><li>
             <p>Dataset#escape_like has been added for escaping LIKE metacharacters.  This
             is designed for the case where part of the LIKE pattern is based on user
@@ -88,7 +87,7 @@
             and an array of timezone periods, and returns the timezone period to use.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now handles JSON
             securely, specifying the :create_additions=&gt;false option when using
@@ -129,11 +128,11 @@
             to determine if a more specific DatabaseError subclass should be used. 
             This should make error handling faster and more robust.</p>
             </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses ESCAPE &#39;'
-            when using LIKE, for similar behavior across databases.  Previously, no
-            ESCAPE clause was used, so behavior differed across databases, with most
-            not using escaping, and PostgreSQL, MySQL, and H2 defaulting to backslash
-            as the escape character.</p>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> now uses ESCAPE
+            &#39;&#39; when using LIKE, for similar behavior across databases. 
+            Previously, no ESCAPE clause was used, so behavior differed across
+            databases, with most not using escaping, and PostgreSQL, MySQL, and H2
+            defaulting to backslash as the escape character.</p>
             </li><li>
             <p>The query extension has been reimplemented and now uses a proxy object
             instead of Object#extend.</p>
@@ -170,7 +169,7 @@
             <p>Coverage testing now uses simplecov instead of rcov on ruby 1.9+.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The switch to using JSON.parse :create_additions=&gt;false means that if
             your app expected JSON to deserialize into arbitrary ruby objects, it is

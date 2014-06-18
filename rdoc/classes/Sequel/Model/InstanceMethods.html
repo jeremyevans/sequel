@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Model::InstanceMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/model/base_rb.html">lib/sequel/model/base.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Model.html">Model</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -398,7 +394,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-each-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1269</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@values</span>.<span class="ruby-identifier">each</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1269</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@values</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-eql-3F'>
@@ -945,7 +941,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_only-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_only-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1623</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_only</span>(<span class="ruby-identifier">hash</span>, *<span class="ruby-identifier">only</span>)&#x000A;  <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_only-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1623</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_only</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">only</span>)&#x000A;  <span class="ruby-identifier">set_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_server'>
@@ -1079,7 +1075,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-update_only-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-update_only-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1685</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_only</span>(<span class="ruby-identifier">hash</span>, *<span class="ruby-identifier">only</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-update_only-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 1685</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_only</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">only</span>)&#x000A;  <span class="ruby-identifier">update_restricted</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">only</span>.<span class="ruby-identifier">flatten</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-valid-3F'>
@@ -1111,8 +1107,8 @@
                   
                   <p>Validates the object.  If the object is invalid, errors should be added to
                   the errors attribute.  By default, does nothing, as all models are valid by
-                  default.  See the <a href="../../../files/doc/validations_rdoc.html">"Model
-                  Validations" guide</a> for details about validation.  Should not be called
+                  default.  See the <a href="../../../files/doc/validations_rdoc.html">“Model
+                  Validations” guide</a>. for details about validation.  Should not be called
                   directly by user code, call <code>valid?</code> instead to check if an
                   object is valid.</p>
                 </div>

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::ConnectionPool</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+          Superclass:
+          <strong>Object</strong>
         </div>
       </div>
       <div id='content'>
@@ -46,17 +46,17 @@
             <p>The base connection pool class, which all other connection pools are based
             on.  This class is not instantiated directly, but subclasses should at the
             very least implement the following API:</p>
-            <dl class="rdoc-list note-list"><dt>initialize(<a href="Database.html">Database</a>, <a href="../Hash.html">Hash</a>) 
+            <dl class="rdoc-list note-list"><dt>initialize(Database, <a href="../Hash.html">Hash</a>) 
             <dd>
             <p>Initialize using the passed <a href="Database.html">Sequel::Database</a>
             object and options hash.</p>
-            </dd><dt>hold(<a href="../Symbol.html">Symbol</a>, &amp;block) 
+            </dd><dt>hold(Symbol, &amp;block) 
             <dd>
             <p>Yield a connection object (obtained from calling the block passed to
             <code>initialize</code>) to the current block. For sharded connection
             pools, the <a href="../Symbol.html">Symbol</a> passed is the shard/server
             to use.</p>
-            </dd><dt>disconnect(<a href="../Symbol.html">Symbol</a>) 
+            </dd><dt>disconnect(Symbol) 
             <dd>
             <p>Disconnect the connection object.  For sharded connection pools, the <a
             href="../Symbol.html">Symbol</a> passed is the shard/server to use.</p>
@@ -71,10 +71,10 @@
             </dd></dl>
             
             <p>For sharded connection pools, the sharded API adds the following methods:</p>
-            <dl class="rdoc-list note-list"><dt>add_servers(<a href="../Array.html">Array</a> of Symbols) 
+            <dl class="rdoc-list note-list"><dt>add_servers(Array of Symbols) 
             <dd>
             <p>start recognizing all shards/servers specified by the array of symbols.</p>
-            </dd><dt>remove_servers(<a href="../Array.html">Array</a> of Symbols) 
+            </dd><dt>remove_servers(Array of Symbols) 
             <dd>
             <p>no longer recognize all shards/servers specified by the array of symbols.</p>
             </dd></dl>
@@ -187,7 +187,7 @@
                   with a single symbol (specifying the server/shard to use) every time a new
                   connection is needed.  The following options are respected for all
                   connection pools:</p>
-                  <dl class="rdoc-list note-list"><dt>:<a href="ConnectionPool.html#attribute-i-after_connect">#after_connect</a> 
+                  <dl class="rdoc-list note-list"><dt>:after_connect 
                   <dd>
                   <p>A callable object called after each new connection is made, with the
                   connection object (and server argument if the callable accepts 2
@@ -218,7 +218,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-created_count-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-created_count-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">created_count</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">size</span>(*<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-created_count-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">created_count</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">size</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-servers'>

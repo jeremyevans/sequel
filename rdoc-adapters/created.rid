@@ -1,4 +1,4 @@
-Tue, 03 Jun 2014 13:04:15 -0700
+Tue, 17 Jun 2014 20:47:47 -0700
 lib/sequel/adapters/ado.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/ado/access.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/adapters/ado/mssql.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -39,7 +39,7 @@ lib/sequel/adapters/odbc.rb	Tue, 18 Feb 2014 10:01:42 -0800
 lib/sequel/adapters/odbc/mssql.rb	Tue, 18 Feb 2014 10:01:42 -0800
 lib/sequel/adapters/openbase.rb	Tue, 22 Apr 2014 10:09:17 -0700
 lib/sequel/adapters/oracle.rb	Mon, 23 Dec 2013 12:09:17 -0800
-lib/sequel/adapters/postgres.rb	Wed, 16 Apr 2014 12:44:50 -0700
+lib/sequel/adapters/postgres.rb	Tue, 17 Jun 2014 20:46:14 -0700
 lib/sequel/adapters/shared/access.rb	Fri, 23 May 2014 13:28:32 -0700
 lib/sequel/adapters/shared/cubrid.rb	Fri, 16 May 2014 16:27:33 -0700
 lib/sequel/adapters/shared/db2.rb	Fri, 16 May 2014 16:27:33 -0700

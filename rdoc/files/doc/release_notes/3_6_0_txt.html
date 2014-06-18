@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.6.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#filter and related methods now accept a string with named
             placeholders, and a hash with placeholder values:</p>
@@ -199,7 +199,7 @@
             <p>natural_right_join</p>
             </li></ul>
             
-            <p>Previously, you had to use join_table(:cross, ...) to use a CROSS JOIN.</p>
+            <p>Previously, you had to use join_table(:cross, …) to use a CROSS JOIN.</p>
             </li><li>
             <p>You can now create clustered indexes on Microsoft SQL Server using the
             :clustered option.</p>
@@ -211,7 +211,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Constant lookup in virtual row blocks now works correctly in ruby 1.9. 
             Virtual row blocks are based on BasicObject on ruby 1.9, which doesn&#39;t
@@ -309,7 +309,7 @@
             identity_map plugin should be loaded first.</p>
             </li><li>
             <p>Using nil as a bound variable now works on PostgreSQL.  Before, <a
-            href="../../../classes/Sequel.html">Sequel</a> would incorrectly use ""
+            href="../../../classes/Sequel.html">Sequel</a> would incorrectly use “”
             instead of NULL, since it transformed all objects to strings before binding
             them.  <a href="../../../classes/Sequel.html">Sequel</a> now binds the
             objects directly.</p>
@@ -368,7 +368,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Model::Errors no longer uses a default proc, but emulates one in the</p>
             <dl class="rdoc-list label-list"><dt>

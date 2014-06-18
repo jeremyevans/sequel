@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.2.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>The Most Powerful and Flexible Associations of Any Ruby ORM</p>
-            <hr style="height: 10px">
+            <hr>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> can now support any
             association type supported by ActiveRecord, and many association types
@@ -148,7 +148,7 @@
             <pre>      parent.associations[:children] &lt;&lt; node&#x000A;    end&#x000A;  end)&#x000A;end&#x000A;nodes = Node.filter(:id &lt; 10).eager(:ancestors, :descendants).all</pre>
             
             <p>New Adapter Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>PostgreSQL bytea fields are now fully supported.</p>
             </li><li>
@@ -163,7 +163,7 @@
             </li></ul>
             
             <p>Other New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#graph now takes a block which it passes to join_table.</p>
             </li><li>
@@ -190,7 +190,7 @@
             </li></ul>
             
             <p>Notable Bug Fixes</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Caching now works with Model subclasses.</p>
             </li><li>
@@ -220,14 +220,14 @@
             </li></ul>
             
             <p>Backwards Incompatible Changes</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>ParseTree support, deprecated in 2.1.0, has been removed in 2.2.0. You
             should use the expression filter syntax instead, perferably without the
             block (though it can be used inside a block as well). This usually involves
             the following types of changes:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">==</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">y</span>)&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;&lt;</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">y</span>)&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">&amp;&amp;</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> &amp; :<span class="ruby-identifier">y</span>) <span class="ruby-comment"># Don&#39;t forget about change</span>&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">||</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">y</span>) <span class="ruby-comment">#  in operator precedence</span>&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like?</span>(<span class="ruby-string">&#39;%blah%&#39;</span>)} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%blah%&#39;</span>))&#x000A;<span class="ruby-identifier">filter</span> <span class="ruby-identifier">do</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>((:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) &amp; (:<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>))&#x000A;  :<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;  :<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">==</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">y</span>)&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;&lt;</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">y</span>)&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">&amp;&amp;</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">y</span>) <span class="ruby-comment"># Don&#39;t forget about change</span>&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span> <span class="ruby-operator">||</span> :<span class="ruby-identifier">y</span>} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">y</span>) <span class="ruby-comment">#  in operator precedence</span>&#x000A;<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like?</span>(<span class="ruby-string">&#39;%blah%&#39;</span>)} =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%blah%&#39;</span>))&#x000A;<span class="ruby-identifier">filter</span> <span class="ruby-identifier">do</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">filter</span>((:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (:<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>))&#x000A;  :<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;  :<span class="ruby-identifier">y</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             </li><li>
             <p>Attempts to save an invalid Model instance will raise an error by default. 
             To revert to returning a nil value, use:</p>

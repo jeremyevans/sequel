@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.24.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Prepared+Statement+Plugins">Prepared Statement Plugins</h1>
+            <h1 id="label-Prepared+Statement+Plugins">Prepared Statement Plugins<span><a href="#label-Prepared+Statement+Plugins">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The <a href="../prepared_statements_rdoc.html">prepared_statements</a>
             plugin makes <a href="../../../classes/Sequel/Model.html">Sequel::Model</a>
@@ -119,7 +119,7 @@
             <pre class="ruby"><span class="ruby-comment"># PS = {}</span>&#x000A;<span class="ruby-constant">PS</span>[:<span class="ruby-identifier">name</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, :<span class="ruby-identifier">$b</span>], :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$id</span>).&#x000A;       <span class="ruby-identifier">prepare</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-constant">PS</span>[:<span class="ruby-identifier">name</span>].<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">params</span>[:<span class="ruby-identifier">b</span>].<span class="ruby-identifier">to_i</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)</pre>
             </li></ul>
             
-            <h1 id="label-Other+New+Features">Other New Features</h1>
+            <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Filtering by associations got a lot more powerful.  <a
             href="../../../classes/Sequel.html">Sequel</a> 3.23.0 introduced filtering
@@ -256,7 +256,7 @@
             Dataset#unbind.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Database#create_table? now uses a single query with IF NOT EXISTS if the
             database supports such syntax.  Previously, it issued a SELECT query to
@@ -378,7 +378,7 @@
             race conditions due to using Queues instead of sleeping.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>Model#save no longer calls Model#valid?.  It now calls the Model#_valid?
             private method that Model#valid? also calls.  To mark a model instance

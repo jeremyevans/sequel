@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>reflection.rdoc</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,18 +38,18 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Reflection">Reflection</h1>
+            <h1 id="label-Reflection">Reflection<span><a href="#label-Reflection">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports reflection
             information in multiple ways.</p>
             
-            <h2 id="label-Adapter+in+Use">Adapter in Use</h2>
+            <h2 id="label-Adapter+in+Use">Adapter in Use<span><a href="#label-Adapter+in+Use">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>You can get the adapter in use using Database#adapter_scheme:</p>
             
             <pre>DB.adapter_scheme # e.g. :postgres, :jdbc, :odbc</pre>
             
-            <h2 id="label-Database+Connected+To">Database Connected To</h2>
+            <h2 id="label-Database+Connected+To">Database Connected To<span><a href="#label-Database+Connected+To">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>In some cases, the adapter scheme will be the same as the database to which
             you are connecting.  However, many adapters support multiple databases. 
@@ -58,19 +58,19 @@
             
             <pre>DB.database_type # :postgres, :h2, :mssql</pre>
             
-            <h2 id="label-Tables+in+the+Database">Tables in the Database</h2>
+            <h2 id="label-Tables+in+the+Database">Tables in the Database<span><a href="#label-Tables+in+the+Database">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database#tables gives an array of table name symbols:</p>
             
             <pre>DB.tables # [:table1, :table2, :table3, ...]</pre>
             
-            <h2 id="label-Views+in+the+Database">Views in the Database</h2>
+            <h2 id="label-Views+in+the+Database">Views in the Database<span><a href="#label-Views+in+the+Database">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database#views and gives an array of view name symbols:</p>
             
             <pre>DB.views # [:view1, :view2, :view3, ...]</pre>
             
-            <h2 id="label-Indexes+on+a+table">Indexes on a table</h2>
+            <h2 id="label-Indexes+on+a+table">Indexes on a table<span><a href="#label-Indexes+on+a+table">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database#indexes takes a table name gives a hash of index information. 
             Keys are index names, values are subhashes with the keys :columns and
@@ -81,7 +81,7 @@
             <p>Index information generally does not include partial indexes, functional
             indexes, or indexes on the primary key of the table.</p>
             
-            <h2 id="label-Foreign+Key+Information+for+a+Table">Foreign Key Information for a Table</h2>
+            <h2 id="label-Foreign+Key+Information+for+a+Table">Foreign Key Information for a Table<span><a href="#label-Foreign+Key+Information+for+a+Table">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database#foreign_key_list takes a table name and gives an array of hashes
             of foreign key information:</p>
@@ -116,7 +116,7 @@
             <p>The action to take ON UPDATE</p>
             </dd></dl>
             
-            <h2 id="label-Column+Information+for+a+Table">Column Information for a Table</h2>
+            <h2 id="label-Column+Information+for+a+Table">Column Information for a Table<span><a href="#label-Column+Information+for+a+Table">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database#schema takes a table symbol and returns column information in an
             array with each element being an array with two elements.  The first
@@ -155,14 +155,14 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># [[:column1, {:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}], ...]</span></pre>
             
-            <h2 id="label-Column+Information+for+a+Model">Column Information for a Model</h2>
+            <h2 id="label-Column+Information+for+a+Model">Column Information for a Model<span><a href="#label-Column+Information+for+a+Model">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Model#db_schema returns pretty much the same information, except it returns
             it as a hash with column keys instead of an array of two element arrays.</p>
             
             <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db_schema</span> <span class="ruby-comment"># {:column1=&gt;{:allow_null=&gt;true, :db_type=&gt;&#39;varchar(255)&#39;, :default=&gt;&#39;blah&#39;, :primary_key=&gt;false, :type=&gt;:string}, ...}</span></pre>
             
-            <h2 id="label-Columns+used+by+a+dataset%2Fmodel">Columns used by a dataset/model</h2>
+            <h2 id="label-Columns+used+by+a+dataset%2Fmodel">Columns used by a dataset/model<span><a href="#label-Columns+used+by+a+dataset%2Fmodel">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Dataset#columns returns the columns of the current dataset as an array of
             symbols:</p>
@@ -180,7 +180,7 @@
             
             <pre>Model.columns # [:column1, :column2, :column3, ...]</pre>
             
-            <h2 id="label-Associations+Defined">Associations Defined</h2>
+            <h2 id="label-Associations+Defined">Associations Defined<span><a href="#label-Associations+Defined">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel/Model.html">Sequel::Model</a> offers complete
             introspection capability for all associations.</p>
@@ -205,7 +205,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">association_reflections</span> <span class="ruby-comment"># {:association1=&gt;{:name=&gt;:association1, :type=&gt;:many_to_one, :model=&gt;Model, ...}, ...}</span></pre>
             
-            <h2 id="label-Validations+Defined">Validations Defined</h2>
+            <h2 id="label-Validations+Defined">Validations Defined<span><a href="#label-Validations+Defined">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>When using the validation_class_methods plugin, you can use the
             validation_reflections class method to get a hash with validation

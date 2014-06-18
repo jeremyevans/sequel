@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>postgresql.rdoc</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-PostgreSQL-specific+Support+in+Sequel">PostgreSQL-specific Support in <a href="../../classes/Sequel.html">Sequel</a></h1>
+            <h1 id="label-PostgreSQL-specific+Support+in+Sequel">PostgreSQL-specific Support in <a href="../../classes/Sequel.html">Sequel</a><span><a href="#label-PostgreSQL-specific+Support+in+Sequel">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p>Sequel&#39;s core database and dataset functions are designed to support
             the features shared by most common SQL database implementations.  However,
@@ -63,7 +63,7 @@
             href="../../classes/Sequel.html">Sequel</a> supports which are not
             mentioned here.</p>
             
-            <h2 id="label-Adapter%2FDriver+Specific+Support">Adapter/Driver Specific Support</h2>
+            <h2 id="label-Adapter%2FDriver+Specific+Support">Adapter/Driver Specific Support<span><a href="#label-Adapter%2FDriver+Specific+Support">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Some of this this support depends on the specific adapter or underlying
             driver in use.</p>
@@ -74,7 +74,7 @@
             specific to the postgres adapter when pg is used as the underlying driver
             (i.e. not available when using the postgres-pr or postgres drivers).</p>
             
-            <h2 id="label-PostgreSQL-specific+Database+Type+Support">PostgreSQL-specific Database Type Support</h2>
+            <h2 id="label-PostgreSQL-specific+Database+Type+Support">PostgreSQL-specific Database Type Support<span><a href="#label-PostgreSQL-specific+Database+Type+Support">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Sequel&#39;s default support on PostgreSQL only includes common database
             types.  However, <a href="../../classes/Sequel.html">Sequel</a> ships with
@@ -134,9 +134,9 @@
             <p>row-valued/composite type syntax support</p>
             </dd></dl>
             
-            <h2 id="label-PostgreSQL-specific+DDL+Support">PostgreSQL-specific DDL Support</h2>
+            <h2 id="label-PostgreSQL-specific+DDL+Support">PostgreSQL-specific DDL Support<span><a href="#label-PostgreSQL-specific+DDL+Support">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <h3 id="label-Exclusion+Constraints">Exclusion Constraints</h3>
+            <h3 id="label-Exclusion+Constraints">Exclusion Constraints<span><a href="#label-Exclusion+Constraints">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>In <code>create_table</code> blocks, you can use the <code>exclude</code>
             method to set up exclusion constraints:</p>
@@ -148,7 +148,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_exclusion_constraint</span>([[:<span class="ruby-identifier">during</span>, <span class="ruby-string">&#39;&amp;&amp;&#39;</span>]], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">table_during_excl</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; ADD CONSTRAINT &quot;table_during_excl&quot; EXCLUDE USING gist (&quot;during&quot; WITH &amp;&amp;)</span></pre>
             
-            <h3 id="label-Adding+Foreign+Key+and+Check+Constraints+Without+Initial+Validation">Adding Foreign Key and Check Constraints Without Initial Validation</h3>
+            <h3 id="label-Adding+Foreign+Key+and+Check+Constraints+Without+Initial+Validation">Adding Foreign Key and Check Constraints Without Initial Validation<span><a href="#label-Adding+Foreign+Key+and+Check+Constraints+Without+Initial+Validation">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>You can add a <code>:not_valid=&gt;true</code> option when adding
             constraints to existing tables so that it doesn&#39;t check if all current
@@ -162,7 +162,7 @@
             
             <pre>DB.alter_table(:table) do&#x000A;  validate_constraint(:table_fk)&#x000A;  validate_constraint(:col_123)&#x000A;end&#x000A;# ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;table_fk&quot;&#x000A;# ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;col_123&quot;</pre>
             
-            <h3 id="label-Creating+Indexes+Concurrently">Creating Indexes Concurrently</h3>
+            <h3 id="label-Creating+Indexes+Concurrently">Creating Indexes Concurrently<span><a href="#label-Creating+Indexes+Concurrently">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>You can create indexes concurrently using the
             <code>:concurrently=&gt;true</code> option:</p>
@@ -173,16 +173,16 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_index</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">t_id</span>, :<span class="ruby-identifier">concurrently=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># DROP INDEX CONCURRENTLY &quot;table_t_id_index&quot;</span></pre>
             
-            <h3 id="label-Specific+Conversions+When+Altering+Column+Types">Specific Conversions When Altering Column Types</h3>
+            <h3 id="label-Specific+Conversions+When+Altering+Column+Types">Specific Conversions When Altering Column Types<span><a href="#label-Specific+Conversions+When+Altering+Column+Types">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>When altering a column type, PostgreSQL allows the user to specify how to
             do the conversion via a USING clause, and <a
             href="../../classes/Sequel.html">Sequel</a> supports this using the
             <code>:using</code> option:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># Assume unix_time column is stored as an integer, and you want to change it to timestamp</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">unix_time</span>, <span class="ruby-constant">Time</span>, :<span class="ruby-identifier">using=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;epoch&#39;</span>, <span class="ruby-constant">Time</span>) <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1 second&#39;</span>, :<span class="ruby-identifier">interval</span>) * :<span class="ruby-identifier">unix_time</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; ALTER COLUMN &quot;unix_time&quot; TYPE timestamp</span>&#x000A;<span class="ruby-comment">#   USING (CAST(&#39;epoch&#39; AS timestamp) + (CAST(&#39;1 second&#39; AS interval) * &quot;unix_time&quot;))</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># Assume unix_time column is stored as an integer, and you want to change it to timestamp</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">unix_time</span>, <span class="ruby-constant">Time</span>, :<span class="ruby-identifier">using=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;epoch&#39;</span>, <span class="ruby-constant">Time</span>) <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1 second&#39;</span>, :<span class="ruby-identifier">interval</span>) <span class="ruby-operator">*</span> :<span class="ruby-identifier">unix_time</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; ALTER COLUMN &quot;unix_time&quot; TYPE timestamp</span>&#x000A;<span class="ruby-comment">#   USING (CAST(&#39;epoch&#39; AS timestamp) + (CAST(&#39;1 second&#39; AS interval) * &quot;unix_time&quot;))</span></pre>
             
-            <h3 id="label-Creating+Unlogged+Tables">Creating Unlogged Tables</h3>
+            <h3 id="label-Creating+Unlogged+Tables">Creating Unlogged Tables<span><a href="#label-Creating+Unlogged+Tables">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>PostgreSQL allows users to create unlogged tables, which are faster but not
             crash safe.  <a href="../../classes/Sequel.html">Sequel</a> allows you do
@@ -191,7 +191,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">unlogged=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">i</span>}&#x000A;<span class="ruby-comment"># CREATE UNLOGGED TABLE &quot;table&quot; (&quot;i&quot; integer)</span></pre>
             
-            <h3 id="label-Creating%2FDropping+Schemas%2C+Languages%2C+Functions%2C+and+Triggers">Creating/Dropping Schemas, Languages, Functions, and Triggers</h3>
+            <h3 id="label-Creating%2FDropping+Schemas%2C+Languages%2C+Functions%2C+and+Triggers">Creating/Dropping Schemas, Languages, Functions, and Triggers<span><a href="#label-Creating%2FDropping+Schemas%2C+Languages%2C+Functions%2C+and+Triggers">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> has built in support for
             creating and dropping PostgreSQL schemas, procedural languages, functions,
@@ -199,21 +199,21 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_schema</span>(:<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-comment"># CREATE SCHEMA &quot;s&quot;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_schema</span>(:<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-comment"># DROP SCHEMA &quot;s&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_language</span>(:<span class="ruby-identifier">plperl</span>)&#x000A;<span class="ruby-comment"># CREATE LANGUAGE plperl</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_language</span>(:<span class="ruby-identifier">plperl</span>)&#x000A;<span class="ruby-comment"># DROP LANGUAGE plperl</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_function</span>(:<span class="ruby-identifier">set_updated_at</span>, <span class="ruby-string">&quot;  BEGIN&#x000A;    NEW.updated_at := CURRENT_TIMESTAMP;&#x000A;    RETURN NEW;&#x000A;  END;&#x000A;&quot;</span>, :<span class="ruby-identifier">language=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">plpgsql</span>, :<span class="ruby-identifier">returns=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">trigger</span>)&#x000A;<span class="ruby-comment"># CREATE FUNCTION set_updated_at() RETURNS trigger LANGUAGE plpgsql AS &#39;</span>&#x000A;<span class="ruby-comment">#  BEGIN</span>&#x000A;<span class="ruby-comment">#    NEW.updated_at := CURRENT_TIMESTAMP;</span>&#x000A;<span class="ruby-comment">#    RETURN NEW;</span>&#x000A;<span class="ruby-comment">#  END;&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_function</span>(:<span class="ruby-identifier">set_updated_at</span>)&#x000A;<span class="ruby-comment"># DROP FUNCTION set_updated_at()</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_trigger</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">trg_updated_at</span>, :<span class="ruby-identifier">set_updated_at</span>, :<span class="ruby-identifier">events=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">insert</span>, :<span class="ruby-identifier">update</span>], :<span class="ruby-identifier">each_row=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># CREATE TRIGGER trg_updated_at BEFORE INSERT OR UPDATE ON &quot;table&quot; FOR EACH ROW EXECUTE PROCEDURE set_updated_at()</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_trigger</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">trg_updated_at</span>)&#x000A;<span class="ruby-comment"># DROP TRIGGER trg_updated_at ON &quot;table&quot;</span></pre>
             
-            <h2 id="label-PostgreSQL-specific+DML+Support">PostgreSQL-specific DML Support</h2>
+            <h2 id="label-PostgreSQL-specific+DML+Support">PostgreSQL-specific DML Support<span><a href="#label-PostgreSQL-specific+DML+Support">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <h3 id="label-Returning+Rows+From+Insert%2C+Update%2C+and+Delete+Statements">Returning Rows From Insert, Update, and Delete Statements</h3>
+            <h3 id="label-Returning+Rows+From+Insert%2C+Update%2C+and+Delete+Statements">Returning Rows From Insert, Update, and Delete Statements<span><a href="#label-Returning+Rows+From+Insert%2C+Update%2C+and+Delete+Statements">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports the ability to
             return rows from insert, update, and delete statements, via
             <code>Dataset#returning</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>&#x000A;<span class="ruby-comment"># INSERT INTO &quot;table&quot; DEFAULT VALUES RETURNING *</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">returning</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># DELETE FROM &quot;table&quot; RETURNING &quot;id&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">returning</span>(:<span class="ruby-identifier">id</span>, <span class="ruby-constant">Sequel</span>.*(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">id</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">idsq</span>)).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># UPDATE &quot;table&quot; SET &quot;id&quot; = 2 RETURNING &quot;id&quot;, (&quot;id&quot; * &quot;id&quot;) AS &quot;idsq&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>&#x000A;<span class="ruby-comment"># INSERT INTO &quot;table&quot; DEFAULT VALUES RETURNING *</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">returning</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># DELETE FROM &quot;table&quot; RETURNING &quot;id&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">returning</span>(:<span class="ruby-identifier">id</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">id</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">idsq</span>)).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># UPDATE &quot;table&quot; SET &quot;id&quot; = 2 RETURNING &quot;id&quot;, (&quot;id&quot; * &quot;id&quot;) AS &quot;idsq&quot;</span></pre>
             
             <p>When returning is used, instead of returning the number of rows affected
             (for updated/delete) or the serial primary key value (for insert), it will
             return an array of hashes with the returned results.</p>
             
-            <h3 id="label-Distinct+On+Specific+Columns">Distinct On Specific Columns</h3>
+            <h3 id="label-Distinct+On+Specific+Columns">Distinct On Specific Columns<span><a href="#label-Distinct+On+Specific+Columns">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> allows passing columns to
             <code>Dataset#distinct</code>, which will make the dataset return rows that
@@ -221,7 +221,7 @@
             
             <pre>DB[:table].distinct(:id).all&#x000A;# SELECT DISTINCT ON (&quot;id&quot;) * FROM &quot;table&quot;</pre>
             
-            <h3 id="label-Using+a+Cursor+to+Process+Large+Datasets+postgres+only">Using a Cursor to Process Large Datasets <code>postgres only</code></h3>
+            <h3 id="label-Using+a+Cursor+to+Process+Large+Datasets+postgres+only">Using a Cursor to Process Large Datasets <code>postgres only</code><span><a href="#label-Using+a+Cursor+to+Process+Large+Datasets+postgres+only">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>The postgres adapter offers a <code>Dataset#use_cursor</code> method to
             process large result sets without keeping all rows in memory:</p>
@@ -238,14 +238,14 @@
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">use_cursor</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where_current_of</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">col=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">new_col_value</span>(<span class="ruby-identifier">row</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h3 id="label-Truncate+Modifiers">Truncate Modifiers</h3>
+            <h3 id="label-Truncate+Modifiers">Truncate Modifiers<span><a href="#label-Truncate+Modifiers">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports PostgreSQL-specific
             truncate options:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">truncate</span>(:<span class="ruby-identifier">cascade</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>, :<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">restart=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># TRUNCATE TABLE ONLY &quot;table&quot; RESTART IDENTITY CASCADE</span></pre>
             
-            <h3 id="label-COPY+Support+postgres%2Fpg+and+jdbc%2Fpostgres+only+">COPY Support <code>postgres/pg and jdbc/postgres only</code> </h3>
+            <h3 id="label-COPY+Support+postgres%2Fpg+and+jdbc%2Fpostgres+only+">COPY Support <code>postgres/pg and jdbc/postgres only</code> <span><a href="#label-COPY+Support+postgres%2Fpg+and+jdbc%2Fpostgres+only+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>PostgreSQL&#39;s COPY feature is pretty much the fastest way to get data in
             or out of the database. <a href="../../classes/Sequel.html">Sequel</a>
@@ -260,14 +260,14 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">copy_into</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">format=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">csv</span>, :<span class="ruby-identifier">columns=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>], :<span class="ruby-identifier">data=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;1,2\n2,3\n&quot;</span>)&#x000A;<span class="ruby-comment"># COPY &quot;table&quot;(&quot;column1&quot;, &quot;column2&quot;) FROM STDIN (FORMAT csv)</span></pre>
             
-            <h3 id="label-Anonymous+Function+Execution">Anonymous Function Execution</h3>
+            <h3 id="label-Anonymous+Function+Execution">Anonymous Function Execution<span><a href="#label-Anonymous+Function+Execution">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>You can execute anonymous functions using a database procedural language
             via <code>Database#do</code> (the plpgsql language is the default):</p>
             
             <pre>DB.do &lt;&lt;-SQL&#x000A;  DECLARE r record;&#x000A;  BEGIN&#x000A;   FOR r IN SELECT table_schema, table_name FROM information_schema.tables&#x000A;     WHERE table_type = &#39;VIEW&#39; AND table_schema = &#39;public&#39;&#x000A;   LOOP&#x000A;     EXECUTE &#39;GRANT ALL ON &#39; || quote_ident(r.table_schema) || &#39;.&#39; || quote_ident(r.table_name) || &#39; TO webuser&#39;;&#x000A;   END LOOP;&#x000A;  END;&#x000A;SQL</pre>
             
-            <h3 id="label-Listening+On+and+Notifying+Channels">Listening On and Notifying Channels</h3>
+            <h3 id="label-Listening+On+and+Notifying+Channels">Listening On and Notifying Channels<span><a href="#label-Listening+On+and+Notifying+Channels">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>You can use <code>Database#notify</code> to send notification to channels:</p>
             
@@ -289,14 +289,14 @@
             <code>static_cache</code> plugin.  Look at the documentation of that plugin
             for details.</p>
             
-            <h3 id="label-Locking+Tables">Locking Tables</h3>
+            <h3 id="label-Locking+Tables">Locking Tables<span><a href="#label-Locking+Tables">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to lock
             tables, though it is generally better to let the database handle locking:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">lock</span>(<span class="ruby-string">&#39;EXCLUSIVE&#39;</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">max</span>(:<span class="ruby-identifier">id</span>)<span class="ruby-operator">+</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># BEGIN;</span>&#x000A;<span class="ruby-comment"># LOCK TABLE &quot;table&quot; IN EXCLUSIVE MODE;</span>&#x000A;<span class="ruby-comment"># SELECT max(&quot;id&quot;) FROM &quot;table&quot; LIMIT 1;</span>&#x000A;<span class="ruby-comment"># INSERT INTO &quot;table&quot; (&quot;id&quot;) VALUES (2) RETURNING NULL;</span>&#x000A;<span class="ruby-comment"># COMMIT;</span></pre>
             
-            <h2 id="label-sequel_pg+%28postgres%2Fpg+only%29">sequel_pg (<code>postgres/pg only</code>)</h2>
+            <h2 id="label-sequel_pg+%28postgres%2Fpg+only%29">sequel_pg (<code>postgres/pg only</code>)<span><a href="#label-sequel_pg+%28postgres%2Fpg+only%29">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>When the postgres adapter is used with the pg driver, <a
             href="../../classes/Sequel.html">Sequel</a> automatically checks for

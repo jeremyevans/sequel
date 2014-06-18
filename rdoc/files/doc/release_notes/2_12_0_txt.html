@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.12.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>Overview</p>
-            <hr style="height: 6px">
+            <hr>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> 2.12 is really just a
             stepping stone to <a href="../../../classes/Sequel.html">Sequel</a> 3.0,
@@ -48,7 +48,7 @@
             deprecated and will be removed or moved into extensions or plugins in 3.0.</p>
             
             <p>Deprecation Logging</p>
-            <hr style="height: 10px">
+            <hr>
             
             <p>If you use a deprecated method or feature, <a
             href="../../../classes/Sequel.html">Sequel</a> will by default print a
@@ -60,7 +60,7 @@
             <pre># Log deprecation information to a file&#x000A;Sequel::Deprecation.output = File.open(&#39;deprecated.txt&#39;, &#39;wb&#39;)&#x000A;# Use 5 lines of backtrace when logging deprecation messages&#x000A;Sequel::Deprecation.backtraces = 5&#x000A;&#x000A;# Use all backtrace lines when logging deprecation messages&#x000A;Sequel::Deprecation.backtraces = true&#x000A;&#x000A;# Don&#39;t include backtraces in the deprecation logging&#x000A;Sequel.Deprecation.backtraces = false&#x000A;&#x000A;# Turn off all deprecation logging&#x000A;Sequel::Deprecation.output = nil</pre>
             
             <p>Deprecated Features Moving to Extensions</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Migrations are being moved into sequel/extensions/migration.  There
             isn&#39;t any reason that they should be loaded in normal use since they
@@ -88,7 +88,7 @@
             </li></ul>
             
             <p>Deprecated Model Features Moving to Plugins</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Model validation class methods have been moved to a plugin.  <a
             href="../../../classes/Sequel.html">Sequel</a> users are encouraged to
@@ -145,7 +145,7 @@
             
             <p>Deprecated Features To Be Removed in <a
             href="../../../classes/Sequel.html">Sequel</a> 3.0</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#transform is deprecated without any replacement planned. It was
             announced on the <a href="../../../classes/Sequel.html">Sequel</a> mailing
@@ -227,7 +227,7 @@
             <p>Dataset.dataset_classes, model_classes, polymorphic_key, and set_model are
             deprecated.</p>
             </li><li>
-            <p>Database#&gt;&gt; is deprecated.</p>
+            <p>Database#>> is deprecated.</p>
             </li><li>
             <p>String#to_blob and SQL::Blob#to_blob are deprecated, use to_sequel_blob.</p>
             </li><li>
@@ -241,7 +241,7 @@
             </li><li>
             <p>Array#to_sql, String#to_sql, and String#split_sql are deprecated.</p>
             </li><li>
-            <p>Passing an array to Database#&lt;&lt; is deprecated.</p>
+            <p>Passing an array to Database#<< is deprecated.</p>
             </li><li>
             <p>Range#interval is deprecated.</p>
             </li><li>
@@ -282,7 +282,7 @@
             </li></ul>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Sequel.virtual_row_instance_eval= was added, which lets you give <a
             href="../../../classes/Sequel.html">Sequel</a> 2.12 the behavior that will
@@ -292,7 +292,7 @@
             instance instead of passing a new VirtualRow instance to the block. It
             allows you to change code that looks like this:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) &amp; (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}</pre>
             
             <p>to:</p>
             
@@ -354,7 +354,7 @@
             
             <pre>Sequel::MySQL.convert_invalid_date_time = nil</pre>
             
-            <p>to return dates like "0000-00-00" and times like "25:00:00" as nil values
+            <p>to return dates like “0000-00-00” and times like “25:00:00” as nil values
             instead of raising an error.  You can also set it to :string to return the
             values as strings.</p>
             </li><li>
@@ -371,7 +371,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Model column accessors have been made faster and the overhead of creating
             them has been reduced significantly.</p>
@@ -460,7 +460,7 @@
             </li></ul>
             
             <p>Backwards Compatibilty</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Saving a newly inserted record in an after_create or after_save hook is no
             longer broken.  It broke in 2.10 as a side effect of allowing the hook to

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>constraint_validations.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -86,7 +86,7 @@
             <dl class="rdoc-list note-list"><dt>All constraints except unique unless :allow_nil is true 
             <dd>
             <p>CHECK column IS NOT NULL</p>
-            </dd><dt>presence (<a href="../../../../classes/String.html">String</a> column) 
+            </dd><dt>presence (String column) 
             <dd>
             <p>CHECK trim(column) != &#39;&#39;</p>
             </dd><dt>exact_length 5 
@@ -101,7 +101,7 @@
             </dd><dt>length_range 3..5 
             <dd>
             <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt;= 5</p>
-            </dd><dt>length_range 3...5 
+            </dd><dt>length_range 3…5 
             <dd>
             <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt; 5</p>
             </dd><dt>format /foo\d+/ 
@@ -112,10 +112,10 @@
             <p>CHECK column ~* &#39;foo\d+&#39;</p>
             </dd><dt>like &#39;foo%&#39; 
             <dd>
-            <p>CHECK column LIKE &#39;foo%&#39; ESCAPE &#39;'</p>
+            <p>CHECK column LIKE &#39;foo%&#39; ESCAPE &#39;&#39;</p>
             </dd><dt>ilike &#39;foo%&#39; 
             <dd>
-            <p>CHECK column ILIKE &#39;foo%&#39; ESCAPE &#39;'</p>
+            <p>CHECK column ILIKE &#39;foo%&#39; ESCAPE &#39;&#39;</p>
             </dd><dt>includes [&#39;a&#39;, &#39;b&#39;] 
             <dd>
             <p>CHECK column IN (&#39;a&#39;, &#39;b&#39;)</p>
@@ -125,7 +125,7 @@
             </dd><dt>includes 3..5 
             <dd>
             <p>CHECK column &gt;= 3 AND column &lt;= 5</p>
-            </dd><dt>includes 3...5 
+            </dd><dt>includes 3…5 
             <dd>
             <p>CHECK column &gt;= 3 AND column &lt; 5</p>
             </dd><dt>unique 

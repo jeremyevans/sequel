@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::EvalInspect</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../files/lib/sequel/extensions/eval_inspect_rb.html">lib/sequel/extensions/eval_inspect.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -63,11 +59,9 @@
                 <div class='description'>
                   
                   <p>Special case objects where inspect does not generally produce input
-                  suitable for eval.  Used by <a
-                  href="SQL/Expression.html#method-i-inspect">Sequel::SQL::Expression#inspect</a>
-                  so that it can produce a string suitable for eval even if components of the
-                  expression have inspect methods that do not produce strings suitable for
-                  eval.</p>
+                  suitable for eval.  Used by Sequel::SQL::Expression#inspect so that it can
+                  produce a string suitable for eval even if components of the expression
+                  have inspect methods that do not produce strings suitable for eval.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eval_inspect-source'); return false">

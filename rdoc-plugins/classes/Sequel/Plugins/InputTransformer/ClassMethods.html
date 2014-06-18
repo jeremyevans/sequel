@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::InputTransformer::ClassMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/input_transformer_rb.html">lib/sequel/plugins/input_transformer.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../InputTransformer.html">InputTransformer</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -100,7 +96,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_input_transformer-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-add_input_transformer-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;must provide both transformer name and block when adding input transformer&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">transformer_name</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-ivar">@input_transformers</span>[<span class="ruby-identifier">transformer_name</span>] = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-ivar">@input_transformer_order</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-identifier">transformer_name</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>] = []&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-add_input_transformer-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;must provide both transformer name and block when adding input transformer&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">transformer_name</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-ivar">@input_transformers</span>[<span class="ruby-identifier">transformer_name</span>] = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-ivar">@input_transformer_order</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-identifier">transformer_name</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>] = []&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-skip_input_transformer'>
@@ -117,7 +113,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-skip_input_transformer-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-skip_input_transformer-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skip_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, *<span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>].<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">columns</span>).<span class="ruby-identifier">uniq!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-skip_input_transformer-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skip_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>].<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">columns</span>).<span class="ruby-identifier">uniq!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-skip_input_transformer-3F'>

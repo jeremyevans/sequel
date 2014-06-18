@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.3.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>JRuby and Ruby 1.9 Officially Supported</p>
-            <hr style="height: 10px">
+            <hr>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> now officially supports
             JRuby 1.1.3 and Ruby 1.9 (svn revision 18194 at least).  Using JRuby with
@@ -55,7 +55,7 @@
             <pre>Sequel.connect(&#39;jdbc:postgresql://host/database?user=*&amp;password=*&#39;)&#x000A;Sequel.connect(&#39;jdbc:mysql://host/database?user=*&amp;password=*&#39;)&#x000A;Sequel.connect(&#39;jdbc:sqlite::memory:&#39;)&#x000A;Sequel.connect(&#39;jdbc:sqlite:relative/path.db&#39;)&#x000A;Sequel.connect(&#39;jdbc:sqlite:/absolute/path.db&#39;)</pre>
             
             <p>Single Gem</p>
-            <hr style="height: 8px">
+            <hr>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> is now distributed as a
             single gem named sequel, by combining the previous sequel_core and sequel
@@ -63,7 +63,7 @@
             want the model functionality.</p>
             
             <p>Database Adapter Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset#empty? now works using the MySQL adapter.</p>
             </li><li>
@@ -86,14 +86,14 @@
             </li></ul>
             
             <p>Backwards Incompatible Changes</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Sequel::Worker has been removed.  There are no known users, and the specs
             caused problems on JRuby.</p>
             </li><li>
             <p>Assigning an empty string to a non-string, non-blob model attribute
             converts it to nil by default.  You can use
-            "Model.typecast_empty_string_to_nil = false" to get the old behavior.  This
+            “Model.typecast_empty_string_to_nil = false” to get the old behavior.  This
             should make web development with <a
             href="../../../classes/Sequel.html">Sequel</a> significantly easier,
             hopefully at no expense to other uses.</p>
@@ -103,14 +103,14 @@
             <p>Model.create_table! now acts the same as Database.create_table!, dropping
             the table unconditionally and then creating it.  This was done for
             consistency.  If you are using Model.create_table! in production code, you
-            should change it to "Model.create_table unless Model.table_exists?",
+            should change it to “Model.create_table unless Model.table_exists?”,
             otherwise you risk wiping out your production data.  I recommended you use
             the migration feature instead of Model.set_schema, as that handles altering
             existing tables.</p>
             </li></ul>
             
             <p>Other Notable Changes</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Using validates_length_of more than once on the same attribute with
             different options without a tag no longer causes the first use to be

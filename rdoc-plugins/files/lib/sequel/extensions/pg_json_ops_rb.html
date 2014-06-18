@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>pg_json_ops.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -63,9 +63,9 @@
             <pre>j = Sequel.expr(:json_column).pg_json&#x000A;jb = Sequel.expr(:jsonb_column).pg_jsonb</pre>
             
             <p>If you have loaded the <a
-            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_json">Sequel::Postgres::JSONOpMethods#pg_json</a>
             or <a
             href="../../../../classes/Sequel/Postgres/JSONOpMethods.html#method-i-pg_jsonb">Sequel::Postgres::JSONOpMethods#pg_jsonb</a>:</p>
@@ -86,7 +86,7 @@
             json/jsonb operations on json/jsonb literals.</p>
             
             <p>In order to get the automatic conversion from a ruby array to a PostgreSQL
-            array (as shown in the #[] and get_text examples above), you need to load
+            array (as shown in the [] and get_text examples above), you need to load
             the pg_array extension.</p>
           </div>
           <div id='context'>

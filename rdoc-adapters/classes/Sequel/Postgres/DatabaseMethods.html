@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Postgres::DatabaseMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,17 +34,12 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
             
-            <p>Methods shared by <a href="Database.html">Database</a> instances that
-            connect to PostgreSQL.</p>
+            <p>Methods shared by Database instances that connect to PostgreSQL.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -657,7 +652,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="Dataset.html">Dataset</a> containing all current database locks</p>
+                  <p>Dataset containing all current database locks</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-locks-source'); return false">
@@ -833,7 +828,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-server_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 444</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@server_version</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@server_version</span>&#x000A;  <span class="ruby-ivar">@server_version</span> = <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    (<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">server_version</span> <span class="ruby-keyword">rescue</span> <span class="ruby-keyword">nil</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:server_version</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@server_version</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT version()&#39;</span>).<span class="ruby-identifier">single_value</span>)&#x000A;      (<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">to_i</span> * <span class="ruby-value">10000</span>) <span class="ruby-operator">+</span> (<span class="ruby-identifier">m</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">to_i</span> * <span class="ruby-value">100</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">3</span>].<span class="ruby-identifier">to_i</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-value">0</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">warn</span> <span class="ruby-string">&#39;Sequel no longer supports PostgreSQL &lt;8.2, some things may not work&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">80200</span>&#x000A;  <span class="ruby-ivar">@server_version</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 444</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@server_version</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@server_version</span>&#x000A;  <span class="ruby-ivar">@server_version</span> = <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    (<span class="ruby-identifier">conn</span>.<span class="ruby-identifier">server_version</span> <span class="ruby-keyword">rescue</span> <span class="ruby-keyword">nil</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:server_version</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@server_version</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">m</span> = <span class="ruby-regexp">/PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT version()&#39;</span>).<span class="ruby-identifier">single_value</span>)&#x000A;      (<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">10000</span>) <span class="ruby-operator">+</span> (<span class="ruby-identifier">m</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>) <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">3</span>].<span class="ruby-identifier">to_i</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-value">0</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">warn</span> <span class="ruby-string">&#39;Sequel no longer supports PostgreSQL &lt;8.2, some things may not work&#39;</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">80200</span>&#x000A;  <span class="ruby-ivar">@server_version</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_create_table_if_not_exists-3F'>
@@ -1020,7 +1015,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-tables-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 516</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-string">&#39;r&#39;</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 516</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-string">&#39;r&#39;</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-type_supported-3F'>

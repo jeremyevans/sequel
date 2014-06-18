@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::CoreRefinements</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -67,10 +67,6 @@
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -136,13 +132,13 @@
                   hash, matching all of the conditions in this hash and the condition
                   specified by the given argument.</p>
                   
-                  <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>} &amp; :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a = 1 AND b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} &amp; <span class="ruby-operator">~</span>:<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE AND NOT b</span></pre>
+                  <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>} <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a = 1 AND b</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>:<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a IS TRUE AND NOT b</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-26-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-26-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> &amp;(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-26-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-case'>
@@ -162,7 +158,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-case-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-case-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">case</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">CaseExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, *<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-case-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">case</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">CaseExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hstore'>
@@ -223,7 +219,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-lit-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 178</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lit</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 178</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_array'>
@@ -351,7 +347,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_function-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_function-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 217</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_function</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, *<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_function-source'><span class="ruby-comment"># File lib/sequel/extensions/core_refinements.rb, line 217</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_function</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_negate'>
@@ -402,10 +398,10 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Return a <code>Sequel::SQL::StringExpression</code> representing an <a
-                  href="SQL.html">SQL</a> string made up of the concatenation of this
-                  array&#39;s elements.  If an argument is passed it is used in between each
-                  element of the array in the <a href="SQL.html">SQL</a> concatenation.</p>
+                  <p>Return a <code>Sequel::SQL::StringExpression</code> representing an SQL
+                  string made up of the concatenation of this array&#39;s elements.  If an
+                  argument is passed it is used in between each element of the array in the
+                  SQL concatenation.</p>
                   
                   <pre>[:a].sql_string_join # SQL: a&#x000A;[:a, :b].sql_string_join # SQL: a || b&#x000A;[:a, &#39;b&#39;].sql_string_join # SQL: a || &#39;b&#39;&#x000A;[&#39;a&#39;, :b].sql_string_join(&#39; &#39;) # SQL: &#39;a&#39; || &#39; &#39; || b</pre>
                 </div>
@@ -426,10 +422,10 @@
                   
                   <p>Return a <code>Sequel::SQL::ValueList</code> created from this array.  Used
                   if this array contains all two element arrays and you want it treated as an
-                  <a href="SQL.html">SQL</a> value list (IN predicate)  instead of as a
-                  conditions specifier (similar to a hash).  This is not necessary if you are
-                  using this array as a value in a filter, but may be necessary if you are
-                  using it as a value with placeholder SQL:</p>
+                  SQL value list (IN predicate)  instead of as a conditions specifier
+                  (similar to a hash).  This is not necessary if you are using this array as
+                  a value in a filter, but may be necessary if you are using it as a value
+                  with placeholder SQL:</p>
                   
                   <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>]=<span class="ruby-operator">&gt;</span>[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: (a, b) IN ((1, 2), (3, 4))</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]]) <span class="ruby-comment"># SQL: (a, b) IN ((1 = 2) AND (3 = 4))</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-string">&#39;(a, b) IN ?&#39;</span>, [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_value_list</span>) <span class="ruby-comment"># SQL: (a, b) IN ((1, 2), (3, 4))</span></pre>
                 </div>

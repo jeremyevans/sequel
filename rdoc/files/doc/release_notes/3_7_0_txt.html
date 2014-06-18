@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.7.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now has support for
             deleting and updating joined datasets on MySQL and PostgreSQL.  Previously,
@@ -96,7 +96,7 @@
             and methods like other <a
             href="../../../classes/Sequel/SQL.html">Sequel::SQL</a> objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">NULL</span> &amp; <span class="ruby-constant">SQLFALSE</span> <span class="ruby-comment"># BooleanExpression =&gt; &quot;(NULL AND FALSE)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> &amp; <span class="ruby-keyword">false</span>     <span class="ruby-comment"># false</span>&#x000A;&#x000A;<span class="ruby-constant">NULL</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>       <span class="ruby-comment"># NumericExpression =&gt; &quot;(NULL + a)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>        <span class="ruby-comment"># raises NoMethodError</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>  <span class="ruby-comment"># StringExpression =&gt; &quot;(NULL || a)&quot;</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)     <span class="ruby-comment"># AliasedExpression =&gt; &quot;NULL AS b&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">NULL</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">SQLFALSE</span> <span class="ruby-comment"># BooleanExpression =&gt; &quot;(NULL AND FALSE)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">false</span>     <span class="ruby-comment"># false</span>&#x000A;&#x000A;<span class="ruby-constant">NULL</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>       <span class="ruby-comment"># NumericExpression =&gt; &quot;(NULL + a)&quot;</span>&#x000A;<span class="ruby-keyword">nil</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>        <span class="ruby-comment"># raises NoMethodError</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">a</span>  <span class="ruby-comment"># StringExpression =&gt; &quot;(NULL || a)&quot;</span>&#x000A;<span class="ruby-constant">NULL</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">b</span>)     <span class="ruby-comment"># AliasedExpression =&gt; &quot;NULL AS b&quot;</span></pre>
             
             <p>For complex systems that want to represent SQL boolean objects in ruby
             (where you don&#39;t know exactly how they&#39;ll be used), using the
@@ -135,7 +135,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>In Model save and destroy when using transactions and when
             raise_on_save_failure is false, ensure that transactions are rolled back if
@@ -179,7 +179,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Dataset::GET_ERROR_MSG and Dataset::MAP_ERROR_MSG constants were removed. 
             Both were replaced with Dataset::ARG_BLOCK_ERROR_MSG.</p>
@@ -192,7 +192,7 @@
             creating tables on PostgreSQL has been modified.</p>
             </li><li>
             <p>The native MySQL adapter no longer sets the OPT_LOCAL_INFILE option to
-            "client" on the native connection.</p>
+            “client” on the native connection.</p>
             </li></ul>
           </div>
           <div id='context'>

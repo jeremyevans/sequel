@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::SingleTableInheritance::ClassMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/single_table_inheritance_rb.html">lib/sequel/plugins/single_table_inheritance.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../SingleTableInheritance.html">SingleTableInheritance</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -191,7 +187,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sti_subclass_added-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sti_subclass_added-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 183</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sti_key_array</span>&#x000A;    <span class="ruby-identifier">key_array</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">key</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">sti_key_array</span>.<span class="ruby-identifier">push</span>(*<span class="ruby-identifier">key_array</span>)}&#x000A;    <span class="ruby-identifier">superclass</span>.<span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sti_subclass_added-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 183</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">sti_key_array</span>&#x000A;    <span class="ruby-identifier">key_array</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">key</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">sti_key_array</span>.<span class="ruby-identifier">push</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">key_array</span>)}&#x000A;    <span class="ruby-identifier">superclass</span>.<span class="ruby-identifier">sti_subclass_added</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

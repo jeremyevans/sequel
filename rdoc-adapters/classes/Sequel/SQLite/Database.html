@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::SQLite::Database</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../SQLite.html">SQLite</a></strong>
+          Superclass:
+          <strong>Sequel::Database</strong>
         </div>
       </div>
       <div id='content'>
@@ -44,8 +44,8 @@
           <div id='description'>
             
             <p><a href="Database.html">Database</a> class for <a
-            href="../SQLite.html">SQLite</a> databases used with <a
-            href="../../Sequel.html">Sequel</a> and the ruby-sqlite3 driver.</p>
+            href="../SQLite.html">SQLite</a> databases used with Sequel and the
+            ruby-sqlite3 driver.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -70,6 +70,20 @@
             </div>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatasetClass</td>
+                    <td>=</td>
+                    <td class='context-item-value'>self</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
@@ -141,7 +155,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:select</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:select</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_ddl'>

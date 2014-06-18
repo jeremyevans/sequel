@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Postgres::ArrayOp</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+          Superclass:
+          <strong>Sequel::SQL::Wrapper</strong>
         </div>
       </div>
       <div id='content'>
@@ -460,7 +460,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-unnest-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-unnest-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">unnest</span>(*<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:unnest</span>, *<span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">a</span>)})&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-unnest-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">unnest</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:unnest</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">wrap_array</span>(<span class="ruby-identifier">a</span>)})&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-unshift'>

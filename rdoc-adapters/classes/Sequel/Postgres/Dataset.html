@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Postgres::Dataset</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,37 +35,14 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p><a href="Dataset.html">Dataset</a> class for PostgreSQL datasets that use
-            the pg, postgres, or postgres-pr driver.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a target="docwin" href="#method-i-call">call</a></li>
-              <li><a target="docwin" href="#method-i-fetch_rows">fetch_rows</a></li>
-              <li><a target="docwin" href="#method-i-paged_each">paged_each</a></li>
-              <li><a target="docwin" href="#method-i-prepare">prepare</a></li>
-              <li><a target="docwin" href="#method-i-prepared_arg_placeholder">prepared_arg_placeholder</a></li>
-              <li><a target="docwin" href="#method-i-use_cursor">use_cursor</a></li>
-              <li><a target="docwin" href="#method-i-where_current_of">where_current_of</a></li>
-            </ol>
-          </div>
+          <div id='description'></div>
           <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li><a target="docwin" href="DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
-              </ol>
-            </div>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
@@ -76,194 +53,6 @@
             </ol>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>APOS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel::Dataset::APOS</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DEFAULT_CURSOR_NAME</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'sequel_cursor'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DatasetClass</td>
-                    <td>=</td>
-                    <td class='context-item-value'>self</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>PREPARED_ARG_PLACEHOLDER</td>
-                    <td>=</td>
-                    <td class='context-item-value'>LiteralString.new('$').freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-call'>
-                <a name='method-i-call'></a>
-                <div class='synopsis'>
-                  <span class='name'>call</span>
-                  <span class='arguments'>(type, bind_vars=OPTS, *values, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Execute the given type of statement with the hash of values.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 751</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">bind_vars</span>=<span class="ruby-constant">OPTS</span>, *<span class="ruby-identifier">values</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">BindArgumentMethods</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bind_vars</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-fetch_rows'>
-                <a name='method-i-fetch_rows'></a>
-                <div class='synopsis'>
-                  <span class='name'>fetch_rows</span>
-                  <span class='arguments'>(sql)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Yield all rows returned by executing the given SQL and converting the
-                  types.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 625</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">cursor_fetch_rows</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:cursor</span>]&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">res</span><span class="ruby-operator">|</span> <span class="ruby-identifier">yield_hash_rows</span>(<span class="ruby-identifier">res</span>, <span class="ruby-identifier">fetch_rows_set_cols</span>(<span class="ruby-identifier">res</span>)){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-paged_each'>
-                <a name='method-i-paged_each'></a>
-                <div class='synopsis'>
-                  <span class='name'>paged_each</span>
-                  <span class='arguments'>(opts=OPTS, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Use a cursor for paging.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-paged_each-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-paged_each-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 631</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">use_cursor</span>(<span class="ruby-identifier">opts</span>).<span class="ruby-identifier">each</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-prepare'>
-                <a name='method-i-prepare'></a>
-                <div class='synopsis'>
-                  <span class='name'>prepare</span>
-                  <span class='arguments'>(type, name=nil, *values)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Prepare the given type of statement with the given name, and store it in
-                  the database to be called later.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 759</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, *<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-prepared_arg_placeholder'>
-                <a name='method-i-prepared_arg_placeholder'></a>
-                <div class='synopsis'>
-                  <span class='name'>prepared_arg_placeholder</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>PostgreSQL uses $N for placeholders instead of ?, so use a $ as the
-                  placeholder.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepared_arg_placeholder-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-prepared_arg_placeholder-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 773</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepared_arg_placeholder</span>&#x000A;  <span class="ruby-constant">PREPARED_ARG_PLACEHOLDER</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-use_cursor'>
-                <a name='method-i-use_cursor'></a>
-                <div class='synopsis'>
-                  <span class='name'>use_cursor</span>
-                  <span class='arguments'>(opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Uses a cursor for fetching records, instead of fetching the entire result
-                  set at once.  Can be used to process large datasets without holding all
-                  rows in memory (which is what the underlying drivers may do by default).
-                  Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:cursor_name 
-                  <dd>
-                  <p>The name assigned to the cursor (default &#39;sequel_cursor&#39;). Nested
-                  cursors require different names.</p>
-                  </dd><dt>:hold 
-                  <dd>
-                  <p>Declare the cursor WITH HOLD and don&#39;t use transaction around the
-                  cursor usage.</p>
-                  </dd><dt>:rows_per_fetch 
-                  <dd>
-                  <p>The number of rows per fetch (default 1000).  Higher numbers result in
-                  fewer queries but greater memory use.</p>
-                  </dd></dl>
-                  
-                  <p>Usage:</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>].<span class="ruby-identifier">use_cursor</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">row</span>}&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>].<span class="ruby-identifier">use_cursor</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10000</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">row</span>}&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>].<span class="ruby-identifier">use_cursor</span>(:<span class="ruby-identifier">cursor_name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;my_cursor&#39;</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-identifier">p</span> <span class="ruby-identifier">row</span>}</pre>
-                  
-                  <p>This is untested with the prepared statement/bound variable support, and
-                  unlikely to work with either.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-use_cursor-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-use_cursor-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 655</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_cursor</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:cursor=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-value">:rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1000</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-where_current_of'>
-                <a name='method-i-where_current_of'></a>
-                <div class='synopsis'>
-                  <span class='name'>where_current_of</span>
-                  <span class='arguments'>(cursor_name=DEFAULT_CURSOR_NAME)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Replace the WHERE clause with one that uses CURRENT OF with the given
-                  cursor name (or the default cursor name).  This allows you to update a
-                  large dataset by updating individual rows while processing the dataset via
-                  a cursor:</p>
-                  
-                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>].<span class="ruby-identifier">use_cursor</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">huge_table</span>].<span class="ruby-identifier">where_current_of</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">ruby_method</span>(<span class="ruby-identifier">row</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-where_current_of-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-where_current_of-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 667</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where_current_of</span>(<span class="ruby-identifier">cursor_name</span>=<span class="ruby-constant">DEFAULT_CURSOR_NAME</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:where=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&#39;CURRENT OF &#39;</span>], <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">cursor_name</span>)))&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

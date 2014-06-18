@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::Schema</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/plugins/schema_rb.html">lib/sequel/plugins/schema.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -54,7 +50,7 @@
             
             <p>Usage:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Add the schema methods to all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">schema</span>&#x000A;&#x000A;<span class="ruby-comment"># Add the schema methods to the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">schema</span></pre>
+            <pre># Add the schema methods to all model subclasses (called before loading subclasses)&#x000A;Sequel::Model.plugin :schema&#x000A;# Add the schema methods to the Album class&#x000A;Album.plugin :schema</pre>
           </div>
           <div id='context'>
           </div>

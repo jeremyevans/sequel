@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.11.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>A few new features were added to query logging.  <a
             href="../../../classes/Sequel.html">Sequel</a> now includes execution time
@@ -72,7 +72,7 @@
             href="../../../classes/Sequel/Model.html">Sequel::Model</a> settings, this
             can be set on a global, per class, and per instance level:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># global</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">true</span> <span class="ruby-comment"># class</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># instance</span></pre>
+            <pre>Sequel::Model.require_modification = false # global&#x000A;Album.require_modification = true # class&#x000A;album.require_modification = false # instance</pre>
             </li><li>
             <p>An instance_filters plugin was added to the list of built in plugins,
             allowing you to add arbitrary filters when updating or destroying an
@@ -133,7 +133,7 @@
             that gives you the SQLite version as an integer (e.g. 30613 for 3.6.13).</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> no longer raises an error
             if you give Dataset#filter or related method an empty argument such as {},
@@ -216,7 +216,7 @@
             contains links to the appropriate guides.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>When connecting to SQLite, <a
             href="../../../classes/Sequel.html">Sequel</a> now automatically sets the

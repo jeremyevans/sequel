@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::ErrorSplitter::InstanceMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/error_splitter_rb.html">lib/sequel/plugins/error_splitter.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../ErrorSplitter.html">ErrorSplitter</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -70,7 +66,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-_valid-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-_valid-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/error_splitter.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_valid?</span>(*)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)}.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ks</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">msgs</span> = <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">ks</span>)&#x000A;      <span class="ruby-identifier">ks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">msgs</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">msg</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">k</span>, <span class="ruby-identifier">msg</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-_valid-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/error_splitter.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_valid?</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">v</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">k</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)}.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ks</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">msgs</span> = <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">ks</span>)&#x000A;      <span class="ruby-identifier">ks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">msgs</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">msg</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">k</span>, <span class="ruby-identifier">msg</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

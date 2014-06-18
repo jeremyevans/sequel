@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Oracle::Database</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Oracle.html">Oracle</a></strong>
+          Superclass:
+          <strong>Sequel::Database</strong>
         </div>
       </div>
       <div id='content'>
@@ -76,6 +76,13 @@
                       <p>ORA-00028: your session has been killed ORA-01012: not logged on ORA-03113:
                       end-of-file on communication channel ORA-03114: not connected to ORACLE</p>
                     </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatasetClass</td>
+                    <td>=</td>
+                    <td class='context-item-value'>self</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ORACLE_TYPES</td>
@@ -167,7 +174,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/oracle.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/oracle.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_insert'>

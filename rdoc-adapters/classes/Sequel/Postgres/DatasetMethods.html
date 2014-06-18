@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Postgres::DatasetMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -383,8 +379,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Disables automatic use of INSERT ... RETURNING.  You can still use
-                  returning manually to force the use of RETURNING when inserting.</p>
+                  <p>Disables automatic use of INSERT … RETURNING.  You can still use returning
+                  manually to force the use of RETURNING when inserting.</p>
                   
                   <p>This is designed for cases where INSERT RETURNING cannot be used, such as
                   when you are using partitioning with trigger functions or conditional
@@ -491,7 +487,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1269</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-comment"># Already know which columns to return, let the standard code handle it</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;    <span class="ruby-comment"># Raw SQL used or RETURNING disabled, just use the default behavior</span>&#x000A;    <span class="ruby-comment"># and return nil since sequence is not known.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Force the use of RETURNING with the primary key value,</span>&#x000A;    <span class="ruby-comment"># unless it has been disabled.</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1269</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:returning</span>]&#x000A;    <span class="ruby-comment"># Already know which columns to return, let the standard code handle it</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;    <span class="ruby-comment"># Raw SQL used or RETURNING disabled, just use the default behavior</span>&#x000A;    <span class="ruby-comment"># and return nil since sequence is not known.</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Force the use of RETURNING with the primary key value,</span>&#x000A;    <span class="ruby-comment"># unless it has been disabled.</span>&#x000A;    <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">insert_pk</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">first</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-insert_select'>
@@ -511,7 +507,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert_select-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_select</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>(*<span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>} <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert_select-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 1287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">returning</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">r</span>} <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:disable_insert_returning</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-lock'>

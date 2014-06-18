@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::Composition::InstanceMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/composition_rb.html">lib/sequel/plugins/composition.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Composition.html">Composition</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -72,7 +68,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_save-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/composition.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;  <span class="ruby-ivar">@compositions</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(&amp;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">n</span>][<span class="ruby-value">:decomposer</span>])} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@compositions</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-before_save-source'><span class="ruby-comment"># File lib/sequel/plugins/composition.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;  <span class="ruby-ivar">@compositions</span>.<span class="ruby-identifier">keys</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">n</span><span class="ruby-operator">|</span> <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">compositions</span>[<span class="ruby-identifier">n</span>][<span class="ruby-value">:decomposer</span>])} <span class="ruby-keyword">if</span> <span class="ruby-ivar">@compositions</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-compositions'>

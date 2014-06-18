@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Unbinder</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Sequel.html">Sequel</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="ASTTransformer.html">ASTTransformer</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -51,12 +51,10 @@
             
             <p>This class only does a limited form of unbinding where the variable names
             and values can be associated unambiguously.  The only cases it handles are
-            &lt;tt&gt;<a
-            href="SQL/ComplexExpression.html">SQL::ComplexExpression</a>&lt;tt&gt; with
-            an operator in <code>UNBIND_OPS</code>, a first argument that&#39;s an
-            instance of a member of <code>UNBIND_KEY_CLASSES</code>, and a second
-            argument that&#39;s an instance of a member of
-            <code>UNBIND_VALUE_CLASSES</code>.</p>
+            &lt;tt&gt;SQL::ComplexExpression&lt;tt&gt; with an operator in
+            <code>UNBIND_OPS</code>, a first argument that&#39;s an instance of a
+            member of <code>UNBIND_KEY_CLASSES</code>, and a second argument that&#39;s
+            an instance of a member of <code>UNBIND_VALUE_CLASSES</code>.</p>
             
             <p>So it can handle cases like:</p>
             
@@ -102,9 +100,8 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>The &lt;tt&gt;<a
-                      href="SQL/ComplexExpression.html">SQL::ComplexExpression</a>&lt;tt&gt;
-                      operates that will be considered for transformation.</p>
+                      <p>The &lt;tt&gt;SQL::ComplexExpression&lt;tt&gt; operates that will be
+                      considered for transformation.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>

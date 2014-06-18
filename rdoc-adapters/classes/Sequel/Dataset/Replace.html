@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Dataset::Replace</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/utils/replace_rb.html">lib/sequel/adapters/utils/replace.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -92,7 +88,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-multi_replace-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-multi_replace-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">multi_replace</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">multi_insert</span>(*<span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-multi_replace-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">multi_replace</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">multi_insert</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-replace'>
@@ -110,7 +106,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-replace-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-replace-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">replace</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">replace_sql</span>(*<span class="ruby-identifier">values</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-replace-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">replace</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">replace_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-replace_sql'>
@@ -127,7 +123,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-replace_sql-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-replace_sql-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb, line 14</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">replace_sql</span>(*<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">insert_sql</span>(*<span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-replace_sql-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/replace.rb, line 14</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">replace_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:replace=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>).<span class="ruby-identifier">insert_sql</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_replace-3F'>

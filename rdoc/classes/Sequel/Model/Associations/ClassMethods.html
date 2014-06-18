@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Model::Associations::ClassMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/model/associations_rb.html">lib/sequel/model/associations.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Associations.html">Associations</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -106,9 +102,9 @@
             
             <p>For a more in depth general overview, as well as a reference guide, see the
             <a href="../../../../files/doc/association_basics_rdoc.html">Association
-            Basics guide</a> For examples of advanced usage, see the <a
+            Basics guide</a>. For examples of advanced usage, see the <a
             href="../../../../files/doc/advanced_associations_rdoc.html">Advanced
-            Associations guide</a></p>
+            Associations guide</a>.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -204,26 +200,26 @@
                   
                   <p>Associates a related model with the current model. The following types are
                   supported:</p>
-                  <dl class="rdoc-list note-list"><dt>:<a href="ClassMethods.html#method-i-many_to_one">#many_to_one</a> 
+                  <dl class="rdoc-list note-list"><dt>:many_to_one 
                   <dd>
                   <p>Foreign key in current model&#39;s table points to  associated model&#39;s
                   primary key.  Each associated model object can be associated with more than
                   one current model objects.  Each current model object can be associated
                   with only one associated model object.</p>
-                  </dd><dt>:<a href="ClassMethods.html#method-i-one_to_many">#one_to_many</a> 
+                  </dd><dt>:one_to_many 
                   <dd>
                   <p>Foreign key in associated model&#39;s table points to this model&#39;s
                   primary key.   Each current model object can be associated with more than
                   one associated model objects.  Each associated model object can be
                   associated with only one current model object.</p>
-                  </dd><dt>:<a href="ClassMethods.html#method-i-one_through_one">#one_through_one</a> 
+                  </dd><dt>:one_through_one 
                   <dd>
                   <p>Similar to <a
                   href="ClassMethods.html#method-i-many_to_many">#many_to_many</a> in terms
                   of foreign keys, but only one object is associated to the current object
                   through the association. Provides only getter methods, no setter or
                   modification methods.</p>
-                  </dd><dt>:<a href="ClassMethods.html#method-i-one_to_one">#one_to_one</a> 
+                  </dd><dt>:one_to_one 
                   <dd>
                   <p>Similar to <a
                   href="ClassMethods.html#method-i-one_to_many">#one_to_many</a> in terms of
@@ -232,7 +228,7 @@
                   href="ClassMethods.html#method-i-many_to_one">#many_to_one</a>, except that
                   the <a href="ClassMethods.html#method-i-one_to_one">#one_to_one</a> setter
                   method saves the passed object.</p>
-                  </dd><dt>:<a href="ClassMethods.html#method-i-many_to_many">#many_to_many</a> 
+                  </dd><dt>:many_to_many 
                   <dd>
                   <p>A join table is used that has a foreign key that points to this model&#39;s
                   primary key and a foreign key that points to the associated model&#39;s
@@ -243,7 +239,7 @@
                   
                   <p>The following options can be supplied:</p>
                   
-                  <h3 id="method-i-associate-label-Multiple+Types">Multiple Types</h3>
+                  <h3 id="method-i-associate-label-Multiple+Types">Multiple Types<span><a href="#method-i-associate-label-Multiple+Types">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
                   <dl class="rdoc-list note-list"><dt>:adder 
                   <dd>
                   <p>Proc used to define the private <em>add</em>* method for doing the database
@@ -302,11 +298,10 @@
                   <dd>
                   <p>The associated class or its name as a string or symbol. If not given, uses
                   the association&#39;s name, which is camelized (and singularized unless the
-                  type is :<a href="ClassMethods.html#method-i-many_to_one">#many_to_one</a>,
-                  :<a href="ClassMethods.html#method-i-one_to_one">#one_to_one</a>, or <a
+                  type is :many_to_one, :one_to_one, or <a
                   href="ClassMethods.html#method-i-one_through_one">#one_through_one</a>). 
                   If this is specified as a string or symbol, you must specify the full class
-                  name (e.g. "SomeModule::MyModel").</p>
+                  name (e.g. “SomeModule::MyModel”).</p>
                   </dd><dt>:clearer 
                   <dd>
                   <p>Proc used to define the private <em>remove_all</em>* method for doing the
@@ -388,7 +383,7 @@
                   <p>The base name to use for the table alias when eager graphing.  Defaults to
                   the name of the association.  If the alias name has already been used in
                   the query, <a href="../../../Sequel.html">Sequel</a> will create a unique
-                  alias by appending a numeric suffix (e.g. alias_0, alias_1, ...) until the
+                  alias by appending a numeric suffix (e.g. alias_0, alias_1, …) until the
                   alias is unique.</p>
                   </dd><dt>:graph_block 
                   <dd>
@@ -486,11 +481,11 @@
                   <p>Set to false to not validate when implicitly saving any associated object.</p>
                   </dd></dl>
                   
-                  <h3 id="method-i-associate-label-%3Amany_to_one">:<a href="ClassMethods.html#method-i-many_to_one">#many_to_one</a></h3>
+                  <h3 id="method-i-associate-label-%3Amany_to_one">:many_to_one<span><a href="#method-i-associate-label-%3Amany_to_one">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
                   <dl class="rdoc-list note-list"><dt>:key 
                   <dd>
                   <p>foreign key in current model&#39;s table that references associated
-                  model&#39;s primary key, as a symbol.  Defaults to :"#{name}_id".  Can use
+                  model&#39;s primary key, as a symbol.  Defaults to :“#{name}_id”.  Can use
                   an array of symbols for a composite key association.</p>
                   </dd><dt>:key_column 
                   <dd>
@@ -515,12 +510,12 @@
                   such as when you are doing a JOIN USING operation on the column on Oracle.</p>
                   </dd></dl>
                   
-                  <h3 id="method-i-associate-label-%3Aone_to_many+and+%3Aone_to_one">:<a href="ClassMethods.html#method-i-one_to_many">#one_to_many</a> and :<a href="ClassMethods.html#method-i-one_to_one">#one_to_one</a></h3>
+                  <h3 id="method-i-associate-label-%3Aone_to_many+and+%3Aone_to_one">:one_to_many and :one_to_one<span><a href="#method-i-associate-label-%3Aone_to_many+and+%3Aone_to_one">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
                   <dl class="rdoc-list note-list"><dt>:key 
                   <dd>
                   <p>foreign key in associated model&#39;s table that references current
                   model&#39;s primary key, as a symbol.  Defaults to
-                  :"#{self.name.underscore}_id".  Can use an array of symbols for a composite
+                  :“#{self.name.underscore}_id”.  Can use an array of symbols for a composite
                   key association.</p>
                   </dd><dt>:key_method 
                   <dd>
@@ -541,11 +536,11 @@
                   </dd><dt>:raise_on_save_failure 
                   <dd>
                   <p>Do not raise exceptions for hook or validation failures when saving
-                  associated objects in the add/remove methods (return nil instead) [<a
-                  href="ClassMethods.html#method-i-one_to_many">#one_to_many</a> only].</p>
+                  associated objects in the add/remove methods (return nil instead)
+                  [one_to_many only].</p>
                   </dd></dl>
                   
-                  <h3 id="method-i-associate-label-%3Amany_to_many+and+%3Aone_through_one">:<a href="ClassMethods.html#method-i-many_to_many">#many_to_many</a> and :<a href="ClassMethods.html#method-i-one_through_one">#one_through_one</a></h3>
+                  <h3 id="method-i-associate-label-%3Amany_to_many+and+%3Aone_through_one">:many_to_many and :one_through_one<span><a href="#method-i-associate-label-%3Amany_to_many+and+%3Aone_through_one">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
                   <dl class="rdoc-list note-list"><dt>:graph_join_table_block 
                   <dd>
                   <p>The block to pass to <code>join_table</code> for the join table when
@@ -582,7 +577,7 @@
                   </dd><dt>:left_key 
                   <dd>
                   <p>foreign key in join table that points to current model&#39;s primary key,
-                  as a symbol. Defaults to :"#{self.name.underscore}_id". Can use an array of
+                  as a symbol. Defaults to :“#{self.name.underscore}_id”. Can use an array of
                   symbols for a composite key association.</p>
                   </dd><dt>:left_primary_key 
                   <dd>
@@ -600,7 +595,7 @@
                   </dd><dt>:right_key 
                   <dd>
                   <p>foreign key in join table that points to associated model&#39;s primary
-                  key, as a symbol.  Defaults to :"#{name.to_s.singularize}_id". Can use an
+                  key, as a symbol.  Defaults to :“#{name.to_s.singularize}_id”. Can use an
                   array of symbols for a composite key association.</p>
                   </dd><dt>:right_primary_key 
                   <dd>
@@ -621,7 +616,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-associate-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-associate-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1565</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;invalid association type&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">assoc_class</span> = <span class="ruby-constant">ASSOCIATION_TYPES</span>[<span class="ruby-identifier">type</span>]&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Model.associate name argument must be a symbol&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;&#x000A;  <span class="ruby-comment"># dup early so we don&#39;t modify opts</span>&#x000A;  <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>]&#x000A;    <span class="ruby-identifier">cloned_assoc</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>])&#x000A;    <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">cloned_assoc</span>[<span class="ruby-value">:orig_opts</span>].<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">orig_opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:cache=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:model</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] = <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:dataset</span>]&#x000A;    <span class="ruby-comment"># It&#39;s possible the association is instance specific, in that it depends on</span>&#x000A;    <span class="ruby-comment"># values other than the foreign key value.  This needs to be checked for</span>&#x000A;    <span class="ruby-comment"># in certain places to disable optimizations.</span>&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">assoc_class</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">cloned_assoc</span>)&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_block</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:eager_block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:predicate_key</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:eager_loading_predicate_key</span>)&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:predicate_key</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_loading_predicate_key</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_join_type</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:left_outer</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order_eager_graph</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:order_eager_graph</span>)&#x000A;  <span class="ruby-identifier">conds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:conditions</span>]&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_alias_base</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">conds</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:graph_conditions</span>) <span class="ruby-keyword">and</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">conds</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:graph_conditions</span>, []).<span class="ruby-identifier">to_a</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]&#x000A;  [<span class="ruby-value">:before_add</span>, <span class="ruby-value">:before_remove</span>, <span class="ruby-value">:after_add</span>, <span class="ruby-value">:after_remove</span>, <span class="ruby-value">:after_load</span>, <span class="ruby-value">:before_set</span>, <span class="ruby-value">:after_set</span>, <span class="ruby-value">:extend</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cb_type</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">late_binding_class_option</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">singularize</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)&#x000A;  &#x000A;  <span class="ruby-comment"># Remove :class entry if it exists and is nil, to work with cached_fetch</span>&#x000A;  <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:class</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>]&#x000A;&#x000A;  <span class="ruby-identifier">send</span>(<span class="ruby-value">:&quot;def_#{type}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">def_association_instance_methods</span>(<span class="ruby-identifier">opts</span>)&#x000A;      &#x000A;  <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:clone</span>)&#x000A;  <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:class_name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class_name</span>], <span class="ruby-value">:class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>], <span class="ruby-value">:block=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>])&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>] = <span class="ruby-identifier">orig_opts</span>&#x000A;  <span class="ruby-comment"># don&#39;t add to association_reflections until we are sure there are no errors</span>&#x000A;  <span class="ruby-identifier">association_reflections</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-associate-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1565</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;invalid association type&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">assoc_class</span> = <span class="ruby-constant">ASSOCIATION_TYPES</span>[<span class="ruby-identifier">type</span>]&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;Model.associate name argument must be a symbol&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;&#x000A;  <span class="ruby-comment"># dup early so we don&#39;t modify opts</span>&#x000A;  <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">dup</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>]&#x000A;    <span class="ruby-identifier">cloned_assoc</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>])&#x000A;    <span class="ruby-identifier">orig_opts</span> = <span class="ruby-identifier">cloned_assoc</span>[<span class="ruby-value">:orig_opts</span>].<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">orig_opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:cache=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:model</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] = <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">orig_opts</span>[<span class="ruby-value">:dataset</span>]&#x000A;    <span class="ruby-comment"># It&#39;s possible the association is instance specific, in that it depends on</span>&#x000A;    <span class="ruby-comment"># values other than the foreign key value.  This needs to be checked for</span>&#x000A;    <span class="ruby-comment"># in certain places to disable optimizations.</span>&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:instance_specific</span>] = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">assoc_class</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:clone</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">cloneable?</span>(<span class="ruby-identifier">cloned_assoc</span>)&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot clone an association to an association of different type (association #{name} with type #{type} cloning #{opts[:clone]} with type #{cloned_assoc[:type]})&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_block</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>] <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:eager_block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:predicate_key</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-value">:eager_loading_predicate_key</span>)&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:predicate_key</span>] = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:eager_loading_predicate_key</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_join_type</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">:left_outer</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:order_eager_graph</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:order_eager_graph</span>)&#x000A;  <span class="ruby-identifier">conds</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:conditions</span>]&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_alias_base</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">conds</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:graph_conditions</span>) <span class="ruby-keyword">and</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">conds</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_conditions</span>] = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:graph_conditions</span>, []).<span class="ruby-identifier">to_a</span>&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]) <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_select</span>]&#x000A;  [<span class="ruby-value">:before_add</span>, <span class="ruby-value">:before_remove</span>, <span class="ruby-value">:after_add</span>, <span class="ruby-value">:after_remove</span>, <span class="ruby-value">:after_load</span>, <span class="ruby-value">:before_set</span>, <span class="ruby-value">:after_set</span>, <span class="ruby-value">:extend</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">cb_type</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>] = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-identifier">cb_type</span>])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">late_binding_class_option</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">singularize</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">name</span>)&#x000A;  &#x000A;  <span class="ruby-comment"># Remove :class entry if it exists and is nil, to work with cached_fetch</span>&#x000A;  <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:class</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>]&#x000A;&#x000A;  <span class="ruby-identifier">send</span>(<span class="ruby-value">:&quot;def_#{type}&quot;</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">def_association_instance_methods</span>(<span class="ruby-identifier">opts</span>)&#x000A;      &#x000A;  <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:clone</span>)&#x000A;  <span class="ruby-identifier">orig_opts</span>.<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:class_name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class_name</span>], <span class="ruby-value">:class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:class</span>], <span class="ruby-value">:block=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:block</span>])&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:orig_opts</span>] = <span class="ruby-identifier">orig_opts</span>&#x000A;  <span class="ruby-comment"># don&#39;t add to association_reflections until we are sure there are no errors</span>&#x000A;  <span class="ruby-identifier">association_reflections</span>[<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-association_reflection'>
@@ -672,7 +667,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eager_load_results-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-eager_load_results-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1631</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_load_results</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">eo</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">eager_load_results</span>(<span class="ruby-identifier">eo</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-eager_load_results-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1631</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_load_results</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-identifier">eo</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">eager_load_results</span>(<span class="ruby-identifier">eo</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-many_to_many'>
@@ -692,7 +687,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-many_to_many-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-many_to_many-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1636</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">many_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-many_to_many-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1636</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">many_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-many_to_one'>
@@ -711,7 +706,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-many_to_one-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-many_to_one-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1641</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">many_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-many_to_one-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1641</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">many_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-one_through_one'>
@@ -731,7 +726,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-one_through_one-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-one_through_one-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1646</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_through_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-one_through_one-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1646</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_through_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-one_to_many'>
@@ -750,7 +745,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-one_to_many-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-one_to_many-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1651</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-one_to_many-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1651</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_to_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-one_to_one'>
@@ -769,7 +764,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-one_to_one-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-one_to_one-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1656</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-one_to_one-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1656</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_to_one</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_to_one</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

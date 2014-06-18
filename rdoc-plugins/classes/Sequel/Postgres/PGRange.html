@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Postgres::PGRange</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -41,8 +41,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Postgres.html">Postgres</a></strong>
+          Superclass:
+          <strong><a target="docwin" href="../../Object.html">Object</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -241,8 +241,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Create an empty <a href="PGRange.html">PGRange</a> with the given database
-                  type.</p>
+                  <p>Create an empty PGRange with the given database type.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-empty-source'); return false">
@@ -259,9 +258,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Create a new <a href="PGRange.html">PGRange</a> instance using the
-                  beginning and ending of the ruby <a href="../../Range.html">Range</a>, with
-                  the given db_type.</p>
+                  <p>Create a new PGRange instance using the beginning and ending of the ruby <a
+                  href="../../Range.html">Range</a>, with the given db_type.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-from_range-source'); return false">
@@ -278,9 +276,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Initialize a new <a href="PGRange.html">PGRange</a> instance.  Accepts the
-                  following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:<a href="PGRange.html#attribute-i-db_type">#db_type</a> 
+                  <p>Initialize a new PGRange instance.  Accepts the following options:</p>
+                  <dl class="rdoc-list note-list"><dt>:db_type 
                   <dd>
                   <p>The PostgreSQL database type for the range.</p>
                   </dd><dt>:empty 
@@ -309,13 +306,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Registers a range type that the extension should handle.  Makes a <a
-                  href="../Database.html">Database</a> instance that has been extended with
-                  <a href="PGRange/DatabaseMethods.html">DatabaseMethods</a> recognize the
-                  range type given and set up the appropriate typecasting.  Also sets up
-                  automatic typecasting for the native postgres adapter, so that on
-                  retrieval, the values are automatically converted to <a
-                  href="PGRange.html">PGRange</a> instances. The <a
+                  <p>Registers a range type that the extension should handle.  Makes a Database
+                  instance that has been extended with <a
+                  href="PGRange/DatabaseMethods.html">DatabaseMethods</a> recognize the range
+                  type given and set up the appropriate typecasting.  Also sets up automatic
+                  typecasting for the native postgres adapter, so that on retrieval, the
+                  values are automatically converted to PGRange instances. The <a
                   href="PGRange.html#attribute-i-db_type">#db_type</a> argument should be the
                   name of the range type. Accepts the following options:</p>
                   <dl class="rdoc-list note-list"><dt>:converter 
@@ -341,7 +337,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-register-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-register-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">register</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">db_type</span> = <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">converter</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:converter</span>]&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t provide both a block and :converter option to register&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">converter</span> = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">soid</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:subtype_oid</span>]&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t provide both a converter and :scalar_oid option to register&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">converter</span> &#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no conversion proc for :scalar_oid=&gt;#{soid.inspect} in PG_TYPES&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">converter</span> = <span class="ruby-constant">PG_TYPES</span>[<span class="ruby-identifier">soid</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">parser</span> = <span class="ruby-constant">Parser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">converter</span>)&#x000A;&#x000A;  <span class="ruby-constant">RANGE_TYPES</span>[<span class="ruby-identifier">db_type</span>] = <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">to_sym</span>&#x000A;&#x000A;  <span class="ruby-constant">DatabaseMethods</span>.<span class="ruby-identifier">define_range_typecast_method</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">parser</span>)&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">oid</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:oid</span>]&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_TYPES</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">parser</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-register-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">register</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">db_type</span> = <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">dup</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">converter</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:converter</span>]&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t provide both a block and :converter option to register&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">converter</span> = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">soid</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:subtype_oid</span>]&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t provide both a converter and :scalar_oid option to register&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">converter</span> &#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no conversion proc for :scalar_oid=&gt;#{soid.inspect} in PG_TYPES&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">converter</span> = <span class="ruby-constant">PG_TYPES</span>[<span class="ruby-identifier">soid</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">parser</span> = <span class="ruby-constant">Parser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">converter</span>)&#x000A;&#x000A;  <span class="ruby-constant">RANGE_TYPES</span>[<span class="ruby-identifier">db_type</span>] = <span class="ruby-identifier">db_type</span>.<span class="ruby-identifier">to_sym</span>&#x000A;&#x000A;  <span class="ruby-constant">DatabaseMethods</span>.<span class="ruby-identifier">define_range_typecast_method</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">parser</span>)&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">oid</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:oid</span>]&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_TYPES</span>[<span class="ruby-identifier">oid</span>] = <span class="ruby-identifier">parser</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -353,9 +349,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Allow <a href="PGRange.html">PGRange</a> values in case statements, where
-                  they return true if they are equal to each other using eql?, or if this <a
-                  href="PGRange.html">PGRange</a> can be converted to a <a
+                  <p>Allow PGRange values in case statements, where they return true if they are
+                  equal to each other using eql?, or if this PGRange can be converted to a <a
                   href="../../Range.html">Range</a>, delegating to that range.</p>
                 </div>
                 <div class='source'>
@@ -390,11 +385,11 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Consider the receiver equal to other <a href="PGRange.html">PGRange</a>
-                  instances with the same beginning, ending, exclusions, and database type. 
-                  Also consider it equal to <a href="../../Range.html">Range</a> instances if
-                  this <a href="PGRange.html">PGRange</a> can be converted to a a <a
-                  href="../../Range.html">Range</a> and those ranges are equal.</p>
+                  <p>Consider the receiver equal to other PGRange instances with the same
+                  beginning, ending, exclusions, and database type.  Also consider it equal
+                  to <a href="../../Range.html">Range</a> instances if this PGRange can be
+                  converted to a a <a href="../../Range.html">Range</a> and those ranges are
+                  equal.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eql-3F-source'); return false">
@@ -445,9 +440,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Wrap the <a href="PGRange.html">PGRange</a> instance in an <a
-                  href="RangeOp.html">RangeOp</a>, allowing you to easily use the PostgreSQL
-                  range functions and operators with literal ranges.</p>
+                  <p>Wrap the PGRange instance in an <a href="RangeOp.html">RangeOp</a>,
+                  allowing you to easily use the PostgreSQL range functions and operators
+                  with literal ranges.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-op-source'); return false">
@@ -551,9 +546,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Whether or not this <a href="PGRange.html">PGRange</a> is a valid ruby
-                  range.  In order to be a valid ruby range, it must have a beginning and an
-                  ending (no unbounded ranges), and it cannot exclude the beginning element.</p>
+                  <p>Whether or not this PGRange is a valid ruby range.  In order to be a valid
+                  ruby range, it must have a beginning and an ending (no unbounded ranges),
+                  and it cannot exclude the beginning element.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-valid_ruby_range-3F-source'); return false">

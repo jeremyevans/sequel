@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Dataset::StoredProcedureMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/utils/stored_procedures_rb.html">lib/sequel/adapters/utils/stored_procedures.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Dataset.html">Dataset</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -100,7 +96,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(*<span class="ruby-identifier">args</span>, &amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">sp</span> = <span class="ruby-identifier">clone</span>&#x000A;  <span class="ruby-identifier">sp</span>.<span class="ruby-identifier">sproc_args</span> = <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">sp</span>.<span class="ruby-identifier">run</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">sp</span> = <span class="ruby-identifier">clone</span>&#x000A;  <span class="ruby-identifier">sp</span>.<span class="ruby-identifier">sproc_args</span> = <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">sp</span>.<span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-inspect'>
@@ -135,7 +131,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-run-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-run-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">run</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-ivar">@sproc_type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>&#x000A;    <span class="ruby-identifier">all</span>(&amp;<span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>&#x000A;    <span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>&#x000A;    <span class="ruby-identifier">insert</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:update</span>&#x000A;    <span class="ruby-identifier">update</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:delete</span>&#x000A;    <span class="ruby-identifier">delete</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-run-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/stored_procedures.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">run</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-ivar">@sproc_type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:select</span>, <span class="ruby-value">:all</span>&#x000A;    <span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:first</span>&#x000A;    <span class="ruby-identifier">first</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:insert</span>&#x000A;    <span class="ruby-identifier">insert</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:update</span>&#x000A;    <span class="ruby-identifier">update</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:delete</span>&#x000A;    <span class="ruby-identifier">delete</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sproc_type-3D'>

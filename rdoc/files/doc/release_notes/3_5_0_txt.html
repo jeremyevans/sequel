@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.5.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>New Plugins</p>
-            <hr style="height: 9px">
+            <hr>
             <ul><li>
             <p>A class_table_inheritance plugin has been added, supporting model
             inheritance in the database using a table-per-model-class approach. Each
@@ -188,10 +188,10 @@
             </li></ul>
             
             <p>New Extensions</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>A named_timezones extension was added, allowing you to use named timezones
-            such as "America/Los_Angeles" (the default <a
+            such as “America/Los_Angeles” (the default <a
             href="../../../classes/Sequel.html">Sequel</a> timezone support only
             supports UTC or local time). This extension requires TZInfo.  It also sets
             the <a
@@ -251,7 +251,7 @@
             </li></ul>
             
             <p>Other New Features</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Associations now support composite keys.  All of the :*key options options
             now accept arrays of symbols instead of plain symbols. Example:</p>
@@ -322,7 +322,7 @@
             was added allowing you to easily use the VirtualRow support outside of
             select, order, and filter calls:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">net_benefit</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">revenue</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cost</span>}&#x000A;<span class="ruby-identifier">good_employee</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">num_commendations</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-identifier">fire</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> &amp; <span class="ruby-operator">~</span><span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">demote</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> &amp; <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">promote</span> = <span class="ruby-identifier">net_benefit</span> &amp; <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">fire</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">employed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">demote</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">rank=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">rank</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">promote</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">rank=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">rank</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>)</pre>
+            <pre class="ruby"><span class="ruby-identifier">net_benefit</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">revenue</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">cost</span>}&#x000A;<span class="ruby-identifier">good_employee</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">virtual_row</span>{<span class="ruby-identifier">num_commendations</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}&#x000A;<span class="ruby-identifier">fire</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span><span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">demote</span> = <span class="ruby-operator">~</span><span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-identifier">promote</span> = <span class="ruby-identifier">net_benefit</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">good_employee</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">fire</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">employed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">demote</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">rank=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">rank</span><span class="ruby-operator">-</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">employees</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">promote</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">rank=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">rank</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>)</pre>
             </li><li>
             <p>When <a href="../../../classes/Sequel.html">Sequel</a> wraps exception in
             its own classes (to provide database independence), it now keeps the
@@ -366,7 +366,7 @@
             </li></ul>
             
             <p>Other Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Typecasting model attributes is now done before checking existing values,
             instead of after.  Before, the code for the model attribute setters would
@@ -462,7 +462,7 @@
             </li></ul>
             
             <p>Backwards Compatibility</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>Graphing to an previously joined (but not graphed) dataset now causes the
             receiver to be wrapped in a subselect, so if you graph a dataset to a

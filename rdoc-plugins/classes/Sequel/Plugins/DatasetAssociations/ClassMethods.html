@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::DatasetAssociations::ClassMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../../files/lib/sequel/plugins/dataset_associations_rb.html">lib/sequel/plugins/dataset_associations.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../DatasetAssociations.html">DatasetAssociations</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -69,7 +65,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-associate-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-associate-source'><span class="ruby-comment"># File lib/sequel/plugins/dataset_associations.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, *)&#x000A;  <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pluralize</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_sym</span>&#x000A;  <span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-identifier">associated</span>(<span class="ruby-identifier">name</span>)}&#x000A;  <span class="ruby-identifier">ret</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-associate-source'><span class="ruby-comment"># File lib/sequel/plugins/dataset_associations.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associate</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">ret</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">r</span> = <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">meth</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">returns_array?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pluralize</span>(<span class="ruby-identifier">name</span>).<span class="ruby-identifier">to_sym</span>&#x000A;  <span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-identifier">meth</span>){<span class="ruby-identifier">associated</span>(<span class="ruby-identifier">name</span>)}&#x000A;  <span class="ruby-identifier">ret</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

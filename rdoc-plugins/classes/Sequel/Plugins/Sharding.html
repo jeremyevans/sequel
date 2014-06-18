@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::Sharding</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/plugins/sharding_rb.html">lib/sequel/plugins/sharding.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -60,7 +56,7 @@
             
             <p>Usage:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Add the sharding support to all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">sharding</span>&#x000A;&#x000A;<span class="ruby-comment"># Add the sharding support to the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">sharding</span></pre>
+            <pre># Add the sharding support to all model subclasses (called before loading subclasses)&#x000A;Sequel::Model.plugin :sharding&#x000A;# Add the sharding support to the Album class&#x000A;Album.plugin :sharding</pre>
           </div>
           <div id='context'>
           </div>

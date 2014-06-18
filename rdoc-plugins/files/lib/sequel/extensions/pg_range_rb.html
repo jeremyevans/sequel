@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>pg_range.rb</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -49,9 +49,7 @@
             
             <p>This extension integrates with Sequel&#39;s native postgres adapter, so
             that when range type values are retrieved, they are parsed and returned as
-            instances of <a
-            href="../../../../classes/Sequel/Postgres/PGRange.html">Sequel::Postgres::PGRange</a>.
-            PGRange mostly acts like a <a
+            instances of Sequel::Postgres::PGRange.  PGRange mostly acts like a <a
             href="../../../../classes/Range.html">Range</a>, but it&#39;s not a <a
             href="../../../../classes/Range.html">Range</a> as not all PostgreSQL range
             type values would be valid ruby ranges.  If the range type value you are
@@ -72,9 +70,9 @@
             <pre>Sequel.pg_range(range)</pre>
             
             <p>If you have loaded the <a
-            href="../../../doc/core_extensions_rdoc.html">core_extensions extension</a>
-            or you have loaded the core_refinements extension and have activated
-            refinements for the file, you can also use <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
             href="../../../../classes/Range.html#method-i-pg_range">Range#pg_range</a>:</p>
             
             <pre>range.pg_range</pre>

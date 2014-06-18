@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::DataObjects::Database</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../DataObjects.html">DataObjects</a></strong>
+          Superclass:
+          <strong>Sequel::Database</strong>
         </div>
       </div>
       <div id='content'>
@@ -44,13 +44,11 @@
           <div id='description'>
             
             <p><a href="../DataObjects.html">DataObjects</a> uses it&#39;s own internal
-            connection pooling in addition to the pooling that <a
-            href="../../Sequel.html">Sequel</a> uses.  You should make sure that you
-            don&#39;t set the connection pool size to more than 8 for a <a
-            href="Database.html">Sequel::DataObjects::Database</a> object, or hack <a
-            href="../DataObjects.html">DataObjects</a> (or Extlib) to use a pool size
-            at least as large as the pool size being used by <a
-            href="../../Sequel.html">Sequel</a>.</p>
+            connection pooling in addition to the pooling that Sequel uses.  You should
+            make sure that you don&#39;t set the connection pool size to more than 8
+            for a <a href="Database.html">Sequel::DataObjects::Database</a> object, or
+            hack <a href="../DataObjects.html">DataObjects</a> (or Extlib) to use a
+            pool size at least as large as the pool size being used by Sequel.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -76,6 +74,13 @@
                     <td class='context-item-name'>DISCONNECT_ERROR_RE</td>
                     <td>=</td>
                     <td class='context-item-value'>/terminating connection due to administrator command/</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatasetClass</td>
+                    <td>=</td>
+                    <td class='context-item-value'>self</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -128,8 +133,8 @@
                   <p>Execute the given SQL.  If a block is given, the DataObjects::Reader
                   created is yielded to it. A block should not be provided unless a a SELECT
                   statement is being used (or something else that returns rows). Otherwise,
-                  the return value is the insert id if <a target="_top" href="http://:type">opts</a> is
-                  :insert, or the number of affected rows, otherwise.</p>
+                  the return value is the insert id if <a href=":type">opts</a> is :insert,
+                  or the number of affected rows, otherwise.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
@@ -200,8 +205,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Return the <a href="../DataObjects.html">DataObjects</a> URI for the <a
-                  href="../../Sequel.html">Sequel</a> URI, removing the do: prefix.</p>
+                  <p>Return the <a href="../DataObjects.html">DataObjects</a> URI for the Sequel
+                  URI, removing the do: prefix.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-uri-source'); return false">

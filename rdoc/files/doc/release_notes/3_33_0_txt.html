@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>3.33.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Features">New Features</h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>A server_block extension has been added that makes Sequel&#39;s sharding
             support easier to use by scoping database access inside the block to a
@@ -104,7 +104,7 @@
             except on MySQL &gt; 5.5.12 (due to MySQL bug 64374).</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements</h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The mysql and mysql2 adapters now both provide an accurate number of rows
             matched, so <a href="../../../classes/Sequel/Model.html">Sequel::Model</a>
@@ -160,12 +160,12 @@
             constantize an invalid string in the model inflector.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility</h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
             <p>The sqlite adapter now typecasts columns that SQLite stores as
             INTEGER/REAL.  Previously, it only typecasted columns that SQLite stored as
             TEXT/BLOB.  For details about SQLite storage, see <a
-            href="http://www.sqlite.org/datatype3.html.">www.sqlite.org/datatype3.html.</a></p>
+            href="http://www.sqlite.org/datatype3.html">www.sqlite.org/datatype3.html</a>.</p>
             
             <p>Any custom type conversion procs used with the sqlite adapter should be
             modified to work with Integer/Float objects in addition to <a

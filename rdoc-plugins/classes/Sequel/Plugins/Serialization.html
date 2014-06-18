@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::Plugins::Serialization</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/plugins/serialization_rb.html">lib/sequel/plugins/serialization.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../Plugins.html">Plugins</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -72,7 +68,7 @@
             Otherwise, it is possible that the default column accessors will take
             precedence.</p>
             
-            <h2 id="label-Example">Example</h2>
+            <h2 id="module-Sequel::Plugins::Serialization-label-Example">Example<span><a href="#module-Sequel::Plugins::Serialization-label-Example">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <pre class="ruby"><span class="ruby-comment"># Require json if you plan to use it, as the plugin doesn&#39;t require it for you.</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;json&#39;</span>&#x000A;&#x000A;<span class="ruby-comment"># Register custom serializer/deserializer pair, if desired</span>&#x000A;<span class="ruby-identifier">require</span> <span class="ruby-string">&#39;sequel/plugins/serialization&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Serialization</span>.<span class="ruby-identifier">register_format</span>(:<span class="ruby-identifier">reverse</span>,&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>},&#x000A;  <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>})&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-comment"># Built-in format support when loading the plugin</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">serialization</span>, :<span class="ruby-identifier">json</span>, :<span class="ruby-identifier">permissions</span>&#x000A;&#x000A;  <span class="ruby-comment"># Built-in format support after loading the plugin using serialize_attributes</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">serialization</span>&#x000A;  <span class="ruby-identifier">serialize_attributes</span> :<span class="ruby-identifier">marshal</span>, :<span class="ruby-identifier">permissions</span>&#x000A;&#x000A;  <span class="ruby-comment"># Use custom registered serialization format just like built-in format</span>&#x000A;  <span class="ruby-identifier">serialize_attributes</span> :<span class="ruby-identifier">reverse</span>, :<span class="ruby-identifier">password</span>&#x000A;&#x000A;  <span class="ruby-comment"># Use a custom serializer/deserializer pair without registering</span>&#x000A;  <span class="ruby-identifier">serialize_attributes</span> [<span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>}, <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">reverse</span>}], :<span class="ruby-identifier">password</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">create</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">permissions</span> = { :<span class="ruby-identifier">global</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;read-only&#39;</span> }&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">save</span></pre>
             
@@ -140,7 +136,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, *<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@deserialization_map</span> = {}&#x000A;    <span class="ruby-ivar">@serialization_map</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@deserialization_map</span> = {}&#x000A;    <span class="ruby-ivar">@serialization_map</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -158,7 +154,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">format</span>=<span class="ruby-keyword">nil</span>, *<span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, *<span class="ruby-identifier">columns</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">format</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-register_format'>

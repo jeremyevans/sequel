@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>2.1.0.txt</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -39,7 +39,7 @@
           <div id='description'>
             
             <p>Model Improvements</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>one_to_many/many_to_many associations now support a :limit option, adding a
             limit/offset to the records returned.  This was possible before using a
@@ -97,7 +97,7 @@
             </li></ul>
             
             <p>Table Joining</p>
-            <hr style="height: 10px">
+            <hr>
             
             <p>Dataset#join_table got a nice overhaul.  You can now use any join type your
             database allows:</p>
@@ -106,7 +106,7 @@
             
             <p>You can now specify the conditions as</p>
             <ul><li>
-            <p>String: "a.b = c.d" # ON a.b = c.d</p>
+            <p>String: “a.b = c.d” # ON a.b = c.d</p>
             </li><li>
             <p>Expression :x &lt; :y # ON x &lt; y</p>
             </li><li>
@@ -130,7 +130,7 @@
             needing to know in advance what table aliases will be used.</p>
             
             <p>Expanded SQL Syntax Support</p>
-            <hr style="height: 10px">
+            <hr>
             
             <p>SQL Case statements are now supported directly using hashes or arrays:</p>
             
@@ -148,7 +148,7 @@
             <pre>:date.extract(:day)</pre>
             
             <p>Other Notable Changes</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>The sequel command line tool can now run migrations.  The -m option
             specifies the directory holding the migration files, and the -M options
@@ -208,7 +208,7 @@
             <pre>the otherwise it would yield a count for the query without&#x000A;DISTINCT.</pre>
             
             <p>ParseTree Support Officially Deprecated</p>
-            <hr style="height: 10px">
+            <hr>
             
             <p>The support for ParseTree-based block filters has officially been
             deprecated and will be removed in <a
@@ -233,7 +233,7 @@
             <p>Which will get you the first 5 records matching the condition.</p>
             
             <p>Backwards Incompatible Changes</p>
-            <hr style="height: 10px">
+            <hr>
             <ul><li>
             <p>To change the datetime classe used from Time to DateTime, you now use:</p>
             
@@ -289,8 +289,8 @@
             </li><li>
             <p>You can no longer abuse the SQL::Function syntax to use a table alias with
             specified columns (e.g. :table[:col1, :col2, :col3]) or to cast to types
-            (e.g. :<a target="_top" href="http://20">x.cast_as(:varchar</a>)).  Use a LiteralString
-            in both cases.</p>
+            (e.g. :<a href="20">x.cast_as(:varchar</a>)).  Use a LiteralString in both
+            cases.</p>
             </li></ul>
           </div>
           <div id='context'>

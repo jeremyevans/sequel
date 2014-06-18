@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::ADO::Database</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -35,8 +35,8 @@
           </li>
         </ol>
         <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../ADO.html">ADO</a></strong>
+          Superclass:
+          <strong>Sequel::Database</strong>
         </div>
       </div>
       <div id='content'>
@@ -76,6 +76,13 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatasetClass</td>
+                    <td>=</td>
+                    <td class='context-item-value'>self</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>Provider</td>
                     <td>=</td>
                     <td class='context-item-value'>opts[:provider] if opts[:provider]</td>
@@ -107,7 +114,7 @@
                   </dd><dt>:driver 
                   <dd>
                   <p>The driver to use in the <a href="../ADO.html">ADO</a> connection string. 
-                  If not provided, a default of "SQL Server" is used.</p>
+                  If not provided, a default of “SQL Server” is used.</p>
                   </dd><dt>:conn_string 
                   <dd>
                   <p>The full <a href="../ADO.html">ADO</a> connection string.  If this is
@@ -115,7 +122,7 @@
                   </dd><dt>:provider 
                   <dd>
                   <p>Sets the <a href="Database.html#Provider">Provider</a> of this <a
-                  href="../ADO.html">ADO</a> connection (for example, "SQLOLEDB"). If you
+                  href="../ADO.html">ADO</a> connection (for example, “SQLOLEDB”). If you
                   don&#39;t specify a provider, the default one used by WIN32OLE has major
                   problems, such as creating a new native database connection for every
                   query, which breaks things such as temporary tables.</p>

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>model_plugins.rdoc</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Model+Plugins">Model Plugins</h1>
+            <h1 id="label-Model+Plugins">Model Plugins<span><a href="#label-Model+Plugins">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             
             <p><a href="../../classes/Sequel/Model.html">Sequel::Model</a> (and <a
             href="../../classes/Sequel.html">Sequel</a> in general) is designed around
@@ -50,7 +50,7 @@
             dataset methods added by earlier plugins, and call super to get the
             behavior before the plugin was added.</p>
             
-            <h2 id="label-Default+Plugins">Default Plugins</h2>
+            <h2 id="label-Default+Plugins">Default Plugins<span><a href="#label-Default+Plugins">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>The <a href="../../classes/Sequel/Model.html">Sequel::Model</a> class is
             completely empty by default, in that it has no class methods or instance
@@ -73,7 +73,7 @@
             href="../../classes/Sequel/Model/Associations.html">Sequel::Model::Associations</a>
             plugin loaded by default, though it is possible to disable this.</p>
             
-            <h2 id="label-Loading+Plugins">Loading Plugins</h2>
+            <h2 id="label-Loading+Plugins">Loading Plugins<span><a href="#label-Loading+Plugins">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Loading a plugin into a model class is generally as simple as calling the
             Sequel::Model.plugin method with the name of the plugin, for example:</p>
@@ -101,7 +101,7 @@
             <p>Doing this, only Node and future subclasses of Node will have the tree
             plugin loaded.</p>
             
-            <h2 id="label-Plugin+Arguments%2FOptions">Plugin Arguments/Options</h2>
+            <h2 id="label-Plugin+Arguments%2FOptions">Plugin Arguments/Options<span><a href="#label-Plugin+Arguments%2FOptions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Some plugins require arguments and/or support options.  For example, the
             single_table_inheritance plugin requires an argument containing the column
@@ -112,7 +112,7 @@
             <p>You should read the documentation for the plugin to determine if it
             requires arguments and what if any options are supported.</p>
             
-            <h2 id="label-Creating+Plugins">Creating Plugins</h2>
+            <h2 id="label-Creating+Plugins">Creating Plugins<span><a href="#label-Creating+Plugins">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>The simplest possible plugin is an empty module in a file stored in
             <code>sequel/plugins/plugin_name</code> somewhere in ruby&#39;s load path:</p>
@@ -125,7 +125,7 @@
             
             <pre>Sequel::Model.plugin Module.new</pre>
             
-            <h2 id="label-Example+Formatting">Example Formatting</h2>
+            <h2 id="label-Example+Formatting">Example Formatting<span><a href="#label-Example+Formatting">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>In general, loading plugins by module instead of by name is not
             recommended, so this guide will assume that plugins are loaded by name. 
@@ -142,7 +142,7 @@
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Bar</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h2 id="label-Adding+Class+Methods">Adding Class Methods</h2>
+            <h2 id="label-Adding+Class+Methods">Adding Class Methods<span><a href="#label-Adding+Class+Methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>If you want your plugin to add class methods to the model class it is
             loaded into, define a ClassMethods module under the plugin module:</p>
@@ -153,7 +153,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">foo</span>&#x000A;<span class="ruby-constant">Bar</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span></pre>
             
-            <h2 id="label-Adding+Instance+Methods">Adding Instance Methods</h2>
+            <h2 id="label-Adding+Instance+Methods">Adding Instance Methods<span><a href="#label-Adding+Instance+Methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>If you want your plugin to add instance methods to the model class it is
             loaded into, define an InstanceMethods module under the plugin module:</p>
@@ -164,7 +164,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">foo</span>&#x000A;<span class="ruby-constant">Bar</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span></pre>
             
-            <h2 id="label-Adding+Dataset+Methods">Adding Dataset Methods</h2>
+            <h2 id="label-Adding+Dataset+Methods">Adding Dataset Methods<span><a href="#label-Adding+Dataset+Methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>If you want your plugin to add methods to the dataset of the model class it
             is loaded into, define a DatasetMethods module under the plugin module:</p>
@@ -175,7 +175,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">foo</span>&#x000A;<span class="ruby-constant">Bar</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span></pre>
             
-            <h2 id="label-Calling+super+to+get+Previous+Behavior">Calling super to get Previous Behavior</h2>
+            <h2 id="label-Calling+super+to+get+Previous+Behavior">Calling super to get Previous Behavior<span><a href="#label-Calling+super+to+get+Previous+Behavior">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>No matter if you are dealing with class, instance, or dataset methods, you
             can call super inside the method to get the previous behavior.  This makes
@@ -184,7 +184,7 @@
             
             <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>&#x000A;  <span class="ruby-keyword">module</span> <span class="ruby-constant">InstanceMethods</span>&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">save</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">allow_saving?</span>&#x000A;        <span class="ruby-keyword">super</span>&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;saving not allowed for this object&#39;</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">private</span>&#x000A;&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">allow_saving?</span>&#x000A;      <span class="ruby-value">%xpom`</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/Waxing/</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h2 id="label-Running+Code+When+the+Plugin+is+Loaded">Running Code When the Plugin is Loaded</h2>
+            <h2 id="label-Running+Code+When+the+Plugin+is+Loaded">Running Code When the Plugin is Loaded<span><a href="#label-Running+Code+When+the+Plugin+is+Loaded">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Some plugins require more than just adding methods.  Any plugin that
             requires state is going to have to initialize that state and store it
@@ -228,7 +228,7 @@
             <p>In general you should only require plugin arguments if you absolutely must
             have a value and there is no good default.</p>
             
-            <h2 id="label-Handling+Subclasses">Handling Subclasses</h2>
+            <h2 id="label-Handling+Subclasses">Handling Subclasses<span><a href="#label-Handling+Subclasses">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel/Model.html">Sequel::Model</a> uses a
             copy-on-subclassing approach to model state.  So instead of model
@@ -262,7 +262,7 @@
             return the value to set into the subclass.</p>
             </dd></dl>
             
-            <h2 id="label-Handling+Changes+to+the+Model%27s+Dataset">Handling Changes to the Model&#39;s Dataset</h2>
+            <h2 id="label-Handling+Changes+to+the+Model%27s+Dataset">Handling Changes to the Model&#39;s Dataset<span><a href="#label-Handling+Changes+to+the+Model%27s+Dataset">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>In many plugins, if the model class changes the dataset, you need to change
             the state for the plugin.  While you can do this by overriding the
@@ -273,7 +273,7 @@
             <p>With this code, any time the model&#39;s dataset changes, the state of the
             plugin will be updated to set the correct table name.</p>
             
-            <h2 id="label-Making+Dataset+Methods+Callable+as+Class+Methods">Making Dataset Methods Callable as Class Methods</h2>
+            <h2 id="label-Making+Dataset+Methods+Callable+as+Class+Methods">Making Dataset Methods Callable as Class Methods<span><a href="#label-Making+Dataset+Methods+Callable+as+Class+Methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>In some cases, when dataset methods are added, you want to also create a
             model class method that will call the dataset method, so you can write:</p>

@@ -2,7 +2,7 @@
 <html lang='en'>
   <head>
     <title>Sequel::SQLite::DatabaseMethods</title>
-    <meta content='text/html; charset=US-ASCII' http-equiv='Content-Type'>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
@@ -34,10 +34,6 @@
             <a target="docwin" href="../../../files/lib/sequel/adapters/shared/sqlite_rb.html">lib/sequel/adapters/shared/sqlite.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Parent:
-          <strong><a target="docwin" href="../SQLite.html">SQLite</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -45,10 +41,8 @@
             
             <p>No matter how you connect to <a href="../SQLite.html">SQLite</a>, the
             following <a href="Database.html">Database</a> options can be used to set
-            PRAGMAs on connections in a thread-safe manner: :<a
-            href="DatabaseMethods.html#method-i-auto_vacuum">#auto_vacuum</a>, :<a
-            href="DatabaseMethods.html#method-i-foreign_keys">#foreign_keys</a>,
-            :synchronous, and :temp_store.</p>
+            PRAGMAs on connections in a thread-safe manner: :auto_vacuum,
+            :foreign_keys, :synchronous, and :temp_store.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -177,8 +171,7 @@
                       
                       <p>Whether to use integers for booleans in the database.  <a
                       href="../SQLite.html">SQLite</a> recommends booleans be stored as integers,
-                      but historically <a href="../../Sequel.html">Sequel</a> has used
-                      &#39;t&#39;/&#39;f&#39;.</p>
+                      but historically Sequel has used &#39;t&#39;/&#39;f&#39;.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -240,9 +233,8 @@
                   <p>Set the <a
                   href="DatabaseMethods.html#method-i-auto_vacuum">#auto_vacuum</a> PRAGMA
                   using the given symbol (:none, :full, or :incremental).  See pragma_set. 
-                  Consider using the :<a
-                  href="DatabaseMethods.html#method-i-auto_vacuum">#auto_vacuum</a> <a
-                  href="Database.html">Database</a> option instead.</p>
+                  Consider using the :auto_vacuum <a href="Database.html">Database</a> option
+                  instead.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-auto_vacuum-3D-source'); return false">
@@ -338,9 +330,8 @@
                   href="DatabaseMethods.html#method-i-foreign_keys">#foreign_keys</a> PRAGMA
                   using the given boolean value, if using <a href="../SQLite.html">SQLite</a>
                   3.6.19+.  If not using 3.6.19+, no error is raised. See pragma_set.
-                  Consider using the :<a
-                  href="DatabaseMethods.html#method-i-foreign_keys">#foreign_keys</a> <a
-                  href="Database.html">Database</a> option instead.</p>
+                  Consider using the :foreign_keys <a href="Database.html">Database</a>
+                  option instead.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_keys-3D-source'); return false">
@@ -441,7 +432,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sqlite_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sqlite_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sqlite_version</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@sqlite_version</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@sqlite_version</span>)&#x000A;  <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT sqlite_version()&#39;</span>).<span class="ruby-identifier">single_value</span>&#x000A;    [<span class="ruby-value">10000</span>, <span class="ruby-value">100</span>, <span class="ruby-value">1</span>].<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;.&#39;</span>)).<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">0</span>] * <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>])}&#x000A;  <span class="ruby-keyword">rescue</span>&#x000A;    <span class="ruby-value">0</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sqlite_version-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sqlite_version</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-ivar">@sqlite_version</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@sqlite_version</span>)&#x000A;  <span class="ruby-ivar">@sqlite_version</span> = <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT sqlite_version()&#39;</span>).<span class="ruby-identifier">single_value</span>&#x000A;    [<span class="ruby-value">10000</span>, <span class="ruby-value">100</span>, <span class="ruby-value">1</span>].<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;.&#39;</span>)).<span class="ruby-identifier">inject</span>(<span class="ruby-value">0</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">a</span>, <span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">m</span>[<span class="ruby-value">0</span>] <span class="ruby-operator">*</span> <span class="ruby-constant">Integer</span>(<span class="ruby-identifier">m</span>[<span class="ruby-value">1</span>])}&#x000A;  <span class="ruby-keyword">rescue</span>&#x000A;    <span class="ruby-value">0</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_create_table_if_not_exists-3F'>
@@ -600,8 +591,7 @@
                   
                   <p>Set the <a href="DatabaseMethods.html#method-i-temp_store">#temp_store</a>
                   PRAGMA using the given symbol (:default, :file, or :memory). See
-                  pragma_set. Consider using the :<a
-                  href="DatabaseMethods.html#method-i-temp_store">#temp_store</a> <a
+                  pragma_set. Consider using the :temp_store <a
                   href="Database.html">Database</a> option instead.</p>
                 </div>
                 <div class='source'>
