@@ -1206,7 +1206,7 @@ module Sequel
         
         # The columns to select when loading the association, associated_class.table_name.* by default.
         def select
-         cached_fetch(:select){Sequel::SQL::ColumnAll.new(associated_class.table_name)}
+          cached_fetch(:select){Sequel::SQL::ColumnAll.new(associated_class.table_name)}
         end
 
         private
