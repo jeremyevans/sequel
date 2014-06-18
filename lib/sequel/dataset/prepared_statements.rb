@@ -86,7 +86,8 @@ module Sequel
         when :first
           clone(:limit=>1).select_sql
         when :insert_select
-          returning.insert_sql(*@prepared_modify_values)
+          ds = opts[:returning] ? self : returning
+          ds.insert_sql(*@prepared_modify_values)
         when :insert
           insert_sql(*@prepared_modify_values)
         when :update

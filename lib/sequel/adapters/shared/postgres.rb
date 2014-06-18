@@ -1285,7 +1285,10 @@ module Sequel
       # Insert a record returning the record inserted.  Always returns nil without
       # inserting a query if disable_insert_returning is used.
       def insert_select(*values)
-        returning.insert(*values){|r| return r} unless @opts[:disable_insert_returning]
+        unless @opts[:disable_insert_returning]
+          ds = opts[:returning] ? self : returning
+          ds.insert(*values){|r| return r}
+        end
       end
 
       # Locks all tables in the dataset's FROM clause (but not in JOINs) with

@@ -1041,6 +1041,18 @@ describe "Postgres::Dataset#insert" do
     @ds.first(:xid=>h[:xid])[:value].should == 10
   end
 
+  specify "should have insert_select respect existing returning clause" do
+    h = @ds.returning(:value___v, :xid___x).insert_select(:value=>10)
+    h[:v].should == 10
+    @ds.first(:xid=>h[:x])[:value].should == 10
+  end
+
+  specify "should have prepared insert_select respect existing returning clause" do
+    h = @ds.returning(:value___v, :xid___x).prepare(:insert_select, :insert_select, :value=>10).call
+    h[:v].should == 10
+    @ds.first(:xid=>h[:x])[:value].should == 10
+  end
+
   specify "should correctly return the inserted record's primary key value" do
     value1 = 10
     id1 = @ds.insert(:value=>value1)

@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#insert_select on PostgreSQL respect existing RETURNING clause (jeremyevans)
+
 * Fix eager loading limited associations via a UNION when an association block is used (jeremyevans)
 
 * Associate reciprocal object before saving associated object when creating new objects in nested_attributes (chanks, jeremyevans) (#831)
