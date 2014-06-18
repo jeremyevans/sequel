@@ -31,25 +31,25 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
 
   specify "should run correct SQL for associations" do
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) -- prepared"]
+    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) -- prepared"]
 
     @Artist.load(:id=>1).album
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2).artist
-    @db.sqls.should == ["SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT id, id2 FROM artists WHERE (artists.id = 2) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2).tags
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2).tag
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) LIMIT 1 -- prepared"]
 
     @Artist.load(:id=>1).tags
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) -- prepared"]
 
     @Artist.load(:id=>1).tag
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
   end
 
   specify "should run correct SQL for composite key associations" do
@@ -63,25 +63,25 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @Artist.one_through_many :tag, :clone=>:tags
 
     @Artist.load(:id=>1, :id2=>2).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
+    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
 
     @Artist.load(:id=>1, :id2=>2).album
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2, :artist_id2=>3).artist
-    @db.sqls.should == ["SELECT * FROM artists WHERE ((artists.id = 2) AND (artists.id2 = 3)) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT id, id2 FROM artists WHERE ((artists.id = 2) AND (artists.id2 = 3)) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2, :id2=>3).tags
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2, :id2=>3).tag
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) LIMIT 1 -- prepared"]
 
     @Artist.load(:id=>1, :id2=>2).tags
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
 
     @Artist.load(:id=>1, :id2=>2).tag
-    @db.sqls.should == ["SELECT tags.* FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
+    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
   end
 
   specify "should not run query if no objects can be associated" do
@@ -120,19 +120,19 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @Album.dataset = @Album.dataset.where(:a=>2)
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
+    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
   specify "should use a prepared statement if the :conditions association option" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>2} 
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
+    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
   specify "should not use a prepared statement if :conditions association option uses an identifier" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{Sequel.identifier('a')=>2}
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
+    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
   specify "should run a regular query if :dataset option is used when defining the association" do

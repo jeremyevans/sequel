@@ -5,6 +5,7 @@ describe "prepared_statements plugin" do
     @db = Sequel.mock(:fetch=>{:id=>1, :name=>'foo', :i=>2}, :autoid=>proc{|sql| 1}, :numrows=>1, :servers=>{:read_only=>{}})
     @c = Class.new(Sequel::Model(@db[:people]))
     @c.columns :id, :name, :i
+    @columns = "id, name, i"
     @c.plugin :prepared_statements
     @p = @c.load(:id=>1, :name=>'foo', :i=>2)
     @ds = @c.dataset
@@ -13,7 +14,7 @@ describe "prepared_statements plugin" do
 
   specify "should correctly lookup by primary key" do
     @c[1].should == @p
-    @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+    @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
   shared_examples_for "prepared_statements plugin" do
@@ -29,7 +30,7 @@ describe "prepared_statements plugin" do
 
     specify "should correctly create instance" do
       @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
-      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo')", "SELECT * FROM people WHERE (id = 1) LIMIT 1"]
+      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo')", "SELECT #{@columns} FROM people WHERE (id = 1) LIMIT 1"]
     end
 
     specify "should correctly create instance if dataset supports insert_select" do
@@ -39,14 +40,15 @@ describe "prepared_statements plugin" do
         end
         def insert_select(h)
           self._fetch = {:id=>1, :name=>'foo', :i => 2}
-          returning.server(:default).with_sql(:insert_sql, h).first
+          ds = opts[:returning] ? self : returning
+          ds.server(:default).with_sql(:insert_sql, h).first
         end
         def insert_sql(*)
-          "#{super}#{' RETURNING *' if opts.has_key?(:returning)}"
+          "#{super}#{" RETURNING #{opts[:returning] && !opts[:returning].empty? ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}" if opts.has_key?(:returning)}"
         end
       end
       @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
-      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo') RETURNING *"]
+      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo') RETURNING #{@columns}"]
     end
   end
 
@@ -54,6 +56,7 @@ describe "prepared_statements plugin" do
 
   describe "when #use_prepared_statements_for? returns false" do
     before do
+      @columns = "*"
       @c.class_eval{def use_prepared_statements_for?(type) false end}
     end
 
@@ -63,7 +66,7 @@ describe "prepared_statements plugin" do
   specify "should work correctly when subclassing" do
     c = Class.new(@c)
     c[1].should == c.load(:id=>1, :name=>'foo', :i=>2)
-    @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+    @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
   describe " with placeholder type specifiers" do 
@@ -73,7 +76,7 @@ describe "prepared_statements plugin" do
 
     specify "should correctly handle without schema type" do
       @c[1].should == @p
-      @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+      @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
     end
 
     specify "should correctly handle with schema type" do
@@ -92,7 +95,7 @@ describe "prepared_statements plugin" do
         end
       end
       @c[1].should == @p
-      @db.sqls.should == ["SELECT * FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+      @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
     end 
   end
 end

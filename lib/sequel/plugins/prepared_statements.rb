@@ -49,6 +49,19 @@ module Sequel
 
         private
 
+        # Create a prepared statement, but modify the SQL used so that the model's columns are explicitly
+        # selected instead of using *, assuming that the dataset selects from a single table.
+        def prepare_explicit_statement(ds, type, vals=OPTS)
+          f = ds.opts[:from]
+          meth = type == :insert_select ? :returning : :select
+          s = ds.opts[meth]
+          if f && f.length == 1 && !ds.opts[:join] && (!s || s.empty?)
+            ds = ds.send(meth, *columns.map{|c| Sequel.identifier(c)})
+          end 
+          
+          prepare_statement(ds, type, vals)
+        end
+
         # Create a prepared statement based on the given dataset with a unique name for the given
         # type of query and values.
         def prepare_statement(ds, type, vals=OPTS)
@@ -76,18 +89,18 @@ module Sequel
         # and return that column values for the row created.
         def prepared_insert_select(cols)
           if dataset.supports_insert_select?
-            cached_prepared_statement(:insert_select, prepared_columns(cols)){prepare_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)), :insert_select, prepared_statement_key_hash(cols))}
+            cached_prepared_statement(:insert_select, prepared_columns(cols)){prepare_explicit_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)), :insert_select, prepared_statement_key_hash(cols))}
           end
         end
 
         # Return a prepared statement that can be used to lookup a row solely based on the primary key.
         def prepared_lookup
-          cached_prepared_statement(:fixed, :lookup){prepare_statement(filter(prepared_statement_key_array(primary_key)), :first)}
+          cached_prepared_statement(:fixed, :lookup){prepare_explicit_statement(filter(prepared_statement_key_array(primary_key)), :first)}
         end
 
         # Return a prepared statement that can be used to refresh a row to get new column values after insertion.
         def prepared_refresh
-          cached_prepared_statement(:fixed, :refresh){prepare_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)).filter(prepared_statement_key_array(primary_key)), :first)}
+          cached_prepared_statement(:fixed, :refresh){prepare_explicit_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)).filter(prepared_statement_key_array(primary_key)), :first)}
         end
 
         # Return an array of two element arrays with the column symbol as the first entry and the
@@ -121,8 +134,6 @@ module Sequel
         def primary_key_lookup(pk)
           prepared_lookup.call(primary_key_hash(pk))
         end
-
-        private
 
         # If a prepared statement has already been cached for the given type and subtype,
         # return it.  Otherwise, yield to the block to get the prepared statement, and cache it.

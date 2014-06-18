@@ -1,5 +1,7 @@
 === HEAD
 
+* Use explicit columns when using automatically prepared SELECT statements in the prepared statement plugins (jeremyevans)
+
 * Make Dataset#insert_select on PostgreSQL respect existing RETURNING clause (jeremyevans)
 
 * Fix eager loading limited associations via a UNION when an association block is used (jeremyevans)

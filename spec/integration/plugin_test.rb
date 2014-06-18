@@ -1761,6 +1761,49 @@ describe "Sequel::Plugins::PreparedStatements" do
   end
 end
 
+describe "Sequel::Plugins::PreparedStatements with schema changes" do
+  before do
+    @db = DB
+    @db.create_table!(:ps_test) do
+      primary_key :id
+      String :name
+    end
+    @c = Class.new(Sequel::Model(@db[:ps_test]))
+    @c.many_to_one :ps_test, :key=>:id, :class=>@c
+    @c.one_to_many :ps_tests, :key=>:id, :class=>@c
+    @c.many_to_many :mps_tests, :left_key=>:id, :right_key=>:id, :class=>@c, :join_table=>:ps_test___x
+    @c.plugin :prepared_statements
+    @c.plugin :prepared_statements_associations
+  end
+  after do
+    @db.drop_table?(:ps_test)
+  end
+
+  it "should handle added columns" do 
+    foo = @c.create(:name=>'foo')
+    @c[foo.id].name.should == 'foo'
+    foo.ps_test.name.should == 'foo'
+    foo.ps_tests.map{|x| x.name}.should == %w'foo'
+    foo.mps_tests.map{|x| x.name}.should == %w'foo'
+    foo.update(:name=>'foo2')
+    @c[foo.id].name.should == 'foo2'
+    foo.delete
+    foo.exists?.should == false
+
+    @db.alter_table(:ps_test){add_column :i, Integer}
+
+    foo = @c.create(:name=>'foo')
+    @c[foo.id].name.should == 'foo'
+    foo.ps_test.name.should == 'foo'
+    foo.ps_tests.map{|x| x.name}.should == %w'foo'
+    foo.mps_tests.map{|x| x.name}.should == %w'foo'
+    foo.update(:name=>'foo2')
+    @c[foo.id].name.should == 'foo2'
+    foo.delete
+    foo.exists?.should == false
+  end
+end
+
 describe "Caching plugins" do
   before(:all) do
     @db = DB

@@ -53,6 +53,20 @@ module Sequel
           opts.send(:cached_fetch, :prepared_statement) do
             unless opts[:instance_specific]
               ds, bv = _associated_dataset(opts, {}).unbind
+
+              f = ds.opts[:from]
+              if f && f.length == 1
+                s = ds.opts[:select]
+                if ds.opts[:join]
+                  if opts.eager_loading_use_associated_key? && s && s.length == 1 && s.first.is_a?(SQL::ColumnAll)
+                    table = s.first.table
+                    ds = ds.select(*opts.associated_class.columns.map{|c| Sequel.identifier(c).qualify(table)})
+                  end
+                elsif !s || s.empty?
+                  ds = ds.select(*opts.associated_class.columns.map{|c| Sequel.identifier(c)})
+                end
+              end 
+          
               if bv.length != assoc_bv.length
                 h = {}
                 bv.each do |k,v|
