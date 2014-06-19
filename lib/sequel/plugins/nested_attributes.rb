@@ -82,29 +82,27 @@ module Sequel
         attr_accessor :nested_attributes_module
         
         # Allow nested attributes to be set for the given associations.  Options:
-        # * :destroy - Allow destruction of nested records.
-        # * :fields - If provided, should be an Array or proc. If it is an array,
-        #   restricts the fields allowed to be modified through the
-        #   association_attributes= method to the specific fields given. If it is
-        #   a proc, it will be called with the associated object and should return an
-        #   array of the allowable fields.
-        # * :limit - For *_to_many associations, a limit on the number of records
-        #   that will be processed, to prevent denial of service attacks.
-        # * :reject_if - A proc that is given each attribute hash before it is
-        #   passed to its associated object. If the proc returns a truthy
-        #   value, the attribute hash is ignored.
-        # * :remove - Allow disassociation of nested records (can remove the associated
-        #   object from the parent object, but not destroy the associated object).
-        # * :strict - Kept for backward compatibility. Setting it to false is
-        #   equivalent to setting :unmatched_pk to :ignore.
-        # * :transform - A proc to transform attribute hashes before they are
-        #   passed to associated object. Takes two arguments, the parent object and
-        #   the attribute hash. Uses the return value as the new attribute hash.
-        # * :unmatched_pk - Specify the action to be taken if a primary key is
-        #   provided in a record, but it doesn't match an existing associated
-        #   object. Set to :create to create a new object with that primary
-        #   key, :ignore to ignore the record, or :raise to raise an error.
-        #   The default is :raise.
+        # :destroy :: Allow destruction of nested records.
+        # :fields :: If provided, should be an Array or proc. If it is an array,
+        #            restricts the fields allowed to be modified through the
+        #            association_attributes= method to the specific fields given. If it is
+        #            a proc, it will be called with the associated object and should return an
+        #            array of the allowable fields.
+        # :limit :: For *_to_many associations, a limit on the number of records
+        #           that will be processed, to prevent denial of service attacks.
+        # :reject_if :: A proc that is given each attribute hash before it is
+        #               passed to its associated object. If the proc returns a truthy
+        #               value, the attribute hash is ignored.
+        # :remove :: Allow disassociation of nested records (can remove the associated
+        #            object from the parent object, but not destroy the associated object).
+        # :transform :: A proc to transform attribute hashes before they are
+        #               passed to associated object. Takes two arguments, the parent object and
+        #               the attribute hash. Uses the return value as the new attribute hash.
+        # :unmatched_pk :: Specify the action to be taken if a primary key is
+        #                  provided in a record, but it doesn't match an existing associated
+        #                  object. Set to :create to create a new object with that primary
+        #                  key, :ignore to ignore the record, or :raise to raise an error.
+        #                  The default is :raise.
         #
         # If a block is provided, it is used to set the :reject_if option.
         def nested_attributes(*associations, &block)
@@ -125,25 +123,35 @@ module Sequel
         # class.
         def def_nested_attribute_method(reflection)
           nested_attributes_module.class_eval do
-            if reflection.returns_array?
-              define_method("#{reflection[:name]}_attributes=") do |array|
-                nested_attributes_list_setter(reflection, array)
-              end
-            else
-             define_method("#{reflection[:name]}_attributes=") do |h|
-                nested_attributes_setter(reflection, h)
-              end
+            define_method("#{reflection[:name]}_attributes=") do |v|
+              set_nested_attributes(reflection[:name], v)
             end
           end
         end
       end
       
       module InstanceMethods
+        # Set the nested attributes for the given association.  obj should be an enumerable of multiple objects
+        # for plural associations.  The opts hash can be used to override any of the default options set by
+        # the class-level nested_attributes call.
+        def set_nested_attributes(assoc, obj, opts=OPTS)
+          raise(Error, "no association named #{assoc} for #{model.inspect}") unless ref = model.association_reflection(assoc)
+          raise(Error, "nested attributes are not enabled for association #{assoc} for #{model.inspect}") unless meta = ref[:nested_attributes]
+          meta = meta.merge(opts)
+          meta[:reflection] = ref
+          if ref.returns_array?
+            nested_attributes_list_setter(meta, obj)
+          else
+            nested_attributes_setter(meta, obj)
+          end
+        end
+
         private
         
         # Check that the keys related to the association are not modified inside the block.  Does
         # not use an ensure block, so callers should be careful.
-        def nested_attributes_check_key_modifications(reflection, obj)
+        def nested_attributes_check_key_modifications(meta, obj)
+          reflection = meta[:reflection]
           keys = reflection.associated_object_keys.map{|x| obj.send(x)}
           yield
           unless keys == reflection.associated_object_keys.map{|x| obj.send(x)}
@@ -154,10 +162,11 @@ module Sequel
         # Create a new associated object with the given attributes, validate
         # it when the parent is validated, and save it when the object is saved.
         # Returns the object created.
-        def nested_attributes_create(reflection, attributes)
+        def nested_attributes_create(meta, attributes)
+          reflection = meta[:reflection]
           obj = reflection.associated_class.new
-          nested_attributes_set_attributes(reflection, obj, attributes)
-          after_validation_hook{validate_associated_object(reflection, obj)}
+          nested_attributes_set_attributes(meta, obj, attributes)
+          after_validation_hook{validate_associated_object(meta, obj)}
           if reflection.returns_array?
             send(reflection[:name]) << obj
             after_save_hook{send(reflection.add_method, obj)}
@@ -185,19 +194,20 @@ module Sequel
         # If a hash is provided it, sort it by key and then use the values.
         # If there is a limit on the nested attributes for this association,
         # make sure the length of the attributes_list is not greater than the limit.
-        def nested_attributes_list_setter(reflection, attributes_list)
+        def nested_attributes_list_setter(meta, attributes_list)
           attributes_list = attributes_list.sort_by{|x| x.to_s}.map{|k,v| v} if attributes_list.is_a?(Hash)
-          if (limit = reflection[:nested_attributes][:limit]) && attributes_list.length > limit
+          if (limit = meta[:limit]) && attributes_list.length > limit
             raise(Error, "number of nested attributes (#{attributes_list.length}) exceeds the limit (#{limit})")
           end
-          attributes_list.each{|a| nested_attributes_setter(reflection, a)}
+          attributes_list.each{|a| nested_attributes_setter(meta, a)}
         end
         
         # Remove the given associated object from the current object. If the
         # :destroy option is given, destroy the object after disassociating it
         # (unless destroying the object would automatically disassociate it).
         # Returns the object removed.
-        def nested_attributes_remove(reflection, obj, opts=OPTS)
+        def nested_attributes_remove(meta, obj, opts=OPTS)
+          reflection = meta[:reflection]
           if !opts[:destroy] || reflection.remove_before_destroy?
             before_save_hook do
               if reflection.returns_array?
@@ -213,8 +223,8 @@ module Sequel
         
         # Set the fields in the obj based on the association, only allowing
         # specific :fields if configured.
-        def nested_attributes_set_attributes(reflection, obj, attributes)
-          if fields = reflection[:nested_attributes][:fields]
+        def nested_attributes_set_attributes(meta, obj, attributes)
+          if fields = meta[:fields]
             fields = fields.call(obj) if fields.respond_to?(:call)
             obj.set_only(attributes, fields)
           else
@@ -232,12 +242,13 @@ module Sequel
         # * If a primary key exists in the attributes hash but it does not match an associated object,
         #   either raise an error, create a new object or ignore the hash, depending on the :unmatched_pk option.
         # * If no primary key exists in the attributes hash, create a new object.
-        def nested_attributes_setter(reflection, attributes)
-          if a = reflection[:nested_attributes][:transform]
+        def nested_attributes_setter(meta, attributes)
+          if a = meta[:transform]
             attributes = a.call(self, attributes)
           end
-          return if (b = reflection[:nested_attributes][:reject_if]) && b.call(attributes)
+          return if (b = meta[:reject_if]) && b.call(attributes)
           modified!
+          reflection = meta[:reflection]
           klass = reflection.associated_class
           sym_keys = Array(klass.primary_key)
           str_keys = sym_keys.map{|k| k.to_s}
@@ -247,28 +258,28 @@ module Sequel
           end
           if obj
             attributes = attributes.dup.delete_if{|k,v| str_keys.include? k.to_s}
-            if reflection[:nested_attributes][:destroy] && klass.db.send(:typecast_value_boolean, attributes.delete(:_delete) || attributes.delete('_delete'))
-              nested_attributes_remove(reflection, obj, :destroy=>true)
-            elsif reflection[:nested_attributes][:remove] && klass.db.send(:typecast_value_boolean, attributes.delete(:_remove) || attributes.delete('_remove'))
-              nested_attributes_remove(reflection, obj)
+            if meta[:destroy] && klass.db.send(:typecast_value_boolean, attributes.delete(:_delete) || attributes.delete('_delete'))
+              nested_attributes_remove(meta, obj, :destroy=>true)
+            elsif meta[:remove] && klass.db.send(:typecast_value_boolean, attributes.delete(:_remove) || attributes.delete('_remove'))
+              nested_attributes_remove(meta, obj)
             else
-              nested_attributes_update(reflection, obj, attributes)
+              nested_attributes_update(meta, obj, attributes)
             end
-          elsif pk.all? && reflection[:nested_attributes][:unmatched_pk] != :create
-            if reflection[:nested_attributes][:unmatched_pk] == :raise
+          elsif pk.all? && meta[:unmatched_pk] != :create
+            if meta[:unmatched_pk] == :raise
               raise(Error, "no matching associated object with given primary key (association: #{reflection[:name]}, pk: #{pk})")
             end
           else
-            nested_attributes_create(reflection, attributes)
+            nested_attributes_create(meta, attributes)
           end
         end
         
         # Update the given object with the attributes, validating it when the
         # parent object is validated and saving it when the parent is saved.
         # Returns the object updated.
-        def nested_attributes_update(reflection, obj, attributes)
-          nested_attributes_update_attributes(reflection, obj, attributes)
-          after_validation_hook{validate_associated_object(reflection, obj)}
+        def nested_attributes_update(meta, obj, attributes)
+          nested_attributes_update_attributes(meta, obj, attributes)
+          after_validation_hook{validate_associated_object(meta, obj)}
           # Don't need to validate the object twice if :validate association option is not false
           # and don't want to validate it at all if it is false.
           after_save_hook{obj.save_changes(:validate=>false)}
@@ -276,15 +287,16 @@ module Sequel
         end
 
         # Update the attributes for the given object related to the current object through the association.
-        def nested_attributes_update_attributes(reflection, obj, attributes)
-          nested_attributes_check_key_modifications(reflection, obj) do
-            nested_attributes_set_attributes(reflection, obj, attributes)
+        def nested_attributes_update_attributes(meta, obj, attributes)
+          nested_attributes_check_key_modifications(meta, obj) do
+            nested_attributes_set_attributes(meta, obj, attributes)
           end
         end
 
         # Validate the given associated object, adding any validation error messages from the
         # given object to the parent object.
-        def validate_associated_object(reflection, obj)
+        def validate_associated_object(meta, obj)
+          reflection = meta[:reflection]
           return if reflection[:validate] == false
           association = reflection[:name]
           if (reflection[:type] == :one_to_many || reflection[:type] == :one_to_one) && (key = reflection[:key]).is_a?(Symbol) && !(pk_val = obj.values[key])

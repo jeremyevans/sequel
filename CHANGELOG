@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#set_nested_attributes to nested_attributes, allowing setting nested attributes options per-call (jeremyevans)
+
 * Use explicit columns when using automatically prepared SELECT statements in the prepared statement plugins (jeremyevans)
 
 * Make Dataset#insert_select on PostgreSQL respect existing RETURNING clause (jeremyevans)

@@ -612,4 +612,31 @@ describe "NestedAttributes plugin" do
     proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
     proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
   end
+
+  it "should allow per-call options via the set_nested_attributes method" do
+    @Tag.columns :id, :name, :number
+    @Album.nested_attributes :tags
+
+    al = @Album.load(:id=>10, :name=>'Al')
+    t = @Tag.load(:id=>30, :name=>'T', :number=>10)
+    al.associations[:tags] = [t]
+    al.set_nested_attributes(:tags, [{:id=>30, :name=>'T2'}, {:name=>'T3'}], :fields=>[:name])
+    @db.sqls.should == []
+    al.save
+    check_sql_array("UPDATE albums SET name = 'Al' WHERE (id = 10)",
+      "UPDATE tags SET name = 'T2' WHERE (id = 30)",
+      "INSERT INTO tags (name) VALUES ('T3')",
+      ["INSERT INTO at (album_id, tag_id) VALUES (10, 1)", "INSERT INTO at (tag_id, album_id) VALUES (1, 10)"])
+    proc{al.set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::Error)
+    proc{al.set_nested_attributes(:tags, [{:name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::Error)
+  end
+
+  it "should have set_nested_attributes method raise error if called with a bad association" do
+    proc{@Album.load(:id=>10, :name=>'Al').set_nested_attributes(:tags2, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::Error)
+  end
+
+  it "should have set_nested_attributes method raise error if called with an association that doesn't support nested attributes" do
+    @Tag.columns :id, :name, :number
+    proc{@Album.load(:id=>10, :name=>'Al').set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::Error)
+  end
 end
