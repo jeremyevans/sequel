@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#values on PostgreSQL to create a dataset that uses VALUES instead of SELECT (jeremyevans)
+
 * Add Model#set_nested_attributes to nested_attributes, allowing setting nested attributes options per-call (jeremyevans)
 
 * Use explicit columns when using automatically prepared SELECT statements in the prepared statement plugins (jeremyevans)

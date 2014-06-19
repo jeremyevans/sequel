@@ -179,6 +179,19 @@ describe "A PostgreSQL database" do
     @db.server_version.should > 70000
   end
 
+  specify "should create a dataset using the VALUES clause via #values" do
+    @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).should == [[1, 2], [3, 4]]
+  end
+
+  specify "should support ordering and limiting with #values" do
+    @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).limit(1).map([:column1, :column2]).should == [[3, 4]]
+    @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).offset(1).map([:column1, :column2]).should == [[1, 2]]
+  end
+
+  specify "should support subqueries with #values" do
+    @db.values([[1, 2]]).from_self.cross_join(@db.values([[3, 4]]).as(:x, [:c1, :c2])).map([:column1, :column2, :c1, :c2]).should == [[1, 2, 3, 4]]
+  end
+
   specify "should respect the :read_only option per-savepoint" do
     proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].insert}}}.should raise_error(Sequel::DatabaseError)
     proc{@db.transaction(:auto_savepoint=>true, :read_only=>true){@db.transaction(:read_only=>false){@db[:public__testfk].insert}}}.should raise_error(Sequel::DatabaseError)

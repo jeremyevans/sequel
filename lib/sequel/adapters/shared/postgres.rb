@@ -524,6 +524,17 @@ module Sequel
         @supported_types.fetch(type){@supported_types[type] = (from(:pg_type).filter(:typtype=>'b', :typname=>type.to_s).count > 0)}
       end
 
+      # Creates a dataset that uses the VALUES clause:
+      #
+      #   DB.values([[1, 2], [3, 4]])
+      #   VALUES ((1, 2), (3, 4))
+      #
+      #   DB.values([[1, 2], [3, 4]]).order(:column2).limit(1, 1)
+      #   VALUES ((1, 2), (3, 4)) ORDER BY column2 LIMIT 1 OFFSET 1
+      def values(v)
+        @default_dataset.clone(:values=>v)
+      end
+
       # Array of symbols specifying view names in the current database.
       #
       # Options:
@@ -1147,12 +1158,13 @@ module Sequel
       CRLF = "\r\n".freeze
       BLOB_RE = /[\000-\037\047\134\177-\377]/n.freeze
       WINDOW = " WINDOW ".freeze
+      SELECT_VALUES = "VALUES ".freeze
       EMPTY_STRING = ''.freeze
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each{|s| s.freeze}
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
       Dataset.def_sql_method(self, :insert, [['if server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
-      Dataset.def_sql_method(self, :select, [['if server_version >= 80400', %w'with select distinct columns from join where group having window compounds order limit lock'], ['else', %w'select distinct columns from join where group having compounds order limit lock']])
+      Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'values order limit'], ['elsif server_version >= 80400', %w'with select distinct columns from join where group having window compounds order limit lock'], ['else', %w'select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if server_version >= 90100', %w'with update table set from where returning'], ['else', %w'update table set from where returning']])
 
       # Shared methods for prepared statements when used with PostgreSQL databases.
@@ -1511,6 +1523,12 @@ module Sequel
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super
+      end
+
+      # Support VALUES clause instead of the SELECT clause to return rows.
+      def select_values_sql(sql)
+        sql << SELECT_VALUES
+        expression_list_append(sql, opts[:values])
       end
 
       # SQL fragment for named window specifications
