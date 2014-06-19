@@ -142,6 +142,13 @@ describe "Database schema parser" do
     DB.create_table!(:items){FalseClass :number}
     DB.schema(:items).first.last[:type].should == :boolean
   end
+
+  specify "should parse maximum length for string columns" do
+    DB.create_table!(:items){String :a, :size=>4}
+    DB.schema(:items).first.last[:max_length].should == 4
+    DB.create_table!(:items){String :a, :fixed=>true, :size=>3}
+    DB.schema(:items).first.last[:max_length].should == 3
+  end
 end if DB.supports_schema_parsing?
 
 describe "Database index parsing" do

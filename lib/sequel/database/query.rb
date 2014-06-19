@@ -157,7 +157,12 @@ module Sequel
 
       cols = schema_parse_table(table_name, opts)
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
-      cols.each{|_,c| c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])}
+      cols.each do |_,c|
+        c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])
+        if !c[:max_length] && c[:type] == :string && (max_length = column_schema_max_length(c[:db_type]))
+          c[:max_length] = max_length
+        end
+      end
       Sequel.synchronize{@schemas[quoted_name] = cols} if cache_schema
       cols
     end
@@ -249,6 +254,14 @@ module Sequel
       end
       default = column_schema_normalize_default(default, type)
       column_schema_default_to_ruby_value(default, type) rescue nil
+    end
+
+    # Look at the db_type and guess the maximum length of the column.
+    # This assumes types such as varchar(255).
+    def column_schema_max_length(db_type)
+      if db_type =~ /\((\d+)\)/
+        $1.to_i
+      end
     end
 
     # Return a Method object for the dataset's output_identifier_method.

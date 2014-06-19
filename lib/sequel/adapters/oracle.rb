@@ -305,6 +305,7 @@ module Sequel
               :allow_null => column.nullable?
           }
           h[:type] = oracle_column_type(h)
+          h[:max_length] = h[:char_size] if h[:type] == :string
           table_schema << [m.call(column.name), h]
         end
         table_schema

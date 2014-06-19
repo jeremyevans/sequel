@@ -1550,7 +1550,7 @@ describe "Schema Parser" do
   specify "should correctly parse all supported data types" do
     sm = Module.new do
       def schema_parse_table(t, opts)
-        [[:x, {:type=>schema_column_type(t.to_s)}]]
+        [[:x, {:db_type=>t.to_s, :type=>schema_column_type(t.to_s)}]]
       end
     end
     @db.extend(sm)
@@ -1563,6 +1563,7 @@ describe "Schema Parser" do
     @db.schema(:"character varying").first.last[:type].should == :string
     @db.schema(:varchar).first.last[:type].should == :string
     @db.schema(:"varchar(255)").first.last[:type].should == :string
+    @db.schema(:"varchar(255)").first.last[:max_length].should == 255
     @db.schema(:text).first.last[:type].should == :string
     @db.schema(:date).first.last[:type].should == :date
     @db.schema(:datetime).first.last[:type].should == :datetime

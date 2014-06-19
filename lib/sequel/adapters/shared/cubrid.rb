@@ -51,12 +51,13 @@ module Sequel
           from(:db_attribute).
           where(:class_name=>m2.call(table_name)).
           order(:def_order).
-          select(:attr_name, :data_type___db_type, :default_value___default, :is_nullable___allow_null).
+          select(:attr_name, :data_type___db_type, :default_value___default, :is_nullable___allow_null, :prec).
           map do |row|
             name = m.call(row.delete(:attr_name))
             row[:allow_null] = row[:allow_null] == 'YES'
             row[:primary_key] = pks.include?(name)
             row[:type] = schema_column_type(row[:db_type])
+            row[:max_length] = row[:prec] if row[:type] == :string
             [name, row]
           end
       end

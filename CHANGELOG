@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :max_length entry to column schema hashes for string types (jeremyevans)
+
 * Add :before_thread_exit option to Database#listen_for_static_cache_updates in pg_static_cache_updater extension (jeremyevans)
 
 * Add Database#values on PostgreSQL to create a dataset that uses VALUES instead of SELECT (jeremyevans)
