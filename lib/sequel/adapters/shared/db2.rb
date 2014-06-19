@@ -42,6 +42,7 @@ module Sequel
             column[:allow_null]  = column.delete(:nulls) == 'Y'
             column[:primary_key] = column.delete(:identity) == 'Y' || !column[:keyseq].nil?
             column[:type]        = schema_column_type(column[:db_type])
+            column[:max_length]  = column[:longlength] if column[:type] == :string
             [ m.call(column.delete(:name)), column]
           end
       end
