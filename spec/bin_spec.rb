@@ -88,8 +88,8 @@ END
     DB2.tables.sort_by{|t| t.to_s}.should == [:a, :b]
     DB[:a].all.should == [{:a=>1, :name=>'foo'}]
     DB[:b].all.should == [{:a=>1}]
-    DB2.schema(:a).should == [[:a, {:allow_null=>false, :default=>nil, :primary_key=>true, :db_type=>"integer", :type=>:integer, :ruby_default=>nil}], [:name, {:allow_null=>true, :default=>nil, :primary_key=>false, :db_type=>"varchar(255)", :type=>:string, :ruby_default=>nil}]]
-    DB2.schema(:b).should == [[:a, {:allow_null=>true, :default=>nil, :primary_key=>false, :db_type=>"integer", :type=>:integer, :ruby_default=>nil}]]
+    DB2.schema(:a).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.should == [[:a, false, nil, true, "integer", :integer, nil], [:name, true, nil, false, "varchar(255)", :string, nil]]
+    DB2.schema(:b).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.should == [[:a, true, nil, false, "integer", :integer, nil]]
     DB2.indexes(:a).should == {}
     DB2.indexes(:b).should == {:b_a_index=>{:unique=>false, :columns=>[:a]}}
     DB2.foreign_key_list(:a).should == []
