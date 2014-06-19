@@ -1,13 +1,14 @@
 module Sequel
   module Plugins
-    # The auto_validations plugin automatically sets up three types of validations
+    # The auto_validations plugin automatically sets up the following types of validations
     # for your model columns:
     #
     # 1. type validations for all columns
     # 2. not_null validations on NOT NULL columns (optionally, presence validations)
     # 3. unique validations on columns or sets of columns with unique indexes
+    # 4. max length validations on string columns
     #
-    # To determine the columns to use for the not_null validations and the types for the type validations,
+    # To determine the columns to use for the type/not_null/max_length validations,
     # the plugin looks at the database schema for the model's table.  To determine
     # the unique validations, Sequel looks at the indexes on the table.  In order
     # for this plugin to be fully functional, the underlying database adapter needs
@@ -49,6 +50,7 @@ module Sequel
           @auto_validate_presence = false
           @auto_validate_not_null_columns = []
           @auto_validate_explicit_not_null_columns = []
+          @auto_validate_max_length_columns = []
           @auto_validate_unique_columns = []
           @auto_validate_types = true
         end
@@ -71,10 +73,14 @@ module Sequel
         # The columns with automatic not_null validations for columns present in the values.
         attr_reader :auto_validate_explicit_not_null_columns
 
+        # The columns or sets of columns with automatic max_length validations, as an array of
+        # pairs, with the first entry being the column name and second entry being the maximum length.
+        attr_reader :auto_validate_max_length_columns
+
         # The columns or sets of columns with automatic unique validations
         attr_reader :auto_validate_unique_columns
 
-        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_explicit_not_null_columns=>:dup, :@auto_validate_unique_columns=>:dup)
+        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_explicit_not_null_columns=>:dup, :@auto_validate_max_length_columns=>:dup, :@auto_validate_unique_columns=>:dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
 
         # Whether to use a presence validation for not null columns
@@ -91,7 +97,7 @@ module Sequel
         # If :all is given as the type, skip all auto validations.
         def skip_auto_validations(type)
           if type == :all
-            [:not_null, :types, :unique].each{|v| skip_auto_validations(v)}
+            [:not_null, :types, :unique, :max_length].each{|v| skip_auto_validations(v)}
           elsif type == :types
             @auto_validate_types = false
           else
@@ -107,6 +113,7 @@ module Sequel
           @auto_validate_not_null_columns = not_null_cols - Array(primary_key)
           explicit_not_null_cols += Array(primary_key)
           @auto_validate_explicit_not_null_columns = explicit_not_null_cols.uniq
+          @auto_validate_max_length_columns = db_schema.select{|col, sch| sch[:type] == :string && sch[:max_length].is_a?(Integer)}.map{|col, sch| [col, sch[:max_length]]}
           table = dataset.first_source_table
           @auto_validate_unique_columns = if db.supports_index_parsing? && [Symbol, SQL::QualifiedIdentifier, SQL::Identifier, String].any?{|c| table.is_a?(c)}
             db.indexes(table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns]}
@@ -132,6 +139,11 @@ module Sequel
               validates_presence(not_null_columns, :allow_missing=>true)
             else
               validates_not_null(not_null_columns, :allow_missing=>true)
+            end
+          end
+          unless (max_length_columns = model.auto_validate_max_length_columns).empty?
+            max_length_columns.each do |col, len|
+              validates_max_length(len, col, :allow_nil=>true)
             end
           end
 

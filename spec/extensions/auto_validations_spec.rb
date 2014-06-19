@@ -2,13 +2,13 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::AutoValidations" do
   before do
-    db = Sequel.mock(:fetch=>{:v=>1})
+    db = Sequel.mock(:fetch=>proc{|sql| sql =~ /a{51}/ ? {:v=>0} : {:v=>1}})
     def db.schema_parse_table(*) true; end
     def db.schema(t, *)
       t = t.first_source if t.is_a?(Sequel::Dataset)
       return [] if t != :test
       [[:id, {:primary_key=>true, :type=>:integer, :allow_null=>false}],
-       [:name, {:primary_key=>false, :type=>:string, :allow_null=>false}],
+       [:name, {:primary_key=>false, :type=>:string, :allow_null=>false, :max_length=>50}],
        [:num, {:primary_key=>false, :type=>:integer, :allow_null=>true}],
        [:d, {:primary_key=>false, :type=>:date, :allow_null=>false}],
        [:nnd, {:primary_key=>false, :type=>:string, :allow_null=>false, :ruby_default=>'nnd'}]]
@@ -42,6 +42,10 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.set(:d=>Date.today, :num=>1)
     @m.valid?.should == false
     @m.errors.should == {[:name, :num]=>["is already taken"]}
+
+    @m.set(:name=>'a'*51)
+    @m.valid?.should == false
+    @m.errors.should == {:name=>["is longer than 50 characters"]}
   end
 
   it "should handle databases that don't support index parsing" do
@@ -86,6 +90,13 @@ describe "Sequel::Plugins::AutoValidations" do
 
     @c.skip_auto_validations(:unique)
     @m.valid?.should == true
+
+    @m.set(:name=>'a'*51)
+    @m.valid?.should == false
+    @m.errors.should == {:name=>["is longer than 50 characters"]}
+
+    @c.skip_auto_validations(:max_length)
+    @m.valid?.should == true
   end
 
   it "should allow skipping all auto validations" do
@@ -94,6 +105,8 @@ describe "Sequel::Plugins::AutoValidations" do
     @c.skip_auto_validations(:all)
     @m.valid?.should == true
     @m.set(:d=>'/', :num=>'a', :name=>'1')
+    @m.valid?.should == true
+    @m.set(:name=>'a'*51)
     @m.valid?.should == true
   end
 
@@ -110,6 +123,10 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.set(:d=>Date.today, :num=>1)
     @m.valid?.should == false
     @m.errors.should == {[:name, :num]=>["is already taken"]}
+
+    @m.set(:name=>'a'*51)
+    @m.valid?.should == false
+    @m.errors.should == {:name=>["is longer than 50 characters"]}
   end
 
   it "should work correctly in STI subclasses" do
@@ -128,6 +145,10 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.should == false
     @m.errors.should == {[:name, :num]=>["is already taken"]}
     @m.db.sqls.should == ["SELECT count(*) AS count FROM test WHERE ((name = '1') AND (num = 1)) LIMIT 1"]
+
+    @m.set(:name=>'a'*51)
+    @m.valid?.should == false
+    @m.errors.should == {:name=>["is longer than 50 characters"]}
   end
 
   it "should work correctly when changing the dataset" do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Automatically setup max_length validations for string columns in the auto_validations plugin (jeremyevans)
+
 * Add :max_length entry to column schema hashes for string types (jeremyevans)
 
 * Add :before_thread_exit option to Database#listen_for_static_cache_updates in pg_static_cache_updater extension (jeremyevans)
