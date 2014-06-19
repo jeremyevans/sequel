@@ -77,4 +77,16 @@ describe "pg_static_cache_updater extension" do
     @db.fetch = {:v=>1234}
     proc{@db.listen_for_static_cache_updates(Class.new(Sequel::Model(@db[:table])))}.should raise_error(Sequel::Error)
   end
+
+  specify "#listen_for_static_cache_updates should handle a :before_thread_exit option" do
+    a = []
+    @db.listen_for_static_cache_updates([@model], :yield=>[nil, nil, 12345], :before_thread_exit=>proc{a << 1}).join
+    a.should == [1]
+  end
+
+  specify "#listen_for_static_cache_updates should call :before_thread_exit option even if listen raises an exception" do
+    a = []
+    @db.listen_for_static_cache_updates([@model], :yield=>[nil, nil, 12345], :after_listen=>proc{raise ArgumentError}, :before_thread_exit=>proc{a << 1}).join
+    a.should == [1]
+  end
 end

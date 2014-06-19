@@ -3417,7 +3417,8 @@ describe 'pg_static_cache_updater extension' do
     q = Queue.new
     q1 = Queue.new
 
-    @db.listen_for_static_cache_updates(@Thing, :timeout=>0, :loop=>proc{q.push(nil); q1.pop.call})
+    @db.listen_for_static_cache_updates(@Thing, :timeout=>0, :loop=>proc{q.push(nil); q1.pop.call}, :before_thread_exit=>proc{q.push(nil)})
+
     q.pop
     q1.push(proc{@db[:things].insert(1, 'A')})
     q.pop
@@ -3432,5 +3433,6 @@ describe 'pg_static_cache_updater extension' do
     @Thing.all.should == []
 
     q1.push(proc{throw :stop})
+    q.pop
   end
 end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
