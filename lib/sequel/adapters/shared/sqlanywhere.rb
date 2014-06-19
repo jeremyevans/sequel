@@ -66,6 +66,7 @@ module Sequel
           else
             schema_column_type(row[:db_type])
           end
+          row[:max_length] = row[:width] if row[:type] == :string
           [m.call(row.delete(:name)), row]
         end
       end
