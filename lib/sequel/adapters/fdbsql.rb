@@ -75,6 +75,11 @@ module Sequel
         end
       end
 
+      # indexes are namespaced per table
+      def global_index_namespace?
+        false
+      end
+
       # the sql layer supports DROP TABLE IF EXISTS
       def supports_drop_table_if_exists?
         true
