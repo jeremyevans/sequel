@@ -93,6 +93,9 @@ module Sequel
         end
       end
 
+      def database_error_classes
+        [PGError]
+      end
 
       NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
       FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}

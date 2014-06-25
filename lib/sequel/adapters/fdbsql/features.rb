@@ -9,14 +9,14 @@ module Sequel
         false
       end
 
-      # Fdbsql does not support deferrable constraints
+      # Fdbsql parser does not support deferrable constraints
       def supports_deferrable_constraints?
         false
       end
 
-      # same implementation as super
+      # Fdbsql supports deferrable fk constraints
       def supports_deferrable_foreign_key_constraints?
-        supports_deferrable_constraints?
+        true
       end
 
       # the sql layer supports CREATE TABLE IF NOT EXISTS syntax,
