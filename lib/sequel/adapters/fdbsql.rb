@@ -25,6 +25,7 @@
 require 'sequel/adapters/fdbsql/connection'
 require 'sequel/adapters/fdbsql/dataset'
 require 'sequel/adapters/fdbsql/create_table_generator'
+require 'sequel/adapters/fdbsql/features'
 require 'sequel/adapters/utils/pg_types'
 require 'sequel/adapters/fdbsql/date_arithmetic'
 
@@ -37,6 +38,7 @@ module Sequel
     class NotCommittedError < RetryError; end
 
     class Database < Sequel::Database
+      include Features
       DatasetClass = Dataset
       # Use a FDBSQL-specific create table generator
       def create_table_generator_class
@@ -73,30 +75,6 @@ module Sequel
           yield res if block_given?
           res.cmd_tuples
         end
-      end
-
-      # indexes are namespaced per table
-      def global_index_namespace?
-        false
-      end
-
-      # the sql layer supports CREATE TABLE IF NOT EXISTS syntax,
-      def supports_create_table_if_not_exists?
-        true
-      end
-
-      # the sql layer supports DROP TABLE IF EXISTS
-      def supports_drop_table_if_exists?
-        true
-      end
-
-      # Fdbsql does not  support deferrable constraints.
-      def supports_deferrable_constraints?
-        false
-      end
-
-      def supports_schema_parsing?
-        true
       end
 
       # Like PostgreSQL fdbsql folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
