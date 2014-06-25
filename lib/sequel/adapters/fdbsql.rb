@@ -90,6 +90,11 @@ module Sequel
         true
       end
 
+      # Fdbsql does not  support deferrable constraints.
+      def supports_deferrable_constraints?
+        false
+      end
+
       def supports_schema_parsing?
         true
       end
