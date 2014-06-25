@@ -80,6 +80,11 @@ module Sequel
         false
       end
 
+      # the sql layer supports CREATE TABLE IF NOT EXISTS syntax,
+      def supports_create_table_if_not_exists?
+        true
+      end
+
       # the sql layer supports DROP TABLE IF EXISTS
       def supports_drop_table_if_exists?
         true
