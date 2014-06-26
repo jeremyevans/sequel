@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :readonly Database option in sqlite adapter (ippeiukai, jeremyevans) (#832)
+
 * Automatically setup max_length validations for string columns in the auto_validations plugin (jeremyevans)
 
 * Add :max_length entry to column schema hashes for string types (jeremyevans)

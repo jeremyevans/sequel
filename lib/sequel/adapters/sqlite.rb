@@ -94,16 +94,16 @@ module Sequel
       # Connect to the database. Since SQLite is a file based database,
       # available options are limited:
       #
-      # * :database - database name (filename or ':memory:' or file: URI)
-      # * :timeout - how long to wait for the database to be available if it
-      #   is locked, given in milliseconds (default is 5000)
-      # * :readonly - open database in read-only mode; useful for reading
-      #   static data that you do not want to modify
+      # :database :: database name (filename or ':memory:' or file: URI)
+      # :readonly :: open database in read-only mode; useful for reading
+      #              static data that you do not want to modify
+      # :timeout :: how long to wait for the database to be available if it
+      #             is locked, given in milliseconds (default is 5000)
       def connect(server)
         opts = server_opts(server)
         opts[:database] = ':memory:' if blank_object?(opts[:database])
         sqlite3_opts = {}
-        sqlite3_opts[:readonly] = !!opts[:readonly] if opts.has_key?(:readonly)
+        sqlite3_opts[:readonly] = typecast_value_boolean(opts[:readonly]) if opts.has_key?(:readonly)
         db = ::SQLite3::Database.new(opts[:database].to_s, sqlite3_opts)
         db.busy_timeout(opts.fetch(:timeout, 5000))
         

@@ -420,6 +420,7 @@ Examples:
 
 The following additional options are supported:
 
+:readonly :: open database in read-only mode
 :timeout :: the busy timeout to use in milliseconds (default: 5000).
 
 === swift
