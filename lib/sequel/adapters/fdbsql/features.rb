@@ -9,10 +9,7 @@ module Sequel
         false
       end
 
-      # Fdbsql parser does not support deferrable constraints
-      def supports_deferrable_constraints?
-        false
-      end
+      # Fdbsql parser does not supports_deferrable_constraints? (aligns with super)
 
       # Fdbsql supports deferrable fk constraints
       def supports_deferrable_foreign_key_constraints?
@@ -29,9 +26,16 @@ module Sequel
         true
       end
 
+      # TODO supports_foreign_key_parsing?
+
+      # TODO supports_index_parsing?
+
+      # FDBSQL does not: supports_partial_indexes? (aligns with super)
+
       def supports_schema_parsing?
         true
       end
+
     end
   end
 end
