@@ -25,9 +25,7 @@ describe 'Fdbsql' do
           @db[:some_table].insert(name: 'a')
           @db2.drop_table(:some_table)
         end
-        # it probably should wrap this exception, but non of the other adapters wrap
-        # commit exceptions, so I'm not going to either
-      end.should raise_error(PG::TRIntegrityConstraintViolation)
+      end.should raise_error(Sequel::Fdbsql::NotCommittedError)
     end
   end
 
