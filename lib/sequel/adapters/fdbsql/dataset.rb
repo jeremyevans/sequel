@@ -66,7 +66,7 @@ module Sequel
         else
           # Force the use of RETURNING with the primary key value,
           # unless it has been disabled.
-          returning(insert_pk).insert(*values){|r| return r.values.first}
+          returning(*insert_pk).insert(*values){|r| return r.values.first}
         end
       end
 
@@ -169,7 +169,7 @@ module Sequel
           case t = f.first
           when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
             if pk = db.primary_key(t)
-              Sequel::SQL::Identifier.new(pk)
+              pk
             end
           end
         end
