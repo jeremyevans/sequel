@@ -222,23 +222,26 @@ module Sequel
         out_identifier = output_identifier_meth(opts[:dataset])
         in_identifier = input_identifier_meth(opts[:dataset])
         # CURRENT_SCHEMA evaluates to the currently chosen schema
-        schema = schema ? literal(in_identifier.call(opts[:schema])) : Sequel.lit('CURRENT_SCHEMA')
-        dataset = metadata_dataset.with_sql(<<-EOSQL)
-          SELECT c.column_name, (c.is_nullable = 'YES') AS allow_null, c.column_default AS "default", c.data_type AS db_type,
-            c.numeric_scale, (tc.constraint_type = 'PRIMARY KEY') AS primary_key
-          FROM information_schema.key_column_usage kc
-          INNER JOIN information_schema.table_constraints tc
-            ON tc.constraint_type = 'PRIMARY KEY'
-            AND tc.table_name = kc.table_name
-            AND tc.table_schema = kc.table_schema
-            AND tc.constraint_name = kc.constraint_name
-          RIGHT JOIN information_schema.columns c
-            ON c.table_name = tc.table_name
-            AND c.table_schema = tc.table_schema
-            AND c.column_name = kc.column_name
-          WHERE c.table_name = #{literal(in_identifier.call(table_name.to_s))}
-          AND c.table_schema = #{schema}
-        EOSQL
+        schema = schema ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
+        dataset = metadata_dataset.
+          select(:c__column_name,
+                 Sequel.as({:c__is_nullable => 'YES'}, 'allow_null'),
+                 Sequel.as(:c__column_default, 'default'),
+                 Sequel.as(:c__data_type, 'db_type'),
+                 :c__numeric_scale,
+                 Sequel.as({:tc__constraint_type => 'PRIMARY KEY'}, 'primary_key')).
+          from(Sequel.as(:information_schema__key_column_usage, 'kc')).
+          join(Sequel.as(:information_schema__table_constraints, 'tc'),
+               tc__constraint_type: 'PRIMARY KEY',
+               tc__table_name: :kc__table_name,
+               tc__table_schema: :kc__table_schema,
+               tc__constraint_name: :kc__constraint_name).
+          right_outer_join(Sequel.as(:information_schema__columns, 'c'),
+                           c__table_name: :kc__table_name,
+                           c__table_schema: :kc__table_schema,
+                           c__column_name: :kc__column_name).
+          filter(c__table_name: in_identifier.call(table_name.to_s),
+                 c__table_schema: schema)
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(normalize_decimal_to_integer(row[:db_type], row[:numeric_scale]))
@@ -261,7 +264,6 @@ module Sequel
           type
         end
       end
-
 
       # Array of symbols specifying table names in the current database.
       # The dataset used is yielded to the block if one is provided,
