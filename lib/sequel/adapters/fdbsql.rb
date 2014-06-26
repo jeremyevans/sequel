@@ -222,7 +222,7 @@ module Sequel
         out_identifier = output_identifier_meth(opts[:dataset])
         in_identifier = input_identifier_meth(opts[:dataset])
         # CURRENT_SCHEMA evaluates to the currently chosen schema
-        schema = schema ? literal(in_identifier.call(opts[:schema])) : 'CURRENT_SCHEMA'
+        schema = schema ? literal(in_identifier.call(opts[:schema])) : Sequel.lit('CURRENT_SCHEMA')
         dataset = metadata_dataset.with_sql(<<-EOSQL)
           SELECT c.column_name, (c.is_nullable = 'YES') AS allow_null, c.column_default AS "default", c.data_type AS db_type,
             c.numeric_scale, (tc.constraint_type = 'PRIMARY KEY') AS primary_key
@@ -273,18 +273,16 @@ module Sequel
       # :schema :: The schema to search
       # :server :: The server to use
       def tables(opts=OPTS, &block)
-        schema = schema ? literal(in_identifier.call(opts[:schema])) : 'CURRENT_SCHEMA'
+        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
         m = output_identifier_meth
-        dataset = metadata_dataset.server(opts[:server]).with_sql(<<-EOSQL)
-          SELECT table_name #{opts[:qualify] ? ', table_schema' : ''}
-          FROM information_schema.tables
-          WHERE table_schema = #{schema}
-            AND table_type = 'TABLE'
-        EOSQL
+        dataset = metadata_dataset.server(opts[:server]).select(:table_name).
+          from(Sequel.qualify('information_schema','tables')).
+          filter(table_schema: schema).
+          filter(table_type: 'TABLE')
         if block_given?
           yield(dataset)
         elsif opts[:qualify]
-          dataset.map{|r| Sequel.qualify(m.call(r[:table_schema]), m.call(r[:table_name])) }
+          dataset.select_append(:table_schema).map{|r| Sequel.qualify(m.call(r[:table_schema]), m.call(r[:table_name])) }
         else
           dataset.map{|r| m.call(r[:table_name])}
         end

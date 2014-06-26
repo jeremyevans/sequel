@@ -145,4 +145,31 @@ describe 'Fdbsql' do
       schema.each {|col| col[1][:primary_key].should be_false}
     end
   end
+
+  describe '#tables' do
+    before do
+      @db.create_table(:test) do
+        primary_key :id
+      end
+      @schema = @db['SELECT CURRENT_SCHEMA'].first.values.first
+      @second_schema = @schema + "--2"
+      @db.create_table(Sequel.qualify(@second_schema,:test2)) do
+        primary_key :id
+      end
+    end
+    after do
+      @db.drop_table?(Sequel.qualify(@second_schema,:test2))
+      @db.drop_table?(:test)
+    end
+    specify 'on explicit schema' do
+      tables = @db.tables(schema: @second_schema)
+      tables.should include(:test2)
+      tables.should_not include(:test)
+    end
+    specify 'qualified' do
+      tables = @db.tables(qualify: true)
+      tables.should include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test))
+      tables.should_not include(:test)
+    end
+  end
 end
