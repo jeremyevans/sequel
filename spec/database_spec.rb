@@ -104,8 +104,8 @@ describe 'Fdbsql' do
       end
       schema = DB.schema(:test, reload: true)
       schema.count.should eq 2
-      id2_col = schema[1]
       id_col = schema[0]
+      id2_col = schema[1]
       id_col[0].should eq :id
       id2_col[0].should eq :id2
       id_col[1][:primary_key].should be_true
@@ -152,6 +152,7 @@ describe 'Fdbsql' do
         @second_schema = @schema + "--2"
         @db.create_table(Sequel.qualify(@second_schema,:test)) do
           primary_key :id2
+          Integer :id
         end
       end
       after do
@@ -159,7 +160,16 @@ describe 'Fdbsql' do
         @db.drop_table?(:test)
       end
 
-      specify 'gets info for correct table'
+      specify 'gets info for correct table' do
+        schema = DB.schema(:test, reload: true, schema: @second_schema)
+        schema.count.should eq 2
+        id2_col = schema[0]
+        id_col = schema[1]
+        id_col[0].should eq :id
+        id2_col[0].should eq :id2
+        id_col[1][:primary_key].should be_false
+        id2_col[1][:primary_key].should be_true
+      end
     end
   end
 

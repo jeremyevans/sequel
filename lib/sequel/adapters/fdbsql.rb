@@ -225,7 +225,7 @@ module Sequel
         out_identifier = output_identifier_meth(opts[:dataset])
         in_identifier = input_identifier_meth(opts[:dataset])
         # CURRENT_SCHEMA evaluates to the currently chosen schema
-        schema = schema ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
+        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
         dataset = metadata_dataset.
           select(:c__column_name,
                  Sequel.as({:c__is_nullable => 'YES'}, 'allow_null'),
