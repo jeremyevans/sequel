@@ -173,7 +173,7 @@ describe 'Fdbsql' do
     end
   end
 
-  describe '#primary_key' do
+  describe 'primary_key' do
     after do
       @db.drop_table?(:test)
       @db.drop_table?(:other_table)
@@ -192,7 +192,7 @@ describe 'Fdbsql' do
         text :name
         primary_key :id
       end
-      DB.primary_key(:test).should eq 'id'
+      DB.primary_key(:test).should eq :id
     end
 
     specify 'with multiple primary keys' do
@@ -202,9 +202,7 @@ describe 'Fdbsql' do
         primary_key [:id, :id2]
       end
       primary_key = DB.primary_key(:test)
-      # changing this to return a complex primary key for real would involve changing
-      # Sequel in a bunch of different places, including the other adapters
-      primary_key.should eq 'id'
+      primary_key.should match_array([:id, :id2])
     end
 
     specify 'with other constraints' do
@@ -212,7 +210,7 @@ describe 'Fdbsql' do
         primary_key :id
         Integer :unique, unique: true
       end
-      DB.primary_key(:test).should eq 'id'
+      DB.primary_key(:test).should eq :id
     end
 
     specify 'with other tables' do
@@ -224,7 +222,7 @@ describe 'Fdbsql' do
         primary_key :id
         varchar :name, unique: true
       end
-      DB.primary_key(:other_table).should eq 'id'
+      DB.primary_key(:other_table).should eq :id
     end
 
     specify 'responds to alter table' do
@@ -235,7 +233,7 @@ describe 'Fdbsql' do
       @db.alter_table(:test) do
         add_primary_key :quid
       end
-      DB.primary_key(:test).should eq 'quid'
+      DB.primary_key(:test).should eq :quid
     end
 
     describe 'with explicit schema' do
@@ -255,7 +253,7 @@ describe 'Fdbsql' do
       end
 
       specify 'gets correct primary key' do
-        DB.primary_key(:test, schema: @second_schema).should eq 'id2'
+        DB.primary_key(:test, schema: @second_schema).should eq :id2
       end
     end
   end

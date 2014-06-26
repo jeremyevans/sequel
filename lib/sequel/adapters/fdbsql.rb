@@ -159,7 +159,14 @@ module Sequel
                tc__constraint_name: :kc__constraint_name).
           filter(kc__table_name: in_identifier.call(table_name.to_s),
                  kc__table_schema: schema)
-        value = dataset.single_value
+        value = dataset.map do |row|
+          out_identifier.call(row.delete(:column_name))
+        end
+        value = case value.size
+                  when 0 then nil
+                  when 1 then value.first
+                  else value
+                end
         Sequel.synchronize{@primary_keys[quoted_table] = value}
       end
 
