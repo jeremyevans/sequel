@@ -143,27 +143,30 @@ module Sequel
 
       # Return primary key for the given table.
       def primary_key(table_name, opts=OPTS)
-        # CURRENT_SCHEMA evaluates to the currently chosen schema
         quoted_table = quote_schema_table(table_name)
         Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
-        schema = schema ? literal(opts[:schema]) : 'CURRENT_SCHEMA'
-        sql =
-          'SELECT kc.column_name ' +
-          'FROM information_schema.table_constraints tc ' +
-          'INNER JOIN information_schema.key_column_usage kc ' +
-          '  ON  tc.table_schema = kc.table_schema ' +
-          '  AND tc.table_name = kc.table_name ' +
-          '  AND tc.constraint_name = kc.constraint_name ' +
-          'LEFT JOIN information_schema.columns c ' +
-          '  ON kc.table_schema = c.table_schema ' +
-          '  AND kc.table_name = c.table_name ' +
-          '  AND kc.column_name = c.column_name ' +
-          "WHERE tc.table_schema = #{schema} " +
-          # Symbols get quoted with double quotes, strings get quoted with single quotes
-          # since this is a column value, we want to ensure that it's a string
-          "  AND tc.table_name = #{literal(table_name.to_s)} " +
-          "  AND tc.constraint_type = 'PRIMARY KEY' "
-        value = fetch(sql).single_value
+        # CURRENT_SCHEMA evaluates to the currently chosen schema
+        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
+        in_identifier = input_identifier_meth(opts[:dataset])
+        out_identifier = output_identifier_meth(opts[:dataset])
+        dataset = metadata_dataset.
+          select(:kc__column_name).
+          from(Sequel.as(:information_schema__key_column_usage, 'kc')).
+          join(Sequel.as(:information_schema__table_constraints, 'tc'),
+               tc__constraint_type: 'PRIMARY KEY',
+               tc__table_name: :kc__table_name,
+               tc__table_schema: :kc__table_schema,
+               tc__constraint_name: :kc__constraint_name).
+          filter(kc__table_name: in_identifier.call(table_name.to_s),
+                 kc__table_schema: schema)
+        value = dataset.map do |row|
+          out_identifier.call(row.delete(:column_name))
+        end
+        value = case value.size
+                  when 0 then nil
+                  when 1 then value.first
+                  else value
+                end
         Sequel.synchronize{@primary_keys[quoted_table] = value}
       end
 

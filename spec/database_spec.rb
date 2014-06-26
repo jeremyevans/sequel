@@ -142,6 +142,25 @@ describe 'Fdbsql' do
       schema.count.should eq 2
       schema.each {|col| col[1][:primary_key].should be_false}
     end
+
+    describe 'with explicit schema' do
+      before do
+        @db.create_table(:test) do
+          primary_key :id
+        end
+        @schema = @db['SELECT CURRENT_SCHEMA'].first.values.first
+        @second_schema = @schema + "--2"
+        @db.create_table(Sequel.qualify(@second_schema,:test)) do
+          primary_key :id2
+        end
+      end
+      after do
+        @db.drop_table?(Sequel.qualify(@second_schema,:test))
+        @db.drop_table?(:test)
+      end
+
+      specify 'gets info for correct table'
+    end
   end
 
   describe 'primary_key' do
@@ -204,7 +223,7 @@ describe 'Fdbsql' do
       @db.alter_table(:test) do
         add_primary_key :quid
       end
-      DB.primary_key(:other_table).should eq :quid
+      DB.primary_key(:test).should eq :quid
     end
 
     describe 'with explicit schema' do
@@ -224,7 +243,7 @@ describe 'Fdbsql' do
       end
 
       specify 'gets correct primary key' do
-        DB.primary_key(Sequel.qualify(@second_schema, :test)).should eq :id2
+        DB.primary_key(:test, schema: @second_schema).should eq :id2
       end
     end
   end
