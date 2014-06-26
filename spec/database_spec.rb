@@ -144,6 +144,91 @@ describe 'Fdbsql' do
     end
   end
 
+  describe 'primary_key' do
+    after do
+      @db.drop_table?(:test)
+      @db.drop_table?(:other_table)
+    end
+
+    specify 'without primary key' do
+      @db.create_table(:test) do
+        text :name
+        int :value
+      end
+      DB.primary_key(:test).should eq nil
+    end
+
+    specify 'with one primary key' do
+      @db.create_table(:test) do
+        text :name
+        primary_key :id
+      end
+      DB.primary_key(:test).should eq :id
+    end
+
+    specify 'with multiple primary keys' do
+      @db.create_table(:test) do
+        Integer :id
+        Integer :id2
+        primary_key [:id, :id2]
+      end
+      primary_key = DB.primary_key(:test)
+      primary_key.should match_array([:id, :id2])
+    end
+
+    specify 'with other constraints' do
+      @db.create_table(:test) do
+        primary_key :id
+        Integer :unique, unique: true
+      end
+      DB.primary_key(:test).should eq :id
+    end
+
+    specify 'with other tables' do
+      @db.create_table(:test) do
+        Integer :id
+        text :name
+      end
+      @db.create_table(:other_table) do
+        primary_key :id
+        varchar :name, unique: true
+      end
+      DB.primary_key(:other_table).should eq :id
+    end
+
+    specify 'responds to alter table' do
+      @db.create_table(:test) do
+        Integer :id
+        text :name
+      end
+      @db.alter_table(:test) do
+        add_primary_key :quid
+      end
+      DB.primary_key(:other_table).should eq :quid
+    end
+
+    describe 'with explicit schema' do
+      before do
+        @db.create_table(:test) do
+          primary_key :id
+        end
+        @schema = @db['SELECT CURRENT_SCHEMA'].first.values.first
+        @second_schema = @schema + "--2"
+        @db.create_table(Sequel.qualify(@second_schema,:test)) do
+          primary_key :id2
+        end
+      end
+      after do
+        @db.drop_table?(Sequel.qualify(@second_schema,:test))
+        @db.drop_table?(:test)
+      end
+
+      specify 'gets correct primary key' do
+        DB.primary_key(Sequel.qualify(@second_schema, :test)).should eq :id2
+      end
+    end
+  end
+
   describe '#tables' do
     before do
       @db.create_table(:test) do
