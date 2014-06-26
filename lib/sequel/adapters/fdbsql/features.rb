@@ -32,6 +32,8 @@ module Sequel
 
       # FDBSQL does not: supports_partial_indexes? (aligns with super)
 
+      # TODO (as part of prepared statements) supports_prepared_transactions?
+
       def supports_schema_parsing?
         true
       end
