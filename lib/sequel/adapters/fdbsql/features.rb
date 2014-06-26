@@ -2,6 +2,9 @@ module Sequel
   module Fdbsql
     # A module containing the supports-style methods that exist on a database in Sequel
     # corresponds to database/features.rb in actual Sequel
+    # Methods where we maintain the same behavior as super, are replaced with comments
+    # Methods that are defined based on whether we have a method defined are not
+    # listed here
     module Features
 
       # indexes are namespaced per table
@@ -38,6 +41,8 @@ module Sequel
 
       # FBBSQL does not: supports_transaction_isolation_levels? (aligns with super)
       # isolation levels don't apply to an MVCC sql
+
+      # FDBSQL does not: supports_transactional_ddl? (aligns with super)
 
     end
   end
