@@ -260,11 +260,11 @@ describe 'Fdbsql' do
 
   describe '#tables' do
     before do
+      @schema = @db['SELECT CURRENT_SCHEMA'].first.values.first
+      @second_schema = @schema + "--2"
       @db.create_table(:test) do
         primary_key :id
       end
-      @schema = @db['SELECT CURRENT_SCHEMA'].first.values.first
-      @second_schema = @schema + "--2"
       @db.create_table(Sequel.qualify(@second_schema,:test2)) do
         primary_key :id
       end
@@ -282,6 +282,40 @@ describe 'Fdbsql' do
       tables = @db.tables(qualify: true)
       tables.should include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test))
       tables.should_not include(:test)
+    end
+  end
+
+  describe '#views' do
+    def drop_things
+      @db.drop_view(Sequel.qualify(@second_schema,:test_view2), if_exists: true)
+      @db.drop_table?(Sequel.qualify(@second_schema,:test_table))
+      @db.drop_view(:test_view, if_exists: true)
+      @db.drop_table?(:test_table)
+    end
+    before do
+      @schema = @db['SELECT CURRENT_SCHEMA'].single_value
+      @second_schema = @schema + "--2"
+      drop_things
+      @db.create_table(:test_table){Integer :a}
+      @db.create_view :test_view, @db[:test_table]
+      @db.create_table(Sequel.qualify(@second_schema,:test_table)) do
+        Integer :b
+      end
+      @db.create_view(Sequel.qualify(@second_schema, :test_view2),
+                      @db[Sequel.qualify(@second_schema, :test_table)])
+    end
+    after do
+      drop_things
+    end
+    specify 'on explicit schema' do
+      views = @db.views(schema: @second_schema)
+      views.should include(:test_view2)
+      views.should_not include(:test_view)
+    end
+    specify 'qualified' do
+      views = @db.views(qualify: true)
+      views.should include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test_view))
+      views.should_not include(:test)
     end
   end
 end

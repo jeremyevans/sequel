@@ -278,19 +278,19 @@ module Sequel
       # :schema :: The schema to search
       # :server :: The server to use
       def tables(opts=OPTS, &block)
-        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
-        m = output_identifier_meth
-        dataset = metadata_dataset.server(opts[:server]).select(:table_name).
-          from(Sequel.qualify('information_schema','tables')).
-          filter(table_schema: schema).
-          filter(table_type: 'TABLE')
-        if block_given?
-          yield(dataset)
-        elsif opts[:qualify]
-          dataset.select_append(:table_schema).map{|r| Sequel.qualify(m.call(r[:table_schema]), m.call(r[:table_name])) }
-        else
-          dataset.map{|r| m.call(r[:table_name])}
-        end
+        tables_or_views('TABLE', opts, &block)
+      end
+
+
+      # Array of symbols specifying view names in the current database.
+      #
+      # Options:
+      # :qualify :: Return the views as Sequel::SQL::QualifiedIdentifier instances,
+      #             using the schema the view is located in as the qualifier.
+      # :schema :: The schema to search
+      # :server :: The server to use
+      def views(opts=OPTS, &block)
+        tables_or_views('VIEW', opts, &block)
       end
 
       def begin_transaction(conn, opts=OPTS)
@@ -334,6 +334,22 @@ module Sequel
           yield
         rescue => e
           raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
+        end
+      end
+
+      def tables_or_views(type, opts, &block)
+        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
+        m = output_identifier_meth
+        dataset = metadata_dataset.server(opts[:server]).select(:table_name).
+          from(Sequel.qualify('information_schema','tables')).
+          filter(table_schema: schema).
+          filter(table_type: type)
+        if block_given?
+          yield(dataset)
+        elsif opts[:qualify]
+          dataset.select_append(:table_schema).map{|r| Sequel.qualify(m.call(r[:table_schema]), m.call(r[:table_name])) }
+        else
+          dataset.map{|r| m.call(r[:table_name])}
         end
       end
 
