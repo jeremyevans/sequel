@@ -36,10 +36,6 @@ module Sequel
 
       # FDBSQL does not: supports_savepoints? (aligns with super)
 
-      def supports_schema_parsing?
-        true
-      end
-
       # FBBSQL does not: supports_transaction_isolation_levels? (aligns with super)
       # isolation levels don't apply to an MVCC sql
 
