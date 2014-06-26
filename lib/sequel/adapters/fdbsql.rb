@@ -262,6 +262,34 @@ module Sequel
         end
       end
 
+
+      # Array of symbols specifying table names in the current database.
+      # The dataset used is yielded to the block if one is provided,
+      # otherwise, an array of symbols of table names is returned.
+      #
+      # Options:
+      # :qualify :: Return the tables as Sequel::SQL::QualifiedIdentifier instances,
+      #             using the schema the table is located in as the qualifier.
+      # :schema :: The schema to search
+      # :server :: The server to use
+      def tables(opts=OPTS, &block)
+        schema = schema ? literal(in_identifier.call(opts[:schema])) : 'CURRENT_SCHEMA'
+        m = output_identifier_meth
+        dataset = metadata_dataset.server(opts[:server]).with_sql(<<-EOSQL)
+          SELECT table_name #{opts[:qualify] ? ', table_schema' : ''}
+          FROM information_schema.tables
+          WHERE table_schema = #{schema}
+            AND table_type = 'TABLE'
+        EOSQL
+        if block_given?
+          yield(dataset)
+        elsif opts[:qualify]
+          dataset.map{|r| Sequel.qualify(m.call(r[:table_schema]), m.call(r[:table_name])) }
+        else
+          dataset.map{|r| m.call(r[:table_name])}
+        end
+      end
+
       def begin_transaction(conn, opts=OPTS)
         super
         conn.in_transaction = true
