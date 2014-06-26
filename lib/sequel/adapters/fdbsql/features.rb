@@ -44,6 +44,14 @@ module Sequel
 
       # FDBSQL does not: supports_transactional_ddl? (aligns with super)
 
+      # FDBSQL does not: supports_combining_alter_table_ops? (aligns with super)
+
+      # FDBSQL does not: supports_create_or_replace_view? (aligns with super)
+
+      # FDBSQL does: supports_named_column_constraints? (aligns with super)
+
+      # FDBSQL does not support:view_with_check_option_support (aligns with super)
+
     end
   end
 end
