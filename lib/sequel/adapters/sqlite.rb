@@ -91,14 +91,20 @@ module Sequel
       # The conversion procs to use for this database
       attr_reader :conversion_procs
 
-      # Connect to the database.  Since SQLite is a file based database,
-      # the only options available are :database (to specify the database
-      # name), and :timeout, to specify how long to wait for the database to
-      # be available if it is locked, given in milliseconds (default is 5000).
+      # Connect to the database. Since SQLite is a file based database,
+      # available options are limited:
+      #
+      # * :database - database name (filename or ':memory:' or file: URI)
+      # * :timeout - how long to wait for the database to be available if it
+      #   is locked, given in milliseconds (default is 5000)
+      # * :readonly - open database in read-only mode; useful for reading
+      #   static data that you do not want to modify
       def connect(server)
         opts = server_opts(server)
         opts[:database] = ':memory:' if blank_object?(opts[:database])
-        db = ::SQLite3::Database.new(opts[:database])
+        sqlite3_opts = {}
+        sqlite3_opts[:readonly] = !!opts[:readonly] if opts.has_key?(:readonly)
+        db = ::SQLite3::Database.new(opts[:database].to_s, sqlite3_opts)
         db.busy_timeout(opts.fetch(:timeout, 5000))
         
         connection_pragmas.each{|s| log_yield(s){db.execute_batch(s)}}
