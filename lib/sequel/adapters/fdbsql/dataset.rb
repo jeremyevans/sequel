@@ -22,10 +22,13 @@
 #
 
 require 'sequel/adapters/utils/pg_types'
+require 'sequel/adapters/fdbsql/features'
+
 module Sequel
   module Fdbsql
 
     class Dataset < Sequel::Dataset
+      include DatasetFeatures
 
       def fetch_rows(sql)
         execute(sql) do |res|
