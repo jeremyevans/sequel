@@ -129,8 +129,6 @@ module Sequel
           where(tc__table_name: sql_table,
                 tc__table_schema: schema)
         foreign_keys = {}
-        # TODO check if there can be multiple constraint schemas considering the table_schema is fixed
-        # TODO can there be multiple tables?
         columns_dataset.each do |row|
           foreign_key = foreign_keys.fetch(row[:name]) do |key|
             foreign_keys[row[:name]] = row
