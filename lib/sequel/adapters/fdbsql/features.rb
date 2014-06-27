@@ -49,5 +49,17 @@ module Sequel
       # FDBSQL does not support:view_with_check_option_support (aligns with super)
 
     end
+
+    # A module containing the supports-style methods that exist on a dataset in Sequel
+    # corresponds to dataset/features.rb in actual Sequel
+    # Methods where we maintain the same behavior as super, are replaced with comments
+    # Methods that are defined based on whether we have a method defined are not
+    # listed here
+    module DatasetFeatures
+
+      # FDBSQL allows you to quote_identifiers? (aligns with super)
+
+      # FDBSQL provides_accurate_rows_matched? (aligns with super)
+    end
   end
 end
