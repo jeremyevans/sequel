@@ -155,6 +155,39 @@ module Sequel
         foreign_keys.values
       end
 
+      # Return indexes for the table
+      # postgres returns:
+      # {:blah_blah_index=>{:columns=>[:n], :unique=>true, :deferrable=>nil},
+      #  :items_n_a_index=>{:columns=>[:n, :a], :unique=>false, :deferrable=>nil}}
+      def indexes(table, opts=OPTS)
+        out_identifier = output_identifier_meth(opts[:dataset])
+        in_identifier = input_identifier_meth(opts[:dataset])
+        schema, table = schema_and_table(table)
+        schema, _ = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
+        dataset = metadata_dataset.
+          select(:is__is_unique,
+                 :is__index_name,
+                 :ic__column_name).
+          from(Sequel.as(:information_schema__indexes, 'is')).
+          join(Sequel.as(:information_schema__index_columns, 'ic'),
+               ic__index_table_schema: :is__table_schema,
+               ic__index_table_name: :is__table_name,
+               ic__index_name: :is__index_name).
+          where(is__table_schema: schema,
+                is__table_name: in_identifier.call(table)).
+          exclude(is__index_type: 'PRIMARY')
+        indexes = {}
+        dataset.each do |row|
+          index = indexes.fetch(out_identifier.call(row[:index_name])) do |key|
+            h = { :unique => row[:is_unique] == 'YES', :columns => [] }
+            indexes[key] = h
+            h
+          end
+          index[:columns] << out_identifier.call(row[:column_name])
+        end
+        indexes
+      end
+
       # The constraint name that we need for all other commands does not include
       # the table name, but the one returned by the information_schema tables
       # does include it. E.g. if we have the constraint "b.__fk_1" on table b
