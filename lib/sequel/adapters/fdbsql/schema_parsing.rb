@@ -98,6 +98,7 @@ module Sequel
         in_identifier = input_identifier_meth(opts[:dataset])
         schema, table = schema_and_table(table)
         schema, _ = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
+        sql_table = in_identifier.call(table)
         columns_dataset = metadata_dataset.
           select(:tc__table_name___table_name,
                  :tc__table_schema___table_schema,
@@ -115,7 +116,7 @@ module Sequel
           join(Sequel.as(:information_schema__referential_constraints, 'rc'),
                tc__constraint_name: :rc__constraint_name,
                tc__constraint_schema: :rc__constraint_schema).
-          where(tc__table_name: in_identifier.call(table),
+          where(tc__table_name: sql_table,
                 tc__table_schema: schema)
 
         keys_dataset = metadata_dataset.
@@ -131,15 +132,18 @@ module Sequel
           join(Sequel.as(:information_schema__key_column_usage, 'kc'),
                kc__constraint_schema: :rc__unique_constraint_schema,
                kc__constraint_name: :rc__unique_constraint_name).
-          where(tc__table_name: in_identifier.call(table),
+          where(tc__table_name: sql_table,
                 tc__table_schema: schema)
         foreign_keys = {}
         # TODO check if there can be multiple constraint schemas considering the table_schema is fixed
         # TODO can there be multiple tables?
+        puts "clo: #{columns_dataset.to_a}"
         columns_dataset.each do |row|
-          foreign_key = foreign_keys.fetch(row[:name]) do |key|
-            puts row[:name]
-            foreign_keys[row[:name]] = row
+          constraint_name = out_identifier.call(local_constraint_name(sql_table, row[:name]))
+          puts "col: #{constraint_name}"
+          foreign_key = foreign_keys.fetch(constraint_name) do |key|
+            foreign_keys[constraint_name] = row
+            row[:name] = constraint_name
             row[:columns] = []
             row[:key] = []
             row
@@ -147,11 +151,24 @@ module Sequel
           foreign_key[:columns] << out_identifier.call(row[:column_name])
         end
         keys_dataset.each do |row|
-          foreign_key = foreign_keys[row[:name]]
+          constraint_name = out_identifier.call(local_constraint_name(sql_table, row[:name]))
+          puts "key: #{constraint_name}"
+          foreign_key = foreign_keys[constraint_name]
           foreign_key[:table] = out_identifier.call(row[:key_table])
           foreign_key[:key] << out_identifier.call(row[:key_column])
         end
+        puts foreign_keys.values.join('\n')
         foreign_keys.values
+      end
+
+      # The constraint name that we need for all other commands does not include
+      # the table name, but the one returned by the information_schema tables
+      # does include it. E.g. if we have the constraint "b.__fk_1" on table b
+      # the correct (e.g. drop) is
+      # `ALTER TABLE b DROP CONSTRAINT __fk_1`
+      # See sql-layer:ReferentialConstraintsFactory
+      def local_constraint_name(table_name, global_constraint_name)
+        global_constraint_name[table_name.length+1..-1]
       end
 
       def column_schema_normalize_default(default, type)
