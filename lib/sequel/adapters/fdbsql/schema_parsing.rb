@@ -42,7 +42,7 @@ module Sequel
                tc__table_name: :kc__table_name,
                tc__table_schema: :kc__table_schema,
                tc__constraint_name: :kc__constraint_name).
-          filter(kc__table_name: in_identifier.call(table),
+          where(kc__table_name: in_identifier.call(table),
                  kc__table_schema: schema)
         value = dataset.map do |row|
           out_identifier.call(row.delete(:column_name))
@@ -63,8 +63,8 @@ module Sequel
         dataset = metadata_dataset.
           select(:c__column_name,
                  Sequel.as({:c__is_nullable => 'YES'}, 'allow_null'),
-                 Sequel.as(:c__column_default, 'default'),
-                 Sequel.as(:c__data_type, 'db_type'),
+                 :c__column_default___default,
+                 :c__data_type___db_type,
                  :c__numeric_scale,
                  Sequel.as({:tc__constraint_type => 'PRIMARY KEY'}, 'primary_key')).
           from(Sequel.as(:information_schema__key_column_usage, 'kc')).
@@ -77,7 +77,7 @@ module Sequel
                            c__table_name: :kc__table_name,
                            c__table_schema: :kc__table_schema,
                            c__column_name: :kc__column_name).
-          filter(c__table_name: in_identifier.call(table),
+          where(c__table_name: in_identifier.call(table),
                  c__table_schema: schema)
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
@@ -158,6 +158,7 @@ module Sequel
         schema, table = schema_or_current_and_table(table, opts)
         dataset = metadata_dataset.
           select(:is__is_unique,
+                 Sequel.as({:is__is_unique => 'YES'}, 'unique'),
                  :is__index_name,
                  :ic__column_name).
           from(Sequel.as(:information_schema__indexes, 'is')).
@@ -171,7 +172,7 @@ module Sequel
         indexes = {}
         dataset.each do |row|
           index = indexes.fetch(out_identifier.call(row[:index_name])) do |key|
-            h = { :unique => row[:is_unique] == 'YES', :columns => [] }
+            h = { :unique => row[:unique], :columns => [] }
             indexes[key] = h
             h
           end
@@ -214,8 +215,8 @@ module Sequel
         m = output_identifier_meth
         dataset = metadata_dataset.server(opts[:server]).select(:table_name).
           from(Sequel.qualify('information_schema','tables')).
-          filter(table_schema: schema).
-          filter(table_type: type)
+          where(table_schema: schema,
+                table_type: type)
         if block_given?
           yield(dataset)
         elsif opts[:qualify]
