@@ -29,8 +29,6 @@ module Sequel
         true
       end
 
-      # TODO supports_index_parsing?
-
       # FDBSQL does not: supports_partial_indexes? (aligns with super)
 
       # TODO (as part of prepared statements) fsupports_prepared_transactions?
