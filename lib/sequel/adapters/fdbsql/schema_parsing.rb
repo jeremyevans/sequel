@@ -137,13 +137,10 @@ module Sequel
         foreign_keys = {}
         # TODO check if there can be multiple constraint schemas considering the table_schema is fixed
         # TODO can there be multiple tables?
-        puts "clo: #{columns_dataset.to_a}"
         columns_dataset.each do |row|
-          constraint_name = out_identifier.call(local_constraint_name(sql_table, row[:name]))
-          puts "col: #{constraint_name}"
-          foreign_key = foreign_keys.fetch(constraint_name) do |key|
-            foreign_keys[constraint_name] = row
-            row[:name] = constraint_name
+          foreign_key = foreign_keys.fetch(row[:name]) do |key|
+            foreign_keys[row[:name]] = row
+            row[:name] = out_identifier.call(local_constraint_name(sql_table, row[:name]))
             row[:columns] = []
             row[:key] = []
             row
@@ -151,13 +148,10 @@ module Sequel
           foreign_key[:columns] << out_identifier.call(row[:column_name])
         end
         keys_dataset.each do |row|
-          constraint_name = out_identifier.call(local_constraint_name(sql_table, row[:name]))
-          puts "key: #{constraint_name}"
-          foreign_key = foreign_keys[constraint_name]
+          foreign_key = foreign_keys[row[:name]]
           foreign_key[:table] = out_identifier.call(row[:key_table])
           foreign_key[:key] << out_identifier.call(row[:key_column])
         end
-        puts foreign_keys.values.join('\n')
         foreign_keys.values
       end
 

@@ -29,8 +29,6 @@ module Sequel
         true
       end
 
-      # TODO supports_foreign_key_parsing?
-
       # TODO supports_index_parsing?
 
       # FDBSQL does not: supports_partial_indexes? (aligns with super)
