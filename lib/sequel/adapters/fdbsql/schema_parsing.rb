@@ -38,12 +38,10 @@ module Sequel
           select(:kc__column_name).
           from(Sequel.as(:information_schema__key_column_usage, 'kc')).
           join(Sequel.as(:information_schema__table_constraints, 'tc'),
-               tc__constraint_type: 'PRIMARY KEY',
-               tc__table_name: :kc__table_name,
-               tc__table_schema: :kc__table_schema,
-               tc__constraint_name: :kc__constraint_name).
+               [:table_name, :table_schema, :constraint_name]).
           where(kc__table_name: in_identifier.call(table),
-                 kc__table_schema: schema)
+                kc__table_schema: schema,
+                tc__constraint_type: 'PRIMARY KEY')
         value = dataset.map do |row|
           out_identifier.call(row.delete(:column_name))
         end
@@ -74,11 +72,9 @@ module Sequel
                tc__table_schema: :kc__table_schema,
                tc__constraint_name: :kc__constraint_name).
           right_outer_join(Sequel.as(:information_schema__columns, 'c'),
-                           c__table_name: :kc__table_name,
-                           c__table_schema: :kc__table_schema,
-                           c__column_name: :kc__column_name).
+                           [:table_name, :table_schema, :column_name]).
           where(c__table_name: in_identifier.call(table),
-                 c__table_schema: schema)
+                c__table_schema: schema)
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(normalize_decimal_to_integer(row[:db_type], row[:numeric_scale]))
@@ -104,14 +100,12 @@ module Sequel
                  :rc__delete_rule___on_delete).
           from(Sequel.as(:information_schema__table_constraints, 'tc')).
           join(Sequel.as(:information_schema__key_column_usage, 'kc'),
-               tc__constraint_type: 'FOREIGN KEY',
-               tc__constraint_schema: :kc__constraint_schema,
-               tc__constraint_name: :kc__constraint_name).
+               [:constraint_schema, :constraint_name]).
           join(Sequel.as(:information_schema__referential_constraints, 'rc'),
-               tc__constraint_name: :rc__constraint_name,
-               tc__constraint_schema: :rc__constraint_schema).
+               [:constraint_name, :constraint_schema]).
           where(tc__table_name: sql_table,
-                tc__table_schema: schema)
+                tc__table_schema: schema,
+                tc__constraint_type: 'FOREIGN KEY')
 
         keys_dataset = metadata_dataset.
           select(:rc__constraint_schema___schema,
@@ -120,14 +114,13 @@ module Sequel
                  :kc__column_name___key_column).
           from(Sequel.as(:information_schema__table_constraints, 'tc')).
           join(Sequel.as(:information_schema__referential_constraints, 'rc'),
-               tc__constraint_type: 'FOREIGN KEY',
-               tc__constraint_schema: :rc__constraint_schema,
-               tc__constraint_name: :rc__constraint_name).
+               [:constraint_schema, :constraint_name]).
           join(Sequel.as(:information_schema__key_column_usage, 'kc'),
                kc__constraint_schema: :rc__unique_constraint_schema,
                kc__constraint_name: :rc__unique_constraint_name).
           where(tc__table_name: sql_table,
-                tc__table_schema: schema)
+                tc__table_schema: schema,
+                tc__constraint_type: 'FOREIGN KEY')
         foreign_keys = {}
         columns_dataset.each do |row|
           foreign_key = foreign_keys.fetch(row[:name]) do |key|
