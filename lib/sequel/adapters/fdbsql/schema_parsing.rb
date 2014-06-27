@@ -98,16 +98,15 @@ module Sequel
         in_identifier = input_identifier_meth(opts[:dataset])
         schema, table = schema_and_table(table)
         schema, _ = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
-        dataset = metadata_dataset.
+        columns_dataset = metadata_dataset.
           select(:tc__table_name___table_name,
                  :tc__table_schema___table_schema,
                  :tc__is_deferable___deferrable,
                  :kc__column_name___column_name,
+                 :kc__constraint_schema___schema,
                  :kc__constraint_name___name,
                  :rc__update_rule___on_update,
-                 :rc__delete_rule___on_delete,
-                 :kc2__table_name___key_table,
-                 :kc2__column_name___key_column).
+                 :rc__delete_rule___on_delete).
           from(Sequel.as(:information_schema__table_constraints, 'tc')).
           join(Sequel.as(:information_schema__key_column_usage, 'kc'),
                tc__constraint_type: 'FOREIGN KEY',
@@ -116,23 +115,40 @@ module Sequel
           join(Sequel.as(:information_schema__referential_constraints, 'rc'),
                tc__constraint_name: :rc__constraint_name,
                tc__constraint_schema: :rc__constraint_schema).
-          join(Sequel.as(:information_schema__key_column_usage, 'kc2'),
-               kc2__constraint_schema: :rc__unique_constraint_schema,
-               kc2__constraint_name: :rc__unique_constraint_name).
+          where(tc__table_name: in_identifier.call(table),
+                tc__table_schema: schema)
+
+        keys_dataset = metadata_dataset.
+          select(:rc__constraint_schema___schema,
+                 :rc__constraint_name___name,
+                 :kc__table_name___key_table,
+                 :kc__column_name___key_column).
+          from(Sequel.as(:information_schema__table_constraints, 'tc')).
+          join(Sequel.as(:information_schema__referential_constraints, 'rc'),
+               tc__constraint_type: 'FOREIGN KEY',
+               tc__constraint_schema: :rc__constraint_schema,
+               tc__constraint_name: :rc__constraint_name).
+          join(Sequel.as(:information_schema__key_column_usage, 'kc'),
+               kc__constraint_schema: :rc__unique_constraint_schema,
+               kc__constraint_name: :rc__unique_constraint_name).
           where(tc__table_name: in_identifier.call(table),
                 tc__table_schema: schema)
         foreign_keys = {}
         # TODO check if there can be multiple constraint schemas considering the table_schema is fixed
         # TODO can there be multiple tables?
-        dataset.each do |row|
+        columns_dataset.each do |row|
           foreign_key = foreign_keys.fetch(row[:name]) do |key|
+            puts row[:name]
             foreign_keys[row[:name]] = row
             row[:columns] = []
-            row[:table] = out_identifier.call(row[:key_table])
             row[:key] = []
             row
           end
           foreign_key[:columns] << out_identifier.call(row[:column_name])
+        end
+        keys_dataset.each do |row|
+          foreign_key = foreign_keys[row[:name]]
+          foreign_key[:table] = out_identifier.call(row[:key_table])
           foreign_key[:key] << out_identifier.call(row[:key_column])
         end
         foreign_keys.values
