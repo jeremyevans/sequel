@@ -60,6 +60,19 @@ module Sequel
       # FDBSQL allows you to quote_identifiers? (aligns with super)
 
       # FDBSQL provides_accurate_rows_matched? (aligns with super)
+
+      # FDBSQL does not support common table expressions: recursive_cte_requires_column_aliases? (aligns with super)
+
+      # FDBSQL does not: requires_sql_standard_datetimes? (aligns with super)
+
+      # FDBSQL does not: requires_placeholder_type_specifiers? (aligns with super)
+
+      # FDBSQL does not support common table expressions: supports_cte?(type=:select) (aligns with super)
+
+      # FDBSQL does not support common table expressions: supports_cte_in_subqueries? (aligns with super)
+
+      # FDBSQL does: supports_derived_column_lists? (aligns with super)
+
     end
   end
 end
