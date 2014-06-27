@@ -5,7 +5,7 @@ module Sequel
     # Methods where we maintain the same behavior as super, are replaced with comments
     # Methods that are defined based on whether we have a method defined are not
     # listed here
-    module Features
+    module DatabaseFeatures
 
       # indexes are namespaced per table
       def global_index_namespace?

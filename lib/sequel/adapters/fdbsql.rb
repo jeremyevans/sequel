@@ -39,7 +39,7 @@ module Sequel
     class NotCommittedError < RetryError; end
 
     class Database < Sequel::Database
-      include Features
+      include DatabaseFeatures
       include SchemaParsing
       DatasetClass = Dataset
       # Use a FDBSQL-specific create table generator
