@@ -1,8 +1,10 @@
-SEQUEL_ADAPTER_TEST = :fdbsql
+SEQUEL_ADAPTER_TEST = :fdbsql unless defined? SEQUEL_ADAPTER_TEST and SEQUEL_ADAPTER_TEST == :fdbsql
 
-require 'sequel'
-SEQUEL_PATH = Gem.loaded_specs['sequel'].full_gem_path
-require File.join("#{SEQUEL_PATH}",'spec','adapters','spec_helper.rb')
+unless defined? SEQUEL_PATH
+  require 'sequel'
+  SEQUEL_PATH = Gem.loaded_specs['sequel'].full_gem_path
+  require File.join("#{SEQUEL_PATH}",'spec','adapters','spec_helper.rb')
+end
 
 describe 'Fdbsql' do
   before(:all) do
