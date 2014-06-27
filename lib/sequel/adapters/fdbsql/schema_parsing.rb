@@ -188,16 +188,6 @@ module Sequel
         indexes
       end
 
-      # The constraint name that we need for all other commands does not include
-      # the table name, but the one returned by the information_schema tables
-      # does include it. E.g. if we have the constraint "b.__fk_1" on table b
-      # the correct (e.g. drop) is
-      # `ALTER TABLE b DROP CONSTRAINT __fk_1`
-      # See sql-layer:ReferentialConstraintsFactory
-      def local_constraint_name(table_name, global_constraint_name)
-        global_constraint_name[table_name.length+1..-1]
-      end
-
       def column_schema_normalize_default(default, type)
         # the default value returned by schema parsing is not escaped or quoted
         # in any way, it's just the value of the string
@@ -215,6 +205,16 @@ module Sequel
       end
 
       private
+
+      # The constraint name that we need for all other commands does not include
+      # the table name, but the one returned by the information_schema tables
+      # does include it. E.g. if we have the constraint "b.__fk_1" on table b
+      # the correct (e.g. drop) is
+      # `ALTER TABLE b DROP CONSTRAINT __fk_1`
+      # See sql-layer:ReferentialConstraintsFactory
+      def local_constraint_name(table_name, global_constraint_name)
+        global_constraint_name[table_name.length+1..-1]
+      end
 
       def tables_or_views(type, opts, &block)
         schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
