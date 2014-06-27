@@ -32,10 +32,8 @@ module Sequel
       def primary_key(table_name, opts=OPTS)
         quoted_table = quote_schema_table(table_name)
         Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
-        # CURRENT_SCHEMA evaluates to the currently chosen schema
-        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
-        in_identifier = input_identifier_meth(opts[:dataset])
-        out_identifier = output_identifier_meth(opts[:dataset])
+        out_identifier, in_identifier = identifier_convertors(opts)
+        schema, table = schema_or_current_and_table(table_name, opts)
         dataset = metadata_dataset.
           select(:kc__column_name).
           from(Sequel.as(:information_schema__key_column_usage, 'kc')).
@@ -44,7 +42,7 @@ module Sequel
                tc__table_name: :kc__table_name,
                tc__table_schema: :kc__table_schema,
                tc__constraint_name: :kc__constraint_name).
-          filter(kc__table_name: in_identifier.call(table_name.to_s),
+          filter(kc__table_name: in_identifier.call(table),
                  kc__table_schema: schema)
         value = dataset.map do |row|
           out_identifier.call(row.delete(:column_name))
@@ -59,11 +57,9 @@ module Sequel
 
       # returns an array of column information with each column being of the form:
       # [:column_name, {:db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}]
-      def schema_parse_table(table_name, opts = {})
-        out_identifier = output_identifier_meth(opts[:dataset])
-        in_identifier = input_identifier_meth(opts[:dataset])
-        # CURRENT_SCHEMA evaluates to the currently chosen schema
-        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
+      def schema_parse_table(table, opts = {})
+        out_identifier, in_identifier = identifier_convertors(opts)
+        schema, table = schema_or_current_and_table(table, opts)
         dataset = metadata_dataset.
           select(:c__column_name,
                  Sequel.as({:c__is_nullable => 'YES'}, 'allow_null'),
@@ -81,7 +77,7 @@ module Sequel
                            c__table_name: :kc__table_name,
                            c__table_schema: :kc__table_schema,
                            c__column_name: :kc__column_name).
-          filter(c__table_name: in_identifier.call(table_name.to_s),
+          filter(c__table_name: in_identifier.call(table),
                  c__table_schema: schema)
         dataset.map do |row|
           row[:default] = nil if blank_object?(row[:default])
@@ -94,10 +90,8 @@ module Sequel
       # Postgres returns hash like:
       # {"b_e_fkey"=> {:name=>:b_e_fkey, :columns=>[:e], :on_update=>:no_action, :on_delete=>:no_action, :deferrable=>false, :table=>:a, :key=>[:c]}}
       def foreign_key_list(table, opts=OPTS)
-        out_identifier = output_identifier_meth(opts[:dataset])
-        in_identifier = input_identifier_meth(opts[:dataset])
-        schema, table = schema_and_table(table)
-        schema, _ = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
+        out_identifier, in_identifier = identifier_convertors(opts)
+        schema, table = schema_or_current_and_table(table, opts)
         sql_table = in_identifier.call(table)
         columns_dataset = metadata_dataset.
           select(:tc__table_name___table_name,
@@ -160,10 +154,8 @@ module Sequel
       # {:blah_blah_index=>{:columns=>[:n], :unique=>true, :deferrable=>nil},
       #  :items_n_a_index=>{:columns=>[:n, :a], :unique=>false, :deferrable=>nil}}
       def indexes(table, opts=OPTS)
-        out_identifier = output_identifier_meth(opts[:dataset])
-        in_identifier = input_identifier_meth(opts[:dataset])
-        schema, table = schema_and_table(table)
-        schema, _ = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
+        out_identifier, in_identifier = identifier_convertors(opts)
+        schema, table = schema_or_current_and_table(table, opts)
         dataset = metadata_dataset.
           select(:is__is_unique,
                  :is__index_name,
@@ -196,14 +188,6 @@ module Sequel
         return default
       end
 
-      def normalize_decimal_to_integer(type, scale)
-        if (type == 'DECIMAL' and scale == 0)
-          'integer'
-        else
-          type
-        end
-      end
-
       private
 
       # The constraint name that we need for all other commands does not include
@@ -216,8 +200,17 @@ module Sequel
         global_constraint_name[table_name.length+1..-1]
       end
 
+      # If the given type is DECIMAL with scale 0, say that it's an integer
+      def normalize_decimal_to_integer(type, scale)
+        if (type == 'DECIMAL' and scale == 0)
+          'integer'
+        else
+          type
+        end
+      end
+
       def tables_or_views(type, opts, &block)
-        schema = opts[:schema] ? opts[:schema] : Sequel.lit('CURRENT_SCHEMA')
+        schema = opts[:schema] || Sequel.lit('CURRENT_SCHEMA')
         m = output_identifier_meth
         dataset = metadata_dataset.server(opts[:server]).select(:table_name).
           from(Sequel.qualify('information_schema','tables')).
@@ -232,6 +225,15 @@ module Sequel
         end
       end
 
+      def identifier_convertors(opts=OPTS)
+        [output_identifier_meth(opts[:dataset]), input_identifier_meth(opts[:dataset])]
+      end
+
+      def schema_or_current_and_table(table, opts=OPTS)
+        schema, table = schema_and_table(table)
+        schema = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
+        [schema, table]
+      end
     end
   end
 end
