@@ -123,7 +123,10 @@ module Sequel
 
       # FDBSQL does not: supports_window_functions? (aligns with super)
 
-      # FDBSQL does not: supports_where_true? (aligns with super)
+      # FDBSQL does: supports_where_true? (aligns with super)
+
+      # FDBSQL does: insert_supports_empty_values? (aligns with super)
+      # i.e. INSERT DEFAULT VALUES
 
       # FDBSQL does not: supports_quoted_function_names? (aligns with super)
 
