@@ -128,7 +128,9 @@ module Sequel
       # FDBSQL does: insert_supports_empty_values? (aligns with super)
       # i.e. INSERT DEFAULT VALUES
 
-      # FDBSQL does not: supports_quoted_function_names? (aligns with super)
+      def supports_quoted_function_names?
+        true
+      end
 
       # FDBSQL does not: uses_with_rollup? (aligns with super)
       # FDBSQL does not use WITH ROLLUP/CUBE instead of ROLLUP()/CUBE().

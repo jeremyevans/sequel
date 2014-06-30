@@ -104,4 +104,26 @@ describe 'Fdbsql Dataset' do
       DB[:test].insert().should eq 1 # 1 should be the pk
     end
   end
+
+  describe 'function names' do
+    before do
+      DB.create_table!(:test) {Text :a; Text :b}
+      DB[:test].insert('1', '')
+      DB[:test].insert('2', 'trucks')
+      DB[:test].insert('3', 'foxes')
+    end
+    after do
+      DB.drop_table?(:test)
+    end
+
+    specify 'evaluate' do
+      DB[:test].select(Sequel.function(:now)).count == 1
+      DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b), :c)).map{|r| r[:c]}.should match_array ['1','2trucks','3foxes']
+    end
+
+    specify 'get quoted' do
+      DB[:test].select(Sequel.function(:now).quoted).sql.should =~ /"now"\(\)/
+      DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b).quoted, :c)).sql.should =~ /"concat"\("a", "b"\)/
+    end
+  end
 end
