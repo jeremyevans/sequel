@@ -41,21 +41,6 @@ module Sequel
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
       Dataset.def_sql_method(self, :update, %w'with update table set from where returning')
 
-      # Returning is always supported.
-      def supports_returning?(type)
-        true
-      end
-
-      # FDBQSL does not support timezones in literal timestamps
-      def supports_timestamp_timezones?
-        false
-      end
-
-      # FDBSQL truncates all seconds
-      def supports_timestamp_usecs?
-        false
-      end
-
       # Insert given values into the database.
       def insert(*values)
         if @opts[:returning]

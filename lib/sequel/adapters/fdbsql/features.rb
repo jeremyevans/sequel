@@ -104,6 +104,21 @@ module Sequel
 
       # FDBSQL does not: supports_replace?
 
+      # Returning is always supported.
+      def supports_returning?(type)
+        true
+      end
+
+      # FDBQSL does not support timezones in literal timestamps
+      def supports_timestamp_timezones?
+        false
+      end
+
+      # FDBSQL truncates all seconds
+      def supports_timestamp_usecs?
+        false
+      end
+
     end
   end
 end
