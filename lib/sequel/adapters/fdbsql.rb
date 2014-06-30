@@ -25,6 +25,8 @@
 require 'sequel/adapters/fdbsql/connection'
 require 'sequel/adapters/fdbsql/dataset'
 require 'sequel/adapters/fdbsql/create_table_generator'
+require 'sequel/adapters/fdbsql/features'
+require 'sequel/adapters/fdbsql/schema_parsing'
 require 'sequel/adapters/utils/pg_types'
 require 'sequel/adapters/fdbsql/date_arithmetic'
 
@@ -37,6 +39,8 @@ module Sequel
     class NotCommittedError < RetryError; end
 
     class Database < Sequel::Database
+      include DatabaseFeatures
+      include SchemaParsing
       DatasetClass = Dataset
       # Use a FDBSQL-specific create table generator
       def create_table_generator_class
@@ -75,15 +79,6 @@ module Sequel
         end
       end
 
-      # the sql layer supports DROP TABLE IF EXISTS
-      def supports_drop_table_if_exists?
-        true
-      end
-
-      def supports_schema_parsing?
-        true
-      end
-
       # Like PostgreSQL fdbsql folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default
         nil
@@ -100,6 +95,9 @@ module Sequel
         end
       end
 
+      def database_error_classes
+        [PGError]
+      end
 
       NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
       FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
@@ -143,32 +141,6 @@ module Sequel
           @primary_keys.delete(tab)
         end
         super
-      end
-
-      # Return primary key for the given table.
-      def primary_key(table_name, opts=OPTS)
-        # CURRENT_SCHEMA evaluates to the currently chosen schema
-        quoted_table = quote_schema_table(table_name)
-        Sequel.synchronize{return @primary_keys[quoted_table] if @primary_keys.has_key?(quoted_table)}
-        schema = schema ? literal(opts[:schema]) : 'CURRENT_SCHEMA'
-        sql =
-          'SELECT kc.column_name ' +
-          'FROM information_schema.table_constraints tc ' +
-          'INNER JOIN information_schema.key_column_usage kc ' +
-          '  ON  tc.table_schema = kc.table_schema ' +
-          '  AND tc.table_name = kc.table_name ' +
-          '  AND tc.constraint_name = kc.constraint_name ' +
-          'LEFT JOIN information_schema.columns c ' +
-          '  ON kc.table_schema = c.table_schema ' +
-          '  AND kc.table_name = c.table_name ' +
-          '  AND kc.column_name = c.column_name ' +
-          "WHERE tc.table_schema = #{schema} " +
-          # Symbols get quoted with double quotes, strings get quoted with single quotes
-          # since this is a column value, we want to ensure that it's a string
-          "  AND tc.table_name = #{literal(table_name.to_s)} " +
-          "  AND tc.constraint_type = 'PRIMARY KEY' "
-        value = fetch(sql).single_value
-        Sequel.synchronize{@primary_keys[quoted_table] = value}
       end
 
       # like PostgreSQL fdbsql uses SERIAL psuedo-type instead of AUTOINCREMENT for
@@ -217,53 +189,6 @@ module Sequel
       # Handle serial type if :serial option is present
       def type_literal_generic_integer(column)
         column[:serial] ? :serial : super
-      end
-
-
-      # returns an array of column information with each column being of the form:
-      # [:column_name, {:db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}]
-      def schema_parse_table(table_name, opts = {})
-        out_identifier = output_identifier_meth(opts[:dataset])
-        in_identifier = input_identifier_meth(opts[:dataset])
-        # CURRENT_SCHEMA evaluates to the currently chosen schema
-        schema = schema ? literal(in_identifier.call(opts[:schema])) : 'CURRENT_SCHEMA'
-        dataset = metadata_dataset.with_sql(<<-EOSQL)
-          SELECT c.column_name, (c.is_nullable = 'YES') AS allow_null, c.column_default AS "default", c.data_type AS db_type,
-            c.numeric_scale, (tc.constraint_type = 'PRIMARY KEY') AS primary_key
-          FROM information_schema.key_column_usage kc
-          INNER JOIN information_schema.table_constraints tc
-            ON tc.constraint_type = 'PRIMARY KEY'
-            AND tc.table_name = kc.table_name
-            AND tc.table_schema = kc.table_schema
-            AND tc.constraint_name = kc.constraint_name
-          RIGHT JOIN information_schema.columns c
-            ON c.table_name = tc.table_name
-            AND c.table_schema = tc.table_schema
-            AND c.column_name = kc.column_name
-          WHERE c.table_name = #{literal(in_identifier.call(table_name.to_s))}
-          AND c.table_schema = #{schema}
-        EOSQL
-        dataset.map do |row|
-          row[:default] = nil if blank_object?(row[:default])
-          row[:type] = schema_column_type(normalize_decimal_to_integer(row[:db_type], row[:numeric_scale]))
-          [out_identifier.call(row.delete(:column_name)), row]
-        end
-      end
-
-      def column_schema_normalize_default(default, type)
-        # the default value returned by schema parsing is not escaped or quoted
-        # in any way, it's just the value of the string
-        # the base implementation assumes it would come back "'my ''default'' value'"
-        # fdbsql returns "my 'default' value" (Not including double quotes for either)
-        return default
-      end
-
-      def normalize_decimal_to_integer(type, scale)
-        if (type == 'DECIMAL' and scale == 0)
-          'integer'
-        else
-          type
-        end
       end
 
       def begin_transaction(conn, opts=OPTS)

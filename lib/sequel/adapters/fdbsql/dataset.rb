@@ -22,10 +22,13 @@
 #
 
 require 'sequel/adapters/utils/pg_types'
+require 'sequel/adapters/fdbsql/features'
+
 module Sequel
   module Fdbsql
 
     class Dataset < Sequel::Dataset
+      include DatasetFeatures
 
       def fetch_rows(sql)
         execute(sql) do |res|
@@ -37,21 +40,6 @@ module Sequel
       Dataset.def_sql_method(self, :delete, %w'with delete from using where returning')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
       Dataset.def_sql_method(self, :update, %w'with update table set from where returning')
-
-      # Returning is always supported.
-      def supports_returning?(type)
-        true
-      end
-
-      # FDBQSL does not support timezones in literal timestamps
-      def supports_timestamp_timezones?
-        false
-      end
-
-      # FDBSQL truncates all seconds
-      def supports_timestamp_usecs?
-        false
-      end
 
       # Insert given values into the database.
       def insert(*values)
@@ -66,7 +54,7 @@ module Sequel
         else
           # Force the use of RETURNING with the primary key value,
           # unless it has been disabled.
-          returning(insert_pk).insert(*values){|r| return r.values.first}
+          returning(*insert_pk).insert(*values){|r| return r.values.first}
         end
       end
 
@@ -108,6 +96,17 @@ module Sequel
         case op
         when :&, :|, :^, :<<, :>>, :'B~'
           complex_expression_emulate_append(sql, op, args)
+        # REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*']
+        when :'~'
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'!~'
+          sql << NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'~*'
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
+        when :'!~*'
+          sql << NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
         else
           super
         end
@@ -169,7 +168,7 @@ module Sequel
           case t = f.first
           when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
             if pk = db.primary_key(t)
-              Sequel::SQL::Identifier.new(pk)
+              pk
             end
           end
         end
