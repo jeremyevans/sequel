@@ -75,6 +75,14 @@ module Sequel
 
       # FDBSQL does not: supports_distinct_on? (aligns with super)
 
+      # FDBSQL does not: supports_group_cube? (aligns with super)
+
+      # FDBSQL does support GROUP BY ROLLUP
+      def supports_group_rollup?
+        true
+      end
+
+
     end
   end
 end
