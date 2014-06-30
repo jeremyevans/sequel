@@ -73,6 +73,8 @@ module Sequel
 
       # FDBSQL does: supports_derived_column_lists? (aligns with super)
 
+      # FDBSQL does not: supports_distinct_on? (aligns with super)
+
     end
   end
 end
