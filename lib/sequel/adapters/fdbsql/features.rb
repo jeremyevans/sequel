@@ -88,6 +88,21 @@ module Sequel
 
       # FDBSQL does: supports_is_true? (aligns with super)
 
+      # FDBSQL does: supports_join_using? (aligns with super)
+
+      # FDBSQL does not: supports_lateral_subqueries? (aligns with super)
+
+      # FDBSQL does: supports_limits_in_correlated_subqueries? (aligns with super)
+
+      # FDBSQL does not support UPDATE or DELETE on joined tables: supports_modifying_joins? (aligns with super)
+
+      # FDBSQL does: supports_multiple_column_in? (aligns with super)
+
+      # FDBSQL does: supports_offsets_in_correlated_subqueries? (aligns with super)
+
+      # FDBSQL does not supports_regexp? (aligns with super)
+
+      # FDBSQL does not: supports_replace?
 
     end
   end
