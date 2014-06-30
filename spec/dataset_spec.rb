@@ -39,4 +39,37 @@ describe 'Fdbsql Dataset' do
 
   end
 
+
+  describe 'intersect and except ALL' do
+    before do
+      DB.create_table!(:test) {Integer :a; Integer :b}
+      DB[:test].insert(1, 10)
+      DB[:test].insert(2, 10)
+      DB[:test].insert(8, 15)
+      DB[:test].insert(2, 10)
+      DB[:test].insert(2, 10)
+      DB[:test].insert(1, 10)
+
+      DB.create_table!(:test2) {Integer :a; Integer :b}
+      DB[:test2].insert(1, 10)
+      DB[:test2].insert(2, 10)
+      DB[:test2].insert(2, 12)
+      DB[:test2].insert(3, 10)
+      DB[:test2].insert(1, 10)
+    end
+
+    after do
+      DB.drop_table?(:test)
+      DB.drop_table?(:test2)
+    end
+
+    specify 'intersect all' do
+      @db[:test].intersect(@db[:test2], all: true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[1, 10], [1,10], [2, 10]]
+    end
+
+    specify 'except all' do
+      @db[:test].except(@db[:test2], all: true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[8, 15], [2,10], [2, 10]]
+    end
+  end
+
 end
