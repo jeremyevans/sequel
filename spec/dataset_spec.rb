@@ -91,4 +91,17 @@ describe 'Fdbsql Dataset' do
       DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:'IS NOT', :b, true)).map{|r| r[:a]}.should match_array [1, 3]
     end
   end
+
+  describe 'insert empty values' do
+    before do
+      DB.create_table!(:test) {primary_key :a}
+    end
+    after do
+      DB.drop_table?(:test)
+    end
+
+    specify 'inserts defaults and returns pk' do
+      DB[:test].insert().should eq 1 # 1 should be the pk
+    end
+  end
 end

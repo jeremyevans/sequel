@@ -109,15 +109,23 @@ module Sequel
         true
       end
 
-      # FDBQSL does not support timezones in literal timestamps
-      def supports_timestamp_timezones?
-        false
-      end
+      # FDBSQL does: supports_select_all_and_column? (aligns with super)
+
+      # FDBQSL does not: supports_timestamp_timezones? (aligns with super)
 
       # FDBSQL truncates all seconds
       def supports_timestamp_usecs?
         false
       end
+
+      # FDBSQL does not: supports_window_functions? (aligns with super)
+
+      # FDBSQL does not: supports_where_true? (aligns with super)
+
+      # FDBSQL does not: supports_quoted_function_names? (aligns with super)
+
+      # FDBSQL does not: uses_with_rollup? (aligns with super)
+      # FDBSQL does not use WITH ROLLUP/CUBE instead of ROLLUP()/CUBE().
 
     end
   end
