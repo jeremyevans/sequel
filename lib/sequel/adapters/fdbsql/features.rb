@@ -100,7 +100,10 @@ module Sequel
 
       # FDBSQL does: supports_offsets_in_correlated_subqueries? (aligns with super)
 
-      # FDBSQL does not supports_regexp? (aligns with super)
+      # FDBSQL does: supports_regexp? (but with functions)
+      def supports_regexp?
+        true
+      end
 
       # FDBSQL does not: supports_replace?
 

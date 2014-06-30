@@ -96,6 +96,17 @@ module Sequel
         case op
         when :&, :|, :^, :<<, :>>, :'B~'
           complex_expression_emulate_append(sql, op, args)
+        # REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*']
+        when :'~'
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'!~'
+          sql << NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'~*'
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
+        when :'!~*'
+          sql << NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
         else
           super
         end
