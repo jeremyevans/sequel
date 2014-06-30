@@ -72,4 +72,23 @@ describe 'Fdbsql Dataset' do
     end
   end
 
+  describe 'is' do
+    before do
+      DB.create_table!(:test) {Integer :a; Boolean :b}
+      DB[:test].insert(1, nil)
+      DB[:test].insert(2, true)
+      DB[:test].insert(3, false)
+    end
+    after do
+      DB.drop_table?(:test)
+    end
+
+    specify 'true' do
+      DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:IS, :b, true)).map{|r| r[:a]}.should match_array [2]
+    end
+
+    specify 'not true' do
+      DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:'IS NOT', :b, true)).map{|r| r[:a]}.should match_array [1, 3]
+    end
+  end
 end

@@ -86,6 +86,9 @@ module Sequel
 
       # FDBSQL does: supports_intersect_except_all? (INTERSECT ALL and EXCEPT ALL) (aligns with super)
 
+      # FDBSQL does: supports_is_true? (aligns with super)
+
+
     end
   end
 end
