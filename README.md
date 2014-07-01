@@ -25,9 +25,7 @@ This project currently supports Sequel v4.11.0
 > before attempting to use this adapter.
 >
 
-# TODO
-
-1. Add *one* the following lines to `Gemfile`:
+1. Add the following line to `Gemfile`:
     - Unreleased development version:
         - `gem 'sequel-fdbsql-adapter', github: 'FoundationDB/sql-layer-adapter-sequel`
 2. Install the new gem
@@ -60,6 +58,7 @@ the `RUNNING_UNIT_TESTS.md` file for more details.
 ### License
 
 The MIT License (MIT)
+
 Copyright (c) 2013-2014 FoundationDB, LLC
-It is free software and may be redistributed under the terms specified
-in the LICENSE file.
+
+It is free software and may be redistributed under the terms specified in the LICENSE file.
