@@ -24,7 +24,6 @@
 
 require 'sequel/adapters/fdbsql/connection'
 require 'sequel/adapters/fdbsql/dataset'
-require 'sequel/adapters/fdbsql/create_table_generator'
 require 'sequel/adapters/fdbsql/features'
 require 'sequel/adapters/fdbsql/prepared_statements'
 require 'sequel/adapters/fdbsql/schema_parsing'
@@ -44,11 +43,6 @@ module Sequel
       include DatabasePreparedStatements
       include SchemaParsing
       DatasetClass = Dataset
-
-      # Use a FDBSQL-specific create table generator
-      def create_table_generator_class
-        CreateTableGenerator
-      end
 
       # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
       # it should just be the timestamp, so we need whole new formats here.
@@ -166,11 +160,7 @@ module Sequel
       # this may be changed in the future, but for now we need to
       # set it at the sequel layer
       def column_definition_null_sql(sql, column)
-        if (column[:primary_key])
-          null = false
-        else
-          null = column.fetch(:null, column[:allow_null])
-        end
+        null = column.fetch(:null, column[:allow_null])
         sql << NOT_NULL if null == false
         sql << NULL if null == true
       end
