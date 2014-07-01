@@ -323,13 +323,13 @@ describe 'Fdbsql' do
 
   describe 'prepared statements' do
     def create_table
-      DB.create_table!(:test) {Integer :a; Text :b}
-      DB[:test].insert(1, 'blueberries')
-      DB[:test].insert(2, 'trucks')
-      DB[:test].insert(3, 'foxes')
+      @db.create_table!(:test) {Integer :a; Text :b}
+      @db[:test].insert(1, 'blueberries')
+      @db[:test].insert(2, 'trucks')
+      @db[:test].insert(3, 'foxes')
     end
     def drop_table
-      DB.drop_table?(:test)
+      @db.drop_table?(:test)
     end
     before do
       create_table
@@ -339,24 +339,17 @@ describe 'Fdbsql' do
     end
 
     it 're-prepares on stale statement' do
-      DB[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+      @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
       drop_table
       create_table
-      DB[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+      @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
     end
 
     it 'can call already prepared' do
-      DB[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+      @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
       drop_table
       create_table
-      DB.call(:select_a, :n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
-    end
-
-    it 'fails if prepared statement is missing' do
-      proc do
-        DB.call(:xtaroeucgdagduacruicanhunt, :n=>10) 
-        # TODO Really check error type and message
-      end.should raise_error(StandardError, /aaaaaaaaaaaa/)
+      @db.call(:select_a, :n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
     end
   end
 end
