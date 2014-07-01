@@ -87,19 +87,16 @@
             <p>Association&#39;s :after_load callbacks are now called when eager loading
             via eager (but not when eager loading via eager_graph).</p>
             </li><li>
-            <p>Any expression can now be used as the argument to <a
-            href="../../../classes/Sequel/SQL/StringMethods.html#method-i-like">Sequel::SQL::StringMethods#like</a>,
-            which means that you can pattern match columns to other columns. Before, it
-            always transformed the argument to a string.</p>
+            <p>Any expression can now be used as the argument to Symbol#like, which means
+            that you can pattern match columns to other columns. Before, it always
+            transformed the argument to a string.</p>
             
             <pre>:a.like(:b)&#x000A;# 2.6.0: a LIKE &#39;b&#39;&#x000A;# 2.7.0: a LIKE b</pre>
             </li><li>
-            <p><a
-            href="../../../classes/Array.html#method-i-sql_array">Array#sql_array</a>
-            was added, allowing you to specify that an array in ruby be treated like an
-            array in SQL.  This is true anyway, except for arrays of all two pairs,
-            which are treated like hashes, for specifying multiple conditions with the
-            same key:</p>
+            <p>Array#sql_array was added, allowing you to specify that an array in ruby be
+            treated like an array in SQL.  This is true anyway, except for arrays of
+            all two pairs, which are treated like hashes, for specifying multiple
+            conditions with the same key:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">filter</span>([:<span class="ruby-identifier">a</span>,:<span class="ruby-identifier">b</span>] =<span class="ruby-operator">&gt;</span> [[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>],[<span class="ruby-value">3</span>,<span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_array</span>)&#x000A;<span class="ruby-comment"># =&gt; SELECT * FROM foo WHERE ((a, b) IN ((1, 2), (3, 4)))</span></pre>
             </li><li>

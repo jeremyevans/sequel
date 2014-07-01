@@ -80,6 +80,7 @@
               <li><a target="docwin" href="#method-i-supports_transactional_ddl-3F">supports_transactional_ddl?</a></li>
               <li><a target="docwin" href="#method-i-tables">tables</a></li>
               <li><a target="docwin" href="#method-i-type_supported-3F">type_supported?</a></li>
+              <li><a target="docwin" href="#method-i-values">values</a></li>
               <li><a target="docwin" href="#method-i-views">views</a></li>
             </ol>
           </div>
@@ -1036,6 +1037,25 @@
                   <pre id='method-i-type_supported-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 522</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_supported?</span>(<span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-ivar">@supported_types</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-ivar">@supported_types</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">type</span>){<span class="ruby-ivar">@supported_types</span>[<span class="ruby-identifier">type</span>] = (<span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_type</span>).<span class="ruby-identifier">filter</span>(<span class="ruby-value">:typtype=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;b&#39;</span>, <span class="ruby-value">:typname=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">type</span>.<span class="ruby-identifier">to_s</span>).<span class="ruby-identifier">count</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-values'>
+                <a name='method-i-values'></a>
+                <div class='synopsis'>
+                  <span class='name'>values</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Creates a dataset that uses the VALUES clause:</p>
+                  
+                  <pre>DB.values([[1, 2], [3, 4]])&#x000A;VALUES ((1, 2), (3, 4))&#x000A;DB.values([[1, 2], [3, 4]]).order(:column2).limit(1, 1)&#x000A;VALUES ((1, 2), (3, 4)) ORDER BY column2 LIMIT 1 OFFSET 1</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-values-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-values-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 534</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">values</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">clone</span>(<span class="ruby-value">:values=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">v</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-views'>
                 <a name='method-i-views'></a>
                 <div class='synopsis'>
@@ -1063,7 +1083,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-views-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 534</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-string">&#39;v&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 545</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">pg_class_relname</span>(<span class="ruby-string">&#39;v&#39;</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

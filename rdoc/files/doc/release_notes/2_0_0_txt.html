@@ -55,8 +55,7 @@
             
             <p>You can use these operators on Symbols, LiteralStrings, and other
             Sequel::SQL::Expressions.  Note that there is no equal operator or not
-            equal operator, to specify those, you use a <a
-            href="../../../classes/Hash.html">Hash</a>.</p>
+            equal operator, to specify those, you use a Hash.</p>
             
             <p>Here are some examples:</p>
             
@@ -74,7 +73,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>((:<span class="ruby-identifier">price</span> <span class="ruby-operator">*</span> :<span class="ruby-identifier">tax</span>) <span class="ruby-operator">-</span> :<span class="ruby-identifier">discount</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>)&#x000A;<span class="ruby-comment"># =&gt; SELECT * FROM items WHERE (((price * tax) - discount) &gt; 100)</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">active</span> <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>:<span class="ruby-identifier">archived</span>)&#x000A;<span class="ruby-comment"># =&gt; SELECT * FROM items WHERE (active AND NOT archived)</span></pre>
             
-            <p>SQL <a href="../../../classes/String.html">String</a> Concatenation</p>
+            <p>SQL String Concatenation</p>
             <hr>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> now has support for
@@ -235,10 +234,9 @@
             removal of deprecated methods.  These are:</p>
             <ul><li>
             <p>Inflector is no longer used, the inflection methods were moved directly
-            into <a href="../../../classes/String.html">String</a> (where they belong
-            because inflections only make sense for strings).  So to override
-            singularization or pluralization rules, use String.inflections instead of
-            Inflector.inflections.</p>
+            into String (where they belong because inflections only make sense for
+            strings).  So to override singularization or pluralization rules, use
+            String.inflections instead of Inflector.inflections.</p>
             </li><li>
             <p>MySQL tinyints are now returned as boolean values instead of integers. 
             MySQL doesn&#39;t have a boolean type, and usually it is recommended to use

@@ -39,7 +39,7 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The auto_validations plugin automatically sets up three types of
+            <p>The auto_validations plugin automatically sets up the following types of
             validations for your model columns:</p>
             <ol><li>
             <p>type validations for all columns</p>
@@ -47,11 +47,13 @@
             <p>not_null validations on NOT NULL columns (optionally, presence validations)</p>
             </li><li>
             <p>unique validations on columns or sets of columns with unique indexes</p>
+            </li><li>
+            <p>max length validations on string columns</p>
             </li></ol>
             
-            <p>To determine the columns to use for the not_null validations and the types
-            for the type validations, the plugin looks at the database schema for the
-            model&#39;s table.  To determine the unique validations, <a
+            <p>To determine the columns to use for the type/not_null/max_length
+            validations, the plugin looks at the database schema for the model&#39;s
+            table.  To determine the unique validations, <a
             href="../../Sequel.html">Sequel</a> looks at the indexes on the table.  In
             order for this plugin to be fully functional, the underlying database
             adapter needs to support both schema and index parsing.</p>
@@ -116,7 +118,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;    <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@auto_validate_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_explicit_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_unique_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;    <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@auto_validate_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_explicit_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_max_length_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_unique_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -133,7 +135,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">setup_auto_validations</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:not_null</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:presence</span>&#x000A;      <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">setup_auto_validations</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:not_null</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:presence</span>&#x000A;      <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

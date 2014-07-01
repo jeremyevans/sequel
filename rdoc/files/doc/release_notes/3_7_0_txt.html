@@ -142,9 +142,9 @@
             a before hook returns false.</p>
             </li><li>
             <p>Dataset#group_and_count now handles arguments other than Symbols. A
-            previous change to the method raised an exception if a <a
-            href="../../../classes/Symbol.html">Symbol</a> was not provided.  It also
-            handles AliasedExpressions natively, so the following works correctly:</p>
+            previous change to the method raised an exception if a Symbol was not
+            provided.  It also handles AliasedExpressions natively, so the following
+            works correctly:</p>
             
             <pre>DB[:table].group_and_count(:column.as(:alias))</pre>
             </li><li>

@@ -156,10 +156,9 @@
             <p><a href="../../../classes/Sequel.html">Sequel</a> now treats clob columns
             as strings instead of blobs (except on DB2 when use_clob_as_blob = true). 
             This can make it so the values are returned as strings instead of SQL::Blob
-            values. Since SQL::Blob is a <a
-            href="../../../classes/String.html">String</a> subclass, this generally
-            will not affect user code unless you are passing the values as input to a
-            separate blob column.</p>
+            values. Since SQL::Blob is a String subclass, this generally will not
+            affect user code unless you are passing the values as input to a separate
+            blob column.</p>
             </li><li>
             <p>The Database &lt;-&gt; ConnectionPool interface was completely changed. <a
             href="../../../classes/Sequel.html">Sequel</a> no longer supports custom

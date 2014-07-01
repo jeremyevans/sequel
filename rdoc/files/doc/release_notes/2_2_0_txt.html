@@ -47,13 +47,11 @@
             
             <p>Association callbacks (:before_add, :after_add, :before_remove,
             :after_remove) have been added, and work for all association types.  Each
-            of the callback options can be a <a
-            href="../../../classes/Symbol.html">Symbol</a> specifying an instance
-            method that takes one argument (the associated object), or a Proc that
-            takes two arguments (the current object and the associated object), or an
-            array of Symbols and Procs.  Additionally, an :after_load callback is
-            available, which is running after loading the associated record(s) from the
-            database.</p>
+            of the callback options can be a Symbol specifying an instance method that
+            takes one argument (the associated object), or a Proc that takes two
+            arguments (the current object and the associated object), or an array of
+            Symbols and Procs.  Additionally, an :after_load callback is available,
+            which is running after loading the associated record(s) from the database.</p>
             
             <p>Association extensions are now supported:</p>
             
@@ -167,17 +165,13 @@
             <ul><li>
             <p>Dataset#graph now takes a block which it passes to join_table.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Symbol.html#method-i-identifier">Symbol#identifier</a>
-            has been added, which can be used if another library defines the same
-            operator(s) on <a href="../../../classes/Symbol.html">Symbol</a> that <a
+            <p>Symbol#identifier has been added, which can be used if another library
+            defines the same operator(s) on Symbol that <a
             href="../../../classes/Sequel.html">Sequel</a> defines.</p>
             </li><li>
             <p>Filter blocks now yield a VirtualRow instance, which can yield Identifiers,
-            QualifiedIdentifiers, or Functions.  Like <a
-            href="../../../classes/Symbol.html#method-i-identifier">Symbol#identifier</a>,
-            this is useful if another library defines the same operator(s) on <a
-            href="../../../classes/Symbol.html">Symbol</a> that <a
+            QualifiedIdentifiers, or Functions.  Like Symbol#identifier, this is useful
+            if another library defines the same operator(s) on Symbol that <a
             href="../../../classes/Sequel.html">Sequel</a> defines.</p>
             </li><li>
             <p>You can now call Model.to_hash to get an identity map for all rows (before

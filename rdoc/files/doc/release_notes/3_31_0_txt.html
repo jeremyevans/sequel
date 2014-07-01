@@ -140,8 +140,7 @@
             <ul><li>
             <p>Dataset#exists now returns a PlaceholderLiteralString instead of a
             LiteralString, which could potentially break some code.  If you would like
-            a <a href="../../../classes/String.html">String</a> returned, you can pass
-            the returned object to Dataset#literal:</p>
+            a String returned, you can pass the returned object to Dataset#literal:</p>
             
             <pre>dataset.literal(dataset.exists)</pre>
             </li><li>
@@ -165,9 +164,8 @@
             have related sql_query_type private methods.</p>
             </li><li>
             <p>The serialization plugin was significantly refactored.
-            Model.serialization_map now contains a callable object instead of a <a
-            href="../../../classes/Symbol.html">Symbol</a>, and
-            Model.serialization_format has been removed.
+            Model.serialization_map now contains a callable object instead of a Symbol,
+            and Model.serialization_format has been removed.
             Model.define_serialized_attribute_accessors private method now takes two
             callable objects before the columns, instead of a single symbol.</p>
             </li></ul>

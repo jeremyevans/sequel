@@ -301,12 +301,11 @@
             <p>The MySQL Database#indexes method no longer returns indexes on partial
             columns (prefix indexes).</p>
             </li><li>
-            <p>Default values for <a href="../../../classes/String.html">String</a>
-            :text=&gt;true and File columns on MySQL are ignored, since MySQL
-            doesn&#39;t support them.  They are not ignored if you use text and blob,
-            since then you are using the database-specific syntax and <a
-            href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t do translation
-            when the database-specific syntax is used.</p>
+            <p>Default values for String :text=&gt;true and File columns on MySQL are
+            ignored, since MySQL doesn&#39;t support them.  They are not ignored if you
+            use text and blob, since then you are using the database-specific syntax
+            and <a href="../../../classes/Sequel.html">Sequel</a> doesn&#39;t do
+            translation when the database-specific syntax is used.</p>
             </li><li>
             <p>On PostgreSQL, attempting the reset the primary key sequence for a table
             without a primary key no longer causes an error.</p>
@@ -339,8 +338,8 @@
             </li><li>
             <p>The exception messages when Sequel.string_to_* fail have been fixed.</p>
             </li><li>
-            <p>The <a href="../../../classes/String.html">String</a> :text=&gt;true
-            generic database type has been fixed when using the Firebird adapter.</p>
+            <p>The String :text=&gt;true generic database type has been fixed when using
+            the Firebird adapter.</p>
             </li></ul>
             
             <p>Backwards Compatibility</p>

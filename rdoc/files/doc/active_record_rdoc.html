@@ -201,7 +201,7 @@
             with it, it should be even easier to transition to <a
             href="../../classes/Sequel.html">Sequel</a>.</p>
             
-            <h3 id="label-No+Need+for+SQL+String+Fragments">No Need for SQL <a href="../../classes/String.html">String</a> Fragments<span><a href="#label-No+Need+for+SQL+String+Fragments">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-No+Need+for+SQL+String+Fragments">No Need for SQL String Fragments<span><a href="#label-No+Need+for+SQL+String+Fragments">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Like the example above, most ActiveRecord code uses SQL string fragments. 
             With <a href="../../classes/Sequel.html">Sequel</a>, you rarely need to. 
@@ -258,10 +258,9 @@
             case sensitive search on both, you can use <code>like</code> instead of
             <code>ilike</code>.</p>
             
-            <p><a href="../../classes/String.html">String</a> concatenation is a similar
-            area, where MySQL and PostgreSQL handle things differently.  With <a
-            href="../../classes/Sequel.html">Sequel</a>, the same code can work on both
-            databases:</p>
+            <p>String concatenation is a similar area, where MySQL and PostgreSQL handle
+            things differently.  With <a href="../../classes/Sequel.html">Sequel</a>,
+            the same code can work on both databases:</p>
             
             <pre>Album.select(Sequel.join([:name, &#39; - Name&#39;]))</pre>
             

@@ -146,7 +146,7 @@
             
             <h3 id="label-Retrieving+Multiple+Objects">Retrieving Multiple Objects<span><a href="#label-Retrieving+Multiple+Objects">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
-            <h4 id="label-As+an+Array+of+Hashes+or+Model+Objects">As an <a href="../../classes/Array.html">Array</a> of Hashes or Model Objects<span><a href="#label-As+an+Array+of+Hashes+or+Model+Objects">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-As+an+Array+of+Hashes+or+Model+Objects">As an Array of Hashes or Model Objects<span><a href="#label-As+an+Array+of+Hashes+or+Model+Objects">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>In many cases, you want an array of all of the rows associated with the
             dataset, in which case <code>Sequel::Dataset#all</code> is the method you
@@ -167,7 +167,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&quot;YJM&quot;</span>, <span class="ruby-string">&quot;AS&quot;</span>]</pre>
             
-            <h4 id="label-As+an+Array+of+Column+Values">As an <a href="../../classes/Array.html">Array</a> of Column Values<span><a href="#label-As+an+Array+of+Column+Values">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-As+an+Array+of+Column+Values">As an Array of Column Values<span><a href="#label-As+an+Array+of+Column+Values">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> also has an extended
             <code>map</code> method that takes an argument.  If you provide an argument
@@ -199,7 +199,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_map</span>([:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>])&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [[<span class="ruby-value">1</span>, <span class="ruby-string">&quot;YJM&quot;</span>], [<span class="ruby-value">2</span>, <span class="ruby-string">&quot;AS&quot;</span>]]</pre>
             
-            <h4 id="label-As+a+Hash">As a <a href="../../classes/Hash.html">Hash</a><span><a href="#label-As+a+Hash">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-As+a+Hash">As a Hash<span><a href="#label-As+a+Hash">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to take an SQL
             query and return it as a ruby hash, using the <code>to_hash</code> method:</p>
@@ -363,7 +363,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-regexp">/JM$/</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1 AND name ~ &#39;JM$&#39;</span></pre>
             
-            <h3 id="label-Array+of+Two+Element+Arrays"><a href="../../classes/Array.html">Array</a> of Two Element Arrays<span><a href="#label-Array+of+Two+Element+Arrays">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Array+of+Two+Element+Arrays">Array of Two Element Arrays<span><a href="#label-Array+of+Two+Element+Arrays">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>If you use an array of two element arrays, it is treated as a hash.  The
             only advantage to using an array of two element arrays is that it allows

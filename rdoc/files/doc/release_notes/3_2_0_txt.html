@@ -166,8 +166,7 @@
             where only one of the composite parts is autoincrementing.</p>
             </li><li>
             <p>You can now use database column values as search patterns and specify the
-            text to search as a <a href="../../../classes/String.html">String</a> or
-            Regexp:</p>
+            text to search as a String or Regexp:</p>
             
             <pre>String.send(:include, Sequel::SQL::StringMethods)&#x000A;Regexp.send(:include, Sequel::SQL::StringMethods)&#x000A;&#39;a&#39;.like(:x)  # (&#39;a&#39; LIKE x)&#x000A;/a/.like(:x)  # (&#39;a&#39; ~ x)&#x000A;/a/i.like(:x) # (&#39;a&#39; ~* x)&#x000A;/a/.like(:x, &#39;b&#39;) # ((&#39;a&#39; ~ x) OR (&#39;a&#39; ~ &#39;b&#39;))</pre>
             </li><li>
@@ -179,8 +178,7 @@
             <p><a href="../../../classes/Sequel.html">Sequel</a> now raises an Error if
             you call <a
             href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>
-            with something that is not a <a href="../../../classes/Hash.html">Hash</a>
-            or <a href="../../../classes/String.html">String</a>.</p>
+            with something that is not a Hash or String.</p>
             </li><li>
             <p>bin/sequel now accepts a -N option to not test the database connection.</p>
             </li><li>
@@ -201,9 +199,8 @@
             </li><li>
             <p>MySQL foreign key table constraints have been fixed.</p>
             </li><li>
-            <p>Database#indexes now works on PostgreSQL if the schema used is a <a
-            href="../../../classes/Symbol.html">Symbol</a>.  It also works on
-            PostgreSQL versions all the way back to 7.4.</p>
+            <p>Database#indexes now works on PostgreSQL if the schema used is a Symbol. 
+            It also works on PostgreSQL versions all the way back to 7.4.</p>
             </li><li>
             <p>Graphing of datasets with dataset sources has been fixed.</p>
             </li><li>

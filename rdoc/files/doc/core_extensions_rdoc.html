@@ -83,11 +83,10 @@
             
             <pre>do_something if value || other_value</pre>
             
-            <p>and value is a <a href="../../classes/Symbol.html">Symbol</a>, instead of a
-            NoMethodError being raised because Symbol#| is not implemented by default,
-            <code>value | other_value</code> will return a <a
-            href="../../classes/Sequel.html">Sequel</a> expression object, which if
-            will evaluate as true, and do_something will be called.</p>
+            <p>and value is a Symbol, instead of a NoMethodError being raised because
+            Symbol#| is not implemented by default, <code>value | other_value</code>
+            will return a <a href="../../classes/Sequel.html">Sequel</a> expression
+            object, which if will evaluate as true, and do_something will be called.</p>
             
             <h2 id="label-Usage">Usage<span><a href="#label-Usage">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -114,16 +113,13 @@
             classes, and what the alternative method is that doesn&#39;t require the
             core extensions.</p>
             
-            <h3 id="label-Symbol+%26+String"><a href="../../classes/Symbol.html">Symbol</a> &amp; <a href="../../classes/String.html">String</a><span><a href="#label-Symbol+%26+String">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Symbol+%26+String">Symbol &amp; String<span><a href="#label-Symbol+%26+String">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <h4 id="label-as">as<span><a href="#label-as">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/AliasMethods.html#method-i-as">Sequel::SQL::AliasMethods#as</a>
-            and <a
-            href="../../classes/Sequel/SQL/AliasMethods.html#method-i-as">Sequel::SQL::AliasMethods#as</a>
-            return <a href="../../classes/Sequel.html">Sequel</a> aliased expressions
-            using the provided alias:</p>
+            <p>Symbol#as and String#as return <a
+            href="../../classes/Sequel.html">Sequel</a> aliased expressions using the
+            provided alias:</p>
             
             <pre>:a.as(:b)  # SQL: a AS b&#x000A;&#39;a&#39;.as(:b) # SQL: &#39;a&#39; AS b</pre>
             
@@ -133,11 +129,8 @@
             
             <h4 id="label-cast">cast<span><a href="#label-cast">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/CastMethods.html#method-i-cast">Sequel::SQL::CastMethods#cast</a>
-            and <a
-            href="../../classes/Sequel/SQL/CastMethods.html#method-i-cast">Sequel::SQL::CastMethods#cast</a>
-            return <a href="../../classes/Sequel.html">Sequel</a> cast expressions for
+            <p>Symbol#cast and String#cast return <a
+            href="../../classes/Sequel.html">Sequel</a> cast expressions for
             typecasting in the database:</p>
             
             <pre>:a.cast(Integer)  # SQL: CAST(a AS integer)&#x000A;&#39;a&#39;.cast(Integer) # SQL: CAST(&#39;a&#39; AS integer)</pre>
@@ -148,11 +141,8 @@
             
             <h4 id="label-cast_numeric">cast_numeric<span><a href="#label-cast_numeric">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/CastMethods.html#method-i-cast_numeric">Sequel::SQL::CastMethods#cast_numeric</a>
-            and <a
-            href="../../classes/Sequel/SQL/CastMethods.html#method-i-cast_numeric">Sequel::SQL::CastMethods#cast_numeric</a>
-            return <a href="../../classes/Sequel.html">Sequel</a> cast expressions for
+            <p>Symbol#cast_numeric and String#cast_numeric return <a
+            href="../../classes/Sequel.html">Sequel</a> cast expressions for
             typecasting in the database, defaulting to integers, where the returned
             expression is treated as an numeric value:</p>
             
@@ -164,11 +154,8 @@
             
             <h4 id="label-cast_string">cast_string<span><a href="#label-cast_string">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/CastMethods.html#method-i-cast_string">Sequel::SQL::CastMethods#cast_string</a>
-            and <a
-            href="../../classes/Sequel/SQL/CastMethods.html#method-i-cast_string">Sequel::SQL::CastMethods#cast_string</a>
-            return <a href="../../classes/Sequel.html">Sequel</a> cast expressions for
+            <p>Symbol#cast_string and String#cast_string return <a
+            href="../../classes/Sequel.html">Sequel</a> cast expressions for
             typecasting in the database, defaulting to strings, where the returned
             expression is treated as a string value:</p>
             
@@ -178,15 +165,14 @@
             
             <pre>Sequel.cast_string(:a)</pre>
             
-            <h3 id="label-Symbol"><a href="../../classes/Symbol.html">Symbol</a><span><a href="#label-Symbol">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Symbol">Symbol<span><a href="#label-Symbol">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <h4 id="label-identifier">identifier<span><a href="#label-identifier">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Symbol.html#method-i-identifier">Symbol#identifier</a>
-            wraps the symbol in a single identifier that will not be split.  By
-            default, <a href="../../classes/Sequel.html">Sequel</a> will split symbols
-            with double or triple underscores to do qualifying and aliasing.</p>
+            <p>Symbol#identifier wraps the symbol in a single identifier that will not be
+            split.  By default, <a href="../../classes/Sequel.html">Sequel</a> will
+            split symbols with double or triple underscores to do qualifying and
+            aliasing.</p>
             
             <pre>:table__column.identifier # SQL: table__column</pre>
             
@@ -196,10 +182,8 @@
             
             <h4 id="label-asc">asc<span><a href="#label-asc">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/OrderMethods.html#method-i-asc">Sequel::SQL::OrderMethods#asc</a>
-            is used to define an ascending order on a column.  It exists mostly for
-            consistency with desc, since ascending is the default order:</p>
+            <p>Symbol#asc is used to define an ascending order on a column.  It exists
+            mostly for consistency with desc, since ascending is the default order:</p>
             
             <pre>:a.asc # SQL: a ASC</pre>
             
@@ -209,10 +193,8 @@
             
             <h4 id="label-desc">desc<span><a href="#label-desc">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/OrderMethods.html#method-i-desc">Sequel::SQL::OrderMethods#desc</a>
-            is used to defined a descending order on a column.  The returned value is
-            usually passed to one of the dataset order methods.</p>
+            <p>Symbol#desc is used to defined a descending order on a column.  The
+            returned value is usually passed to one of the dataset order methods.</p>
             
             <pre>:a.desc # SQL: a DESC</pre>
             
@@ -222,8 +204,7 @@
             
             <h4 id="label-%2B%2C+-%2C+%2A%2C+%2F">+, -, *, /<span><a href="#label-%2B%2C+-%2C+%2A%2C+%2F">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p>The standard mathematical operators are defined on <a
-            href="../../classes/Symbol.html">Symbol</a>, and return a <a
+            <p>The standard mathematical operators are defined on Symbol, and return a <a
             href="../../classes/Sequel.html">Sequel</a> numeric expression object
             representing the operation:</p>
             
@@ -235,9 +216,8 @@
             
             <h4 id="label-%2A">*<span><a href="#label-%2A">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p>The * operator is overloaded on <a
-            href="../../classes/Symbol.html">Symbol</a> such that if it is called with
-            no arguments, it represents a selection of all columns in the table:</p>
+            <p>The * operator is overloaded on Symbol such that if it is called with no
+            arguments, it represents a selection of all columns in the table:</p>
             
             <pre>:a.* # SQL: a.*</pre>
             
@@ -247,10 +227,8 @@
             
             <h4 id="label-qualify">qualify<span><a href="#label-qualify">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/QualifyingMethods.html#method-i-qualify">Sequel::SQL::QualifyingMethods#qualify</a>
-            qualifies the identifier (e.g. a column) with a another identifier (e.g. a
-            table):</p>
+            <p>Symbol#qualify qualifies the identifier (e.g. a column) with a another
+            identifier (e.g. a table):</p>
             
             <pre>:column.qualify(:table) # SQL: table.column</pre>
             
@@ -258,17 +236,14 @@
             
             <pre>Sequel.qualify(:table, :column)</pre>
             
-            <p>Note the reversed order of the arguments.  For the <a
-            href="../../classes/Sequel/SQL/QualifyingMethods.html#method-i-qualify">Sequel::SQL::QualifyingMethods#qualify</a>
-            method, the argument is the qualifier, while for Sequel.qualify, the
-            qualifier is the first argument.</p>
+            <p>Note the reversed order of the arguments.  For the Symbol#qualify method,
+            the argument is the qualifier, while for Sequel.qualify, the qualifier is
+            the first argument.</p>
             
             <h4 id="label-like">like<span><a href="#label-like">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/StringMethods.html#method-i-like">Sequel::SQL::StringMethods#like</a>
-            returns a case sensitive LIKE expression between the identifier and the
-            given argument:</p>
+            <p>Symbol#like returns a case sensitive LIKE expression between the identifier
+            and the given argument:</p>
             
             <pre>:a.like(&#39;b%&#39;) # SQL: a LIKE &#39;b%&#39; ESCAPE &#39;\&#39;</pre>
             
@@ -278,10 +253,8 @@
             
             <h4 id="label-ilike">ilike<span><a href="#label-ilike">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/StringMethods.html#method-i-ilike">Sequel::SQL::StringMethods#ilike</a>
-            returns a case insensitive LIKE expression between the identifier and the
-            given argument:</p>
+            <p>Symbol#ilike returns a case insensitive LIKE expression between the
+            identifier and the given argument:</p>
             
             <pre>:a.ilike(&#39;b%&#39;) # SQL: a ILIKE &#39;b%&#39; ESCAPE &#39;\&#39;</pre>
             
@@ -291,10 +264,9 @@
             
             <h4 id="label-sql_subscript">sql_subscript<span><a href="#label-sql_subscript">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/SubscriptMethods.html#method-i-sql_subscript">Sequel::SQL::SubscriptMethods#sql_subscript</a>
-            returns a <a href="../../classes/Sequel.html">Sequel</a> expression
-            representing an SQL array access:</p>
+            <p>Symbol#sql_subscript returns a <a
+            href="../../classes/Sequel.html">Sequel</a> expression representing an SQL
+            array access:</p>
             
             <pre>:a.sql_subscript(1) # SQL: a[1]</pre>
             
@@ -304,9 +276,7 @@
             
             <h4 id="label-extract">extract<span><a href="#label-extract">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Sequel/SQL/ComplexExpressionMethods.html#method-i-extract">Sequel::SQL::ComplexExpressionMethods#extract</a>
-            does a datetime part extraction from the receiver:</p>
+            <p>Symbol#extract does a datetime part extraction from the receiver:</p>
             
             <pre>:a.extract(:year) # SQL: extract(year FROM a)</pre>
             
@@ -314,16 +284,14 @@
             
             <pre>Sequel.extract(:year, :a)</pre>
             
-            <p>Note the reversed order of the arguments.  In <a
-            href="../../classes/Sequel/SQL/ComplexExpressionMethods.html#method-i-extract">Sequel::SQL::ComplexExpressionMethods#extract</a>,
-            the datetime part is the argument, while in Sequel.extract, the datetime
-            part is the first argument.</p>
+            <p>Note the reversed order of the arguments.  In Symbol#extract, the datetime
+            part is the argument, while in Sequel.extract, the datetime part is the
+            first argument.</p>
             
             <h4 id="label-sql_boolean%2C+sql_number%2C+sql_string">sql_boolean, sql_number, sql_string<span><a href="#label-sql_boolean%2C+sql_number%2C+sql_string">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p>These <a href="../../classes/Symbol.html">Symbol</a> methods are used to
-            force the treating of the object as a specific SQL type, instead of as a
-            general SQL type.  For example:</p>
+            <p>These Symbol methods are used to force the treating of the object as a
+            specific SQL type, instead of as a general SQL type.  For example:</p>
             
             <pre>:a.sql_boolean + 1  # NoMethodError&#x000A;:a.sql_number &lt;&lt; 1  # SQL: a &lt;&lt; 1&#x000A;:a.sql_string + &#39;a&#39; # SQL: a || &#39;a&#39;</pre>
             
@@ -333,9 +301,7 @@
             
             <h4 id="label-sql_function">sql_function<span><a href="#label-sql_function">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Symbol.html#method-i-sql_function">Symbol#sql_function</a>
-            returns an SQL function call expression object:</p>
+            <p>Symbol#sql_function returns an SQL function call expression object:</p>
             
             <pre>:now.sql_function # SQL: now()&#x000A;:sum.sql_function(:a) # SQL: sum(a)&#x000A;:concat.sql_function(:a, :b) # SQL: concat(a, b)</pre>
             
@@ -343,14 +309,13 @@
             
             <pre>Sequel.function(:sum, :a)</pre>
             
-            <h3 id="label-String"><a href="../../classes/String.html">String</a><span><a href="#label-String">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-String">String<span><a href="#label-String">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <h4 id="label-lit">lit<span><a href="#label-lit">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a href="../../classes/String.html#method-i-lit">String#lit</a> creates a
-            literal string, using placeholders if any arguments are given.  Literal
-            strings are not escaped, they are treated as SQL code, not as an SQL
-            string:</p>
+            <p>String#lit creates a literal string, using placeholders if any arguments
+            are given.  Literal strings are not escaped, they are treated as SQL code,
+            not as an SQL string:</p>
             
             <pre>&#39;a&#39;.lit          # SQL: a&#x000A;&#39;&quot;a&quot; = ?&#39;.lit(1) # SQL: &quot;a&quot; = 1</pre>
             
@@ -360,9 +325,7 @@
             
             <h4 id="label-to_sequel_blob">to_sequel_blob<span><a href="#label-to_sequel_blob">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/String.html#method-i-to_sequel_blob">String#to_sequel_blob</a>
-            returns the string wrapper in <a
+            <p>String#to_sequel_blob returns the string wrapper in <a
             href="../../classes/Sequel.html">Sequel</a> blob object.  Often blobs need
             to be handled differently than regular strings by the database adapters.</p>
             
@@ -372,7 +335,7 @@
             
             <pre>Sequel.blob(&quot;a\0&quot;)</pre>
             
-            <h3 id="label-Hash%2C+Array%2C+%26+Symbol"><a href="../../classes/Hash.html">Hash</a>, <a href="../../classes/Array.html">Array</a>, &amp; <a href="../../classes/Symbol.html">Symbol</a><span><a href="#label-Hash%2C+Array%2C+%26+Symbol">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Hash%2C+Array%2C+%26+Symbol">Hash, Array, &amp; Symbol<span><a href="#label-Hash%2C+Array%2C+%26+Symbol">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <h4 id="label-%7E">~<span><a href="#label-%7E">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -385,13 +348,12 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
             
-            <h3 id="label-Hash+%26+Array"><a href="../../classes/Hash.html">Hash</a> &amp; <a href="../../classes/Array.html">Array</a><span><a href="#label-Hash+%26+Array">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Hash+%26+Array">Hash &amp; Array<span><a href="#label-Hash+%26+Array">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <h4 id="label-case">case<span><a href="#label-case">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a href="../../classes/Array.html#method-i-case">Array#case</a> and <a
-            href="../../classes/Hash.html#method-i-case">Hash#case</a> return an SQL
-            CASE expression, where the keys are conditions and the values are results:</p>
+            <p>Array#case and Hash#case return an SQL CASE expression, where the keys are
+            conditions and the values are results:</p>
             
             <pre class="ruby">{{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>)   <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span>&#x000A;[[{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]}, <span class="ruby-value">1</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END</span></pre>
             
@@ -401,10 +363,8 @@
             
             <h4 id="label-sql_expr">sql_expr<span><a href="#label-sql_expr">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a href="../../classes/Array.html#method-i-sql_expr">Array#sql_expr</a> and
-            <a href="../../classes/Hash.html#method-i-sql_expr">Hash#sql_expr</a> treat
-            the receiver as a conditions specifier, matching all of the conditions in
-            the array.</p>
+            <p>Array#sql_expr and Hash#sql_expr treat the receiver as a conditions
+            specifier, matching all of the conditions in the array.</p>
             
             <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_expr</span>     <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span></pre>
             
@@ -414,11 +374,8 @@
             
             <h4 id="label-sql_negate">sql_negate<span><a href="#label-sql_negate">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a href="../../classes/Array.html#method-i-sql_negate">Array#sql_negate</a>
-            and <a
-            href="../../classes/Hash.html#method-i-sql_negate">Hash#sql_negate</a>
-            treat the receiver as a conditions specifier, matching none of the
-            conditions in the array:</p>
+            <p>Array#sql_negate and Hash#sql_negate treat the receiver as a conditions
+            specifier, matching none of the conditions in the array:</p>
             
             <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_negate</span>     <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_negate</span> <span class="ruby-comment"># SQL: a != 1 AND b NOT IN (2, 3)</span></pre>
             
@@ -428,10 +385,8 @@
             
             <h4 id="label-sql_or">sql_or<span><a href="#label-sql_or">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a href="../../classes/Array.html#method-i-sql_or">Array#sql_or</a> nd <a
-            href="../../classes/Hash.html#method-i-sql_or">Hash#sql_or</a> treat the
-            receiver as a conditions specifier, matching any of the conditions in the
-            array:</p>
+            <p>Array#sql_or nd Hash#sql_or treat the receiver as a conditions specifier,
+            matching any of the conditions in the array:</p>
             
             <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_or</span>     <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span>&#x000A;[[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]].<span class="ruby-identifier">sql_or</span> <span class="ruby-comment"># SQL: a = 1 OR b IN (2, 3)</span></pre>
             
@@ -439,13 +394,11 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>])</pre>
             
-            <h3 id="label-Array"><a href="../../classes/Array.html">Array</a><span><a href="#label-Array">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Array">Array<span><a href="#label-Array">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <h4 id="label-sql_value_list">sql_value_list<span><a href="#label-sql_value_list">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Array.html#method-i-sql_value_list">Array#sql_value_list</a>
-            wraps the array in an array subclass, which <a
+            <p>Array#sql_value_list wraps the array in an array subclass, which <a
             href="../../classes/Sequel.html">Sequel</a> will always treat as a value
             list and not a conditions specifier.  By default, <a
             href="../../classes/Sequel.html">Sequel</a> treats arrays of two element
@@ -459,10 +412,8 @@
             
             <h4 id="label-sql_string_join">sql_string_join<span><a href="#label-sql_string_join">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p><a
-            href="../../classes/Array.html#method-i-sql_string_join">Array#sql_string_join</a>
-            joins all of the elements in the array in an SQL string concatentation
-            expression:</p>
+            <p>Array#sql_string_join joins all of the elements in the array in an SQL
+            string concatentation expression:</p>
             
             <pre>[:a].sql_string_join # SQL: a&#x000A;[:a, :b].sql_string_join # SQL: a || b&#x000A;[:a, &#39;b&#39;].sql_string_join # SQL: a || &#39;b&#39;&#x000A;[&#39;a&#39;, :b].sql_string_join(&#39; &#39;) # SQL: &#39;a&#39; || &#39; &#39; || b</pre>
             
@@ -470,7 +421,7 @@
             
             <pre>Sequel.join([&#39;a&#39;, :b], &#39; &#39;)</pre>
             
-            <h3 id="label-Hash+%26+Symbol"><a href="../../classes/Hash.html">Hash</a> &amp; <a href="../../classes/Symbol.html">Symbol</a><span><a href="#label-Hash+%26+Symbol">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Hash+%26+Symbol">Hash &amp; Symbol<span><a href="#label-Hash+%26+Symbol">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <h4 id="label-%26">&amp;<span><a href="#label-%26">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             

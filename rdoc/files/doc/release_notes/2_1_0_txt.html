@@ -110,8 +110,7 @@
             </li><li>
             <p>Expression :x &lt; :y # ON x &lt; y</p>
             </li><li>
-            <p><a href="../../../classes/Array.html">Array</a> of Symbols: [:x, :y, :z] #
-            USING (x, y, z)</p>
+            <p>Array of Symbols: [:x, :y, :z] # USING (x, y, z)</p>
             </li><li>
             <p>nil # no conditions, used for NATURAL or CROSS joins</p>
             </li></ul>
@@ -164,12 +163,10 @@
             <p>HAVING now comes before ORDER BY, which most databases seem to prefer.  If
             your database wants HAVING after ORDER BY, please let us know.</p>
             </li><li>
-            <p><a
-            href="../../../classes/Sequel/SQL/QualifyingMethods.html#method-i-qualify">Sequel::SQL::QualifyingMethods#qualify</a>
-            now exists, to specify the table name for a given symbol, similar to the
-            use of as to specify an alias.  This is mainly helpful in conjuction with
-            the join_table block, as that provides the table aliases to use to qualify
-            the columns inside the block.</p>
+            <p>Symbol#qualify now exists, to specify the table name for a given symbol,
+            similar to the use of as to specify an alias.  This is mainly helpful in
+            conjuction with the join_table block, as that provides the table aliases to
+            use to qualify the columns inside the block.</p>
             </li><li>
             <p>BitwiseMethods (&amp;, |, ^, ~, &lt;&lt;, &gt;&gt;) have been added to the
             NumericExpression class, so you can do the following:</p>

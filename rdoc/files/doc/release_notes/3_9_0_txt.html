@@ -229,8 +229,7 @@
             <p>In the hash passed to Dataset#update, symbol keys with a double embedded
             underscore are now considerated as implicit qualifiers, instead of being
             used verbatim.  If you have a column that includes a double underscore, you
-            now need to wrap it in an SQL::Identifier or use a <a
-            href="../../../classes/String.html">String</a> instead.</p>
+            now need to wrap it in an SQL::Identifier or use a String instead.</p>
             </li><li>
             <p>The connection pools no longer convert non-StandardError based exceptions
             to RuntimeErrors.  Previously, all of the common adapters turned this

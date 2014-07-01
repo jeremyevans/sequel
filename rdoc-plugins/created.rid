@@ -1,4 +1,4 @@
-Tue, 17 Jun 2014 20:48:02 -0700
+Tue, 01 Jul 2014 08:13:14 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/blank.rb	Tue, 19 Jun 2012 10:06:46 -0700
@@ -29,7 +29,7 @@ lib/sequel/extensions/pg_array_ops.rb	Fri, 16 May 2014 16:27:33 -0700
 lib/sequel/extensions/pg_hstore.rb	Wed, 26 Mar 2014 09:08:13 -0700
 lib/sequel/extensions/pg_hstore_ops.rb	Thu, 06 Feb 2014 13:15:21 -0800
 lib/sequel/extensions/pg_inet.rb	Sun, 01 Dec 2013 14:52:18 -0800
-lib/sequel/extensions/pg_interval.rb	Tue, 17 Jun 2014 20:46:14 -0700
+lib/sequel/extensions/pg_interval.rb	Tue, 17 Jun 2014 20:53:00 -0700
 lib/sequel/extensions/pg_json.rb	Fri, 16 May 2014 16:27:33 -0700
 lib/sequel/extensions/pg_json_ops.rb	Tue, 03 Jun 2014 10:55:35 -0700
 lib/sequel/extensions/pg_loose_count.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -37,7 +37,7 @@ lib/sequel/extensions/pg_range.rb	Sun, 01 Dec 2013 14:53:24 -0800
 lib/sequel/extensions/pg_range_ops.rb	Mon, 21 Oct 2013 11:50:03 -0700
 lib/sequel/extensions/pg_row.rb	Tue, 29 Apr 2014 11:53:53 -0700
 lib/sequel/extensions/pg_row_ops.rb	Sat, 26 Oct 2013 06:54:00 -0700
-lib/sequel/extensions/pg_static_cache_updater.rb	Fri, 23 Aug 2013 16:59:00 -0700
+lib/sequel/extensions/pg_static_cache_updater.rb	Thu, 19 Jun 2014 11:13:26 -0700
 lib/sequel/extensions/pretty_table.rb	Thu, 22 Aug 2013 12:22:05 -0700
 lib/sequel/extensions/query.rb	Tue, 11 Feb 2014 12:09:28 -0800
 lib/sequel/extensions/query_literals.rb	Thu, 22 Aug 2013 12:22:05 -0700
@@ -59,7 +59,7 @@ lib/sequel/plugins/association_autoreloading.rb	Mon, 03 Jun 2013 16:35:29 -0700
 lib/sequel/plugins/association_dependencies.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/association_pks.rb	Wed, 16 Apr 2014 12:44:50 -0700
 lib/sequel/plugins/association_proxies.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/auto_validations.rb	Thu, 17 Apr 2014 08:18:53 -0700
+lib/sequel/plugins/auto_validations.rb	Thu, 19 Jun 2014 15:43:20 -0700
 lib/sequel/plugins/blacklist_security.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/boolean_readers.rb	Sat, 06 Apr 2013 16:15:38 -0700
 lib/sequel/plugins/caching.rb	Thu, 19 Sep 2013 07:06:56 -0700
@@ -72,7 +72,7 @@ lib/sequel/plugins/dirty.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/eager_each.rb	Thu, 27 Mar 2014 08:30:07 -0700
 lib/sequel/plugins/error_splitter.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/force_encoding.rb	Thu, 19 Sep 2013 07:06:56 -0700
-lib/sequel/plugins/hook_class_methods.rb	Thu, 19 Sep 2013 07:06:56 -0700
+lib/sequel/plugins/hook_class_methods.rb	Thu, 26 Jun 2014 13:06:20 -0700
 lib/sequel/plugins/input_transformer.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/instance_filters.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/instance_hooks.rb	Wed, 15 Jan 2014 10:40:54 -0800
@@ -82,13 +82,13 @@ lib/sequel/plugins/list.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/many_through_many.rb	Tue, 06 May 2014 11:07:10 -0700
 lib/sequel/plugins/many_to_one_pk_lookup.rb	Mon, 03 Jun 2013 16:35:29 -0700
 lib/sequel/plugins/mssql_optimistic_locking.rb	Wed, 06 Nov 2013 11:51:32 -0800
-lib/sequel/plugins/nested_attributes.rb	Tue, 17 Jun 2014 20:46:14 -0700
+lib/sequel/plugins/nested_attributes.rb	Thu, 19 Jun 2014 11:13:26 -0700
 lib/sequel/plugins/optimistic_locking.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/pg_array_associations.rb	Wed, 30 Apr 2014 08:18:43 -0700
 lib/sequel/plugins/pg_row.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/pg_typecast_on_load.rb	Mon, 15 Jul 2013 08:40:45 -0700
-lib/sequel/plugins/prepared_statements.rb	Wed, 23 Apr 2014 10:52:30 -0700
-lib/sequel/plugins/prepared_statements_associations.rb	Mon, 14 Apr 2014 15:36:00 -0700
+lib/sequel/plugins/prepared_statements.rb	Wed, 18 Jun 2014 15:07:26 -0700
+lib/sequel/plugins/prepared_statements_associations.rb	Wed, 18 Jun 2014 15:07:26 -0700
 lib/sequel/plugins/prepared_statements_safe.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/prepared_statements_with_pk.rb	Thu, 26 Apr 2012 15:16:20 -0700
 lib/sequel/plugins/rcte_tree.rb	Tue, 15 Apr 2014 08:59:53 -0700

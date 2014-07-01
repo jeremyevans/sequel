@@ -201,13 +201,11 @@
             <p>Dataset#unbind has been added, which allows you to take a dataset that uses
             static bound values and convert them to placeholders. Currently, the only
             cases handled are SQL::ComplexExpression objects that use a =, !=, &lt;,
-            &gt;, &lt;=, or &gt;= operator where the first argument is a <a
-            href="../../../classes/Symbol.html">Symbol</a>, SQL::Indentifier, or
-            SQL::QualifiedIdentifier, and the second argument is a Numeric, <a
-            href="../../../classes/String.html">String</a>, Date, or Time. 
-            Dataset#unbind returns a two element array, where the first element is a
-            modified copy of the receiver, and the second element is a bound variable
-            hash:</p>
+            &gt;, &lt;=, or &gt;= operator where the first argument is a Symbol,
+            SQL::Indentifier, or SQL::QualifiedIdentifier, and the second argument is a
+            Numeric, String, Date, or Time.  Dataset#unbind returns a two element
+            array, where the first element is a modified copy of the receiver, and the
+            second element is a bound variable hash:</p>
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>, <span class="ruby-identifier">bv</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">unbind</span>&#x000A;<span class="ruby-identifier">ds</span> <span class="ruby-comment"># DB[:table].filter(:a=&gt;:$a)</span>&#x000A;<span class="ruby-identifier">bv</span> <span class="ruby-comment"># {:a=&gt;1}</span></pre>
             

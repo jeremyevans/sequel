@@ -161,15 +161,14 @@
             strings as SQL strings (escaping them correctly), and not as raw SQL. 
             However, you can convert a ruby string to a literal string, and <a
             href="../../classes/Sequel.html">Sequel</a> will then treat it as raw SQL. 
-            This is typically done through <a
-            href="../../classes/String.html#method-i-lit">String#lit</a> if the <a
+            This is typically done through String#lit if the <a
             href="core_extensions_rdoc.html">core_extensions</a> are in use, or <a
             href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>
             if they are not in use.</p>
             
             <pre>&#39;a&#39;.lit&#x000A;Sequel.lit(&#39;a&#39;)</pre>
             
-            <p>Using <a href="../../classes/String.html#method-i-lit">String#lit</a> or <a
+            <p>Using String#lit or <a
             href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>
             to turn a ruby string into a literal string results in SQL injection if the
             string is derived from user input.  With both of these methods, the strings
@@ -180,14 +179,12 @@
             
             <p>Even though they have similar names, note that <a
             href="../../classes/Sequel/Database.html#method-i-literal">Sequel::Database#literal</a>
-            operates very differently from <a
-            href="../../classes/String.html#method-i-lit">String#lit</a> or <a
+            operates very differently from String#lit or <a
             href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>.
             <a
             href="../../classes/Sequel/Database.html#method-i-literal">Sequel::Database#literal</a>
             is for taking any supported object, and getting an SQL representation of
-            that object, while <a
-            href="../../classes/String.html#method-i-lit">String#lit</a> or <a
+            that object, while String#lit or <a
             href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>
             are for treating a ruby string as raw SQL.  For example:</p>
             

@@ -48,8 +48,7 @@
             performance of web application code.</p>
             
             <p>In order for this optimization to have an effect, you need to make sure
-            that you are calling set_dataset with a <a
-            href="../../../classes/Symbol.html">Symbol</a> and not a Dataset object:</p>
+            that you are calling set_dataset with a Symbol and not a Dataset object:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Optimized:</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>; <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">foos</span>); <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> :<span class="ruby-identifier">foos</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Not Optimized, but otherwise equivalent:</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>[:<span class="ruby-identifier">foos</span>]); <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">set_dataset</span> <span class="ruby-identifier">db</span>[:<span class="ruby-identifier">foos</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
             </li><li>
@@ -104,16 +103,16 @@
             
             <pre class="ruby"><span class="ruby-comment"># 2.10.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">prettify</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">name</span>))&#x000A;<span class="ruby-comment"># 2.11.0</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">prettify</span>(:<span class="ruby-identifier">name</span>)}</pre>
             </li><li>
-            <p><a href="../../../classes/String.html#method-i-lit">String#lit</a> can now
-            accept arguments and return an SQL literal string.  This allows you to do
-            things that were previously hard or at least unnecessarily verbose.  For
-            example, you can now easily use the SQL standard SUBSTRING function:</p>
+            <p>String#lit can now accept arguments and return an SQL literal string.  This
+            allows you to do things that were previously hard or at least unnecessarily
+            verbose.  For example, you can now easily use the SQL standard SUBSTRING
+            function:</p>
             
             <pre class="ruby"><span class="ruby-identifier">column</span> = :<span class="ruby-identifier">user</span>&#x000A;<span class="ruby-identifier">pattern</span> = <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">pattern</span>]&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">substring</span>(<span class="ruby-string">&#39;? from ?&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-identifier">column</span>, <span class="ruby-identifier">pattern</span>))}</pre>
             </li><li>
             <p>A validates_inclusion_of validation method was added to Model. You can
-            provide a Range or an <a href="../../../classes/Array.html">Array</a> in
-            the :in option to specify the allowed values:</p>
+            provide a Range or an Array in the :in option to specify the allowed
+            values:</p>
             
             <pre class="ruby"><span class="ruby-identifier">validates_inclusion_of</span> :<span class="ruby-identifier">value</span>, :<span class="ruby-keyword">in</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>&#x000A;<span class="ruby-identifier">validates_inclusion_of</span> :<span class="ruby-identifier">weekday</span>, :<span class="ruby-keyword">in</span>=<span class="ruby-operator">&gt;</span><span class="ruby-node">%wMonday Tuesday ...&#39;</span></pre>
             </li><li>
@@ -143,10 +142,9 @@
             raise_on_typecast_failure = false and not have an error raised when an
             invalid date format is used.</p>
             </li><li>
-            <p><a
-            href="../../../classes/String.html#method-i-to_sequel_blob">String#to_sequel_blob</a>
-            was added and should now be used instead of String#to_blob.  sqlite3-ruby
-            defines String#to_blob differently, which could cause problems.</p>
+            <p>String#to_sequel_blob was added and should now be used instead of
+            String#to_blob.  sqlite3-ruby defines String#to_blob differently, which
+            could cause problems.</p>
             </li><li>
             <p>Blob columns are now fully supported in the SQLite adapter, with the hex
             escape syntax being used for input, and returning columns of type <a
@@ -172,12 +170,12 @@
             <p>The MySQL adapter now sets the encoding option on the database connection
             itself, so it works across reconnects.</p>
             </li><li>
-            <p><a href="../../../classes/Sequel.html">Sequel</a> itself no longer uses <a
-            href="../../../classes/String.html#method-i-lit">String#lit</a> or Symbol#*
-            internally, so it shouldn&#39;t break if another library defines them.</p>
+            <p><a href="../../../classes/Sequel.html">Sequel</a> itself no longer uses
+            String#lit or Symbol#* internally, so it shouldn&#39;t break if another
+            library defines them.</p>
             </li><li>
-            <p>The default index name is now generated correctly if a non-String or <a
-            href="../../../classes/Symbol.html">Symbol</a> column is used.</p>
+            <p>The default index name is now generated correctly if a non-String or Symbol
+            column is used.</p>
             </li><li>
             <p>Some ruby -w warnings have been fixed.</p>
             </li><li>

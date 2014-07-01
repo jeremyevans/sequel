@@ -675,8 +675,8 @@
             
             <pre class="ruby"><span class="ruby-comment"># guesses GoldAlbum</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">gold_albums</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>You can specify the :class option using the class itself, a <a
-            href="../../classes/Symbol.html">Symbol</a>, or a String:</p>
+            <p>You can specify the :class option using the class itself, a Symbol, or a
+            String:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-constant">Artist</span> <span class="ruby-comment"># Class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Artist</span> <span class="ruby-comment"># Symbol</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Artist&quot;</span> <span class="ruby-comment"># String</span></pre>
             
@@ -879,8 +879,7 @@
             
             <h3 id="label-Callback+Options">Callback Options<span><a href="#label-Callback+Options">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
-            <p>All callbacks can be specified as a <a
-            href="../../classes/Symbol.html">Symbol</a>, Proc, or array of both/either
+            <p>All callbacks can be specified as a Symbol, Proc, or array of both/either
             specifying a callback to call.  Symbols are interpreted as instance methods
             that are called with the associated object.  Procs are called with the
             receiver as the first argument and the associated object as the second

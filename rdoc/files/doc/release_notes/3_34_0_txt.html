@@ -42,9 +42,8 @@
             <ul><li>
             <p>A pg_array extension has been added, supporting PostgreSQL&#39;s numeric
             and string array types.  Both single dimensional and multi-dimensional
-            array types are supported.  <a href="../../../classes/Array.html">Array</a>
-            values are returned as instances of Sequel::Postgres::PGArray, which is a
-            delegate class of <a href="../../../classes/Array.html">Array</a>.  You can
+            array types are supported.  Array values are returned as instances of
+            Sequel::Postgres::PGArray, which is a delegate class of Array.  You can
             turn an existing array into a PGArray using Array#pg_array.</p>
             
             <p>If you are using arrays in model objects, you need to load support for
@@ -60,8 +59,8 @@
             <p>A pg_hstore extension has been added, supporting PostgreSQL&#39;s hstore
             type, which is a simple hash with string keys and string or NULL values. 
             hstore values are retrieved as instances of Sequel::Postgres::HStore, which
-            is a delegate class of <a href="../../../classes/Hash.html">Hash</a>.  You
-            can turn an existing hash into an hstore using Hash#hstore.</p>
+            is a delegate class of Hash.  You can turn an existing hash into an hstore
+            using Hash#hstore.</p>
             
             <p>If you are using hstores in model objects, you need to load support for
             that:</p>

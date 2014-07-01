@@ -31,12 +31,59 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-06-17 20:46:14 -0700</span>
+          <span class='datetime'>2014-07-01 08:06:25 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.12.0+%282014-07-01%29">4.12.0 (2014-07-01)<span><a href="#label-4.12.0+%282014-07-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Support :readonly Database option in sqlite adapter (ippeiukai,
+            jeremyevans) (#832)</p>
+            </li><li>
+            <p>Automatically setup max_length validations for string columns in the
+            auto_validations plugin (jeremyevans)</p>
+            </li><li>
+            <p>Add :max_length entry to column schema hashes for string types
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add :before_thread_exit option to Database#listen_for_static_cache_updates
+            in pg_static_cache_updater extension (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#values on PostgreSQL to create a dataset that uses VALUES
+            instead of SELECT (jeremyevans)</p>
+            </li><li>
+            <p>Add Model#set_nested_attributes to nested_attributes, allowing setting
+            nested attributes options per-call (jeremyevans)</p>
+            </li><li>
+            <p>Use explicit columns when using automatically prepared SELECT statements in
+            the prepared statement plugins (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#insert_select on PostgreSQL respect existing RETURNING clause
+            (jeremyevans)</p>
+            </li><li>
+            <p>Fix eager loading limited associations via a UNION when an association
+            block is used (jeremyevans)</p>
+            </li><li>
+            <p>Associate reciprocal object before saving associated object when creating
+            new objects in nested_attributes (chanks, jeremyevans) (#831)</p>
+            </li><li>
+            <p>Handle intervals containing more than 100 hours in the pg_interval
+            extension&#39;s parser (will) (#827)</p>
+            </li><li>
+            <p>Remove methods/class deprecated in 4.11.0 (jeremyevans)</p>
+            </li><li>
+            <p>Allow Dataset#natural_join/cross_join and related methods to take a options
+            hash passed to join_table (jeremyevans)</p>
+            </li><li>
+            <p>Add :reset_implicit_qualifier option to Dataset#join_table, to set false to
+            not reset the implicit qualifier (jeremyevans)</p>
+            </li><li>
+            <p>Support :notice_receiver Database option when postgres adapter is used with
+            pg driver (jeltz, jeremyevans) (#825)</p>
+            </li></ul>
             
             <h3 id="label-4.11.0+%282014-06-03%29">4.11.0 (2014-06-03)<span><a href="#label-4.11.0+%282014-06-03%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             <ul><li>
@@ -625,9 +672,8 @@
             </li><li>
             <p>Support mysql2 0.3.12+ result streaming via Dataset#stream (jeremyevans)</p>
             </li><li>
-            <p>Convert Java::JavaUtil::HashMap to ruby <a
-            href="../classes/Hash.html">Hash</a> in jdbc adapter, for better handling
-            of PostgreSQL hstore type (jeremyevans) (#686)</p>
+            <p>Convert Java::JavaUtil::HashMap to ruby Hash in jdbc adapter, for better
+            handling of PostgreSQL hstore type (jeremyevans) (#686)</p>
             </li><li>
             <p>Raise NoMatchingRow if calling add_association with a primary key value
             that doesn&#39;t match an existing row (jeremyevans)</p>
@@ -1560,8 +1606,8 @@
             <p>Return OCI8::CLOB values as ruby Strings in the Oracle adapter
             (jeremyevans)</p>
             </li><li>
-            <p>Use clob for <a href="../classes/String.html">String</a> :text=&gt;true
-            types on Oracle, DB2, HSQLDB, and Derby (jeremyevans) (#555)</p>
+            <p>Use clob for String :text=&gt;true types on Oracle, DB2, HSQLDB, and Derby
+            (jeremyevans) (#555)</p>
             </li><li>
             <p>Allowing marshalling of Sequel::Postgres::HStore (jeremyevans) (#556)</p>
             </li><li>
@@ -1795,8 +1841,8 @@
             </li><li>
             <p>Call super in list plugin before_create (jeremyevans) (#504)</p>
             </li><li>
-            <p>Do not automatically cast <a href="../classes/String.html">String</a> to
-            text in pg_auto_parameterize extension (jeremyevans)</p>
+            <p>Do not automatically cast String to text in pg_auto_parameterize extension
+            (jeremyevans)</p>
             </li><li>
             <p>Support alter_table validate_constraint on PostgreSQL for validating
             constraints previously declared with NOT VALID (jeremyevans)</p>
@@ -1848,8 +1894,8 @@
             <p>Add pg_range extension, for dealing with PostgreSQL 9.2+ range types
             (jeremyevans)</p>
             </li><li>
-            <p>Make pg_array extension convert array members when typecasting <a
-            href="../classes/Array.html">Array</a> to PGArray (jeremyevans)</p>
+            <p>Make pg_array extension convert array members when typecasting Array to
+            PGArray (jeremyevans)</p>
             </li><li>
             <p>Make jdbc/postgres adapter convert array type elements (e.g. date[] arrays
             are returned as arrays of Date instances) (jeremyevans)</p>
@@ -4429,8 +4475,7 @@
             </li><li>
             <p>Raise a <a href="../classes/Sequel/Error.html">Sequel::Error</a> if <a
             href="../classes/Sequel.html#method-c-connect">Sequel.connect</a> is called
-            with something other than a <a href="../classes/Hash.html">Hash</a> or <a
-            href="../classes/String.html">String</a> (jeremyevans) (#272)</p>
+            with something other than a Hash or String (jeremyevans) (#272)</p>
             </li><li>
             <p>Add -N option to bin/sequel to not test the database connection
             (jeremyevans)</p>
@@ -4504,9 +4549,8 @@
             <p>On PostgreSQL, assume the public schema if one is not given and there is no
             default in Database#tables (jeremyevans)</p>
             </li><li>
-            <p>Ignore a :default value if creating a <a
-            href="../classes/String.html">String</a> :text=&gt;true or File column on
-            MySQL, since it doesn&#39;t support defaults on text/blob columns
+            <p>Ignore a :default value if creating a String :text=&gt;true or File column
+            on MySQL, since it doesn&#39;t support defaults on text/blob columns
             (jeremyevans)</p>
             </li><li>
             <p>On PostgreSQL, do not raise an error when attempting to reset the primary
@@ -4585,8 +4629,7 @@
             </li><li>
             <p>Fix exception messages when Sequel.string_to_* fail (jeremyevans)</p>
             </li><li>
-            <p>Fix <a href="../classes/String.html">String</a> :type=&gt;:text generic
-            type in the Firebird adapter (wishdev)</p>
+            <p>Fix String :type=&gt;:text generic type in the Firebird adapter (wishdev)</p>
             </li><li>
             <p>Add Sequel.amalgalite adapter method (jeremyevans)</p>
             </li></ul>
@@ -4616,9 +4659,8 @@
             <p>Add index parsing to PostgreSQL, MySQL, SQLite, and JDBC adapters
             (jeremyevans)</p>
             </li><li>
-            <p>Correctly quote SQL <a href="../classes/Array.html">Array</a> references,
-            and handle qualified identifiers with them (e.g.
-            :table__column.sql_subscript(1)) (jeremyevans)</p>
+            <p>Correctly quote SQL Array references, and handle qualified identifiers with
+            them (e.g. :table__column.sql_subscript(1)) (jeremyevans)</p>
             </li><li>
             <p>Allow dropping an index with a name different than the default name
             (jeremyevans)</p>
@@ -4872,9 +4914,8 @@
             </li><li>
             <p>Deprecate String#to_blob and Sequel::SQL::Blob#to_blob (jeremyevans)</p>
             </li><li>
-            <p>Deprecate use of Symbol#| for SQL array subscripts, add <a
-            href="../classes/Sequel/SQL/SubscriptMethods.html#method-i-sql_subscript">Sequel::SQL::SubscriptMethods#sql_subscript</a>
-            (jeremyevans)</p>
+            <p>Deprecate use of Symbol#| for SQL array subscripts, add
+            Symbol#sql_subscript (jeremyevans)</p>
             </li><li>
             <p>Deprecate Symbol#to_column_ref (jeremyevans)</p>
             </li><li>
@@ -4916,8 +4957,8 @@
             </li><li>
             <p>Remove SQL::IrregularFunction, no longer used internally (jeremyevans)</p>
             </li><li>
-            <p>Allow <a href="../classes/String.html#method-i-lit">String#lit</a> to take
-            arguments and return a SQL::PlaceholderLiteralString (jeremyevans)</p>
+            <p>Allow String#lit to take arguments and return a
+            SQL::PlaceholderLiteralString (jeremyevans)</p>
             </li><li>
             <p>Add Model#set_associated_object, used by the many_to_one setter method, for
             easier overriding (jeremyevans)</p>
@@ -4954,12 +4995,10 @@
             </li><li>
             <p>Fully support blobs on SQLite (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/String.html#method-i-to_sequel_blob">String#to_sequel_blob</a>,
-            alias String#to_blob to that (jeremyevans)</p>
+            <p>Add String#to_sequel_blob, alias String#to_blob to that (jeremyevans)</p>
             </li><li>
-            <p>Fix default index names when a non-String or <a
-            href="../classes/Symbol.html">Symbol</a> column is used (jeremyevans)</p>
+            <p>Fix default index names when a non-String or Symbol column is used
+            (jeremyevans)</p>
             </li><li>
             <p>Fix some ruby -w warnings (jeremyevans) (#259)</p>
             </li><li>
@@ -5038,9 +5077,8 @@
             <p>Add Firebird adapter, requires Firebird ruby driver located at <a
             href="http://github.com/wishdev/fb">github.com/wishdev/fb</a> (wishdev)</p>
             </li><li>
-            <p>Don&#39;t clobber the following <a href="../classes/Symbol.html">Symbol</a>
-            instance methods when using ruby 1.9: [], &lt;, &lt;=, &gt;, &gt;=
-            (jeremyevans)</p>
+            <p>Don&#39;t clobber the following Symbol instance methods when using ruby
+            1.9: [], &lt;, &lt;=, &gt;, &gt;= (jeremyevans)</p>
             </li><li>
             <p>Quote the table name and the index for PostgreSQL index creation
             (jeremyevans)</p>
@@ -5186,8 +5224,7 @@
             </li><li>
             <p>Treat interval as it&#39;s own type, not an integer type (jeremyevans)</p>
             </li><li>
-            <p>Allow use of implicitly qualified symbol as argument to <a
-            href="../classes/Sequel/SQL/QualifyingMethods.html#method-i-qualify">Sequel::SQL::QualifyingMethods#qualify</a>
+            <p>Allow use of implicitly qualified symbol as argument to Symbol#qualify
             (:a.qualify(:b__c)=&gt;b.c.a), fixes model associations in different
             schemas (jeremyevans) (#246)</p>
             </li></ul>
@@ -5238,9 +5275,7 @@
             </li><li>
             <p>Add a :uniq association option to many_to_many associations (jeremyevans)</p>
             </li><li>
-            <p>Support using any expression as the argument to <a
-            href="../classes/Sequel/SQL/StringMethods.html#method-i-like">Sequel::SQL::StringMethods#like</a>
-            (jeremyevans)</p>
+            <p>Support using any expression as the argument to Symbol#like (jeremyevans)</p>
             </li><li>
             <p>Much better support for multiple schemas in PostgreSQL (jeremyevans) (#243)</p>
             </li><li>
@@ -5261,8 +5296,8 @@
             </li><li>
             <p>Don&#39;t typecast serialized columns in models (jeremyevans)</p>
             </li><li>
-            <p>Add <a href="../classes/Array.html#method-i-sql_array">Array#sql_array</a>
-            to handle ruby arrays of all two pairs as SQL arrays (jeremyevans) (#245)</p>
+            <p>Add Array#sql_array to handle ruby arrays of all two pairs as SQL arrays
+            (jeremyevans) (#245)</p>
             </li><li>
             <p>Add ComplexExpression#== and eql?, for checking equality (rubymage) (#244)</p>
             </li><li>
@@ -5529,12 +5564,10 @@
             <p>Add the Model.to_hash dataset method (jeremyevans)</p>
             </li><li>
             <p>Filter blocks now yield a SQL::VirtualRow argument, which is useful if
-            another library defines operator methods on <a
-            href="../classes/Symbol.html">Symbol</a> (jeremyevans)</p>
+            another library defines operator methods on Symbol (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/Symbol.html#method-i-identifier">Symbol#identifier</a>
-            method, to make x__a be treated as “x__a” instead of “x”.“a” (jeremyevans)</p>
+            <p>Add Symbol#identifier method, to make x__a be treated as “x__a” instead of
+            “x”.“a” (jeremyevans)</p>
             </li><li>
             <p>Dataset#update no longer takes a block, please use a hash argument with the
             expression syntax instead (jeremyevans)</p>
@@ -5571,9 +5604,8 @@
             <p>Sequel&#39;s MySQL adapter should no longer conflict with
             ActiveRecord&#39;s use of MySQL (careo)</p>
             </li><li>
-            <p>Treat <a href="../classes/Hash.html">Hash</a> as expression instead of
-            column alias when used in DISTINCT, ORDER BY, and GROUP BY clauses
-            (jeremyevans)</p>
+            <p>Treat Hash as expression instead of column alias when used in DISTINCT,
+            ORDER BY, and GROUP BY clauses (jeremyevans)</p>
             </li><li>
             <p>PostgreSQL bytea fields are now fully supported (dlee)</p>
             </li><li>
@@ -5672,16 +5704,13 @@
             href="../classes/Sequel.html">Sequel</a> DSL, that have default types and
             wrap the object in the correct class (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/Sequel/SQL/QualifyingMethods.html#method-i-qualify">Sequel::SQL::QualifyingMethods#qualify</a>,
-            for adding a table/schema qualifier to a column/table name (jeremyevans)</p>
+            <p>Add Symbol#qualify, for adding a table/schema qualifier to a column/table
+            name (jeremyevans)</p>
             </li><li>
             <p>Remove Module#metaprivate, since it duplicates the standard
             Module#private_class_method (jeremyevans)</p>
             </li><li>
-            <p>Support the SQL CASE expression via <a
-            href="../classes/Array.html#method-i-case">Array#case</a> and <a
-            href="../classes/Hash.html#method-i-case">Hash#case</a> (jeremyevans)</p>
+            <p>Support the SQL CASE expression via Array#case and Hash#case (jeremyevans)</p>
             </li><li>
             <p>Support the SQL EXTRACT function: :date.extract(:year) (jeremyevans)</p>
             </li><li>
@@ -5778,16 +5807,14 @@
             :graph_join_table_conditions association options, used when eager graphing
             (jeremyevans)</p>
             </li><li>
-            <p>Add AssociationReflection class (subclass of <a
-            href="../classes/Hash.html">Hash</a>), to make calling a couple of private
-            Model methods unnecessary (jeremyevans)</p>
+            <p>Add AssociationReflection class (subclass of Hash), to make calling a
+            couple of private Model methods unnecessary (jeremyevans)</p>
             </li><li>
             <p>Change hook methods so that if a tag/method is specified it overwrites an
             existing hook block with the same tag/method (jeremyevans)</p>
             </li><li>
-            <p>Refactor <a href="../classes/String.html">String</a> inflection support,
-            you must use String.inflections instead of Inflector.inflections now
-            (jeremyevans)</p>
+            <p>Refactor String inflection support, you must use String.inflections instead
+            of Inflector.inflections now (jeremyevans)</p>
             </li><li>
             <p>Allow connection to ODBC-MSSQL via a URL (petersumskas) (#230)</p>
             </li><li>
@@ -5810,9 +5837,8 @@
             <p>Add Module#metaattr_accessor for creating attr_accessors for the metaclass
             (jeremyevans)</p>
             </li><li>
-            <p>Add SQL string concatenation support to blockless filters, via <a
-            href="../classes/Array.html#method-i-sql_string_join">Array#sql_string_join</a>
-            (jeremyevans)</p>
+            <p>Add SQL string concatenation support to blockless filters, via
+            Array#sql_string_join (jeremyevans)</p>
             </li><li>
             <p>Add Pagination#last_page? and Pagination#first_page? (apeiros)</p>
             </li><li>
@@ -6056,9 +6082,8 @@
             </li><li>
             <p>Add Symbol#*, a replacement for Symbol#all (jeremyevans)</p>
             </li><li>
-            <p>Deprecate including ColumnMethods in Object, include it in <a
-            href="../classes/Symbol.html">Symbol</a>, <a
-            href="../classes/String.html">String</a>, and <a
+            <p>Deprecate including ColumnMethods in Object, include it in Symbol, String,
+            and <a
             href="../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>
             (jeremyevans)</p>
             </li><li>
@@ -6819,7 +6844,7 @@
             arbitrary SQL (thanks Aman Gupta).</p>
             </li><li>
             <p>Fixed bug in postgres adapter where a LiteralString would be literalized as
-            a regular <a href="../classes/String.html">String</a>.</p>
+            a regular String.</p>
             </li><li>
             <p>Fixed SQLite insert with subquery (#68).</p>
             </li><li>
@@ -7019,9 +7044,8 @@
             </li><li>
             <p>Fixed Sequelizer to not fail if ParseTree or Ruby2Ruby gems are missing.</p>
             </li><li>
-            <p>Renamed String#expr into <a
-            href="../classes/String.html#method-i-lit">String#lit</a> (#expr should be
-            deprecated in future versions).</p>
+            <p>Renamed String#expr into String#lit (#expr should be deprecated in future
+            versions).</p>
             </li><li>
             <p>Renamed Sequel::ExpressionString into LiteralString.</p>
             </li><li>

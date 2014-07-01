@@ -170,9 +170,7 @@
             manually give descriptive names to the tables in the cascaded associations,
             but you can now do so by passing the association as an <a
             href="../../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a>
-            instance instead of a plain <a
-            href="../../../classes/Symbol.html">Symbol</a>.  Here&#39;s a usage
-            example:</p>
+            instance instead of a plain Symbol.  Here&#39;s a usage example:</p>
             
             <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">Game</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">winner=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">players</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">winning_players</span>),&#x000A;                      :<span class="ruby-identifier">loser=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">players</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">losing_players</span>)).&#x000A;      <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">winning_players__name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;A&#39;</span>,&#x000A;            :<span class="ruby-identifier">losing_players__name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;B&#39;</span>)</pre>
             </li><li>
@@ -236,12 +234,11 @@
             <p>The list plugin&#39;s before_create method now calls super, which fixes
             usage when other plugins that define before_create are loaded before it.</p>
             </li><li>
-            <p>In the pg_array extension, when typecasting an <a
-            href="../../../classes/Array.html">Array</a> to PGArray, a recursive map is
-            done on the input array to convert each value in the input array to the
-            expected type, using the typecasting method that would be used for the
-            scalar value.  For example, for model objects, where ids is an integer
-            array column:</p>
+            <p>In the pg_array extension, when typecasting an Array to PGArray, a
+            recursive map is done on the input array to convert each value in the input
+            array to the expected type, using the typecasting method that would be used
+            for the scalar value.  For example, for model objects, where ids is an
+            integer array column:</p>
             
             <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">set</span>(:<span class="ruby-identifier">ids=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-string">&#39;2&#39;</span>]).<span class="ruby-identifier">ids</span>.<span class="ruby-identifier">to_a</span> <span class="ruby-comment"># =&gt; [1, 2]</span></pre>
             </li><li>
@@ -329,8 +326,7 @@
             not respond to (or raises an exception), you may need to specify the
             :eager_loader_key=&gt;nil option.</p>
             </li><li>
-            <p>In the pg_auto_parameterize extension, <a
-            href="../../../classes/String.html">String</a> values are no longer
+            <p>In the pg_auto_parameterize extension, String values are no longer
             automatically casted to text.  This is because the default type of a string
             literal in PostgreSQL is unknown, not text.  This makes it much less likely
             to require manual casts, but has the potential to break existing code

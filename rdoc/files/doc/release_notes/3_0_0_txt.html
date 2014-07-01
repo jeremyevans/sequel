@@ -147,16 +147,14 @@
             an insert.  This fixes an issue when Sequel&#39;s master/slave database
             support is used with models.</p>
             </li><li>
-            <p>SQL <a href="../../../classes/Array.html">Array</a> references are now
-            quoted correctly, so code like this now works:</p>
+            <p>SQL Array references are now quoted correctly, so code like this now works:</p>
             
             <pre>:table__column.sql_subscript(1)</pre>
             </li><li>
             <p>The PostgreSQL shared adapter now handles sequences that need to be quoted
             correctly (previously these were quoted twice).</p>
             </li><li>
-            <p><a href="../../../classes/String.html">String</a> quoting on Oracle no
-            longer doubles backslashes.</p>
+            <p>String quoting on Oracle no longer doubles backslashes.</p>
             </li><li>
             <p>Database#count now works correctly when used on MSSQL when using an adapter
             that doesn&#39;t handle unnamed columns.</p>

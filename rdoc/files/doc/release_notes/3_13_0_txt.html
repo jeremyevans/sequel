@@ -198,15 +198,11 @@
             
             <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
             <ul><li>
-            <p><a
-            href="../../../classes/Array.html#method-i-sql_array">Array#sql_array</a>
-            and the Sequel::SQL::SQLArray class are now considered deprecated.  Use the
-            <a
-            href="../../../classes/Array.html#method-i-sql_value_list">Array#sql_value_list</a>
-            and the <a
+            <p>Array#sql_array and the Sequel::SQL::SQLArray class are now considered
+            deprecated.  Use the Array#sql_value_list and the <a
             href="../../../classes/Sequel/SQL/ValueList.html">Sequel::SQL::ValueList</a>
             class instead.  SQLArray is now just an alias for ValueList, but it now is
-            an <a href="../../../classes/Array.html">Array</a> subclass instead of a <a
+            an Array subclass instead of a <a
             href="../../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>
             subclass.</p>
             </li><li>
@@ -219,11 +215,9 @@
             signed integer instead of an unsigned integer, for better compatibility
             with other databases.</p>
             </li><li>
-            <p>Using nil as a case expression value (the 2nd argument to <a
-            href="../../../classes/Hash.html#method-i-case">Hash#case</a> and <a
-            href="../../../classes/Array.html#method-i-case">Array#case</a>) will now
-            use NULL as the case expression value, instead of omitting the case
-            expression value:</p>
+            <p>Using nil as a case expression value (the 2nd argument to Hash#case and
+            Array#case) will now use NULL as the case expression value, instead of
+            omitting the case expression value:</p>
             
             <pre class="ruby"><span class="ruby-comment"># 3.12.0</span>&#x000A;{<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># CASE WHEN 1 THEN 2 ELSE 0 END</span>&#x000A;&#x000A;<span class="ruby-comment"># 3.13.0</span>&#x000A;{<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># CASE NULL WHEN 1 THEN 2 ELSE 0 END</span></pre>
             

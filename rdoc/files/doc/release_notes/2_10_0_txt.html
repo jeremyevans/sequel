@@ -121,8 +121,8 @@
             parameters, DatabaseConnectionError will be raised immediately, instead of
             the connection pool busy waiting until if gives up with a PoolTimeoutError.</p>
             </li><li>
-            <p>Database#tables is now supported on the JDBC adapter, returning an <a
-            href="../../../classes/Array.html">Array</a> of table name symbols.</p>
+            <p>Database#tables is now supported on the JDBC adapter, returning an Array of
+            table name symbols.</p>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now converts the
             following Java types returned by the JDBC adapter into ruby types:
@@ -202,19 +202,16 @@
             <hr>
             <ul><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now longer overwrites the
-            following <a href="../../../classes/Symbol.html">Symbol</a> instance
-            methods when running on ruby 1.9: [], &lt;, &lt;=, &gt;, and &gt;=.  One of
-            Sequel&#39;s principals is that it does not override methods defined by
-            ruby, and now that ruby 1.9 defines the above methods on <a
-            href="../../../classes/Symbol.html">Symbol</a>, <a
-            href="../../../classes/Sequel.html">Sequel</a> shouldn&#39;t be overwriting
-            them.</p>
+            following Symbol instance methods when running on ruby 1.9: [], &lt;,
+            &lt;=, &gt;, and &gt;=.  One of Sequel&#39;s principals is that it does not
+            override methods defined by ruby, and now that ruby 1.9 defines the above
+            methods on Symbol, <a href="../../../classes/Sequel.html">Sequel</a>
+            shouldn&#39;t be overwriting them.</p>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> already provides a way to
-            work around this issue when another library adds the same methods to <a
-            href="../../../classes/Symbol.html">Symbol</a> that <a
-            href="../../../classes/Sequel.html">Sequel</a> does. For example, you need
-            to change the following:</p>
+            work around this issue when another library adds the same methods to Symbol
+            that <a href="../../../classes/Sequel.html">Sequel</a> does. For example,
+            you need to change the following:</p>
             
             <pre>dataset.filter(:number &gt; 1)&#x000A;dataset.filter(:number &gt;= 2)&#x000A;dataset.filter(:name &lt; &#39;M&#39;)&#x000A;dataset.filter(:name &lt;= &#39;I&#39;)&#x000A;dataset.filter(:is_bool[:x])</pre>
             
@@ -315,8 +312,7 @@
             </li><li>
             <p>It is possible that some migrations will break, though it is unlikely.  If
             you were using any of the classes mentioned above as a method inside a
-            migration, it might be broken.  However, since <a
-            href="../../../classes/String.html">String</a>, Float, and Integer
+            migration, it might be broken.  However, since String, Float, and Integer
             wouldn&#39;t have worked as methods before, it is unlikely that anyone used
             this.</p>
             </li><li>

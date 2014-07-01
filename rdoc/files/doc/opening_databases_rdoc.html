@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-06-17 20:46:14 -0700</span>
+          <span class='datetime'>2014-06-26 09:16:03 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -282,8 +282,7 @@
             C, which may be faster than the other adapters.</p>
             
             <p>Similar to the JDBC adapter, the DO adapter only cares about connection
-            strings, which can either be the <a
-            href="../../classes/String.html">String</a> argument given to <a
+            strings, which can either be the String argument given to <a
             href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>
             directly or contained in a :uri or :url option.  The DO adapter passes
             through the connection string directly to DataObjects, it does no
@@ -518,12 +517,18 @@
             retrieve an infinite timestamp/date.  You can set this to :nil to convert
             to nil, :string to leave as a string, or :float to convert to an infinite
             float.</p>
-            </dd><dt>:encoding 
-            <dd>
-            <p>Set the client_encoding to the given string</p>
             </dd><dt>:connect_timeout 
             <dd>
             <p>Set the number of seconds to wait for a connection (default 20, only
+            respected if using the pg library).</p>
+            </dd><dt>:encoding 
+            <dd>
+            <p>Set the client_encoding to the given string</p>
+            </dd><dt>:notice_receiver 
+            <dd>
+            <p>A proc that be called with the PGresult objects that have notice or warning
+            messages. The default notice receiver just prints the messages to stderr,
+            but this can be used to handle notice/warning messages differently.  Only
             respected if using the pg library).</p>
             </dd><dt>:sslmode 
             <dd>
@@ -568,7 +573,10 @@
             <pre># In Memory databases:&#x000A;Sequel.sqlite&#x000A;Sequel.connect(&#39;sqlite:/&#39;) &#x000A;Sequel.sqlite(&#39;:memory:&#39;)&#x000A;# Relative Path&#x000A;Sequel.sqlite(&#39;blog.db&#39;)&#x000A;Sequel.sqlite(&#39;./blog.db&#39;)&#x000A;Sequel.connect(&#39;sqlite://blog.db&#39;)&#x000A;&#x000A;# Absolute Path&#x000A;Sequel.sqlite(&#39;/var/sqlite/blog.db&#39;)&#x000A;Sequel.connect(&#39;sqlite:///var/sqlite/blog.db&#39;)</pre>
             
             <p>The following additional options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:timeout 
+            <dl class="rdoc-list note-list"><dt>:readonly 
+            <dd>
+            <p>open database in read-only mode</p>
+            </dd><dt>:timeout 
             <dd>
             <p>the busy timeout to use in milliseconds (default: 5000).</p>
             </dd></dl>

@@ -41,7 +41,7 @@
             <p>The base connection pool class, which all other connection pools are based
             on.  This class is not instantiated directly, but subclasses should at the
             very least implement the following API:</p>
-            <dl class="rdoc-list note-list"><dt>initialize(Database, <a href="../../../classes/Hash.html">Hash</a>) 
+            <dl class="rdoc-list note-list"><dt>initialize(Database, Hash) 
             <dd>
             <p>Initialize using the passed <a
             href="../../../classes/Sequel/Database.html">Sequel::Database</a> object
@@ -50,13 +50,11 @@
             <dd>
             <p>Yield a connection object (obtained from calling the block passed to
             <code>initialize</code>) to the current block. For sharded connection
-            pools, the <a href="../../../classes/Symbol.html">Symbol</a> passed is the
-            shard/server to use.</p>
+            pools, the Symbol passed is the shard/server to use.</p>
             </dd><dt>disconnect(Symbol) 
             <dd>
-            <p>Disconnect the connection object.  For sharded connection pools, the <a
-            href="../../../classes/Symbol.html">Symbol</a> passed is the shard/server
-            to use.</p>
+            <p>Disconnect the connection object.  For sharded connection pools, the Symbol
+            passed is the shard/server to use.</p>
             </dd><dt>servers 
             <dd>
             <p>An array of shard/server symbols for all shards/servers that this

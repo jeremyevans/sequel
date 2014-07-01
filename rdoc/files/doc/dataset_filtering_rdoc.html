@@ -152,7 +152,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">max</span>(<span class="ruby-identifier">price</span>)}.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((price - 100) &lt; max(price))&quot;</span></pre>
             
-            <h2 id="label-String+search+functions"><a href="../../classes/String.html">String</a> search functions<span><a href="#label-String+search+functions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-String+search+functions">String search functions<span><a href="#label-String+search+functions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>You can search SQL strings in a case sensitive manner using the Sequel.like
             method:</p>
@@ -173,7 +173,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Acme%&#39;</span>, <span class="ruby-regexp">/Beta.*/</span>)).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment">#=&gt; &quot;SELECT * FROM items WHERE ((name LIKE &#39;Acme%&#39; ESCAPE &#39;\&#39;) OR (name ~ &#39;Beta.*&#39;))&quot;</span></pre>
             
-            <h2 id="label-String+concatenation"><a href="../../classes/String.html">String</a> concatenation<span><a href="#label-String+concatenation">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-String+concatenation">String concatenation<span><a href="#label-String+concatenation">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>You can concatenate SQL strings using Sequel.join:</p>
             

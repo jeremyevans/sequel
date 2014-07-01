@@ -80,37 +80,41 @@
                 <div class='description'>
                   
                   <p>Allow nested attributes to be set for the given associations.  Options:</p>
-                  <ul><li>
-                  <p>:destroy - Allow destruction of nested records.</p>
-                  </li><li>
-                  <p>:fields - If provided, should be an <a href="../../../Array.html">Array</a>
-                  or proc. If it is an array, restricts the fields allowed to be modified
-                  through the association_attributes= method to the specific fields given. If
-                  it is a proc, it will be called with the associated object and should
-                  return an array of the allowable fields.</p>
-                  </li><li>
-                  <p>:limit - For *_to_many associations, a limit on the number of records that
-                  will be processed, to prevent denial of service attacks.</p>
-                  </li><li>
-                  <p>:reject_if - A proc that is given each attribute hash before it is passed
-                  to its associated object. If the proc returns a truthy value, the attribute
-                  hash is ignored.</p>
-                  </li><li>
-                  <p>:remove - Allow disassociation of nested records (can remove the associated
-                  object from the parent object, but not destroy the associated object).</p>
-                  </li><li>
-                  <p>:strict - Kept for backward compatibility. Setting it to false is
-                  equivalent to setting :unmatched_pk to :ignore.</p>
-                  </li><li>
-                  <p>:transform - A proc to transform attribute hashes before they are passed to
-                  associated object. Takes two arguments, the parent object and the attribute
-                  hash. Uses the return value as the new attribute hash.</p>
-                  </li><li>
-                  <p>:unmatched_pk - Specify the action to be taken if a primary key is provided
-                  in a record, but it doesn&#39;t match an existing associated object. Set to
-                  :create to create a new object with that primary key, :ignore to ignore the
-                  record, or :raise to raise an error. The default is :raise.</p>
-                  </li></ul>
+                  <dl class="rdoc-list note-list"><dt>:destroy 
+                  <dd>
+                  <p>Allow destruction of nested records.</p>
+                  </dd><dt>:fields 
+                  <dd>
+                  <p>If provided, should be an <a href="../../../Array.html">Array</a> or proc.
+                  If it is an array, restricts the fields allowed to be modified through the
+                  association_attributes= method to the specific fields given. If it is a
+                  proc, it will be called with the associated object and should return an
+                  array of the allowable fields.</p>
+                  </dd><dt>:limit 
+                  <dd>
+                  <p>For *_to_many associations, a limit on the number of records that will be
+                  processed, to prevent denial of service attacks.</p>
+                  </dd><dt>:reject_if 
+                  <dd>
+                  <p>A proc that is given each attribute hash before it is passed to its
+                  associated object. If the proc returns a truthy value, the attribute hash
+                  is ignored.</p>
+                  </dd><dt>:remove 
+                  <dd>
+                  <p>Allow disassociation of nested records (can remove the associated object
+                  from the parent object, but not destroy the associated object).</p>
+                  </dd><dt>:transform 
+                  <dd>
+                  <p>A proc to transform attribute hashes before they are passed to associated
+                  object. Takes two arguments, the parent object and the attribute hash. Uses
+                  the return value as the new attribute hash.</p>
+                  </dd><dt>:unmatched_pk 
+                  <dd>
+                  <p>Specify the action to be taken if a primary key is provided in a record,
+                  but it doesn&#39;t match an existing associated object. Set to :create to
+                  create a new object with that primary key, :ignore to ignore the record, or
+                  :raise to raise an error. The default is :raise.</p>
+                  </dd></dl>
                   
                   <p>If a block is provided, it is used to set the :reject_if option.</p>
                 </div>
@@ -118,7 +122,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-nested_attributes-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-nested_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 110</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">nested_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">include</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">nested_attributes_module</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">nested_attributes_module</span>&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">reflections</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no association named #{a} for #{self}&quot;</span>)}&#x000A;  <span class="ruby-identifier">reflections</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>] = <span class="ruby-identifier">opts</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:unmatched_pk</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:strict</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">?</span> <span class="ruby-value">:ignore</span> <span class="ruby-operator">:</span> <span class="ruby-value">:raise</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:reject_if</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">def_nested_attribute_method</span>(<span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-nested_attributes-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">nested_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">include</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">nested_attributes_module</span> <span class="ruby-operator">||=</span> <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">nested_attributes_module</span>&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}&#x000A;  <span class="ruby-identifier">reflections</span> = <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no association named #{a} for #{self}&quot;</span>)}&#x000A;  <span class="ruby-identifier">reflections</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>] = <span class="ruby-identifier">opts</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:unmatched_pk</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:strict</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">?</span> <span class="ruby-value">:ignore</span> <span class="ruby-operator">:</span> <span class="ruby-value">:raise</span>&#x000A;    <span class="ruby-identifier">r</span>[<span class="ruby-value">:nested_attributes</span>][<span class="ruby-value">:reject_if</span>] <span class="ruby-operator">||=</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">def_nested_attribute_method</span>(<span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
