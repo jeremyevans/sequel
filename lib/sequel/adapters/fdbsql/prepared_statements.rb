@@ -59,8 +59,11 @@ module Sequel
         end
       end
 
-      # I'm sorry, I have no idea what to call this
-      module BasicPreparedStatementMethods
+      # Allow use of bind arguments for FDBSQL using the pg driver.
+      module BindArgumentMethods
+
+        include ArgumentMapper
+
         # Override insert action to use RETURNING if the server supports it.
         def run
           if @prepared_type == :insert
@@ -76,13 +79,6 @@ module Sequel
           super
           @prepared_sql
         end
-      end
-
-      # Allow use of bind arguments for FDBSQL using the pg driver.
-      module BindArgumentMethods
-
-        include ArgumentMapper
-        include ::Sequel::Fdbsql::DatasetPreparedStatements::BasicPreparedStatementMethods
 
         private
 
