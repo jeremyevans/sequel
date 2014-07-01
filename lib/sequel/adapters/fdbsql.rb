@@ -210,8 +210,9 @@ module Sequel
       def bound_variable_arg(arg, conn)
         case arg
         # TODO TDD it:
-#        when Sequel::SQL::Blob
-#          literal(arg)
+        when Sequel::SQL::Blob
+          # the 1 means treat this as a binary blob
+          {:value => arg, :format => 1}
         when Sequel::SQLTime
           # the literal methods put quotes around things, but this is a bound variable, so we can't use those
           arg.strftime(BOUND_VARIABLE_SQLTIME_FORMAT)
