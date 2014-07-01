@@ -40,7 +40,8 @@ module Sequel
 
       attr_accessor :in_transaction
 
-      def initialize(opts)
+      def initialize(db, opts)
+        @db = db
         @config = opts
         @connection_hash = {
           :host => @config[:host],
@@ -60,10 +61,11 @@ module Sequel
         end
       end
 
-      def query(sql)
+      def query(sql, args=nil)
+        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
         check_disconnect_errors do
           retry_on_not_committed do
-            @connection.query(sql)
+            @connection.query(sql, args)
           end
         end
       end
@@ -71,8 +73,7 @@ module Sequel
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
-        raise 'fdbsql Connection.execute args are not supported' unless args.nil?
-        q = query(sql)
+        q = query(sql, args)
         block_given? ? yield(q) : q.cmd_tuples
       end
 

@@ -26,6 +26,7 @@ require 'sequel/adapters/fdbsql/connection'
 require 'sequel/adapters/fdbsql/dataset'
 require 'sequel/adapters/fdbsql/create_table_generator'
 require 'sequel/adapters/fdbsql/features'
+require 'sequel/adapters/fdbsql/prepared_statements'
 require 'sequel/adapters/fdbsql/schema_parsing'
 require 'sequel/adapters/utils/pg_types'
 require 'sequel/adapters/fdbsql/date_arithmetic'
@@ -40,6 +41,7 @@ module Sequel
 
     class Database < Sequel::Database
       include DatabaseFeatures
+      include DatabasePreparedStatements
       include SchemaParsing
       DatasetClass = Dataset
       # Use a FDBSQL-specific create table generator
@@ -63,15 +65,19 @@ module Sequel
 
       def connect(server)
         opts = server_opts(server)
-        Connection.new(apply_default_options(opts))
+        Connection.new(self, apply_default_options(opts))
       end
 
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
-          res = log_yield(sql) do
-            check_database_errors do
-              conn.query(sql)
+          res = check_database_errors do
+            if sql.is_a?(Symbol)
+              execute_prepared_statement(conn, sql, opts, &block)
+            else
+              log_yield(sql) do
+                conn.query(sql, opts[:arguments])
+              end
             end
           end
           yield res if block_given?
@@ -189,6 +195,25 @@ module Sequel
       # Handle serial type if :serial option is present
       def type_literal_generic_integer(column)
         column[:serial] ? :serial : super
+      end
+
+      # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
+      # handle fractional seconds in Time/DateTime or blobs with "\0", and it won't ever
+      # handle Sequel::SQLTime values correctly.  Only public for use by the adapter, shouldn't
+      # be used by external code.
+      def bound_variable_arg(arg, conn)
+        arg
+        # TODO TDD it:
+        # case arg
+        # when Sequel::SQL::Blob
+        #   conn.escape_bytea(arg)
+        # when Sequel::SQLTime
+        #   literal(arg)
+        # when DateTime, Time
+        #   literal(arg)
+        # else
+        #   arg
+        # end
       end
 
       def begin_transaction(conn, opts=OPTS)
