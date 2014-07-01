@@ -33,7 +33,7 @@ describe 'Fdbsql::Connection' do
         fake_conn_instance = double("fake connection")
         fake_conn_instance.stub(:query).and_raise(e)
         @fake_conn.stub(:new).and_return(fake_conn_instance)
-        conn = Sequel::Fdbsql::Connection.new({})
+        conn = Sequel::Fdbsql::Connection.new(nil, {})
         proc do
           conn.query('SELECT 3')
         end.should raise_error(PG::TRIntegrityConstraintViolation)
@@ -51,7 +51,7 @@ describe 'Fdbsql::Connection' do
           3
         end
         @fake_conn.stub(:new).and_return(fake_conn_instance)
-        conn = Sequel::Fdbsql::Connection.new({})
+        conn = Sequel::Fdbsql::Connection.new(nil, {})
         conn.query('SELECT 3')
       end
     end
@@ -64,7 +64,7 @@ describe 'Fdbsql::Connection' do
         fake_conn_instance = double("fake connection")
         fake_conn_instance.stub(:query).once.and_raise(e)
         @fake_conn.stub(:new).and_return(fake_conn_instance)
-        conn = Sequel::Fdbsql::Connection.new({})
+        conn = Sequel::Fdbsql::Connection.new(nil, {})
         conn.in_transaction = true
         proc do
           conn.query('SELECT 3')
