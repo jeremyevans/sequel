@@ -25,6 +25,7 @@ describe 'Fdbsql::Connection' do
   def fake_conn
     fake_conn_instance = double("fake connection")
     fake_conn_instance.stub(:set_notice_receiver)
+    fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 1.9.6'}])
     yield fake_conn_instance
     @fake_conn.stub(:new).and_return(fake_conn_instance)
   end
@@ -37,7 +38,7 @@ describe 'Fdbsql::Connection' do
         e = PG::TRIntegrityConstraintViolation.new
         e.stub(:result).and_return(result)
         result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-        fake_conn {|conn| conn.stub(:query).and_raise(e)}
+        fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).ordered.and_raise(e)}
         conn = Sequel::Fdbsql::Connection.new(nil, {})
         proc do
           conn.query('SELECT 3')
@@ -51,7 +52,7 @@ describe 'Fdbsql::Connection' do
         result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
         time = 0
         fake_conn do |conn|
-          conn.stub(:query) do
+          conn.stub(:query).with('SELECT 3', nil).ordered do
             raise e if (time += 1) < 5
             3
           end
@@ -66,7 +67,7 @@ describe 'Fdbsql::Connection' do
         e = PG::TRIntegrityConstraintViolation.new
         e.stub(:result).and_return(result)
         result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-        fake_conn {|conn| conn.stub(:query).once.and_raise(e)}
+        fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).once.ordered.and_raise(e)}
         conn = Sequel::Fdbsql::Connection.new(nil, {})
         conn.in_transaction = true
         proc do

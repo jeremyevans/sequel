@@ -110,7 +110,7 @@ module Sequel
           version = res.first['_SQL_COL_1']
           m = version.match('^.* (\d+)\.(\d+)\.(\d+)')
           if m.nil?
-            raise "No match when checking FDB SQL Layer version: #{r[1]}"
+            raise "No match when checking FDB SQL Layer version: #{version}"
           end
           m
         end
