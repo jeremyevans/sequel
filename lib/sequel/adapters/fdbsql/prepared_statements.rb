@@ -162,7 +162,16 @@ module Sequel
           log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}
           conn.prepared_statements[ps_name] = sql
         end
-        raise "TODO #{ps_name}, #{args}, #{sql}"
+
+        log_sql = "EXECUTE #{ps_name}"
+        if statement.log_sql
+          log_sql << " ("
+          log_sql << sql
+          log_sql << ")"
+        end
+        log_yield(sql, args) do
+          conn.execute_prepared_statement(ps_name, args)
+        end
       end
     end
 

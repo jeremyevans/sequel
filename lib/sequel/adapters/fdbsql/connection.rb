@@ -88,6 +88,14 @@ module Sequel
         end
       end
 
+      def execute_prepared_statement(name, args)
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.exec_prepared(name, args)
+          end
+        end
+      end
+
       private
 
       def connect
