@@ -93,4 +93,17 @@ describe 'Fdbsql::Connection' do
       end
     end
   end
+  describe 'receiver' do
+    specify "should set notice receiver when connecting" do
+      receiver = proc {|x| puts x}
+
+      fake_conn do |conn|
+        conn.should_receive(:set_notice_receiver).once.with(receiver)
+        # because we give it a block for our default receiver
+        conn.should_not_receive(:set_notice_receiver).with(no_args())
+      end
+
+      conn = Sequel::Fdbsql::Connection.new(nil, notice_receiver: receiver)
+    end
+  end
 end
