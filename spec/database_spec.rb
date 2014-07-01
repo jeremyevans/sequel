@@ -349,7 +349,7 @@ describe 'Fdbsql' do
       DB[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
       drop_table
       create_table
-      DB.call(:select_a, :n=>10).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+      DB.call(:select_a, :n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
     end
 
     it 'fails if prepared statement is missing' do
