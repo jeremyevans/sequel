@@ -59,10 +59,30 @@ module Sequel
         end
       end
 
+      # I'm sorry, I have no idea what to call this
+      module BasicPreparedStatementMethods
+        # Override insert action to use RETURNING if the server supports it.
+        def run
+          if @prepared_type == :insert
+            fetch_rows(prepared_sql){|r| return r.values.first}
+          else
+            super
+          end
+        end
+
+        def prepared_sql
+          return @prepared_sql if @prepared_sql
+          @opts[:returning] = insert_pk if @prepared_type == :insert
+          super
+          @prepared_sql
+        end
+      end
+
       # Allow use of bind arguments for FDBSQL using the pg driver.
       module BindArgumentMethods
+
         include ArgumentMapper
-        include ::Sequel::Fdbsql::DatasetPreparedStatements
+        include ::Sequel::Fdbsql::DatasetPreparedStatements::BasicPreparedStatementMethods
 
         private
 
