@@ -63,6 +63,7 @@ module Sequel
                  Sequel.as({:c__is_nullable => 'YES'}, 'allow_null'),
                  :c__column_default___default,
                  :c__data_type___db_type,
+                 :c__character_maximum_length___max_length,
                  :c__numeric_scale,
                  Sequel.as({:tc__constraint_type => 'PRIMARY KEY'}, 'primary_key')).
           from(Sequel.as(:information_schema__key_column_usage, 'kc')).
