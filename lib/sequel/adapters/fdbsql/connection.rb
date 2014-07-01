@@ -40,6 +40,8 @@ module Sequel
 
       attr_accessor :in_transaction
 
+      attr_accessor :prepared_statements
+
       def initialize(db, opts)
         @db = db
         @config = opts
@@ -50,6 +52,7 @@ module Sequel
           :user => @config[:username],
           :password => @config[:password]
         }
+        @prepared_statements = {}
         connect
       end
 
@@ -77,6 +80,13 @@ module Sequel
         block_given? ? yield(q) : q.cmd_tuples
       end
 
+      def prepare(name, sql)
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.prepare(name, sql)
+          end
+        end
+      end
 
       private
 

@@ -150,12 +150,18 @@ module Sequel
     module DatabasePreparedStatements
 
       def execute_prepared_statement(conn, name, opts=OPTS, &block)
-#        statement = prepared_statement(name)
-#        sql = statement.prepared_sql
-#        ps_name = name.to_s
-#        if args = opts[:arguments]
-#          args = args.map{|arg| bound_variable_arg(arg, conn)}
-#        end
+        statement = prepared_statement(name)
+        sql = statement.prepared_sql
+        ps_name = name.to_s
+        if args = opts[:arguments]
+          args = args.map{|arg| bound_variable_arg(arg, conn)}
+        end
+        # create prepared statement if it doesn't exist, or has new sql
+        unless conn.prepared_statements[ps_name] == sql
+          conn.execute("DEALLOCATE #{ps_name}") if conn.prepared_statements.include?(ps_name)
+          log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}
+          conn.prepared_statements[ps_name] = sql
+        end
         raise "TODO #{ps_name}, #{args}, #{sql}"
       end
     end
