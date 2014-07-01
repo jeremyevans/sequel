@@ -76,4 +76,21 @@ describe 'Fdbsql::Connection' do
       end
     end
   end
+
+  describe 'checks sql layer version' do
+    ['1.9.5', '0.9.6', '1.8.6'].each do |version|
+      it "throws error for #{version}" do
+        fake_conn {|conn| conn.stub(:query).with('SELECT VERSION()', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
+        proc do
+          conn = Sequel::Fdbsql::Connection.new(nil, {})
+        end.should raise_error(Sequel::DatabaseError, /Unsupported.*version.*#{version}/)
+      end
+    end
+    ['1.9.6', '1.9.7', '1.10.0', '2.0.0', '2.9.5'].each do |version|
+      it "does not throw error for #{version}" do
+        fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
+        conn = Sequel::Fdbsql::Connection.new(nil, {})
+      end
+    end
+  end
 end

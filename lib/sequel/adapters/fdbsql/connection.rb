@@ -118,7 +118,7 @@ module Sequel
         # Combine into single number, two digits per part: 1.9.3 => 10903
         @sql_layer_version = (100 * ver[1].to_i + ver[2].to_i) * 100 + ver[3].to_i
         if @sql_layer_version < 10906
-          raise "Unsupported FDB SQL Layer version: #{@sql_layer_version} (#{ver[0]})"
+          raise Sequel::DatabaseError.new("Unsupported FDB SQL Layer version: #{ver[1]}.#{ver[2]}.#{ver[3]}")
         end
       end
 
