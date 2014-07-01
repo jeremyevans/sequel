@@ -100,6 +100,8 @@ module Sequel
 
       def connect
         @connection = PG::Connection.new(@connection_hash)
+        # Swallow warnings
+        @connection.set_notice_receiver { |proc| }
         configure_connection
       end
 
