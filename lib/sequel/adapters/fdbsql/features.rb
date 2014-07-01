@@ -77,10 +77,7 @@ module Sequel
 
       # FDBSQL does not: supports_group_cube? (aligns with super)
 
-      # FDBSQL does support GROUP BY ROLLUP
-      def supports_group_rollup?
-        true
-      end
+      # FDBSQL does not: supports_group_rollup? (aligns with super)
 
       # FDBSQL does: supports_intersect_except? (INTERSECT and EXCEPT) (aligns with super)
 
