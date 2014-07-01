@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.12.0 (2014-07-01)
 
 * Support :readonly Database option in sqlite adapter (ippeiukai, jeremyevans) (#832)
 
