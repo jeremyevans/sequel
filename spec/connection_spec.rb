@@ -22,6 +22,13 @@ describe 'Fdbsql::Connection' do
     stub_const('PG::Connection', @fake_conn)
   end
 
+  def fake_conn
+    fake_conn_instance = double("fake connection")
+    fake_conn_instance.stub(:set_notice_receiver)
+    yield fake_conn_instance
+    @fake_conn.stub(:new).and_return(fake_conn_instance)
+  end
+
   describe 'Automatic retry on NotCommitted' do
 
     describe 'outside a transaction' do
@@ -30,9 +37,7 @@ describe 'Fdbsql::Connection' do
         e = PG::TRIntegrityConstraintViolation.new
         e.stub(:result).and_return(result)
         result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-        fake_conn_instance = double("fake connection")
-        fake_conn_instance.stub(:query).and_raise(e)
-        @fake_conn.stub(:new).and_return(fake_conn_instance)
+        fake_conn {|conn| conn.stub(:query).and_raise(e)}
         conn = Sequel::Fdbsql::Connection.new(nil, {})
         proc do
           conn.query('SELECT 3')
@@ -44,13 +49,13 @@ describe 'Fdbsql::Connection' do
         e = PG::TRIntegrityConstraintViolation.new
         e.stub(:result).and_return(result)
         result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-        fake_conn_instance = double("fake connection")
         time = 0
-        fake_conn_instance.stub(:query) do
-          raise e if (time += 1) < 5
-          3
+        fake_conn do |conn|
+          conn.stub(:query) do
+            raise e if (time += 1) < 5
+            3
+          end
         end
-        @fake_conn.stub(:new).and_return(fake_conn_instance)
         conn = Sequel::Fdbsql::Connection.new(nil, {})
         conn.query('SELECT 3')
       end
@@ -61,9 +66,7 @@ describe 'Fdbsql::Connection' do
         e = PG::TRIntegrityConstraintViolation.new
         e.stub(:result).and_return(result)
         result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-        fake_conn_instance = double("fake connection")
-        fake_conn_instance.stub(:query).once.and_raise(e)
-        @fake_conn.stub(:new).and_return(fake_conn_instance)
+        fake_conn {|conn| conn.stub(:query).once.and_raise(e)}
         conn = Sequel::Fdbsql::Connection.new(nil, {})
         conn.in_transaction = true
         proc do
