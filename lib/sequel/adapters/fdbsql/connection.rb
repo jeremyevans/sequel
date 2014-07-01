@@ -102,11 +102,24 @@ module Sequel
         @connection = PG::Connection.new(@connection_hash)
         # Swallow warnings
         @connection.set_notice_receiver { |proc| }
-        configure_connection
+        check_version
       end
 
-      def configure_connection
-        # TODO this exists in activerecord adapter, go back and see what's needed here
+      def check_version
+        ver = execute('SELECT VERSION()') do |res|
+          version = res.first['_SQL_COL_1']
+          m = version.match('^.* (\d+)\.(\d+)\.(\d+)')
+          if m.nil?
+            raise "No match when checking FDB SQL Layer version: #{r[1]}"
+          end
+          m
+        end
+
+        # Combine into single number, two digits per part: 1.9.3 => 10903
+        @sql_layer_version = (100 * ver[1].to_i + ver[2].to_i) * 100 + ver[3].to_i
+        if @sql_layer_version < 10906
+          raise "Unsupported FDB SQL Layer version: #{@sql_layer_version} (#{ver[0]})"
+        end
       end
 
       def status
