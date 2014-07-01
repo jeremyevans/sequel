@@ -44,10 +44,16 @@ module Sequel
       include DatabasePreparedStatements
       include SchemaParsing
       DatasetClass = Dataset
+
       # Use a FDBSQL-specific create table generator
       def create_table_generator_class
         CreateTableGenerator
       end
+
+      # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
+      # it should just be the timestamp, so we need whole new formats here.
+      BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
+      BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
 
       set_adapter_scheme :fdbsql
 
@@ -202,18 +208,19 @@ module Sequel
       # handle Sequel::SQLTime values correctly.  Only public for use by the adapter, shouldn't
       # be used by external code.
       def bound_variable_arg(arg, conn)
-        arg
+        case arg
         # TODO TDD it:
-        # case arg
-        # when Sequel::SQL::Blob
-        #   conn.escape_bytea(arg)
-        # when Sequel::SQLTime
-        #   literal(arg)
-        # when DateTime, Time
-        #   literal(arg)
-        # else
-        #   arg
-        # end
+#        when Sequel::SQL::Blob
+#          literal(arg)
+        when Sequel::SQLTime
+          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
+          arg.strftime(BOUND_VARIABLE_SQLTIME_FORMAT)
+        when DateTime, Time
+          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
+          from_application_timestamp(arg).strftime(BOUND_VARIABLE_TIMESTAMP_FORMAT)
+        else
+           arg
+        end
       end
 
       def begin_transaction(conn, opts=OPTS)
