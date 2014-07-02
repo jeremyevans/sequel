@@ -40,7 +40,10 @@ module Sequel
 
       attr_accessor :in_transaction
 
-      def initialize(opts)
+      attr_accessor :prepared_statements
+
+      def initialize(db, opts)
+        @db = db
         @config = opts
         @connection_hash = {
           :host => @config[:host],
@@ -49,6 +52,7 @@ module Sequel
           :user => @config[:username],
           :password => @config[:password]
         }
+        @prepared_statements = {}
         connect
       end
 
@@ -60,10 +64,11 @@ module Sequel
         end
       end
 
-      def query(sql)
+      def query(sql, args=nil)
+        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
         check_disconnect_errors do
           retry_on_not_committed do
-            @connection.query(sql)
+            @connection.query(sql, args)
           end
         end
       end
@@ -71,21 +76,50 @@ module Sequel
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
-        raise 'fdbsql Connection.execute args are not supported' unless args.nil?
-        q = query(sql)
+        q = query(sql, args)
         block_given? ? yield(q) : q.cmd_tuples
       end
 
+      def prepare(name, sql)
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.prepare(name, sql)
+          end
+        end
+      end
+
+      def execute_prepared_statement(name, args)
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.exec_prepared(name, args)
+          end
+        end
+      end
 
       private
 
       def connect
         @connection = PG::Connection.new(@connection_hash)
-        configure_connection
+        # Swallow warnings
+        @connection.set_notice_receiver { |proc| }
+        check_version
       end
 
-      def configure_connection
-        # TODO this exists in activerecord adapter, go back and see what's needed here
+      def check_version
+        ver = execute('SELECT VERSION()') do |res|
+          version = res.first['_SQL_COL_1']
+          m = version.match('^.* (\d+)\.(\d+)\.(\d+)')
+          if m.nil?
+            raise "No match when checking FDB SQL Layer version: #{version}"
+          end
+          m
+        end
+
+        # Combine into single number, two digits per part: 1.9.3 => 10903
+        @sql_layer_version = (100 * ver[1].to_i + ver[2].to_i) * 100 + ver[3].to_i
+        if @sql_layer_version < 10906
+          raise Sequel::DatabaseError.new("Unsupported FDB SQL Layer version: #{ver[1]}.#{ver[2]}.#{ver[3]}")
+        end
       end
 
       def status

@@ -31,7 +31,7 @@ module Sequel
 
       # FDBSQL does not: supports_partial_indexes? (aligns with super)
 
-      # TODO (as part of prepared statements) fsupports_prepared_transactions?
+      # FDBSQL does not: supports_prepared_transactions? (two-phase commit) (aligns with super)
 
       # FDBSQL does not: supports_savepoints? (aligns with super)
 
@@ -77,10 +77,7 @@ module Sequel
 
       # FDBSQL does not: supports_group_cube? (aligns with super)
 
-      # FDBSQL does support GROUP BY ROLLUP
-      def supports_group_rollup?
-        true
-      end
+      # FDBSQL does not: supports_group_rollup? (aligns with super)
 
       # FDBSQL does: supports_intersect_except? (INTERSECT and EXCEPT) (aligns with super)
 

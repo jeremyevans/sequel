@@ -16,9 +16,4 @@
 
 ### Expected Failures
 
-`DROP TABLE IF EXISTS` causes a warning with the FoundationDB SQL Layer, but a notice with postgres,
-this causes the tests to print out `WARN:  Cannot find the table 'sequel_testing'.'artists'`
-
-
-There are 66 failing tests in the spec_integration, hopefully by the time SQL Layer 1.9.6 comes out
-they will all be fixed.
+There are 42 failing tests in the spec_integration. Some of these will be fixed as part of the 1.9.6 release of the sql-layer, others will be removed by a patch to the specs.

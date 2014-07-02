@@ -24,8 +24,8 @@
 
 require 'sequel/adapters/fdbsql/connection'
 require 'sequel/adapters/fdbsql/dataset'
-require 'sequel/adapters/fdbsql/create_table_generator'
 require 'sequel/adapters/fdbsql/features'
+require 'sequel/adapters/fdbsql/prepared_statements'
 require 'sequel/adapters/fdbsql/schema_parsing'
 require 'sequel/adapters/utils/pg_types'
 require 'sequel/adapters/fdbsql/date_arithmetic'
@@ -40,12 +40,14 @@ module Sequel
 
     class Database < Sequel::Database
       include DatabaseFeatures
+      include DatabasePreparedStatements
       include SchemaParsing
       DatasetClass = Dataset
-      # Use a FDBSQL-specific create table generator
-      def create_table_generator_class
-        CreateTableGenerator
-      end
+
+      # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
+      # it should just be the timestamp, so we need whole new formats here.
+      BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
+      BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
 
       set_adapter_scheme :fdbsql
 
@@ -63,15 +65,19 @@ module Sequel
 
       def connect(server)
         opts = server_opts(server)
-        Connection.new(apply_default_options(opts))
+        Connection.new(self, apply_default_options(opts))
       end
 
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
-          res = log_yield(sql) do
-            check_database_errors do
-              conn.query(sql)
+          res = check_database_errors do
+            if sql.is_a?(Symbol)
+              execute_prepared_statement(conn, sql, opts, &block)
+            else
+              log_yield(sql) do
+                conn.query(sql, opts[:arguments])
+              end
             end
           end
           yield res if block_given?
@@ -154,11 +160,7 @@ module Sequel
       # this may be changed in the future, but for now we need to
       # set it at the sequel layer
       def column_definition_null_sql(sql, column)
-        if (column[:primary_key])
-          null = false
-        else
-          null = column.fetch(:null, column[:allow_null])
-        end
+        null = column.fetch(:null, column[:allow_null])
         sql << NOT_NULL if null == false
         sql << NULL if null == true
       end
@@ -189,6 +191,27 @@ module Sequel
       # Handle serial type if :serial option is present
       def type_literal_generic_integer(column)
         column[:serial] ? :serial : super
+      end
+
+      # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
+      # handle fractional seconds in Time/DateTime or blobs with "\0", and it won't ever
+      # handle Sequel::SQLTime values correctly.  Only public for use by the adapter, shouldn't
+      # be used by external code.
+      def bound_variable_arg(arg, conn)
+        case arg
+        # TODO TDD it:
+        when Sequel::SQL::Blob
+          # the 1 means treat this as a binary blob
+          {:value => arg, :format => 1}
+        when Sequel::SQLTime
+          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
+          arg.strftime(BOUND_VARIABLE_SQLTIME_FORMAT)
+        when DateTime, Time
+          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
+          from_application_timestamp(arg).strftime(BOUND_VARIABLE_TIMESTAMP_FORMAT)
+        else
+           arg
+        end
       end
 
       def begin_transaction(conn, opts=OPTS)

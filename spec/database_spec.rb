@@ -320,4 +320,36 @@ describe 'Fdbsql' do
       views.should_not include(:test)
     end
   end
+
+  describe 'prepared statements' do
+    def create_table
+      @db.create_table!(:test) {Integer :a; Text :b}
+      @db[:test].insert(1, 'blueberries')
+      @db[:test].insert(2, 'trucks')
+      @db[:test].insert(3, 'foxes')
+    end
+    def drop_table
+      @db.drop_table?(:test)
+    end
+    before do
+      create_table
+    end
+    after do
+      drop_table
+    end
+
+    it 're-prepares on stale statement' do
+      @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+      drop_table
+      create_table
+      @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+    end
+
+    it 'can call already prepared' do
+      @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+      drop_table
+      create_table
+      @db.call(:select_a, :n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+    end
+  end
 end
