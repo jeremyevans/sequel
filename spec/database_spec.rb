@@ -352,4 +352,10 @@ describe 'Fdbsql' do
       @db.call(:select_a, :n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
     end
   end
+
+  describe 'connecting' do
+    specify '#fdbsql' do
+      db2 = Sequel.fdbsql(DB.uri)
+    end
+  end
 end

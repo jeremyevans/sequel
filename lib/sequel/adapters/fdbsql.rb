@@ -31,6 +31,11 @@ require 'sequel/adapters/utils/pg_types'
 require 'sequel/adapters/fdbsql/date_arithmetic'
 
 module Sequel
+
+  Database::ADAPTERS << :fdbsql
+
+  def_adapter_method(:fdbsql)
+
   module Fdbsql
     CONVERTED_EXCEPTIONS  = [PGError]
 
