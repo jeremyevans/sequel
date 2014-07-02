@@ -47,11 +47,14 @@ module Sequel
         @config = opts
         @connection_hash = {
           :host => @config[:host],
-          :port => @config[:port],
+          :port => @config[:port] || 15432,
           :dbname => @config[:database],
-          :user => @config[:username],
-          :password => @config[:password]
-        }
+          :user => @config[:user],
+          :password => @config[:password],
+          :hostaddr => @config[:hostaddr],
+          :connect_timeout => @config[:connect_timeout] || 20,
+          :sslmode => @config[:sslmode]
+        }.delete_if { |key, value| value.nil? or (value.respond_to?(:empty?) and value.empty?)}
         @prepared_statements = {}
         connect
       end

@@ -38,6 +38,14 @@ This project currently supports Sequel v4.11.0
     DB = Sequel.connect('fdbsql://user@localhost:15432/database_name')
     ```
 
+### Adapter specific connection options
+The following additional options are supported for Sequel.connect
+
+* :hostaddr - Server address (avoids hostname lookup, overrides host)
+* :connect_timeout - Maximum time (in seconds) to wait for connection to succeed (default 20)
+* :sslmode - Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL
+
+
 ### Contributing
 
 1. Fork
