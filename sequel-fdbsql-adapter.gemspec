@@ -41,7 +41,7 @@ EOF
   s.license      = 'MIT'
   s.platform     = Gem::Platform::RUBY
 
-  s.requirements = 'FoundationDB SQL Layer version 1.9.5'
+  s.requirements = 'FoundationDB SQL Layer version 1.9.6'
   s.required_ruby_version = '>= 1.9.3'
 
   s.add_dependency 'sequel', '~> 4.12'
