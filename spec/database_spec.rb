@@ -352,4 +352,48 @@ describe 'Fdbsql' do
       @db.call(:select_a, :n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
     end
   end
+
+  describe 'connecting' do
+    specify '#fdbsql' do
+      db2 = Sequel.fdbsql(DB.uri)
+    end
+
+    describe 'opts' do
+      before do
+        @fake_conn = double('connection class')
+        stub_const('PG::Connection', @fake_conn)
+      end
+
+      def fake_conn(args)
+        fake_conn_instance = double("fake connection")
+        fake_conn_instance.stub(:set_notice_receiver)
+        fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).
+          and_return(double(cmd_tuples: 1, first: {'_SQL_COL_1' => 'FoundationDB 1.9.6'}))
+        @fake_conn.should_receive(:new).with(args).once.and_return(fake_conn_instance)
+        fake_conn_instance.should_receive(:close).once
+      end
+
+      [['database', {:database => 'mydb'}, {:dbname => 'mydb'}],
+       ['host', {:host => 'somewhere.com'}, {:host => 'somewhere.com'}],
+       ['host', {:host => nil}, {:host => 'localhost'}],
+       ['password', {:password => 'mypw'}, {:password => 'mypw'}],
+       ['user', {:user => 'uxt'}, {:user => 'uxt'}],
+       ['username', {:username => 'uxt'}, {:user => 'uxt'}],
+       ['hostaddr', {:hostaddr => '192.168.1.35'}, {:hostaddr => '192.168.1.35'}],
+       ['port', {:port => 3487}, {:port => 3487}],
+       ['default port', {}, {:port => 15432}],
+       ['connect_timeout', {:connect_timeout => 4890}, {:connect_timeout => 4890}],
+       ['default connect_timeout', {}, {:connect_timeout => 20}],
+       ['sslmode', {:sslmode => 'require'}, {:sslmode => 'require'}], # (disable|allow|prefer|require)
+      ].each do |opts|
+        specify opts[0] do
+          fake_conn(include(opts[2]))
+          default = {:adapter => 'fdbsql', :database => 'the database', :host => 'localhost'}
+          Sequel.connect(default.merge(opts[1])) do |db|
+            db.run('SELECT VERSION()')
+          end
+        end
+      end
+    end
+  end
 end

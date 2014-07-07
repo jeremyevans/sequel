@@ -46,12 +46,15 @@ module Sequel
         @db = db
         @config = opts
         @connection_hash = {
-          :host => @config[:host],
-          :port => @config[:port],
+          :host => @config[:host] || 'localhost',
+          :port => @config[:port] || 15432,
           :dbname => @config[:database],
-          :user => @config[:username],
-          :password => @config[:password]
-        }
+          :user => @config[:user],
+          :password => @config[:password],
+          :hostaddr => @config[:hostaddr],
+          :connect_timeout => @config[:connect_timeout] || 20,
+          :sslmode => @config[:sslmode]
+        }.delete_if { |key, value| value.nil? or (value.respond_to?(:empty?) and value.empty?)}
         @prepared_statements = {}
         connect
       end
@@ -100,8 +103,12 @@ module Sequel
 
       def connect
         @connection = PG::Connection.new(@connection_hash)
-        # Swallow warnings
-        @connection.set_notice_receiver { |proc| }
+        if (@config[:notice_receiver])
+          @connection.set_notice_receiver(@config[:notice_receiver])
+        else
+          # Swallow warnings
+          @connection.set_notice_receiver { |proc| }
+        end
         check_version
       end
 

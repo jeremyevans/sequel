@@ -27,7 +27,7 @@ This project currently supports Sequel v4.11.0
 
 1. Add the following line to `Gemfile`:
     - Unreleased development version:
-        - `gem 'sequel-fdbsql-adapter', github: 'FoundationDB/sql-layer-adapter-sequel`
+        - `gem 'sequel-fdbsql-adapter', github: 'FoundationDB/sql-layer-adapter-sequel'`
 2. Install the new gem
     - `$ bundle install`
 3. Connect
@@ -35,8 +35,16 @@ This project currently supports Sequel v4.11.0
     require 'sequel'
     require 'sequel-fdbsql-adapter'
 
-    DB = Sequel.connect('fdbsql://user@localhost:15432/database_name')
+    DB = Sequel.connect('fdbsql://user@localhost:15432/schema_name')
     ```
+
+### Adapter specific connection options
+The following additional options are supported for Sequel.connect
+
+* :hostaddr - Server address (avoids hostname lookup, overrides host)
+* :connect_timeout - Maximum time (in seconds) to wait for connection to succeed (default 20)
+* :sslmode - Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL
+
 
 ### Contributing
 

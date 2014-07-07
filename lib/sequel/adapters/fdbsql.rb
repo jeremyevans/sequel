@@ -31,6 +31,11 @@ require 'sequel/adapters/utils/pg_types'
 require 'sequel/adapters/fdbsql/date_arithmetic'
 
 module Sequel
+
+  Database::ADAPTERS << :fdbsql
+
+  def_adapter_method(:fdbsql)
+
   module Fdbsql
     CONVERTED_EXCEPTIONS  = [PGError]
 
@@ -65,7 +70,7 @@ module Sequel
 
       def connect(server)
         opts = server_opts(server)
-        Connection.new(self, apply_default_options(opts))
+        Connection.new(self, opts)
       end
 
       def execute(sql, opts = {}, &block)
@@ -226,28 +231,6 @@ module Sequel
       end
 
       private
-
-
-      CONNECTION_DEFAULTS = {
-        :host => 'localhost',
-        :port => 15432,
-        :username => 'fdbsql',
-        :password => '',
-      }
-
-      def apply_default_options(sequel_options)
-        config = CONNECTION_DEFAULTS.merge(sequel_options)
-        config[:encoding] =
-          config[:charset] || 'UTF8'    unless config[:encoding]
-
-        if config.key?(:database)
-          database = config[:database]
-        else
-          raise ArgumentError, "No database specified. Missing config option: database"
-        end
-
-        return config
-      end
 
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
