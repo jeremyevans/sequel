@@ -35,7 +35,7 @@ This project currently supports Sequel v4.11.0
     require 'sequel'
     require 'sequel-fdbsql-adapter'
 
-    DB = Sequel.connect('fdbsql://user@localhost:15432/database_name')
+    DB = Sequel.connect('fdbsql://user@localhost:15432/schema_name')
     ```
 
 ### Adapter specific connection options
