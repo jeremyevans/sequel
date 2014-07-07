@@ -375,6 +375,7 @@ describe 'Fdbsql' do
 
       [['database', {:database => 'mydb'}, {:dbname => 'mydb'}],
        ['host', {:host => 'somewhere.com'}, {:host => 'somewhere.com'}],
+       ['host', {:host => nil}, {:host => 'localhost'}],
        ['password', {:password => 'mypw'}, {:password => 'mypw'}],
        ['user', {:user => 'uxt'}, {:user => 'uxt'}],
        ['username', {:username => 'uxt'}, {:user => 'uxt'}],

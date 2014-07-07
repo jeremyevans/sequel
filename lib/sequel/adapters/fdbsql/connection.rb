@@ -46,7 +46,7 @@ module Sequel
         @db = db
         @config = opts
         @connection_hash = {
-          :host => @config[:host],
+          :host => @config[:host] || 'localhost',
           :port => @config[:port] || 15432,
           :dbname => @config[:database],
           :user => @config[:user],
