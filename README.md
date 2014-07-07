@@ -27,7 +27,7 @@ This project currently supports Sequel v4.11.0
 
 1. Add the following line to `Gemfile`:
     - Unreleased development version:
-        - `gem 'sequel-fdbsql-adapter', github: 'FoundationDB/sql-layer-adapter-sequel`
+        - `gem 'sequel-fdbsql-adapter', github: 'FoundationDB/sql-layer-adapter-sequel'`
 2. Install the new gem
     - `$ bundle install`
 3. Connect
