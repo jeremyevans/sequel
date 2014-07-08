@@ -154,8 +154,9 @@ module Sequel
       end
 
       # Parse the given string as json, returning either a JSONArray
-      # or JSONHash instance, and raising an error if the JSON
-      # parsing does not yield an array or hash.
+      # or JSONHash instance (or JSONBArray or JSONBHash instance if jsonb
+      # argument is true), or a String, Numeric, true, false, or nil
+      # if the json library used supports that.
       def self.parse_json(s, jsonb=false)
         begin
           value = Sequel.parse_json(s)
@@ -168,6 +169,8 @@ module Sequel
           (jsonb ? JSONBArray : JSONArray).new(value)
         when Hash 
           (jsonb ? JSONBHash : JSONHash).new(value)
+        when String, Numeric, true, false, nil
+          value
         else
           raise Sequel::InvalidValue, "unhandled json value: #{value.inspect} (from #{s.inspect})"
         end

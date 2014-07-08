@@ -10,17 +10,6 @@ describe "pg_json extension" do
     @ac = m::JSONArray
     @bhc = m::JSONBHash
     @bac = m::JSONBArray
-
-    # Create subclass in correct namespace for easily overriding methods
-    j = m::JSON = JSON.dup
-    j.instance_eval do
-      Parser = JSON::Parser
-      alias old_parse parse
-      def parse(s)
-        return 1 if s == '1'
-        old_parse(s) 
-      end
-    end
   end
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
@@ -64,10 +53,15 @@ describe "pg_json extension" do
       Sequel.instance_eval do
         alias pj parse_json
         def parse_json(v)
-          v
+          {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new}.fetch(v){pj(v)}
         end
       end
-      proc{@m.parse_json('1')}.should raise_error(Sequel::InvalidValue)
+      @m.parse_json('1').should == 1
+      @m.parse_json("'a'").should == 'a'
+      @m.parse_json('true').should == true
+      @m.parse_json('false').should == false
+      @m.parse_json('null').should == nil
+      proc{@m.parse_json('o')}.should raise_error(Sequel::InvalidValue)
     ensure
       Sequel.instance_eval do
         alias parse_json pj
