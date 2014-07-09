@@ -5,8 +5,7 @@
 # that when inet/cidr fields are retrieved, they are returned as
 # IPAddr instances
 #
-# After loading the extension, you should extend your dataset
-# with a module so that it correctly handles the inet/cidr type:
+# To use this extension, load it into your database:
 #
 #   DB.extension :pg_inet
 #
