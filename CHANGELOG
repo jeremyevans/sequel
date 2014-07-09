@@ -1,5 +1,7 @@
 === HEAD
 
+* Add modification_detection plugin, for automatic detection of in-place column value modifications (jeremyevans)
+
 * Speed up using plain strings, numbers, true, false, and nil in json columns if underlying json library supports them (jeremyevans) (#834)
 
 === 4.12.0 (2014-07-01)
