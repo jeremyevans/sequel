@@ -3436,3 +3436,44 @@ describe 'pg_static_cache_updater extension' do
     q.pop
   end
 end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
+
+describe 'PostgreSQL enum types' do
+  before(:all) do
+    @db = DB
+    @db.extension :pg_array, :pg_enum
+    @db.create_enum(:test_enum, %w'a b c d')
+
+    @db.create_table!(:test_enumt) do
+      test_enum  :t
+    end
+  end
+  after(:all) do
+    @db.drop_table?(:test_enumt)
+    @db.drop_enum(:test_enum)
+  end
+
+  specify "should return correct entries in the schema" do
+    s = @db.schema(:test_enumt)
+    s.first.last[:type].should == :enum
+    s.first.last[:enum_values].should == %w'a b c d'
+  end
+
+  it "should add array parsers for enum values" do
+    @db.get(Sequel.pg_array(%w'a b', :test_enum)).should == %w'a b'
+  end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+
+  it "should set up model typecasting correctly" do
+    c = Class.new(Sequel::Model(:test_enumt))
+    o = c.new
+    o.t = :a
+    o.t.should == 'a'
+  end
+
+  it "should add values to existing enum" do
+    @db.add_enum_value(:test_enum, 'e')
+    @db.add_enum_value(:test_enum, 'f', :after=>'a')
+    @db.add_enum_value(:test_enum, 'g', :before=>'b')
+    @db.add_enum_value(:test_enum, 'a', :if_not_exists=>true)
+    @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].should == %w'a f g b c d e'
+  end
+end
