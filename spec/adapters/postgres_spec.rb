@@ -3473,7 +3473,7 @@ describe 'PostgreSQL enum types' do
     @db.add_enum_value(:test_enum, 'e')
     @db.add_enum_value(:test_enum, 'f', :after=>'a')
     @db.add_enum_value(:test_enum, 'g', :before=>'b')
-    @db.add_enum_value(:test_enum, 'a', :if_not_exists=>true)
+    @db.add_enum_value(:test_enum, 'a', :if_not_exists=>true) if @db.server_version >= 90300
     @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].should == %w'a f g b c d e'
-  end
+  end if DB.server_version >= 90100
 end
