@@ -147,6 +147,11 @@ describe "class_table_inheritance plugin" do
     o.valid?.should == true
   end
 
+  it "should set the type column field even when not validating" do
+    Employee.new.save(:validate=>false)
+    @db.sqls.should == ["INSERT INTO employees (kind) VALUES ('Employee')"]
+  end
+
   it "should raise an error if attempting to create an anonymous subclass" do
     proc{Class.new(Manager)}.should raise_error(Sequel::Error)
   end

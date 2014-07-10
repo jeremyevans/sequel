@@ -1511,6 +1511,7 @@ module Sequel
       def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
+        _before_validation
         if opts[:validate] != false
           unless checked_save_failure(opts){_valid?(true, opts)}
             raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
@@ -1701,11 +1702,21 @@ module Sequel
       #   artist(:name=>'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = OPTS)
+        _before_validation
         _valid?(false, opts)
       end
 
       private
       
+      # Run code before any validation is done, but also run it before saving
+      # even if validation is skipped.  This is a private hook.  It exists so that
+      # plugins can set values automatically before validation (as the values
+      # need to be validated), but should be set even if validation is skipped.
+      # Unlike the regular before_validation hook, we do not skip the save/validation
+      # if this returns false.
+      def _before_validation
+      end
+
       # Do the deletion of the object's dataset, and check that the row
       # was actually deleted.
       def _delete

@@ -221,14 +221,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Set the cti_key column to the name of the model.
-        def before_validation
-          if new? && model.cti_key && !model.cti_model_map
-            send("#{model.cti_key}=", model.name.to_s)
-          end
-          super
-        end
-        
         # Delete the row from all backing tables, starting from the
         # most recent table and going through all superclasses.
         def delete
@@ -241,6 +233,14 @@ module Sequel
         end
         
         private
+        
+        # Set the cti_key column to the name of the model.
+        def _before_validation
+          if new? && model.cti_key && !model.cti_model_map
+            send("#{model.cti_key}=", model.name.to_s)
+          end
+          super
+        end
         
         # Insert rows into all backing tables, using the columns
         # in each table.  

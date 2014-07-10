@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix regression in timestamps and table inheritance plugin where column values would not be saved if validation is skipped (jeremyevans) (#839)
+
 * Add pg_enum extension, for dealing with PostgreSQL enums (jeremyevans)
 
 * Add modification_detection plugin, for automatic detection of in-place column value modifications (jeremyevans)

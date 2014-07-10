@@ -85,6 +85,11 @@ describe Sequel::Model, "single table inheritance plugin" do
     o.valid?.should == true
   end
 
+  it "should set type column field even if validations are skipped" do
+    StiTestSub1.new.save(:validate=>false)
+    DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1"]
+  end
+
   it "should override an existing value in the class name field" do
     StiTest.create(:kind=>'StiTestSub1')
     DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]

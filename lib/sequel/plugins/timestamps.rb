@@ -57,12 +57,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Set the create timestamp when creating
-        def before_validation
-          set_create_timestamp if new?
-          super
-        end
-        
         # Set the update timestamp when updating
         def before_update
           set_update_timestamp
@@ -70,6 +64,12 @@ module Sequel
         end
         
         private
+        
+        # Set the create timestamp when creating
+        def _before_validation
+          set_create_timestamp if new?
+          super
+        end
         
         # If the object has accessor methods for the create timestamp field, and
         # the create timestamp value is nil or overwriting it is allowed, set the
