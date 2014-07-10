@@ -1,7 +1,7 @@
 # The pg_row extension adds support for Sequel to handle
 # PostgreSQL's row-valued/composite types.
 #
-# This extension integrates with Sequel's native postgres adapter, so
+# This extension integrates with Sequel's native postgres and jdbc/postgresql adapters, so
 # that when composite fields are retrieved, they are parsed and returned
 # as instances of Sequel::Postgres::PGRow::(HashRow|ArrayRow), or
 # optionally a custom type.  HashRow and ArrayRow are DelegateClasses of
@@ -74,7 +74,7 @@
 #   DB.conversion_procs.select{|k,v| v.is_a?(Sequel::Postgres::PGRow::Parser) && \
 #     v.converter && (v.converter.name.nil? || v.converter.name == '') }.map{|k,v| v}
 # 
-# If you are not using the native postgres adapter and are using composite types
+# If you are not using the native postgres or jdbc/postgresql adapters and are using composite types
 # types as model column values you probably should use the
 # pg_typecast_on_load plugin if the column values are returned as a string.
 #

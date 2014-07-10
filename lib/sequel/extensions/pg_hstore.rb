@@ -3,8 +3,8 @@
 # the hstore type stores an arbitrary key-value table, where the keys
 # are strings and the values are strings or NULL.
 #
-# This extension integrates with Sequel's native postgres adapter, so
-# that when hstore fields are retrieved, they are parsed and returned
+# This extension integrates with Sequel's native postgres and jdbc/postgresql
+# adapters, so that when hstore fields are retrieved, they are parsed and returned
 # as instances of Sequel::Postgres::HStore.  HStore is
 # a DelegateClass of Hash, so it mostly acts like a hash, but not
 # completely (is_a?(Hash) is false).  If you want the actual hash,
@@ -78,11 +78,9 @@
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using hstore columns in CREATE/ALTER TABLE statements.
 #
-# If you are not using the native postgres adapter and are using hstore
+# If you are not using the native postgres or jdbc/postgresql adapters and are using hstore
 # types as model column values you probably should use the
-# typecast_on_load plugin if the column values are returned as a
-# hash, and the pg_typecast_on_load plugin if the column
-# values are returned as a string.
+# pg_typecast_on_load plugin if the column values are returned as a string.
 #
 # This extension requires the delegate and strscan libraries.
 

@@ -1,15 +1,16 @@
 # The pg_json extension adds support for Sequel to handle
-# PostgreSQL's json type.  It is slightly more strict than the
-# PostgreSQL json type in that the object returned must be an
+# PostgreSQL's json and jsonb types.  It is slightly more strict than the
+# PostgreSQL json types in that the object returned should be an
 # array or object (PostgreSQL's json type considers plain numbers
-# and strings as valid).  This is because Sequel relies completely
-# on the ruby JSON library for parsing, and ruby's JSON library
-# does not accept the values.
+# strings, true, false, and null as valid).  Sequel will work with
+# PostgreSQL json values that are not arrays or objects, but support
+# is fairly limited and the values do not roundtrip.
 #
 # This extension integrates with Sequel's native postgres adapter, so
 # that when json fields are retrieved, they are parsed and returned
 # as instances of Sequel::Postgres::JSONArray or
-# Sequel::Postgres::JSONHash.  JSONArray and JSONHash are
+# Sequel::Postgres::JSONHash (or JSONBArray or JSONBHash for jsonb
+# columns).  JSONArray and JSONHash are
 # DelegateClasses of Array and Hash, so they mostly act the same, but
 # not completely (json_array.is_a?(Array) is false).  If you want
 # the actual array for a JSONArray, call JSONArray#to_a.  If you want
@@ -20,15 +21,15 @@
 # To turn an existing Array or Hash into a JSONArray or JSONHash,
 # use Sequel.pg_json:
 #
-#   Sequel.pg_json(array)
-#   Sequel.pg_json(hash)
+#   Sequel.pg_json(array) # or Sequel.pg_jsonb(array) for jsonb type
+#   Sequel.pg_json(hash)  # or Sequel.pg_jsonb(hash) for jsonb type
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension
 # and have activated refinements for the file, you can also use Array#pg_json and Hash#pg_json:
 #
-#   array.pg_json
-#   hash.pg_json
+#   array.pg_json # or array.pg_jsonb for jsonb type
+#   hash.pg_json  # or hash.pg_jsonb for jsonb type
 #
 # So if you want to insert an array or hash into an json database column:
 #

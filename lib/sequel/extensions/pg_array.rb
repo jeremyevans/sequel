@@ -1,10 +1,10 @@
 # The pg_array extension adds support for Sequel to handle
 # PostgreSQL's array types.
 #
-# This extension integrates with Sequel's native postgres adapter, so
-# that when array fields are retrieved, they are parsed and returned
-# as instances of Sequel::Postgres::PGArray.  PGArray is
-# a DelegateClass of Array, so it mostly acts like an array, but not
+# This extension integrates with Sequel's native postgres adapter and
+# the jdbc/postgresql adapter, so that when array fields are retrieved,
+# they are parsed and returned as instances of Sequel::Postgres::PGArray.
+# PGArray is a DelegateClass of Array, so it mostly acts like an array, but not
 # completely (is_a?(Array) is false).  If you want the actual array,
 # you can call PGArray#to_a.  This is done so that Sequel does not
 # treat a PGArray like an Array by default, which would cause issues.
@@ -39,18 +39,21 @@
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using postgres array columns in CREATE/ALTER TABLE statements.
 #
-# If you are not using the native postgres adapter and are using array
-# types as model column values you probably should use the
-# typecast_on_load plugin if the column values are returned as a
-# regular array, and the pg_typecast_on_load plugin if the column
-# values are returned as a string.
+# If you are not using the native postgres or jdbc/postgresql adapter and are using array
+# types as model column values you probably should use the the pg_typecast_on_load plugin
+# if the column values are returned as a string.
 #
 # This extension by default includes handlers for array types for
 # all scalar types that the native postgres adapter handles. It
 # also makes it easy to add support for other array types.  In
 # general, you just need to make sure that the scalar type is
 # handled and has the appropriate converter installed in
-# Sequel::Postgres::PG_TYPES under the appropriate type OID.
+# Sequel::Postgres::PG_TYPES or the Database instance's
+# conversion_procs usingthe appropriate type OID.  For user defined
+# types, you can do this via:
+#
+#   DB.conversion_procs[scalar_type_oid] = lambda{|string| ...}
+#
 # Then you can call
 # Sequel::Postgres::PGArray::DatabaseMethods#register_array_type
 # to automatically set up a handler for the array type.  So if you
@@ -63,6 +66,7 @@
 # Sequel::Postgres::PGArray.register.  In this case, you'll have
 # to specify the type oids:
 #
+#   Sequel::Postgres::PG_TYPES[1234] = lambda{|string| ...}
 #   Sequel::Postgres::PGArray.register('foo', :oid=>4321, :scalar_oid=>1234)
 #
 # Both Sequel::Postgres::PGArray::DatabaseMethods#register_array_type
