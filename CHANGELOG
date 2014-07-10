@@ -1,5 +1,7 @@
 === HEAD
 
+* Make composition and serialization plugins support validations on underlying columns (jeremyevans)
+
 * Fix regression in timestamps and table inheritance plugin where column values would not be saved if validation is skipped (jeremyevans) (#839)
 
 * Add pg_enum extension, for dealing with PostgreSQL enums (jeremyevans)

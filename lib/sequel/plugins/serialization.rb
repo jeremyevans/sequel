@@ -175,12 +175,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Serialize deserialized values before saving
-        def before_save
-          serialize_deserialized_values
-          super
-        end
-        
         # Hash of deserialized values, used as a cache.
         def deserialized_values
           @deserialized_values ||= {}
@@ -203,6 +197,12 @@ module Sequel
 
         private
 
+        # Serialize deserialized values before saving
+        def _before_validation
+          serialize_deserialized_values
+          super
+        end
+        
         # Clear any cached deserialized values when doing a manual refresh.
         def _refresh_set_values(hash)
           @deserialized_values.clear if @deserialized_values

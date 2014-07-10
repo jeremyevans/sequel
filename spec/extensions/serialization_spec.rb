@@ -26,6 +26,24 @@ describe "Serialization plugin" do
     DB.sqls.last.should =~ /INSERT INTO items \((ghi)\) VALUES \('\[123\]'\)/
   end
 
+  it "should handle validations of underlying column" do
+    @c.plugin :serialization, :yaml, :abc
+    o = @c.new
+    def o.validate
+      errors.add(:abc, "not present") unless self[:abc]
+    end
+    o.valid?.should == false
+    o.abc = {}
+    o.valid?.should == true
+  end
+
+  it "should set column values even when not validating" do
+    @c.set_primary_key :id
+    @c.plugin :serialization, :yaml, :abc
+    @c.load({:id=>1}).set(:abc=>{}).save(:validate=>false)
+    DB.sqls.last.gsub("\n", '').should == "UPDATE items SET abc = '--- {}' WHERE (id = 1)"
+  end
+
   it "should allow serializing attributes to yaml" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1)
