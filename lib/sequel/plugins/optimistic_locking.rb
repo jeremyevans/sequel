@@ -18,7 +18,6 @@ module Sequel
     #
     # This plugin relies on the instance_filters plugin.
     module OptimisticLocking
-
       # Exception class raised when trying to update or destroy a stale object.
       class Error < Sequel::NoExistingObject; end
 
