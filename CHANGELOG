@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix recursive mutex locking issue on JRuby when using Sequel::Model(dataset) (jeremyevans) (#841)
+
 * Make composition and serialization plugins support validations on underlying columns (jeremyevans)
 
 * Fix regression in timestamps and table inheritance plugin where column values would not be saved if validation is skipped (jeremyevans) (#839)
