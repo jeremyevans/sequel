@@ -76,6 +76,11 @@ module Sequel
           extend ::Sequel::DB2::DatabaseMethods
           extend_datasets ::Sequel::DB2::DatasetMethods
         end
+        when 'openedge'
+          Sequel.require 'adapters/shared/openedge'
+          extend Sequel::OpenEdge::DatabaseMethods
+          extend_datasets(Sequel::OpenEdge::DatasetMethods)
+        end
       end
 
       def connection_execute_method
