@@ -1,5 +1,7 @@
 === HEAD
 
+* Use all_tab_cols instead of user_tab cols for defaults parsing in the oracle adapter (jeremyevans)
+
 * Fix recursive mutex locking issue on JRuby when using Sequel::Model(dataset) (jeremyevans) (#841)
 
 * Make composition and serialization plugins support validations on underlying columns (jeremyevans)
