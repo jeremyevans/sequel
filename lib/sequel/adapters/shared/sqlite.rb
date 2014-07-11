@@ -38,10 +38,15 @@ module Sequel
         pragma_set(:auto_vacuum, value)
       end
 
+      # Add a custom function to the connected database, it takes a name, an
+      # and a block defining the behavior of the function. The return value
+      # of the block will be the return value of the function.
       def create_function(name, opts=OPTS, &block)
-        arity = [block.arity - 1, -1].max
+        arity = [block.arity, -1].max
         synchronize(opts[:server]) do |conn|
-          conn.create_function(name, arity, SQLite3::Constants::TextRep::ANY, &block)
+          conn.create_function(name, arity) do |function_proxy, *args|
+            function_proxy.result = block.call(*args)
+          end
         end
       end
 

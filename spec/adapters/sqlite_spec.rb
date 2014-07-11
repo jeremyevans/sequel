@@ -39,8 +39,8 @@ describe "An SQLite database" do
 
   specify "#create_function should create functions" do
     proc{@db['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
-    @db.create_function('tf') do |func|
-      func.result = 1
+    @db.create_function('tf') do
+      1
     end
     @db['SELECT tf()'].all.should == [{:"tf()"=>1}]
   end
