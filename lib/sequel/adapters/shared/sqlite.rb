@@ -38,6 +38,13 @@ module Sequel
         pragma_set(:auto_vacuum, value)
       end
 
+      def create_function(name, opts=OPTS, &block)
+        arity = [block.arity - 1, -1].max
+        synchronize(opts[:server]) do |conn|
+          conn.create_function(name, arity, SQLite3::Constants::TextRep::ANY, &block)
+        end
+      end
+
       # Set the case_sensitive_like PRAGMA using the given boolean value, if using
       # SQLite 3.2.3+.  If not using 3.2.3+, no error is raised. See pragma_set.
       # Consider using the :case_sensitive_like Database option instead.

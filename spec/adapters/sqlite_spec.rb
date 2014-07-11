@@ -36,12 +36,20 @@ describe "An SQLite database" do
       proc {@db.auto_vacuum = :invalid}.should raise_error(Sequel::Error)
     end
   end
-  
+
+  specify "#create_function should create functions" do
+    proc{@db['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
+    @db.create_function('tf') do |func|
+      func.result = 1
+    end
+    @db['SELECT tf()'].all.should == [{:"tf()"=>1}]
+  end
+
   specify "should respect case sensitive like false" do
     @db.case_sensitive_like = false
     @db.get(Sequel.like('a', 'A')).to_s.should == '1'
   end
-  
+
   specify "should respect case sensitive like true" do
     @db.case_sensitive_like = true
     @db.get(Sequel.like('a', 'A')).to_s.should == '0'
