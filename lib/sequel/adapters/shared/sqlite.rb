@@ -38,6 +38,18 @@ module Sequel
         pragma_set(:auto_vacuum, value)
       end
 
+      # Add a custom function to the connected database, it takes a name, an
+      # and a block defining the behavior of the function. The return value
+      # of the block will be the return value of the function.
+      def create_function(name, opts=OPTS, &block)
+        arity = [block.arity, -1].max
+        synchronize(opts[:server]) do |conn|
+          conn.create_function(name, arity) do |function_proxy, *args|
+            function_proxy.result = block.call(*args)
+          end
+        end
+      end
+
       # Set the case_sensitive_like PRAGMA using the given boolean value, if using
       # SQLite 3.2.3+.  If not using 3.2.3+, no error is raised. See pragma_set.
       # Consider using the :case_sensitive_like Database option instead.
