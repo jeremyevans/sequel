@@ -132,7 +132,9 @@ begin
     t
   end
 
-  task :default => [:spec]
+  desc "Run the core, model, and extension/plugin specs"
+  task :default => [:spec, :spec_plugin]
+
   spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/(adapters/([a-ln-z]|m[a-np-z])|extensions/core_extensions)"')}
   spec.call("spec_bin", ["spec/bin_spec.rb"], "Run bin/sequel specs")
   spec.call("spec_core", Dir["spec/core/*_spec.rb"], "Run core specs")
