@@ -395,7 +395,9 @@ module Sequel
         end
       end
 
-      # Whether this range is empty (has no points).
+      # Whether this range is empty (has no points).  Note that for manually created ranges
+      # (ones not retrieved from the database), this will only be true if the range
+      # was created using the :empty option.
       def empty?
         @empty
       end

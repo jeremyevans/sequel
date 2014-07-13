@@ -35,7 +35,7 @@ module Sequel
   #     dataset # => DB1[:comments]
   #   end
   def self.Model(source)
-    if cache_anonymous_models && (klass = Sequel.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source]})
+    if cache_anonymous_models && (klass = Model::ANONYMOUS_MODEL_CLASSES_MUTEX.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source]})
       return klass
     end
     klass = if source.is_a?(Database)
@@ -45,7 +45,7 @@ module Sequel
     else
       Class.new(Model).set_dataset(source)
     end
-    Sequel.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source] = klass} if cache_anonymous_models
+    Model::ANONYMOUS_MODEL_CLASSES_MUTEX.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source] = klass} if cache_anonymous_models
     klass
   end
 
@@ -77,6 +77,9 @@ module Sequel
     # Map that stores model classes created with <tt>Sequel::Model()</tt>, to allow the reopening
     # of classes when dealing with code reloading.
     ANONYMOUS_MODEL_CLASSES = {}
+
+    # Mutex protecting access to ANONYMOUS_MODEL_CLASSES
+    ANONYMOUS_MODEL_CLASSES_MUTEX = Mutex.new
 
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
