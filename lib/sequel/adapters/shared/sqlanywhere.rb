@@ -255,7 +255,6 @@ module Sequel
       DATEPART = 'datepart'.freeze
       REGEXP = 'REGEXP'.freeze
       NOT_REGEXP = 'NOT REGEXP'.freeze
-      TIMESTAMP_USEC_FORMAT = ".%03d".freeze
       APOS = Dataset::APOS
       APOS_RE = Dataset::APOS_RE
       DOUBLE_APOS = Dataset::DOUBLE_APOS
@@ -425,10 +424,6 @@ module Sequel
         end
       end
 
-      def format_timestamp_usec(usec)
-        sprintf(TIMESTAMP_USEC_FORMAT, usec/1000)
-      end
-
       # Sybase uses TOP N for limit.  For Sybase TOP (N) is used
       # to allow the limit to be a bound variable.
       def select_limit_sql(sql)
@@ -464,6 +459,11 @@ module Sequel
         else
           super
         end
+      end
+
+      # SQLAnywhere supports millisecond timestamp precision.
+      def timestamp_precision
+        3
       end
     end
   end

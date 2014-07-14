@@ -525,7 +525,6 @@ module Sequel
       DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
       DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
       DATEPART_OPEN = "datepart(".freeze
-      TIMESTAMP_USEC_FORMAT = ".%03d".freeze
       OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
       HEX_START = '0x'.freeze
       UNICODE_STRING_START = "N'".freeze
@@ -844,13 +843,6 @@ module Sequel
         @db.schema(self).map{|k, v| k if v[:primary_key] == true}.compact.first
       end
 
-      # MSSQL raises an error if you try to provide more than 3 decimal places
-      # for a fractional timestamp.  This probably doesn't work for smalldatetime
-      # fields.
-      def format_timestamp_usec(usec)
-        sprintf(TIMESTAMP_USEC_FORMAT, usec/1000)
-      end
-
       # Use OUTPUT INSERTED.* to return all columns of the inserted row,
       # for use with the prepared statement code.
       def insert_output_sql(sql)
@@ -981,6 +973,11 @@ module Sequel
       end
       alias delete_output_sql output_sql
       alias update_output_sql output_sql
+
+      # MSSQL supports millisecond timestamp precision.
+      def timestamp_precision
+        3
+      end
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)
