@@ -1,5 +1,7 @@
 === HEAD
 
+* Add column_select plugin, for using explicit column selections in model datasets (jeremyevans)
+
 * Use associated model's existing selection for join associations if it consists solely of explicitly quailfied columns (jeremyevans)
 
 * Add round_timestamps extension for automatically rounding timestamp values to database precision before literalizing (jeremyevans)
