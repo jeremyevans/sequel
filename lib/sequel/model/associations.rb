@@ -1206,13 +1206,24 @@ module Sequel
         
         # The columns to select when loading the association, associated_class.table_name.* by default.
         def select
-          cached_fetch(:select){Sequel::SQL::ColumnAll.new(associated_class.table_name)}
+          cached_fetch(:select){default_select}
         end
 
         private
 
         def _associated_dataset
           super.inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys), :qualify=>:deep)
+        end
+
+        # The default selection for associations that require joins.  These do not use the default
+        # model selection unless all entries in the select are explicitly qualified identifiers, as
+        # other it can include unqualified columns which would be made ambiguous by joining.
+        def default_select
+          if (sel = associated_class.dataset.opts[:select]) && sel.all?{|c| selection_is_qualified?(c)}
+            sel
+          else
+            Sequel::SQL::ColumnAll.new(associated_class.table_name)
+          end
         end
 
         def filter_by_associations_conditions_associated_keys
@@ -1250,6 +1261,21 @@ module Sequel
 
         def reciprocal_type
           :many_to_many
+        end
+
+        # Whether the given expression represents a qualified identifier.  Used to determine if it is
+        # OK to use directly when joining.
+        def selection_is_qualified?(c)
+          case c
+          when Symbol
+            Sequel.split_symbol(c)[0]
+          when Sequel::SQL::QualifiedIdentifier
+            true
+          when Sequel::SQL::AliasedExpression
+            selection_is_qualified?(c.expression)
+          else
+            false
+          end
         end
 
         # Split the join table into source and alias parts.
@@ -1478,8 +1504,8 @@ module Sequel
         #                the current association's key(s).  Set to nil to not use a reciprocal.
         # :remover :: Proc used to define the private _remove_* method for doing the database work
         #             to remove the association between the given object and the current object (*_to_many assocations).
-        # :select :: the columns to select.  Defaults to the associated class's
-        #            table_name.* in a many_to_many association, which means it doesn't include the attributes from the
+        # :select :: the columns to select.  Defaults to the associated class's table_name.* in an association
+        #            that uses joins, which means it doesn't include the attributes from the
         #            join table.  If you want to include the join table attributes, you can
         #            use this option, but beware that the join table attributes can clash with
         #            attributes from the model table, so you should alias any attributes that have

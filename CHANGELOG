@@ -1,5 +1,7 @@
 === HEAD
 
+* Use associated model's existing selection for join associations if it consists solely of explicitly quailfied columns (jeremyevans)
+
 * Add round_timestamps extension for automatically rounding timestamp values to database precision before literalizing (jeremyevans)
 
 * Make rake default task run plugin specs as well as core/model specs (jeremyevans)
