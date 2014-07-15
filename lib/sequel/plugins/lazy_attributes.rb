@@ -37,7 +37,10 @@ module Sequel
         # For each attribute given, create an accessor method that allows a lazy
         # lookup of the attribute.  Each attribute should be given as a symbol.
         def lazy_attributes(*attrs)
-          set_dataset(dataset.select(*(columns - attrs)))
+          unless select = dataset.opts[:select]
+            select = dataset.columns.map{|c| Sequel.qualify(dataset.first_source, c)}
+          end
+          set_dataset(dataset.select(*select.reject{|c| attrs.include?(dataset.send(:_hash_key_symbol, c))}))
           attrs.each{|a| define_lazy_attribute_getter(a)}
         end
         
@@ -66,8 +69,9 @@ module Sequel
         # the attribute for just the current object.  Return the value of
         # the attribute for the current object.
         def lazy_attribute_lookup(a)
+          selection = Sequel.qualify(model.table_name, a)
           if frozen?
-            return this.dup.select(a).get(a)
+            return this.dup.get(selection)
           end
 
           if retrieved_with
@@ -75,14 +79,14 @@ module Sequel
             composite_pk = true if primary_key.is_a?(Array)
             id_map = {}
             retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a) || o.frozen?}
-            model.select(*(Array(primary_key) + [a])).filter(primary_key=>id_map.keys).naked.each do |row|
+            model.select(*(Array(primary_key).map{|k| Sequel.qualify(model.table_name, k)} + [selection])).filter(primary_key=>id_map.keys).naked.each do |row|
               obj = id_map[composite_pk ? row.values_at(*primary_key) : row[primary_key]]
               if obj && !obj.values.has_key?(a)
                 obj.values[a] = row[a]
               end
             end
           end
-          values[a] = this.select(a).get(a) unless values.has_key?(a)
+          values[a] = this.get(selection) unless values.has_key?(a)
           values[a]
         end
       end
