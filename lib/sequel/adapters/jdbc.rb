@@ -162,7 +162,14 @@ module Sequel
         db.extend(Sequel::JDBC::SqlAnywhere::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::SqlAnywhere::Dataset
         drv
-      end
+      end,
+      :datadirect=>proc do |db|
+        com.ddtek.jdbc.openedge.OpenEdgeDriver
+        Sequel.require 'adapters/jdbc/openedge'
+        db.extend(Sequel::JDBC::OpenEdge::DatabaseMethods)
+        db.extend_datasets Sequel::OpenEdge::DatasetMethods
+        com.ddtek.jdbc.openedge.OpenEdgeDriver
+      end,
     }
     
     # Allowing loading the necessary JDBC support via a gem, which
