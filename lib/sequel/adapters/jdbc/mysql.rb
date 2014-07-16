@@ -26,6 +26,11 @@ module Sequel
           false
         end
 
+        # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
+        def disconnect_error?(exception, opts)
+          exception.message =~ /\ACommunications link failure/ || super
+        end
+
         # Get the last inserted id using LAST_INSERT_ID().
         def last_insert_id(conn, opts=OPTS)
           if stmt = opts[:stmt]
