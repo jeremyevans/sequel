@@ -32,7 +32,14 @@ module Sequel
         def convert_input_dataset(ds)
           ds = super
           if !ds.opts[:select] && (from = ds.opts[:from]) && from.length == 1 && !ds.opts[:join]
-            ds = ds.select(*ds.columns.map{|c| Sequel.qualify(ds.first_source, Sequel.identifier(c))})
+            if db.supports_schema_parsing?
+              cols = check_non_connection_error{db.schema(ds)}
+              if cols
+                cols = cols.map{|c, _| c}
+              end
+            end
+            cols ||= check_non_connection_error{ds.columns}
+            ds = ds.select(*cols.map{|c| Sequel.qualify(ds.first_source, Sequel.identifier(c))})
           end
           ds
         end

@@ -82,6 +82,22 @@ describe "Sequel::Plugins::ColumnSelect" do
     @Album.load(:id=>1).albums_dataset.sql.should == 'SELECT albums.* FROM albums INNER JOIN j ON (j.r = albums.id) WHERE (j.l = 1)'
   end
 
+  it "should use the schema to get columns if available" do
+    def @db.supports_schema_parsing?() true end
+    def @db.schema(t, *)
+      [[:t, {}], [:d, {}]]
+    end
+    @Album.plugin :column_select
+    @Album.dataset.sql.should == 'SELECT albums.t, albums.d FROM albums'
+  end
+
+  it "should handle case where schema parsing does not produce results" do
+    def @db.supports_schema_parsing?() true end
+    def @db.schema_parse_table(t, *) [] end
+    @Album.plugin :column_select
+    @Album.dataset.sql.should == 'SELECT albums.id, albums.a, albums.b, albums.c FROM albums'
+  end
+
   it "works correctly when loaded on model without a dataset" do
     c = Class.new(Sequel::Model)
     c.plugin :column_select
