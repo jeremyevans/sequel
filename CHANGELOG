@@ -1,5 +1,7 @@
 === HEAD
 
+* Add dataset_source_alias extension, for automatically aliasing datasets to their first source (jeremyevans)
+
 * Use qualified columns in the lazy_attributes plugin (jeremyevans)
 
 * Add column_select plugin, for using explicit column selections in model datasets (jeremyevans)
