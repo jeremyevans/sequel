@@ -1,5 +1,7 @@
 === HEAD
 
+* Set primary keys correctly for models even if datasets select specific columns (jeremyevans)
+
 * Add dataset_source_alias extension, for automatically aliasing datasets to their first source (jeremyevans)
 
 * Use qualified columns in the lazy_attributes plugin (jeremyevans)

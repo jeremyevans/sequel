@@ -900,6 +900,14 @@ module Sequel
         schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}
+
+          # Set the primary key(s) based on the schema information,
+          # if the schema information includes primary key information
+          if schema_array.all?{|k,v| v.has_key?(:primary_key)}
+            pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
+            pks.length > 0 ? set_primary_key(pks) : no_primary_key
+          end
+
           if (select = ds_opts[:select]) && !(select.length == 1 && select.first.is_a?(SQL::ColumnAll))
             # We don't remove the columns from the schema_hash,
             # as it's possible they will be used for typecasting
@@ -913,12 +921,6 @@ module Sequel
             # returned by the schema.
             cols = schema_array.collect{|k,v| k}
             set_columns(cols)
-            # Set the primary key(s) based on the schema information,
-            # if the schema information includes primary key information
-            if schema_array.all?{|k,v| v.has_key?(:primary_key)}
-              pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
-              pks.length > 0 ? set_primary_key(pks) : no_primary_key
-            end
             # Also set the columns for the dataset, so the dataset
             # doesn't have to do a query to get them.
             dataset.instance_variable_set(:@columns, cols)

@@ -905,6 +905,16 @@ describe "Model.db_schema" do
     @c.primary_key.should == :x
   end
   
+  specify "should automatically set a singular primary key even if there are specific columns selected" do
+    ds = @dataset.select(:a, :b, :x)
+    d = ds.db
+    def d.schema(table, *opts) [[:x, {:primary_key=>true}]] end
+    @c.primary_key.should == :id
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{:primary_key=>true}}
+    @c.primary_key.should == :x
+  end
+  
   specify "should automatically set the composite primary key based on the schema" do
     ds = @dataset
     d = ds.db
