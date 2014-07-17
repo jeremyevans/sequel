@@ -79,7 +79,8 @@ module Sequel
             composite_pk = true if primary_key.is_a?(Array)
             id_map = {}
             retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a) || o.frozen?}
-            model.select(*(Array(primary_key).map{|k| Sequel.qualify(model.table_name, k)} + [selection])).filter(primary_key=>id_map.keys).naked.each do |row|
+            predicate_key = composite_pk ? primary_key.map{|k| Sequel.qualify(model.table_name, k)} : Sequel.qualify(model.table_name, primary_key)
+            model.select(*(Array(primary_key).map{|k| Sequel.qualify(model.table_name, k)} + [selection])).where(predicate_key=>id_map.keys).naked.each do |row|
               obj = id_map[composite_pk ? row.values_at(*primary_key) : row[primary_key]]
               if obj && !obj.values.has_key?(a)
                 obj.values[a] = row[a]

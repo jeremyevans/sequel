@@ -118,8 +118,8 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.name}.should == %w'1 2'
     ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
     sqls = @db.sqls
-    ['SELECT la.id, la.name FROM la WHERE (id IN (1, 2))',
-     'SELECT la.id, la.name FROM la WHERE (id IN (2, 1))'].should include(sqls.pop)
+    ['SELECT la.id, la.name FROM la WHERE (la.id IN (1, 2))',
+     'SELECT la.id, la.name FROM la WHERE (la.id IN (2, 1))'].should include(sqls.pop)
     sqls.should == ['SELECT la.id FROM la']
   end
 
@@ -127,7 +127,7 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms = @c.all
     ms.first.freeze
     ms.map{|m| m.name}.should == %w'1 2'
-    @db.sqls.should == ['SELECT la.id FROM la', 'SELECT la.name FROM la WHERE (id = 1) LIMIT 1', 'SELECT la.id, la.name FROM la WHERE (id IN (2))']
+    @db.sqls.should == ['SELECT la.id FROM la', 'SELECT la.name FROM la WHERE (id = 1) LIMIT 1', 'SELECT la.id, la.name FROM la WHERE (la.id IN (2))']
   end
 
   it "should add the accessors to a module included in the class, so they can be easily overridden" do
@@ -141,8 +141,8 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.name}.should == %w'1-blah 2-blah'
     ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
     sqls = @db.sqls
-    ['SELECT la.id, la.name FROM la WHERE (id IN (1, 2))',
-     'SELECT la.id, la.name FROM la WHERE (id IN (2, 1))'].should include(sqls.pop)
+    ['SELECT la.id, la.name FROM la WHERE (la.id IN (1, 2))',
+     'SELECT la.id, la.name FROM la WHERE (la.id IN (2, 1))'].should include(sqls.pop)
     sqls.should == ['SELECT la.id FROM la']
   end
 
@@ -156,8 +156,8 @@ describe "Sequel::Plugins::LazyAttributes" do
     ms.map{|m| m.deserialized_values}.should == [{:name=>3}, {:name=>6}]
     ms.map{|m| m.name}.should == [3,6]
     sqls = @db.sqls
-    ['SELECT la.id, la.name FROM la WHERE (id IN (1, 2))',
-     'SELECT la.id, la.name FROM la WHERE (id IN (2, 1))'].should include(sqls.pop)
+    ['SELECT la.id, la.name FROM la WHERE (la.id IN (1, 2))',
+     'SELECT la.id, la.name FROM la WHERE (la.id IN (2, 1))'].should include(sqls.pop)
     sqls.should == ['SELECT la.id FROM la']
     m = @ds.first
     m.values.should == {:id=>1}
