@@ -908,10 +908,10 @@ describe "Model.db_schema" do
   specify "should automatically set a singular primary key even if there are specific columns selected" do
     ds = @dataset.select(:a, :b, :x)
     d = ds.db
-    def d.schema(table, *opts) [[:x, {:primary_key=>true}]] end
+    def d.schema(table, *opts) [[:a, {:primary_key=>false}], [:b, {:primary_key=>false}], [:x, {:primary_key=>true}]] end
     @c.primary_key.should == :id
     @c.dataset = ds
-    @c.db_schema.should == {:x=>{:primary_key=>true}}
+    @c.db_schema.should == {:a=>{:primary_key=>false}, :b=>{:primary_key=>false}, :x=>{:primary_key=>true}}
     @c.primary_key.should == :x
   end
   
