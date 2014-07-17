@@ -105,6 +105,7 @@ module Sequel
           @cti_table_map = opts[:table_map] || {}
           @cti_model_map = opts[:model_map]
           set_dataset_cti_row_proc
+          set_dataset(dataset.select(*columns.map{|c| Sequel.qualify(table_name, Sequel.identifier(c))}))
         end
       end
 
@@ -163,7 +164,7 @@ module Sequel
             # Need to set dataset and columns before calling super so that
             # the main column accessor module is included in the class before any
             # plugin accessor modules (such as the lazy attributes accessor module).
-            set_dataset(ds.join(table, [pk]))
+            set_dataset(ds.join(table, pk=>pk).select_append(*(columns - [primary_key]).map{|c| Sequel.qualify(table, Sequel.identifier(c))}))
             set_columns(self.columns)
           end
           super

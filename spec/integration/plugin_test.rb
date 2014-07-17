@@ -1,8 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-# DB2 does not seem to support USING joins in every version; it seems to be
-# valid expression in DB2 iSeries UDB though.
-unless !DB.dataset.supports_join_using? || Sequel.guarded?(:db2)
 describe "Class Table Inheritance Plugin" do
   before(:all) do
     @db = DB
@@ -37,7 +34,7 @@ describe "Class Table Inheritance Plugin" do
     class ::Executive < Manager
     end 
     class ::Staff < Employee
-      many_to_one :manager, :qualify=>false
+      many_to_one :manager
     end 
     
     @i1 =@db[:employees].insert(:name=>'E', :kind=>'Employee')
@@ -96,10 +93,10 @@ describe "Class Table Inheritance Plugin" do
   end
   
   specify "should handle associations only defined in subclasses" do
-    Employee.filter(:id=>@i2).all.first.manager.id.should == @i4
+    Employee.filter(:employees__id=>@i2).all.first.manager.id.should == @i4
   end
 
-  cspecify "should insert rows into all tables", [proc{|db| db.sqlite_version < 30709}, :sqlite] do
+  specify "should insert rows into all tables" do
     e = Executive.create(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
     i = e.id
     @db[:employees][:id=>i].should == {:id=>i, :name=>'Ex2', :kind=>'Executive'}
@@ -138,12 +135,11 @@ describe "Class Table Inheritance Plugin" do
     Executive.limit(1).eager(:staff_members).first.staff_members.should == [Staff[@i2]]
   end
   
-  cspecify "should handle eagerly graphing one_to_many relationships", [proc{|db| db.sqlite_version < 30709}, :sqlite] do
+  specify "should handle eagerly graphing one_to_many relationships" do
     es = Executive.limit(1).eager_graph(:staff_members).all
     es.should == [Executive[@i4]]
     es.map{|x| x.staff_members}.should == [[Staff[@i2]]]
   end
-end
 end
 
 describe "Many Through Many Plugin" do
