@@ -222,7 +222,7 @@ begin
   end
 rescue => e
   raise e if backtrace
-  error_proc["Error: #{e.class}: #{e.message}#{e.backtrace.first}"]
+  error_proc["Error: #{e.class}: #{e.message}\n#{e.backtrace.first}"]
 end
 
 if !ARGV.empty? 
