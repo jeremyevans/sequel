@@ -169,6 +169,11 @@ module Sequel
       "#<#{visible_class_name}: #{sql.inspect}>"
     end
     
+    # Whether this dataset is a joined dataset (multiple FROM tables or any JOINs).
+    def joined_dataset?
+     !!((opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join])
+    end
+
     # The alias to use for the row_number column, used when emulating OFFSET
     # support and for eager limit strategies
     def row_number_column

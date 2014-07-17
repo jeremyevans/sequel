@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#joined_dataset? a public method (jeremyevans)
+
 * Allow external jdbc, odbc, and do subadapters to be loaded automatically (jeremyevans)
 
 * Recognize another disconnect error in the jdbc/mysql adapter (jeremyevans)

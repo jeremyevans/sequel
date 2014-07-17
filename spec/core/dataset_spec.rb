@@ -4879,3 +4879,23 @@ describe "Dataset emulated complex expression operators" do
     @ds.literal(~@n).should == "((0 - x) - 1)"
   end
 end
+
+describe "#joined_dataset?" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+
+  it "should be false if the dataset has 0 or 1 from table" do
+    @ds.joined_dataset?.should == false
+    @ds.from(:a).joined_dataset?.should == false
+  end
+
+  it "should be true if the dataset has 2 or more from tables" do
+    @ds.from(:a, :b).joined_dataset?.should == true
+    @ds.from(:a, :b, :c).joined_dataset?.should == true
+  end
+
+  it "should be true if the dataset has any join tables" do
+    @ds.from(:a).cross_join(:b).joined_dataset?.should == true
+  end
+end

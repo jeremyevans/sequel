@@ -1135,11 +1135,6 @@ module Sequel
       "#{join_type.to_s.gsub(UNDERSCORE, SPACE).upcase} JOIN"
     end
 
-    # Whether this dataset is a joined dataset
-    def joined_dataset?
-     (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
-    end
-
     # Append a literalization of the array to SQL string.
     # Treats as an expression if an array of all two pairs, or as a SQL array otherwise.
     def literal_array_append(sql, v)
