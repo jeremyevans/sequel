@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix qualification of columns when Dataset#graph automatically wraps the initially graphed dataset in a subselect (jeremyevans)
+
 * Make Dataset#joined_dataset? a public method (jeremyevans)
 
 * Allow external jdbc, odbc, and do subadapters to be loaded automatically (jeremyevans)

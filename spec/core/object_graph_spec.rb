@@ -58,6 +58,11 @@ describe Sequel::Dataset, "graphing" do
       ds.sql.should == 'SELECT points.id, points.x AS y, lines.id AS lines_id, lines.x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     end
 
+    it "should requalify currently selected columns in new graph if current dataset joins tables" do
+      ds = @ds1.cross_join(:lines).select(:points__id, :lines__id___lid, :lines__x, :lines__y).graph(@ds3, :x=>:id)
+      ds.sql.should == 'SELECT points.id, points.lid, points.x, points.y, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM (SELECT points.id, lines.id AS lid, lines.x, lines.y FROM points CROSS JOIN lines) AS points LEFT OUTER JOIN graphs ON (graphs.x = points.id)'
+    end
+
     it "should raise error if currently selected expressions cannot be handled" do
       proc{@ds1.select(1).graph(@ds2, :x=>:id)}.should raise_error(Sequel::Error)
     end

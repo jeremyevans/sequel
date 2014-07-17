@@ -95,7 +95,8 @@ module Sequel
       ds = self
 
       # Use a from_self if this is already a joined table (or from_self specifically disabled for graphs)
-      if (@opts[:graph_from_self] != false && !@opts[:graph] && (@opts[:from].length > 1 || @opts[:join]))
+      if (@opts[:graph_from_self] != false && !@opts[:graph] && joined_dataset?)
+        from_selfed = true
         implicit_qualifier = options[:from_self_alias] || first_source
         ds = ds.from_self(:alias=>implicit_qualifier)
       end
@@ -109,49 +110,46 @@ module Sequel
       # Whether to add the columns to the list of column aliases
       add_columns = !ds.opts.include?(:graph_aliases)
 
-      # Setup the initial graph data structure if it doesn't exist
       if graph = opts[:graph]
         opts[:graph] = graph = graph.dup
         select = opts[:select].dup
         [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k] = graph[k].dup}
       else
+        # Setup the initial graph data structure if it doesn't exist
         qualifier = ds.first_source_alias
         master = alias_symbol(qualifier)
         raise_alias_error.call if master == table_alias
+
         # Master hash storing all .graph related information
         graph = opts[:graph] = {}
+
         # Associates column aliases back to tables and columns
         column_aliases = graph[:column_aliases] = {}
+
         # Associates table alias (the master is never aliased)
         table_aliases = graph[:table_aliases] = {master=>self}
+
         # Keep track of the alias numbers used
         ca_num = graph[:column_alias_num] = Hash.new(0)
+
         # All columns in the master table are never
         # aliased, but are not included if set_graph_aliases
         # has been used.
         if add_columns
           if (select = @opts[:select]) && !select.empty? && !(select.length == 1 && (select.first.is_a?(SQL::ColumnAll)))
-            select = select.each do |sel|
-              column = case sel
-              when Symbol
-                _, c, a = split_symbol(sel)
-                (a || c).to_sym
-              when SQL::Identifier
-                sel.value.to_sym
-              when SQL::QualifiedIdentifier
-                column = sel.column
-                column = column.value if column.is_a?(SQL::Identifier)
-                column.to_sym
-              when SQL::AliasedExpression
-                column = sel.alias
-                column = column.value if column.is_a?(SQL::Identifier)
-                column.to_sym
-              else
-                raise Error, "can't figure out alias to use for graphing for #{sel.inspect}"
-              end
+            select = select.map do |sel|
+              raise Error, "can't figure out alias to use for graphing for #{sel.inspect}" unless column = _hash_key_symbol(sel)
               column_aliases[column] = [master, column]
+              if from_selfed
+                # Initial dataset was wrapped in subselect, selected all
+                # columns in the subselect, qualified by the subselect alias.
+                Sequel.qualify(qualifier, Sequel.identifier(column))
+              else
+                # Initial dataset not wrapped in subslect, just make
+                # sure columns are qualified in some way.
+                qualified_expression(sel, qualifier)
+              end
             end
-            select = qualified_expression(select, qualifier)
           else
             select = columns.map do |column|
               column_aliases[column] = [master, column]
