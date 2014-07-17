@@ -783,6 +783,12 @@ describe Sequel::Model, "#this" do
     instance.this.sql.should == "SELECT * FROM examples WHERE (a = 3) LIMIT 1"
   end
 
+  it "should use a qualified primary key if the dataset is joined" do
+    @example.dataset = @example.dataset.cross_join(:a)
+    instance = @example.load(:id => 3)
+    instance.this.sql.should == "SELECT * FROM examples CROSS JOIN a WHERE (examples.id = 3) LIMIT 1"
+  end
+
   it "should support composite primary keys" do
     @example.set_primary_key [:x, :y]
     instance = @example.load(:x => 4, :y => 5)

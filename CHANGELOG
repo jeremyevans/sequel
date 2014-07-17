@@ -1,5 +1,7 @@
 === HEAD
 
+* Qualify primary keys for models with joined datasets when looking up model instances by primary key (jeremyevans)
+
 * Fix qualification of columns when Dataset#graph automatically wraps the initially graphed dataset in a subselect (jeremyevans)
 
 * Make Dataset#joined_dataset? a public method (jeremyevans)

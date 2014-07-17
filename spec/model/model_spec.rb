@@ -824,10 +824,10 @@ describe Sequel::Model, ".[]" do
     DB.sqls.should == ["SELECT * FROM items WHERE name = 'sharon'"]
   end
 
-  it "should return the first record for the given pk for a filtered dataset" do
-    @c.dataset = @c.dataset.filter(:active=>true)
+  it "should use a qualified primary key if the dataset is joined" do
+    @c.dataset = @c.dataset.cross_join(:a)
     @c[1].should == @c.load(:name => 'sharon', :id => 1)
-    DB.sqls.should == ["SELECT * FROM items WHERE ((active IS TRUE) AND (id = 1)) LIMIT 1"]
+    DB.sqls.should == ["SELECT * FROM items CROSS JOIN a WHERE (items.id = 1) LIMIT 1"]
   end
 
   it "should work correctly for composite primary key specified as array" do

@@ -1038,6 +1038,8 @@ module Sequel
           ds.literal_append(sql, pk)
           ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
+        elsif dataset.joined_dataset?
+          first_where(qualified_primary_key_hash(pk))
         else
           first_where(primary_key_hash(pk))
         end
@@ -1645,7 +1647,16 @@ module Sequel
       #   Artist[1].this
       #   # SELECT * FROM artists WHERE (id = 1) LIMIT 1
       def this
-        @this ||= use_server(model.instance_dataset.filter(pk_hash))
+        return @this if @this
+        raise Error, "No dataset for model #{model}" unless ds = model.instance_dataset
+
+        cond = if ds.joined_dataset?
+          model.qualified_primary_key_hash(pk)
+        else
+          pk_hash
+        end
+
+        @this = use_server(ds.where(cond))
       end
       
       # Runs #set with the passed hash and then runs save_changes.
