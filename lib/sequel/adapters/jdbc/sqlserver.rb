@@ -1,7 +1,17 @@
+Sequel::JDBC.load_driver('com.microsoft.sqlserver.jdbc.SQLServerDriver')
 Sequel.require 'adapters/jdbc/mssql'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:sqlserver] = proc do |db|
+        db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
+        db.extend_datasets Sequel::MSSQL::DatasetMethods
+        db.send(:set_mssql_unicode_strings)
+        com.microsoft.sqlserver.jdbc.SQLServerDriver
+      end
+    end
+
     # Database and Dataset instance methods for SQLServer specific
     # support via JDBC.
     module SQLServer

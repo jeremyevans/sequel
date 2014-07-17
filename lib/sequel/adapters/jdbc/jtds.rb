@@ -1,7 +1,17 @@
+Sequel::JDBC.load_driver('Java::net.sourceforge.jtds.jdbc.Driver', :JTDS)
 Sequel.require 'adapters/jdbc/mssql'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:jtds] = proc do |db|
+        db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::JTDS::Dataset
+        db.send(:set_mssql_unicode_strings)
+        Java::net.sourceforge.jtds.jdbc.Driver
+      end
+    end
+
     # Database and Dataset instance methods for JTDS specific
     # support via JDBC.
     module JTDS

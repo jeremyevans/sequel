@@ -1,9 +1,17 @@
+Sequel::DataObjects.load_driver 'do_postgres'
 Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   Postgres::CONVERTED_EXCEPTIONS << ::DataObjects::Error
   
   module DataObjects
+    Sequel.synchronize do
+      DATABASE_SETUP[:postgres] = proc do |db|
+        db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
+        db.extend_datasets Sequel::Postgres::DatasetMethods
+      end
+    end
+
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
     # database via DataObjects.
     module Postgres

@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow external jdbc, odbc, and do subadapters to be loaded automatically (jeremyevans)
+
 * Recognize another disconnect error in the jdbc/mysql adapter (jeremyevans)
 
 * Set primary keys correctly for models even if datasets select specific columns (jeremyevans)

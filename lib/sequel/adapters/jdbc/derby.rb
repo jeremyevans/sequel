@@ -1,7 +1,16 @@
+Sequel::JDBC.load_driver('org.apache.derby.jdbc.EmbeddedDriver', :Derby)
 Sequel.require 'adapters/jdbc/transactions'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:derby] = proc do |db|
+        db.extend(Sequel::JDBC::Derby::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Derby::Dataset
+        org.apache.derby.jdbc.EmbeddedDriver
+      end
+    end
+
     # Database and Dataset support for Derby databases accessed via JDBC.
     module Derby
       # Instance methods for Derby Database objects accessed via JDBC.

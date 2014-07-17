@@ -22,23 +22,10 @@ module Sequel
       return scheme if scheme.is_a?(Class)
 
       scheme = scheme.to_s.gsub('-', '_').to_sym
-      
-      unless klass = ADAPTER_MAP[scheme]
-        # attempt to load the adapter file
-        begin
-          require "sequel/adapters/#{scheme}"
-        rescue LoadError => e
-          raise Sequel.convert_exception_class(e, AdapterNotFound)
-        end
-        
-        # make sure we actually loaded the adapter
-        unless klass = ADAPTER_MAP[scheme]
-          raise AdapterNotFound, "Could not load #{scheme} adapter: adapter class not registered in ADAPTER_MAP"
-        end
-      end
-      klass
+
+      load_adapter(scheme)
     end
-        
+
     # Returns the scheme symbol for the Database class.
     def self.adapter_scheme
       @scheme
@@ -90,6 +77,40 @@ module Sequel
       db
     end
     
+    # Load the adapter from the file system.  Raises Sequel::AdapterNotFound
+    # if the adapter cannot be loaded, or if the adapter isn't registered
+    # correctly after being loaded. Options:
+    # :map :: The Hash in which to look for an already loaded adapter (defaults to ADAPTER_MAP).
+    # :subdir :: The subdirectory of sequel/adapters to look in, only to be used for loading
+    #            subadapters.
+    def self.load_adapter(scheme, opts=OPTS)
+      map = opts[:map] || ADAPTER_MAP
+      if subdir = opts[:subdir]
+        file = "#{subdir}/#{scheme}"
+      else
+        file = scheme
+      end
+      
+      unless obj = Sequel.synchronize{map[scheme]}
+        # attempt to load the adapter file
+        begin
+          require "sequel/adapters/#{file}"
+        rescue LoadError => e
+          # If subadapter file doesn't exist, just return, 
+          # using the main adapter class without database customizations.
+          return if subdir
+          raise Sequel.convert_exception_class(e, AdapterNotFound)
+        end
+        
+        # make sure we actually loaded the adapter
+        unless obj = Sequel.synchronize{map[scheme]}
+          raise AdapterNotFound, "Could not load #{file} adapter: adapter class not registered in ADAPTER_MAP"
+        end
+      end
+
+      obj
+    end
+
     # Sets the adapter scheme for the Database class. Call this method in
     # descendants of Database to allow connection using a URL. For example the
     # following:
@@ -104,7 +125,7 @@ module Sequel
     #   Sequel.connect('mydb://user:password@dbserver/mydb')
     def self.set_adapter_scheme(scheme) # :nodoc:
       @scheme = scheme
-      ADAPTER_MAP[scheme] = self
+      Sequel.synchronize{ADAPTER_MAP[scheme] = self}
     end
     private_class_method :set_adapter_scheme
     

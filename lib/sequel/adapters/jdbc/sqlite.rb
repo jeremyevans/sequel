@@ -1,7 +1,17 @@
+Sequel::JDBC.load_driver('org.sqlite.JDBC', :SQLite3)
 Sequel.require 'adapters/shared/sqlite'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:sqlite] = proc do |db|
+        db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
+        db.extend_datasets Sequel::SQLite::DatasetMethods
+        db.set_integer_booleans
+        org.sqlite.JDBC
+      end
+    end
+
     # Database and Dataset support for SQLite databases accessed via JDBC.
     module SQLite
       # Instance methods for SQLite Database objects accessed via JDBC.

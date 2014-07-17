@@ -2,6 +2,14 @@ Sequel.require 'adapters/shared/mssql'
 
 module Sequel
   module ODBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:mssql] = proc do |db|
+        db.extend Sequel::ODBC::MSSQL::DatabaseMethods
+        db.dataset_class = Sequel::ODBC::MSSQL::Dataset
+        db.send(:set_mssql_unicode_strings)
+      end
+    end
+
     # Database and Dataset instance methods for MSSQL specific
     # support via ODBC.
     module MSSQL

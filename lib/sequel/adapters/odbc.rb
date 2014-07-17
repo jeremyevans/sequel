@@ -2,6 +2,10 @@ require 'odbc'
 
 module Sequel
   module ODBC
+    # Contains procs keyed on subadapter type that extend the
+    # given database object so it supports the correct database type.
+    DATABASE_SETUP = {}
+      
     class Database < Sequel::Database
       set_adapter_scheme :odbc
 
@@ -61,20 +65,8 @@ module Sequel
       private
       
       def adapter_initialize
-        case @opts[:db_type]
-        when 'mssql'
-          Sequel.require 'adapters/odbc/mssql'
-          extend Sequel::ODBC::MSSQL::DatabaseMethods
-          self.dataset_class = Sequel::ODBC::MSSQL::Dataset
-          set_mssql_unicode_strings
-        when 'progress'
-          Sequel.require 'adapters/shared/progress'
-          extend Sequel::Progress::DatabaseMethods
-          extend_datasets(Sequel::Progress::DatasetMethods)
-        when 'db2'
-          Sequel.require 'adapters/shared/db2'
-          extend ::Sequel::DB2::DatabaseMethods
-          extend_datasets ::Sequel::DB2::DatasetMethods
+        if (db_type = @opts[:db_type]) && (prok = Sequel::Database.load_adapter(db_type.to_sym, :map=>DATABASE_SETUP, :subdir=>'odbc'))
+          prok.call(self)
         end
       end
 

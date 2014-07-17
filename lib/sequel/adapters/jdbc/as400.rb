@@ -1,8 +1,17 @@
+Sequel::JDBC.load_driver('com.ibm.as400.access.AS400JDBCDriver')
 Sequel.require 'adapters/jdbc/transactions'
 Sequel.require 'adapters/utils/emulate_offset_with_row_number'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:as400] = proc do |db|
+        db.extend(Sequel::JDBC::AS400::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::AS400::Dataset
+        com.ibm.as400.access.AS400JDBCDriver
+      end
+    end
+
     # Database and Dataset support for AS400 databases accessed via JDBC.
     module AS400
       # Instance methods for AS400 Database objects accessed via JDBC.

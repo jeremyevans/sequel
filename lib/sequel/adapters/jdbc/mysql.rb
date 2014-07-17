@@ -1,7 +1,16 @@
+Sequel::JDBC.load_driver('com.mysql.jdbc.Driver', :MySQL)
 Sequel.require 'adapters/shared/mysql'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:mysql] = proc do |db|
+        db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
+        db.extend_datasets Sequel::MySQL::DatasetMethods
+        com.mysql.jdbc.Driver
+      end
+    end
+
     # Database and Dataset instance methods for MySQL specific
     # support via JDBC.
     module MySQL

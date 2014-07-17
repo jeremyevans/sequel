@@ -1,7 +1,16 @@
+Sequel::DataObjects.load_driver 'do_sqlite3'
 Sequel.require 'adapters/shared/sqlite'
 
 module Sequel
   module DataObjects
+    Sequel.synchronize do
+      DATABASE_SETUP[:sqlite3] = proc do |db|
+        db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
+        db.extend_datasets Sequel::SQLite::DatasetMethods
+        db.set_integer_booleans
+      end
+    end
+
     # Database and Dataset support for SQLite databases accessed via DataObjects.
     module SQLite
       # Instance methods for SQLite Database objects accessed via DataObjects.
