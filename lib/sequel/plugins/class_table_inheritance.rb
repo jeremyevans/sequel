@@ -31,12 +31,20 @@ module Sequel
     # When using the class_table_inheritance plugin, subclasses use joined 
     # datasets:
     #
-    #   Employee.dataset.sql  # SELECT * FROM employees
-    #   Manager.dataset.sql   # SELECT * FROM employees
-    #                         # INNER JOIN managers USING (id)
-    #   Executive.dataset.sql # SELECT * FROM employees 
-    #                         # INNER JOIN managers USING (id)
-    #                         # INNER JOIN executives USING (id)
+    #   Employee.dataset.sql
+    #   # SELECT employees.id, employees.name, employees.kind
+    #   # FROM employees
+    #
+    #   Manager.dataset.sql
+    #   # SELECT employees.id, employees.name, employees.kind, managers.num_staff
+    #   # FROM employees
+    #   # JOIN managers ON (managers.id = employees.id)
+    #
+    #   Executive.dataset.sql
+    #   # SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers
+    #   # FROM employees
+    #   # JOIN managers ON (managers.id = employees.id)
+    #   # JOIN executives ON (executives.id = managers.id)
     #
     # This allows Executive.all to return instances with all attributes
     # loaded.  The plugin overrides the deleting, inserting, and updating
