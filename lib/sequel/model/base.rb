@@ -1785,7 +1785,7 @@ module Sequel
       # the record should be refreshed from the database.
       def _insert
         ds = _insert_dataset
-        if !ds.opts[:select] and ds.supports_insert_select? and h = _insert_select_raw(ds)
+        if _use_insert_select?(ds) && (h = _insert_select_raw(ds))
           _save_set_values(h)
           nil
         else
@@ -1946,6 +1946,11 @@ module Sequel
       # Update this instances dataset with the supplied column hash.
       def _update_without_checking(columns)
         _update_dataset.update(columns)
+      end
+
+      # Whether to use insert_select when inserting a new row.
+      def _use_insert_select?(ds)
+        (!ds.opts[:select] || ds.opts[:returning]) && ds.supports_insert_select? 
       end
 
       # Internal validation method.  If +raise_errors+ is +true+, hook

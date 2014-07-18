@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Model#save use insert_select if the dataset used for inserting already uses returning (jeremyevans)
+
 * Add Dataset#unqualified_column_for helper method, returning unqualified version of possibly qualified column (jeremyevans)
 
 * Calling Dataset#returning when the Database does not support or emulate RETURNING now raises an Error (jeremyevans)
