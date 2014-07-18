@@ -664,13 +664,13 @@ module Sequel
         raise(Error, "SQL Server versions 2000 and earlier do not support the OUTPUT clause") unless supports_output_clause?
         output = {}
         case values
-          when Hash
-            output[:column_list], output[:select_list] = values.keys, values.values
-          when Array
-            output[:select_list] = values
+        when Hash
+          output[:column_list], output[:select_list] = values.keys, values.values
+        when Array
+          output[:select_list] = values
         end
         output[:into] = into
-        clone({:output => output})
+        clone(:output => output)
       end
 
       # MSSQL uses [] to quote identifiers.
