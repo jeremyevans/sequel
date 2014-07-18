@@ -7,6 +7,14 @@ module Sequel
     # in a migration concurrently while running the application,
     # without it affecting the operation of the application.
     #
+    # Note that by default on databases that supporting RETURNING,
+    # using explicit column selections will cause instance creations
+    # to use two queries (insert and refresh) instead of a single
+    # query using RETURNING.  You can use the insert_returning_select
+    # plugin to automatically use RETURNING for instance creations
+    # for models where the column_select plugin automatically sets up
+    # an explicit column selection.
+    #
     # Usage:
     #
     #   # Make all model subclasses explicitly select qualified columns

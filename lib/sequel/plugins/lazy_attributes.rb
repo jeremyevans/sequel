@@ -17,6 +17,13 @@ module Sequel
     #
     #   # You can specify multiple columns to lazily load:
     #   Album.plugin :lazy_attributes, :review, :tracklist
+    #
+    # Note that by default on databases that supporting RETURNING,
+    # using explicit column selections will cause instance creations
+    # to use two queries (insert and refresh) instead of a single
+    # query using RETURNING.  You can use the insert_returning_select
+    # plugin to automatically use RETURNING for instance creations
+    # for models using the lazy_attributes plugin.
     module LazyAttributes
       # Lazy attributes requires the tactical_eager_loading plugin
       def self.apply(model, *attrs)
