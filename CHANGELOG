@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#unqualified_column_for helper method, returning unqualified version of possibly qualified column (jeremyevans)
+
 * Calling Dataset#returning when the Database does not support or emulate RETURNING now raises an Error (jeremyevans)
 
 * Emulate RETURNING on Microsoft SQL Server using OUTPUT, as long as only simple column references are used (jeremyevans)

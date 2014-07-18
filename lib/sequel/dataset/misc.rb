@@ -197,6 +197,17 @@ module Sequel
       end
     end
 
+    # This returns an SQL::Identifier or SQL::AliasedExpression containing an
+    # SQL identifier that represents the unqualified column for the given value.
+    # The given value should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier,
+    # or SQL::AliasedExpression containing one of those.  In other cases, this
+    # returns nil
+    def unqualified_column_for(v)
+      unless v.is_a?(String)
+        _unqualified_column_for(v)
+      end
+    end
+
     # Creates a unique table alias that hasn't already been used in the dataset.
     # table_alias can be any type of object accepted by alias_symbol.
     # The symbol returned will be the implicit alias in the argument,
@@ -236,6 +247,27 @@ module Sequel
     end
 
     private
+
+    # Internal recursive version of unqualified_column_for, handling Strings inside
+    # of other objects.
+    def _unqualified_column_for(v)
+      case v
+      when Symbol
+        _, c, a = Sequel.split_symbol(v)
+        c = Sequel.identifier(c)
+        a ? c.as(a) : c
+      when String
+        Sequel.identifier(v)
+      when SQL::Identifier
+        v
+      when SQL::QualifiedIdentifier
+        _unqualified_column_for(v.column)
+      when SQL::AliasedExpression
+        if expr = unqualified_column_for(v.expression)
+          SQL::AliasedExpression.new(expr, v.alias)
+        end
+      end
+    end
 
     # Return the class name for this dataset, but skip anonymous classes
     def visible_class_name

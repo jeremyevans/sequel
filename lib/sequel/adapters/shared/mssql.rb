@@ -681,8 +681,10 @@ module Sequel
       # Emulate RETURNING using the output clause.  This only handles values that are simple column references.
       def returning(*values)
         values = values.map do |v|
-          raise Error, "cannot emulate RETURNING via OUTPUT for value: #{v.inspect}" if v.is_a?(String)
-          _returning_output_value(v)
+          unless r = unqualified_column_for(v)
+            raise(Error, "cannot emulate RETURNING via OUTPUT for value: #{v.inspect}")
+          end
+          r
         end
         clone(:returning=>values)
       end
@@ -1016,27 +1018,6 @@ module Sequel
         end
       end
 
-      # Convert RETURNING value into appropriate OUTPUT value (unqualified).  Note that
-      # this only supports simple column references.
-      def _returning_output_value(v)
-        case v
-        when Symbol
-          _, c, a = Sequel.split_symbol(v)
-          c = Sequel.identifier(c)
-          a ? c.as(a) : c
-        when String
-          Sequel.identifier(v)
-        when SQL::Identifier
-          _returning_output_value(v.value)
-        when SQL::QualifiedIdentifier
-          _returning_output_value(v.column)
-        when SQL::AliasedExpression
-          SQL::AliasedExpression.new(_returning_output_value(v.expression), v.alias)
-        else
-          raise Error, "cannot emulate RETURNING via OUTPUT for value: #{v.inspect}"
-        end
-      end
-      
       # MSSQL supports millisecond timestamp precision.
       def timestamp_precision
         3

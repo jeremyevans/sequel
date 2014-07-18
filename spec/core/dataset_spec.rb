@@ -4905,3 +4905,38 @@ describe "#joined_dataset?" do
     @ds.from(:a).cross_join(:b).joined_dataset?.should == true
   end
 end
+
+describe "#unqualified_column_for" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+
+  it "should handle Symbols" do
+    @ds.unqualified_column_for(:a).should == Sequel.identifier('a')
+    @ds.unqualified_column_for(:b__a).should == Sequel.identifier('a')
+    @ds.unqualified_column_for(:a___c).should == Sequel.identifier('a').as('c')
+    @ds.unqualified_column_for(:b__a___c).should == Sequel.identifier('a').as('c')
+  end
+
+  it "should handle SQL::Identifiers" do
+    @ds.unqualified_column_for(Sequel.identifier(:a)).should == Sequel.identifier(:a)
+  end
+
+  it "should handle SQL::QualifiedIdentifiers" do
+    @ds.unqualified_column_for(Sequel.qualify(:b, :a)).should == Sequel.identifier('a')
+  end
+
+  it "should handle SQL::AliasedExpressions" do
+    @ds.unqualified_column_for(Sequel.qualify(:b, :a).as(:c)).should == Sequel.identifier('a').as(:c)
+  end
+
+  it "should return nil for other objects" do
+    @ds.unqualified_column_for(Object.new).should == nil
+    @ds.unqualified_column_for('a').should == nil
+  end
+
+  it "should return nil for other objects inside SQL::AliasedExpressions" do
+    @ds.unqualified_column_for(Sequel.as(Object.new, 'a')).should == nil
+    @ds.unqualified_column_for(Sequel.as('a', 'b')).should == nil
+  end
+end
