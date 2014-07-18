@@ -201,6 +201,7 @@ END
     bin(:args=>'-D -d', :stderr=>true).should == "Error: Cannot specify -D and -d together\n"
     bin(:args=>'-m foo -d', :stderr=>true).should == "Error: Cannot specify -m and -d together\n"
     bin(:args=>'-S foo -d', :stderr=>true).should == "Error: Cannot specify -S and -d together\n"
+    bin(:args=>'-S foo -C', :stderr=>true).should == "Error: Cannot specify -S and -C together\n"
   end
 
   it "should use a mock database if no database is given" do

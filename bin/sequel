@@ -41,6 +41,7 @@ options = OptionParser.new do |opts|
   
   opts.on("-C", "--copy-databases", "copy one database to another") do 
     copy_databases = true
+    exclusive_options << :C
   end
   
   opts.on("-d", "--dump-migration", "print database migration to STDOUT") do 
