@@ -117,6 +117,12 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:id=>2).first[:numb].should == 20
   end
 
+  specify "should support bound variables with insert_select" do
+    @ds.call(:insert_select, {:n=>20}, :numb=>:$n).should == {:id=>2, :numb=>20}
+    @ds.count.should == 2
+    @ds.order(:id).map(:numb).should == [10, 20]
+  end if DB.dataset.supports_insert_select?
+
   specify "should support bound variables with delete" do
     @ds.filter(:numb=>:$n).call(:delete, :n=>10).should == 1
     @ds.count.should == 0
@@ -227,6 +233,12 @@ describe "Prepared Statements and Bound Arguments" do
     @db.call(:insert_n, :n=>20).should == 2
     @ds.filter(:id=>2).first[:numb].should == 20
   end
+
+  specify "should support prepared_statements with insert_select" do
+    @ds.prepare(:insert_select, :insert_select_n, :numb=>:$n).call(:n=>20).should == {:id=>2, :numb=>20}
+    @ds.count.should == 2
+    @ds.order(:id).map(:numb).should == [10, 20]
+  end if DB.dataset.supports_insert_select?
 
   specify "should support prepared statements with delete" do
     @ds.filter(:numb=>:$n).prepare(:delete, :delete_n)

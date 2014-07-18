@@ -3412,7 +3412,7 @@ describe "Dataset prepared statements and bound variables " do
   before do
     @db = Sequel.mock
     @ds = @db[:items]
-    meta_def(@ds, :insert_sql){|*v| "#{super(*v)}#{' RETURNING *' if opts.has_key?(:returning)}" }
+    meta_def(@ds, :insert_select_sql){|*v| "#{insert_sql(*v)} RETURNING *" }
   end
   
   specify "#call should take a type and bind hash and interpolate it" do

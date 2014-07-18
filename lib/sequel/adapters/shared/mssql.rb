@@ -623,7 +623,14 @@ module Sequel
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
       def insert_select(*values)
         return unless supports_insert_select?
-        naked.clone(default_server_opts(:sql=>output(nil, [SQL::ColumnAll.new(:inserted)]).insert_sql(*values))).single_record
+        with_sql_first(insert_select_sql(*values))
+      end
+
+      # Add OUTPUT clause unless there is already an existing output clause, then return
+      # the SQL to insert.
+      def insert_select_sql(*values)
+        ds = opts[:output] ? self : output(nil, [SQL::ColumnAll.new(:inserted)])
+        ds.insert_sql(*values)
       end
 
       # Specify a table for a SELECT ... INTO query.
@@ -843,16 +850,6 @@ module Sequel
         @db.schema(self).map{|k, v| k if v[:primary_key] == true}.compact.first
       end
 
-      # Use OUTPUT INSERTED.* to return all columns of the inserted row,
-      # for use with the prepared statement code.
-      def insert_output_sql(sql)
-        if @opts.has_key?(:returning)
-          sql << OUTPUT_INSERTED
-        else
-          output_sql(sql)
-        end
-      end
-
       # Handle CROSS APPLY and OUTER APPLY JOIN types
       def join_type_sql(join_type)
         case join_type
@@ -971,6 +968,7 @@ module Sequel
           end
         end
       end
+      alias insert_output_sql output_sql
       alias delete_output_sql output_sql
       alias update_output_sql output_sql
 
