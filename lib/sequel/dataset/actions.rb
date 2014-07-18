@@ -1022,8 +1022,12 @@ module Sequel
     def unaliased_identifier(c)
       case c
       when Symbol
-        c_table, column, _ = split_symbol(c)
-        c_table ? SQL::QualifiedIdentifier.new(c_table, column.to_sym) : column.to_sym
+        table, column, aliaz = split_symbol(c)
+        if aliaz
+          table ? SQL::QualifiedIdentifier.new(table, column) : Sequel.identifier(column)
+        else
+          c
+        end
       when SQL::AliasedExpression
         c.expression
       when SQL::OrderedExpression
