@@ -694,6 +694,7 @@ module Sequel
     #   DB[:items].returning(nil) # RETURNING NULL
     #   DB[:items].returning(:id, :name) # RETURNING id, name
     def returning(*values)
+      raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
       clone(:returning=>values)
     end
 

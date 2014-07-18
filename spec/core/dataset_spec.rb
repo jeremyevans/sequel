@@ -4354,9 +4354,10 @@ end
 
 describe "Dataset#returning" do
   before do
-    @ds = Sequel.mock(:fetch=>proc{|s| {:foo=>s}})[:t].returning(:foo)
+    @db = Sequel.mock(:fetch=>proc{|s| {:foo=>s}})
+    @db.extend_datasets{def supports_returning?(type) true end}
+    @ds = @db[:t].returning(:foo)
     @pr = proc do
-      def @ds.supports_returning?(*) true end
       sc = class << @ds; self; end
       Sequel::Dataset.def_sql_method(sc, :delete, %w'delete from where returning')
       Sequel::Dataset.def_sql_method(sc, :insert, %w'insert into columns values returning')
@@ -4393,6 +4394,11 @@ describe "Dataset#returning" do
     @ds.delete.should == [{:foo=>"DELETE FROM t RETURNING foo"}]
     @ds.insert(1).should == [{:foo=>"INSERT INTO t VALUES (1) RETURNING foo"}]
     @ds.update(:foo=>1).should == [{:foo=>"UPDATE t SET foo = 1 RETURNING foo"}]
+  end
+
+  specify "should raise an error if RETURNING is not supported" do
+    @db.extend_datasets{def supports_returning?(type) false end}
+    proc{@db[:t].returning}.should raise_error(Sequel::Error)
   end
 end
 
