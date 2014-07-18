@@ -56,6 +56,7 @@ describe "bin/sequel" do
     bin(:args=>'-c "print DB.tables.inspect"').should == '[]'
     DB.create_table(:a){Integer :a}
     bin(:args=>'-c "print DB.tables.inspect"').should == '[:a]'
+    bin(:args=>'-v -c "print DB.tables.inspect"').should == "sequel #{Sequel.version}\n[:a]"
   end
 
   it "-C should copy databases" do
@@ -188,7 +189,7 @@ END
     bin(:args=>'-t -c "lambda{lambda{lambda{raise \'foo\'}.call}.call}.call"', :stderr=>true).count("\n").should > 3
   end
 
-  it "-v should output the Sequel version" do
+  it "-v should output the Sequel version and exit if database is not given" do
     bin(:args=>"-v", :no_conn=>true).should == "sequel #{Sequel.version}\n"
   end
 
@@ -244,6 +245,7 @@ END
     bin(:post=>TMP_FILE).should == '[]'
     DB.create_table(:a){Integer :a}
     bin(:post=>TMP_FILE).should == '[:a]'
+    bin(:post=>TMP_FILE, :args=>'-v').should == "sequel #{Sequel.version}\n[:a]"
   end
 
   it "should run code provided on stdin" do

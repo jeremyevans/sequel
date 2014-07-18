@@ -11,6 +11,7 @@ env = nil
 migrate_dir = nil
 migrate_ver = nil
 backtrace = nil
+show_version = false
 test = true
 load_dirs = []
 exclusive_options = []
@@ -103,8 +104,7 @@ options = OptionParser.new do |opts|
   end
   
   opts.on_tail("-v", "--version", "Show version") do
-    puts "sequel #{Sequel.version}"
-    exit
+    show_version = true
   end
 end
 opts = options
@@ -141,6 +141,12 @@ end
 begin
   $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
   require 'sequel'
+  if show_version
+    puts "sequel #{Sequel.version}"
+    unless db || code
+      exit
+    end
+  end
 
   DB = connect_proc[db]
   load_dirs.each{|d| d.is_a?(Array) ? require(d.first) : Dir["#{d}/**/*.rb"].each{|f| load(f)}}
