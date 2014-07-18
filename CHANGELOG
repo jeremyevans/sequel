@@ -1,5 +1,7 @@
 === HEAD
 
+* Unalias aliased tables in Dataset#insert (jeremyevans)
+
 * Add insert_returning_select plugin, for setting up RETURNING for inserts for models selecting explicit columns (jeremyevans)
 
 * Make Model#save use insert_select if the dataset used for inserting already uses returning (jeremyevans)

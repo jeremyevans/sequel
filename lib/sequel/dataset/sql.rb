@@ -1085,7 +1085,11 @@ module Sequel
 
     def insert_into_sql(sql)
       sql << INTO
-      source_list_append(sql, @opts[:from])
+      if (f = @opts[:from]) && f.length == 1
+        identifier_append(sql, unaliased_identifier(f.first))
+      else
+        source_list_append(sql, f)
+      end
     end
 
     def insert_columns_sql(sql)

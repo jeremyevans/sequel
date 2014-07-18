@@ -3204,6 +3204,11 @@ describe "Dataset#insert_sql" do
   specify "should accept an array of columns and an LiteralString" do
     @ds.insert_sql([:a, :b, :c], Sequel.lit('VALUES (1, 2, 3)')).should == "INSERT INTO items (a, b, c) VALUES (1, 2, 3)"
   end
+
+  specify "should use unaliased table name" do
+    @ds.from(:items___i).insert_sql(1).should == "INSERT INTO items VALUES (1)"
+    @ds.from(Sequel.as(:items, :i)).insert_sql(1).should == "INSERT INTO items VALUES (1)"
+  end
 end
 
 describe "Dataset#inspect" do
