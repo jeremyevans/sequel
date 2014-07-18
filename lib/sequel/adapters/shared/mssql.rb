@@ -629,7 +629,7 @@ module Sequel
       # Add OUTPUT clause unless there is already an existing output clause, then return
       # the SQL to insert.
       def insert_select_sql(*values)
-        ds = opts[:output] ? self : output(nil, [SQL::ColumnAll.new(:inserted)])
+        ds = (opts[:output] || opts[:returning]) ? self : output(nil, [SQL::ColumnAll.new(:inserted)])
         ds.insert_sql(*values)
       end
 
@@ -677,7 +677,16 @@ module Sequel
       def quoted_identifier_append(sql, name)
         sql << BRACKET_OPEN << name.to_s.gsub(/\]/, DOUBLE_BRACKET_CLOSE) << BRACKET_CLOSE
       end
-      
+
+      # Emulate RETURNING using the output clause.  This only handles values that are simple column references.
+      def returning(*values)
+        values = values.map do |v|
+          raise Error, "cannot emulate RETURNING via OUTPUT for value: #{v.inspect}" if v.is_a?(String)
+          _returning_output_value(v)
+        end
+        clone(:returning=>values)
+      end
+
       # On MSSQL 2012+ add a default order to the current dataset if an offset is used.
       # The default offset emulation using a subquery would be used in the unordered
       # case by default, and that also adds a default order, so it's better to just
@@ -744,9 +753,14 @@ module Sequel
         is_2012_or_later?
       end
 
-      # MSSQL 2005+ supports the output clause.
+      # MSSQL 2005+ supports the OUTPUT clause.
       def supports_output_clause?
         is_2005_or_later?
+      end
+
+      # MSSQL 2005+ can emulate RETURNING via the OUTPUT clause.
+      def supports_returning?(type)
+        supports_insert_select?
       end
 
       # MSSQL 2005+ supports window functions
@@ -822,6 +836,10 @@ module Sequel
       end
       alias update_from_sql delete_from2_sql
 
+      def delete_output_sql(sql)
+        output_sql(sql, :DELETED)
+      end
+
       # There is no function on Microsoft SQL Server that does character length
       # and respects trailing spaces (datalength respects trailing spaces, but
       # counts bytes instead of characters).  Use a hack to work around the
@@ -849,6 +867,11 @@ module Sequel
       def first_primary_key
         @db.schema(self).map{|k, v| k if v[:primary_key] == true}.compact.first
       end
+
+      def insert_output_sql(sql)
+        output_sql(sql, :INSERTED)
+      end
+      alias update_output_sql insert_output_sql
 
       # Handle CROSS APPLY and OUTER APPLY JOIN types
       def join_type_sql(join_type)
@@ -953,9 +976,16 @@ module Sequel
       end
 
       # SQL fragment for MSSQL's OUTPUT clause.
-      def output_sql(sql)
+      def output_sql(sql, type)
         return unless supports_output_clause?
-        return unless output = @opts[:output]
+        if output = @opts[:output]
+          output_list_sql(sql, output)
+        elsif values = @opts[:returning]
+          output_returning_sql(sql, type, values)
+        end
+      end
+
+      def output_list_sql(sql, output)
         sql << OUTPUT
         column_list_append(sql, output[:select_list])
         if into = output[:into]
@@ -968,10 +998,45 @@ module Sequel
           end
         end
       end
-      alias insert_output_sql output_sql
-      alias delete_output_sql output_sql
-      alias update_output_sql output_sql
 
+      def output_returning_sql(sql, type, values)
+        sql << OUTPUT
+        if values.empty?
+          literal_append(sql, SQL::ColumnAll.new(type))
+        else
+          values = values.map do |v|
+            case v
+            when SQL::AliasedExpression
+              Sequel.qualify(type, v.expression).as(v.alias)
+            else
+              Sequel.qualify(type, v)
+            end
+          end
+          column_list_append(sql, values)
+        end
+      end
+
+      # Convert RETURNING value into appropriate OUTPUT value (unqualified).  Note that
+      # this only supports simple column references.
+      def _returning_output_value(v)
+        case v
+        when Symbol
+          _, c, a = Sequel.split_symbol(v)
+          c = Sequel.identifier(c)
+          a ? c.as(a) : c
+        when String
+          Sequel.identifier(v)
+        when SQL::Identifier
+          _returning_output_value(v.value)
+        when SQL::QualifiedIdentifier
+          _returning_output_value(v.column)
+        when SQL::AliasedExpression
+          SQL::AliasedExpression.new(_returning_output_value(v.expression), v.alias)
+        else
+          raise Error, "cannot emulate RETURNING via OUTPUT for value: #{v.inspect}"
+        end
+      end
+      
       # MSSQL supports millisecond timestamp precision.
       def timestamp_precision
         3

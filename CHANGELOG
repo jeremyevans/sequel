@@ -1,5 +1,7 @@
 === HEAD
 
+* Emulate RETURNING on Microsoft SQL Server using OUTPUT, as long as only simple column references are used (jeremyevans)
+
 * Switch class_table_inheritance plugin to use JOIN ON instead of JOIN USING (jeremyevans)
 
 * Qualify primary keys for models with joined datasets when looking up model instances by primary key (jeremyevans)
