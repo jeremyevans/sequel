@@ -2,8 +2,6 @@
 
 require 'rubygems'
 require 'optparse'
-$:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
-require 'sequel'
 
 code = nil
 copy_databases = nil
@@ -140,6 +138,9 @@ connect_proc = lambda do |database|
 end
 
 begin
+  $:.unshift(File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib')))
+  require 'sequel'
+
   DB = connect_proc[db]
   load_dirs.each{|d| d.is_a?(Array) ? require(d.first) : Dir["#{d}/**/*.rb"].each{|f| load(f)}}
   if migrate_dir
