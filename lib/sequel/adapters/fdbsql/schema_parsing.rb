@@ -93,7 +93,7 @@ module Sequel
         columns_dataset = metadata_dataset.
           select(:tc__table_name___table_name,
                  :tc__table_schema___table_schema,
-                 :tc__is_deferable___deferrable,
+                 :tc__is_deferrable___deferrable,
                  :kc__column_name___column_name,
                  :kc__constraint_schema___schema,
                  :kc__constraint_name___name,
