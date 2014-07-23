@@ -368,7 +368,7 @@ module Sequel
         generator.columns.each do |c|
           if t = c.delete(:table)
             same_table = t == name
-            k = c[:key]
+            key = c[:key]
 
             key ||= key_proc.call(t)
 
