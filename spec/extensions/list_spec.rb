@@ -106,10 +106,9 @@ describe "List plugin" do
       "SELECT * FROM items WHERE (id = 3) ORDER BY scope_id, position LIMIT 1"]
   end
 
-  it "should refresh positions automatically on deletion" do
+  it "should update positions automatically on deletion" do
     @o.destroy
-
-    @db.sqls.first.should == "UPDATE items SET position = (position - 1) WHERE (position > 3)"
+    @db.sqls.should == ["DELETE FROM items WHERE (id = 7)", "UPDATE items SET position = (position - 1) WHERE (position > 3)"]
   end
 
   it "should have last_position return the last position in the list" do

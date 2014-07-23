@@ -1,5 +1,7 @@
 === HEAD
 
+* Make list plugin update remaining positions after destroying an instance (ehq, jeremyevans) (#847)
+
 * Unalias aliased tables in Dataset#insert (jeremyevans)
 
 * Add insert_returning_select plugin, for setting up RETURNING for inserts for models selecting explicit columns (jeremyevans)

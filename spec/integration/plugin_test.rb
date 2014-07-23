@@ -1490,6 +1490,11 @@ describe "List plugin without a scope" do
     proc { @c[:name => "def"].move_up(10) }.should raise_error(Sequel::Error)
     proc { @c[:name => "def"].move_down(10) }.should raise_error(Sequel::Error)
   end
+
+  it "should update positions on destroy" do
+    @c[:name => "def"].destroy
+    @c.select_map([:position, :name]).should == [[1, 'abc'], [2, 'hig']]
+  end
 end
 
 describe "List plugin with a scope" do
@@ -1567,6 +1572,11 @@ describe "List plugin with a scope" do
 
     proc { @c[:name => "P1"].move_up(10) }.should raise_error(Sequel::Error)
     proc { @c[:name => "P1"].move_down(10) }.should raise_error(Sequel::Error)
+  end
+
+  it "should update positions on destroy" do
+    @c[:name => "P2"].destroy
+    @c.select_order_map([:pos, :name]).should == [[1, "Hm"], [1, "P1"], [1, "Ps"], [2, "Au"], [2, "P3"]]
   end
 end
 

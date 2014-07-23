@@ -96,13 +96,13 @@ module Sequel
           super
         end
 
-        def around_destroy
-          tail = list_dataset.where("? > ?", position_field, position_value)
-          decrement = Sequel::SQL::NumericExpression.new(:-, position_field, 1)
-
-          tail.update(position_field => decrement)
-
+        # When destroying an instance, move all entries after the instance down
+        # one position, so that there aren't any gaps
+        def after_destroy
           super
+
+          f = Sequel.expr(position_field)
+          list_dataset.where(f > position_value).update(f => f - 1)
         end
 
         # Find the last position in the list containing this instance.
