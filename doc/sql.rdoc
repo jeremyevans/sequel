@@ -287,9 +287,9 @@ Sequel also supports the SQL EXISTS operator using <tt>Dataset#exists</tt>:
 
 Hashes in Sequel use IS if the value is true, false, or nil:
 
-  {:column=>nil) # ("column" IS NULL)
-  {:column=>true) # ("column" IS TRUE)
-  {:column=>false) # ("column" IS FALSE)
+  {:column=>nil} # ("column" IS NULL)
+  {:column=>true} # ("column" IS TRUE)
+  {:column=>false} # ("column" IS FALSE)
 
 Negation works the same way as it does for equality and inclusion:
 
