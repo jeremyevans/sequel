@@ -96,6 +96,15 @@ module Sequel
           super
         end
 
+        def around_destroy
+          tail = list_dataset.where("? > ?", position_field, position_value)
+          decrement = Sequel::SQL::NumericExpression.new(:-, position_field, 1)
+
+          tail.update(position_field => decrement)
+
+          super
+        end
+
         # Find the last position in the list containing this instance.
         def last_position
           list_dataset.max(position_field).to_i
