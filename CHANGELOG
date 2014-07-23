@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle another disconnection error in the postgres adapter (lbosque) (#848)
+
 * Make list plugin update remaining positions after destroying an instance (ehq, jeremyevans) (#847)
 
 * Unalias aliased tables in Dataset#insert (jeremyevans)
