@@ -368,12 +368,10 @@ module Sequel
         generator.columns.each do |c|
           if t = c.delete(:table)
             same_table = t == name
-            key = c[:key]
+            key = c[:key] || key_proc.call(t)
 
-            key ||= key_proc.call(t)
-
-            if same_table && !k.nil?
-              generator.constraints.unshift(:type=>:unique, :columns=>Array(k))
+            if same_table && !key.nil?
+              generator.constraints.unshift(:type=>:unique, :columns=>Array(key))
             end
 
             generator.foreign_key([c[:name]], t, c.merge(:name=>c[:foreign_key_constraint_name], :type=>:foreign_key, :key=>key))

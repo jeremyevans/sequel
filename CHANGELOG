@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix handling of MySQL create_table foreign_key calls using :key option (mimperatore, jeremyevans) (#850)
+
 * Handle another disconnection error in the postgres adapter (lbosque) (#848)
 
 * Make list plugin update remaining positions after destroying an instance (ehq, jeremyevans) (#847)
