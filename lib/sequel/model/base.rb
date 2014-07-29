@@ -1151,7 +1151,28 @@ module Sequel
         changed_columns.clear 
         yield self if block_given?
       end
-      
+
+      # Copy constructor -- Duplicate internal data structures.
+      def initialize_copy(other)
+        super
+        @values = @values.dup
+        @changed_columns = @changed_columns.dup if @changed_columns
+        @errors = @errors.dup if @errors
+        @this = @this.dup if @this
+      end
+
+      # Clone constructor -- freeze internal data structures if the original's
+      # are frozen.
+      def initialize_clone(other)
+        super
+        if other.frozen?
+          @values.freeze
+          @changed_columns.freeze if @changed_columns
+          @errors.freeze if @errors
+          @this.freeze if @this
+        end
+      end
+
       # Returns value of the column's attribute.
       #
       #   Artist[1][:id] #=> 1
@@ -1220,14 +1241,6 @@ module Sequel
         @changed_columns ||= []
       end
   
-      # Similar to Model#dup, but copies frozen status to returned object
-      # if current object is frozen.
-      def clone
-        o = dup
-        o.freeze if frozen?
-        o
-      end
-
       # Deletes and returns +self+.  Does not run destroy hooks.
       # Look into using +destroy+ instead.
       #
@@ -1253,18 +1266,6 @@ module Sequel
         checked_save_failure(opts){checked_transaction(opts){_destroy(opts)}}
       end
 
-      # Produce a shallow copy of the object, similar to Object#dup.
-      def dup
-        s = self
-        super.instance_eval do
-          @values = s.values.dup
-          @changed_columns = s.changed_columns.dup
-          @errors = s.errors.dup
-          @this = s.this.dup if !new? && model.primary_key
-          self
-        end
-      end
-  
       # Iterates through all of the current values using each.
       #
       #  Album[1].each{|k, v| puts "#{k} => #{v}"}
