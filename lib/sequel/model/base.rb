@@ -1165,12 +1165,7 @@ module Sequel
       # are frozen.
       def initialize_clone(other)
         super
-        if other.frozen?
-          @values.freeze
-          @changed_columns.freeze if @changed_columns
-          @errors.freeze if @errors
-          @this.freeze if @this
-        end
+        freeze if other.frozen?
       end
 
       # Returns value of the column's attribute.
