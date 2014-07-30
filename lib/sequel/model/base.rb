@@ -1152,22 +1152,6 @@ module Sequel
         yield self if block_given?
       end
 
-      # Copy constructor -- Duplicate internal data structures.
-      def initialize_copy(other)
-        super
-        @values = @values.dup
-        @changed_columns = @changed_columns.dup if @changed_columns
-        @errors = @errors.dup if @errors
-        @this = @this.dup if @this
-      end
-
-      # Clone constructor -- freeze internal data structures if the original's
-      # are frozen.
-      def initialize_clone(other)
-        super
-        freeze if other.frozen?
-      end
-
       # Returns value of the column's attribute.
       #
       #   Artist[1][:id] #=> 1
@@ -2013,6 +1997,34 @@ module Sequel
       # Default error class used for errors.
       def errors_class
         Errors
+      end
+
+      if RUBY_VERSION >= '1.9'
+        # Clone constructor -- freeze internal data structures if the original's
+        # are frozen.
+        def initialize_clone(other)
+          super
+          freeze if other.frozen?
+          self
+        end
+      else
+        # Ruby 1.8 doesn't support initialize_clone, so override clone to dup and freeze. 
+        def clone
+          o = dup
+          o.freeze if frozen?
+          o
+        end
+        public :clone
+      end
+
+      # Copy constructor -- Duplicate internal data structures.
+      def initialize_copy(other)
+        super
+        @values = @values.dup
+        @changed_columns = @changed_columns.dup if @changed_columns
+        @errors = @errors.dup if @errors
+        @this = @this.dup if @this
+        self
       end
 
       # Set the columns with the given hash.  By default, the same as +set+, but

@@ -1,5 +1,7 @@
 === HEAD
 
+* Use copy constructors instead of overriding Model#dup and #clone (ged, jeremyevans) (#852)
+
 * Fix handling of MySQL create_table foreign_key calls using :key option (mimperatore, jeremyevans) (#850)
 
 * Handle another disconnection error in the postgres adapter (lbosque) (#848)

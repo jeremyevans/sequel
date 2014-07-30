@@ -154,15 +154,6 @@ module Sequel
           @compositions ||= {}
         end
 
-        # Duplicate compositions hash when duplicating model instance.
-        def dup
-          s = self
-          super.instance_eval do
-            @compositions = s.compositions.dup
-            self
-          end
-        end
-
         # Freeze compositions hash when freezing model instance.
         def freeze
           compositions.freeze
@@ -182,6 +173,13 @@ module Sequel
         def _refresh_set_values(hash)
           @compositions.clear if @compositions
           super
+        end
+
+        # Duplicate compositions hash when duplicating model instance.
+        def initialize_copy(other)
+          super
+          @compositions = other.compositions.dup
+          self
         end
       end
     end

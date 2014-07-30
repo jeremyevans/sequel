@@ -181,15 +181,6 @@ module Sequel
         end
 
         # Freeze the deserialized values
-        def dup
-          dv = deserialized_values.dup
-          super.instance_eval do
-            @deserialized_values = dv
-            self
-          end
-        end
-
-        # Freeze the deserialized values
         def freeze
           deserialized_values.freeze
           super
@@ -216,6 +207,13 @@ module Sequel
             raise Sequel::Error, "no entry in deserialization_map for #{column.inspect}" unless callable = model.deserialization_map[column]
             callable.call(v)
           end
+        end
+
+        # Dup the deserialized values when duping model instance.
+        def initialize_copy(other)
+          super
+          @deserialized_values = other.deserialized_values.dup
+          self
         end
 
         # Serialize all deserialized values

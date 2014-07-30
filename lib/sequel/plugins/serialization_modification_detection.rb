@@ -45,15 +45,6 @@ module Sequel
           cc
         end
 
-        # Duplicate the original deserialized values when duplicating instance.
-        def dup
-          o = @original_deserialized_values
-          super.instance_eval do
-            @original_deserialized_values = o.dup if o
-            self
-          end
-        end
-
         # Freeze the original deserialized values when freezing the instance.
         def freeze
           @original_deserialized_values ||= {}
@@ -62,6 +53,15 @@ module Sequel
         end
 
         private
+
+        # Duplicate the original deserialized values when duplicating instance.
+        def initialize_copy(other)
+          super
+          if o = other.instance_variable_get(:@original_deserialized_values)
+            @original_deserialized_values = o.dup
+          end
+          self
+        end
 
         # For new objects, serialize any existing deserialized values so that changes can
         # be detected.
