@@ -988,6 +988,13 @@ describe "Dataset#literal" do
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).should == "'2010-01-02 03:04:05.500000'"
   end
   
+  specify "should literalize times properly for databases supporting millisecond precision" do
+    meta_def(@dataset, :timestamp_precision){3}
+    @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).should == "'01:02:03.500'"
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).should == "'2010-01-02 03:04:05.500'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).should == "'2010-01-02 03:04:05.500'"
+  end
+  
   specify "should literalize Date properly" do
     d = Date.today
     s = d.strftime("'%Y-%m-%d'")
@@ -4929,6 +4936,7 @@ describe "#unqualified_column_for" do
 
   it "should handle SQL::QualifiedIdentifiers" do
     @ds.unqualified_column_for(Sequel.qualify(:b, :a)).should == Sequel.identifier('a')
+    @ds.unqualified_column_for(Sequel.qualify(:b, 'a')).should == Sequel.identifier('a')
   end
 
   it "should handle SQL::AliasedExpressions" do

@@ -2008,6 +2008,7 @@ module Sequel
           self
         end
       else
+        # :nocov:
         # Ruby 1.8 doesn't support initialize_clone, so override clone to dup and freeze. 
         def clone
           o = dup
@@ -2015,6 +2016,7 @@ module Sequel
           o
         end
         public :clone
+        # :nocov:
       end
 
       # Copy constructor -- Duplicate internal data structures.

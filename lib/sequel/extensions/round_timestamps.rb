@@ -23,7 +23,9 @@
 #   DB.extension(:round_timestamps)
 
 unless RUBY_VERSION >= '1.9'
+  # :nocov:
   raise LoadError, 'the round_timestamps extension only works on ruby 1.9+'
+  # :nocov:
 end
 
 module Sequel
