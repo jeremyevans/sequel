@@ -106,7 +106,7 @@ module Sequel
                :columns=>r[:columns].split(',').map{|v| m.call(v.split(' ').first)},
                :table=>m.call(r[:table_name]),
                :key=>r[:column_map].split(',').map{|v| m.call(v.split(' IS ').last)}}
-           end
+          end
         end
         fk_indexes.values
       end

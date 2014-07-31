@@ -107,7 +107,7 @@ module Sequel
       def self.configure(model, opts=OPTS)
         model.instance_eval do
           @cti_base_model = self
-          @cti_key = key = opts[:key] 
+          @cti_key = opts[:key] 
           @cti_tables = [table_name]
           @cti_columns = {table_name=>columns}
           @cti_table_map = opts[:table_map] || {}

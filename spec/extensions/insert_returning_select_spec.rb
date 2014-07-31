@@ -5,7 +5,7 @@ describe "Sequel::Plugins::InsertReturningSelect" do
     @db = Sequel.mock(:fetch=>{:id=>1, :x=>2}, :autoid=>1)
     @db.extend_datasets do
       def supports_returning?(_) true end
-      def insert_select(*v) with_sql_first("#{insert_sql(*v)} RETURNING #{opts[:returning].map{|v| literal(v)}.join(', ')}") end
+      def insert_select(*v) with_sql_first("#{insert_sql(*v)} RETURNING #{opts[:returning].map{|x| literal(x)}.join(', ')}") end
     end
     @Album = Class.new(Sequel::Model(@db[:albums].select(:id, :x)))
     @Album.columns :id, :x
