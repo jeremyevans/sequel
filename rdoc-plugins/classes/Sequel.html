@@ -55,6 +55,9 @@
             <a target="docwin" href="../files/lib/sequel/extensions/current_datetime_timestamp_rb.html">lib/sequel/extensions/current_datetime_timestamp.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/dataset_source_alias_rb.html">lib/sequel/extensions/dataset_source_alias.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/date_arithmetic_rb.html">lib/sequel/extensions/date_arithmetic.rb</a>
           </li>
           <li class='other'>
@@ -109,6 +112,9 @@
             <a target="docwin" href="../files/lib/sequel/extensions/pg_array_ops_rb.html">lib/sequel/extensions/pg_array_ops.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/pg_enum_rb.html">lib/sequel/extensions/pg_enum.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/pg_hstore_rb.html">lib/sequel/extensions/pg_hstore.rb</a>
           </li>
           <li class='other'>
@@ -152,6 +158,9 @@
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/query_literals_rb.html">lib/sequel/extensions/query_literals.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/round_timestamps_rb.html">lib/sequel/extensions/round_timestamps.rb</a>
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">lib/sequel/extensions/ruby18_symbol_extensions.rb</a>
@@ -220,6 +229,9 @@
             <a target="docwin" href="../files/lib/sequel/plugins/class_table_inheritance_rb.html">lib/sequel/plugins/class_table_inheritance.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/plugins/column_select_rb.html">lib/sequel/plugins/column_select.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/plugins/composition_rb.html">lib/sequel/plugins/composition.rb</a>
           </li>
           <li class='other'>
@@ -250,6 +262,9 @@
             <a target="docwin" href="../files/lib/sequel/plugins/input_transformer_rb.html">lib/sequel/plugins/input_transformer.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/plugins/insert_returning_select_rb.html">lib/sequel/plugins/insert_returning_select.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/plugins/instance_filters_rb.html">lib/sequel/plugins/instance_filters.rb</a>
           </li>
           <li class='other'>
@@ -269,6 +284,9 @@
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/plugins/many_to_one_pk_lookup_rb.html">lib/sequel/plugins/many_to_one_pk_lookup.rb</a>
+          </li>
+          <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/plugins/modification_detection_rb.html">lib/sequel/plugins/modification_detection.rb</a>
           </li>
           <li class='other'>
             <a target="docwin" href="../files/lib/sequel/plugins/mssql_optimistic_locking_rb.html">lib/sequel/plugins/mssql_optimistic_locking.rb</a>
@@ -648,6 +666,38 @@
             
             <pre>DB.extension(:current_datetime_timestamp)</pre>
             
+            <p>The dataset_source_alias extension changes Sequel&#39;s default behavior of
+            automatically aliasing datasets from using t1, t2, etc. to using an alias
+            based on the source of the dataset.  Example:</p>
+            
+            <pre>DB.from(DB.from(:a))&#x000A;# default: SELECT * FROM (SELECT * FROM a) AS t1&#x000A;# with extension: SELECT * FROM (SELECT * FROM a) AS a</pre>
+            
+            <p>This also works when joining:</p>
+            
+            <pre>DB[:a].join(DB[:b], [:id])&#x000A;# SELECT * FROM a INNER JOIN (SELECT * FROM b) AS b USING (id)</pre>
+            
+            <p>To avoid conflicting aliases, this attempts to alias tables uniquely if it
+            detects a conflict:</p>
+            
+            <pre>DB.from(:a, DB.from(:a))&#x000A;# SELECT * FROM a, (SELECT * FROM a) AS a_0</pre>
+            
+            <p>Note that not all conflicts are correctly detected and handled. It is
+            encouraged to alias your datasets manually instead of relying on the
+            auto-aliasing if there would be a conflict.</p>
+            
+            <p>In the places where <a href="Sequel.html">Sequel</a> cannot determine the
+            appropriate alias to use for the dataset, it will fallback to the standard
+            t1, t2, etc. aliasing.</p>
+            
+            <p>You can load this extension into specific datasets:</p>
+            
+            <pre>ds = DB[:table]&#x000A;ds = ds.extension(:dataset_source_alias)</pre>
+            
+            <p>Or you can load it into all of a database&#39;s datasets, which is probably
+            the desired behavior if you are using this extension:</p>
+            
+            <pre>DB.extension(:dataset_source_alias)</pre>
+            
             <p>The date_arithmetic extension adds the ability to perform
             database-independent addition/substraction of intervals to/from dates and
             timestamps.</p>
@@ -935,6 +985,43 @@
             
             <p>In order for hstore to automatically wrap the returned value correctly in
             an HStoreOp, you need to load the pg_hstore_ops extension.</p>
+            
+            <p>The pg_enum extension adds support for <a href="Sequel.html">Sequel</a> to
+            handle PostgreSQL&#39;s enum types.  To use this extension, first load it
+            into your Database instance:</p>
+            
+            <pre>DB.extension :pg_enum</pre>
+            
+            <p>It allows creation of enum types using create_enum:</p>
+            
+            <pre>DB.create_enum(:type_name, %w&#39;value1 value2 value3&#39;)</pre>
+            
+            <p>You can also add values to existing enums via add_enum_value:</p>
+            
+            <pre>DB.add_enum_value(:enum_type_name, &#39;value4&#39;)</pre>
+            
+            <p>If you want to drop an enum type, you can use drop_enum:</p>
+            
+            <pre>DB.drop_enum(:type_name)</pre>
+            
+            <p>Just like any user-created type, after creating the type, you can create
+            tables that have a column of that type:</p>
+            
+            <pre>DB.create_table(:table_name)&#x000A;  enum_type_name :column_name&#x000A;end</pre>
+            
+            <p>When parsing the schema, enum types are recognized, and available values
+            returned in the schema hash:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span>(:<span class="ruby-identifier">table_name</span>)&#x000A;[[:<span class="ruby-identifier">column_name</span>, {:<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">enum</span>, :<span class="ruby-identifier">enum_values=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-string">&#39;value1&#39;</span>, <span class="ruby-string">&#39;value2&#39;</span>]}]]</pre>
+            
+            <p>If the pg_array extension is used, arrays of enums are returned as a
+            PGArray:</p>
+            
+            <pre>DB.create_table(:table_name)&#x000A;  column :column_name, &#39;enum_type_name[]&#39;&#x000A;end&#x000A;DB[:table_name].get(:column_name)&#x000A;# [&#39;value1&#39;, &#39;value2&#39;]</pre>
+            
+            <p>Finally, typecasting for enums is setup to cast to strings, which allows
+            you to use symbols in your model code.  Similar, you can provide the enum
+            values as symbols when creating enums using create_enum or add_enum_value.</p>
             
             <p>The pg_hstore_ops extension adds support to Sequel&#39;s DSL to make it
             easier to call PostgreSQL hstore functions and operators.</p>

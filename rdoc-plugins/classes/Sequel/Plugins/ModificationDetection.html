@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::ModificationDetection</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::ModificationDetection
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/modification_detection_rb.html">lib/sequel/plugins/modification_detection.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>This plugin automatically detects in-place modifications to columns as well
+            as direct modifications of the values hash.</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">modification_detection</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; &#39;a&#39;</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">a</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;b&#39;</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-comment"># UPDATE users SET a = &#39;ab&#39; WHERE (id = 1)</span></pre>
+            
+            <p>Note that for this plugin to work correctly, the column values must
+            correctly implement the hash method, returning the same value if the object
+            is equal, and a different value if the object is not equal.</p>
+            
+            <p>Note that this plugin causes a performance hit for all retrieved objects,
+            so it shouldn&#39;t be used in cases where performance is a primary
+            concern.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Make all model subclass automatically detect column modifications</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">modification_detection</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class automatically detect column modifications</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">modification_detection</span></pre>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="ModificationDetection/ClassMethods.html">Sequel::Plugins::ModificationDetection::ClassMethods</a></li>
+              <li><a target="docwin" href="ModificationDetection/InstanceMethods.html">Sequel::Plugins::ModificationDetection::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

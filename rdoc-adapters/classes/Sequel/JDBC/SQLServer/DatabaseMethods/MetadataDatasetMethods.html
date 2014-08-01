@@ -37,63 +37,10 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Work around a bug in SQL Server <a href="../../../JDBC.html">JDBC</a>
-            Driver 3.0, where the metadata for the getColumns result set specifies an
-            incorrect type for the IS_AUTOINCREMENT column. The column is a string, but
-            the type is specified as a short. This causes getObject() to throw a
-            com.microsoft.sqlserver.jdbc.SQLServerException: “The conversion from char
-            to SMALLINT is unsupported.” Using getString() rather than getObject() for
-            this column avoids the problem. Reference: <a
-            href="http://social.msdn.microsoft.com/Forums/en/sqldataaccess/thread/20df12f3-d1bf-4526-9daa-239a83a8e435">social.msdn.microsoft.com/Forums/en/sqldataaccess/thread/20df12f3-d1bf-4526-9daa-239a83a8e435</a></p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a target="docwin" href="#method-i-basic_type_convertor">basic_type_convertor</a></li>
-              <li><a target="docwin" href="#method-i-type_convertor">type_convertor</a></li>
-            </ol>
-          </div>
+          <div id='description'></div>
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-basic_type_convertor'>
-                <a name='method-i-basic_type_convertor'></a>
-                <div class='synopsis'>
-                  <span class='name'>basic_type_convertor</span>
-                  <span class='arguments'>(map, meta, type, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-basic_type_convertor-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-basic_type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">basic_type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-type_convertor'>
-                <a name='method-i-type_convertor'></a>
-                <div class='synopsis'>
-                  <span class='name'>type_convertor</span>
-                  <span class='arguments'>(map, meta, type, i)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-type_convertor-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

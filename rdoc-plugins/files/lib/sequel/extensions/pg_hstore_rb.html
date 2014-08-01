@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-03-26 09:08:13 -0700</span>
+          <span class='datetime'>2014-07-10 10:50:58 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -44,15 +44,15 @@
             key-value table, where the keys are strings and the values are strings or
             NULL.</p>
             
-            <p>This extension integrates with Sequel&#39;s native postgres adapter, so
-            that when hstore fields are retrieved, they are parsed and returned as
-            instances of Sequel::Postgres::HStore.  HStore is a DelegateClass of <a
-            href="../../../../classes/Hash.html">Hash</a>, so it mostly acts like a
-            hash, but not completely (is_a?(Hash) is false).  If you want the actual
-            hash, you can call Hstore#to_hash.  This is done so that <a
-            href="../../../../classes/Sequel.html">Sequel</a> does not treat a HStore
-            like a <a href="../../../../classes/Hash.html">Hash</a> by default, which
-            would cause issues.</p>
+            <p>This extension integrates with Sequel&#39;s native postgres and
+            jdbc/postgresql adapters, so that when hstore fields are retrieved, they
+            are parsed and returned as instances of Sequel::Postgres::HStore.  HStore
+            is a DelegateClass of <a href="../../../../classes/Hash.html">Hash</a>, so
+            it mostly acts like a hash, but not completely (is_a?(Hash) is false).  If
+            you want the actual hash, you can call Hstore#to_hash.  This is done so
+            that <a href="../../../../classes/Sequel.html">Sequel</a> does not treat a
+            HStore like a <a href="../../../../classes/Hash.html">Hash</a> by default,
+            which would cause issues.</p>
             
             <p>In addition to the parsers, this extension comes with literalizers for
             HStore using the standard <a
@@ -138,10 +138,9 @@
             <p>See the schema modification guide for details on using hstore columns in
             CREATE/ALTER TABLE statements.</p>
             
-            <p>If you are not using the native postgres adapter and are using hstore types
-            as model column values you probably should use the typecast_on_load plugin
-            if the column values are returned as a hash, and the pg_typecast_on_load
-            plugin if the column values are returned as a string.</p>
+            <p>If you are not using the native postgres or jdbc/postgresql adapters and
+            are using hstore types as model column values you probably should use the
+            pg_typecast_on_load plugin if the column values are returned as a string.</p>
             
             <p>This extension requires the delegate and strscan libraries.</p>
           </div>

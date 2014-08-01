@@ -44,7 +44,6 @@
             <ol>
               <li><a target="docwin" href="#method-i-after_destroy">after_destroy</a></li>
               <li><a target="docwin" href="#method-i-after_update">after_update</a></li>
-              <li><a target="docwin" href="#method-i-dup">dup</a></li>
               <li><a target="docwin" href="#method-i-freeze">freeze</a></li>
               <li><a target="docwin" href="#method-i-instance_filter">instance_filter</a></li>
             </ol>
@@ -88,23 +87,6 @@
                   <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 57</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">clear_instance_filters</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-method-i-dup'>
-                <a name='method-i-dup'></a>
-                <div class='synopsis'>
-                  <span class='name'>dup</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Duplicate internal structures when duplicating model instance.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-dup-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-dup-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">ifs</span> = <span class="ruby-identifier">instance_filters</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-keyword">super</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@instance_filters</span> = <span class="ruby-identifier">ifs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-freeze'>
                 <a name='method-i-freeze'></a>
                 <div class='synopsis'>
@@ -119,7 +101,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">instance_filters</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">instance_filters</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-instance_filter'>
@@ -137,7 +119,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-instance_filter-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-instance_filter-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">instance_filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_filters</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">args</span>, <span class="ruby-identifier">block</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-instance_filter-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_filters.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">instance_filter</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_filters</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">args</span>, <span class="ruby-identifier">block</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

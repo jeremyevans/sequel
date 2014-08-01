@@ -39,8 +39,7 @@
         <div id='text'>
           <div id='description'>
             
-            <p>Instance methods for datasets that connect to an <a
-            href="../SQLite.html">SQLite</a> database</p>
+            <p>Instance methods for datasets that connect to an SQLite database</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -245,9 +244,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> doesn&#39;t support a NOT LIKE b, you
-                  need to use NOT (a LIKE b). It doesn&#39;t support xor or the extract
-                  function natively, so those have to be emulated.</p>
+                  <p>SQLite doesn&#39;t support a NOT LIKE b, you need to use NOT (a LIKE b). It
+                  doesn&#39;t support xor or the extract function natively, so those have to
+                  be emulated.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-complex_expression_sql_append-source'); return false">
@@ -264,9 +263,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> has CURRENT_TIMESTAMP and related
-                  constants in UTC instead of in localtime, so convert those constants to
-                  local time.</p>
+                  <p>SQLite has CURRENT_TIMESTAMP and related constants in UTC instead of in
+                  localtime, so convert those constants to local time.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-constant_sql_append-source'); return false">
@@ -283,9 +281,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> performs a TRUNCATE style DELETE if no
-                  filter is specified. Since we want to always return the count of records,
-                  add a condition that is always true and then delete.</p>
+                  <p>SQLite performs a TRUNCATE style DELETE if no filter is specified. Since we
+                  want to always return the count of records, add a condition that is always
+                  true and then delete.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-delete-source'); return false">
@@ -321,7 +319,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p>HAVING requires GROUP BY on <a href="../SQLite.html">SQLite</a></p>
+                  <p>HAVING requires GROUP BY on SQLite</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-having-source'); return false">
@@ -338,8 +336,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> uses the nonstandard ` (backtick) for
-                  quoting identifiers.</p>
+                  <p>SQLite uses the nonstandard ` (backtick) for quoting identifiers.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-quoted_identifier_append-source'); return false">
@@ -356,10 +353,10 @@
                 </div>
                 <div class='description'>
                   
-                  <p>When a qualified column is selected on <a href="../SQLite.html">SQLite</a>
-                  and the qualifier is a subselect, the column name used is the full
-                  qualified name (including the qualifier) instead of just the column name. 
-                  To get correct column names, you must use an alias.</p>
+                  <p>When a qualified column is selected on SQLite and the qualifier is a
+                  subselect, the column name used is the full qualified name (including the
+                  qualifier) instead of just the column name.  To get correct column names,
+                  you must use an alias.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select-source'); return false">
@@ -376,8 +373,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> 3.8.3+ supports common table
-                  expressions.</p>
+                  <p>SQLite 3.8.3+ supports common table expressions.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_cte-3F-source'); return false">
@@ -394,8 +390,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> does not support table aliases with
-                  column aliases</p>
+                  <p>SQLite does not support table aliases with column aliases</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_derived_column_lists-3F-source'); return false">
@@ -412,8 +407,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> does not support INTERSECT ALL or
-                  EXCEPT ALL</p>
+                  <p>SQLite does not support INTERSECT ALL or EXCEPT ALL</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_intersect_except_all-3F-source'); return false">
@@ -430,7 +424,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> does not support IS TRUE</p>
+                  <p>SQLite does not support IS TRUE</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_is_true-3F-source'); return false">
@@ -447,8 +441,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> does not support multiple columns for
-                  the IN/NOT IN operators</p>
+                  <p>SQLite does not support multiple columns for the IN/NOT IN operators</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_multiple_column_in-3F-source'); return false">
@@ -465,9 +458,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> supports timezones in literal
-                  timestamps, since it stores them as text.  But using timezones in
-                  timestamps breaks <a href="../SQLite.html">SQLite</a> datetime functions,
+                  <p>SQLite supports timezones in literal timestamps, since it stores them as
+                  text.  But using timezones in timestamps breaks SQLite datetime functions,
                   so we allow the user to override the default per database.</p>
                 </div>
                 <div class='source'>
@@ -485,7 +477,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p><a href="../SQLite.html">SQLite</a> cannot use WHERE &#39;t&#39;.</p>
+                  <p>SQLite cannot use WHERE &#39;t&#39;.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_where_true-3F-source'); return false">

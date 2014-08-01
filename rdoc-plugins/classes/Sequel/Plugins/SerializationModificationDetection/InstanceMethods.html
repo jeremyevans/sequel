@@ -44,7 +44,6 @@
             <ol>
               <li><a target="docwin" href="#method-i-after_save">after_save</a></li>
               <li><a target="docwin" href="#method-i-changed_columns">changed_columns</a></li>
-              <li><a target="docwin" href="#method-i-dup">dup</a></li>
               <li><a target="docwin" href="#method-i-freeze">freeze</a></li>
             </ol>
           </div>
@@ -88,23 +87,6 @@
                   <pre id='method-i-changed_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">changed_columns</span>&#x000A;  <span class="ruby-identifier">cc</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">cc</span> = <span class="ruby-identifier">cc</span>.<span class="ruby-identifier">dup</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>&#x000A;  <span class="ruby-identifier">deserialized_values</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cc</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">c</span> <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-identifier">cc</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">original_deserialized_value</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">v</span>} &#x000A;  <span class="ruby-identifier">cc</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
-              <div class='method public-instance' id='method-method-i-dup'>
-                <a name='method-i-dup'></a>
-                <div class='synopsis'>
-                  <span class='name'>dup</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Duplicate the original deserialized values when duplicating instance.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-dup-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-dup-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">o</span> = <span class="ruby-ivar">@original_deserialized_values</span>&#x000A;  <span class="ruby-keyword">super</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@original_deserialized_values</span> = <span class="ruby-identifier">o</span>.<span class="ruby-identifier">dup</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">o</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
               <div class='method public-instance' id='method-method-i-freeze'>
                 <a name='method-i-freeze'></a>
                 <div class='synopsis'>
@@ -119,7 +101,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@original_deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-ivar">@original_deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization_modification_detection.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@original_deserialized_values</span> <span class="ruby-operator">||=</span> {}&#x000A;  <span class="ruby-ivar">@original_deserialized_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

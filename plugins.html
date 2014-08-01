@@ -3,7 +3,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <title>Sequel: The Database Toolkit for Ruby - Plugins.html.erb</title>
+  <title>Sequel: The Database Toolkit for Ruby - Plugins</title>
 
   <meta http-equiv="Content-Script-Type" content="text/javascript" />
   <meta http-equiv="Content-Style-Type" content="text/css" />
@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.12.0</h2>
+    <h2>Sequel::Model Plugins for v4.13.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -68,6 +68,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ForceEncoding.html">force_encoding</a>: Forces the all model column string values to a given encoding.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InputTransformer.html">input_transformer</a>: Automatically transform input to model column setters.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/LazyAttributes.html">lazy_attributes</a>: Allows you to set some attributes that should not be loaded by default, but only loaded when an object requests them.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ModificationDetection.html">modification_detection</a>: Automatically detect in-place changes to column values.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/StringStripper.html">string_stripper</a>: Strips strings assigned to model attributes.</li>
 </ul></li>
 <li>Caching:<ul>
@@ -101,6 +102,11 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdateOrCreate.html">update_or_create</a>: Adds helper methods for updating an object if it exists, or creating such an object if it does not.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdatePrimaryKey.html">update_primary_key</a>: Allows you to safely update the primary key of a model object.</li>
 </ul></li>
+<li>Selection:<ul>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ColumnSelect.html">column_select</a>: Selects explicitly qualified columns (table.column1, table.column2, ...) instead of just * for model datasets.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/InsertReturningSelect.html">insert_returning_select</a>: Automatically sets RETURNING clause for INSERT queries for models that use an explicit column selection.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/TableSelect.html">table_select</a>: Selects table.* instead of just * for model datasets.</li>
+</ul></li>
 <li>Serialization:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Composition.html">composition</a>: Supports defining getters/setters for objects with data backed by the model's columns.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/JsonSerializer.html">json_serializer</a>: Allows you to serialize/deserialize model objects to/from JSON.</li>
@@ -123,7 +129,6 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Schema.html">schema</a>: Adds backwards compatibility for Model.set_schema and Model.create_table.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Scissors.html">scissors</a>: Adds class methods for delete, destroy, and update.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Subclasses.html">subclasses</a>: Allows easy access all model subclasses and descendent classes, without using ObjectSpace.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/TableSelect.html">table_select</a>: Selects table.* instead of just * for model datasets.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
 </ul></li>
 </ul>
@@ -166,6 +171,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/from_block_rb.html">from_block</a>: Makes blocks passed to Database#from affect FROM clause instead of WHERE clause.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/looser_typecasting_rb.html">looser_typecasting</a>: Uses .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_array_rb.html">pg_array</a>: Adds support for PostgreSQL arrays.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_enum_rb.html">pg_enum</a>: Adds support for PostgreSQL enums.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_hstore_rb.html">pg_hstore</a>: Adds support for the PostgreSQL hstore type.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_inet_rb.html">pg_inet</a>: Adds support for the PostgreSQL inet and cidr types.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_interval_rb.html">pg_interval</a>: Adds support for the PostgreSQL interval type.</li>
@@ -186,6 +192,7 @@
 <ul>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection</a>: Attemps to skip database queries by introspecting the selected columns if possible.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/current_datetime_timestamp_rb.html">current_datetime_timestamp</a>: Creates current Time/DateTime objects that are literalized as CURRENT_TIMESTAMP.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/dataset_source_alias_rb.html">dataset_source_alias</a>: Automatically aliases datasets to their source instead of using t1, t2, etc..</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/date_arithmetic_rb.html">date_arithmetic</a>: Allows for database-independent date calculations (adding/subtracting an interval to/from a date/timestamp).</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/empty_array_ignore_nulls_rb.html">empty_array_ignore_nulls</a>: Makes Sequel's handling of IN/NOT IN with an empty ignore correct NULL handling.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/filter_having_rb.html">filter_having</a>: Makes Dataset#filter, #and, #or, and #having operate on HAVING clause if HAVING clause is already present.</li>
@@ -197,6 +204,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_rb.html">query</a>: Adds Dataset#query for a different interface to creating queries that doesn't use method chaining.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/query_literals_rb.html">query_literals</a>: Automatically uses literal strings for regular strings in select, group, and order methods (similar to filter methods).</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/round_timestamps_rb.html">round_timestamps</a>: Automatically round timestamp values to database supported precision before literalizing them.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/select_remove_rb.html">select_remove</a>: Adds Dataset#select_remove to remove selected columns from a dataset.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sequel_3_dataset_methods_rb.html">sequel_3_dataset_methods</a>: Adds Dataset#[]=, #insert_multiple, #qualify_to, #qualify_to_first_source, #set, #to_csv, #db=, and #opts= methods.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/set_overrides_rb.html">set_overrides</a>: Adds Dataset#set_defaults and #set_overrides for setting default values in some INSERT/UPDATE statements.</li>

@@ -38,36 +38,9 @@
       <div id='content'>
         <div id='text'>
           <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a target="docwin" href="#method-i-before_validation">before_validation</a></li>
-            </ol>
-          </div>
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-before_validation'>
-                <a name='method-i-before_validation'></a>
-                <div class='synopsis'>
-                  <span class='name'>before_validation</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Set the sti_key column based on the sti_key_map.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_validation-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-before_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/single_table_inheritance.rb, line 219</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_validation</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>[<span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key</span>]&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;#{model.sti_key}=&quot;</span>, <span class="ruby-identifier">model</span>.<span class="ruby-identifier">sti_key_chooser</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

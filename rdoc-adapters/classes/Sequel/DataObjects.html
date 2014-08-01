@@ -40,7 +40,7 @@
             <a target="docwin" href="../../files/lib/sequel/adapters/do/postgres_rb.html">lib/sequel/adapters/do/postgres.rb</a>
           </li>
           <li class='other'>
-            <a target="docwin" href="../../files/lib/sequel/adapters/do/sqlite_rb.html">lib/sequel/adapters/do/sqlite.rb</a>
+            <a target="docwin" href="../../files/lib/sequel/adapters/do/sqlite3_rb.html">lib/sequel/adapters/do/sqlite3.rb</a>
           </li>
           <li>
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
@@ -51,12 +51,10 @@
         <div id='text'>
           <div id='description'>
             
-            <p>Module holding the <a href="DataObjects.html">DataObjects</a> support for
-            Sequel.  <a href="DataObjects.html">DataObjects</a> is a ruby library with
-            a standard API for accessing databases.</p>
+            <p>Module holding the DataObjects support for Sequel.  DataObjects is a ruby
+            library with a standard API for accessing databases.</p>
             
-            <p>The <a href="DataObjects.html">DataObjects</a> adapter currently supports
-            PostgreSQL, <a href="DataObjects/MySQL.html">MySQL</a>, and SQLite:</p>
+            <p>The DataObjects adapter currently supports PostgreSQL, MySQL, and SQLite:</p>
             <ul><li>
             <p>Sequel.connect(&#39;do:sqlite3::memory:&#39;)</p>
             </li><li>
@@ -64,6 +62,13 @@
             </li><li>
             <p>Sequel.connect(&#39;do:mysql://user:password@host/database&#39;)</p>
             </li></ul>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-load_driver">load_driver</a></li>
+            </ol>
           </div>
           <div id='context'>
           </div>
@@ -85,36 +90,36 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DATABASE_SETUP</td>
                     <td>=</td>
-                    <td class='context-item-value'>
-                      {:postgres=>proc do |db|
-                      require 'do_postgres'
-                      Sequel.require 'adapters/do/postgres'
-                      db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
-                      db.extend_datasets Sequel::Postgres::DatasetMethods
-                      end,
-                      :mysql=>proc do |db|
-                      require 'do_mysql'
-                      Sequel.require 'adapters/do/mysql'
-                      db.extend(Sequel::DataObjects::MySQL::DatabaseMethods)
-                      db.dataset_class = Sequel::DataObjects::MySQL::Dataset
-                      end,
-                      :sqlite3=>proc do |db|
-                      require 'do_sqlite3'
-                      Sequel.require 'adapters/do/sqlite'
-                      db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
-                      db.extend_datasets Sequel::SQLite::DatasetMethods
-                      db.set_integer_booleans
-                      end
-                      }
-                    </td>
+                    <td class='context-item-value'>{}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>Contains procs keyed on sub adapter type that extend the given database
+                      <p>Contains procs keyed on subadapter type that extend the given database
                       object so it supports the correct database type.</p>
                     </td>
                   </tr>
                 </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-load_driver'>
+                <a name='method-c-load_driver'></a>
+                <div class='synopsis'>
+                  <span class='name'>load_driver</span>
+                  <span class='arguments'>(path)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Wrapper for require that raises AdapterNotFound if driver could not be
+                  loaded</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-load_driver-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-load_driver-source'><span class="ruby-comment"># File lib/sequel/adapters/do.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">load_driver</span>(<span class="ruby-identifier">path</span>)&#x000A;  <span class="ruby-identifier">require</span> <span class="ruby-identifier">path</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">LoadError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">AdapterNotFound</span>, <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

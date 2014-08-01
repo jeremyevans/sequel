@@ -50,6 +50,12 @@
             one query to get the reviews for all of those albums:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">lazy_attributes</span>, :<span class="ruby-identifier">review</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span><span class="ruby-operator">&lt;</span><span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">review</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># You can specify multiple columns to lazily load:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">lazy_attributes</span>, :<span class="ruby-identifier">review</span>, :<span class="ruby-identifier">tracklist</span></pre>
+            
+            <p>Note that by default on databases that supporting RETURNING, using explicit
+            column selections will cause instance creations to use two queries (insert
+            and refresh) instead of a single query using RETURNING.  You can use the
+            insert_returning_select plugin to automatically use RETURNING for instance
+            creations for models using the lazy_attributes plugin.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -85,7 +91,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>  &#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:tactical_eager_loading</span>  &#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -102,7 +108,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lazy_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/lazy_attributes.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lazy_attributes</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">attrs</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">attrs</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

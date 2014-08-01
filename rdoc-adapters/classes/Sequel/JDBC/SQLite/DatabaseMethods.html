@@ -37,96 +37,10 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Instance methods for <a href="../SQLite.html">SQLite</a> <a
-            href="../Database.html">Database</a> objects accessed via <a
-            href="../../JDBC.html">JDBC</a>.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a target="docwin" href="#method-i-foreign_key_list">foreign_key_list</a></li>
-              <li><a target="docwin" href="#method-i-indexes">indexes</a></li>
-            </ol>
-          </div>
+          <div id='description'></div>
           <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li><a target="docwin" href="../../SQLite/DatabaseMethods.html">Sequel::SQLite::DatabaseMethods</a></li>
-              </ol>
-            </div>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DATABASE_ERROR_REGEXPS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel::SQLite::DatabaseMethods::DATABASE_ERROR_REGEXPS.merge(/Abort due to constraint violation/ => ConstraintViolation).freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>FOREIGN_KEY_ERROR_RE</td>
-                    <td>=</td>
-                    <td class='context-item-value'>/query does not return ResultSet/.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>LAST_INSERT_ROWID</td>
-                    <td>=</td>
-                    <td class='context-item-value'>'SELECT last_insert_rowid()'.freeze</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-foreign_key_list'>
-                <a name='method-i-foreign_key_list'></a>
-                <div class='synopsis'>
-                  <span class='name'>foreign_key_list</span>
-                  <span class='arguments'>(table, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Swallow pointless exceptions when the foreign key list pragma doesn&#39;t
-                  return any rows.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_key_list-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-foreign_key_list-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlite.rb, line 16</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">foreign_key_list</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">FOREIGN_KEY_ERROR_RE</span>&#x000A;  []&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-indexes'>
-                <a name='method-i-indexes'></a>
-                <div class='synopsis'>
-                  <span class='name'>indexes</span>
-                  <span class='arguments'>(table, opts=OPTS)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Swallow pointless exceptions when the index list pragma doesn&#39;t return
-                  any rows.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-indexes-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlite.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">FOREIGN_KEY_ERROR_RE</span>&#x000A;  {}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

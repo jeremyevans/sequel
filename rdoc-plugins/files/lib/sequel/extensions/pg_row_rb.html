@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-29 11:53:53 -0700</span>
+          <span class='datetime'>2014-07-10 10:50:58 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -42,10 +42,11 @@
             href="../../../../classes/Sequel.html">Sequel</a> to handle
             PostgreSQL&#39;s row-valued/composite types.</p>
             
-            <p>This extension integrates with Sequel&#39;s native postgres adapter, so
-            that when composite fields are retrieved, they are parsed and returned as
-            instances of Sequel::Postgres::PGRow::(HashRow|ArrayRow), or optionally a
-            custom type.  HashRow and ArrayRow are DelegateClasses of of <a
+            <p>This extension integrates with Sequel&#39;s native postgres and
+            jdbc/postgresql adapters, so that when composite fields are retrieved, they
+            are parsed and returned as instances of
+            Sequel::Postgres::PGRow::(HashRow|ArrayRow), or optionally a custom type. 
+            HashRow and ArrayRow are DelegateClasses of of <a
             href="../../../../classes/Hash.html">Hash</a> and <a
             href="../../../../classes/Array.html">Array</a>, so they mostly act like a
             hash or array, but not completely (is_a?(Hash) and is_a?(Array) are false).
@@ -123,9 +124,10 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">conversion_procs</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">Parser</span>) <span class="ruby-operator">&amp;&amp;</span>    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&#39;</span>) }.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}</pre>
             
-            <p>If you are not using the native postgres adapter and are using composite
-            types types as model column values you probably should use the
-            pg_typecast_on_load plugin if the column values are returned as a string.</p>
+            <p>If you are not using the native postgres or jdbc/postgresql adapters and
+            are using composite types types as model column values you probably should
+            use the pg_typecast_on_load plugin if the column values are returned as a
+            string.</p>
             
             <p>See the schema modification guide for details on using row type columns in
             CREATE/ALTER TABLE statements.</p>

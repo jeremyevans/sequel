@@ -31,12 +31,102 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-07-01 08:06:25 -0700</span>
+          <span class='datetime'>2014-08-01 09:04:01 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.13.0+%282014-08-01%29">4.13.0 (2014-08-01)<span><a href="#label-4.13.0+%282014-08-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Use copy constructors instead of overriding Model#dup and clone (ged,
+            jeremyevans) (#852)</p>
+            </li><li>
+            <p>Fix handling of MySQL create_table foreign_key calls using :key option
+            (mimperatore, jeremyevans) (#850)</p>
+            </li><li>
+            <p>Handle another disconnection error in the postgres adapter (lbosque) (#848)</p>
+            </li><li>
+            <p>Make list plugin update remaining positions after destroying an instance
+            (ehq, jeremyevans) (#847)</p>
+            </li><li>
+            <p>Unalias aliased tables in Dataset#insert (jeremyevans)</p>
+            </li><li>
+            <p>Add insert_returning_select plugin, for setting up RETURNING for inserts
+            for models selecting explicit columns (jeremyevans)</p>
+            </li><li>
+            <p>Make Model#save use insert_select if the dataset used for inserting already
+            uses returning (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#unqualified_column_for helper method, returning unqualified
+            version of possibly qualified column (jeremyevans)</p>
+            </li><li>
+            <p>Calling Dataset#returning when the Database does not support or emulate
+            RETURNING now raises an Error (jeremyevans)</p>
+            </li><li>
+            <p>Emulate RETURNING on Microsoft SQL Server using OUTPUT, as long as only
+            simple column references are used (jeremyevans)</p>
+            </li><li>
+            <p>Switch class_table_inheritance plugin to use JOIN ON instead of JOIN USING
+            (jeremyevans)</p>
+            </li><li>
+            <p>Qualify primary keys for models with joined datasets when looking up model
+            instances by primary key (jeremyevans)</p>
+            </li><li>
+            <p>Fix qualification of columns when Dataset#graph automatically wraps the
+            initially graphed dataset in a subselect (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#joined_dataset? a public method (jeremyevans)</p>
+            </li><li>
+            <p>Allow external jdbc, odbc, and do subadapters to be loaded automatically
+            (jeremyevans)</p>
+            </li><li>
+            <p>Recognize another disconnect error in the jdbc/mysql adapter (jeremyevans)</p>
+            </li><li>
+            <p>Set primary keys correctly for models even if datasets select specific
+            columns (jeremyevans)</p>
+            </li><li>
+            <p>Add dataset_source_alias extension, for automatically aliasing datasets to
+            their first source (jeremyevans)</p>
+            </li><li>
+            <p>Use qualified columns in the lazy_attributes plugin (jeremyevans)</p>
+            </li><li>
+            <p>Add column_select plugin, for using explicit column selections in model
+            datasets (jeremyevans)</p>
+            </li><li>
+            <p>Use associated model&#39;s existing selection for join associations if it
+            consists solely of explicitly quailfied columns (jeremyevans)</p>
+            </li><li>
+            <p>Add round_timestamps extension for automatically rounding timestamp values
+            to database precision before literalizing (jeremyevans)</p>
+            </li><li>
+            <p>Make rake default task run plugin specs as well as core/model specs
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use all_tables and all_views for Database#tables and views on Oracle
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use all_tab_cols instead of user_tab cols for defaults parsing in the
+            oracle adapter (jeremyevans)</p>
+            </li><li>
+            <p>Fix recursive mutex locking issue on JRuby when using
+            Sequel::Model(dataset) (jeremyevans) (#841)</p>
+            </li><li>
+            <p>Make composition and serialization plugins support validations on
+            underlying columns (jeremyevans)</p>
+            </li><li>
+            <p>Fix regression in timestamps and table inheritance plugin where column
+            values would not be saved if validation is skipped (jeremyevans) (#839)</p>
+            </li><li>
+            <p>Add pg_enum extension, for dealing with PostgreSQL enums (jeremyevans)</p>
+            </li><li>
+            <p>Add modification_detection plugin, for automatic detection of in-place
+            column value modifications (jeremyevans)</p>
+            </li><li>
+            <p>Speed up using plain strings, numbers, true, false, and nil in json columns
+            if underlying json library supports them (jeremyevans) (#834)</p>
+            </li></ul>
             
             <h3 id="label-4.12.0+%282014-07-01%29">4.12.0 (2014-07-01)<span><a href="#label-4.12.0+%282014-07-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             <ul><li>

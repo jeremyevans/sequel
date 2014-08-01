@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-06-17 20:53:00 -0700</span>
+          <span class='datetime'>2014-07-10 10:50:58 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -40,9 +40,9 @@
             
             <p>The pg_interval extension adds support for PostgreSQL&#39;s interval type.</p>
             
-            <p>This extension integrates with Sequel&#39;s native postgres adapter, so
-            that when interval type values are retrieved, they are parsed and returned
-            as instances of ActiveSupport::Duration.</p>
+            <p>This extension integrates with Sequel&#39;s native postgres and
+            jdbc/postgresql adapters, so that when interval type values are retrieved,
+            they are parsed and returned as instances of ActiveSupport::Duration.</p>
             
             <p>In addition to the parser, this extension adds literalizers for
             ActiveSupport::Duration that use the standard <a
@@ -55,8 +55,8 @@
             
             <pre>DB.extension :pg_interval</pre>
             
-            <p>If you are not using the native postgres adapter and are using interval
-            types as model column values you probably should use the
+            <p>If you are not using the native postgres or jdbc/postgresql adapters and
+            are using interval types as model column values you probably should use the
             pg_typecast_on_load plugin if the column values are returned as a string.</p>
             
             <p>This extension integrates with the pg_array extension.  If you plan to use

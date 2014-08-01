@@ -500,7 +500,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-select-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1208</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">select</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:select</span>){<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">table_name</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-select-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 1208</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">select</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:select</span>){<span class="ruby-identifier">default_select</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
