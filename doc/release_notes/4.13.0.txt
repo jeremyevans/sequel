@@ -96,7 +96,7 @@
   returning the unqualified version of a possibly qualified column.
 
 * The composition and serialization plugins now support validations
-  on the underlying columns.  Previously, the didn't update the
+  on the underlying columns.  Previously, they didn't update the
   underlying columns until after validations were performed.  This
   works better when using the auto_validations plugin.
 
