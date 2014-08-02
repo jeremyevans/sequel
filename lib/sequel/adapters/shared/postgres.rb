@@ -918,7 +918,7 @@ module Sequel
       def index_definition_sql(table_name, index)
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
-        expr = if opclass = index[:opclass] or order = index[:order]
+        expr = if opclass = index[:opclass] or order = index[:order] or nulls = index[:nulls]
           mapped_cols = Array(cols).map do |c|
             col_expr = literal(c)
             if opclass
@@ -933,6 +933,14 @@ module Sequel
               col_expr += case col_ord
                           when :asc then " ASC"
                           when :desc then " DESC"
+                          else ""
+                          end
+            end
+            if nulls
+              col_nulls = nulls.is_a?(Hash) ? nulls[c] : nulls
+              col_expr += case col_nulls
+                          when :first then " NULLS FIRST"
+                          when :last then " NULLS LAST"
                           else ""
                           end
             end
