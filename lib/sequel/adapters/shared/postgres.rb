@@ -918,8 +918,46 @@ module Sequel
       def index_definition_sql(table_name, index)
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
-        expr = if o = index[:opclass]
-          "(#{Array(cols).map{|c| "#{literal(c)} #{o}"}.join(', ')})"
+        opclass = index[:opclass]
+        order = index[:order]
+        nulls = index[:nulls]
+
+        if order and server_version < 80300
+          raise Error, "PostgreSQL version < 8.3 doesn't support index order specification"
+        end
+        if nulls and server_version < 80300
+          raise Error, "PostgreSQL version < 8.3 doesn't support index nulls sort specification"
+        end
+
+        expr = if opclass or order or nulls
+          mapped_cols = Array(cols).map do |c|
+            col_expr = literal(c)
+            if opclass
+              col_expr += if opclass.is_a? Hash
+                "#{" #{opclass[c]}" if opclass[c]}"
+              else
+                " #{opclass}"
+              end
+            end
+            if order
+              col_ord = order.is_a?(Hash) ? order[c] : order
+              col_expr += case col_ord
+                          when :asc then " ASC"
+                          when :desc then " DESC"
+                          else ""
+                          end
+            end
+            if nulls
+              col_nulls = nulls.is_a?(Hash) ? nulls[c] : nulls
+              col_expr += case col_nulls
+                          when :first then " NULLS FIRST"
+                          when :last then " NULLS LAST"
+                          else ""
+                          end
+            end
+            col_expr
+          end
+          "(#{mapped_cols.join(', ')})"
         else
           literal(Array(cols))
         end

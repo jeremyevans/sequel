@@ -898,6 +898,56 @@ describe "A PostgreSQL database" do
     end
   end
 
+  specify "should support opclass specification for composite indexes" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; index([:user_id, :title], :opclass => {:user_id => :int4_ops}, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
+      'CREATE INDEX "posts_user_id_title_index" ON "posts" USING btree ("user_id" int4_ops, "title")'
+      ]
+    end
+  end
+
+  specify "should support index order specification" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :order => :desc, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
+      'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" DESC)'
+      ]
+    end
+  end if DB.server_version >= 80300
+
+  specify "should support index order specification for composite indexes" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :order => { :comments_count => :desc }, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer, "comments_count" integer)',
+      'CREATE INDEX "posts_user_id_comments_count_index" ON "posts" USING btree ("user_id", "comments_count" DESC)'
+      ]
+    end
+  end if DB.server_version >= 80300
+
+  specify "should support index NULLS specification" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :nulls => :last, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
+      'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" NULLS LAST)'
+      ]
+    end
+  end if DB.server_version >= 80300
+
+  specify "should support index NULLS specification for composite indexes" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :nulls => { :comments_count => :last }, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer, "comments_count" integer)',
+      'CREATE INDEX "posts_user_id_comments_count_index" ON "posts" USING btree ("user_id", "comments_count" NULLS LAST)'
+      ]
+    end
+  end if DB.server_version >= 80300
+
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french', :index_type=>:gist}
 
