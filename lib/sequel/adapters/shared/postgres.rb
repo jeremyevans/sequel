@@ -918,12 +918,19 @@ module Sequel
       def index_definition_sql(table_name, index)
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
-        expr = if o = index[:opclass]
-          unless o.is_a? Hash
-            "(#{Array(cols).map{|c| "#{literal(c)} #{o}"}.join(', ')})"
-          else
-            "(#{Array(cols).map{|c| "#{literal(c)} #{o[c]}"}.join(', ')})"
+        expr = if opclass = index[:opclass]
+          mapped_cols = Array(cols).map do |c|
+            col_expr = literal(c)
+            if opclass
+              col_expr += if opclass.is_a? Hash
+                "#{" #{opclass[c]}" if opclass[c]}"
+              else
+                " #{opclass}"
+              end
+            end
+            col_expr
           end
+          "(#{mapped_cols.join(', ')})"
         else
           literal(Array(cols))
         end
