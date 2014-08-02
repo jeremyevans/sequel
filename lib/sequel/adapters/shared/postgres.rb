@@ -919,7 +919,11 @@ module Sequel
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
         expr = if o = index[:opclass]
-          "(#{Array(cols).map{|c| "#{literal(c)} #{o}"}.join(', ')})"
+          unless o.is_a? Hash
+            "(#{Array(cols).map{|c| "#{literal(c)} #{o}"}.join(', ')})"
+          else
+            "(#{Array(cols).map{|c| "#{literal(c)} #{o[c]}"}.join(', ')})"
+          end
         else
           literal(Array(cols))
         end
