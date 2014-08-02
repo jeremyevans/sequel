@@ -195,6 +195,41 @@ module Sequel
       #                  built.
       # :opclass :: Use a specific operator class in the index.
       #
+      #             For composite indexes it's strongly recommended to use
+      #             hash value for this option.
+      #
+      #             Examples:
+      #               index :user_id, :opclass => :int4_ops
+      #               # CREATE INDEX table_user_id_index ON table (user_id int4_ops)
+      #
+      #               index [:user_id, :title], :opclass => { :user_id => :int4_ops }
+      #               # CREATE INDEX table_user_id_title_index ON table (user_id int4_ops, title)
+      #
+      # :order :: Use a specific order (<tt>ASC | DESC</tt>) in the index.
+      #
+      #           Supports either hash values or symbol values (<tt>:asc</tt> or <tt>:desc</tt>).
+      #
+      #           Examples:
+      #             index :count, :order => :desc
+      #             # CREATE INDEX table_count_index ON table (count DESC)
+      #
+      #             index [:created_at, :count], :order => { :created_at => :asc, :count => :desc }
+      #             # CREATE INDEX table_created_at_count_index ON table (created_at ASC, count DESC)
+      #
+      # :nulls :: Specifies how to sort null values (<tt>NULLS FIRST | NULLS LAST</tt>).
+      #
+      #           Supports either hash values or symbol values.
+      #
+      #           * <tt>:first</tt> specifies that nulls sort before non-nulls.
+      #           * <tt>:last</tt> specifies than nulls sort after non-nulls.
+      #
+      #           Examples:
+      #             add_index :title, :nulls => :first
+      #             # CREATE INDEX table_title_index ON table (title NULLS FIRST)
+      #
+      #             add_index [:user_id, :title], :nulls => { :user_id => :last }
+      #             # CREATE INDEX table_user_id_title_index ON table (user_id NULLS LAST, title)
+      #
       # Microsoft SQL Server specific options:
       #
       # :include :: Include additional column values in the index, without
