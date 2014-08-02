@@ -918,6 +918,36 @@ describe "A PostgreSQL database" do
     end
   end
 
+  specify "should support index order specification" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :order => :desc, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
+      'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" DESC)'
+      ]
+    end
+  end
+
+  specify "should support index order specification for composite indexes" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :order => { :user_id => :asc, :comments_count => :desc }, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer, "comments_count" integer)',
+      'CREATE INDEX "posts_user_id_comments_count_index" ON "posts" USING btree ("user_id" ASC, "comments_count" DESC)'
+      ]
+    end
+  end
+
+  specify "should support index order specification for composite indexes with hash containing not all fields" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :order => { :comments_count => :desc }, :type => :btree)}
+    check_sqls do
+      @db.sqls.should == [
+      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer, "comments_count" integer)',
+      'CREATE INDEX "posts_user_id_comments_count_index" ON "posts" USING btree ("user_id", "comments_count" DESC)'
+      ]
+    end
+  end
+
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french', :index_type=>:gist}
 
