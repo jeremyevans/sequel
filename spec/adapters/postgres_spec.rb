@@ -899,16 +899,6 @@ describe "A PostgreSQL database" do
   end
 
   specify "should support opclass specification for composite indexes" do
-    @db.create_table(:posts){text :title; text :body; integer :user_id; index([:user_id, :title], :opclass => {:user_id => :int4_ops, :title => :text_pattern_ops}, :type => :btree)}
-    check_sqls do
-      @db.sqls.should == [
-      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
-      'CREATE INDEX "posts_user_id_title_index" ON "posts" USING btree ("user_id" int4_ops, "title" text_pattern_ops)'
-      ]
-    end
-  end
-
-  specify "should support opclass specification for composite indexes with hash containing not all fields" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; index([:user_id, :title], :opclass => {:user_id => :int4_ops}, :type => :btree)}
     check_sqls do
       @db.sqls.should == [
@@ -929,16 +919,6 @@ describe "A PostgreSQL database" do
   end
 
   specify "should support index order specification for composite indexes" do
-    @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :order => { :user_id => :asc, :comments_count => :desc }, :type => :btree)}
-    check_sqls do
-      @db.sqls.should == [
-      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer, "comments_count" integer)',
-      'CREATE INDEX "posts_user_id_comments_count_index" ON "posts" USING btree ("user_id" ASC, "comments_count" DESC)'
-      ]
-    end
-  end
-
-  specify "should support index order specification for composite indexes with hash containing not all fields" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :order => { :comments_count => :desc }, :type => :btree)}
     check_sqls do
       @db.sqls.should == [
@@ -959,16 +939,6 @@ describe "A PostgreSQL database" do
   end
 
   specify "should support index NULLS specification for composite indexes" do
-    @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :nulls => { :user_id => :first, :comments_count => :last }, :type => :btree)}
-    check_sqls do
-      @db.sqls.should == [
-      'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer, "comments_count" integer)',
-      'CREATE INDEX "posts_user_id_comments_count_index" ON "posts" USING btree ("user_id" NULLS FIRST, "comments_count" NULLS LAST)'
-      ]
-    end
-  end
-
-  specify "should support index NULLS specification for composite indexes with hash containing not all fields" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; integer :comments_count; index([:user_id, :comments_count], :nulls => { :comments_count => :last }, :type => :btree)}
     check_sqls do
       @db.sqls.should == [
