@@ -708,9 +708,12 @@ module Sequel
       end
 
       EXCLUSION_CONSTRAINT_SQL_STATE = '23P01'.freeze
+      DEADLOCK_SQL_STATE = '40P01'.freeze
       def database_specific_error_class_from_sqlstate(sqlstate)
         if sqlstate == EXCLUSION_CONSTRAINT_SQL_STATE
           ExclusionConstraintViolation
+        elsif sqlstate == DEADLOCK_SQL_STATE
+          SerializationFailure
         else
           super
         end
