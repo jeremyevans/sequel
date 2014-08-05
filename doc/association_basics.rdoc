@@ -697,7 +697,7 @@ and a new associated object will be created from them:
 
   @artist.add_album(:name=>'RF') # creates Album object
 
-The add_<i>association</i> method returns the now associated object:
+The add_<i>association</i> method returns the new associated object:
 
   @album = @artist.add_album(:name=>'RF')
 
