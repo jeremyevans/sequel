@@ -1533,6 +1533,13 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON "test" CASCADE'
     # Make sure if exists works
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
+    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true, :when=> {:new__name => 'b'}).should == %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()}
+    @d.create_trigger(:test, :identity, :tf, :each_row=>true, :events => :update, :when=> {:new__name => 'b'})
+    proc{@d[:test].filter(:name=>'a').update(:value=>nil)}.should_not raise_error
+    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>nil}]
+    proc{@d[:test].filter(:name=>'a').update(:name=>'b')}.should raise_error(Sequel::DatabaseError)
+    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>nil}]
+    @d.drop_trigger(:test, :identity)
   end
 end
 

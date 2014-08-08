@@ -482,6 +482,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL 9.0+ supports trigger conditions.
+      def supports_trigger_conditions?
+        server_version >= 90000
+      end
+
       # PostgreSQL supports prepared transactions (two-phase commit) if
       # max_prepared_transactions is greater than 0.
       def supports_prepared_transactions?
@@ -844,7 +849,9 @@ module Sequel
       def create_trigger_sql(table, name, function, opts=OPTS)
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         whence = opts[:after] ? 'AFTER' : 'BEFORE'
-        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
+        raise Error, "Trigger conditions are not supported for this database" if opts[:when] and !supports_trigger_conditions?
+        filter = opts[:when] ? " WHEN #{filter_expr(opts[:when])}" : ''
+        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]}#{filter} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
       end
 
       # DDL fragment for initial part of CREATE VIEW statement
