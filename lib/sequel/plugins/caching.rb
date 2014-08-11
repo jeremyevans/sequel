@@ -64,10 +64,15 @@ module Sequel
           cache_get(cache_key(pk))
         end
 
+        # Returns the prefix used to namespace this class in the cache.
+        def cache_key_prefix
+          "#{self}"
+        end
+
         # Return a key string for the given primary key.
         def cache_key(pk)
           raise(Error, 'no primary key for this record') unless pk.is_a?(Array) ? pk.all? : pk
-          "#{self}:#{Array(pk).join(',')}"
+          "#{cache_key_prefix}:#{Array(pk).join(',')}"
         end
         
         Plugins.inherited_instance_variables(self, :@cache_store=>nil, :@cache_ttl=>nil, :@cache_ignore_exceptions=>nil)
