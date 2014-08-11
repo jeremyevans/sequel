@@ -120,6 +120,29 @@ describe Sequel::Model, "single table inheritance plugin" do
     StiTestSub1A.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1A', 'StiTestSub1B'))"
     StiTestSub1B.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1B'))"
   end
+  
+  it "should work correctly with the :caching plugin" do
+    cache_class = Class.new(Hash) do
+      attr_accessor :ttl
+      def set(k, v, ttl); self[k] = v; @ttl = ttl; end
+      def get(k); self[k]; end
+    end
+    cache = cache_class.new
+
+    StiTest.plugin :caching, cache
+    StiTest.define_singleton_method(:cache_key_prefix) { "stitest" }
+    c2 = Class.new StiTest
+    c2.cache_key(:id).should == StiTest.cache_key(:id)
+
+    obj2 = c2.new
+    obj2.values[:x] = 2
+    obj2.save
+    c2[obj2.id]
+    c2.cache_get_pk(obj2.id).values.should == StiTest.cache_get_pk(obj2.id).values
+    obj2.save
+    c2.cache_get_pk(obj2.id).should == nil
+    StiTest.cache_get_pk(obj2.id).should == nil
+  end
 
   describe "with custom options" do
     before do
@@ -249,6 +272,5 @@ describe Sequel::Model, "single table inheritance plugin" do
       StiTest3.create.kind.should == 'stitest3'
       StiTest4.create.kind.should == 'stitest4'
     end
-
   end
 end
