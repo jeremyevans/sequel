@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :when option to PostgreSQL create_trigger method, for adding a filter to the trigger (aschrab) (#860)
+
 * Recognize an additional serialization failure on PostgreSQL (tmtm) (#857)
 
 === 4.13.0 (2014-08-01)
