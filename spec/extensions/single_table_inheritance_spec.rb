@@ -130,7 +130,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     cache = cache_class.new
 
     StiTest.plugin :caching, cache
-    StiTest.define_singleton_method(:cache_key_prefix) { "stitest" }
+    def StiTest.cache_key_prefix; "stitest" end
     c2 = Class.new StiTest
     c2.cache_key(:id).should == StiTest.cache_key(:id)
 

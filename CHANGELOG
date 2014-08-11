@@ -1,5 +1,7 @@
 === HEAD
 
+* Add cache_key_prefix method to caching plugin, which can be overridden for custom handling (pete) (#861)
+
 * Add :when option to PostgreSQL create_trigger method, for adding a filter to the trigger (aschrab) (#860)
 
 * Recognize an additional serialization failure on PostgreSQL (tmtm) (#857)

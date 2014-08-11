@@ -252,7 +252,7 @@ describe Sequel::Model, "caching" do
 
   it "should support overriding the cache key prefix" do
     c2 = Class.new(@c)
-    c2.define_singleton_method(:cache_key_prefix) {"ceetwo"}
+    def c2.cache_key_prefix; "ceetwo" end
     c3 = Class.new(c2)
     @c.cache_key(:id).should_not == c2.cache_key(:id)
     c2.cache_key(:id).should == c3.cache_key(:id)
