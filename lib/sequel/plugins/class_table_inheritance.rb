@@ -159,6 +159,8 @@ module Sequel
           cmm = cti_model_map
           pk = primary_key
           ds = dataset
+          table = nil
+          columns = nil
           subclass.instance_eval do
             raise(Error, "cannot create anonymous subclass for model class using class_table_inheritance") if !(n = name) || n.empty?
             table = ctm[n.to_sym] || implicit_table_name
@@ -178,9 +180,9 @@ module Sequel
           super
           subclass.instance_eval do
             set_dataset_cti_row_proc
-            (columns - [cbm.primary_key]).each{|a| define_lazy_attribute_getter(a)}
-            cti_tables.reverse.each do |table|
-              db.schema(table).each{|k,v| db_schema[k] = v}
+            (columns - [cbm.primary_key]).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
+            cti_tables.reverse.each do |t|
+              db.schema(t).each{|k,v| db_schema[k] = v}
             end
           end
         end

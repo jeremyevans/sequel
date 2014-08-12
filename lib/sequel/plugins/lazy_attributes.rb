@@ -53,13 +53,15 @@ module Sequel
         
         private
 
-        # Add a lazy attribute getter method to the lazy_attributes_module
-        def define_lazy_attribute_getter(a)
+        # Add a lazy attribute getter method to the lazy_attributes_module. Options:
+        # :dataset :: The base dataset to use for the lazy attribute lookup
+        # :table :: The table name to use to qualify the attribute and primary key columns.
+        def define_lazy_attribute_getter(a, opts=OPTS)
           include(self.lazy_attributes_module ||= Module.new) unless lazy_attributes_module
           lazy_attributes_module.class_eval do
             define_method(a) do
               if !values.has_key?(a) && !new?
-                lazy_attribute_lookup(a)
+                lazy_attribute_lookup(a, opts)
               else
                 super()
               end
@@ -75,10 +77,22 @@ module Sequel
         # attribute for all of those objects.  If not, query the database for
         # the attribute for just the current object.  Return the value of
         # the attribute for the current object.
-        def lazy_attribute_lookup(a)
-          selection = Sequel.qualify(model.table_name, a)
+        def lazy_attribute_lookup(a, opts=OPTS)
+          unless table = opts[:table]
+            table = model.table_name
+          end
+
+          if base_ds = opts[:dataset]
+            ds = base_ds.where(model.qualified_primary_key_hash(pk, table))
+          else
+            base_ds = model.dataset
+            ds = this
+          end
+
+          selection = Sequel.qualify(table, a)
+
           if frozen?
-            return this.dup.get(selection)
+            return ds.dup.get(selection)
           end
 
           if retrieved_with
@@ -86,15 +100,15 @@ module Sequel
             composite_pk = true if primary_key.is_a?(Array)
             id_map = {}
             retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a) || o.frozen?}
-            predicate_key = composite_pk ? primary_key.map{|k| Sequel.qualify(model.table_name, k)} : Sequel.qualify(model.table_name, primary_key)
-            model.select(*(Array(primary_key).map{|k| Sequel.qualify(model.table_name, k)} + [selection])).where(predicate_key=>id_map.keys).naked.each do |row|
+            predicate_key = composite_pk ? primary_key.map{|k| Sequel.qualify(table, k)} : Sequel.qualify(table, primary_key)
+            base_ds.select(*(Array(primary_key).map{|k| Sequel.qualify(table, k)} + [selection])).where(predicate_key=>id_map.keys).naked.each do |row|
               obj = id_map[composite_pk ? row.values_at(*primary_key) : row[primary_key]]
               if obj && !obj.values.has_key?(a)
                 obj.values[a] = row[a]
               end
             end
           end
-          values[a] = this.get(selection) unless values.has_key?(a)
+          values[a] = ds.get(selection) unless values.has_key?(a)
           values[a]
         end
       end

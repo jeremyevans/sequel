@@ -171,6 +171,29 @@ describe "class_table_inheritance plugin" do
     m.values.should == {:id=>1, :name=>'J', :kind=>'Executive', :num_staff=>2, :num_managers=>3}
   end
 
+  it "should lazily load columns in middle classes correctly when loaded from parent class" do
+    Employee.dataset._fetch = {:id=>1, :kind=>'Executive'}
+    Manager.dataset._fetch = {:num_staff=>2}
+    e = Employee[1]
+    e.should be_a_kind_of(Executive)
+    @db.sqls.should == ["SELECT employees.id, employees.name, employees.kind FROM employees WHERE (id = 1) LIMIT 1"]
+    e.num_staff.should == 2
+    @db.sqls.should == ["SELECT managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 1) LIMIT 1"]
+  end
+
+  it "should eagerly load lazily columns in subclasses when loaded from parent class" do
+    Employee.dataset._fetch = {:id=>1, :kind=>'Executive'}
+    Manager.dataset._fetch = {:id=>1, :num_staff=>2}
+    Executive.dataset._fetch = {:id=>1, :num_managers=>3}
+    e = Employee.all.first
+    e.should be_a_kind_of(Executive)
+    @db.sqls.should == ["SELECT employees.id, employees.name, employees.kind FROM employees"]
+    e.num_staff#.should == 2
+    @db.sqls.should == ["SELECT managers.id, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id IN (1))"]
+    e.num_managers#.should == 3
+    @db.sqls.should == ['SELECT executives.id, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (executives.id IN (1))']
+  end
+  
   it "should include schema for columns for tables for ancestor classes" do
     Employee.db_schema.should == {:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}}
     Manager.db_schema.should == {:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer}}

@@ -63,9 +63,26 @@ describe "Class Table Inheritance Plugin" do
   end
   
   specify "should lazily load columns in subclass tables" do
+    Employee[@i2][:manager_id].should == nil
+    Employee[@i2].manager_id.should == @i4
+    Employee[@i3][:num_staff].should == nil
+    Employee[@i3].num_staff.should == 7
+    Employee[@i4][:num_staff].should == nil
+    Employee[@i4].num_staff.should == 5
+    Employee[@i4][:num_managers].should == nil
+    Employee[@i4].num_managers.should == 6
+  end
+  
+  specify "should eagerly load columns in subclass tables when retrieving multiple objects" do
     a = Employee.order(:id).all
     a[1][:manager_id].should == nil
     a[1].manager_id.should == @i4
+    a[2][:num_staff].should == nil
+    a[2].num_staff.should == 7
+    a[3][:num_staff].should == 5 # eagerly loaded by previous call
+    a[3].num_staff.should == 5
+    a[3][:num_managers].should == nil
+    a[3].num_managers.should == 6
   end
   
   specify "should include schema for columns for tables for ancestor classes" do
