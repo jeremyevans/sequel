@@ -733,7 +733,9 @@ module Sequel
       # Sets up the insert methods to use ON DUPLICATE KEY UPDATE
       # If you pass no arguments, ALL fields will be
       # updated with the new values.  If you pass the fields you
-      # want then ONLY those field will be updated.
+      # want then ONLY those field will be updated. If you pass a
+      # hash you can customize the values (for example, to increment
+      # a numeric field).
       #
       # Useful if you have a unique key and want to update
       # inserting rows that violate the unique key restriction.
@@ -749,6 +751,14 @@ module Sequel
       #   )
       #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       #   # ON DUPLICATE KEY UPDATE value=VALUES(value)
+      #
+      #   dataset.on_duplicate_key_update(
+      #     :value => Sequel.lit('value + VALUES(value)')
+      #   ).multi_insert(
+      #     [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #   )
+      #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
+      #   # ON DUPLICATE KEY UPDATE value=value + VALUES(value)
       def on_duplicate_key_update(*args)
         clone(:on_duplicate_key_update => args)
       end
