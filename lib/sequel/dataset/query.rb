@@ -67,7 +67,7 @@ module Sequel
       where(*cond, &block)
     end
     
-    # Returns a new clone of the dataset with with the given options merged.
+    # Returns a new clone of the dataset with the given options merged.
     # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
     # columns are deleted.  This method should generally not be called
     # directly by user code.
