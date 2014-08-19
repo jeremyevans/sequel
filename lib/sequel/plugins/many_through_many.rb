@@ -257,14 +257,14 @@ module Sequel
                 select_all(egds.first_source).
                 select_append(*associated_key_array)
               egds = opts.apply_eager_graph_limit_strategy(egls, egds)
-              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(Array(lpkcs)) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>iq, :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :select=>select||orig_egds.columns, &graph_block)
+              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(Array(lpkcs)) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>iq, :join_type=>eo[:join_type]||join_type, :join_only=>eo[:join_only], :from_self_alias=>eo[:from_self_alias], :select=>select||orig_egds.columns, &graph_block)
             else
               opts.edges.each do |t|
-                ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>eo[:join_type]||t[:join_type], :qualify=>:deep, :implicit_qualifier=>iq, :from_self_alias=>eo[:from_self_alias], &t[:block])
+                ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>eo[:join_type]||t[:join_type], :join_only=>eo[:join_only], :qualify=>:deep, :implicit_qualifier=>iq, :from_self_alias=>eo[:from_self_alias], &t[:block])
                 iq = nil
               end
               fe = opts.final_edge
-              ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, &graph_block)
+              ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, :join_only=>eo[:join_only], &graph_block)
             end
           end
         end

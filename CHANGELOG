@@ -1,5 +1,7 @@
 === HEAD
 
+* Have association_join work with existing model selections (jeremyevans)
+
 * Fix regression in class_table_inheritance plugin when lazily loading column in middle table (jeremyevans) (#862)
 
 * Add cache_key_prefix method to caching plugin, which can be overridden for custom handling (pete) (#861)

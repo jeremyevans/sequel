@@ -171,6 +171,11 @@ describe Sequel::Dataset, "graphing" do
       ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points INNER JOIN lines ON (lines.x = points.id)'
     end
 
+    it "should accept a :join_only option" do
+      ds = @ds1.graph(:lines, {:x=>:id}, :join_only=>true)
+      ds.sql.should == 'SELECT * FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    end
+
     it "should not select any columns from the graphed table if :select option is false" do
       ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
       ds.sql.should == 'SELECT points.id, points.x, points.y, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN graphs ON (graphs.id = lines.graph_id)'

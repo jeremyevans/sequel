@@ -1166,6 +1166,14 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.association_join(:genre).sql.should == 'SELECT * FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres AS genre ON (genre.id = ag.genre_id)'
   end
   
+  it "should handle custom selects when using association_join" do
+    GraphAlbum.select{a(b)}.association_join(:band).sql.should == 'SELECT a(b) FROM albums INNER JOIN bands AS band ON (band.id = albums.band_id)'
+    GraphAlbum.select{a(b)}.association_join(:track).sql.should == 'SELECT a(b) FROM albums INNER JOIN tracks AS track ON (track.album_id = albums.id)'
+    GraphAlbum.select{a(b)}.association_join(:tracks).sql.should == 'SELECT a(b) FROM albums INNER JOIN tracks ON (tracks.album_id = albums.id)'
+    GraphAlbum.select{a(b)}.association_join(:genres).sql.should == 'SELECT a(b) FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres ON (genres.id = ag.genre_id)'
+    GraphAlbum.select{a(b)}.association_join(:genre).sql.should == 'SELECT a(b) FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres AS genre ON (genre.id = ag.genre_id)'
+  end
+  
   it "should set up correct join types when using association_*_join" do
     GraphAlbum.association_inner_join(:band).sql.should == 'SELECT * FROM albums INNER JOIN bands AS band ON (band.id = albums.band_id)'
     GraphAlbum.association_left_join(:track).sql.should == 'SELECT * FROM albums LEFT JOIN tracks AS track ON (track.album_id = albums.id)'

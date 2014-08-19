@@ -1791,10 +1791,10 @@ module Sequel
                 select_all(egds.first_source).
                 select_append(*associated_key_array)
               egds = opts.apply_eager_graph_limit_strategy(egls, egds)
-              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :select=>select||orig_egds.columns, &graph_block)
+              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :join_only=>eo[:join_only], :select=>select||orig_egds.columns, &graph_block)
             else
-              ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>eo[:join_type]||jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>eo[:from_self_alias], &jt_graph_block)
-              ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, &graph_block)
+              ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>eo[:join_type]||jt_join_type, :join_only=>eo[:join_only], :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>eo[:from_self_alias], &jt_graph_block)
+              ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, :join_only=>eo[:join_only], &graph_block)
             end
           end
       
@@ -2561,7 +2561,7 @@ END
           end
           local_opts = ds.opts[:eager_graph][:local]
           limit_strategy = r.eager_graph_limit_strategy(local_opts[:limit_strategy])
-          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
+          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :join_only=>local_opts[:join_only], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
           if r[:order_eager_graph] && (order = r.fetch(:graph_order, r[:order]))
             ds = ds.order_more(*qualified_expression(order, assoc_table_alias))
           end
@@ -2614,7 +2614,7 @@ END
         # Return a new dataset with JOINs of the given type added, using the tables and
         # conditions specified by the associations.
         def _association_join(type, associations)
-          clone(:join=>clone(:graph_from_self=>false).eager_graph_with_options(associations, :join_type=>type).opts[:join])
+          clone(:join=>clone(:graph_from_self=>false).eager_graph_with_options(associations, :join_type=>type, :join_only=>true).opts[:join])
         end
 
         # If the association has conditions itself, then it requires additional filters be

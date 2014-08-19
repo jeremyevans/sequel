@@ -36,6 +36,7 @@ module Sequel
     #                     the receiver is wrapped in a from_self before graphing, and this option
     #                     determines the alias to use.
     # :implicit_qualifier :: The qualifier of implicit conditions, see #join_table.
+    # :join_only :: Only join the tables, do not change the selected columns.
     # :join_type :: The type of join to use (passed to +join_table+).  Defaults to :left_outer.
     # :qualify:: The type of qualification to do, see #join_table.
     # :select :: An array of columns to select.  When not used, selects
@@ -103,6 +104,9 @@ module Sequel
       
       # Join the table early in order to avoid cloning the dataset twice
       ds = ds.join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias_qualifier, :implicit_qualifier=>implicit_qualifier, :qualify=>options[:qualify], &block)
+
+      return ds if options[:join_only]
+
       opts = ds.opts
 
       # Whether to include the table in the result set
