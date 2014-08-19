@@ -78,6 +78,17 @@ describe "class_table_inheritance plugin" do
     Manager.all.collect{|x| x.class}.should == [Manager, Executive]
   end
   
+  it "should have refresh return all columns in subclass after loading from superclass" do
+    Employee.dataset._fetch = [{:id=>1, :name=>'A', :kind=>'Executive'}]
+    Executive.instance_dataset._fetch = [{:id=>1, :name=>'A', :kind=>'Executive', :num_staff=>3, :num_managers=>2}]
+    a = Employee.first
+    a.class.should == Executive
+    a.values.should == {:id=>1, :name=>'A', :kind=>'Executive'}
+    a.refresh.values.should == {:id=>1, :name=>'A', :kind=>'Executive', :num_staff=>3, :num_managers=>2}
+    @db.sqls.should == ["SELECT employees.id, employees.name, employees.kind FROM employees LIMIT 1",
+      "SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (executives.id = 1) LIMIT 1"]
+  end
+  
   it "should return rows with the current class if cti_key is nil" do
     Employee.plugin(:class_table_inheritance)
     Employee.dataset._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Staff'}]

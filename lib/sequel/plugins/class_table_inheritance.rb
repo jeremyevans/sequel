@@ -62,6 +62,13 @@ module Sequel
     #   a = Employee.all # [<#Staff>, <#Manager>, <#Executive>]
     #   a.first.values # {:id=>1, name=>'S', :kind=>'Staff'}
     #   a.first.manager_id # Loads the manager_id attribute from the database
+    #
+    # If you want to get all columns in a subclass instance after loading
+    # via the superclass, call Model#refresh.
+    #
+    #   a = Employee.first
+    #   a.values # {:id=>1, name=>'S', :kind=>'Executive'}
+    #   a.refresh.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
     # 
     # Usage:
     #
