@@ -462,6 +462,9 @@ module Sequel
       # Modify a column's default value in the DDL for the table.
       #
       #   set_column_default(:artist_name, 'a') # ALTER COLUMN artist_name SET DEFAULT 'a'
+      #
+      # On MySQL, make sure to use a symbol for the name of the column, as otherwise you
+      # can lose the type and NULL/NOT NULL setting for the column.
       def set_column_default(name, default)
         @operations << {:op => :set_column_default, :name => name, :default => default}
       end
@@ -473,6 +476,9 @@ module Sequel
       # PostgreSQL specific options:
       #
       # :using :: Add a USING clause that specifies how to convert existing values to new values.
+      #
+      # On MySQL, make sure to use a symbol for the name of the column, as otherwise you
+      # can lose the default and NULL/NOT NULL setting for the column.
       def set_column_type(name, type, opts=OPTS)
         @operations << {:op => :set_column_type, :name => name, :type => type}.merge(opts)
       end
@@ -480,6 +486,9 @@ module Sequel
       # Set a given column as allowing NULL values.
       #
       #   set_column_allow_null(:artist_name) # ALTER COLUMN artist_name DROP NOT NULL
+      #
+      # On MySQL, make sure to use a symbol for the name of the column, as otherwise you
+      # can lose the default and type for the column.
       def set_column_allow_null(name, allow_null=true)
         @operations << {:op => :set_column_null, :name => name, :null => allow_null}
       end
@@ -487,6 +496,9 @@ module Sequel
       # Set a given column as not allowing NULL values.
       #
       #   set_column_not_null(:artist_name) # ALTER COLUMN artist_name SET NOT NULL
+      #
+      # On MySQL, make sure to use a symbol for the name of the column, as otherwise you
+      # can lose the default and type for the column.
       def set_column_not_null(name)
         set_column_allow_null(name, false)
       end
