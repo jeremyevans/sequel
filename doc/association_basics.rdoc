@@ -909,10 +909,10 @@ or a String:
 
 ==== :key
 
-For +many_to_one+ associations, is the foreign_key in current model's table
-that references associated model's primary key, as a symbol.  Defaults to
-:<i>association</i>_id.  Can use an array of symbols for a composite key
-association.
+For +many_to_one+ associations, this is the foreign_key in the current model's
+table that references the associated model's primary key as a symbol.
+Defaults to :<i>association</i>_id.  Can use an array of symbols for a
+composite key association.
 
   Album.many_to_one :artist # :key=>:artist_id
 
