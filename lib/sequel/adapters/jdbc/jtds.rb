@@ -26,6 +26,10 @@ module Sequel
           false
         end
 
+        def disconnect_error?(exception, opts)
+          super || exception.message =~ /\AInvalid state, the Connection object is closed\.\z/
+        end
+
         # Handle nil values by using setNull with the correct parameter type.
         def set_ps_arg_nil(cps, i)
           cps.setNull(i, cps.getParameterMetaData.getParameterType(i))

@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize additional disconnect error in jdbc/jtds adapter (jeremyevans)
+
 * Have association_join work with existing model selections (jeremyevans)
 
 * Fix regression in class_table_inheritance plugin when lazily loading column in middle table (jeremyevans) (#862)
