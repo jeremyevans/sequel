@@ -14,6 +14,7 @@
 #
 #   DB.extension(:set_overrides)
 
+#
 module Sequel
   module SetOverrides
     Dataset::NON_SQL_OPTIONS.concat([:defaults, :overrides])

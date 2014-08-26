@@ -42,6 +42,7 @@
 # the enum values as symbols when creating enums using create_enum or
 # add_enum_value.
 
+#
 module Sequel
   module Postgres
     # Methods enabling Database object integration with enum types.

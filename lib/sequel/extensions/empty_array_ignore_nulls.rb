@@ -20,6 +20,7 @@
 #
 #   DB.extension(:empty_array_ignore_nulls)
 
+#
 module Sequel
   module EmptyArrayIgnoreNulls
     # Use a simple expression that is always true or false, never NULL.

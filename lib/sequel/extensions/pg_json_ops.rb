@@ -65,6 +65,7 @@
 # (as shown in the #[] and #get_text examples above), you need to load the pg_array
 # extension.
 
+#
 module Sequel
   module Postgres
     # The JSONBaseOp class is a simple container for a single object that

@@ -6,6 +6,7 @@
 #
 #   Sequel.extension :_pretty_table
 
+#
 module Sequel
   module PrettyTable
     # Prints nice-looking plain-text tables via puts

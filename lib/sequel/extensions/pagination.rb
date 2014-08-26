@@ -14,6 +14,7 @@
 #
 #   DB.extension(:pagination)
 
+#
 module Sequel
   module DatasetPagination
     # Returns a paginated dataset. The returned dataset is limited to

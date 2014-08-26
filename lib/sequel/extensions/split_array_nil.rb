@@ -31,6 +31,7 @@
 #
 #   DB.extension(:split_array_nil)
 
+#
 module Sequel
   class Dataset
     module SplitArrayNil

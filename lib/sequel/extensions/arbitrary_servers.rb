@@ -53,6 +53,7 @@
 # to switch to the sharded threaded connection pool before using this
 # extension.
 
+#
 module Sequel
   module ArbitraryServers
     private

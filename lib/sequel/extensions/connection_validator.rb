@@ -43,6 +43,7 @@
 # you are currently using a single threaded pool and want to
 # use this extension, switch to using a threaded pool.
 
+#
 module Sequel
   module ConnectionValidator
     class Retry < Error; end

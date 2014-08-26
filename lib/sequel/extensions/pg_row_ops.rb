@@ -79,6 +79,7 @@
 #   # SELECT (a.*)::a, (b.*)::b FROM a INNER JOIN b ON (b.id = a.b_id)
 #   # => {:a=>{:id=>1, :b_id=>2}, :b=>{:id=>2}}
 
+#
 module Sequel
   module Postgres
     # This class represents a composite type expression reference.

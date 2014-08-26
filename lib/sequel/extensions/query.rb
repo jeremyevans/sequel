@@ -18,6 +18,7 @@
 #
 #   DB.extension(:query)
 
+#
 module Sequel
   module DatabaseQuery
     def self.extended(db)

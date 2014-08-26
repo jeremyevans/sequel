@@ -36,6 +36,7 @@
 #
 #   DB.extension(:dataset_source_alias)
 
+#
 module Sequel
   class Dataset
     module DatasetSourceAlias

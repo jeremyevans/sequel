@@ -12,6 +12,7 @@
 #
 #   Sequel.extension :eval_inspect
 
+#
 module Sequel
   module EvalInspect
     # Special case objects where inspect does not generally produce input

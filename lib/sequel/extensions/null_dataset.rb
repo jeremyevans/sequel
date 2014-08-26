@@ -31,6 +31,7 @@
 #
 #   DB.extension(:null_dataset)
 
+#
 module Sequel
   class Dataset
     module Nullifiable

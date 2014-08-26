@@ -14,6 +14,7 @@
 #
 #   DB.extension(:filter_having)
 
+#
 module Sequel
   module FilterHaving
     # Operate on HAVING clause if HAVING clause already present.

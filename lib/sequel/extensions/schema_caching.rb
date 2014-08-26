@@ -42,6 +42,7 @@
 # and it handles all ruby objects used in the schema hash.  Because of this,
 # you should not attempt to load the schema from a untrusted file.
 
+#
 module Sequel
   module SchemaCaching
     # Dump the cached schema to the filename given in Marshal format.
