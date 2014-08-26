@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle composite primary keys when working around validation issues for one_to_(one|many) associations in nested_attributes plugin (jeremyevans) (#870)
+
 * Recognize additional disconnect error in jdbc/jtds adapter (jeremyevans)
 
 * Have association_join work with existing model selections (jeremyevans)

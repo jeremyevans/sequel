@@ -304,8 +304,9 @@ module Sequel
             # which will fail if we validate before saving the current object.  If there is
             # no value for the foreign key, set it to the current primary key value, or a dummy
             # value of 0 if we haven't saved the current object.
-            obj.values[key] = pk || 0
-            key = nil if pk
+            p_key = pk unless pk.is_a?(Array)
+            obj.values[key] = p_key || 0
+            key = nil if p_key
           end
           obj.errors.full_messages.each{|m| errors.add(association, m)} unless obj.valid?
           if key && !pk_val
