@@ -52,7 +52,7 @@
 # conversion_procs usingthe appropriate type OID.  For user defined
 # types, you can do this via:
 #
-#   DB.conversion_procs[scalar_type_oid] = lambda{|string| ...}
+#   DB.conversion_procs[scalar_type_oid] = lambda{|string| }
 #
 # Then you can call
 # Sequel::Postgres::PGArray::DatabaseMethods#register_array_type
@@ -66,7 +66,7 @@
 # Sequel::Postgres::PGArray.register.  In this case, you'll have
 # to specify the type oids:
 #
-#   Sequel::Postgres::PG_TYPES[1234] = lambda{|string| ...}
+#   Sequel::Postgres::PG_TYPES[1234] = lambda{|string| }
 #   Sequel::Postgres::PGArray.register('foo', :oid=>4321, :scalar_oid=>1234)
 #
 # Both Sequel::Postgres::PGArray::DatabaseMethods#register_array_type

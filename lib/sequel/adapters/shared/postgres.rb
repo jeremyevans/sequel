@@ -1400,7 +1400,7 @@ module Sequel
       #
       # Options:
       # :cascade :: whether to use the CASCADE option, useful when truncating
-      #   tables with Foreign Keys.
+      #             tables with foreign keys.
       # :only :: truncate using ONLY, so child tables are unaffected
       # :restart :: use RESTART IDENTITY to restart any related sequences
       #

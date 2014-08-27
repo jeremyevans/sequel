@@ -84,12 +84,12 @@ module Sequel
         #   represents the getter method in the composition object. Example:
         #     # Uses columns year, month, and day in the current model
         #     # Uses year, month, and day methods in the composition object
-        #     :mapping=>[:year, :month, :day]
+        #     {:mapping=>[:year, :month, :day]}
         #     # Uses columns year, month, and day in the current model
         #     # Uses y, m, and d methods in the composition object where
         #     # for example y in the composition object represents year
         #     # in the model object.
-        #     :mapping=>[[:year, :y], [:month, :m], [:day, :d]]
+        #     {:mapping=>[[:year, :y], [:month, :m], [:day, :d]]}
         def composition(name, opts=OPTS)
           opts = opts.dup
           compositions[name] = opts

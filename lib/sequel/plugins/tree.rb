@@ -70,7 +70,7 @@ module Sequel
         
         # Returns the dataset for retrieval of all root nodes
         #
-        #   TreeClass.roots_dataset => Sequel#Dataset
+        #   TreeClass.roots_dataset # => Sequel::Dataset instance
         def roots_dataset
           ds = where(Sequel.or(Array(parent_column).zip([])))
           ds = ds.order(*tree_order) if tree_order

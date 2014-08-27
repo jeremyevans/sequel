@@ -57,7 +57,7 @@ may itself contain placeholders:
   # Insert record with 'Jim', note that the previous filter is ignored
   ds.call(:insert, {:n=>'Jim'}, :name=>:$n)
   # Change name to 'Bob' for all records with name of 'Jim'
-  ds.call(:update, {:n=>'Jim', :new_n=>'Bob'}, :name=>$:new_n)
+  ds.call(:update, {:n=>'Jim', :new_n=>'Bob'}, :name=>:$new_n)
 
 == Prepared Statements
 

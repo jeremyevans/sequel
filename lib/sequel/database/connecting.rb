@@ -244,7 +244,7 @@ module Sequel
       # server, instead of the :default server.
       #
       #   DB.synchronize do |conn|
-      #     ...
+      #     # ...
       #   end
       def synchronize(server=nil)
         @pool.hold(server || :default){|conn| yield conn}

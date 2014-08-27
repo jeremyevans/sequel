@@ -1351,7 +1351,7 @@ module Sequel
       #   a = Artist[1]
       #   Artist.db.transaction do
       #     a.lock!
-      #     a.update(...)
+      #     a.update(:name=>'A')
       #   end
       def lock!
         _refresh(this.for_update) unless new?
@@ -2249,7 +2249,7 @@ module Sequel
       # If there is no order already defined on this dataset, order it by
       # the primary key and call paged_each.
       #
-      #   Album.paged_each{|row| ...}
+      #   Album.paged_each{|row| }
       #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 0
       #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 1000
       #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 2000

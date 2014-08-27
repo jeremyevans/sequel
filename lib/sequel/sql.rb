@@ -909,7 +909,7 @@ module Sequel
       # Return a +StringExpression+ representing the concatenation of the receiver
       # with the given argument.
       #
-      #   :x.sql_string + :y => # "x" || "y"
+      #   :x.sql_string + :y # => "x" || "y"
       def +(ce)
         StringExpression.new(:'||', self, ce)
       end
@@ -984,14 +984,14 @@ module Sequel
       # and converts it to a +BooleanExpression+.  The operator and args
       # used depends on the case of the right (2nd) argument:
       #
-      # * 0..10 - left >= 0 AND left <= 10
-      # * [1,2] - left IN (1,2)
-      # * nil - left IS NULL
-      # * true - left IS TRUE 
-      # * false - left IS FALSE 
-      # * /as/ - left ~ 'as'
-      # * :blah - left = blah
-      # * 'blah' - left = 'blah'
+      # 0..10 :: left >= 0 AND left <= 10
+      # [1,2] :: left IN (1,2)
+      # nil :: left IS NULL
+      # true :: left IS TRUE 
+      # false :: left IS FALSE 
+      # /as/ :: left ~ 'as'
+      # :blah :: left = blah
+      # 'blah' :: left = 'blah'
       #
       # If multiple arguments are given, they are joined with the op given (AND
       # by default, OR possible).  If negate is set to true,

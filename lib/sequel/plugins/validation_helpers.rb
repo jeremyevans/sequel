@@ -19,7 +19,7 @@ module Sequel
     # Options:
     # :allow_blank :: Whether to skip the validation if the value is blank.  You should
     #                 make sure all objects respond to blank if you use this option, which you can do by:
-    #     Sequel.extension :blank
+    #                     Sequel.extension :blank
     # :allow_missing :: Whether to skip the validation if the attribute isn't a key in the
     #                   values hash.  This is different from allow_nil, because Sequel only sends the attributes
     #                   in the values when doing an insert or update.  If the attribute is not present, Sequel
@@ -44,8 +44,7 @@ module Sequel
     #
     #   Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS.merge!(
     #     :exact_length=>{:message=>lambda{|exact| I18n.t("errors.exact_length", :exact => exact)}},
-    #     :integer=>{:message=>lambda{I18n.t("errors.integer")}},
-    #     ...
+    #     :integer=>{:message=>lambda{I18n.t("errors.integer")}}
     #   )
     #
     # and then use something like this in your yaml translation file:
@@ -215,7 +214,7 @@ module Sequel
         # If you want to to a case insensitive uniqueness validation on a database that
         # is case sensitive by default, you can use:
         #
-        #   :where=>(proc do |ds, obj, cols|
+        #   validates_unique :column, :where=>(proc do |ds, obj, cols|
         #     ds.where(cols.map do |c|
         #       v = obj.send(c)
         #       v = v.downcase if v

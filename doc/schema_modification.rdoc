@@ -32,7 +32,7 @@ convert to database types:
     String :a3, :fixed=>true            # char(255)
     String :a4, :fixed=>true, :size=>50 # char(50)
     String :a5, :text=>true             # text
-    File :b,                            # blob
+    File :b                             # blob
     Fixnum :c                           # integer
     Bignum :d                           # bigint
     Float :e                            # double precision

@@ -79,6 +79,6 @@ The first argument is the name of the extension as a symbol, and the second is t
 
 You can also call <tt>Sequel::Dataset.register_extension</tt> with a proc:
 
-  Sequel::Dataset.register_extension(:extension_name){|ds| ...}
+  Sequel::Dataset.register_extension(:extension_name){|ds| }
 
 Note that if you use a proc, a corresponding Database extension will not be created automatically (you can still call <tt>Sequel::Database.register_extension</tt> manually in this case).

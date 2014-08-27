@@ -62,7 +62,7 @@ module Sequel
     #
     # Your web stack will probably parse that into a nested hash similar to:
     #
-    #   {:artist=>{:name=>?, :albums_attributes=>{0=>{:name=>?}, 1=>{:id=>?, :name=>?}}}}
+    #   {:artist=>{:name=>'Y', :albums_attributes=>{0=>{:name=>'X'}, 1=>{:id=>'2', :name=>'Z'}}}}
     #
     # Then you can do:
     #

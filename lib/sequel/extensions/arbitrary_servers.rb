@@ -33,8 +33,8 @@
 #   DB.with_server(:host=>'...', :database=>'...') do
 #     DB.synchronize do
 #       # All of these use the host/database given to with_server
-#       DB[:table].insert(...)
-#       DB[:table].update(...)
+#       DB[:table].insert(:c=>1)
+#       DB[:table].update(:c=>2)
 #       DB.tables
 #       DB[:table].all
 #     end

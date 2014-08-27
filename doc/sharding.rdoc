@@ -134,12 +134,12 @@ to assume the :default shard.  However, you can specify a
 different shard using the :servers_hash option when connecting
 to the database:
 
-  DB = Sequel.connect(..., :servers_hash=>Hash.new(:some_shard))
+  DB = Sequel.connect('postgres://...', :servers_hash=>Hash.new(:some_shard))
 
 You can also use this feature to raise an exception if an
 unconfigured shard is used:
 
-  DB = Sequel.connect(..., :servers_hash=>Hash.new{raise ...})
+  DB = Sequel.connect('postgres://...', :servers_hash=>Hash.new{raise 'foo'})
 
 If you specify a :servers_hash option to raise an exception for non configured
 shards you should also explicitly specify a :read_only entry in your :servers option

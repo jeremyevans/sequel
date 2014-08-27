@@ -7,8 +7,8 @@ module Sequel
     #    cache_store.set(key, obj, time) # Associate the obj with the given key
     #                                    # in the cache for the time (specified
     #                                    # in seconds).
-    #    cache_store.get(key) => obj     # Returns object set with same key.
-    #    cache_store.get(key2) => nil    # nil returned if there isn't an object
+    #    cache_store.get(key) # => obj   # Returns object set with same key.
+    #    cache_store.get(key2) # => nil  # nil returned if there isn't an object
     #                                    # currently in the cache with that key.
     #    cache_store.delete(key)         # Remove key from cache
     #
