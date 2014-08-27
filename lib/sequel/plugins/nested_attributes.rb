@@ -218,6 +218,9 @@ module Sequel
             end
           end
           after_save_hook{obj.destroy} if opts[:destroy]
+          if reflection.returns_array?
+            associations[reflection[:name]].delete(obj)
+          end
           obj
         end
         

@@ -324,6 +324,7 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:albums] = [al]
     ar.set(:albums_attributes=>[{:id=>10, :_remove=>'t'}])
+    ar.associations[:albums].should == []
     @db.sqls.should == []
     @Album.dataset._fetch = {:id=>1}
     ar.save
@@ -337,6 +338,7 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set(:tags_attributes=>[{:id=>20, :_remove=>true}])
+    a.associations[:tags].should == []
     @db.sqls.should == []
     a.save
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)"]
