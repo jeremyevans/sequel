@@ -126,7 +126,7 @@ module Sequel
         columns_dataset.each do |row|
           foreign_key = foreign_keys.fetch(row[:name]) do |key|
             foreign_keys[row[:name]] = row
-            row[:name] = out_identifier.call(local_constraint_name(sql_table, row[:name]))
+            row[:name] = out_identifier.call(row[:name])
             row[:columns] = []
             row[:key] = []
             row
@@ -182,16 +182,6 @@ module Sequel
       end
 
       private
-
-      # The constraint name that we need for all other commands does not include
-      # the table name, but the one returned by the information_schema tables
-      # does include it. E.g. if we have the constraint "b.__fk_1" on table b
-      # the correct (e.g. drop) is
-      # `ALTER TABLE b DROP CONSTRAINT __fk_1`
-      # See sql-layer:ReferentialConstraintsFactory
-      def local_constraint_name(table_name, global_constraint_name)
-        global_constraint_name[table_name.length+1..-1]
-      end
 
       # If the given type is DECIMAL with scale 0, say that it's an integer
       def normalize_decimal_to_integer(type, scale)
