@@ -396,4 +396,15 @@ describe 'Fdbsql' do
       end
     end
   end
+
+  describe 'Database schema modifiers' do
+    # this test was copied from sequel's integration/schema_test because that one drops a serial primary key which is not
+    # currently supported in fdbsql
+    specify "should be able to specify constraint names for column constraints" do
+      @db.create_table!(:items2){Integer :id, :primary_key=>true, :primary_key_constraint_name=>:foo_pk}
+      @db.create_table!(:items){foreign_key :id, :items2, :unique=>true, :foreign_key_constraint_name => :foo_fk, :unique_constraint_name => :foo_uk, :null=>false}
+      @db.alter_table(:items){drop_constraint :foo_fk, :type=>:foreign_key; drop_constraint :foo_uk, :type=>:unique}
+      @db.alter_table(:items2){drop_constraint :foo_pk, :type=>:primary_key}
+    end
+  end
 end
