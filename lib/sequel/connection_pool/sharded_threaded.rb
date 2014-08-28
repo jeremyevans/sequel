@@ -7,12 +7,12 @@ Sequel.require 'connection_pool/threaded'
 # to be removed from the pool when they are returned to it.
 class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # The following additional options are respected:
-  # * :servers - A hash of servers to use.  Keys should be symbols.  If not
-  #   present, will use a single :default server.
-  # * :servers_hash - The base hash to use for the servers.  By default,
-  #   Sequel uses Hash.new(:default).  You can use a hash with a default proc
-  #   that raises an error if you want to catch all cases where a nonexistent
-  #   server is used.
+  # :servers :: A hash of servers to use.  Keys should be symbols.  If not
+  #             present, will use a single :default server.
+  # :servers_hash :: The base hash to use for the servers.  By default,
+  #                  Sequel uses Hash.new(:default).  You can use a hash with a default proc
+  #                  that raises an error if you want to catch all cases where a nonexistent
+  #                  server is used.
   def initialize(db, opts = OPTS)
     super
     @available_connections = {}
@@ -84,8 +84,8 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # 
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database. Options:
-  # * :server - Should be a symbol specifing the server to disconnect from,
-  #   or an array of symbols to specify multiple servers.
+  # :server :: Should be a symbol specifing the server to disconnect from,
+  #            or an array of symbols to specify multiple servers.
   def disconnect(opts=OPTS)
     sync do
       (opts[:server] ? Array(opts[:server]) : @servers.keys).each do |s|

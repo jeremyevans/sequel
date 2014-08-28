@@ -13,20 +13,20 @@ module Sequel
     #
     # the following database schema may be used (table - columns):
     #
-    # * employees - id, name, kind
-    # * staff - id, manager_id
-    # * managers - id, num_staff
-    # * executives - id, num_managers
+    # employees :: id, name, kind
+    # staff :: id, manager_id
+    # managers :: id, num_staff
+    # executives :: id, num_managers
     #
     # The class_table_inheritance plugin assumes that the main table
     # (e.g. employees) has a primary key field (usually autoincrementing),
     # and all other tables have a foreign key of the same name that points
     # to the same key in their superclass's table.  For example:
     #
-    # * employees.id  - primary key, autoincrementing
-    # * staff.id - foreign key referencing employees(id)
-    # * managers.id - foreign key referencing employees(id)
-    # * executives.id - foreign key referencing managers(id)
+    # employees.id :: primary key, autoincrementing
+    # staff.id :: foreign key referencing employees(id)
+    # managers.id :: foreign key referencing employees(id)
+    # executives.id :: foreign key referencing managers(id)
     #
     # When using the class_table_inheritance plugin, subclasses use joined 
     # datasets:

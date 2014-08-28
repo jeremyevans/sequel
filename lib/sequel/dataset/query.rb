@@ -862,18 +862,18 @@ module Sequel
     # 
     # Accepts the following argument types:
     #
-    # * Hash - list of equality/inclusion expressions
-    # * Array - depends:
-    #   * If first member is a string, assumes the rest of the arguments
-    #     are parameters and interpolates them into the string.
-    #   * If all members are arrays of length two, treats the same way
-    #     as a hash, except it allows for duplicate keys to be
-    #     specified.
-    #   * Otherwise, treats each argument as a separate condition.
-    # * String - taken literally
-    # * Symbol - taken as a boolean column argument (e.g. WHERE active)
-    # * Sequel::SQL::BooleanExpression - an existing condition expression,
-    #   probably created using the Sequel expression filter DSL.
+    # Hash :: list of equality/inclusion expressions
+    # Array :: depends:
+    #          * If first member is a string, assumes the rest of the arguments
+    #            are parameters and interpolates them into the string.
+    #          * If all members are arrays of length two, treats the same way
+    #            as a hash, except it allows for duplicate keys to be
+    #            specified.
+    #          * Otherwise, treats each argument as a separate condition.
+    # String :: taken literally
+    # Symbol :: taken as a boolean column argument (e.g. WHERE active)
+    # Sequel::SQL::BooleanExpression :: an existing condition expression,
+    #                                   probably created using the Sequel expression filter DSL.
     #
     # where also accepts a block, which should return one of the above argument
     # types, and is treated the same way.  This block yields a virtual row object,

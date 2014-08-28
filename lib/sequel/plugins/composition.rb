@@ -72,24 +72,24 @@ module Sequel
         # You must provide either a :mapping option or both the :composer and :decomposer options. 
         #
         # Options:
-        # * :class - if using the :mapping option, the class to use, as a Class, String or Symbol.
-        # * :composer - A proc that is instance evaled when the composition getter method is called
-        #   to create the composition.
-        # * :decomposer - A proc that is instance evaled before saving the model object,
-        #   if the composition object exists, which sets the columns in the model object
-        #   based on the value of the composition object.
-        # * :mapping - An array where each element is either a symbol or an array of two symbols.
-        #   A symbol is treated like an array of two symbols where both symbols are the same.
-        #   The first symbol represents the getter method in the model, and the second symbol
-        #   represents the getter method in the composition object. Example:
-        #     # Uses columns year, month, and day in the current model
-        #     # Uses year, month, and day methods in the composition object
-        #     {:mapping=>[:year, :month, :day]}
-        #     # Uses columns year, month, and day in the current model
-        #     # Uses y, m, and d methods in the composition object where
-        #     # for example y in the composition object represents year
-        #     # in the model object.
-        #     {:mapping=>[[:year, :y], [:month, :m], [:day, :d]]}
+        # :class :: if using the :mapping option, the class to use, as a Class, String or Symbol.
+        # :composer :: A proc that is instance evaled when the composition getter method is called
+        #              to create the composition.
+        # :decomposer :: A proc that is instance evaled before saving the model object,
+        #                if the composition object exists, which sets the columns in the model object
+        #                based on the value of the composition object.
+        # :mapping :: An array where each element is either a symbol or an array of two symbols.
+        #             A symbol is treated like an array of two symbols where both symbols are the same.
+        #             The first symbol represents the getter method in the model, and the second symbol
+        #             represents the getter method in the composition object. Example:
+        #                 # Uses columns year, month, and day in the current model
+        #                 # Uses year, month, and day methods in the composition object
+        #                 {:mapping=>[:year, :month, :day]}
+        #                 # Uses columns year, month, and day in the current model
+        #                 # Uses y, m, and d methods in the composition object where
+        #                 # for example y in the composition object represents year
+        #                 # in the model object.
+        #                 {:mapping=>[[:year, :y], [:month, :m], [:day, :d]]}
         def composition(name, opts=OPTS)
           opts = opts.dup
           compositions[name] = opts

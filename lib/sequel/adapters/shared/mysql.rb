@@ -161,7 +161,7 @@ module Sequel
       # Return an array of symbols specifying table names in the current database.
       #
       # Options:
-      # * :server - Set the server to use
+      # :server :: Set the server to use
       def tables(opts=OPTS)
         full_tables('BASE TABLE', opts)
       end
@@ -178,7 +178,7 @@ module Sequel
       # Return an array of symbols specifying view names in the current database.
       #
       # Options:
-      # * :server - Set the server to use
+      # :server :: Set the server to use
       def views(opts=OPTS)
         full_tables('VIEW', opts)
       end
@@ -363,8 +363,8 @@ module Sequel
         end
 
         # Split column constraints into table constraints in some cases:
-        # * foreign key - Always
-        # * unique, primary_key - Only if constraint has a name
+        # foreign key - Always
+        # unique, primary_key - Only if constraint has a name
         generator.columns.each do |c|
           if t = c.delete(:table)
             same_table = t == name

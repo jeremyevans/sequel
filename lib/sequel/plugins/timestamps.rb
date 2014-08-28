@@ -22,10 +22,10 @@ module Sequel
       # Configure the plugin by setting the available options.  Note that
       # if this method is run more than once, previous settings are ignored,
       # and it will just use the settings given or the default settings.  Options:
-      # * :create - The field to hold the create timestamp (default: :created_at)
-      # * :force - Whether to overwrite an existing create timestamp (default: false)
-      # * :update - The field to hold the update timestamp (default: :updated_at)
-      # * :update_on_create - Whether to set the update timestamp to the create timestamp when creating (default: false)
+      # :create :: The field to hold the create timestamp (default: :created_at)
+      # :force :: Whether to overwrite an existing create timestamp (default: false)
+      # :update :: The field to hold the update timestamp (default: :updated_at)
+      # :update_on_create :: Whether to set the update timestamp to the create timestamp when creating (default: false)
       def self.configure(model, opts=OPTS)
         model.instance_eval do
           @create_timestamp_field = opts[:create]||:created_at

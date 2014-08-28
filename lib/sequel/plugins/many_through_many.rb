@@ -20,9 +20,9 @@ module Sequel
     #
     # This argument is an array of arrays with three elements.  Each entry in the main array represents a JOIN in SQL:
     #
-    # * The first element in each array represents the name of the table to join.
-    # * The second element in each array represents the column used to join to the previous table.
-    # * The third element in each array represents the column used to join to the next table.
+    # first element :: represents the name of the table to join.
+    # second element :: represents the column used to join to the previous table.
+    # third element :: represents the column used to join to the next table.
     #
     # So the "Artist.many_through_many :tags" is translated into something similar to:
     #
@@ -180,21 +180,21 @@ module Sequel
 
       module ClassMethods
         # Create a many_through_many association.  Arguments:
-        # * name - Same as associate, the name of the association.
-        # * through - The tables and keys to join between the current table and the associated table.
-        #   Must be an array, with elements that are either 3 element arrays, or hashes with keys :table, :left, and :right.
-        #   The required entries in the array/hash are:
-        #   :table (first array element) :: The name of the table to join.
-        #   :left (middle array element) :: The key joining the table to the previous table. Can use an
-        #                                   array of symbols for a composite key association.
-        #   :right (last array element) :: The key joining the table to the next table. Can use an
-        #                                  array of symbols for a composite key association.
-        #   If a hash is provided, the following keys are respected when using eager_graph:
-        #   :block :: A proc to use as the block argument to join.
-        #   :conditions :: Extra conditions to add to the JOIN ON clause.  Must be a hash or array of two pairs.
-        #   :join_type :: The join type to use for the join, defaults to :left_outer.
-        #   :only_conditions :: Conditions to use for the join instead of the ones specified by the keys.
-        # * opts - The options for the associaion.  Takes the same options as many_to_many.
+        # name :: Same as associate, the name of the association.
+        # through :: The tables and keys to join between the current table and the associated table.
+        #            Must be an array, with elements that are either 3 element arrays, or hashes with keys :table, :left, and :right.
+        #            The required entries in the array/hash are:
+        #            :table (first array element) :: The name of the table to join.
+        #            :left (middle array element) :: The key joining the table to the previous table. Can use an
+        #                                            array of symbols for a composite key association.
+        #            :right (last array element) :: The key joining the table to the next table. Can use an
+        #                                           array of symbols for a composite key association.
+        #            If a hash is provided, the following keys are respected when using eager_graph:
+        #            :block :: A proc to use as the block argument to join.
+        #            :conditions :: Extra conditions to add to the JOIN ON clause.  Must be a hash or array of two pairs.
+        #            :join_type :: The join type to use for the join, defaults to :left_outer.
+        #            :only_conditions :: Conditions to use for the join instead of the ones specified by the keys.
+        # opts :: The options for the associaion.  Takes the same options as many_to_many.
         def many_through_many(name, through, opts=OPTS, &block)
           associate(:many_through_many, name, opts.merge(through.is_a?(Hash) ? through : {:through=>through}), &block)
         end
