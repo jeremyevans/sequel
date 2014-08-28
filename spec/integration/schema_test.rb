@@ -681,7 +681,7 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
   end
 
-  cspecify "should work correctly with many operations in a single alter_table call", [:jdbc, :db2], [:db2] do
+  cspecify "should work correctly with many operations in a single alter_table call", [:jdbc, :db2], [:db2], :fdbsql do
     @db.create_table!(:items) do
       primary_key :id
       String :name2
