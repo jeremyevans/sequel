@@ -1867,6 +1867,7 @@ describe "Caching plugins" do
   end
 end
 
+# fdbsql does not support check constraint, so the before blocks here won't work
 unless (DB.adapter_scheme == :fdbsql)
   describe "Sequel::Plugins::ConstraintValidations" do
     before(:all) do
