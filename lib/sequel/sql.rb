@@ -1022,7 +1022,7 @@ module Sequel
         when Regexp
           StringExpression.like(l, r)
         when DelayedEvaluation
-          Sequel.delay{from_value_pair(l, r.callable.call)}
+          Sequel.delay{|ds| from_value_pair(l, r.call(ds))}
         when Dataset::PlaceholderLiteralizer::Argument
           r.transform{|v| from_value_pair(l, v)}
         else
@@ -1220,7 +1220,18 @@ module Sequel
         @callable = callable
       end
 
-      to_s_method :delayed_evaluation_sql, '@callable'
+      # Call the underlying callable and return the result.  If the
+      # underlying callable only accepts a single argument, call it
+      # with the given dataset.
+      def call(ds)
+        if @callable.respond_to?(:arity) && @callable.arity == 1
+          @callable.call(ds)
+        else
+          @callable.call
+        end
+      end
+
+      to_s_method :delayed_evaluation_sql
     end
 
     # Represents an SQL function call.

@@ -41,6 +41,14 @@ describe "Dataset::PlaceholderLiteralizer" do
     @db.sqls.should == ["SELECT s FROM items WHERE ((a = 1) AND (b = (c + 1)) AND (id = 1)) HAVING h", "SELECT s2 FROM items WHERE ((a = 2) AND (b = (d + 1)) AND (id = 2)) HAVING h2"]
   end
   
+  specify "should handle calls with placeholders and delayed arguments that take dataset argument" do
+    d = @ds.select(Sequel.delay{|ds| ds.first_source})
+    loader = @c.loader(d){|pl, ds| ds.where(:a=>pl.arg).where(:b=>Sequel.+(pl.arg, 1)).where(pl.arg)}
+    loader.first(1, :c, :id=>1).should == @h
+    loader.first(2, :d, :id=>2).should == @h
+    @db.sqls.should == ["SELECT items FROM items WHERE ((a = 1) AND (b = (c + 1)) AND (id = 1))", "SELECT items FROM items WHERE ((a = 2) AND (b = (d + 1)) AND (id = 2))"]
+  end
+  
   specify "should handle calls with a placeholders used as filter arguments" do
     loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg)}
     loader.first(:id=>1).should == @h

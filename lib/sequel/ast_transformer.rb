@@ -69,7 +69,7 @@ module Sequel
       when SQL::JoinClause
         SQL::JoinClause.new(o.join_type, v(o.table_expr))
       when SQL::DelayedEvaluation
-        SQL::DelayedEvaluation.new(lambda{v(o.callable.call)})
+        SQL::DelayedEvaluation.new(lambda{|ds| v(o.call(ds))})
       when SQL::Wrapper
         SQL::Wrapper.new(v(o.value))
       else

@@ -3717,6 +3717,11 @@ describe "Sequel::Dataset#qualify" do
     ds.sql.should == 'SELECT t.* FROM t WHERE t.b'
   end
 
+  specify "should handle SQL::DelayedEvaluations that take dataset arguments" do
+    ds = @ds.filter(Sequel.delay{|ds| ds.first_source}).qualify
+    ds.sql.should == 'SELECT t.* FROM t WHERE t.t'
+  end
+
   specify "should handle all other objects by returning them unchanged" do
     @ds.select("a").filter{a(3)}.filter('blah').order(Sequel.lit('true')).group(Sequel.lit('a > ?', 1)).having(false).qualify.sql.should == "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a > 1 HAVING 'f' ORDER BY true"
   end
