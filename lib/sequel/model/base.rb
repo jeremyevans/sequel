@@ -2091,7 +2091,7 @@ module Sequel
       # Returns all methods that can be used for attribute assignment (those that end with =),
       # depending on the type:
       #
-      # :default :: Use the default methods allowed in th model class. 
+      # :default :: Use the default methods allowed in the model class. 
       # :all :: Allow setting all setters, except those specifically restricted (such as ==).
       # Array :: Only allow setting of columns in the given array.
       def setter_methods(type)
