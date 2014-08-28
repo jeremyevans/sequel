@@ -1046,11 +1046,13 @@ module Sequel
     # SQL expression object based on the expr type.  See +where+.
     def filter_expr(expr = nil, &block)
       expr = nil if expr == []
+
       if expr && block
         return SQL::BooleanExpression.new(:AND, filter_expr(expr), filter_expr(block))
       elsif block
         expr = block
       end
+
       case expr
       when Hash
         SQL::BooleanExpression.from_value_pairs(expr)
@@ -1064,10 +1066,8 @@ module Sequel
         end
       when Proc
         filter_expr(Sequel.virtual_row(&expr))
-      when SQL::NumericExpression, SQL::StringExpression
-        raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
-      when Symbol, SQL::Expression
-        expr
+      when Numeric, SQL::NumericExpression, SQL::StringExpression
+        raise(Error, "Invalid filter expression: #{expr.inspect}") 
       when TrueClass, FalseClass
         if supports_where_true?
           SQL::BooleanExpression.new(:NOOP, expr)
@@ -1081,7 +1081,7 @@ module Sequel
       when PlaceholderLiteralizer::Argument
         expr.transform{|v| filter_expr(v)}
       else
-        raise(Error, "Invalid filter argument: #{expr.inspect}")
+        expr
       end
     end
     

@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow more types as filter expressions, only specifically disallow Numeric/String expressions (jeremyevans)
+
 * Remove objects from cached association array at time of nested_attributes call instead of waiting until save (jeremyevans)
 
 * Handle composite primary keys when working around validation issues for one_to_(one|many) associations in nested_attributes plugin (jeremyevans) (#870)

@@ -593,8 +593,18 @@ describe "Dataset#where" do
       "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
   end
 
-  specify "should raise an error if an invalid argument is used" do
+  specify "should handle arbitrary objects" do
+    o = Object.new
+    def o.sql_literal(ds)
+      "foo"
+    end
+    @dataset.filter(o).sql.should == 'SELECT * FROM test WHERE foo'
+  end
+
+  specify "should raise an error if an numeric is used" do
     proc{@dataset.filter(1)}.should raise_error(Sequel::Error)
+    proc{@dataset.filter(1.0)}.should raise_error(Sequel::Error)
+    proc{@dataset.filter(BigDecimal.new('1.0'))}.should raise_error(Sequel::Error)
   end
 
   specify "should raise an error if a NumericExpression or StringExpression is used" do
