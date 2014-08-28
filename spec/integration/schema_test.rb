@@ -364,7 +364,7 @@ describe "Database schema modifiers" do
     end
   end
 
-  specify "should create temporary tables without raising an exception" do
+  cspecify "should create temporary tables without raising an exception", :fdbsql do
     @db.create_table!(:items_temp, :temp=>true){Integer :number}
   end
 
