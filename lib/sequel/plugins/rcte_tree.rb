@@ -66,10 +66,10 @@ module Sequel
     # You can override the options for any specific association by making
     # sure the plugin options contain one of the following keys:
     #
-    # * :parent - hash of options for the parent association
-    # * :children - hash of options for the children association
-    # * :ancestors - hash of options for the ancestors association
-    # * :descendants - hash of options for the descendants association
+    # :parent :: hash of options for the parent association
+    # :children :: hash of options for the children association
+    # :ancestors :: hash of options for the ancestors association
+    # :descendants :: hash of options for the descendants association
     #
     # Note that you can change the name of the above associations by specifying
     # a :name key in the appropriate hash of options above.  For example:
@@ -80,15 +80,15 @@ module Sequel
     # Any other keys in the main options hash are treated as options shared by
     # all of the associations.  Here's a few options that affect the plugin:
     #
-    # * :key - The foreign key in the table that points to the primary key
-    #   of the parent (default: :parent_id)
-    # * :primary_key - The primary key to use (default: the model's primary key)
-    # * :key_alias - The symbol identifier to use for aliasing when eager
-    #   loading (default: :x_root_x)
-    # * :cte_name - The symbol identifier to use for the common table expression
-    #   (default: :t)
-    # * :level_alias - The symbol identifier to use when eagerly loading descendants
-    #   up to a given level (default: :x_level_x)
+    # :key :: The foreign key in the table that points to the primary key
+    #         of the parent (default: :parent_id)
+    # :primary_key :: The primary key to use (default: the model's primary key)
+    # :key_alias :: The symbol identifier to use for aliasing when eager
+    #               loading (default: :x_root_x)
+    # :cte_name :: The symbol identifier to use for the common table expression
+    #              (default: :t)
+    # :level_alias :: The symbol identifier to use when eagerly loading descendants
+    #                 up to a given level (default: :x_level_x)
     module RcteTree
       # Create the appropriate parent, children, ancestors, and descendants
       # associations for the model.

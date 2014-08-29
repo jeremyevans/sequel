@@ -15,6 +15,7 @@
 #
 #   DB.extension(:graph_each)
 
+#
 module Sequel
   module GraphEach
     # Call graph_each for graphed datasets that are not being eager graphed.

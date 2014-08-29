@@ -280,7 +280,6 @@ module Sequel
     FORMAT_DATE_STANDARD = "DATE '%Y-%m-%d'".freeze
     FORMAT_OFFSET = "%+03i%02i".freeze
     FORMAT_TIMESTAMP_RE = /%[Nz]/.freeze
-    FORMAT_TIMESTAMP_USEC = ".%06d".freeze
     FORMAT_USEC = '%N'.freeze
     FRAME_ALL = "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING".freeze
     FRAME_ROWS = "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW".freeze
@@ -331,10 +330,11 @@ module Sequel
     USING = ' USING ('.freeze
     UNION_ALL_SELECT = ' UNION ALL SELECT '.freeze
     VALUES = " VALUES ".freeze
-    V190 = '1.9.0'.freeze
     WHERE = " WHERE ".freeze
     WITH_ORDINALITY = " WITH ORDINALITY".freeze
     WITHIN_GROUP = " WITHIN GROUP (ORDER BY ".freeze
+
+    DATETIME_SECFRACTION_ARG = RUBY_VERSION >= '1.9.0' ? 1000000 : 86400000000
 
     [:literal, :quote_identifier, :quote_schema_table].each do |meth|
       class_eval(<<-END, __FILE__, __LINE__ + 1)
@@ -517,11 +517,11 @@ module Sequel
 
     # Append literalization of delayed evaluation to SQL string,
     # causing the delayed evaluation proc to be evaluated.
-    def delayed_evaluation_sql_append(sql, callable)
+    def delayed_evaluation_sql_append(sql, delay)
       if recorder = @opts[:placeholder_literalizer]
-        recorder.use(sql, callable, nil)
+        recorder.use(sql, lambda{delay.call(self)}, nil)
       else
-        literal_append(sql, callable.call)
+        literal_append(sql, delay.call(self))
       end
     end
 
@@ -1022,7 +1022,7 @@ module Sequel
       v2 = db.from_application_timestamp(v)
       fmt = default_timestamp_format.gsub(FORMAT_TIMESTAMP_RE) do |m|
         if m == FORMAT_USEC
-          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(RUBY_VERSION < V190 ? 86400000000 : 1000000) : v.usec) if supports_timestamp_usecs?
+          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*(DATETIME_SECFRACTION_ARG) : v.usec) if supports_timestamp_usecs?
         else
           if supports_timestamp_timezones?
             # Would like to just use %z format, but it doesn't appear to work on Windows
@@ -1043,7 +1043,10 @@ module Sequel
     # Return the SQL timestamp fragment to use for the fractional time part.
     # Should start with the decimal point.  Uses 6 decimal places by default.
     def format_timestamp_usec(usec)
-      sprintf(FORMAT_TIMESTAMP_USEC, usec)
+      unless (ts = timestamp_precision) == 6
+        usec = usec/(10 ** (6 - ts))
+      end
+      sprintf(".%0#{ts}d", usec)
     end
 
     # Append literalization of identifier to SQL string, considering regular strings
@@ -1082,7 +1085,11 @@ module Sequel
 
     def insert_into_sql(sql)
       sql << INTO
-      source_list_append(sql, @opts[:from])
+      if (f = @opts[:from]) && f.length == 1
+        identifier_append(sql, unaliased_identifier(f.first))
+      else
+        source_list_append(sql, f)
+      end
     end
 
     def insert_columns_sql(sql)
@@ -1130,11 +1137,6 @@ module Sequel
     # spaces and upcases.
     def join_type_sql(join_type)
       "#{join_type.to_s.gsub(UNDERSCORE, SPACE).upcase} JOIN"
-    end
-
-    # Whether this dataset is a joined dataset
-    def joined_dataset?
-     (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
     end
 
     # Append a literalization of the array to SQL string.
@@ -1511,6 +1513,11 @@ module Sequel
     # Append literalization of the subselect to SQL String.
     def subselect_sql_append(sql, ds)
       ds.clone(:append_sql=>sql).sql
+    end
+
+    # The number of decimal digits of precision to use in timestamps.
+    def timestamp_precision
+      supports_timestamp_usecs? ? 6 : 0
     end
 
     def update_table_sql(sql)

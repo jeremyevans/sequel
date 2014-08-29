@@ -1,5 +1,15 @@
+Sequel::JDBC.load_driver('org.h2.Driver', :H2)
+
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:h2] = proc do |db|
+        db.extend(Sequel::JDBC::H2::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::H2::Dataset
+        org.h2.Driver
+      end
+    end
+
     # Database and Dataset support for H2 databases accessed via JDBC.
     module H2
       # Instance methods for H2 Database objects accessed via JDBC.

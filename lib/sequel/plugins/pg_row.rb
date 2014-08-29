@@ -28,7 +28,7 @@ module Sequel
     #
     #   DB[:company].first
     #   # => {:name=>'MS', :address=>
-    #     Address.load(:street=>'123 Foo St', :city=>'Bar Town', :zip=>'12345')}
+    #   #  Address.load(:street=>'123 Foo St', :city=>'Bar Town', :zip=>'12345')}
     #
     # If you want a lot of your models to be used as row types, you can load the
     # plugin into Sequel::Model itself:

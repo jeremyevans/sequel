@@ -35,7 +35,7 @@ module Sequel
     #     :arguments => [2],
     #     :block => {|x| 3},
     #     :instance => artist,
-    #     :reflection => {:name=>:albums, ...},
+    #     :reflection => {:name=>:albums} # AssociationReflection instance 
     #     :proxy_argument => 1,
     #     :proxy_block => {|ds| ds}
     #   }

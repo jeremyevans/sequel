@@ -67,7 +67,7 @@ module Sequel
       where(*cond, &block)
     end
     
-    # Returns a new clone of the dataset with with the given options merged.
+    # Returns a new clone of the dataset with the given options merged.
     # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
     # columns are deleted.  This method should generally not be called
     # directly by user code.
@@ -694,6 +694,7 @@ module Sequel
     #   DB[:items].returning(nil) # RETURNING NULL
     #   DB[:items].returning(:id, :name) # RETURNING id, name
     def returning(*values)
+      raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
       clone(:returning=>values)
     end
 
@@ -861,18 +862,18 @@ module Sequel
     # 
     # Accepts the following argument types:
     #
-    # * Hash - list of equality/inclusion expressions
-    # * Array - depends:
-    #   * If first member is a string, assumes the rest of the arguments
-    #     are parameters and interpolates them into the string.
-    #   * If all members are arrays of length two, treats the same way
-    #     as a hash, except it allows for duplicate keys to be
-    #     specified.
-    #   * Otherwise, treats each argument as a separate condition.
-    # * String - taken literally
-    # * Symbol - taken as a boolean column argument (e.g. WHERE active)
-    # * Sequel::SQL::BooleanExpression - an existing condition expression,
-    #   probably created using the Sequel expression filter DSL.
+    # Hash :: list of equality/inclusion expressions
+    # Array :: depends:
+    #          * If first member is a string, assumes the rest of the arguments
+    #            are parameters and interpolates them into the string.
+    #          * If all members are arrays of length two, treats the same way
+    #            as a hash, except it allows for duplicate keys to be
+    #            specified.
+    #          * Otherwise, treats each argument as a separate condition.
+    # String :: taken literally
+    # Symbol :: taken as a boolean column argument (e.g. WHERE active)
+    # Sequel::SQL::BooleanExpression :: an existing condition expression,
+    #                                   probably created using the Sequel expression filter DSL.
     #
     # where also accepts a block, which should return one of the above argument
     # types, and is treated the same way.  This block yields a virtual row object,
@@ -1045,11 +1046,13 @@ module Sequel
     # SQL expression object based on the expr type.  See +where+.
     def filter_expr(expr = nil, &block)
       expr = nil if expr == []
+
       if expr && block
         return SQL::BooleanExpression.new(:AND, filter_expr(expr), filter_expr(block))
       elsif block
         expr = block
       end
+
       case expr
       when Hash
         SQL::BooleanExpression.from_value_pairs(expr)
@@ -1063,10 +1066,8 @@ module Sequel
         end
       when Proc
         filter_expr(Sequel.virtual_row(&expr))
-      when SQL::NumericExpression, SQL::StringExpression
-        raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
-      when Symbol, SQL::Expression
-        expr
+      when Numeric, SQL::NumericExpression, SQL::StringExpression
+        raise(Error, "Invalid filter expression: #{expr.inspect}") 
       when TrueClass, FalseClass
         if supports_where_true?
           SQL::BooleanExpression.new(:NOOP, expr)
@@ -1080,7 +1081,7 @@ module Sequel
       when PlaceholderLiteralizer::Argument
         expr.transform{|v| filter_expr(v)}
       else
-        raise(Error, "Invalid filter argument: #{expr.inspect}")
+        expr
       end
     end
     

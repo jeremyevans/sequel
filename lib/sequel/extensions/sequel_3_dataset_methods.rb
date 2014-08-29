@@ -19,6 +19,7 @@
 #
 #   DB.extension(:sequel_3_dataset_methods)
 
+#
 module Sequel
   module Sequel3DatasetMethods
     COMMA = Dataset::COMMA

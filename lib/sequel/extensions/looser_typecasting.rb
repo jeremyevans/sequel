@@ -10,6 +10,7 @@
 #
 #   DB.extension :looser_typecasting
 
+#
 module Sequel
   module LooserTypecasting
     # Typecast the value to a Float using to_f instead of Kernel.Float

@@ -1206,13 +1206,24 @@ module Sequel
         
         # The columns to select when loading the association, associated_class.table_name.* by default.
         def select
-          cached_fetch(:select){Sequel::SQL::ColumnAll.new(associated_class.table_name)}
+          cached_fetch(:select){default_select}
         end
 
         private
 
         def _associated_dataset
           super.inner_join(self[:join_table], self[:right_keys].zip(right_primary_keys), :qualify=>:deep)
+        end
+
+        # The default selection for associations that require joins.  These do not use the default
+        # model selection unless all entries in the select are explicitly qualified identifiers, as
+        # other it can include unqualified columns which would be made ambiguous by joining.
+        def default_select
+          if (sel = associated_class.dataset.opts[:select]) && sel.all?{|c| selection_is_qualified?(c)}
+            sel
+          else
+            Sequel::SQL::ColumnAll.new(associated_class.table_name)
+          end
         end
 
         def filter_by_associations_conditions_associated_keys
@@ -1250,6 +1261,21 @@ module Sequel
 
         def reciprocal_type
           :many_to_many
+        end
+
+        # Whether the given expression represents a qualified identifier.  Used to determine if it is
+        # OK to use directly when joining.
+        def selection_is_qualified?(c)
+          case c
+          when Symbol
+            Sequel.split_symbol(c)[0]
+          when Sequel::SQL::QualifiedIdentifier
+            true
+          when Sequel::SQL::AliasedExpression
+            selection_is_qualified?(c.expression)
+          else
+            false
+          end
         end
 
         # Split the join table into source and alias parts.
@@ -1478,8 +1504,8 @@ module Sequel
         #                the current association's key(s).  Set to nil to not use a reciprocal.
         # :remover :: Proc used to define the private _remove_* method for doing the database work
         #             to remove the association between the given object and the current object (*_to_many assocations).
-        # :select :: the columns to select.  Defaults to the associated class's
-        #            table_name.* in a many_to_many association, which means it doesn't include the attributes from the
+        # :select :: the columns to select.  Defaults to the associated class's table_name.* in an association
+        #            that uses joins, which means it doesn't include the attributes from the
         #            join table.  If you want to include the join table attributes, you can
         #            use this option, but beware that the join table attributes can clash with
         #            attributes from the model table, so you should alias any attributes that have
@@ -1765,10 +1791,10 @@ module Sequel
                 select_all(egds.first_source).
                 select_append(*associated_key_array)
               egds = opts.apply_eager_graph_limit_strategy(egls, egds)
-              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :select=>select||orig_egds.columns, &graph_block)
+              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :join_only=>eo[:join_only], :select=>select||orig_egds.columns, &graph_block)
             else
-              ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>eo[:join_type]||jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>eo[:from_self_alias], &jt_graph_block)
-              ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, &graph_block)
+              ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>eo[:join_type]||jt_join_type, :join_only=>eo[:join_only], :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>eo[:from_self_alias], &jt_graph_block)
+              ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, :join_only=>eo[:join_only], &graph_block)
             end
           end
       
@@ -2535,7 +2561,7 @@ END
           end
           local_opts = ds.opts[:eager_graph][:local]
           limit_strategy = r.eager_graph_limit_strategy(local_opts[:limit_strategy])
-          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
+          ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :join_only=>local_opts[:join_only], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
           if r[:order_eager_graph] && (order = r.fetch(:graph_order, r[:order]))
             ds = ds.order_more(*qualified_expression(order, assoc_table_alias))
           end
@@ -2588,7 +2614,7 @@ END
         # Return a new dataset with JOINs of the given type added, using the tables and
         # conditions specified by the associations.
         def _association_join(type, associations)
-          clone(:join=>clone(:graph_from_self=>false).eager_graph_with_options(associations, :join_type=>type).opts[:join])
+          clone(:join=>clone(:graph_from_self=>false).eager_graph_with_options(associations, :join_type=>type, :join_only=>true).opts[:join])
         end
 
         # If the association has conditions itself, then it requires additional filters be

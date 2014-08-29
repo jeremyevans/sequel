@@ -900,6 +900,14 @@ module Sequel
         schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}
+
+          # Set the primary key(s) based on the schema information,
+          # if the schema information includes primary key information
+          if schema_array.all?{|k,v| v.has_key?(:primary_key)}
+            pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
+            pks.length > 0 ? set_primary_key(pks) : no_primary_key
+          end
+
           if (select = ds_opts[:select]) && !(select.length == 1 && select.first.is_a?(SQL::ColumnAll))
             # We don't remove the columns from the schema_hash,
             # as it's possible they will be used for typecasting
@@ -913,12 +921,6 @@ module Sequel
             # returned by the schema.
             cols = schema_array.collect{|k,v| k}
             set_columns(cols)
-            # Set the primary key(s) based on the schema information,
-            # if the schema information includes primary key information
-            if schema_array.all?{|k,v| v.has_key?(:primary_key)}
-              pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
-              pks.length > 0 ? set_primary_key(pks) : no_primary_key
-            end
             # Also set the columns for the dataset, so the dataset
             # doesn't have to do a query to get them.
             dataset.instance_variable_set(:@columns, cols)
@@ -1036,6 +1038,8 @@ module Sequel
           ds.literal_append(sql, pk)
           ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
+        elsif dataset.joined_dataset?
+          first_where(qualified_primary_key_hash(pk))
         else
           first_where(primary_key_hash(pk))
         end
@@ -1147,7 +1151,7 @@ module Sequel
         changed_columns.clear 
         yield self if block_given?
       end
-      
+
       # Returns value of the column's attribute.
       #
       #   Artist[1][:id] #=> 1
@@ -1216,14 +1220,6 @@ module Sequel
         @changed_columns ||= []
       end
   
-      # Similar to Model#dup, but copies frozen status to returned object
-      # if current object is frozen.
-      def clone
-        o = dup
-        o.freeze if frozen?
-        o
-      end
-
       # Deletes and returns +self+.  Does not run destroy hooks.
       # Look into using +destroy+ instead.
       #
@@ -1249,18 +1245,6 @@ module Sequel
         checked_save_failure(opts){checked_transaction(opts){_destroy(opts)}}
       end
 
-      # Produce a shallow copy of the object, similar to Object#dup.
-      def dup
-        s = self
-        super.instance_eval do
-          @values = s.values.dup
-          @changed_columns = s.changed_columns.dup
-          @errors = s.errors.dup
-          @this = s.this.dup if !new? && model.primary_key
-          self
-        end
-      end
-  
       # Iterates through all of the current values using each.
       #
       #  Album[1].each{|k, v| puts "#{k} => #{v}"}
@@ -1367,7 +1351,7 @@ module Sequel
       #   a = Artist[1]
       #   Artist.db.transaction do
       #     a.lock!
-      #     a.update(...)
+      #     a.update(:name=>'A')
       #   end
       def lock!
         _refresh(this.for_update) unless new?
@@ -1511,6 +1495,7 @@ module Sequel
       def save(opts=OPTS)
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
+        _before_validation
         if opts[:validate] != false
           unless checked_save_failure(opts){_valid?(true, opts)}
             raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
@@ -1642,7 +1627,16 @@ module Sequel
       #   Artist[1].this
       #   # SELECT * FROM artists WHERE (id = 1) LIMIT 1
       def this
-        @this ||= use_server(model.instance_dataset.filter(pk_hash))
+        return @this if @this
+        raise Error, "No dataset for model #{model}" unless ds = model.instance_dataset
+
+        cond = if ds.joined_dataset?
+          model.qualified_primary_key_hash(pk)
+        else
+          pk_hash
+        end
+
+        @this = use_server(ds.where(cond))
       end
       
       # Runs #set with the passed hash and then runs save_changes.
@@ -1701,11 +1695,21 @@ module Sequel
       #   artist(:name=>'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = OPTS)
+        _before_validation
         _valid?(false, opts)
       end
 
       private
       
+      # Run code before any validation is done, but also run it before saving
+      # even if validation is skipped.  This is a private hook.  It exists so that
+      # plugins can set values automatically before validation (as the values
+      # need to be validated), but should be set even if validation is skipped.
+      # Unlike the regular before_validation hook, we do not skip the save/validation
+      # if this returns false.
+      def _before_validation
+      end
+
       # Do the deletion of the object's dataset, and check that the row
       # was actually deleted.
       def _delete
@@ -1761,7 +1765,7 @@ module Sequel
       # the record should be refreshed from the database.
       def _insert
         ds = _insert_dataset
-        if !ds.opts[:select] and ds.supports_insert_select? and h = _insert_select_raw(ds)
+        if _use_insert_select?(ds) && (h = _insert_select_raw(ds))
           _save_set_values(h)
           nil
         else
@@ -1924,6 +1928,11 @@ module Sequel
         _update_dataset.update(columns)
       end
 
+      # Whether to use insert_select when inserting a new row.
+      def _use_insert_select?(ds)
+        (!ds.opts[:select] || ds.opts[:returning]) && ds.supports_insert_select? 
+      end
+
       # Internal validation method.  If +raise_errors+ is +true+, hook
       # failures will be raised as HookFailure exceptions.  If it is
       # +false+, +false+ will be returned instead.
@@ -1990,6 +1999,36 @@ module Sequel
         Errors
       end
 
+      if RUBY_VERSION >= '1.9'
+        # Clone constructor -- freeze internal data structures if the original's
+        # are frozen.
+        def initialize_clone(other)
+          super
+          freeze if other.frozen?
+          self
+        end
+      else
+        # :nocov:
+        # Ruby 1.8 doesn't support initialize_clone, so override clone to dup and freeze. 
+        def clone
+          o = dup
+          o.freeze if frozen?
+          o
+        end
+        public :clone
+        # :nocov:
+      end
+
+      # Copy constructor -- Duplicate internal data structures.
+      def initialize_copy(other)
+        super
+        @values = @values.dup
+        @changed_columns = @changed_columns.dup if @changed_columns
+        @errors = @errors.dup if @errors
+        @this = @this.dup if @this
+        self
+      end
+
       # Set the columns with the given hash.  By default, the same as +set+, but
       # exists so it can be overridden.  This is called only for new records, before
       # changed_columns is cleared.
@@ -2052,7 +2091,7 @@ module Sequel
       # Returns all methods that can be used for attribute assignment (those that end with =),
       # depending on the type:
       #
-      # :default :: Use the default methods allowed in th model class. 
+      # :default :: Use the default methods allowed in the model class. 
       # :all :: Allow setting all setters, except those specifically restricted (such as ==).
       # Array :: Only allow setting of columns in the given array.
       def setter_methods(type)
@@ -2210,7 +2249,7 @@ module Sequel
       # If there is no order already defined on this dataset, order it by
       # the primary key and call paged_each.
       #
-      #   Album.paged_each{|row| ...}
+      #   Album.paged_each{|row| }
       #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 0
       #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 1000
       #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 2000

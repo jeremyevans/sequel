@@ -187,7 +187,7 @@ module Sequel
       # Array of symbols specifying the table names in the current database.
       #
       # Options:
-      # * :server - Set the server to use.
+      # :server :: Set the server to use.
       def tables(opts=OPTS)
         tables_and_views(TABLES_FILTER, opts)
       end
@@ -207,7 +207,7 @@ module Sequel
       # Array of symbols specifying the view names in the current database.
       #
       # Options:
-      # * :server - Set the server to use.
+      # :server :: Set the server to use.
       def views(opts=OPTS)
         tables_and_views(VIEWS_FILTER, opts)
       end

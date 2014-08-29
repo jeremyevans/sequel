@@ -28,6 +28,7 @@
 #
 #   DB.extension :error_sql
 
+#
 module Sequel
   class DatabaseError
     # Get the SQL code that caused this error to be raised.

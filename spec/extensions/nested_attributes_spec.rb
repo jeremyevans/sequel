@@ -36,12 +36,16 @@ describe "NestedAttributes plugin" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
     @Artist.one_to_many :concerts, :class=>@Concert, :key=>:artist_id
     @Artist.one_to_one :first_album, :class=>@Album, :key=>:artist_id
+    @Artist.one_to_one :first_concert, :class=>@Concert, :key=>:artist_id
+    @Concert.one_to_many :albums, :class=>@Album, :key=>:artist_id, :primary_key=>:artist_id
     @Album.many_to_one :artist, :class=>@Artist, :reciprocal=>:albums
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
     @Tag.many_to_many :albums, :class=>@Album, :left_key=>:tag_id, :right_key=>:album_id, :join_table=>:at
     @Artist.nested_attributes :albums, :first_album, :destroy=>true, :remove=>true
     @Artist.nested_attributes :concerts, :destroy=>true, :remove=>true
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
+    @Artist.nested_attributes :first_concert
+    @Concert.nested_attributes :albums
     @db.sqls
   end
   
@@ -76,7 +80,7 @@ describe "NestedAttributes plugin" do
     @Album.class_eval do
       plugin :validation_helpers
       def validate
-        validates_presence :artist_id
+        validates_integer :artist_id
         super
       end
     end
@@ -94,6 +98,55 @@ describe "NestedAttributes plugin" do
     check_sql_array(["INSERT INTO artists (name, id) VALUES ('Ar', 1)", "INSERT INTO artists (id, name) VALUES (1, 'Ar')"],
       "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)",
       ["INSERT INTO albums (artist_id, name) VALUES (1, 'Al')", "INSERT INTO albums (name, artist_id) VALUES ('Al', 1)"])
+  end
+
+  it "should support creating new one_to_many and one_to_one objects with composite keys with presence validations on the foreign key" do
+    insert = nil
+    @Album.class_eval do
+      plugin :validation_helpers
+      def validate
+        validates_integer :artist_id
+        super
+      end
+    end
+    @Concert.class_eval do
+      define_method :_insert do
+        insert = values.dup
+      end
+      def before_create # Have to define the CPK somehow.
+        self.tour = 'To'
+        self.date = '2004-04-05'
+        super
+      end
+      def after_create
+        super
+        self.artist_id = 3
+      end
+    end
+
+    c = @Concert.new(:playlist=>'Pl')
+    @db.sqls.should == []
+    c.albums_attributes = [{:name=>'Al'}]
+    c.save
+    insert.should == {:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl'}
+    check_sql_array(["INSERT INTO albums (name, artist_id) VALUES ('Al', 3)", "INSERT INTO albums (artist_id, name) VALUES (3, 'Al')"])
+
+    @Concert.class_eval do
+      plugin :validation_helpers
+      def validate
+        validates_integer :artist_id
+        super
+      end
+    end
+
+    a = @Artist.new(:name=>'Ar')
+    a.id = 1
+    a.first_concert_attributes = {:playlist=>'Pl'}
+    @db.sqls.should == []
+    a.save
+    check_sql_array(["INSERT INTO artists (name, id) VALUES ('Ar', 1)", "INSERT INTO artists (id, name) VALUES (1, 'Ar')"],
+                   "UPDATE concerts SET artist_id = NULL WHERE (artist_id = 1)")
+    insert.should == {:tour=>'To', :date=>'2004-04-05', :artist_id=>1, :playlist=>'Pl'}
   end
 
   it "should should not remove existing values from object when validating" do
@@ -130,7 +183,7 @@ describe "NestedAttributes plugin" do
     insert = nil
     @Concert.class_eval do
       define_method :_insert do
-        insert = values
+        insert = values.dup
       end
       def before_create # Have to define the CPK somehow.
         self.tour = 'To'
@@ -151,7 +204,7 @@ describe "NestedAttributes plugin" do
     @Album.class_eval do
       unrestrict_primary_key
       define_method :_insert do
-        insert = values
+        insert = values.dup
       end
     end
     a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:id=>7, :name=>'Al'}]})
@@ -166,7 +219,7 @@ describe "NestedAttributes plugin" do
     @Artist.nested_attributes :concerts, :unmatched_pk=>:create
     @Concert.class_eval do
       define_method :_insert do
-        insert = values
+        insert = values.dup
       end
     end
     a = @Artist.new({:name=>'Ar', :concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :playlist=>'Pl'}]})
@@ -271,6 +324,7 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     ar.associations[:albums] = [al]
     ar.set(:albums_attributes=>[{:id=>10, :_remove=>'t'}])
+    ar.associations[:albums].should == []
     @db.sqls.should == []
     @Album.dataset._fetch = {:id=>1}
     ar.save
@@ -284,6 +338,7 @@ describe "NestedAttributes plugin" do
     t = @Tag.load(:id=>20, :name=>'T')
     a.associations[:tags] = [t]
     a.set(:tags_attributes=>[{:id=>20, :_remove=>true}])
+    a.associations[:tags].should == []
     @db.sqls.should == []
     a.save
     @db.sqls.should == ["DELETE FROM at WHERE ((album_id = 10) AND (tag_id = 20))", "UPDATE albums SET name = 'Al' WHERE (id = 10)"]

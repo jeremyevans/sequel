@@ -57,7 +57,7 @@ describe "Model#save" do
     ds._fetch = {:y=>2}
     def ds.supports_insert_select?() true end
     def ds.insert_select(hash)
-      execute("INSERT INTO items (y) VALUES (2) RETURNING *"){|r| return r}
+      with_sql_first("INSERT INTO items (y) VALUES (2) RETURNING *")
     end
     o = @c.new(:x => 1)
     o.save
@@ -70,6 +70,23 @@ describe "Model#save" do
     ds = @c.dataset = @c.dataset.select(:y)
     ds.should_not_receive(:insert_select)
     @c.new(:x => 1).save
+  end
+
+  it "should use dataset's insert_select method if the dataset uses returning, even if specific columns are selected" do
+    def (@c.dataset).supports_returning?(_) true end
+    ds = @c.dataset = @c.dataset.select(:y).returning(:y)
+    DB.reset
+    ds = @c.instance_dataset
+    ds._fetch = {:y=>2}
+    def ds.supports_insert_select?() true end
+    def ds.insert_select(hash)
+      with_sql_first("INSERT INTO items (y) VALUES (2) RETURNING y")
+    end
+    o = @c.new(:x => 1)
+    o.save
+    
+    o.values.should == {:y=>2}
+    DB.sqls.should == ["INSERT INTO items (y) VALUES (2) RETURNING y"]
   end
 
   it "should use value returned by insert as the primary key and refresh the object" do
@@ -781,6 +798,12 @@ describe Sequel::Model, "#this" do
 
     instance = @example.load(:a => 3)
     instance.this.sql.should == "SELECT * FROM examples WHERE (a = 3) LIMIT 1"
+  end
+
+  it "should use a qualified primary key if the dataset is joined" do
+    @example.dataset = @example.dataset.cross_join(:a)
+    instance = @example.load(:id => 3)
+    instance.this.sql.should == "SELECT * FROM examples CROSS JOIN a WHERE (examples.id = 3) LIMIT 1"
   end
 
   it "should support composite primary keys" do

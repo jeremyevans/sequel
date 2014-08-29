@@ -19,6 +19,7 @@
 #
 #   DB.extension(:pretty_table)
 
+#
 module Sequel
   extension :_pretty_table
 

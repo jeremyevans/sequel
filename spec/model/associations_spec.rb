@@ -1890,6 +1890,30 @@ describe Sequel::Model, "many_to_many" do
     end
   end
   
+  it "should not override a selection consisting completely of qualified columns using Sequel::SQL::QualifiedIdentifier" do
+    @c1.dataset = @c1.dataset.select(Sequel.qualify(:attributes, :id), Sequel.qualify(:attributes, :b))
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.id, attributes.b FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
+  end
+  
+  it "should not override a selection consisting completely of qualified columns using symbols" do
+    @c1.dataset = @c1.dataset.select(:attributes__id, :attributes__b)
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.id, attributes.b FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
+  end
+  
+  it "should not override a selection consisting completely of qualified columns using Sequel::SQL::AliasedExpression" do
+    @c1.dataset = @c1.dataset.select(Sequel.qualify(:attributes, :id).as(:a), Sequel.as(:attributes__b, :c))
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.id AS a, attributes.b AS c FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
+  end
+  
+  it "should override a selection consisting of non qualified columns" do
+    @c1.dataset = @c1.dataset.select{foo(:bar)}
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'
+  end
+  
   it "should respect :eager_loader_predicate_key when lazily loading" do
     @c2.many_to_many :attributes, :class => @c1, :eager_loading_predicate_key=>Sequel.subscript(:attributes_nodes__node_id, 0)
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id[0] = 1234)'

@@ -62,7 +62,7 @@ module Sequel
     #
     # Your web stack will probably parse that into a nested hash similar to:
     #
-    #   {:artist=>{:name=>?, :albums_attributes=>{0=>{:name=>?}, 1=>{:id=>?, :name=>?}}}}
+    #   {:artist=>{:name=>'Y', :albums_attributes=>{0=>{:name=>'X'}, 1=>{:id=>'2', :name=>'Z'}}}}
     #
     # Then you can do:
     #
@@ -218,6 +218,9 @@ module Sequel
             end
           end
           after_save_hook{obj.destroy} if opts[:destroy]
+          if reflection.returns_array?
+            associations[reflection[:name]].delete(obj)
+          end
           obj
         end
         
@@ -304,8 +307,9 @@ module Sequel
             # which will fail if we validate before saving the current object.  If there is
             # no value for the foreign key, set it to the current primary key value, or a dummy
             # value of 0 if we haven't saved the current object.
-            obj.values[key] = pk || 0
-            key = nil if pk
+            p_key = pk unless pk.is_a?(Array)
+            obj.values[key] = p_key || 0
+            key = nil if p_key
           end
           obj.errors.full_messages.each{|m| errors.add(association, m)} unless obj.valid?
           if key && !pk_val

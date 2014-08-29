@@ -1533,6 +1533,16 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON "test" CASCADE'
     # Make sure if exists works
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
+
+    if @d.supports_trigger_conditions?
+      @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true, :when=> {:new__name => 'b'}).should == %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()}
+      @d.create_trigger(:test, :identity, :tf, :each_row=>true, :events => :update, :when=> {:new__name => 'b'})
+      proc{@d[:test].filter(:name=>'a').update(:value=>nil)}.should_not raise_error
+      @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>nil}]
+      proc{@d[:test].filter(:name=>'a').update(:name=>'b')}.should raise_error(Sequel::DatabaseError)
+      @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>nil}]
+      @d.drop_trigger(:test, :identity)
+    end
   end
 end
 
@@ -3436,3 +3446,44 @@ describe 'pg_static_cache_updater extension' do
     q.pop
   end
 end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
+
+describe 'PostgreSQL enum types' do
+  before(:all) do
+    @db = DB
+    @db.extension :pg_array, :pg_enum
+    @db.create_enum(:test_enum, %w'a b c d')
+
+    @db.create_table!(:test_enumt) do
+      test_enum  :t
+    end
+  end
+  after(:all) do
+    @db.drop_table?(:test_enumt)
+    @db.drop_enum(:test_enum)
+  end
+
+  specify "should return correct entries in the schema" do
+    s = @db.schema(:test_enumt)
+    s.first.last[:type].should == :enum
+    s.first.last[:enum_values].should == %w'a b c d'
+  end
+
+  it "should add array parsers for enum values" do
+    @db.get(Sequel.pg_array(%w'a b', :test_enum)).should == %w'a b'
+  end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+
+  it "should set up model typecasting correctly" do
+    c = Class.new(Sequel::Model(:test_enumt))
+    o = c.new
+    o.t = :a
+    o.t.should == 'a'
+  end
+
+  it "should add values to existing enum" do
+    @db.add_enum_value(:test_enum, 'e')
+    @db.add_enum_value(:test_enum, 'f', :after=>'a')
+    @db.add_enum_value(:test_enum, 'g', :before=>'b')
+    @db.add_enum_value(:test_enum, 'a', :if_not_exists=>true) if @db.server_version >= 90300
+    @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].should == %w'a f g b c d e'
+  end if DB.server_version >= 90100
+end

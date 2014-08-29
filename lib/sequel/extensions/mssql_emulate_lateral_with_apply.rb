@@ -22,6 +22,7 @@
 #
 #   DB.extension(:mssql_emulate_lateral_with_apply)
 
+#
 module Sequel
   module MSSQL
     module EmulateLateralWithApply

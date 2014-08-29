@@ -16,6 +16,7 @@
 #
 #   DB.extension :pg_loose_count
 
+#
 module Sequel
   module Postgres
     module LooseCount

@@ -169,6 +169,11 @@ module Sequel
       "#<#{visible_class_name}: #{sql.inspect}>"
     end
     
+    # Whether this dataset is a joined dataset (multiple FROM tables or any JOINs).
+    def joined_dataset?
+     !!((opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join])
+    end
+
     # The alias to use for the row_number column, used when emulating OFFSET
     # support and for eager limit strategies
     def row_number_column
@@ -189,6 +194,17 @@ module Sequel
         [c.table, c.table_alias]
       else
         [c, nil]
+      end
+    end
+
+    # This returns an SQL::Identifier or SQL::AliasedExpression containing an
+    # SQL identifier that represents the unqualified column for the given value.
+    # The given value should be a Symbol, SQL::Identifier, SQL::QualifiedIdentifier,
+    # or SQL::AliasedExpression containing one of those.  In other cases, this
+    # returns nil
+    def unqualified_column_for(v)
+      unless v.is_a?(String)
+        _unqualified_column_for(v)
       end
     end
 
@@ -231,6 +247,27 @@ module Sequel
     end
 
     private
+
+    # Internal recursive version of unqualified_column_for, handling Strings inside
+    # of other objects.
+    def _unqualified_column_for(v)
+      case v
+      when Symbol
+        _, c, a = Sequel.split_symbol(v)
+        c = Sequel.identifier(c)
+        a ? c.as(a) : c
+      when String
+        Sequel.identifier(v)
+      when SQL::Identifier
+        v
+      when SQL::QualifiedIdentifier
+        _unqualified_column_for(v.column)
+      when SQL::AliasedExpression
+        if expr = unqualified_column_for(v.expression)
+          SQL::AliasedExpression.new(expr, v.alias)
+        end
+      end
+    end
 
     # Return the class name for this dataset, but skip anonymous classes
     def visible_class_name

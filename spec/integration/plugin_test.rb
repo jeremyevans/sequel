@@ -1,8 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-# DB2 does not seem to support USING joins in every version; it seems to be
-# valid expression in DB2 iSeries UDB though.
-unless !DB.dataset.supports_join_using? || Sequel.guarded?(:db2)
 describe "Class Table Inheritance Plugin" do
   before(:all) do
     @db = DB
@@ -37,7 +34,7 @@ describe "Class Table Inheritance Plugin" do
     class ::Executive < Manager
     end 
     class ::Staff < Employee
-      many_to_one :manager, :qualify=>false
+      many_to_one :manager
     end 
     
     @i1 =@db[:employees].insert(:name=>'E', :kind=>'Employee')
@@ -66,9 +63,26 @@ describe "Class Table Inheritance Plugin" do
   end
   
   specify "should lazily load columns in subclass tables" do
+    Employee[@i2][:manager_id].should == nil
+    Employee[@i2].manager_id.should == @i4
+    Employee[@i3][:num_staff].should == nil
+    Employee[@i3].num_staff.should == 7
+    Employee[@i4][:num_staff].should == nil
+    Employee[@i4].num_staff.should == 5
+    Employee[@i4][:num_managers].should == nil
+    Employee[@i4].num_managers.should == 6
+  end
+  
+  specify "should eagerly load columns in subclass tables when retrieving multiple objects" do
     a = Employee.order(:id).all
     a[1][:manager_id].should == nil
     a[1].manager_id.should == @i4
+    a[2][:num_staff].should == nil
+    a[2].num_staff.should == 7
+    a[3][:num_staff].should == 5 # eagerly loaded by previous call
+    a[3].num_staff.should == 5
+    a[3][:num_managers].should == nil
+    a[3].num_managers.should == 6
   end
   
   specify "should include schema for columns for tables for ancestor classes" do
@@ -96,10 +110,10 @@ describe "Class Table Inheritance Plugin" do
   end
   
   specify "should handle associations only defined in subclasses" do
-    Employee.filter(:id=>@i2).all.first.manager.id.should == @i4
+    Employee.filter(:employees__id=>@i2).all.first.manager.id.should == @i4
   end
 
-  cspecify "should insert rows into all tables", [proc{|db| db.sqlite_version < 30709}, :sqlite] do
+  specify "should insert rows into all tables" do
     e = Executive.create(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
     i = e.id
     @db[:employees][:id=>i].should == {:id=>i, :name=>'Ex2', :kind=>'Executive'}
@@ -138,12 +152,11 @@ describe "Class Table Inheritance Plugin" do
     Executive.limit(1).eager(:staff_members).first.staff_members.should == [Staff[@i2]]
   end
   
-  cspecify "should handle eagerly graphing one_to_many relationships", [proc{|db| db.sqlite_version < 30709}, :sqlite] do
+  specify "should handle eagerly graphing one_to_many relationships" do
     es = Executive.limit(1).eager_graph(:staff_members).all
     es.should == [Executive[@i4]]
     es.map{|x| x.staff_members}.should == [[Staff[@i2]]]
   end
-end
 end
 
 describe "Many Through Many Plugin" do
@@ -1494,6 +1507,11 @@ describe "List plugin without a scope" do
     proc { @c[:name => "def"].move_up(10) }.should raise_error(Sequel::Error)
     proc { @c[:name => "def"].move_down(10) }.should raise_error(Sequel::Error)
   end
+
+  it "should update positions on destroy" do
+    @c[:name => "def"].destroy
+    @c.select_map([:position, :name]).should == [[1, 'abc'], [2, 'hig']]
+  end
 end
 
 describe "List plugin with a scope" do
@@ -1571,6 +1589,11 @@ describe "List plugin with a scope" do
 
     proc { @c[:name => "P1"].move_up(10) }.should raise_error(Sequel::Error)
     proc { @c[:name => "P1"].move_down(10) }.should raise_error(Sequel::Error)
+  end
+
+  it "should update positions on destroy" do
+    @c[:name => "P2"].destroy
+    @c.select_order_map([:pos, :name]).should == [[1, "Hm"], [1, "P1"], [1, "Ps"], [2, "Au"], [2, "P3"]]
   end
 end
 

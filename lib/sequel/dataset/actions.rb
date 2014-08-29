@@ -461,23 +461,23 @@ module Sequel
     #
     # Examples:
     #
-    #   DB[:table].order(:id).paged_each{|row| ...}
+    #   DB[:table].order(:id).paged_each{|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 1000
     #   # SELECT * FROM table ORDER BY id LIMIT 1000 OFFSET 1000
     #   # ...
     #
-    #   DB[:table].order(:id).paged_each(:rows_per_fetch=>100){|row| ...}
+    #   DB[:table].order(:id).paged_each(:rows_per_fetch=>100){|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 100
     #   # SELECT * FROM table ORDER BY id LIMIT 100 OFFSET 100
     #   # ...
     #
-    #   DB[:table].order(:id).paged_each(:strategy=>:filter){|row| ...}
+    #   DB[:table].order(:id).paged_each(:strategy=>:filter){|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 1000
     #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
     #   # ...
     #
     #   DB[:table].order(:table__id).paged_each(:strategy=>:filter,
-    #     :filter_values=>proc{|row, exprs| [row[:id]]}){|row| ...}
+    #     :filter_values=>proc{|row, exprs| [row[:id]]}){|row| }
     #   # SELECT * FROM table ORDER BY id LIMIT 1000
     #   # SELECT * FROM table WHERE id > 1001 ORDER BY id LIMIT 1000
     #   # ...
@@ -1022,8 +1022,12 @@ module Sequel
     def unaliased_identifier(c)
       case c
       when Symbol
-        c_table, column, _ = split_symbol(c)
-        c_table ? SQL::QualifiedIdentifier.new(c_table, column.to_sym) : column.to_sym
+        table, column, aliaz = split_symbol(c)
+        if aliaz
+          table ? SQL::QualifiedIdentifier.new(table, column) : Sequel.identifier(column)
+        else
+          c
+        end
       when SQL::AliasedExpression
         c.expression
       when SQL::OrderedExpression

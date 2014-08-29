@@ -194,7 +194,7 @@ artist or tracks method on the album will not do another database lookup.
 
 So putting everything together, the artist eager loader looks like:
 
-  :eager_loader=>(proc do |eo_opts|
+  Album.many_to_one :artist, :eager_loader=>(proc do |eo_opts|
     eo_opts[:rows].each{|album| album.associations[:artist] = nil}
     id_map = eo_opts[:id_map]
     Artist.where(:id=>id_map.keys).all do |artist|
@@ -208,7 +208,7 @@ So putting everything together, the artist eager loader looks like:
 
 and the tracks eager loader looks like:
 
-  :eager_loader=>(proc do |eo_opts|
+  Album.one_to_many :tracks, :eager_loader=>(proc do |eo_opts|
     eo_opts[:rows].each{|album| album.associations[:tracks] = []}
     id_map = eo_opts[:id_map]
     Track.where(:id=>id_map.keys).all do |tracks|

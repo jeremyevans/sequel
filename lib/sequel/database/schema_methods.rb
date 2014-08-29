@@ -792,13 +792,14 @@ module Sequel
     # SQL DDL ON DELETE fragment to use, based on the given action.
     # The following actions are recognized:
     # 
-    # * :cascade - Delete rows referencing this row.
-    # * :no_action (default) - Raise an error if other rows reference this
-    #   row, allow deferring of the integrity check.
-    # * :restrict - Raise an error if other rows reference this row,
-    #   but do not allow deferring the integrity check.
-    # * :set_default - Set columns referencing this row to their default value.
-    # * :set_null - Set columns referencing this row to NULL.
+    # :cascade :: Delete rows referencing this row.
+    # :no_action :: Raise an error if other rows reference this
+    #               row, allow deferring of the integrity check.
+    #               This is the default.
+    # :restrict :: Raise an error if other rows reference this row,
+    #              but do not allow deferring the integrity check.
+    # :set_default :: Set columns referencing this row to their default value.
+    # :set_null :: Set columns referencing this row to NULL.
     #
     # Any other object given is just converted to a string, with "_" converted to " " and upcased.
     def on_delete_clause(action)

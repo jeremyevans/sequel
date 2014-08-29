@@ -399,6 +399,11 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.association_join(:artists).sql.should == "SELECT * FROM tags INNER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"
   end
 
+  it "should support custom selects when using association_join" do
+    @c1.select{a(b)}.association_join(:tags).sql.should == "SELECT a(b) FROM artists INNER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"
+    @c2.select{a(b)}.association_join(:artists).sql.should == "SELECT a(b) FROM tags INNER JOIN artists ON (artists.tag_ids @> ARRAY[tags.id])"
+  end
+
   it "should eagerly graph associations" do
     @c2.dataset._fetch = {:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
     @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}

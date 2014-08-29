@@ -105,7 +105,7 @@ END_MIG
     #             will yield the same type.  Without this set, types that aren't
     #             recognized will be translated to a string-like type.
     # :foreign_keys :: If set to false, don't dump foreign_keys (they can be
-    #             added later via #dump_foreign_key_migration)
+    #                  added later via #dump_foreign_key_migration)
     # :indexes :: If set to false, don't dump indexes (they can be added
     #             later via #dump_index_migration).
     # :index_names :: If set to false, don't record names of indexes. If

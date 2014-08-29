@@ -13,30 +13,38 @@ module Sequel
     #
     # the following database schema may be used (table - columns):
     #
-    # * employees - id, name, kind
-    # * staff - id, manager_id
-    # * managers - id, num_staff
-    # * executives - id, num_managers
+    # employees :: id, name, kind
+    # staff :: id, manager_id
+    # managers :: id, num_staff
+    # executives :: id, num_managers
     #
     # The class_table_inheritance plugin assumes that the main table
     # (e.g. employees) has a primary key field (usually autoincrementing),
     # and all other tables have a foreign key of the same name that points
     # to the same key in their superclass's table.  For example:
     #
-    # * employees.id  - primary key, autoincrementing
-    # * staff.id - foreign key referencing employees(id)
-    # * managers.id - foreign key referencing employees(id)
-    # * executives.id - foreign key referencing managers(id)
+    # employees.id :: primary key, autoincrementing
+    # staff.id :: foreign key referencing employees(id)
+    # managers.id :: foreign key referencing employees(id)
+    # executives.id :: foreign key referencing managers(id)
     #
     # When using the class_table_inheritance plugin, subclasses use joined 
     # datasets:
     #
-    #   Employee.dataset.sql  # SELECT * FROM employees
-    #   Manager.dataset.sql   # SELECT * FROM employees
-    #                         # INNER JOIN managers USING (id)
-    #   Executive.dataset.sql # SELECT * FROM employees 
-    #                         # INNER JOIN managers USING (id)
-    #                         # INNER JOIN executives USING (id)
+    #   Employee.dataset.sql
+    #   # SELECT employees.id, employees.name, employees.kind
+    #   # FROM employees
+    #
+    #   Manager.dataset.sql
+    #   # SELECT employees.id, employees.name, employees.kind, managers.num_staff
+    #   # FROM employees
+    #   # JOIN managers ON (managers.id = employees.id)
+    #
+    #   Executive.dataset.sql
+    #   # SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers
+    #   # FROM employees
+    #   # JOIN managers ON (managers.id = employees.id)
+    #   # JOIN executives ON (executives.id = managers.id)
     #
     # This allows Executive.all to return instances with all attributes
     # loaded.  The plugin overrides the deleting, inserting, and updating
@@ -54,6 +62,13 @@ module Sequel
     #   a = Employee.all # [<#Staff>, <#Manager>, <#Executive>]
     #   a.first.values # {:id=>1, name=>'S', :kind=>'Staff'}
     #   a.first.manager_id # Loads the manager_id attribute from the database
+    #
+    # If you want to get all columns in a subclass instance after loading
+    # via the superclass, call Model#refresh.
+    #
+    #   a = Employee.first
+    #   a.values # {:id=>1, name=>'S', :kind=>'Executive'}
+    #   a.refresh.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
     # 
     # Usage:
     #
@@ -99,12 +114,13 @@ module Sequel
       def self.configure(model, opts=OPTS)
         model.instance_eval do
           @cti_base_model = self
-          @cti_key = key = opts[:key] 
+          @cti_key = opts[:key] 
           @cti_tables = [table_name]
           @cti_columns = {table_name=>columns}
           @cti_table_map = opts[:table_map] || {}
           @cti_model_map = opts[:model_map]
           set_dataset_cti_row_proc
+          set_dataset(dataset.select(*columns.map{|c| Sequel.qualify(table_name, Sequel.identifier(c))}))
         end
       end
 
@@ -150,6 +166,8 @@ module Sequel
           cmm = cti_model_map
           pk = primary_key
           ds = dataset
+          table = nil
+          columns = nil
           subclass.instance_eval do
             raise(Error, "cannot create anonymous subclass for model class using class_table_inheritance") if !(n = name) || n.empty?
             table = ctm[n.to_sym] || implicit_table_name
@@ -163,15 +181,15 @@ module Sequel
             # Need to set dataset and columns before calling super so that
             # the main column accessor module is included in the class before any
             # plugin accessor modules (such as the lazy attributes accessor module).
-            set_dataset(ds.join(table, [pk]))
+            set_dataset(ds.join(table, pk=>pk).select_append(*(columns - [primary_key]).map{|c| Sequel.qualify(table, Sequel.identifier(c))}))
             set_columns(self.columns)
           end
           super
           subclass.instance_eval do
             set_dataset_cti_row_proc
-            (columns - [cbm.primary_key]).each{|a| define_lazy_attribute_getter(a)}
-            cti_tables.reverse.each do |table|
-              db.schema(table).each{|k,v| db_schema[k] = v}
+            (columns - [cbm.primary_key]).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
+            cti_tables.reverse.each do |t|
+              db.schema(t).each{|k,v| db_schema[k] = v}
             end
           end
         end
@@ -221,14 +239,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Set the cti_key column to the name of the model.
-        def before_validation
-          if new? && model.cti_key && !model.cti_model_map
-            send("#{model.cti_key}=", model.name.to_s)
-          end
-          super
-        end
-        
         # Delete the row from all backing tables, starting from the
         # most recent table and going through all superclasses.
         def delete
@@ -241,6 +251,14 @@ module Sequel
         end
         
         private
+        
+        # Set the cti_key column to the name of the model.
+        def _before_validation
+          if new? && model.cti_key && !model.cti_model_map
+            send("#{model.cti_key}=", model.name.to_s)
+          end
+          super
+        end
         
         # Insert rows into all backing tables, using the columns
         # in each table.  

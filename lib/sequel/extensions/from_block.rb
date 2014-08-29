@@ -12,6 +12,7 @@
 #
 #   DB.extension :from_block
 
+#
 module Sequel
   module Database::FromBlock
     # If a block is given, make it affect the FROM clause:

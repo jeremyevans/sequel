@@ -6,7 +6,7 @@
 # unbounded beginnings and endings (which ruby's range does not
 # support).
 #
-# This extension integrates with Sequel's native postgres adapter, so
+# This extension integrates with Sequel's native postgres and jdbc/postgresql adapters, so
 # that when range type values are retrieved, they are parsed and returned
 # as instances of Sequel::Postgres::PGRange.  PGRange mostly acts
 # like a Range, but it's not a Range as not all PostgreSQL range
@@ -45,7 +45,7 @@
 #
 #   DB.extension :pg_range
 #
-# If you are not using the native postgres adapter and are using range
+# If you are not using the native postgres or jdbc/postgresql adapters and are using range
 # types as model column values you probably should use the
 # pg_typecast_on_load plugin if the column values are returned as a string.
 #
@@ -395,7 +395,9 @@ module Sequel
         end
       end
 
-      # Whether this range is empty (has no points).
+      # Whether this range is empty (has no points).  Note that for manually created ranges
+      # (ones not retrieved from the database), this will only be true if the range
+      # was created using the :empty option.
       def empty?
         @empty
       end

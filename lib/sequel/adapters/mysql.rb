@@ -62,24 +62,24 @@ module Sequel
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
-      # * :auto_is_null - Set to true to use MySQL default behavior of having
-      #   a filter for an autoincrement column equals NULL to return the last
-      #   inserted row.
-      # * :charset - Same as :encoding (:encoding takes precendence)
-      # * :compress - Set to false to not compress results from the server
-      # * :config_default_group - The default group to read from the in
-      #   the MySQL config file.
-      # * :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE
-      #   option on the connection with the given value.
-      # * :connect_timeout - Set the timeout in seconds before a connection
-      #   attempt is abandoned.
-      # * :encoding - Set all the related character sets for this
-      #   connection (connection, client, database, server, and results).
-      # * :read_timeout - Set the timeout in seconds for reading back results
-      #   to a query.
-      # * :socket - Use a unix socket file instead of connecting via TCP/IP.
-      # * :timeout - Set the timeout in seconds before the server will
-      #   disconnect this connection (a.k.a @@wait_timeout).
+      # :auto_is_null :: Set to true to use MySQL default behavior of having
+      #                  a filter for an autoincrement column equals NULL to return the last
+      #                  inserted row.
+      # :charset :: Same as :encoding (:encoding takes precendence)
+      # :compress :: Set to false to not compress results from the server
+      # :config_default_group :: The default group to read from the in
+      #                          the MySQL config file.
+      # :config_local_infile :: If provided, sets the Mysql::OPT_LOCAL_INFILE
+      #                         option on the connection with the given value.
+      # :connect_timeout :: Set the timeout in seconds before a connection
+      #                     attempt is abandoned.
+      # :encoding :: Set all the related character sets for this
+      #              connection (connection, client, database, server, and results).
+      # :read_timeout :: Set the timeout in seconds for reading back results
+      #                  to a query.
+      # :socket :: Use a unix socket file instead of connecting via TCP/IP.
+      # :timeout :: Set the timeout in seconds before the server will
+      #             disconnect this connection (a.k.a @@wait_timeout).
       def connect(server)
         opts = server_opts(server)
         conn = Mysql.init

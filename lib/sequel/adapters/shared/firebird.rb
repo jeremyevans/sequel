@@ -175,7 +175,14 @@ module Sequel
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        returning.insert(*values){|r| return r}
+        with_sql_first(insert_select_sql(*values))
+      end
+
+      # The SQL to use for an insert_select, adds a RETURNING clause to the insert
+      # unless the RETURNING clause is already present.
+      def insert_select_sql(*values)
+        ds = opts[:returning] ? self : returning
+        ds.insert_sql(*values)
       end
 
       def requires_sql_standard_datetimes?

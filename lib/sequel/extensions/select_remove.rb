@@ -12,6 +12,7 @@
 #
 #   DB.extension(:select_remove)
 
+#
 module Sequel
   module SelectRemove
     # Remove columns from the list of selected columns.  If any of the currently selected

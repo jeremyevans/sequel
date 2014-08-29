@@ -3,6 +3,29 @@ Sequel.require 'adapters/jdbc/transactions'
 
 module Sequel
   module JDBC
+    drv = [
+      lambda{Java::sybase.jdbc4.sqlanywhere.IDriver},
+      lambda{Java::ianywhere.ml.jdbcodbc.jdbc4.IDriver},
+      lambda{Java::sybase.jdbc.sqlanywhere.IDriver},
+      lambda{Java::ianywhere.ml.jdbcodbc.jdbc.IDriver},
+      lambda{Java::com.sybase.jdbc4.jdbc.Sybdriver},
+      lambda{Java::com.sybase.jdbc3.jdbc.Sybdriver}
+    ].each do |class_proc|
+      begin
+        break class_proc.call
+      rescue NameError
+      end
+    end
+    raise(Sequel::AdapterNotFound, "no suitable SQLAnywhere JDBC driver found") unless drv
+
+    Sequel.synchronize do
+      DATABASE_SETUP[:sqlanywhere] = proc do |db|
+        db.extend(Sequel::JDBC::SqlAnywhere::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::SqlAnywhere::Dataset
+        drv
+      end
+    end
+
     class TypeConvertor
       def SqlAnywhereBoolean(r, i)
         if v = Short(r, i)

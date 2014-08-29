@@ -1290,6 +1290,12 @@ describe "A broken adapter (lib is there but the class is not)" do
   end
 end
 
+describe "Sequel::Database.load_adapter" do
+  specify "should not raise an error if subadapter does not exist" do
+    Sequel::Database.load_adapter(:foo, :subdir=>'bar').should == nil
+  end
+end
+
 describe "A single threaded database" do
   after do
     Sequel::Database.single_threaded = false

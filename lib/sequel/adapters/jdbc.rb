@@ -27,146 +27,11 @@ module Sequel
     # to :integer.
     DECIMAL_TYPE_RE = /number|numeric|decimal/io
     
-    # Contains procs keyed on sub adapter type that extend the
+    # Contains procs keyed on subadapter type that extend the
     # given database object so it supports the correct database type.
-    DATABASE_SETUP = {:postgresql=>proc do |db|
-        JDBC.load_gem(:Postgres)
-        org.postgresql.Driver
-        Sequel.require 'adapters/jdbc/postgresql'
-        db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::Postgres::Dataset
-        org.postgresql.Driver
-      end,
-      :mysql=>proc do |db|
-        JDBC.load_gem(:MySQL)
-        com.mysql.jdbc.Driver
-        Sequel.require 'adapters/jdbc/mysql'
-        db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
-        db.extend_datasets Sequel::MySQL::DatasetMethods
-        com.mysql.jdbc.Driver
-      end,
-      :sqlite=>proc do |db|
-        JDBC.load_gem(:SQLite3)
-        org.sqlite.JDBC
-        Sequel.require 'adapters/jdbc/sqlite'
-        db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
-        db.extend_datasets Sequel::SQLite::DatasetMethods
-        db.set_integer_booleans
-        org.sqlite.JDBC
-      end,
-      :oracle=>proc do |db|
-        Java::oracle.jdbc.driver.OracleDriver
-        Sequel.require 'adapters/jdbc/oracle'
-        db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::Oracle::Dataset
-        Java::oracle.jdbc.driver.OracleDriver
-      end,
-      :sqlserver=>proc do |db|
-        com.microsoft.sqlserver.jdbc.SQLServerDriver
-        Sequel.require 'adapters/jdbc/sqlserver'
-        db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
-        db.extend_datasets Sequel::MSSQL::DatasetMethods
-        db.send(:set_mssql_unicode_strings)
-        com.microsoft.sqlserver.jdbc.SQLServerDriver
-      end,
-      :jtds=>proc do |db|
-        JDBC.load_gem(:JTDS)
-        Java::net.sourceforge.jtds.jdbc.Driver
-        Sequel.require 'adapters/jdbc/jtds'
-        db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::JTDS::Dataset
-        db.send(:set_mssql_unicode_strings)
-        Java::net.sourceforge.jtds.jdbc.Driver
-      end,
-      :h2=>proc do |db|
-        JDBC.load_gem(:H2)
-        org.h2.Driver
-        Sequel.require 'adapters/jdbc/h2'
-        db.extend(Sequel::JDBC::H2::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::H2::Dataset
-        org.h2.Driver
-      end,
-      :hsqldb=>proc do |db|
-        JDBC.load_gem(:HSQLDB)
-        org.hsqldb.jdbcDriver
-        Sequel.require 'adapters/jdbc/hsqldb'
-        db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::HSQLDB::Dataset
-        org.hsqldb.jdbcDriver
-      end,
-      :derby=>proc do |db|
-        JDBC.load_gem(:Derby)
-        org.apache.derby.jdbc.EmbeddedDriver
-        Sequel.require 'adapters/jdbc/derby'
-        db.extend(Sequel::JDBC::Derby::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::Derby::Dataset
-        org.apache.derby.jdbc.EmbeddedDriver
-      end,
-      :as400=>proc do |db|
-        com.ibm.as400.access.AS400JDBCDriver
-        Sequel.require 'adapters/jdbc/as400'
-        db.extend(Sequel::JDBC::AS400::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::AS400::Dataset
-        com.ibm.as400.access.AS400JDBCDriver
-      end,
-      :"informix-sqli"=>proc do |db|
-        com.informix.jdbc.IfxDriver
-        Sequel.require 'adapters/jdbc/informix'
-        db.extend(Sequel::JDBC::Informix::DatabaseMethods)
-        db.extend_datasets Sequel::Informix::DatasetMethods
-        com.informix.jdbc.IfxDriver
-      end,
-      :db2=>proc do |db|
-        com.ibm.db2.jcc.DB2Driver
-        Sequel.require 'adapters/jdbc/db2'
-        db.extend(Sequel::JDBC::DB2::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::DB2::Dataset
-        com.ibm.db2.jcc.DB2Driver
-      end,
-      :firebirdsql=>proc do |db|
-        org.firebirdsql.jdbc.FBDriver
-        Sequel.require 'adapters/jdbc/firebird'
-        db.extend(Sequel::JDBC::Firebird::DatabaseMethods)
-        db.extend_datasets Sequel::Firebird::DatasetMethods
-        org.firebirdsql.jdbc.FBDriver
-      end,
-      :jdbcprogress=>proc do |db|
-        com.progress.sql.jdbc.JdbcProgressDriver
-        Sequel.require 'adapters/jdbc/progress'
-        db.extend(Sequel::JDBC::Progress::DatabaseMethods)
-        db.extend_datasets Sequel::Progress::DatasetMethods
-        com.progress.sql.jdbc.JdbcProgressDriver
-      end,
-      :cubrid=>proc do |db|
-        Java::cubrid.jdbc.driver.CUBRIDDriver
-        Sequel.require 'adapters/jdbc/cubrid'
-        db.extend(Sequel::JDBC::Cubrid::DatabaseMethods)
-        db.extend_datasets Sequel::Cubrid::DatasetMethods
-        Java::cubrid.jdbc.driver.CUBRIDDriver
-      end,
-      :sqlanywhere=>proc do |db|
-        drv = [
-          lambda{Java::sybase.jdbc4.sqlanywhere.IDriver},
-          lambda{Java::ianywhere.ml.jdbcodbc.jdbc4.IDriver},
-          lambda{Java::sybase.jdbc.sqlanywhere.IDriver},
-          lambda{Java::ianywhere.ml.jdbcodbc.jdbc.IDriver},
-          lambda{Java::com.sybase.jdbc4.jdbc.Sybdriver},
-          lambda{Java::com.sybase.jdbc3.jdbc.Sybdriver}
-        ].each do |class_proc|
-          begin
-            break class_proc.call
-          rescue NameError
-          end
-        end
-        Sequel.require 'adapters/jdbc/sqlanywhere'
-        db.extend(Sequel::JDBC::SqlAnywhere::DatabaseMethods)
-        db.dataset_class = Sequel::JDBC::SqlAnywhere::Dataset
-        drv
-      end
-    }
+    DATABASE_SETUP = {}
     
-    # Allowing loading the necessary JDBC support via a gem, which
-    # works for PostgreSQL, MySQL, and SQLite.
+    # Allow loading the necessary JDBC support via a gem.
     def self.load_gem(name)
       begin
         require "jdbc/#{name.to_s.downcase}"
@@ -178,6 +43,18 @@ module Sequel
           jdbc_module.load_driver if jdbc_module.respond_to?(:load_driver)
         end
       end
+    end
+
+    # Attempt to load the JDBC driver class, which should be specified as a string
+    # containing the driver class name (which JRuby should autoload).
+    # Note that the string is evaled, so this method is not safe to call with
+    # untrusted input.
+    # Raise a Sequel::AdapterNotFound if evaluating the class name raises a NameError.
+    def self.load_driver(drv, gem=nil)
+      load_gem(gem) if gem
+      eval drv
+    rescue NameError
+      raise Sequel::AdapterNotFound, "#{drv} not loaded#{", try installing jdbc-#{gem.to_s.downcase} gem" if gem}"
     end
 
     class TypeConvertor
@@ -473,7 +350,7 @@ module Sequel
         
         resolved_uri = jndi? ? get_uri_from_jndi : uri
 
-        @driver = if (match = /\Ajdbc:([^:]+)/.match(resolved_uri)) && (prok = DATABASE_SETUP[match[1].to_sym])
+        @driver = if (match = /\Ajdbc:([^:]+)/.match(resolved_uri)) && (prok = Sequel::Database.load_adapter(match[1].to_sym, :map=>DATABASE_SETUP, :subdir=>'jdbc'))
           prok.call(self)
         else
           @opts[:driver]

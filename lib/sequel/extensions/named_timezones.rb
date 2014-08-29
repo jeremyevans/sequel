@@ -39,6 +39,7 @@
 
 require 'tzinfo'
 
+#
 module Sequel
   self.datetime_class = DateTime
   

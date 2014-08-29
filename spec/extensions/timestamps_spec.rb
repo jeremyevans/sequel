@@ -32,6 +32,12 @@ describe "Sequel::Plugins::Timestamps" do
     o.valid?.should == true
   end
 
+  it "should set timestamp fields when skipping validations" do
+    @c.plugin :timestamps
+    @c.new.save(:validate=>false)
+    @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
+  end
+
   it "should set the create timestamp field on creation" do
     o = @c.create
     @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]

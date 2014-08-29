@@ -17,12 +17,12 @@ module Sequel
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
-      # * :auto_is_null - Set to true to use MySQL default behavior of having
-      #   a filter for an autoincrement column equals NULL to return the last
-      #   inserted row.
-      # * :charset - Same as :encoding (:encoding takes precendence)
-      # * :encoding - Set all the related character sets for this
-      #   connection (connection, client, database, server, and results).
+      # :auto_is_null :: Set to true to use MySQL default behavior of having
+      #                  a filter for an autoincrement column equals NULL to return the last
+      #                  inserted row.
+      # :charset :: Same as :encoding (:encoding takes precendence)
+      # :encoding :: Set all the related character sets for this
+      #              connection (connection, client, database, server, and results).
       #
       # The options hash is also passed to mysql2, and can include mysql2
       # options such as :local_infile.
@@ -61,7 +61,7 @@ module Sequel
         execute(sql, opts){|c| return c.last_id}
       end
 
-      # Return the version of the MySQL server two which we are connecting.
+      # Return the version of the MySQL server to which we are connecting.
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_info[:id]} || super)
       end

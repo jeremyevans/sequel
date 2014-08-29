@@ -1,7 +1,16 @@
+Sequel::JDBC.load_driver('org.hsqldb.jdbcDriver', :HSQLDB)
 Sequel.require 'adapters/jdbc/transactions'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:hsqldb] = proc do |db|
+        db.extend(Sequel::JDBC::HSQLDB::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::HSQLDB::Dataset
+        org.hsqldb.jdbcDriver
+      end
+    end
+
     # Database and Dataset support for HSQLDB databases accessed via JDBC.
     module HSQLDB
       # Instance methods for HSQLDB Database objects accessed via JDBC.

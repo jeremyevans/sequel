@@ -525,7 +525,6 @@ module Sequel
       DATEPART_SECOND_MIDDLE = ') + datepart(ns, '.freeze
       DATEPART_SECOND_CLOSE = ")/1000000000.0) AS double precision)".freeze
       DATEPART_OPEN = "datepart(".freeze
-      TIMESTAMP_USEC_FORMAT = ".%03d".freeze
       OUTPUT_INSERTED = " OUTPUT INSERTED.*".freeze
       HEX_START = '0x'.freeze
       UNICODE_STRING_START = "N'".freeze
@@ -624,7 +623,14 @@ module Sequel
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
       def insert_select(*values)
         return unless supports_insert_select?
-        naked.clone(default_server_opts(:sql=>output(nil, [SQL::ColumnAll.new(:inserted)]).insert_sql(*values))).single_record
+        with_sql_first(insert_select_sql(*values))
+      end
+
+      # Add OUTPUT clause unless there is already an existing output clause, then return
+      # the SQL to insert.
+      def insert_select_sql(*values)
+        ds = (opts[:output] || opts[:returning]) ? self : output(nil, [SQL::ColumnAll.new(:inserted)])
+        ds.insert_sql(*values)
       end
 
       # Specify a table for a SELECT ... INTO query.
@@ -658,20 +664,31 @@ module Sequel
         raise(Error, "SQL Server versions 2000 and earlier do not support the OUTPUT clause") unless supports_output_clause?
         output = {}
         case values
-          when Hash
-            output[:column_list], output[:select_list] = values.keys, values.values
-          when Array
-            output[:select_list] = values
+        when Hash
+          output[:column_list], output[:select_list] = values.keys, values.values
+        when Array
+          output[:select_list] = values
         end
         output[:into] = into
-        clone({:output => output})
+        clone(:output => output)
       end
 
       # MSSQL uses [] to quote identifiers.
       def quoted_identifier_append(sql, name)
         sql << BRACKET_OPEN << name.to_s.gsub(/\]/, DOUBLE_BRACKET_CLOSE) << BRACKET_CLOSE
       end
-      
+
+      # Emulate RETURNING using the output clause.  This only handles values that are simple column references.
+      def returning(*values)
+        values = values.map do |v|
+          unless r = unqualified_column_for(v)
+            raise(Error, "cannot emulate RETURNING via OUTPUT for value: #{v.inspect}")
+          end
+          r
+        end
+        clone(:returning=>values)
+      end
+
       # On MSSQL 2012+ add a default order to the current dataset if an offset is used.
       # The default offset emulation using a subquery would be used in the unordered
       # case by default, and that also adds a default order, so it's better to just
@@ -738,9 +755,14 @@ module Sequel
         is_2012_or_later?
       end
 
-      # MSSQL 2005+ supports the output clause.
+      # MSSQL 2005+ supports the OUTPUT clause.
       def supports_output_clause?
         is_2005_or_later?
+      end
+
+      # MSSQL 2005+ can emulate RETURNING via the OUTPUT clause.
+      def supports_returning?(type)
+        supports_insert_select?
       end
 
       # MSSQL 2005+ supports window functions
@@ -816,6 +838,10 @@ module Sequel
       end
       alias update_from_sql delete_from2_sql
 
+      def delete_output_sql(sql)
+        output_sql(sql, :DELETED)
+      end
+
       # There is no function on Microsoft SQL Server that does character length
       # and respects trailing spaces (datalength respects trailing spaces, but
       # counts bytes instead of characters).  Use a hack to work around the
@@ -844,22 +870,10 @@ module Sequel
         @db.schema(self).map{|k, v| k if v[:primary_key] == true}.compact.first
       end
 
-      # MSSQL raises an error if you try to provide more than 3 decimal places
-      # for a fractional timestamp.  This probably doesn't work for smalldatetime
-      # fields.
-      def format_timestamp_usec(usec)
-        sprintf(TIMESTAMP_USEC_FORMAT, usec/1000)
-      end
-
-      # Use OUTPUT INSERTED.* to return all columns of the inserted row,
-      # for use with the prepared statement code.
       def insert_output_sql(sql)
-        if @opts.has_key?(:returning)
-          sql << OUTPUT_INSERTED
-        else
-          output_sql(sql)
-        end
+        output_sql(sql, :INSERTED)
       end
+      alias update_output_sql insert_output_sql
 
       # Handle CROSS APPLY and OUTER APPLY JOIN types
       def join_type_sql(join_type)
@@ -964,9 +978,16 @@ module Sequel
       end
 
       # SQL fragment for MSSQL's OUTPUT clause.
-      def output_sql(sql)
+      def output_sql(sql, type)
         return unless supports_output_clause?
-        return unless output = @opts[:output]
+        if output = @opts[:output]
+          output_list_sql(sql, output)
+        elsif values = @opts[:returning]
+          output_returning_sql(sql, type, values)
+        end
+      end
+
+      def output_list_sql(sql, output)
         sql << OUTPUT
         column_list_append(sql, output[:select_list])
         if into = output[:into]
@@ -979,8 +1000,28 @@ module Sequel
           end
         end
       end
-      alias delete_output_sql output_sql
-      alias update_output_sql output_sql
+
+      def output_returning_sql(sql, type, values)
+        sql << OUTPUT
+        if values.empty?
+          literal_append(sql, SQL::ColumnAll.new(type))
+        else
+          values = values.map do |v|
+            case v
+            when SQL::AliasedExpression
+              Sequel.qualify(type, v.expression).as(v.alias)
+            else
+              Sequel.qualify(type, v)
+            end
+          end
+          column_list_append(sql, values)
+        end
+      end
+
+      # MSSQL supports millisecond timestamp precision.
+      def timestamp_precision
+        3
+      end
 
       # Only include the primary table in the main update clause
       def update_table_sql(sql)

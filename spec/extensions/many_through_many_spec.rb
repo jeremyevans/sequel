@@ -872,6 +872,10 @@ describe "many_through_many eager loading methods" do
     @c1.association_join(:tags).sql.should == "SELECT * FROM artists INNER JOIN albums_artists ON (albums_artists.artist_id = artists.id) INNER JOIN albums ON (albums.id = albums_artists.album_id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id)"
   end
 
+  it "should support custom selects when using association_join" do
+    @c1.select{a(b)}.association_join(:tags).sql.should == "SELECT a(b) FROM artists INNER JOIN albums_artists ON (albums_artists.artist_id = artists.id) INNER JOIN albums ON (albums.id = albums_artists.album_id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id)"
+  end
+
   it "should eagerly graph a single many_through_many association" do
     a = @c1.eager_graph(:tags).all
     a.should == [@c1.load(:id=>1)]

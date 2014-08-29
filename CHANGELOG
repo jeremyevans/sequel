@@ -1,3 +1,89 @@
+=== HEAD
+
+* Allow delayed evaluation blocks to take dataset as an argument (jeremyevans)
+
+* Allow more types as filter expressions, only specifically disallow Numeric/String expressions (jeremyevans)
+
+* Remove objects from cached association array at time of nested_attributes call instead of waiting until save (jeremyevans)
+
+* Handle composite primary keys when working around validation issues for one_to_(one|many) associations in nested_attributes plugin (jeremyevans) (#870)
+
+* Recognize additional disconnect error in jdbc/jtds adapter (jeremyevans)
+
+* Have association_join work with existing model selections (jeremyevans)
+
+* Fix regression in class_table_inheritance plugin when lazily loading column in middle table (jeremyevans) (#862)
+
+* Add cache_key_prefix method to caching plugin, which can be overridden for custom handling (pete) (#861)
+
+* Add :when option to PostgreSQL create_trigger method, for adding a filter to the trigger (aschrab) (#860)
+
+* Recognize an additional serialization failure on PostgreSQL (tmtm) (#857)
+
+=== 4.13.0 (2014-08-01)
+
+* Use copy constructors instead of overriding Model#dup and #clone (ged, jeremyevans) (#852)
+
+* Fix handling of MySQL create_table foreign_key calls using :key option (mimperatore, jeremyevans) (#850)
+
+* Handle another disconnection error in the postgres adapter (lbosque) (#848)
+
+* Make list plugin update remaining positions after destroying an instance (ehq, jeremyevans) (#847)
+
+* Unalias aliased tables in Dataset#insert (jeremyevans)
+
+* Add insert_returning_select plugin, for setting up RETURNING for inserts for models selecting explicit columns (jeremyevans)
+
+* Make Model#save use insert_select if the dataset used for inserting already uses returning (jeremyevans)
+
+* Add Dataset#unqualified_column_for helper method, returning unqualified version of possibly qualified column (jeremyevans)
+
+* Calling Dataset#returning when the Database does not support or emulate RETURNING now raises an Error (jeremyevans)
+
+* Emulate RETURNING on Microsoft SQL Server using OUTPUT, as long as only simple column references are used (jeremyevans)
+
+* Switch class_table_inheritance plugin to use JOIN ON instead of JOIN USING (jeremyevans)
+
+* Qualify primary keys for models with joined datasets when looking up model instances by primary key (jeremyevans)
+
+* Fix qualification of columns when Dataset#graph automatically wraps the initially graphed dataset in a subselect (jeremyevans)
+
+* Make Dataset#joined_dataset? a public method (jeremyevans)
+
+* Allow external jdbc, odbc, and do subadapters to be loaded automatically (jeremyevans)
+
+* Recognize another disconnect error in the jdbc/mysql adapter (jeremyevans)
+
+* Set primary keys correctly for models even if datasets select specific columns (jeremyevans)
+
+* Add dataset_source_alias extension, for automatically aliasing datasets to their first source (jeremyevans)
+
+* Use qualified columns in the lazy_attributes plugin (jeremyevans)
+
+* Add column_select plugin, for using explicit column selections in model datasets (jeremyevans)
+
+* Use associated model's existing selection for join associations if it consists solely of explicitly quailfied columns (jeremyevans)
+
+* Add round_timestamps extension for automatically rounding timestamp values to database precision before literalizing (jeremyevans)
+
+* Make rake default task run plugin specs as well as core/model specs (jeremyevans)
+
+* Use all_tables and all_views for Database#tables and #views on Oracle (jeremyevans)
+
+* Use all_tab_cols instead of user_tab cols for defaults parsing in the oracle adapter (jeremyevans)
+
+* Fix recursive mutex locking issue on JRuby when using Sequel::Model(dataset) (jeremyevans) (#841)
+
+* Make composition and serialization plugins support validations on underlying columns (jeremyevans)
+
+* Fix regression in timestamps and table inheritance plugin where column values would not be saved if validation is skipped (jeremyevans) (#839)
+
+* Add pg_enum extension, for dealing with PostgreSQL enums (jeremyevans)
+
+* Add modification_detection plugin, for automatic detection of in-place column value modifications (jeremyevans)
+
+* Speed up using plain strings, numbers, true, false, and nil in json columns if underlying json library supports them (jeremyevans) (#834)
+
 === 4.12.0 (2014-07-01)
 
 * Support :readonly Database option in sqlite adapter (ippeiukai, jeremyevans) (#832)

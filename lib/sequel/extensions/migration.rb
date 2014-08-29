@@ -6,6 +6,7 @@
 #
 #   Sequel.extension :migration
 
+#
 module Sequel
   # Sequel's older migration class, available for backward compatibility.
   # Uses subclasses with up and down instance methods for each migration:

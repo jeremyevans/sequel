@@ -65,6 +65,7 @@
 # In order for #hstore to automatically wrap the returned value correctly in
 # an HStoreOp, you need to load the pg_hstore_ops extension.
 
+#
 module Sequel
   module Postgres
     # The ArrayOp class is a simple container for a single object that

@@ -160,8 +160,8 @@ Sequel has built in support for creating and dropping PostgreSQL schemas, proced
   DB.drop_function(:set_updated_at)
   # DROP FUNCTION set_updated_at()
 
-  DB.create_trigger(:table, :trg_updated_at, :set_updated_at, :events=>[:insert, :update], :each_row=>true)
-  # CREATE TRIGGER trg_updated_at BEFORE INSERT OR UPDATE ON "table" FOR EACH ROW EXECUTE PROCEDURE set_updated_at()
+  DB.create_trigger(:table, :trg_updated_at, :set_updated_at, :events=>:update, :each_row=>true, :when => {:new__updated_at => :old__updated_at})
+  # CREATE TRIGGER trg_updated_at BEFORE UPDATE ON "table" FOR EACH ROW WHEN ("new"."updated_at" = "old"."updated_at") EXECUTE PROCEDURE set_updated_at()
   DB.drop_trigger(:table, :trg_updated_at)
   # DROP TRIGGER trg_updated_at ON "table"
 

@@ -1,8 +1,17 @@
+Sequel::JDBC.load_driver('com.ibm.db2.jcc.DB2Driver')
 Sequel.require 'adapters/shared/db2'
 Sequel.require 'adapters/jdbc/transactions'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:db2] = proc do |db|
+        db.extend(Sequel::JDBC::DB2::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::DB2::Dataset
+        com.ibm.db2.jcc.DB2Driver
+      end
+    end
+
     class TypeConvertor
       def DB2Clob(r, i)
         if v = r.getClob(i)

@@ -31,6 +31,7 @@
 #
 #   DB.extension(:query_literals)
 
+#
 module Sequel
   # The QueryLiterals module can be used to make select, group, and
   # order methods operate similar to the filter methods if the first

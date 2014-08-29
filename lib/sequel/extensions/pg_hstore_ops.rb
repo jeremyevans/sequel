@@ -66,6 +66,7 @@
 # PostgreSQL arrays will have the returned expression automatically wrapped in a
 # Postgres::ArrayOp if the pg_array_ops extension is loaded.
 
+#
 module Sequel
   module Postgres
     # The HStoreOp class is a simple container for a single object that

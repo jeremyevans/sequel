@@ -161,59 +161,60 @@ module Sequel
       end
 
       # Creates the function in the database.  Arguments:
-      # * name : name of the function to create
-      # * definition : string definition of the function, or object file for a dynamically loaded C function.
-      # * opts : options hash:
-      #   * :args : function arguments, can be either a symbol or string specifying a type or an array of 1-3 elements:
-      #     * element 1 : argument data type
-      #     * element 2 : argument name
-      #     * element 3 : argument mode (e.g. in, out, inout)
-      #   * :behavior : Should be IMMUTABLE, STABLE, or VOLATILE.  PostgreSQL assumes VOLATILE by default.
-      #   * :cost : The estimated cost of the function, used by the query planner.
-      #   * :language : The language the function uses.  SQL is the default.
-      #   * :link_symbol : For a dynamically loaded see function, the function's link symbol if different from the definition argument.
-      #   * :returns : The data type returned by the function.  If you are using OUT or INOUT argument modes, this is ignored.
-      #     Otherwise, if this is not specified, void is used by default to specify the function is not supposed to return a value.
-      #   * :rows : The estimated number of rows the function will return.  Only use if the function returns SETOF something.
-      #   * :security_definer : Makes the privileges of the function the same as the privileges of the user who defined the function instead of
-      #     the privileges of the user who runs the function.  There are security implications when doing this, see the PostgreSQL documentation.
-      #   * :set : Configuration variables to set while the function is being run, can be a hash or an array of two pairs.  search_path is
-      #     often used here if :security_definer is used.
-      #   * :strict : Makes the function return NULL when any argument is NULL.
+      # name :: name of the function to create
+      # definition :: string definition of the function, or object file for a dynamically loaded C function.
+      # opts :: options hash:
+      #         :args :: function arguments, can be either a symbol or string specifying a type or an array of 1-3 elements:
+      #                  1 :: argument data type
+      #                  2 :: argument name
+      #                  3 :: argument mode (e.g. in, out, inout)
+      #         :behavior :: Should be IMMUTABLE, STABLE, or VOLATILE.  PostgreSQL assumes VOLATILE by default.
+      #         :cost :: The estimated cost of the function, used by the query planner.
+      #         :language :: The language the function uses.  SQL is the default.
+      #         :link_symbol :: For a dynamically loaded see function, the function's link symbol if different from the definition argument.
+      #         :returns :: The data type returned by the function.  If you are using OUT or INOUT argument modes, this is ignored.
+      #                     Otherwise, if this is not specified, void is used by default to specify the function is not supposed to return a value.
+      #         :rows :: The estimated number of rows the function will return.  Only use if the function returns SETOF something.
+      #         :security_definer :: Makes the privileges of the function the same as the privileges of the user who defined the function instead of
+      #                              the privileges of the user who runs the function.  There are security implications when doing this, see the PostgreSQL documentation.
+      #         :set :: Configuration variables to set while the function is being run, can be a hash or an array of two pairs.  search_path is
+      #                 often used here if :security_definer is used.
+      #         :strict :: Makes the function return NULL when any argument is NULL.
       def create_function(name, definition, opts=OPTS)
         self << create_function_sql(name, definition, opts)
       end
 
       # Create the procedural language in the database. Arguments:
-      # * name : Name of the procedural language (e.g. plpgsql)
-      # * opts : options hash:
-      #   * :handler : The name of a previously registered function used as a call handler for this language.
-      #   * :replace : Replace the installed language if it already exists (on PostgreSQL 9.0+).
-      #   * :trusted : Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
-      #   * :validator : The name of previously registered function used as a validator of functions defined in this language.
+      # name :: Name of the procedural language (e.g. plpgsql)
+      # opts :: options hash:
+      #         :handler :: The name of a previously registered function used as a call handler for this language.
+      #         :replace :: Replace the installed language if it already exists (on PostgreSQL 9.0+).
+      #         :trusted :: Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
+      #         :validator :: The name of previously registered function used as a validator of functions defined in this language.
       def create_language(name, opts=OPTS)
         self << create_language_sql(name, opts)
       end
 
       # Create a schema in the database. Arguments:
-      # * name : Name of the schema (e.g. admin)
-      # * opts : options hash:
-      #   * :if_not_exists : Don't raise an error if the schema already exists (PostgreSQL 9.3+)
-      #   * :owner : The owner to set for the schema (defaults to current user if not specified)
+      # name :: Name of the schema (e.g. admin)
+      # opts :: options hash:
+      #         :if_not_exists :: Don't raise an error if the schema already exists (PostgreSQL 9.3+)
+      #         :owner :: The owner to set for the schema (defaults to current user if not specified)
       def create_schema(name, opts=OPTS)
         self << create_schema_sql(name, opts)
       end
 
       # Create a trigger in the database.  Arguments:
-      # * table : the table on which this trigger operates
-      # * name : the name of this trigger
-      # * function : the function to call for this trigger, which should return type trigger.
-      # * opts : options hash:
-      #   * :after : Calls the trigger after execution instead of before.
-      #   * :args : An argument or array of arguments to pass to the function.
-      #   * :each_row : Calls the trigger for each row instead of for each statement.
-      #   * :events : Can be :insert, :update, :delete, or an array of any of those. Calls the trigger whenever that type of statement is used.  By default,
-      #     the trigger is called for insert, update, or delete.
+      # table :: the table on which this trigger operates
+      # name :: the name of this trigger
+      # function :: the function to call for this trigger, which should return type trigger.
+      # opts :: options hash:
+      #         :after :: Calls the trigger after execution instead of before.
+      #         :args :: An argument or array of arguments to pass to the function.
+      #         :each_row :: Calls the trigger for each row instead of for each statement.
+      #         :events :: Can be :insert, :update, :delete, or an array of any of those. Calls the trigger whenever that type of statement is used.  By default,
+      #                    the trigger is called for insert, update, or delete.
+      #         :when :: A filter to use for the trigger
       def create_trigger(table, name, function, opts=OPTS)
         self << create_trigger_sql(table, name, function, opts)
       end
@@ -234,39 +235,39 @@ module Sequel
       end
 
       # Drops the function from the database. Arguments:
-      # * name : name of the function to drop
-      # * opts : options hash:
-      #   * :args : The arguments for the function.  See create_function_sql.
-      #   * :cascade : Drop other objects depending on this function.
-      #   * :if_exists : Don't raise an error if the function doesn't exist.
+      # name :: name of the function to drop
+      # opts :: options hash:
+      #         :args :: The arguments for the function.  See create_function_sql.
+      #         :cascade :: Drop other objects depending on this function.
+      #         :if_exists :: Don't raise an error if the function doesn't exist.
       def drop_function(name, opts=OPTS)
         self << drop_function_sql(name, opts)
       end
 
       # Drops a procedural language from the database.  Arguments:
-      # * name : name of the procedural language to drop
-      # * opts : options hash:
-      #   * :cascade : Drop other objects depending on this function.
-      #   * :if_exists : Don't raise an error if the function doesn't exist.
+      # name :: name of the procedural language to drop
+      # opts :: options hash:
+      #         :cascade :: Drop other objects depending on this function.
+      #         :if_exists :: Don't raise an error if the function doesn't exist.
       def drop_language(name, opts=OPTS)
         self << drop_language_sql(name, opts)
       end
 
       # Drops a schema from the database.  Arguments:
-      # * name : name of the schema to drop
-      # * opts : options hash:
-      #   * :cascade : Drop all objects in this schema.
-      #   * :if_exists : Don't raise an error if the schema doesn't exist.
+      # name :: name of the schema to drop
+      # opts :: options hash:
+      #         :cascade :: Drop all objects in this schema.
+      #         :if_exists :: Don't raise an error if the schema doesn't exist.
       def drop_schema(name, opts=OPTS)
         self << drop_schema_sql(name, opts)
       end
 
       # Drops a trigger from the database.  Arguments:
-      # * table : table from which to drop the trigger
-      # * name : name of the trigger to drop
-      # * opts : options hash:
-      #   * :cascade : Drop other objects depending on this function.
-      #   * :if_exists : Don't raise an error if the function doesn't exist.
+      # table :: table from which to drop the trigger
+      # name :: name of the trigger to drop
+      # opts :: options hash:
+      #         :cascade :: Drop other objects depending on this function.
+      #         :if_exists :: Don't raise an error if the function doesn't exist.
       def drop_trigger(table, name, opts=OPTS)
         self << drop_trigger_sql(table, name, opts)
       end
@@ -480,6 +481,11 @@ module Sequel
       # PostgreSQL supports partial indexes.
       def supports_partial_indexes?
         true
+      end
+
+      # PostgreSQL 9.0+ supports trigger conditions.
+      def supports_trigger_conditions?
+        server_version >= 90000
       end
 
       # PostgreSQL supports prepared transactions (two-phase commit) if
@@ -708,9 +714,12 @@ module Sequel
       end
 
       EXCLUSION_CONSTRAINT_SQL_STATE = '23P01'.freeze
+      DEADLOCK_SQL_STATE = '40P01'.freeze
       def database_specific_error_class_from_sqlstate(sqlstate)
         if sqlstate == EXCLUSION_CONSTRAINT_SQL_STATE
           ExclusionConstraintViolation
+        elsif sqlstate == DEADLOCK_SQL_STATE
+          SerializationFailure
         else
           super
         end
@@ -841,7 +850,11 @@ module Sequel
       def create_trigger_sql(table, name, function, opts=OPTS)
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         whence = opts[:after] ? 'AFTER' : 'BEFORE'
-        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
+        if filter = opts[:when]
+          raise Error, "Trigger conditions are not supported for this database" unless supports_trigger_conditions?
+          filter = " WHEN #{filter_expr(filter)}"
+        end
+        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]}#{filter} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
       end
 
       # DDL fragment for initial part of CREATE VIEW statement
@@ -1297,10 +1310,15 @@ module Sequel
       # Insert a record returning the record inserted.  Always returns nil without
       # inserting a query if disable_insert_returning is used.
       def insert_select(*values)
-        unless @opts[:disable_insert_returning]
-          ds = opts[:returning] ? self : returning
-          ds.insert(*values){|r| return r}
-        end
+        return unless supports_insert_select?
+        with_sql_first(insert_select_sql(*values))
+      end
+
+      # The SQL to use for an insert_select, adds a RETURNING clause to the insert
+      # unless the RETURNING clause is already present.
+      def insert_select_sql(*values)
+        ds = opts[:returning] ? self : returning
+        ds.insert_sql(*values)
       end
 
       # Locks all tables in the dataset's FROM clause (but not in JOINs) with
@@ -1382,7 +1400,7 @@ module Sequel
       #
       # Options:
       # :cascade :: whether to use the CASCADE option, useful when truncating
-      #   tables with Foreign Keys.
+      #             tables with foreign keys.
       # :only :: truncate using ONLY, so child tables are unaffected
       # :restart :: use RESTART IDENTITY to restart any related sequences
       #

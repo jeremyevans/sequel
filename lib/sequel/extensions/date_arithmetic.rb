@@ -24,6 +24,7 @@
 #
 #   DB[:table].select(add.as(:d)).where(sub > Sequel::CURRENT_TIMESTAMP)
 
+#
 module Sequel
   module SQL
     module Builders

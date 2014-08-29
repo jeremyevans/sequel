@@ -27,6 +27,26 @@ describe "Composition plugin" do
     proc{@c.composition :date, :mapping=>[]}.should_not raise_error
   end
 
+  it "should handle validations of underlying columns" do
+    @c.composition :date, :mapping=>[:year, :month, :day]
+    o = @c.new
+    def o.validate
+      [:year, :month, :day].each{|c| errors.add(c, "not present") unless send(c)}
+    end
+    o.valid?.should == false
+    o.date = Date.new(1, 2, 3)
+    o.valid?.should == true
+  end
+
+  it "should set column values even when not validating" do
+    @c.composition :date, :mapping=>[:year, :month, :day]
+    @c.load({}).set(:date=>Date.new(4, 8, 12)).save(:validate=>false)
+    sql = DB.sqls.last
+    sql.should include("year = 4")
+    sql.should include("month = 8")
+    sql.should include("day = 12")
+  end
+
   it ".compositions should return the reflection hash of compositions" do
     @c.compositions.should == {}
     @c.composition :date, :mapping=>[:year, :month, :day]

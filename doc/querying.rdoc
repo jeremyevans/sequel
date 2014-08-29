@@ -40,7 +40,7 @@ by its primary key value:
   # Find artist with primary key (id) 1
   artist = Artist[1]
   # SELECT * FROM artists WHERE id = 1
-  => #<Artist @values={:name=>"YJM", :id=>1}>
+  # => #<Artist @values={:name=>"YJM", :id=>1}>
 
 If there is no record with the given primary key, nil will be returned. If you want
 to raise an exception if no record is found, you can use <tt>Sequel::Model.with_pk!</tt>:
@@ -54,17 +54,17 @@ If you just want the first record in the dataset,
 
   artist = Artist.first
   # SELECT * FROM artists LIMIT 1
-  => #<Artist @values={:name=>"YJM", :id=>1}>
+  # => #<Artist @values={:name=>"YJM", :id=>1}>
 
 Any options you pass to +first+ will be used as a filter:
 
   artist = Artist.first(:name => 'YJM')
   # SELECT * FROM artists WHERE (name = 'YJM') LIMIT 1
-  => #<Artist @values={:name=>"YJM", :id=>1}>
+  # => #<Artist @values={:name=>"YJM", :id=>1}>
   
   artist = Artist.first(Sequel.like(:name, 'Y%'))
   # SELECT * FROM artists WHERE (name LIKE 'Y%' ESCAPE '\') LIMIT 1
-  => #<Artist @values={:name=>"YJM", :id=>1}>
+  # => #<Artist @values={:name=>"YJM", :id=>1}>
   
 If there is no matching row, +first+ will return nil.  If you want to
 raise an exception instead, use <tt>first!</tt>.
@@ -74,7 +74,7 @@ requires an argument:
 
   DB[:artists][:name => 'YJM']
   # SELECT * FROM artists WHERE (name = 'YJM') LIMIT 1
-  => {:name=>"YJM", :id=>1}
+  # => {:name=>"YJM", :id=>1}
 
 Note that while Model.[] allows you to pass a primary key directly,
 Dataset#[] does not (unless it is a model dataset).
@@ -89,7 +89,7 @@ reverse order by the primary key field:
 
   artist = Artist.last
   # SELECT * FROM artists ORDER BY id DESC LIMIT 1
-  => #<Artist @values={:name=>"YJM", :id=>1}>
+  # => #<Artist @values={:name=>"YJM", :id=>1}>
 
 Note that what +last+ does is reverse the order of the dataset and then
 call +first+.  This is why +last+ raises a Sequel::Error if there is no
@@ -107,7 +107,7 @@ you want:
 
   artist_name = Artist.get(:name)
   # SELECT name FROM artists LIMIT 1
-  => "YJM"
+  # => "YJM"
 
 === Retrieving Multiple Objects
 
@@ -119,8 +119,8 @@ want to use:
 
   artists = Artist.all
   # SELECT * FROM artists
-  => [#<Artist @values={:name=>"YJM", :id=>1}>,
-      #<Artist @values={:name=>"AS", :id=>2}>]
+  # => [#<Artist @values={:name=>"YJM", :id=>1}>,
+  #     #<Artist @values={:name=>"AS", :id=>2}>]
 
 ==== Using an Enumerable Interface
 
@@ -138,7 +138,7 @@ such as +map+:
 
   artist_names = Artist.map{|x| x.name}
   # SELECT * FROM artists
-  => ["YJM", "AS"]
+  # => ["YJM", "AS"]
 
 ==== As an Array of Column Values
 
@@ -148,7 +148,7 @@ given column.  So the previous example can be handled more easily with:
 
   artist_names = Artist.map(:name)
   # SELECT * FROM artists
-  => ["YJM", "AS"]
+  # => ["YJM", "AS"]
 
 One difference between these two ways of returning an array of values is
 that providing +map+ with an argument is really doing:
@@ -162,21 +162,21 @@ single column and return an array of the columns values, you can use
 
   artist_names = Artist.select_map(:name)
   # SELECT name FROM artists
-  => ["YJM", "AS"]
+  # => ["YJM", "AS"]
 
 It's also common to want to order such a map, so Sequel provides a
 +select_order_map+ method as well:
 
   artist_names = Artist.select_order_map(:name)
   # SELECT name FROM artists ORDER BY name
-  => ["AS", "YJM"]
+  # => ["AS", "YJM"]
 
 In all of these cases, you can provide an array of column symbols and
 an array of arrays of values will be returned:
 
   artist_names = Artist.select_map([:id, :name])
   # SELECT id, name FROM artists
-  => [[1, "YJM"], [2, "AS"]]
+  # => [[1, "YJM"], [2, "AS"]]
 
 ==== As a Hash
 
@@ -185,7 +185,7 @@ using the +to_hash+ method:
 
   artist_names = Artist.to_hash(:id, :name)
   # SELECT * FROM artists
-  => {1=>"YJM", 2=>"AS"}
+  # => {1=>"YJM", 2=>"AS"}
 
 As you can see, the +to_hash+ method uses the first symbol as the key
 and the second symbol as the value.  So if you swap the two arguments the hash
@@ -193,7 +193,7 @@ will have its keys and values transposed:
 
   artist_names = Artist.to_hash(:name, :id)
   # SELECT * FROM artists
-  => {"YJM"=>1, "AS"=>2}
+  # => {"YJM"=>1, "AS"=>2}
 
 Now what if you have multiple values for the same key?  By default, +to_hash+
 will just have the last matching value.  If you care about all matching values,
@@ -202,20 +202,20 @@ values, in the order they were received:
 
   artist_names = Artist.to_hash_groups(:name, :id)
   # SELECT * FROM artists
-  => {"YJM"=>[1, 10, ...], "AS"=>[2, 20, ...]}
+  # => {"YJM"=>[1, 10, ...], "AS"=>[2, 20, ...]}
 
 If you only provide one argument to +to_hash+, it uses the entire hash
 or model object as the value:
 
   artist_names = DB[:artists].to_hash(:name)
   # SELECT * FROM artists
-  => {"YJM"=>{:id=>1, :name=>"YJM"}, "AS"=>{:id=>2, :name=>"AS"}}
+  # => {"YJM"=>{:id=>1, :name=>"YJM"}, "AS"=>{:id=>2, :name=>"AS"}}
 
 and +to_hash_groups+ works similarly:
 
   artist_names = DB[:artists].to_hash_groups(:name)
   # SELECT * FROM artists
-  => {"YJM"=>[{:id=>1, :name=>"YJM"}, {:id=>10, :name=>"YJM"}], ...}
+  # => {"YJM"=>[{:id=>1, :name=>"YJM"}, {:id=>10, :name=>"YJM"}], ...}
 
 Model datasets have a +to_hash+ method that can be called without any
 arguments, in which case it will use the primary key as the key and
@@ -224,8 +224,8 @@ identity map:
 
   artist_names = Artist.to_hash
   # SELECT * FROM artists
-  => {1=>#<Artist @values={:id=>1, :name=>"YGM"}>,
-      2=>#<Artist @values={:id=>2, :name=>"AS"}>}
+  # => {1=>#<Artist @values={:id=>1, :name=>"YGM"}>,
+  #     2=>#<Artist @values={:id=>2, :name=>"AS"}>}
 
 There is no equivalent handling to +to_hash_groups+, since there would
 only be one matching record, as the primary key must be unique.
@@ -237,13 +237,13 @@ columns selected and return a hash:
 
   artist_names = Artist.select_hash(:name, :id)
   # SELECT name, id FROM artists
-  => {"YJM"=>1, "AS"=>2}
+  # => {"YJM"=>1, "AS"=>2}
 
 Likewise, +select_hash_groups+ also exists:
 
   artist_names = Artist.select_hash_groups(:name, :id)
   # SELECT name, id FROM artists
-  => {"YJM"=>[1, 10, ...], "AS"=>[2, 20, ...]}
+  # => {"YJM"=>[1, 10, ...], "AS"=>[2, 20, ...]}
 
 == Modifying datasets 
 
@@ -975,15 +975,15 @@ If you just want to know whether the current dataset would return any rows, use 
 
   Album.empty?
   # SELECT 1 FROM albums LIMIT 1
-  => false
+  # => false
 
   Album.where(:id=>0).empty?
   # SELECT 1 FROM albums WHERE id = 0 LIMIT 1
-  => true
+  # => true
 
   Album.where(Sequel.like(:name, 'R%')).empty?
   # SELECT 1 FROM albums WHERE name LIKE 'R%' ESCAPE '\' LIMIT 1
-  => false
+  # => false
 
 == Aggregate Calculations
 
@@ -995,23 +995,23 @@ for each of these aggregate functions.
 
   Album.count
   # SELECT count(*) AS count FROM albums LIMIT 1
-  => 2
+  # => 2
   
 The other methods take a column argument and call the aggregate function with
 the argument:
 
   Album.sum(:id)
   # SELECT sum(id) FROM albums LIMIT 1
-  => 3
+  # => 3
 
   Album.avg(:id)
   # SELECT avg(id) FROM albums LIMIT 1
-  => 1.5
+  # => 1.5
 
   Album.min(:id)
   # SELECT min(id) FROM albums LIMIT 1
-  => 1
+  # => 1
 
   Album.max(:id)
   # SELECT max(id) FROM albums LIMIT 1
-  => 2
+  # => 2

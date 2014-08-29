@@ -287,9 +287,9 @@ Sequel also supports the SQL EXISTS operator using <tt>Dataset#exists</tt>:
 
 Hashes in Sequel use IS if the value is true, false, or nil:
 
-  {:column=>nil) # ("column" IS NULL)
-  {:column=>true) # ("column" IS TRUE)
-  {:column=>false) # ("column" IS FALSE)
+  {:column=>nil} # ("column" IS NULL)
+  {:column=>true} # ("column" IS TRUE)
+  {:column=>false} # ("column" IS FALSE)
 
 Negation works the same way as it does for equality and inclusion:
 
@@ -506,7 +506,7 @@ To select all columns in a table, Sequel supports the * method on identifiers wi
 
 Sequel allows the easy production of SQL CASE statements using the <tt>Sequel.case</tt> method.  The first argument is a hash or array of two element arrays representing the conditions, the second argument is the default value (ELSE).   The keys of the hash (or first element in each array) is the WHEN condition, and the values of the hash (or second element in each array) is the THEN result.  Here are some examples:
 
-  Sequel.case({:column=>1, 0) # (CASE WHEN "column" THEN 1 ELSE 0 END)
+  Sequel.case({:column=>1}, 0) # (CASE WHEN "column" THEN 1 ELSE 0 END)
   Sequel.case([[column, 1]], 0) # (CASE WHEN "column" THEN 1 ELSE 0 END)
   Sequel.case({{:column=>nil}=>1}, 0) # (CASE WHEN (column IS NULL) THEN 1 ELSE 0 END)
 

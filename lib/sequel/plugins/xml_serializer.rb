@@ -12,50 +12,50 @@ module Sequel
     #   album = Album[1]
     #   puts album.to_xml
     #   # Output:
-    #   <?xml version="1.0"?>
-    #   <album>
-    #     <id>1</id>
-    #     <name>RF</name>
-    #     <artist_id>2</artist_id>
-    #   </album>
+    #   # <?xml version="1.0"?>
+    #   # <album>
+    #   #   <id>1</id>
+    #   #   <name>RF</name>
+    #   #   <artist_id>2</artist_id>
+    #   # </album>
     #
     # You can provide options to control the XML output:
     #
     #   puts album.to_xml(:only=>:name)
     #   puts album.to_xml(:except=>[:id, :artist_id])
     #   # Output:
-    #   <?xml version="1.0"?>
-    #   <album>
-    #     <name>RF</name>
-    #   </album>
+    #   # <?xml version="1.0"?>
+    #   # <album>
+    #   #   <name>RF</name>
+    #   # </album>
     #
     #   album.to_xml(:include=>:artist)
     #   # Output:
-    #   <?xml version="1.0"?>
-    #   <album>
-    #     <id>1</id>
-    #     <name>RF</name>
-    #     <artist_id>2</artist_id>
-    #     <artist>
-    #       <id>2</id>
-    #       <name>YJM</name>
-    #     </artist>
-    #   </album>
+    #   # <?xml version="1.0"?>
+    #   # <album>
+    #   #   <id>1</id>
+    #   #   <name>RF</name>
+    #   #   <artist_id>2</artist_id>
+    #   #   <artist>
+    #   #     <id>2</id>
+    #   #     <name>YJM</name>
+    #   #   </artist>
+    #   # </album>
     # 
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
     #   album.to_xml(:include=>{:artist=>{:only=>:name}})
     #   # Output:
-    #   <?xml version="1.0"?>
-    #   <album>
-    #     <id>1</id>
-    #     <name>RF</name>
-    #     <artist_id>2</artist_id>
-    #     <artist>
-    #       <name>YJM</name>
-    #     </artist>
-    #   </album>
+    #   # <?xml version="1.0"?>
+    #   # <album>
+    #   #   <id>1</id>
+    #   #   <name>RF</name>
+    #   #   <artist_id>2</artist_id>
+    #   #   <artist>
+    #   #     <name>YJM</name>
+    #   #   </artist>
+    #   # </album>
     #
     # +to_xml+ also exists as a class and dataset method, both
     # of which return all objects in the dataset:

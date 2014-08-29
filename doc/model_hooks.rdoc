@@ -121,7 +121,7 @@ However, skipping hooks is a bad idea in general and should be avoided.  As ment
 
 The +this+ dataset works just like any other dataset, so you can call +update+ on it to modify it:
 
-  album.this.update(:copies_sold=>album.copies_sold + 1))
+  album.this.update(:copies_sold=>album.copies_sold + 1)
 
 If you want to insert a row into the model's table without running the creation hooks, you can use <tt>Model.insert</tt> instead of <tt>Model.create</tt>:
 

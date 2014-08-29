@@ -52,6 +52,7 @@
 # loading this extension.  Doing so will allow you to use PGArray#op to get
 # an RangeOp, allowing you to perform range operations on range literals.
 
+#
 module Sequel
   module Postgres
     # The RangeOp class is a simple container for a single object that

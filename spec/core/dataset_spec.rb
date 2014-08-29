@@ -593,8 +593,18 @@ describe "Dataset#where" do
       "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
   end
 
-  specify "should raise an error if an invalid argument is used" do
+  specify "should handle arbitrary objects" do
+    o = Object.new
+    def o.sql_literal(ds)
+      "foo"
+    end
+    @dataset.filter(o).sql.should == 'SELECT * FROM test WHERE foo'
+  end
+
+  specify "should raise an error if an numeric is used" do
     proc{@dataset.filter(1)}.should raise_error(Sequel::Error)
+    proc{@dataset.filter(1.0)}.should raise_error(Sequel::Error)
+    proc{@dataset.filter(BigDecimal.new('1.0'))}.should raise_error(Sequel::Error)
   end
 
   specify "should raise an error if a NumericExpression or StringExpression is used" do
@@ -982,22 +992,17 @@ describe "Dataset#literal" do
     d.literal(d).should == "(#{d.sql})"
   end
   
-  specify "should literalize Sequel::SQLTime properly" do
-    t = Sequel::SQLTime.now
-    s = t.strftime("'%H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}'"
+  specify "should literalize times properly" do
+    @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).should == "'01:02:03.500000'"
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).should == "'2010-01-02 03:04:05.500000'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).should == "'2010-01-02 03:04:05.500000'"
   end
   
-  specify "should literalize Time properly" do
-    t = Time.now
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}'"
-  end
-  
-  specify "should literalize DateTime properly" do
-    t = DateTime.now
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction * (RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000))}'"
+  specify "should literalize times properly for databases supporting millisecond precision" do
+    meta_def(@dataset, :timestamp_precision){3}
+    @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).should == "'01:02:03.500'"
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).should == "'2010-01-02 03:04:05.500'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).should == "'2010-01-02 03:04:05.500'"
   end
   
   specify "should literalize Date properly" do
@@ -1015,52 +1020,19 @@ describe "Dataset#literal" do
 
   specify "should literalize Time, DateTime, Date properly if SQL standard format is required" do
     meta_def(@dataset, :requires_sql_standard_datetimes?){true}
-
-    t = Time.now
-    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}'"
-
-    t = DateTime.now
-    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* (RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000))}'"
-
-    d = Date.today
-    s = d.strftime("DATE '%Y-%m-%d'")
-    @dataset.literal(d).should == s
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).should == "TIMESTAMP '2010-01-02 03:04:05.500000'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).should == "TIMESTAMP '2010-01-02 03:04:05.500000'"
+    @dataset.literal(Date.new(2010, 1, 2)).should == "DATE '2010-01-02'"
   end
   
   specify "should literalize Time and DateTime properly if the database support timezones in timestamps" do
     meta_def(@dataset, :supports_timestamp_timezones?){true}
+    @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5, 500000)).should == "'2010-01-02 03:04:05.500000+0000'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).should == "'2010-01-02 03:04:05.500000+0000'"
 
-    t = Time.now.utc
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}+0000'"
-
-    t = DateTime.now.new_offset(0)
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* (RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000))}+0000'"
-  end
-  
-  specify "should literalize Time and DateTime properly if the database doesn't support usecs in timestamps" do
     meta_def(@dataset, :supports_timestamp_usecs?){false}
-    
-    t = Time.now.utc
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}'"
-
-    t = DateTime.now.new_offset(0)
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}'"
-    
-    meta_def(@dataset, :supports_timestamp_timezones?){true}
-    
-    t = Time.now.utc
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}+0000'"
-
-    t = DateTime.now.new_offset(0)
-    s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}+0000'"
+    @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05+0000'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05+0000'"
   end
   
   specify "should not modify literal strings" do
@@ -3249,6 +3221,11 @@ describe "Dataset#insert_sql" do
   specify "should accept an array of columns and an LiteralString" do
     @ds.insert_sql([:a, :b, :c], Sequel.lit('VALUES (1, 2, 3)')).should == "INSERT INTO items (a, b, c) VALUES (1, 2, 3)"
   end
+
+  specify "should use unaliased table name" do
+    @ds.from(:items___i).insert_sql(1).should == "INSERT INTO items VALUES (1)"
+    @ds.from(Sequel.as(:items, :i)).insert_sql(1).should == "INSERT INTO items VALUES (1)"
+  end
 end
 
 describe "Dataset#inspect" do
@@ -3457,7 +3434,7 @@ describe "Dataset prepared statements and bound variables " do
   before do
     @db = Sequel.mock
     @ds = @db[:items]
-    meta_def(@ds, :insert_sql){|*v| "#{super(*v)}#{' RETURNING *' if opts.has_key?(:returning)}" }
+    meta_def(@ds, :insert_select_sql){|*v| "#{insert_sql(*v)} RETURNING *" }
   end
   
   specify "#call should take a type and bind hash and interpolate it" do
@@ -3740,6 +3717,11 @@ describe "Sequel::Dataset#qualify" do
     ds.sql.should == 'SELECT t.* FROM t WHERE t.b'
   end
 
+  specify "should handle SQL::DelayedEvaluations that take dataset arguments" do
+    ds = @ds.filter(Sequel.delay{|ds| ds.first_source}).qualify
+    ds.sql.should == 'SELECT t.* FROM t WHERE t.t'
+  end
+
   specify "should handle all other objects by returning them unchanged" do
     @ds.select("a").filter{a(3)}.filter('blah').order(Sequel.lit('true')).group(Sequel.lit('a > ?', 1)).having(false).qualify.sql.should == "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a > 1 HAVING 'f' ORDER BY true"
   end
@@ -3935,7 +3917,12 @@ describe "Sequel timezone support" do
     @dataset = @db.dataset
     meta_def(@dataset, :supports_timestamp_timezones?){true}
     meta_def(@dataset, :supports_timestamp_usecs?){false}
-    @offset = sprintf("%+03i%02i", *(Time.now.utc_offset/60).divmod(60))
+    @utc_time = Time.utc(2010, 1, 2, 3, 4, 5)
+    @local_time = Time.local(2010, 1, 2, 3, 4, 5)
+    @offset = sprintf("%+03i%02i", *(@local_time.utc_offset/60).divmod(60))
+    @dt_offset = @local_time.utc_offset/Rational(86400, 1)
+    @utc_datetime = DateTime.new(2010, 1, 2, 3, 4, 5)
+    @local_datetime = DateTime.new(2010, 1, 2, 3, 4, 5, @dt_offset)
   end
   after do
     Sequel.default_timezone = nil
@@ -3944,50 +3931,26 @@ describe "Sequel timezone support" do
   
   specify "should handle an database timezone of :utc when literalizing values" do
     Sequel.database_timezone = :utc
-
-    t = Time.now
-    s = t.getutc.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}+0000'"
-
-    t = DateTime.now
-    s = t.new_offset(0).strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}+0000'"
+    @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05+0000'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05+0000'"
   end
   
   specify "should handle an database timezone of :local when literalizing values" do
     Sequel.database_timezone = :local
-
-    t = Time.now.utc
-    s = t.getlocal.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}#{@offset}'"
-
-    t = DateTime.now.new_offset(0)
-    s = t.new_offset(DateTime.now.offset).strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}#{@offset}'"
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05#{@offset}'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, 5, @dt_offset)).should == "'2010-01-02 03:04:05#{@offset}'"
   end
   
   specify "should have Database#timezone override Sequel.database_timezone" do
     Sequel.database_timezone = :local
     @db.timezone = :utc
-
-    t = Time.now
-    s = t.getutc.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}+0000'"
-
-    t = DateTime.now
-    s = t.new_offset(0).strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}+0000'"
+    @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05+0000'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05+0000'"
 
     Sequel.database_timezone = :utc
     @db.timezone = :local
-
-    t = Time.now.utc
-    s = t.getlocal.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}#{@offset}'"
-
-    t = DateTime.now.new_offset(0)
-    s = t.new_offset(DateTime.now.offset).strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}#{@offset}'"
+    @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5)).should == "'2010-01-02 03:04:05#{@offset}'"
+    @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, 5, @dt_offset)).should == "'2010-01-02 03:04:05#{@offset}'"
   end
   
   specify "should handle converting database timestamps into application timestamps" do
@@ -4418,9 +4381,10 @@ end
 
 describe "Dataset#returning" do
   before do
-    @ds = Sequel.mock(:fetch=>proc{|s| {:foo=>s}})[:t].returning(:foo)
+    @db = Sequel.mock(:fetch=>proc{|s| {:foo=>s}})
+    @db.extend_datasets{def supports_returning?(type) true end}
+    @ds = @db[:t].returning(:foo)
     @pr = proc do
-      def @ds.supports_returning?(*) true end
       sc = class << @ds; self; end
       Sequel::Dataset.def_sql_method(sc, :delete, %w'delete from where returning')
       Sequel::Dataset.def_sql_method(sc, :insert, %w'insert into columns values returning')
@@ -4457,6 +4421,11 @@ describe "Dataset#returning" do
     @ds.delete.should == [{:foo=>"DELETE FROM t RETURNING foo"}]
     @ds.insert(1).should == [{:foo=>"INSERT INTO t VALUES (1) RETURNING foo"}]
     @ds.update(:foo=>1).should == [{:foo=>"UPDATE t SET foo = 1 RETURNING foo"}]
+  end
+
+  specify "should raise an error if RETURNING is not supported" do
+    @db.extend_datasets{def supports_returning?(type) false end}
+    proc{@db[:t].returning}.should raise_error(Sequel::Error)
   end
 end
 
@@ -4941,5 +4910,61 @@ describe "Dataset emulated complex expression operators" do
 
   it "should emulate B~" do
     @ds.literal(~@n).should == "((0 - x) - 1)"
+  end
+end
+
+describe "#joined_dataset?" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+
+  it "should be false if the dataset has 0 or 1 from table" do
+    @ds.joined_dataset?.should == false
+    @ds.from(:a).joined_dataset?.should == false
+  end
+
+  it "should be true if the dataset has 2 or more from tables" do
+    @ds.from(:a, :b).joined_dataset?.should == true
+    @ds.from(:a, :b, :c).joined_dataset?.should == true
+  end
+
+  it "should be true if the dataset has any join tables" do
+    @ds.from(:a).cross_join(:b).joined_dataset?.should == true
+  end
+end
+
+describe "#unqualified_column_for" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+
+  it "should handle Symbols" do
+    @ds.unqualified_column_for(:a).should == Sequel.identifier('a')
+    @ds.unqualified_column_for(:b__a).should == Sequel.identifier('a')
+    @ds.unqualified_column_for(:a___c).should == Sequel.identifier('a').as('c')
+    @ds.unqualified_column_for(:b__a___c).should == Sequel.identifier('a').as('c')
+  end
+
+  it "should handle SQL::Identifiers" do
+    @ds.unqualified_column_for(Sequel.identifier(:a)).should == Sequel.identifier(:a)
+  end
+
+  it "should handle SQL::QualifiedIdentifiers" do
+    @ds.unqualified_column_for(Sequel.qualify(:b, :a)).should == Sequel.identifier('a')
+    @ds.unqualified_column_for(Sequel.qualify(:b, 'a')).should == Sequel.identifier('a')
+  end
+
+  it "should handle SQL::AliasedExpressions" do
+    @ds.unqualified_column_for(Sequel.qualify(:b, :a).as(:c)).should == Sequel.identifier('a').as(:c)
+  end
+
+  it "should return nil for other objects" do
+    @ds.unqualified_column_for(Object.new).should == nil
+    @ds.unqualified_column_for('a').should == nil
+  end
+
+  it "should return nil for other objects inside SQL::AliasedExpressions" do
+    @ds.unqualified_column_for(Sequel.as(Object.new, 'a')).should == nil
+    @ds.unqualified_column_for(Sequel.as('a', 'b')).should == nil
   end
 end

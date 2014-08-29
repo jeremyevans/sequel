@@ -122,6 +122,7 @@
 #   readd all constraints you want to use inside the alter table block,
 #   making no other changes inside the alter_table block.
 
+#
 module Sequel
   module ConstraintValidations
     # The default table name used for the validation metadata.

@@ -37,6 +37,7 @@
 #     DB[:a].server(:read_only).all # Uses shard1
 #   end
 
+#
 module Sequel
   module ServerBlock
     # Enable the server block on the connection pool, choosing the correct

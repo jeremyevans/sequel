@@ -21,6 +21,7 @@
 #
 #   DB.extension(:current_datetime_timestamp)
 
+#
 module Sequel
   module CurrentDateTimeTimestamp
     module DatasetMethods

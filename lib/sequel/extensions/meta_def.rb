@@ -5,6 +5,7 @@
 #
 #   Sequel.extension :meta_def
 
+#
 module Sequel
   # Contains meta_def method for adding methods to objects via blocks.
   # Only recommended for backwards compatibility with existing code.

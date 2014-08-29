@@ -18,17 +18,17 @@ module Sequel
     #   album.to_json(:only=>:name)
     #   album.to_json(:except=>[:id, :artist_id])
     #   # => '{"json_class"="Album","name"=>"RF"}'
-    #
+    #   
     #   album.to_json(:include=>:artist)
     #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
-    #          "artist":{"json_class":"Artist","id":2,"name":"YJM"}}'
+    #   #      "artist":{"json_class":"Artist","id":2,"name":"YJM"}}'
     # 
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
     #   album.to_json(:include=>{:artist=>{:only=>:name}})
     #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
-    #          "artist":{"json_class":"Artist","name":"YJM"}}'
+    #   #      "artist":{"json_class":"Artist","name":"YJM"}}'
     #
     # You can specify the <tt>:root</tt> option to nest the JSON under the
     # name of the model:

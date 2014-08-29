@@ -385,14 +385,14 @@ However, the migrations you write should contain an +up+ block that does somethi
 reverses the changes made by the +up+ block:
 
   Sequel.migration do
-    up{...}
-    down{...}
+    up{}
+    down{}
   end
 
 or they should use the reversible migrations feature with a +change+ block:
 
   Sequel.migration do
-    change{...}
+    change{}
   end
 
 == What to put in your migration's +down+ block

@@ -15,6 +15,7 @@
 #
 #   DB.extension(:columns_introspection)
 
+#
 module Sequel
   module ColumnsIntrospection
     # Attempt to guess the columns that will be returned

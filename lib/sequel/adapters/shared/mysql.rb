@@ -161,7 +161,7 @@ module Sequel
       # Return an array of symbols specifying table names in the current database.
       #
       # Options:
-      # * :server - Set the server to use
+      # :server :: Set the server to use
       def tables(opts=OPTS)
         full_tables('BASE TABLE', opts)
       end
@@ -178,7 +178,7 @@ module Sequel
       # Return an array of symbols specifying view names in the current database.
       #
       # Options:
-      # * :server - Set the server to use
+      # :server :: Set the server to use
       def views(opts=OPTS)
         full_tables('VIEW', opts)
       end
@@ -363,17 +363,15 @@ module Sequel
         end
 
         # Split column constraints into table constraints in some cases:
-        # * foreign key - Always
-        # * unique, primary_key - Only if constraint has a name
+        # foreign key - Always
+        # unique, primary_key - Only if constraint has a name
         generator.columns.each do |c|
           if t = c.delete(:table)
             same_table = t == name
-            k = c[:key]
+            key = c[:key] || key_proc.call(t)
 
-            key ||= key_proc.call(t)
-
-            if same_table && !k.nil?
-              generator.constraints.unshift(:type=>:unique, :columns=>Array(k))
+            if same_table && !key.nil?
+              generator.constraints.unshift(:type=>:unique, :columns=>Array(key))
             end
 
             generator.foreign_key([c[:name]], t, c.merge(:name=>c[:foreign_key_constraint_name], :type=>:foreign_key, :key=>key))
@@ -735,7 +733,9 @@ module Sequel
       # Sets up the insert methods to use ON DUPLICATE KEY UPDATE
       # If you pass no arguments, ALL fields will be
       # updated with the new values.  If you pass the fields you
-      # want then ONLY those field will be updated.
+      # want then ONLY those field will be updated. If you pass a
+      # hash you can customize the values (for example, to increment
+      # a numeric field).
       #
       # Useful if you have a unique key and want to update
       # inserting rows that violate the unique key restriction.
@@ -751,6 +751,14 @@ module Sequel
       #   )
       #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       #   # ON DUPLICATE KEY UPDATE value=VALUES(value)
+      #
+      #   dataset.on_duplicate_key_update(
+      #     :value => Sequel.lit('value + VALUES(value)')
+      #   ).multi_insert(
+      #     [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #   )
+      #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
+      #   # ON DUPLICATE KEY UPDATE value=value + VALUES(value)
       def on_duplicate_key_update(*args)
         clone(:on_duplicate_key_update => args)
       end

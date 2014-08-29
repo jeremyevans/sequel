@@ -96,6 +96,15 @@ module Sequel
           super
         end
 
+        # When destroying an instance, move all entries after the instance down
+        # one position, so that there aren't any gaps
+        def after_destroy
+          super
+
+          f = Sequel.expr(position_field)
+          list_dataset.where(f > position_value).update(f => f - 1)
+        end
+
         # Find the last position in the list containing this instance.
         def last_position
           list_dataset.max(position_field).to_i

@@ -85,17 +85,6 @@ module Sequel
           initial_values.has_key?(column)
         end
 
-        # Duplicate internal data structures
-        def dup 
-          s = self
-          super.instance_eval do
-            @initial_values = s.initial_values.dup
-            @missing_initial_values = s.send(:missing_initial_values).dup
-            @previous_changes = s.previous_changes.dup if s.previous_changes
-            self
-          end
-        end
-
         # Freeze internal data structures
         def freeze
           initial_values.freeze
@@ -207,6 +196,15 @@ module Sequel
           unless values.has_key?(column) || (miv = missing_initial_values).include?(column)
             miv << column
           end
+        end
+
+        # Duplicate internal data structures
+        def initialize_copy(other)
+          super
+          @initial_values = other.initial_values.dup
+          @missing_initial_values = other.send(:missing_initial_values).dup
+          @previous_changes = other.previous_changes.dup if other.previous_changes
+          self
         end
 
         # Reset the initial values when initializing.

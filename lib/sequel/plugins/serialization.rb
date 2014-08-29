@@ -175,24 +175,9 @@ module Sequel
       end
 
       module InstanceMethods
-        # Serialize deserialized values before saving
-        def before_save
-          serialize_deserialized_values
-          super
-        end
-        
         # Hash of deserialized values, used as a cache.
         def deserialized_values
           @deserialized_values ||= {}
-        end
-
-        # Freeze the deserialized values
-        def dup
-          dv = deserialized_values.dup
-          super.instance_eval do
-            @deserialized_values = dv
-            self
-          end
         end
 
         # Freeze the deserialized values
@@ -203,6 +188,12 @@ module Sequel
 
         private
 
+        # Serialize deserialized values before saving
+        def _before_validation
+          serialize_deserialized_values
+          super
+        end
+        
         # Clear any cached deserialized values when doing a manual refresh.
         def _refresh_set_values(hash)
           @deserialized_values.clear if @deserialized_values
@@ -216,6 +207,13 @@ module Sequel
             raise Sequel::Error, "no entry in deserialization_map for #{column.inspect}" unless callable = model.deserialization_map[column]
             callable.call(v)
           end
+        end
+
+        # Dup the deserialized values when duping model instance.
+        def initialize_copy(other)
+          super
+          @deserialized_values = other.deserialized_values.dup
+          self
         end
 
         # Serialize all deserialized values

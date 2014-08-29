@@ -327,8 +327,8 @@ ActiveRecord 2 tries to guess whether to use preloading or JOINs for eager loadi
 
 With either way of eager loading, you must call +all+ to retrieve all records at once.  You cannot use +each+, +map+, or one of the other Enumerable methods.  Just like +each+, +all+ takes a block that iterates over the records:
 
-  Artist.eager(:albums=>[:tags, :tracks]).each{|a| ...} # No cookie
-  Artist.eager(:albums=>[:tags, :tracks]).all{|a| ...} # Cookie
+  Artist.eager(:albums=>[:tags, :tracks]).each{|a| } # No cookie
+  Artist.eager(:albums=>[:tags, :tracks]).all{|a| } # Cookie
   
 Like ActiveRecord, Sequel supports cascading of eager loading for both methods of eager loading.
 
@@ -495,7 +495,7 @@ Note that +test_connection+ will return true if a connection can be made, but wi
 Sequel only uses connections for the minimum amount of time necessary, checking them out to do a query, and returning them as soon as the query finishes.  If you do want direct access to the connection object:
 
   Sequel::Model.db.synchronize do |connection|
-    ...
+    # ...
   end
 
 Note that the connection is yielded to the block, and the block ensures it is returned to the pool.  Sequel doesn't have a method that returns a connection, since that would check it out with no ability to ensure it is returned to the pool.
@@ -532,7 +532,7 @@ If you really want to destroy all rows in the table,call +destroy+ on the Model'
 
 If you want to use a specific <tt>Sequel::Database</tt> object, you can use <tt>db=</tt>:
 
-  BACKUP_DB = Sequel.connect(...)
+  BACKUP_DB = Sequel.connect('postgres://...')
   Album.db = BACKUP_DB
 
 If you want a specific dataset in that database, you can use +set_dataset+ or <tt>dataset=</tt>:

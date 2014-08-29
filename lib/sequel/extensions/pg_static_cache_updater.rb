@@ -62,6 +62,7 @@
 #   use the same Database).
 # * Must be using a thread-safe connection pool (the default).
 
+#
 module Sequel
   module Postgres
     module StaticCacheUpdater

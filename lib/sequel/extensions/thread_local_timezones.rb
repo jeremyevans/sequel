@@ -34,6 +34,7 @@
 #   Sequel.thread_application_timezone = :nil
 #   Sequel.application_timezone # => nil
 
+#
 module Sequel
   module ThreadLocalTimezones
     %w'application database typecast'.each do |t|

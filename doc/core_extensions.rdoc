@@ -275,7 +275,7 @@ Array#case and Hash#case return an SQL CASE expression, where the keys are condi
 
 Alternative: Sequel.case:
 
-  Sequel.case({:a=>[2,3]}=>1}, 0)
+  Sequel.case({{:a=>[2,3]}=>1}, 0)
 
 ==== sql_expr
 

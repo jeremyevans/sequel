@@ -1,9 +1,18 @@
+Sequel::JDBC.load_driver('org.postgresql.Driver', :Postgres)
 Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   Postgres::CONVERTED_EXCEPTIONS << NativeException
   
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:postgresql] = proc do |db|
+        db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Postgres::Dataset
+        org.postgresql.Driver
+      end
+    end
+
     class TypeConvertor
       # Return PostgreSQL array types as ruby Arrays instead of
       # JDBC PostgreSQL driver-specific array type. Only used if the

@@ -14,6 +14,7 @@
 #
 #   DB.extension(:hash_aliases)
 
+#
 module Sequel
   module HashAliases
     def from(*source)

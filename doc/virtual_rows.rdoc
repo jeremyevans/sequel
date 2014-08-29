@@ -157,7 +157,7 @@ function without arguments, then call the * method on the function:
 To append the DISTINCT keyword before the method arguments, just call the
 distinct method on the returned Function:
 
-  ds.select{|o| o.count(o.col1).distinct)}
+  ds.select{|o| o.count(o.col1).distinct}
   ds.select{count(col1).distinct}
   # SELECT count(DISTINCT col1)
   
@@ -230,7 +230,7 @@ virtual row block to create a literal string:
 You can use this on a regular virtual row block too, but it
 doesn't look as nice:
 
-  ds.where{|o| o.>(:a, o.`('some SQL')}
+  ds.where{|o| o.>(:a, o.`('some SQL'))}
 
 == Returning multiple values
 

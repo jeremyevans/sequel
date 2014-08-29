@@ -509,6 +509,13 @@ describe "A MySQL database" do
     end
   end
 
+  specify "should correctly format CREATE TABLE statements with foreign keys, when :key != the default (:id)" do
+    @db.create_table(:items){primary_key :id; Integer :other_than_id; foreign_key :p_id, :items, :key => :other_than_id, :null => false, :on_delete => :cascade}
+    check_sqls do
+      @db.sqls.should == ["CREATE TABLE `items` (`id` integer PRIMARY KEY AUTO_INCREMENT, `other_than_id` integer, `p_id` integer NOT NULL, UNIQUE (`other_than_id`), FOREIGN KEY (`p_id`) REFERENCES `items`(`other_than_id`) ON DELETE CASCADE)"]
+    end
+  end
+
   specify "should correctly format ALTER TABLE statements with foreign keys" do
     @db.create_table(:items){Integer :id}
     @db.create_table(:users){primary_key :id}

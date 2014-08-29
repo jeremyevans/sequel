@@ -1,8 +1,17 @@
+Sequel::JDBC.load_driver('com.progress.sql.jdbc.JdbcProgressDriver')
 Sequel.require 'adapters/shared/progress'
 Sequel.require 'adapters/jdbc/transactions'
 
 module Sequel
   module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:jdbcprogress] = proc do |db|
+        db.extend(Sequel::JDBC::Progress::DatabaseMethods)
+        db.extend_datasets Sequel::Progress::DatasetMethods
+        com.progress.sql.jdbc.JdbcProgressDriver
+      end
+    end
+
     # Database and Dataset instance methods for Progress v9 specific
     # support via JDBC.
     module Progress

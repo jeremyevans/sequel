@@ -38,13 +38,15 @@ describe "prepared_statements plugin" do
         def supports_insert_select?
           true
         end
+        def supports_returning?(type)
+          true
+        end
         def insert_select(h)
           self._fetch = {:id=>1, :name=>'foo', :i => 2}
-          ds = opts[:returning] ? self : returning
-          ds.server(:default).with_sql(:insert_sql, h).first
+          server(:default).with_sql_first(insert_select_sql(h))
         end
-        def insert_sql(*)
-          "#{super}#{" RETURNING #{opts[:returning] && !opts[:returning].empty? ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}" if opts.has_key?(:returning)}"
+        def insert_select_sql(*v)
+          "#{insert_sql(*v)} RETURNING #{(opts[:returning] && !opts[:returning].empty?) ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}"
         end
       end
       @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
