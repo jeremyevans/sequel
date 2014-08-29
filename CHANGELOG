@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise original exception if there is an exception raised when rolling back transaction/savepoint (jeremyevans) (#875)
+
 * Allow delayed evaluation blocks to take dataset as an argument (jeremyevans)
 
 * Allow more types as filter expressions, only specifically disallow Numeric/String expressions (jeremyevans)

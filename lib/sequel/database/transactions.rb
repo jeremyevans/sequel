@@ -128,8 +128,7 @@ module Sequel
       rescue Exception => e
         begin
           rollback_transaction(conn, opts)
-        rescue Exception => e3
-          raise_error(e3, :classes=>database_error_classes, :conn=>conn)
+        rescue Exception
         end
         transaction_error(e, :conn=>conn, :rollback=>rollback)
       ensure
