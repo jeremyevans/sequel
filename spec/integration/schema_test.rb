@@ -364,7 +364,7 @@ describe "Database schema modifiers" do
     end
   end
 
-  specify "should create temporary tables without raising an exception" do
+  cspecify "should create temporary tables without raising an exception", :fdbsql do
     @db.create_table!(:items_temp, :temp=>true){Integer :number}
   end
 
@@ -420,7 +420,7 @@ describe "Database schema modifiers" do
     @ds.insert([10])
   end
 
-  specify "should be able to specify constraint names for column constraints" do
+  cspecify "should be able to specify constraint names for column constraints", :fdbsql do
     @db.create_table!(:items2){primary_key :id, :primary_key_constraint_name=>:foo_pk}
     @db.create_table!(:items){foreign_key :id, :items2, :unique=>true, :foreign_key_constraint_name => :foo_fk, :unique_constraint_name => :foo_uk, :null=>false}
     @db.alter_table(:items){drop_constraint :foo_fk, :type=>:foreign_key; drop_constraint :foo_uk, :type=>:unique}
@@ -681,7 +681,7 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
   end
 
-  cspecify "should work correctly with many operations in a single alter_table call", [:jdbc, :db2], [:db2] do
+  cspecify "should work correctly with many operations in a single alter_table call", [:jdbc, :db2], [:db2], :fdbsql do
     @db.create_table!(:items) do
       primary_key :id
       String :name2
