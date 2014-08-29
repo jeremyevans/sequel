@@ -16,4 +16,4 @@
 
 ### Expected Failures
 
-Using the forked version of Sequel for testing, there are no expected failures.
+Using the forked version of Sequel for testing, there are no expected failures. Sometimes, if the sql-layer is under load you may get a test failure due to past_version; rerunning the test should work.
