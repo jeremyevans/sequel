@@ -48,7 +48,7 @@
             order they were called on the object.  For example, the following now work
             as expected:</p>
             
-            <pre>ds1.union(ds2).union(ds3)&#x000A;ds1.except(ds2).except(ds3)&#x000A;ds1.intersect(ds2).intersect(ds3)&#x000A;ds1.union(ds2).except(ds3)&#x000A;ds1.except(ds2).intersect(ds3)&#x000A;ds1.intersect(ds2).union(ds3)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">except</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds3</span>)&#x000A;<span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">intersect</span>(<span class="ruby-identifier">ds2</span>).<span class="ruby-identifier">union</span>(<span class="ruby-identifier">ds3</span>)</pre>
             </li><li>
             <p>Exception classes ValidationFailure and BeforeHookFailure were added so it
             is eaiser to catch a failed validation.  These are both subclasses of <a
@@ -114,7 +114,7 @@
             <p>The native postgresql adapter has been changed to only log client messages
             of level WARNING by default.  You can modify this via:</p>
             
-            <pre>Sequel::Postgres.client_min_messages = nil # Use Server Default&#x000A;Sequel::Postgres.client_min_messages = :notice # Use NOTICE level</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">client_min_messages</span> = <span class="ruby-keyword">nil</span> <span class="ruby-comment"># Use Server Default</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">client_min_messages</span> = :<span class="ruby-identifier">notice</span> <span class="ruby-comment"># Use NOTICE level</span></pre>
             </li><li>
             <p>Model#inspect now calls Model#inspect_values for easier overloading.</p>
             </li></ul>

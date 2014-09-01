@@ -61,12 +61,10 @@
                   <p>Return a JSON string representing an array of all objects in this dataset. 
                   Takes the same options as the instance method, and passes them to every
                   instance.  Additionally, respects the following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:array 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:array </td><td>
                   <p>An array of instances.  If this is not provided, calls all on the receiver
                   to get the array.</p>
-                  </dd><dt>:root 
-                  <dd>
+                  </td></tr><tr><td class='label'>:root </td><td>
                   <p>If set to :collection, only wraps the collection in a root object.  If set
                   to :instance, only wraps the instances in a root object.  If set to :both,
                   wraps both the collection and instances in a root object.  Unfortunately,
@@ -74,7 +72,7 @@
                   one of those symbols, it defaults to both.  That may change in a future
                   version, so for forwards compatibility, you should pick a specific symbol
                   for your desired behavior.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_json-source'); return false">

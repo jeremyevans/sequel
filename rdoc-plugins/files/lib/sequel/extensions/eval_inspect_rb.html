@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-23 13:28:32 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -41,19 +41,18 @@
             <p>The eval_inspect extension changes inspect for Sequel::SQL::Expression
             subclasses to return a string suitable for ruby&#39;s eval, such that</p>
             
-            <pre>eval(obj.inspect) == obj</pre>
+            <pre class="ruby"><span class="ruby-identifier">eval</span>(<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">inspect</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">obj</span></pre>
             
             <p>is true.  The above code is true for most of ruby&#39;s simple classes such
             as <a href="../../../../classes/String.html">String</a>, Integer, Float,
             and <a href="../../../../classes/Symbol.html">Symbol</a>, but it&#39;s not
-            true for classes such as Time, Date, and BigDecimal.  <a
-            href="../../../../classes/Sequel.html">Sequel</a> attempts to handle
-            situations where instances of these classes are a component of a <a
-            href="../../../../classes/Sequel.html">Sequel</a> expression.</p>
+            true for classes such as Time, Date, and BigDecimal.  Sequel attempts to
+            handle situations where instances of these classes are a component of a
+            Sequel expression.</p>
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :eval_inspect</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">eval_inspect</span></pre>
           </div>
           <div id='context'>
           </div>

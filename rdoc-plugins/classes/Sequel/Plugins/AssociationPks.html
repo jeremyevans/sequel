@@ -45,7 +45,7 @@
             objects, and easily modifying the associated objects to set the primary
             keys to just the ones given:</p>
             
-            <pre>Artist.one_to_many :albums&#x000A;artist = Artist[1]&#x000A;artist.album_pks # [1, 2, 3]&#x000A;artist.album_pks = [2, 4]&#x000A;artist.album_pks # [2, 4]</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [1, 2, 3]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> = [<span class="ruby-value">2</span>, <span class="ruby-value">4</span>]&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">album_pks</span> <span class="ruby-comment"># [2, 4]</span></pre>
             
             <p>Note that it uses the singular form of the association name. Also note that
             the setter both associates to new primary keys not in the assocation and
@@ -58,7 +58,7 @@
             
             <p>Usage:</p>
             
-            <pre># Make all model subclass *_to_many associations have association_pks&#x000A;# methods (called before loading subclasses)&#x000A;Sequel::Model.plugin :association_pks&#x000A;# Make the Album *_to_many associations have association_pks&#x000A;# methods (called before the association methods)&#x000A;Album.plugin :association_pks</pre>
+            <pre class="ruby"><span class="ruby-comment"># Make all model subclass *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_pks</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before the association methods)</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_pks</span></pre>
           </div>
           <div id='context'>
           </div>

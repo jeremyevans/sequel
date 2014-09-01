@@ -104,29 +104,25 @@
                   
                   <p>In addition to the usual database options, the following options have an
                   effect:</p>
-                  <dl class="rdoc-list note-list"><dt>:command_timeout 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:command_timeout </td><td>
                   <p>Sets the time in seconds to wait while attempting to execute a command
                   before cancelling the attempt and generating an error. Specifically, it
                   sets the <a href="../ADO.html">ADO</a> <a
                   href="Database.html#CommandTimeout">CommandTimeout</a> property. If this
                   property is not set, the default of 30 seconds is used.</p>
-                  </dd><dt>:driver 
-                  <dd>
+                  </td></tr><tr><td class='label'>:driver </td><td>
                   <p>The driver to use in the <a href="../ADO.html">ADO</a> connection string. 
                   If not provided, a default of “SQL Server” is used.</p>
-                  </dd><dt>:conn_string 
-                  <dd>
+                  </td></tr><tr><td class='label'>:conn_string </td><td>
                   <p>The full <a href="../ADO.html">ADO</a> connection string.  If this is
                   provided, the usual options are ignored.</p>
-                  </dd><dt>:provider 
-                  <dd>
+                  </td></tr><tr><td class='label'>:provider </td><td>
                   <p>Sets the <a href="Database.html#Provider">Provider</a> of this <a
                   href="../ADO.html">ADO</a> connection (for example, “SQLOLEDB”). If you
                   don&#39;t specify a provider, the default one used by WIN32OLE has major
                   problems, such as creating a new native database connection for every
                   query, which breaks things such as temporary tables.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Pay special attention to the :provider option, as without specifying a
                   provider, many things will be broken.  The SQLNCLI10 provider appears to

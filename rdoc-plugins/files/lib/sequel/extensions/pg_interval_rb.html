@@ -45,15 +45,14 @@
             they are parsed and returned as instances of ActiveSupport::Duration.</p>
             
             <p>In addition to the parser, this extension adds literalizers for
-            ActiveSupport::Duration that use the standard <a
-            href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
-            so they work on all adapters.</p>
+            ActiveSupport::Duration that use the standard Sequel literalization
+            callbacks, so they work on all adapters.</p>
             
             <p>If you would like to use interval columns in your model objects, you
             probably want to modify the typecasting so that it recognizes and correctly
             handles the interval columns, which you can do by:</p>
             
-            <pre>DB.extension :pg_interval</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_interval</span></pre>
             
             <p>If you are not using the native postgres or jdbc/postgresql adapters and
             are using interval types as model column values you probably should use the
@@ -63,7 +62,7 @@
             arrays of interval types, load the pg_array extension before the
             pg_interval extension:</p>
             
-            <pre>DB.extension :pg_array, :pg_interval</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span>, :<span class="ruby-identifier">pg_interval</span></pre>
             
             <p>The parser this extension uses requires that IntervalStyle for PostgreSQL
             is set to postgres (the default setting).  If IntervalStyle is changed from

@@ -66,7 +66,7 @@
             <p>Prepared statement support is very similar to bound variable support,
             except that the statement is first prepared with a name:</p>
             
-            <pre>ps = ds.prepare(:select, :select_by_name)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">select_by_name</span>)</pre>
             
             <p>It is then called later with the bound arguments to use:</p>
             

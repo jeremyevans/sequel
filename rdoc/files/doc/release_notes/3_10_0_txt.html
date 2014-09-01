@@ -61,7 +61,7 @@
             <p>All usage of the association when eager loading or when getting reflections
             need to use the new singular association name:</p>
             
-            <pre># Before&#x000A;Lyric.eager(:songs).all&#x000A;Lyric.eager_graph(:songs).all&#x000A;Lyric.association_reflection(:songs)&#x000A;# After&#x000A;Lyric.eager(:song).all&#x000A;Lyric.eager_graph(:song).all&#x000A;Lyric.association_reflection(:song)</pre>
+            <pre class="ruby"><span class="ruby-comment"># Before</span>&#x000A;<span class="ruby-constant">Lyric</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">songs</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Lyric</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">songs</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Lyric</span>.<span class="ruby-identifier">association_reflection</span>(:<span class="ruby-identifier">songs</span>)&#x000A;<span class="ruby-comment"># After</span>&#x000A;<span class="ruby-constant">Lyric</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">song</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Lyric</span>.<span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">song</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">Lyric</span>.<span class="ruby-identifier">association_reflection</span>(:<span class="ruby-identifier">song</span>)</pre>
             </li></ul>
             
             <p>Any <a href="../../../classes/Sequel.html">Sequel</a> plugins or extensions
@@ -171,7 +171,7 @@
             For example, if YAML is required after sequel, then the following will
             raise an error:</p>
             
-            <pre>DB[:a].filter{x &gt; y}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">y</span>}</pre>
             
             <p>because YAML adds the y method to all objects.  Now, you can call <a
             href="../../../classes/Sequel/BasicObject.html#method-c-remove_methods-21">Sequel::BasicObject.remove_methods!</a>,
@@ -233,7 +233,7 @@
             undefs private methods in addition to public and protected methods.  So the
             following code now works as expected:</p>
             
-            <pre>DB[:a].filter{x &gt; p} # WHERE x &gt; p</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">p</span>} <span class="ruby-comment"># WHERE x &gt; p</span></pre>
             </li><li>
             <p><a href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>
             with a block now returns the value of the block:</p>

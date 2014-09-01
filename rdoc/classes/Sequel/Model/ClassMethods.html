@@ -464,7 +464,7 @@
                   href="../Model.html">Model</a> proxies many dataset methods to the
                   underlying dataset.</p>
                   
-                  <pre>Artist.dataset.all # SELECT * FROM artists</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># SELECT * FROM artists</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-dataset-source'); return false">
@@ -514,7 +514,7 @@
                   href="DatasetModule.html">Sequel::Model::DatasetModule</a> (a Module
                   subclass), which allows you to call the subset method on them:</p>
                   
-                  <pre>Artist.dataset_module do&#x000A;  subset :released, Sequel.identifier(release_date) &gt; Sequel::CURRENT_DATE&#x000A;end</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">subset</span> :<span class="ruby-identifier">released</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">release_date</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                   
                   <p>Any public methods in the dataset module will have class methods created
                   that call the method on the dataset, assuming that the class method is not
@@ -565,7 +565,7 @@
                   href="../Model.html">Sequel::Model</a> to set the default database to be
                   used by subclasses, or to override the database used for specific models:</p>
                   
-                  <pre>Sequel::Model.db = DB1&#x000A;Artist.db = DB2</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">DB1</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">DB2</span></pre>
                   
                   <p>Note that you should not use this to change the model&#39;s database at
                   runtime.  If you have that need, you should look into Sequel&#39;s sharding
@@ -712,7 +712,7 @@
                   <p>This creates an optimized first_by_name method, which you can call
                   normally:</p>
                   
-                  <pre>Artist.first_by_name(&quot;Joe&quot;)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_by_name</span>(<span class="ruby-string">&quot;Joe&quot;</span>)</pre>
                   
                   <p>The alternative way to use this to pass your own block:</p>
                   
@@ -722,8 +722,7 @@
                   setting limits if necessary (as shown above).</p>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:arity 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:arity </td><td>
                   <p>When using a symbol method name, this specifies the arity of the method.
                   This should be used if if the method accepts an arbitrary number of
                   arguments, or the method has default argument values.  Note that if the
@@ -732,19 +731,16 @@
                   arguments, so you should use this option in that case.  If you want to
                   handle multiple possible arities, you need to call the finder method
                   multiple times with unique :arity and :name methods each time.</p>
-                  </dd><dt>:name 
-                  <dd>
+                  </td></tr><tr><td class='label'>:name </td><td>
                   <p>The name of the method to create.  This must be given if you pass a block.
                   If you use a symbol, this defaults to the symbol prefixed by the type.</p>
-                  </dd><dt>:mod 
-                  <dd>
+                  </td></tr><tr><td class='label'>:mod </td><td>
                   <p>The module in which to create the finder method.  Defaults to the singleton
                   class of the model.</p>
-                  </dd><dt>:type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:type </td><td>
                   <p>The type of query to run.  Can be :first, :each, :all, or :get, defaults to
                   :first.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Caveats:</p>
                   
@@ -755,7 +751,7 @@
                   
                   <p>Then calling a finder without an argument will not work as you expect.</p>
                   
-                  <pre>Artist.finder :by_name&#x000A;Artist.by_name(nil).first&#x000A;# WHERE (name IS NOT NULL)&#x000A;Artist.first_by_name(nil)&#x000A;# WHERE (name IS NULL)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">finder</span> :<span class="ruby-identifier">by_name</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">by_name</span>(<span class="ruby-keyword">nil</span>).<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># WHERE (name IS NOT NULL)</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first_by_name</span>(<span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-comment"># WHERE (name IS NULL)</span></pre>
                   
                   <p>See <a
                   href="../Dataset/PlaceholderLiteralizer.html">Dataset::PlaceholderLiteralizer</a>
@@ -963,10 +959,9 @@
                   
                   <p>The options are the same as the options for finder, with the following
                   exception:</p>
-                  <dl class="rdoc-list note-list"><dt>:type 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:type </td><td>
                   <p>Specifies the type of prepared statement to create</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepared_finder-source'); return false">
@@ -1012,7 +1007,7 @@
                   This is useful if you plan to join other tables to this table and you want
                   the column references to be qualified.</p>
                   
-                  <pre>Artist.filter(Artist.qualified_primary_key_hash(1))&#x000A;# SELECT * FROM artists WHERE (artists.id = 1)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">qualified_primary_key_hash</span>(<span class="ruby-value">1</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (artists.id = 1)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-qualified_primary_key_hash-source'); return false">
@@ -1107,7 +1102,7 @@
                   extends the dataset with the dataset_method_modules. It also attempts to
                   determine the database schema for the model, based on the given dataset.</p>
                   
-                  <pre>Artist.set_dataset(:tbl_artists)&#x000A;Artist.set_dataset(DB[:artists])</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_dataset</span>(:<span class="ruby-identifier">tbl_artists</span>)&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">set_dataset</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>])</pre>
                   
                   <p>Note that you should not use this to change the model&#39;s dataset at
                   runtime.  If you have that need, you should look into Sequel&#39;s sharding
@@ -1173,11 +1168,11 @@
                   of as a scope, and like most dataset methods, they can be chained. For
                   example:</p>
                   
-                  <pre>Topic.subset(:joes, :username.like(&#39;%joe%&#39;))&#x000A;Topic.subset(:popular){num_posts &gt; 100}&#x000A;Topic.subset(:recent){created_on &gt; Date.today - 7}</pre>
+                  <pre class="ruby"><span class="ruby-constant">Topic</span>.<span class="ruby-identifier">subset</span>(:<span class="ruby-identifier">joes</span>, :<span class="ruby-identifier">username</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%joe%&#39;</span>))&#x000A;<span class="ruby-constant">Topic</span>.<span class="ruby-identifier">subset</span>(:<span class="ruby-identifier">popular</span>){<span class="ruby-identifier">num_posts</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-constant">Topic</span>.<span class="ruby-identifier">subset</span>(:<span class="ruby-identifier">recent</span>){<span class="ruby-identifier">created_on</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>}</pre>
                   
                   <p>Allows you to do:</p>
                   
-                  <pre>Topic.joes.recent.popular</pre>
+                  <pre class="ruby"><span class="ruby-constant">Topic</span>.<span class="ruby-identifier">joes</span>.<span class="ruby-identifier">recent</span>.<span class="ruby-identifier">popular</span></pre>
                   
                   <p>to get topics with a username that includes joe that have more than 100
                   posts and were created less than 7 days ago.</p>

@@ -43,12 +43,12 @@
             <p>The add_* association methods now accept a primary key, and associates the
             receiver to the associated model object with that primary key:</p>
             
-            <pre>artist.add_album(42)&#x000A;# equivalent to: artist.add_album(Album[42])</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-value">42</span>)&#x000A;<span class="ruby-comment"># equivalent to: artist.add_album(Album[42])</span></pre>
             </li><li>
             <p>The validation_class_methods plugin now has the ability to reflect on
             validations:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_class_methods</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">validates_acceptance_of</span>(:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">validation_reflections</span>&#x000A;<span class="ruby-comment"># =&gt; {:a=&gt;[[:acceptance, {:tag=&gt;:acceptance, :allow_nil=&gt;true,</span>&#x000A;            :<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;is not accepted&quot;</span>, :<span class="ruby-identifier">accept=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;1&quot;</span>}]]}</pre>
+            <pre>Album.plugin :validation_class_methods&#x000A;Album.validates_acceptance_of(:a)&#x000A;Album.validation_reflections&#x000A;# =&gt; {:a=&gt;[[:acceptance, {:tag=&gt;:acceptance, :allow_nil=&gt;true,&#x000A;            :message=&gt;&quot;is not accepted&quot;, :accept=&gt;&quot;1&quot;}]]}</pre>
             </li></ul>
             
             <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>

@@ -54,7 +54,7 @@
             </li><li>
             <p>A drop_foreign_key method has been added to the alter_table generator:</p>
             
-            <pre>alter_table(:tab){drop_foreign_key :col}</pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">tab</span>){<span class="ruby-identifier">drop_foreign_key</span> :<span class="ruby-identifier">col</span>}</pre>
             
             <p>This relies on foreign_key_list working and including the name of the
             foreign key.  Previously, you&#39;d have to drop the foreign key constraint
@@ -137,7 +137,7 @@
             
             <p>If you do want to use a plain string, you now need to alias it:</p>
             
-            <pre>dataset.get([Sequel.as(&#39;string&#39;, :some_alias)])</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">get</span>([<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-string">&#39;string&#39;</span>, :<span class="ruby-identifier">some_alias</span>)])</pre>
             </li></ul>
             
             <h1 id="label-Sequel+4+Implementation+Planning"><a href="../../../classes/Sequel.html">Sequel</a> 4 Implementation Planning<span><a href="#label-Sequel+4+Implementation+Planning">&para;</a> <a href="#documentation">&uarr;</a></span></h1>

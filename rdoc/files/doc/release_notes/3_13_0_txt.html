@@ -80,17 +80,17 @@
             specify that you want to use prepared transactions using the :prepare
             option which should be some transaction id string:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">prepare=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;some string&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">...</span> <span class="ruby-keyword">end</span></pre>
+            <pre>DB.transaction(:prepare=&gt;&#39;some string&#39;) do ... end</pre>
             
             <p>Assuming that no exceptions are raised in the transaction block, <a
             href="../../../classes/Sequel.html">Sequel</a> will prepare the
             transaction.  You can then commit the transaction later:</p>
             
-            <pre>DB.commit_prepared_transaction(&#39;some string&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">commit_prepared_transaction</span>(<span class="ruby-string">&#39;some string&#39;</span>)</pre>
             
             <p>If you need to rollback the prepared transaction, you can do so as well:</p>
             
-            <pre>DB.rollback_prepared_transaction(&#39;some string&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-string">&#39;some string&#39;</span>)</pre>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now supports customizable
             transaction isolation levels on PostgreSQL, MySQL, and Microsoft SQL
@@ -98,12 +98,12 @@
             transaction using the :isolation option with an :uncommitted, :committed,
             :repeatable, or :serializable value:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">isolation=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">serializable</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">...</span> <span class="ruby-keyword">end</span></pre>
+            <pre>DB.transaction(:isolation=&gt;:serializable) do ... end</pre>
             
             <p>You can also set the default isolation level for transactions via the
             transaction_isolation_level Database attribute:</p>
             
-            <pre>DB.transaction_isolation_level = :committed</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction_isolation_level</span> = :<span class="ruby-identifier">committed</span></pre>
             
             <p>If you are connecting to Microsoft SQL Server, it is recommended that you
             set a default transaction isolation level if you plan on using this
@@ -178,7 +178,7 @@
             is now a GenericExpression subclass, allowing you to treat it like most
             other <a href="../../../classes/Sequel.html">Sequel</a> expression objects:</p>
             
-            <pre>&#39;(a || ?)&#39;.lit(:b).like(&#39;Test%&#39;)&#x000A;# ((a || b) LIKE &#39;Test%&#39;)</pre>
+            <pre class="ruby"><span class="ruby-string">&#39;(a || ?)&#39;</span>.<span class="ruby-identifier">lit</span>(:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;Test%&#39;</span>)&#x000A;<span class="ruby-comment"># ((a || b) LIKE &#39;Test%&#39;)</span></pre>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> now supports the bitwise
             shift operators (&lt;&lt; and &gt;&gt;) on Microsoft SQL Server by

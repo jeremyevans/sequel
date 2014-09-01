@@ -47,7 +47,7 @@
             
             <p>In the method documentation examples, assume that:</p>
             
-            <pre>jsonb_op = Sequel.pg_jsonb(:jsonb)</pre>
+            <pre class="ruby"><span class="ruby-identifier">jsonb_op</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb</span>(:<span class="ruby-identifier">jsonb</span>)</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -130,13 +130,13 @@
                   
                   <p>Check if the receiver contains all of the keys in the given array:</p>
                   
-                  <pre>jsonb_op.contain_all(:a) # (jsonb ?&amp; a)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contain_all</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (jsonb ?&amp; a)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contain_all-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contain_all-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 269</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_all</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contain_all-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 270</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_all</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-contain_any'>
@@ -149,13 +149,13 @@
                   
                   <p>Check if the receiver contains any of the keys in the given array:</p>
                   
-                  <pre>jsonb_op.contain_any(:a) # (jsonb ?| a)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contain_any</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (jsonb ?| a)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contain_any-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contain_any-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 276</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_any</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contain_any-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 277</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_any</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-contained_by'>
@@ -168,13 +168,13 @@
                   
                   <p>Check if the other jsonb contains all entries in the receiver:</p>
                   
-                  <pre>jsonb_op.contained_by(:h) # (jsonb &lt;@ h)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">h</span>) <span class="ruby-comment"># (jsonb &lt;@ h)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contained_by-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contained_by-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 290</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contained_by</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contained_by-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 291</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contained_by</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-contains'>
@@ -187,13 +187,13 @@
                   
                   <p>Check if the receiver contains all entries in the other jsonb:</p>
                   
-                  <pre>jsonb_op.contains(:h) # (jsonb @&gt; h)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">h</span>) <span class="ruby-comment"># (jsonb @&gt; h)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contains-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contains-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 283</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contains</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contains-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 284</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contains</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_jsonb</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-has_key-3F'>
@@ -206,13 +206,13 @@
                   
                   <p>Check if the receiver contains the given key:</p>
                   
-                  <pre>jsonb_op.has_key?(&#39;a&#39;) # (jsonb ? &#39;a&#39;)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">jsonb_op</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (jsonb ? &#39;a&#39;)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-has_key-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-has_key-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 297</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-has_key-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 298</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-pg_jsonb'>
@@ -230,7 +230,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_jsonb-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 303</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pg_jsonb-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 304</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_jsonb</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

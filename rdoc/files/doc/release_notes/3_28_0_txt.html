@@ -137,13 +137,13 @@
             the object, it now will consider the type of the argument when a &amp;, |,
             or + operator is used.  For example:</p>
             
-            <pre>:x &amp; 1</pre>
+            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
             
             <p>Previously, this did “x AND 1”, now it does “x &amp; 1”.  Using a logical
             operator on an integer doesn&#39;t make sense, but it&#39;s possible people
             did so if the database uses 1/0 for true/false. Likewise:</p>
             
-            <pre>:x + &#39;foo&#39;</pre>
+            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
             
             <p>Previously, this did “x + &#39;foo&#39;” (addition), now it does “x ||
             &#39;foo&#39;” (string concatenation).</p>
@@ -151,7 +151,7 @@
             <p>The sql_string, sql_number, and sql_boolean methods are now available on
             SQL::ComplexExpressions, so you can do:</p>
             
-            <pre>(:x + 1).sql_string + &#39; foos&#39;&#x000A;# (x + 1) || &#39; foos&#39;</pre>
+            <pre class="ruby">(:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>).<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39; foos&#39;</span>&#x000A;<span class="ruby-comment"># (x + 1) || &#39; foos&#39;</span></pre>
             
             <p>Previously, there was not an easy way to generate such SQL expressions.</p>
             </li><li>
@@ -202,7 +202,7 @@
             href="../../../classes/Sequel/SQLTime.html#method-c-create">Sequel::SQLTime.create</a>
             has been added for more easily creating instances:</p>
             
-            <pre>Sequel::SQLTime.create(hour, minute, second, usec)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">minute</span>, <span class="ruby-identifier">second</span>, <span class="ruby-identifier">usec</span>)</pre>
             </li><li>
             <p>Dataset#select_all now accepts SQL::AliasedExpression and SQL::JoinClause
             arguments and returns the appropriate SQL::ColumnAll value that selects all
@@ -306,19 +306,19 @@
             </li><li>
             <p>If you were previously doing:</p>
             
-            <pre>:x &amp; 1</pre>
+            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
             
             <p>and wanting “x AND 1”, you have to switch to:</p>
             
-            <pre>:x.sql_boolean &amp; 1</pre>
+            <pre class="ruby">:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">sql_boolean</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span></pre>
             
             <p>Likewise, if you were previously doing:</p>
             
-            <pre>:x + &#39;foo&#39;</pre>
+            <pre class="ruby">:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
             
             <p>and wanting “x + &#39;foo&#39;”, you need to switch to:</p>
             
-            <pre>:x.sql_number + &#39;foo&#39;</pre>
+            <pre class="ruby">:<span class="ruby-identifier">x</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;foo&#39;</span></pre>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> no longer does defensive
             type checking in the SQL expression support, as it was often more strict

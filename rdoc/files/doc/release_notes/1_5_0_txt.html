@@ -52,7 +52,7 @@
             
             <p>:name=&gt;(albums.name||artist.names), \</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">albums</span>.<span class="ruby-identifier">artist_id</span>}</pre>
+            <pre>:artist_id=&gt;albums.artist_id}</pre>
             
             <p>Models can use graph as well, in which case the values will be model
             objects:</p>
@@ -73,7 +73,7 @@
             
             <p>You can use set_graph_aliases to select specific columns:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">graph</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">set_graph_aliases</span>(    :<span class="ruby-identifier">artist_name=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">name</span>], :<span class="ruby-identifier">album_name=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">albums</span>,</pre>
+            <pre>DB[:artists].graph(:albums, :artist_id=&gt;:id).set_graph_aliases( \&#x000A;  :artist_name=&gt;[:artists, :name], :album_name=&gt;[:albums,</pre>
             
             <p>:name]).first</p>
             
@@ -99,14 +99,14 @@
             href="../../../classes/Sequel.html">Sequel</a> 2.0.0.  The deprecation
             framework is fairly flexible. You can choose where the messages get sent:</p>
             
-            <pre>Sequel::Deprecation.deprecation_message_stream = STDERR # the default&#x000A;Sequel::Deprecation.deprecation_message_stream = \&#x000A;  File.new(&#39;deprecation.txt&#39;, &#39;wb&#39;) # A file&#x000A;Sequel::Deprecation.deprecation_message_stream = nil # ignore the</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecation_message_stream</span> = <span class="ruby-constant">STDERR</span> <span class="ruby-comment"># the default</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecation_message_stream</span> =    <span class="ruby-constant">File</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;deprecation.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>) <span class="ruby-comment"># A file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecation_message_stream</span> = <span class="ruby-keyword">nil</span> <span class="ruby-comment"># ignore the</span></pre>
             
             <p>messages</p>
             
             <p>You can even have all deprecation messages accompanied by a traceback, so
             you can see exactly where in your code you are using a deprecated method:</p>
             
-            <pre>Sequel::Deprecation.print_tracebacks = true</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">print_tracebacks</span> = <span class="ruby-keyword">true</span></pre>
             
             <p>All deprecation methods come with an message telling you what alternative
             code will work.</p>

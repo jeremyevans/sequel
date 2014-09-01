@@ -60,13 +60,13 @@
                   
                   <p>If a block is given, make it affect the FROM clause:</p>
                   
-                  <pre>DB.from{table_function(1)}&#x000A;# SELECT * FROM table_function(1)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_function</span>(<span class="ruby-value">1</span>)}&#x000A;<span class="ruby-comment"># SELECT * FROM table_function(1)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-from-source'><span class="ruby-comment"># File lib/sequel/extensions/from_block.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-from-source'><span class="ruby-comment"># File lib/sequel/extensions/from_block.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-ivar">@default_dataset</span>.<span class="ruby-identifier">from</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

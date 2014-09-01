@@ -69,7 +69,7 @@
             
             <p>Example:</p>
             
-            <pre>Sequel.extension :blank</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">blank</span></pre>
             
             <h2 id="label-Add+Extensions+Applied+to+All+Databases%2FDatasets">Add Extensions Applied to All Databases/Datasets<span><a href="#label-Add+Extensions+Applied+to+All+Databases%2FDatasets">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -81,7 +81,7 @@
             href="../../classes/Sequel/Database.html#method-c-extension">Sequel::Database.extension</a>,
             it will not have that extension loaded. Example:</p>
             
-            <pre>Sequel::Database.extension :columns_introspection</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">columns_introspection</span></pre>
             
             <h2 id="label-Connect+to+Databases">Connect to Databases<span><a href="#label-Connect+to+Databases">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -91,7 +91,7 @@
             an application with a single Database instance is to store that instance in
             a constant named DB.  Example:</p>
             
-            <pre>DB = Sequel.connect(&#39;postgres://user:pass@host/database&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:pass@host/database&#39;</span>)</pre>
             
             <h2 id="label-Add+Extensions+Specific+to+a+Database+or+All+Datasets+in+that+Database">Add Extensions Specific to a Database or All Datasets in that Database<span><a href="#label-Add+Extensions+Specific+to+a+Database+or+All+Datasets+in+that+Database">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -101,7 +101,7 @@
             href="../../classes/Sequel/Database.html#method-i-extension">Sequel::Database#extension</a>.
             Example:</p>
             
-            <pre>DB.extension :pg_array</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span></pre>
             
             <h2 id="label-Configure+Global+Model+Behavior">Configure Global Model Behavior<span><a href="#label-Configure+Global+Model+Behavior">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -109,7 +109,7 @@
             so before loading your model classes, as configuration is copied into the
             subclass when model subclasses are created.  Example:</p>
             
-            <pre>Sequel::Model.raise_on_save_failure = false</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span></pre>
             
             <h2 id="label-Add+Global+Model+Plugins">Add Global Model Plugins<span><a href="#label-Add+Global+Model+Plugins">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -117,7 +117,7 @@
             loading your model classes, as plugin specific data may need to be copied
             into the subclass when model subclasses are created.  Example:</p>
             
-            <pre>Sequel::Model.plugin :prepared_statements</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements</span></pre>
             
             <h2 id="label-Load+Model+Classes">Load Model Classes<span><a href="#label-Load+Model+Classes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -139,7 +139,7 @@
             automatically reconnect on an as needed basis in the child processes, so
             you only need to do the following in the parent process:</p>
             
-            <pre>DB.disconnect</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">disconnect</span></pre>
           </div>
           <div id='context'>
           </div>

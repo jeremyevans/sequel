@@ -44,7 +44,7 @@
             support easier to use by scoping database access inside the block to a
             given server/shard:</p>
             
-            <pre>Sequel.extension :server_block&#x000A;DB.extend Sequel::ServerBlock&#x000A;DB.with_server(:shard_1) do&#x000A;  # All of these will execute against shard_1&#x000A;  DB.tables&#x000A;  DB[:table].all&#x000A;  DB.run &#39;SOME SQL&#39;&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ServerBlock</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">shard_1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># All of these will execute against shard_1</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">all</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&#39;SOME SQL&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             </li><li>
             <p>An arbitrary_servers extension has been added that extends Sequel&#39;s
             sharding support so that you can use arbitrary connection options instead
@@ -84,7 +84,7 @@
             href="../../../classes/Sequel.html#method-c-migration">Sequel.migration</a>
             block:</p>
             
-            <pre>Sequel.migration do&#x000A;  no_transaction&#x000A;  change do&#x000A;    # ...&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">no_transaction</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>That will make it so that a transaction is not used for that particular
             migration.  The second way is passing the :use_tranctions=&gt;false option

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-09-09 13:03:58 -0700</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -56,7 +56,7 @@
             
             <p>Global extensions are loaded via <code>Sequel.extension</code>:</p>
             
-            <pre>Sequel.extension :named_timezones</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">named_timezones</span></pre>
             
             <p>What this does is require the relevent extension from
             <code>sequel/extensions/named_timezones</code> somewhere in the ruby path. 
@@ -70,7 +70,7 @@
             <code>Sequel::Database</code> instance.  They are loaded via
             <code>Sequel::Database#extension</code>:</p>
             
-            <pre>DB.extension :server_block</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span></pre>
             
             <p>The first thing that this does is load the relevent extension globally. 
             However, Database extensions should be structured in a way that loading the
@@ -82,7 +82,7 @@
             <p>If you want a Database extension loaded into all future Database instances,
             you can use <code>Sequel::Database.extension</code>:</p>
             
-            <pre>Sequel::Database.extension :server_block</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">server_block</span></pre>
             
             <p>All future <code>Sequel::Database</code> instances created afterward will
             then automatically have the server_block extension loaded.</p>
@@ -97,12 +97,12 @@
             dataset that includes the extension (similar to how most dataset query
             methods work):</p>
             
-            <pre>ds = DB[:a].extension(:columns_introspection)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
             
             <p><code>Sequel::Dataset#extension!</code> modifies a dataset to include the
             extension (similar to how dataset mutation methods work):</p>
             
-            <pre>ds = DB[:a]&#x000A;ds.extension!(:columns_introspection)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension!</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
             
             <p>It is recommended you only use <code>Sequel::Dataset#extension!</code> if
             you have good reasons to.</p>
@@ -117,13 +117,13 @@
             <code>Sequel::Database</code> instance, you can also load it as a Database
             extension:</p>
             
-            <pre>DB.extension :columns_introspection</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">columns_introspection</span></pre>
             
             <p>Likewise, if you want to load an extension into all future datasets for all
             future databases, you can load it via
             <code>Sequel::Database.extension</code>:</p>
             
-            <pre>Sequel::Database.extension :columns_introspection</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">columns_introspection</span></pre>
             
             <h2 id="label-Creating+Global+Extensions">Creating Global Extensions<span><a href="#label-Creating+Global+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -131,7 +131,7 @@
             so that you can require it via
             <code>sequel/extensions/extension_name</code>.  Then users can load it via:</p>
             
-            <pre>Sequel.extension :extension_name</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">extension_name</span></pre>
             
             <p>It is recommended you only create a global extension if what you want to do
             would not work as a Database or Dataset extension.</p>
@@ -145,7 +145,7 @@
             <code>Sequel::Database</code> instance when the extension is loaded.  For
             example, the server_block extension uses something like:</p>
             
-            <pre>Sequel::Database.register_extension(:server_block, Sequel::ServerBlock)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">server_block</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ServerBlock</span>)</pre>
             
             <p>The first argument is the name of the extension as a symbol, and the second
             is the module.</p>
@@ -168,7 +168,7 @@
             <code>Sequel::Dataset</code> instance when the extension is loaded.  For
             example, the columns_introspection extension uses something like:</p>
             
-            <pre>Sequel::Dataset.register_extension(:columns_introspection, Sequel::ColumnsIntrospection)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">columns_introspection</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnsIntrospection</span>)</pre>
             
             <p>The first argument is the name of the extension as a symbol, and the second
             is the module.  When you call the
@@ -180,7 +180,7 @@
             <p>You can also call <code>Sequel::Dataset.register_extension</code> with a
             proc:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">extension_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">register_extension</span>(:<span class="ruby-identifier">extension_name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> }</pre>
             
             <p>Note that if you use a proc, a corresponding Database extension will not be
             created automatically (you can still call

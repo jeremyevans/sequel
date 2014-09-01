@@ -405,7 +405,7 @@
             <p>The named_timezones extension can now be loaded as a database extension,
             which allows for automatic conversions of string timezones:</p>
             
-            <pre>DB.extension :named_timezones&#x000A;DB.timezone = &#39;America/Los_Angeles&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">named_timezones</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
             </li><li>
             <p>Offsets are now emulated by Microsoft Access using a combination of reverse
             orders and total counts.  This is slow, especially on large datasets, but

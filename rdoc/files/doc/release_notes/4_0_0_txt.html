@@ -111,11 +111,11 @@
             <p>Calling ungraphed on an eager_graph dataset will restore the row_proc for
             that dataset.  This is not backwards compatible if your method chain does:</p>
             
-            <pre>dataset.eager_graph.naked.ungraphed</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">eager_graph</span>.<span class="ruby-identifier">naked</span>.<span class="ruby-identifier">ungraphed</span></pre>
             
             <p>Switch such code to:</p>
             
-            <pre>dataset.eager_graph.ungraphed.naked</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">eager_graph</span>.<span class="ruby-identifier">ungraphed</span>.<span class="ruby-identifier">naked</span></pre>
             </li><li>
             <p>The Model#set_restricted and update_restricted private methods have a
             slightly different API now.</p>
@@ -176,12 +176,12 @@
             <p>Dataset#from now accepts virtual_row blocks, making it easy to use with
             table returning functions:</p>
             
-            <pre>DB.from{table_returning_function(arg)}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_returning_function</span>(<span class="ruby-identifier">arg</span>)}</pre>
             </li><li>
             <p>Sequel.deep_qualify has been added, for easily doing a deep qualification
             of objects:</p>
             
-            <pre>Sequel.deep_qualify(:table, Sequel.+(:column, 1))&#x000A;# (&quot;table&quot;.&quot;column&quot; + 1)&#x000A;Sequel.deep_qualify(:table, Sequel.like(:a, &#39;b&#39;))&#x000A;# (&quot;table&quot;.&quot;a&quot; LIKE &#39;b&#39; ESCAPE &#39;\&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(:<span class="ruby-identifier">table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>))&#x000A;<span class="ruby-comment"># (&quot;table&quot;.&quot;column&quot; + 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(:<span class="ruby-identifier">table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b&#39;</span>))&#x000A;<span class="ruby-comment"># (&quot;table&quot;.&quot;a&quot; LIKE &#39;b&#39; ESCAPE &#39;\&#39;)</span></pre>
             </li><li>
             <p>The prepared_statements_associations plugin now handles one_to_one
             associations.</p>
@@ -189,7 +189,7 @@
             <p>SQL::Subscript objects now handle ruby range arguments, operating as an SQL
             array slice:</p>
             
-            <pre>Sequel.subscript(:a, 1..2) # a[1:2]</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># a[1:2]</span></pre>
             </li><li>
             <p>Database#create_view now accepts a :columns option to provide explicit
             column names for the view.</p>

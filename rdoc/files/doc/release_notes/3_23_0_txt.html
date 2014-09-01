@@ -46,7 +46,7 @@
             at query time.  To dynamically modify an eager load, you use a hash with
             the proc as the value. For example, if you have this code:</p>
             
-            <pre>Artist.eager(:albums)</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums</span>)</pre>
             
             <p>And you only want to eagerly load albums where the id is greater than or
             equal to some number provided by the user, you do:</p>
@@ -72,7 +72,7 @@
             customization for regular association loading.  Previously, this was
             possible by using the association&#39;s dataset:</p>
             
-            <pre>albums = artist.albums_dataset.filter{id &gt; min}</pre>
+            <pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">min</span>}</pre>
             
             <p>However, then there was no handling of caching, callbacks, or reciprocals. 
             For example:</p>
@@ -103,7 +103,7 @@
             
             <p>Since the above can also be accomplished with:</p>
             
-            <pre>artist.albums</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span></pre>
             
             <p>this may not seem like a big improvement, but it allows you to filter on
             multiple associations simultaneously:</p>
@@ -136,7 +136,7 @@
             Sequel::ColumnIntrospection.  To enable introspection for all datasets,
             use:</p>
             
-            <pre>Sequel::Dataset.introspect_all_columns</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">introspect_all_columns</span></pre>
             </li><li>
             <p>A serialization_modification_detection plugin has been added. Previously,
             <a href="../../../classes/Sequel.html">Sequel</a> could not detect
@@ -147,7 +147,7 @@
             
             <p>but not if you just modified the object directly:</p>
             
-            <pre>model.hash_columns[:foo] = :bar</pre>
+            <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">hash_columns</span>[:<span class="ruby-identifier">foo</span>] = :<span class="ruby-identifier">bar</span></pre>
             
             <p>With this plugin, such modifications can be detected, at a potentially
             significant performance cost.</p>
@@ -199,7 +199,7 @@
             workaround until you can modify your program to use the new filter by
             associations support:</p>
             
-            <pre>Sequel::Model::Associations::DatasetMethods.&#x000A;  send(:remove_method, :complex_expression_sql)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">Associations</span><span class="ruby-operator">::</span><span class="ruby-constant">DatasetMethods</span>.&#x000A;  <span class="ruby-identifier">send</span>(:<span class="ruby-identifier">remove_method</span>, :<span class="ruby-identifier">complex_expression_sql</span>)</pre>
             </li><li>
             <p>The private Sequel::Model#_load_associated_objects method now takes an
             additional, optional options hash.  Plugins that override that method need

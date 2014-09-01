@@ -67,7 +67,7 @@
                   
                   <p>If no arguments are given, return an SQL::ColumnAll:</p>
                   
-                  <pre>Sequel.expr(:a__b).*  # a.b.*</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a__b</span>).<span class="ruby-operator">*</span>  <span class="ruby-comment"># a.b.*</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-2A-source'); return false">
@@ -87,7 +87,7 @@
                   <p>Qualify the receiver with the given <code>qualifier</code> (table for
                   column/schema for table).</p>
                   
-                  <pre>Sequel.expr(:column).qualify(:table) # &quot;table&quot;.&quot;column&quot;&#x000A;Sequel.expr(:table).qualify(:schema) # &quot;schema&quot;.&quot;table&quot;&#x000A;Sequel.qualify(:table, :column).qualify(:schema) # &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-qualify-source'); return false">

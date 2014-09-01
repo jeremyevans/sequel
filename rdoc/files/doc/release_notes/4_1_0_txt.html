@@ -43,26 +43,26 @@
             <p>Database#run and << now accept SQL::PlaceholderLiteralString objects,
             allowing you to more easily run arbitrary DDL queries with placeholders:</p>
             
-            <pre>DB.run Sequel.lit(&quot;CREATE TABLE ? (? integer)&quot;, :table, :column)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;CREATE TABLE ? (? integer)&quot;</span>, :<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)</pre>
             </li><li>
             <p>You can now provide options for check constraints by calling the
             constraint/add_constraint methods with a hash as the first argument. On
             PostgreSQL, you can now use the :not_valid option for check constraints, so
             they are enforced for inserts and updates, but not for existing rows.</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-operator">...</span>&#x000A;  <span class="ruby-identifier">constraint</span>({:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">constraint_name</span>, :<span class="ruby-identifier">not_valid=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">column_name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre>DB.create_table(:table) do&#x000A;  ...&#x000A;  constraint({:name=&gt;:constraint_name, :not_valid=&gt;true}) do&#x000A;    column_name &gt; 10&#x000A;  end&#x000A;end</pre>
             </li><li>
             <p>Dataset#stream has been added to the mysql2 adapter, and will have the
             dataset stream results if used with mysql2 0.3.12+.  This allows you to
             process large datasets without keeping the entire dataset in memory.</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">large_table</span>].<span class="ruby-identifier">stream</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}</pre>
+            <pre>DB[:large_table].stream.each{|r| ...}</pre>
             </li><li>
             <p>Database#error_info has been added to the postgres adapter.  It is
             supported on PostgreSQL 9.3+ if pg-0.16.0+ is used as the underlying
             driver, and it gives you a hash of metadata related to the exception:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table_name</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-keyword">rescue</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">error_info</span>(<span class="ruby-identifier">$!</span>)&#x000A;<span class="ruby-comment"># =&gt; {:schema=&gt;&quot;public&quot;, :table=&gt;&quot;table_name&quot;, :column=&gt;nil,</span>&#x000A;      :<span class="ruby-identifier">constraint=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;constraint_name&quot;</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>}</pre>
+            <pre>DB[:table_name].insert(1) rescue DB.error_info($!)&#x000A;# =&gt; {:schema=&gt;&quot;public&quot;, :table=&gt;&quot;table_name&quot;, :column=&gt;nil,&#x000A;      :constraint=&gt;&quot;constraint_name&quot;, :type=&gt;nil}</pre>
             </li><li>
             <p>The :deferrable option is now supported when adding exclusion constraints
             on PostgreSQL, to allow setting up deferred exclusion constraints.</p>

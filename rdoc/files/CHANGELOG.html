@@ -31,12 +31,46 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-01 09:04:01 -0700</span>
+          <span class='datetime'>2014-09-01 08:59:17 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.14.0+%282014-09-01%29">4.14.0 (2014-09-01)<span><a href="#label-4.14.0+%282014-09-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Raise original exception if there is an exception raised when rolling back
+            transaction/savepoint (jeremyevans) (#875)</p>
+            </li><li>
+            <p>Allow delayed evaluation blocks to take dataset as an argument
+            (jeremyevans)</p>
+            </li><li>
+            <p>Allow more types as filter expressions, only specifically disallow
+            Numeric/String expressions (jeremyevans)</p>
+            </li><li>
+            <p>Remove objects from cached association array at time of nested_attributes
+            call instead of waiting until save (jeremyevans)</p>
+            </li><li>
+            <p>Handle composite primary keys when working around validation issues for
+            one_to_(one|many) associations in nested_attributes plugin (jeremyevans)
+            (#870)</p>
+            </li><li>
+            <p>Recognize additional disconnect error in jdbc/jtds adapter (jeremyevans)</p>
+            </li><li>
+            <p>Have association_join work with existing model selections (jeremyevans)</p>
+            </li><li>
+            <p>Fix regression in class_table_inheritance plugin when lazily loading column
+            in middle table (jeremyevans) (#862)</p>
+            </li><li>
+            <p>Add cache_key_prefix method to caching plugin, which can be overridden for
+            custom handling (pete) (#861)</p>
+            </li><li>
+            <p>Add :when option to PostgreSQL create_trigger method, for adding a filter
+            to the trigger (aschrab) (#860)</p>
+            </li><li>
+            <p>Recognize an additional serialization failure on PostgreSQL (tmtm) (#857)</p>
+            </li></ul>
             
             <h3 id="label-4.13.0+%282014-08-01%29">4.13.0 (2014-08-01)<span><a href="#label-4.13.0+%282014-08-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             <ul><li>
@@ -4198,11 +4232,10 @@
             </li><li>
             <p>Add a :distinct option for all associations, which uses the SQL DISTINCT
             clause (jeremyevans)</p>
-            </li><li><dl class="rdoc-list note-list"><dt>Don&#39;t require 
-            <dd>
+            </li><li><table class="rdoc-list note-list"><tbody><tr><td class='label'>Don&#39;t require </td><td>
             <p>prefix for constant lookups in instance_evaled virtual row blocks on ruby
             1.9 (jeremyevans)</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             </li></ul>
             
             <h3 id="label-3.5.0+%282009-10-01%29">3.5.0 (2009-10-01)<span><a href="#label-3.5.0+%282009-10-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>

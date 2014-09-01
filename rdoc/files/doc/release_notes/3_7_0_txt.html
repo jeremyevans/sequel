@@ -73,7 +73,7 @@
             <p>Neither of these methods offer any new functionality, they just cut down on
             the number of required key strokes:</p>
             
-            <pre>select_map(:column)       # select(:column).map(:column)&#x000A;select_order_map(:column) # select(:column).order(:column).&#x000A;                          #  map(:column)&#x000A;select_hash(:key_column, :value_column)&#x000A;# select(:key_column, :value_column).&#x000A;#  to_hash(:key_column, :value_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">select_map</span>(:<span class="ruby-identifier">column</span>)       <span class="ruby-comment"># select(:column).map(:column)</span>&#x000A;<span class="ruby-identifier">select_order_map</span>(:<span class="ruby-identifier">column</span>) <span class="ruby-comment"># select(:column).order(:column).</span>&#x000A;                          <span class="ruby-comment">#  map(:column)</span>&#x000A;<span class="ruby-identifier">select_hash</span>(:<span class="ruby-identifier">key_column</span>, :<span class="ruby-identifier">value_column</span>)&#x000A;<span class="ruby-comment"># select(:key_column, :value_column).</span>&#x000A;<span class="ruby-comment">#  to_hash(:key_column, :value_column)</span></pre>
             </li><li>
             <p>The NULL, NOTNULL, TRUE, SQLTRUE, FALSE, and SQLFALSE constants were added
             to <a
@@ -146,7 +146,7 @@
             provided.  It also handles AliasedExpressions natively, so the following
             works correctly:</p>
             
-            <pre>DB[:table].group_and_count(:column.as(:alias))</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>))</pre>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> no longer uses native
             autoreconnection in the mysql adapter. Native autoreconnection has problems
@@ -170,10 +170,9 @@
             adapters that support autoincrementing 64-bit integer primary keys.</p>
             </li><li>
             <p>The native mysql adapter will now attempt to load options in the</p>
-            <dl class="rdoc-list label-list"><dt>client
-            <dd>
+            <table class="rdoc-list label-list"><tbody><tr><td class='label'>client</td><td>
             <p>section of the my.cnf file.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             </li><li>
             <p>The rake spec tasks for the project now work correctly with RSpec 1.2.9.</p>
             </li></ul>

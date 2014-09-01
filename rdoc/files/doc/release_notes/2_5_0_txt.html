@@ -77,12 +77,12 @@
             the uniqueness of multiple columns. validates_uniqueness_of now supports
             this directly:</p>
             
-            <pre>validates_uniqueness_of [:column1, :column2]</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_uniqueness_of</span> [:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>]</pre>
             
             <p>This protects against the database having multiple rows with the same
             values for both :column1 and :column2.  This is different from:</p>
             
-            <pre>validates_uniqueness_of :column1, :column2</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_uniqueness_of</span> :<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span></pre>
             
             <p>Which checks that the value of column1 is unique in the table, and that the
             value of column2 is unique in the table (which is much more restrictive).</p>
@@ -94,7 +94,7 @@
             <p>Dataset methods insert_sql, delete_sql, and update_sql respect the :sql
             option, allowing you to do things such as:</p>
             
-            <pre>ds = DB[&#39;INSERT INTO t (time) VALUES (CURRENT_TIMESTAMP)&#39;]&#x000A;ds.insert&#x000A;ds.insert</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;INSERT INTO t (time) VALUES (CURRENT_TIMESTAMP)&#39;</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert</span></pre>
             </li><li>
             <p>The database adapters (at least MySQL, PostgreSQL, SQLite, and JDBC)
             generally raise <a
@@ -137,7 +137,7 @@
             <p>Date and DateTime conversions now convert 2 digit years.  To revert to the
             previous behavior:</p>
             
-            <pre>Sequel.convert_two_digit_years = false</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span> = <span class="ruby-keyword">false</span></pre>
             
             <p>Note that Ruby 1.8 and 1.9 handle Date parsing differently, so there is no
             backwards compatibility change for Ruby 1.9.  However, this also means that
@@ -148,11 +148,11 @@
             <p>You can no longer abuse the SQL function syntax for specifying database
             types.  For example, you must change:</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">varchar</span>[<span class="ruby-value">255</span>]</pre>
+            <pre>:type=&gt;:varchar[255]</pre>
             
             <p>to:</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">varchar</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">255</span></pre>
+            <pre>:type=&gt;:varchar, :size=&gt;255</pre>
             </li></ul>
           </div>
           <div id='context'>

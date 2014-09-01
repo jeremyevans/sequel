@@ -252,58 +252,46 @@
                   instances. The db_type argument should be the exact database type used (as
                   returned by the PostgreSQL format_type database function).  Accepts the
                   following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:array_type 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:array_type </td><td>
                   <p>The type to automatically cast the array to when literalizing the array.
                   Usually the same as db_type.</p>
-                  </dd><dt>:converter 
-                  <dd>
+                  </td></tr><tr><td class='label'>:converter </td><td>
                   <p>A callable object (e.g. Proc), that is called with each element of the
                   array (usually a string), and should return the appropriate typecasted
                   object.</p>
-                  </dd><dt>:oid 
-                  <dd>
-                  <p>The PostgreSQL OID for the array type.  This is used by the <a
-                  href="../../Sequel.html">Sequel</a> postgres adapter to set up automatic
-                  type conversion on retrieval from the database.</p>
-                  </dd><dt>:parser 
-                  <dd>
+                  </td></tr><tr><td class='label'>:oid </td><td>
+                  <p>The PostgreSQL OID for the array type.  This is used by the Sequel postgres
+                  adapter to set up automatic type conversion on retrieval from the database.</p>
+                  </td></tr><tr><td class='label'>:parser </td><td>
                   <p>Can be set to :json to use the faster JSON-based parser.  Note that the
                   JSON-based parser can only correctly handle integers values correctly.  It
                   doesn&#39;t handle full precision for numeric types, and doesn&#39;t handle
                   NaN/Infinity values for floating point types.</p>
-                  </dd><dt>:scalar_oid 
-                  <dd>
+                  </td></tr><tr><td class='label'>:scalar_oid </td><td>
                   <p>Should be the PostgreSQL OID for the scalar version of this array type. If
                   given, automatically sets the :converter option by looking for scalar
                   conversion proc.</p>
-                  </dd><dt>:scalar_typecast 
-                  <dd>
+                  </td></tr><tr><td class='label'>:scalar_typecast </td><td>
                   <p>Should be a symbol indicating the typecast method that should be called on
                   each element of the array, when a plain array is passed into a database
                   typecast method.  For example, for an array of integers, this could be set
                   to :integer, so that the typecast_value_integer method is called on all of
                   the array elements.  Defaults to :type_symbol option.</p>
-                  </dd><dt>:type_procs 
-                  <dd>
+                  </td></tr><tr><td class='label'>:type_procs </td><td>
                   <p>A hash mapping oids to conversion procs, used for looking up the
                   :scalar_oid and value and setting the :oid value.  Defaults to the global
                   Sequel::Postgres::PG_TYPES.</p>
-                  </dd><dt>:type_symbol 
-                  <dd>
+                  </td></tr><tr><td class='label'>:type_symbol </td><td>
                   <p>The base of the schema type symbol for this type.  For example, if you
-                  provide :integer, <a href="../../Sequel.html">Sequel</a> will recognize
-                  this type as :integer_array during schema parsing. Defaults to the db_type
-                  argument.</p>
-                  </dd><dt>:typecast_method_map 
-                  <dd>
+                  provide :integer, Sequel will recognize this type as :integer_array during
+                  schema parsing. Defaults to the db_type argument.</p>
+                  </td></tr><tr><td class='label'>:typecast_method_map </td><td>
                   <p>The map in which to place the database type string to type symbol mapping.
                   Defaults to <a href="PGArray.html#ARRAY_TYPES">ARRAY_TYPES</a>.</p>
-                  </dd><dt>:typecast_methods_module 
-                  <dd>
+                  </td></tr><tr><td class='label'>:typecast_methods_module </td><td>
                   <p>If given, a module object to add the typecasting method to.  Defaults to <a
                   href="PGArray/DatabaseMethods.html">DatabaseMethods</a>.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>If a block is given, it is treated as the :converter option.</p>
                 </div>
@@ -331,7 +319,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-op-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 281</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array_ops.rb, line 282</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-constant">ArrayOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_literal_append'>

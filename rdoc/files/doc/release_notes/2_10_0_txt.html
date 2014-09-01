@@ -107,7 +107,7 @@
             MySQL engine, charset, and/or collation.  You can also set a default
             engine, charset, and collation for MySQL to use:</p>
             
-            <pre>Sequel::MySQL.default_engine = &#39;InnoDB&#39;&#x000A;Sequel::MySQL.default_charset = &#39;utf8&#39;&#x000A;Sequel::MySQL.default_collate = &#39;utf8&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MySQL</span>.<span class="ruby-identifier">default_engine</span> = <span class="ruby-string">&#39;InnoDB&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MySQL</span>.<span class="ruby-identifier">default_charset</span> = <span class="ruby-string">&#39;utf8&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MySQL</span>.<span class="ruby-identifier">default_collate</span> = <span class="ruby-string">&#39;utf8&#39;</span></pre>
             
             <p>The defaults will be used if the options are not provided.  If a default
             engine is set, you can specify :engine=&gt;nil to not use it (same goes for
@@ -213,7 +213,7 @@
             that <a href="../../../classes/Sequel.html">Sequel</a> does. For example,
             you need to change the following:</p>
             
-            <pre>dataset.filter(:number &gt; 1)&#x000A;dataset.filter(:number &gt;= 2)&#x000A;dataset.filter(:name &lt; &#39;M&#39;)&#x000A;dataset.filter(:name &lt;= &#39;I&#39;)&#x000A;dataset.filter(:is_bool[:x])</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;M&#39;</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-string">&#39;I&#39;</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">is_bool</span>[:<span class="ruby-identifier">x</span>])</pre>
             
             <p>To:</p>
             
@@ -230,7 +230,7 @@
             can to call sql_string, sql_number, or sql_function on the symbol.  So the
             following would also work:</p>
             
-            <pre>dataset.filter(:number.sql_number &gt; 1)&#x000A;dataset.filter(:number.sql_number &gt;= 2)&#x000A;dataset.filter(:name.sql_string &lt; &#39;M&#39;)&#x000A;dataset.filter(:name.sql_number &lt;= &#39;I&#39;)&#x000A;dataset.filter(:is_bool.sql_function(:x))</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">number</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">number</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">2</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;M&#39;</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-operator">&lt;=</span> <span class="ruby-string">&#39;I&#39;</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">is_bool</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">x</span>))</pre>
             
             <p>Using the block argument makes for a nicer API, though, so I recommend
             using it when possible.</p>
@@ -282,7 +282,7 @@
             identifiers, it will probably return lowercase identifiers by default now. 
             To get back the old behavior:</p>
             
-            <pre>DB.identifier_output_method = nil</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_output_method</span> = <span class="ruby-keyword">nil</span></pre>
             </li><li>
             <p>The module hierarchy under <a
             href="../../../classes/Sequel/SQL.html">Sequel::SQL</a> has changed.  Now,
@@ -301,7 +301,7 @@
             ability wasn&#39;t exposed to the user, and was purely an optimization.  If
             you have any code like:</p>
             
-            <pre>DB.schema</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">schema</span></pre>
             
             <p>by itself after the Database object was instantiated, you should remove it.</p>
             </li><li>

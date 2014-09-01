@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-02 08:01:22 -0700</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -253,7 +253,7 @@
             <p>For the destroy hooks, you need to make sure you call <code>destroy</code>
             on the object:</p>
             
-            <pre>album.destroy # runs destroy hooks</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">destroy</span> <span class="ruby-comment"># runs destroy hooks</span></pre>
             
             <h2 id="label-Skipping+Hooks">Skipping Hooks<span><a href="#label-Skipping+Hooks">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -261,7 +261,7 @@
             destroy hooks by calling <code>delete</code> instead of
             <code>destroy</code>:</p>
             
-            <pre>album.delete # does not run destroy hooks</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">delete</span> <span class="ruby-comment"># does not run destroy hooks</span></pre>
             
             <p>However, skipping hooks is a bad idea in general and should be avoided.  As
             mentioned above, <a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t
@@ -270,12 +270,12 @@
             level to do so.  This can be done for a specific model object by using the
             <code>this</code> method for a dataset that represents a single object:</p>
             
-            <pre>album.this # dataset</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">this</span> <span class="ruby-comment"># dataset</span></pre>
             
             <p>The <code>this</code> dataset works just like any other dataset, so you can
             call <code>update</code> on it to modify it:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">this</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>))</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">this</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)</pre>
             
             <p>If you want to insert a row into the model&#39;s table without running the
             creation hooks, you can use <code>Model.insert</code> instead of

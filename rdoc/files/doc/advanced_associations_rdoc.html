@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-08 15:54:32 -0700</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -62,30 +62,26 @@
             <code>:graph_only_conditions</code>, <code>:graph_join_type</code> (and
             <code>:graph_join_table_*</code> ones for JOINing to the join table in a
             many_to_many association).</p>
-            <dl class="rdoc-list note-list"><dt>:graph_join_type 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:graph_join_type </td><td>
             <p>The type of join to do (<code>:inner</code>, <code>:left</code>,
             <code>:right</code>)</p>
-            </dd><dt>:graph_conditions 
-            <dd>
+            </td></tr><tr><td class='label'>:graph_conditions </td><td>
             <p>Additional conditions to put on join (needs to be a hash or array of all
             two pairs).  Automatically assumes unqualified symbols or first element of
             the pair to be columns of the associated model, and unqualified symbols of
             the second element of the pair to be columns of the current model.</p>
-            </dd><dt>:graph_block 
-            <dd>
+            </td></tr><tr><td class='label'>:graph_block </td><td>
             <p>A block passed to <code>join_table</code>, allowing you to specify
             conditions other than equality, or to use OR, or set up any arbitrary
             condition.  The block is passed the associated table alias, current table 
             alias, and an array of previous joins clause objects.</p>
-            </dd><dt>:graph_only_conditions 
-            <dd>
+            </td></tr><tr><td class='label'>:graph_only_conditions </td><td>
             <p>Use these conditions instead of the standard association conditions. This
             is necessary when you don&#39;t want to have an equal condition between the
             foreign key and primary key of the tables. You can also use this to have a
             JOIN USING (array of symbols), or a NATURAL or CROSS JOIN (nil, with the
             appropriate <code>:graph_join_type</code>).</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>These can be used like this:</p>
             
@@ -102,7 +98,7 @@
             start with A, and eager load just those albums, ordered by the albums name,
             you can do:</p>
             
-            <pre>albums = Artist.&#x000A;  eager_graph(:albums).&#x000A;  where(Sequel.like(:albums__name, &#39;A%&#39;)).&#x000A;  order(:albums__name).&#x000A;  all</pre>
+            <pre class="ruby"><span class="ruby-identifier">albums</span> = <span class="ruby-constant">Artist</span>.&#x000A;  <span class="ruby-identifier">eager_graph</span>(:<span class="ruby-identifier">albums</span>).&#x000A;  <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">albums__name</span>, <span class="ruby-string">&#39;A%&#39;</span>)).&#x000A;  <span class="ruby-identifier">order</span>(:<span class="ruby-identifier">albums__name</span>).&#x000A;  <span class="ruby-identifier">all</span></pre>
             
             <p>For lazy loading (e.g. <a href="1">Model</a>.association), the
             <code>:dataset</code> option can be used to specify an arbitrary dataset
@@ -117,23 +113,18 @@
             
             <p>:eager_loader should be a proc that takes a single hash argument, which
             will have at least the following keys:</p>
-            <dl class="rdoc-list note-list"><dt>:id_map 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:id_map </td><td>
             <p>A mapping of key values to arrays of current model instances, usage
             described below</p>
-            </dd><dt>:rows 
-            <dd>
+            </td></tr><tr><td class='label'>:rows </td><td>
             <p>An array of model objects</p>
-            </dd><dt>:associations 
-            <dd>
+            </td></tr><tr><td class='label'>:associations </td><td>
             <p>A hash of dependent associations to eagerly load</p>
-            </dd><dt>:self 
-            <dd>
+            </td></tr><tr><td class='label'>:self </td><td>
             <p>The dataset that is doing the eager loading</p>
-            </dd><dt>:eager_block 
-            <dd>
+            </td></tr><tr><td class='label'>:eager_block </td><td>
             <p>A dynamic callback for this eager load.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Since you are given all of the records, you can do things like filter on
             associations that are specified by multiple keys, or do multiple queries
@@ -151,7 +142,7 @@
             may be hard to visualize, so I&#39;ll give an example.  Let&#39;s say you
             have the following associations</p>
             
-            <pre>Album.many_to_one :artist&#x000A;Album.one_to_many :tracks</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">tracks</span></pre>
             
             <p>and the following three albums in the database:</p>
             
@@ -159,7 +150,7 @@
             
             <p>If you try to eager load this dataset:</p>
             
-            <pre>Album.eager(:artist, :tracks).all</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">tracks</span>).<span class="ruby-identifier">all</span></pre>
             
             <p>Then the id_map provided to the artist :eager_loader proc would be:</p>
             
@@ -214,11 +205,11 @@
             
             <p>So putting everything together, the artist eager loader looks like:</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">eager_loader=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">artist</span>] = <span class="ruby-keyword">nil</span>}&#x000A;  <span class="ruby-identifier">id_map</span> = <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">id_map</span>]&#x000A;  <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">albums</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">id</span>]&#x000A;      <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">artist</span>] = <span class="ruby-identifier">artist</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">eager_loader=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">artist</span>] = <span class="ruby-keyword">nil</span>}&#x000A;  <span class="ruby-identifier">id_map</span> = <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">id_map</span>]&#x000A;  <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">albums</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">id</span>]&#x000A;      <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">artist</span>] = <span class="ruby-identifier">artist</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>)</pre>
             
             <p>and the tracks eager loader looks like:</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">eager_loader=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">tracks</span>] = []}&#x000A;  <span class="ruby-identifier">id_map</span> = <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">id_map</span>]&#x000A;  <span class="ruby-constant">Track</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">tracks</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">albums</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">track</span>.<span class="ruby-identifier">album_id</span>]&#x000A;      <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">tracks</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">track</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">tracks</span>, :<span class="ruby-identifier">eager_loader=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">eo_opts</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">rows</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">tracks</span>] = []}&#x000A;  <span class="ruby-identifier">id_map</span> = <span class="ruby-identifier">eo_opts</span>[:<span class="ruby-identifier">id_map</span>]&#x000A;  <span class="ruby-constant">Track</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">id_map</span>.<span class="ruby-identifier">keys</span>).<span class="ruby-identifier">all</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">tracks</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">albums</span> = <span class="ruby-identifier">id_map</span>[<span class="ruby-identifier">track</span>.<span class="ruby-identifier">album_id</span>]&#x000A;      <span class="ruby-identifier">albums</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">tracks</span>] <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">track</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>)</pre>
             
             <p>Now, these are both overly simplistic eager loaders that don&#39;t respect
             cascaded associations or any of the association options.  But hopefully
@@ -256,7 +247,7 @@
             <p>For retrieving the associated objects for a single object, this just uses a
             LIMIT:</p>
             
-            <pre>artist.first_10_albums&#x000A;# SELECT * FROM albums WHERE (artist_id = 1) LIMIT 10</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">first_10_albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (artist_id = 1) LIMIT 10</span></pre>
             
             <h3 id="label-Eager+Loading+via+eager">Eager Loading via eager<span><a href="#label-Eager+Loading+via+eager">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             

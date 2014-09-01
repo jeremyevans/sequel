@@ -50,7 +50,7 @@
             typecast on load in the plugin call itself, or afterwards using 
             add_typecast_on_load_columns:</p>
             
-            <pre>Album.plugin :typecast_on_load, :release_date, :record_date&#x000A;# or:&#x000A;Album.plugin :typecast_on_load&#x000A;Album.add_typecast_on_load_columns :release_date, :record_date</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">typecast_on_load</span>, :<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">record_date</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">typecast_on_load</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_typecast_on_load_columns</span> :<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">record_date</span></pre>
             
             <p>If the database returns release_date and record_date columns as strings
             instead of dates, this will ensure that if you access those columns through

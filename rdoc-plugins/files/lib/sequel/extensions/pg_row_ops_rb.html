@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-26 06:54:00 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,21 +43,20 @@
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :pg_row_ops</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_row_ops</span></pre>
             
             <p>The most common usage is passing an expression to Sequel.pg_row_op:</p>
             
-            <pre>r = Sequel.pg_row_op(:row_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(:<span class="ruby-identifier">row_column</span>)</pre>
             
             <p>If you have also loaded the pg_row extension, you can use Sequel.pg_row as
             well:</p>
             
-            <pre>r = Sequel.pg_row(:row_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row</span>(:<span class="ruby-identifier">row_column</span>)</pre>
             
-            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
-            expression objects, you can call the pg_row method:</p>
+            <p>Also, on most Sequel expression objects, you can call the pg_row method:</p>
             
-            <pre>r = Sequel.expr(:row_column).pg_row</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">row_column</span>).<span class="ruby-identifier">pg_row</span></pre>
             
             <p>If you have loaded the <a
             href="../../../doc/core_extensions_rdoc.html">core_extensions
@@ -65,40 +64,40 @@
             activated refinements for the file, you can also use <a
             href="../../../../classes/Sequel/Postgres/PGRowOp/ExpressionMethods.html#method-i-pg_row">Sequel::Postgres::PGRowOp::ExpressionMethods#pg_row</a>:</p>
             
-            <pre>r = :row_column.pg_row</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = :<span class="ruby-identifier">row_column</span>.<span class="ruby-identifier">pg_row</span></pre>
             
             <p>There&#39;s only fairly basic support currently.  You can use the [] method
             to access a member of the composite type:</p>
             
-            <pre>r[:a] # (row_column).a</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-comment"># (row_column).a</span></pre>
             
             <p>This can be chained:</p>
             
-            <pre>r[:a][:b] # ((row_column).a).b</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>[:<span class="ruby-identifier">a</span>][:<span class="ruby-identifier">b</span>] <span class="ruby-comment"># ((row_column).a).b</span></pre>
             
             <p>If you&#39;ve loaded the pg_array_ops extension, you there is also support
             for composite types that include arrays, or arrays of composite types:</p>
             
-            <pre>r[1][:a] # (row_column[1]).a&#x000A;r[:a][1] # (row_column).a[1]</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>][:<span class="ruby-identifier">a</span>] <span class="ruby-comment"># (row_column[1]).a</span>&#x000A;<span class="ruby-identifier">r</span>[:<span class="ruby-identifier">a</span>][<span class="ruby-value">1</span>] <span class="ruby-comment"># (row_column).a[1]</span></pre>
             
             <p>The only other support is the splat method:</p>
             
-            <pre>r.splat # (row_column.*)</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>.<span class="ruby-identifier">splat</span> <span class="ruby-comment"># (row_column.*)</span></pre>
             
             <p>The splat method is necessary if you are trying to reference a table&#39;s
             type when the table has the same name as one of it&#39;s columns.  For
             example:</p>
             
-            <pre>DB.create_table(:a){Integer :a; Integer :b}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>; <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">b</span>}</pre>
             
             <p>Let&#39;s say you want to reference the composite type for the table:</p>
             
-            <pre>a = Sequel.pg_row_op(:a)&#x000A;DB[:a].select(a[:b]) # SELECT (a).b FROM a</pre>
+            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">a</span>[:<span class="ruby-identifier">b</span>]) <span class="ruby-comment"># SELECT (a).b FROM a</span></pre>
             
             <p>Unfortunately, that doesn&#39;t work, as it references the integer column,
             not the table. The splat method works around this:</p>
             
-            <pre>DB[:a].select(a.splat[:b]) # SELECT (a.*).b FROM a</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">a</span>.<span class="ruby-identifier">splat</span>[:<span class="ruby-identifier">b</span>]) <span class="ruby-comment"># SELECT (a.*).b FROM a</span></pre>
             
             <p>Splat also takes an argument which is used for casting.  This is necessary
             if you want to return the composite type itself, instead of the columns in

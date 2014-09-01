@@ -47,11 +47,11 @@
             (for example, to make file system path creation easier), the following code
             will not do what you want:</p>
             
-            <pre>:price/10 &gt; 100</pre>
+            <pre class="ruby">:<span class="ruby-identifier">price</span><span class="ruby-operator">/</span><span class="ruby-value">10</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span></pre>
             
             <p>In that case, you need to do the following:</p>
             
-            <pre>:price.sql_number/10 &gt; 100</pre>
+            <pre class="ruby">:<span class="ruby-identifier">price</span>.<span class="ruby-identifier">sql_number</span><span class="ruby-operator">/</span><span class="ruby-value">10</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">100</span></pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -78,7 +78,7 @@
                   
                   <p>Extract a datetime part (e.g. year, month) from self:</p>
                   
-                  <pre>:date.extract(:year) # extract(year FROM &quot;date&quot;)</pre>
+                  <pre class="ruby">:<span class="ruby-identifier">date</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>) <span class="ruby-comment"># extract(year FROM &quot;date&quot;)</span></pre>
                   
                   <p>Also has the benefit of returning the result as a <a
                   href="NumericExpression.html">NumericExpression</a> instead of a generic <a
@@ -120,7 +120,7 @@
                   <p>Return a <a href="NumericExpression.html">NumericExpression</a>
                   representation of <code>self</code>.</p>
                   
-                  <pre>~:a # NOT &quot;a&quot;&#x000A;~:a.sql_number # ~&quot;a&quot;</pre>
+                  <pre class="ruby"><span class="ruby-operator">~</span>:<span class="ruby-identifier">a</span> <span class="ruby-comment"># NOT &quot;a&quot;</span>&#x000A;<span class="ruby-operator">~</span>:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_number</span> <span class="ruby-comment"># ~&quot;a&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_number-source'); return false">
@@ -140,7 +140,7 @@
                   <p>Return a <a href="StringExpression.html">StringExpression</a>
                   representation of <code>self</code>.</p>
                   
-                  <pre>:a + :b # &quot;a&quot; + &quot;b&quot;&#x000A;:a.sql_string + :b # &quot;a&quot; || &quot;b&quot;</pre>
+                  <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; + &quot;b&quot;</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; || &quot;b&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_string-source'); return false">

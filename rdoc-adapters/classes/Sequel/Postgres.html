@@ -60,29 +60,26 @@
             <p>Top level module for holding all PostgreSQL-related modules and classes for
             Sequel.  There are a few module level accessors that are added via
             metaprogramming.  These are:</p>
-            <dl class="rdoc-list note-list"><dt><a href="Postgres.html#attribute-c-client_min_messages">::client_min_messages</a> 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="Postgres.html#attribute-c-client_min_messages">::client_min_messages</a> </td><td>
             <p>Change the minimum level of messages that PostgreSQL will send to the the
             client.  The PostgreSQL default is NOTICE, the Sequel default is WARNING. 
             Set to nil to not change the server default. Overridable on a per instance
             basis via the :client_min_messages option.</p>
-            </dd><dt><a href="Postgres.html#attribute-c-force_standard_strings">::force_standard_strings</a> 
-            <dd>
+            </td></tr><tr><td class='label'><a href="Postgres.html#attribute-c-force_standard_strings">::force_standard_strings</a> </td><td>
             <p>Set to false to not force the use of standard strings.  Overridable on a
             per instance basis via the :force_standard_strings option.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>It is not recommened you use these module-level accessors.  Instead, use
             the database option to make the setting per-Database.</p>
             
             <p>All adapters that connect to PostgreSQL support the following option in
             addition to those mentioned above:</p>
-            <dl class="rdoc-list note-list"><dt>:search_path 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:search_path </td><td>
             <p>Set the schema search_path for this Database&#39;s connections. Allows to
             to set which schemas do not need explicit qualification, and in which order
             to check the schemas when an unqualified object is referenced.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>

@@ -118,16 +118,15 @@
                   
                   <p>Set the touch_column and touched_associations variables for the model.
                   Options:</p>
-                  <ul><li>
-                  <p>:associations - The associations to touch when a model instance is updated
-                  or destroyed.  Can be a symbol for a single association, a hash with
-                  association keys and column values, or an array of symbols and/or hashes. 
-                  If a symbol is used, the column used when updating the associated objects
-                  is the model&#39;s touch_column. If a hash is used, the value is used as
-                  the column to update.</p>
-                  </li><li>
-                  <p>:column - The column to modify when touching a model instance.</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:associations </td><td>
+                  <p>The associations to touch when a model instance is updated or destroyed. 
+                  Can be a symbol for a single association, a hash with association keys and
+                  column values, or an array of symbols and/or hashes.  If a symbol is used,
+                  the column used when updating the associated objects is the model&#39;s
+                  touch_column. If a hash is used, the value is used as the column to update.</p>
+                  </td></tr><tr><td class='label'>:column </td><td>
+                  <p>The column to modify when touching a model instance.</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">

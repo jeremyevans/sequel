@@ -94,26 +94,26 @@
                   :composer and :decomposer options.</p>
                   
                   <p>Options:</p>
-                  <ul><li>
-                  <p>:class - if using the :mapping option, the class to use, as a Class, <a
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:class </td><td>
+                  <p>if using the :mapping option, the class to use, as a Class, <a
                   href="../../../String.html">String</a> or <a
                   href="../../../Symbol.html">Symbol</a>.</p>
-                  </li><li>
-                  <p>:composer - A proc that is instance evaled when the composition getter
-                  method is called to create the composition.</p>
-                  </li><li>
-                  <p>:decomposer - A proc that is instance evaled before saving the model
-                  object, if the composition object exists, which sets the columns in the
-                  model object based on the value of the composition object.</p>
-                  </li><li>
-                  <p>:mapping - An array where each element is either a symbol or an array of
-                  two symbols. A symbol is treated like an array of two symbols where both
-                  symbols are the same. The first symbol represents the getter method in the
-                  model, and the second symbol represents the getter method in the
-                  composition object. Example:</p>
+                  </td></tr><tr><td class='label'>:composer </td><td>
+                  <p>A proc that is instance evaled when the composition getter method is called
+                  to create the composition.</p>
+                  </td></tr><tr><td class='label'>:decomposer </td><td>
+                  <p>A proc that is instance evaled before saving the model object, if the
+                  composition object exists, which sets the columns in the model object based
+                  on the value of the composition object.</p>
+                  </td></tr><tr><td class='label'>:mapping </td><td>
+                  <p>An array where each element is either a symbol or an array of two symbols.
+                  A symbol is treated like an array of two symbols where both symbols are the
+                  same. The first symbol represents the getter method in the model, and the
+                  second symbol represents the getter method in the composition object.
+                  Example:</p>
                   
-                  <pre class="ruby"><span class="ruby-comment"># Uses columns year, month, and day in the current model</span>&#x000A;<span class="ruby-comment"># Uses year, month, and day methods in the composition object</span>&#x000A;:<span class="ruby-identifier">mapping=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">month</span>, :<span class="ruby-identifier">day</span>]&#x000A;<span class="ruby-comment"># Uses columns year, month, and day in the current model</span>&#x000A;<span class="ruby-comment"># Uses y, m, and d methods in the composition object where</span>&#x000A;<span class="ruby-comment"># for example y in the composition object represents year</span>&#x000A;<span class="ruby-comment"># in the model object.</span>&#x000A;:<span class="ruby-identifier">mapping=</span><span class="ruby-operator">&gt;</span>[[:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">y</span>], [:<span class="ruby-identifier">month</span>, :<span class="ruby-identifier">m</span>], [:<span class="ruby-identifier">day</span>, :<span class="ruby-identifier">d</span>]]</pre>
-                  </li></ul>
+                  <pre class="ruby"><span class="ruby-comment"># Uses columns year, month, and day in the current model</span>&#x000A;<span class="ruby-comment"># Uses year, month, and day methods in the composition object</span>&#x000A;{:<span class="ruby-identifier">mapping=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">month</span>, :<span class="ruby-identifier">day</span>]}&#x000A;<span class="ruby-comment"># Uses columns year, month, and day in the current model</span>&#x000A;<span class="ruby-comment"># Uses y, m, and d methods in the composition object where</span>&#x000A;<span class="ruby-comment"># for example y in the composition object represents year</span>&#x000A;<span class="ruby-comment"># in the model object.</span>&#x000A;{:<span class="ruby-identifier">mapping=</span><span class="ruby-operator">&gt;</span>[[:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">y</span>], [:<span class="ruby-identifier">month</span>, :<span class="ruby-identifier">m</span>], [:<span class="ruby-identifier">day</span>, :<span class="ruby-identifier">d</span>]]}</pre>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-composition-source'); return false">

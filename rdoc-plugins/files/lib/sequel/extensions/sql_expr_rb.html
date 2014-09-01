@@ -42,11 +42,11 @@
             returns an wrapped object that works nicely with Sequel&#39;s DSL by
             calling Sequel.expr:</p>
             
-            <pre>1.sql_expr &lt; :a     # 1 &lt; a&#x000A;false.sql_expr &amp; :a # FALSE AND a&#x000A;true.sql_expr | :a  # TRUE OR a&#x000A;~nil.sql_expr       # NOT NULL&#x000A;&quot;a&quot;.sql_expr + &quot;b&quot;  # &#39;a&#39; || &#39;b&#39;</pre>
+            <pre class="ruby"><span class="ruby-value">1</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&lt;</span> :<span class="ruby-identifier">a</span>     <span class="ruby-comment"># 1 &lt; a</span>&#x000A;<span class="ruby-keyword">false</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">a</span> <span class="ruby-comment"># FALSE AND a</span>&#x000A;<span class="ruby-keyword">true</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">a</span>  <span class="ruby-comment"># TRUE OR a</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-keyword">nil</span>.<span class="ruby-identifier">sql_expr</span>       <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;b&quot;</span>  <span class="ruby-comment"># &#39;a&#39; || &#39;b&#39;</span></pre>
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :sql_expr</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">sql_expr</span></pre>
           </div>
           <div id='context'>
           </div>

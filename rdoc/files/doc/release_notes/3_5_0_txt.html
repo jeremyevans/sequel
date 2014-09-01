@@ -77,7 +77,7 @@
             <p>When using the class_table_inheritance plugin, subclasses use joined
             datasets:</p>
             
-            <pre>Employee.dataset.sql  # SELECT * FROM employees&#x000A;Manager.dataset.sql   # SELECT * FROM employees&#x000A;                      # INNER JOIN managers USING (id)&#x000A;Executive.dataset.sql # SELECT * FROM employees&#x000A;                      # INNER JOIN managers USING (id)&#x000A;                      # INNER JOIN executives USING (id)</pre>
+            <pre class="ruby"><span class="ruby-constant">Employee</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>  <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;<span class="ruby-constant">Manager</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span>   <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN managers USING (id)</span>&#x000A;<span class="ruby-constant">Executive</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">sql</span> <span class="ruby-comment"># SELECT * FROM employees</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN managers USING (id)</span>&#x000A;                      <span class="ruby-comment"># INNER JOIN executives USING (id)</span></pre>
             
             <p>This allows Executive.all to return instances with all attributes loaded. 
             The plugin overrides deleting, inserting, and updating in the model to work
@@ -87,7 +87,7 @@
             holding the class name.  This allows methods on the superclass to return
             instances of specific subclasses.</p>
             
-            <pre>a = Employee.all # [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</pre>
+            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;#Staff&gt;, &lt;#Manager&gt;, &lt;#Executive&gt;]</span></pre>
             
             <p>This plugin requires the lazy_attributes plugin and uses it to handle
             subclass specific attributes that would not be loaded when calling
@@ -149,7 +149,7 @@
             typecast on load in the plugin call itself, or afterwards using
             add_typecast_on_load_columns:</p>
             
-            <pre>Album.plugin :typecast_on_load, :release_date, :record_date&#x000A;# or:&#x000A;Album.plugin :typecast_on_load&#x000A;Album.add_typecast_on_load_columns :release_date, :record_date</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">typecast_on_load</span>, :<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">record_date</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">typecast_on_load</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">add_typecast_on_load_columns</span> :<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">record_date</span></pre>
             
             <p>If the database returns release_date and record_date columns as strings
             instead of dates, this will ensure that if you access those columns through
@@ -173,7 +173,7 @@
             method, and all descendent classes are available via the descendents
             method:</p>
             
-            <pre>c = Class.new(Sequel::Model)&#x000A;c.plugin :subclasses&#x000A;sc1 = Class.new(c)&#x000A;sc2 = Class.new(c)&#x000A;ssc1 = Class.new(sc1)&#x000A;c.subclasses    # [sc1, sc2]&#x000A;sc1.subclasses  # [ssc1]&#x000A;sc2.subclasses  # []&#x000A;ssc1.subclasses # []&#x000A;c.descendents   # [sc1, ssc1, sc2]</pre>
+            <pre class="ruby"><span class="ruby-identifier">c</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">subclasses</span>&#x000A;<span class="ruby-identifier">sc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">sc2</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-identifier">ssc1</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">sc1</span>)&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">subclasses</span>    <span class="ruby-comment"># [sc1, sc2]</span>&#x000A;<span class="ruby-identifier">sc1</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># [ssc1]</span>&#x000A;<span class="ruby-identifier">sc2</span>.<span class="ruby-identifier">subclasses</span>  <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">ssc1</span>.<span class="ruby-identifier">subclasses</span> <span class="ruby-comment"># []</span>&#x000A;<span class="ruby-identifier">c</span>.<span class="ruby-identifier">descendents</span>   <span class="ruby-comment"># [sc1, ssc1, sc2]</span></pre>
             
             <p>The main use case for this is if you want to modify all models after the
             model subclasses have been created.  Since mutable options are copied when
@@ -211,7 +211,7 @@
             so you want to use New York time in the database and Los Angeles time in
             the application.  This is easily done via:</p>
             
-            <pre>Sequel.database_timezone = &#39;America/New_York&#39;&#x000A;Sequel.application_timezone = &#39;America/Los_Angeles&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-string">&#39;America/New_York&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
             
             <p>Then, before timestamps are stored in the database, they are converted to
             New York time.  When timestamps are retrieved from the database, they are
@@ -225,25 +225,25 @@
             store time in UTC, but have the application deal with the timezone of the
             current user.  That can be done with:</p>
             
-            <pre>Sequel.database_timezone = :utc&#x000A;# In each thread:&#x000A;Sequel.thread_application_timezone = current_user.timezone</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = :<span class="ruby-identifier">utc</span>&#x000A;<span class="ruby-comment"># In each thread:</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">thread_application_timezone</span> = <span class="ruby-identifier">current_user</span>.<span class="ruby-identifier">timezone</span></pre>
             
             <p>This extension is designed to work with the named_timezones extension.</p>
             </li><li>
             <p>An sql_expr extension was added that adds .sql_expr methods to all objects,
             giving them easy access to Sequel&#39;s DSL:</p>
             
-            <pre>1.sql_expr &lt; :a     # 1 &lt; a&#x000A;false.sql_expr &amp; :a # FALSE AND a&#x000A;true.sql_expr | :a  # TRUE OR a&#x000A;~nil.sql_expr       # NOT NULL&#x000A;&quot;a&quot;.sql_expr + &quot;b&quot;  # &#39;a&#39; || &#39;b&#39;</pre>
+            <pre class="ruby"><span class="ruby-value">1</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&lt;</span> :<span class="ruby-identifier">a</span>     <span class="ruby-comment"># 1 &lt; a</span>&#x000A;<span class="ruby-keyword">false</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">a</span> <span class="ruby-comment"># FALSE AND a</span>&#x000A;<span class="ruby-keyword">true</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">a</span>  <span class="ruby-comment"># TRUE OR a</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-keyword">nil</span>.<span class="ruby-identifier">sql_expr</span>       <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;b&quot;</span>  <span class="ruby-comment"># &#39;a&#39; || &#39;b&#39;</span></pre>
             
             <p>Proc#sql_expr uses a virtual row:</p>
             
-            <pre>proc{[[a, b], [a, c]]}.sql_expr | :x&#x000A;# (((a = b) AND (a = c)) OR x)</pre>
+            <pre class="ruby"><span class="ruby-identifier">proc</span>{[[<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>], [<span class="ruby-identifier">a</span>, <span class="ruby-identifier">c</span>]]}.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">x</span>&#x000A;<span class="ruby-comment"># (((a = b) AND (a = c)) OR x)</span></pre>
             </li><li>
             <p>A looser_typecasting extension was added, for using to_f and to_i instead
             of the more strict Kernel.Float and Kernel.Integer when typecasting floats
             and integers. To use it, you should extend the database with the
             Sequel::LooserTypecasting module after loading the extension:</p>
             
-            <pre>Sequel.extension :looser_typecasting&#x000A;DB.extend(Sequel::LooserTypecasting)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">looser_typecasting</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LooserTypecasting</span>)</pre>
             
             <p>This makes the behavior more like ActiveRecord:</p>
             
@@ -325,7 +325,7 @@
             you to more easily determine the wrapped exception class, without resorting
             to parsing the exception message.</p>
             
-            <pre class="ruby"><span class="ruby-keyword">begin</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">wrapped_exception</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Mysql</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>&#x000A;    <span class="ruby-operator">...</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">PGError</span>&#x000A;    <span class="ruby-operator">...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre>begin&#x000A;  DB.run(&#39;...&#39;)&#x000A;rescue Sequel::DatabaseError =&gt; e&#x000A;  case e.wrapped_exception&#x000A;  when Mysql::Error&#x000A;    ...&#x000A;  when PGError&#x000A;    ...&#x000A;  end&#x000A;end</pre>
             </li><li>
             <p>The MySQL adapter now supports a Dataset#split_multiple_result_sets method
             that yields arrays of rows (one per result set), instead of rows.  This

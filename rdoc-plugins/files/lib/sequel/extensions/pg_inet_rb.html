@@ -38,9 +38,8 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The pg_inet extension adds support for <a
-            href="../../../../classes/Sequel.html">Sequel</a> to handle
-            PostgreSQL&#39;s inet and cidr types using ruby&#39;s IPAddr class.</p>
+            <p>The pg_inet extension adds support for Sequel to handle PostgreSQL&#39;s
+            inet and cidr types using ruby&#39;s IPAddr class.</p>
             
             <p>This extension integrates with Sequel&#39;s native postgres and
             jdbc/postgresql adapters, so that when inet/cidr fields are retrieved, they
@@ -48,7 +47,7 @@
             
             <p>To use this extension, load it into your database:</p>
             
-            <pre>DB.extension :pg_inet</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_inet</span></pre>
             
             <p>If you are not using the native postgres or jdbc/postgresql adapters and
             are using inet/cidr types as model column values you probably should use
@@ -59,7 +58,7 @@
             the inet[] or cidr[] types, load the pg_array extension before the pg_inet
             extension:</p>
             
-            <pre>DB.extension :pg_array, :pg_inet</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span>, :<span class="ruby-identifier">pg_inet</span></pre>
             
             <p>This extension does not add special support for the macaddr type.  Ruby
             doesn&#39;t have a stdlib class that represents mac addresses, so these

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-23 10:52:30 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:17 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -44,16 +44,16 @@
             without issuing a database query.</p>
             
             <p>This method is not fool-proof, it&#39;s possible that some databases will
-            use column names that <a href="../../../../classes/Sequel.html">Sequel</a>
-            does not expect.  Also, it may not correctly handle all cases.</p>
+            use column names that Sequel does not expect.  Also, it may not correctly
+            handle all cases.</p>
             
             <p>To attempt to introspect columns for a single dataset:</p>
             
-            <pre>ds = ds.extension(:columns_introspection)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
             
             <p>To attempt to introspect columns for all datasets on a single database:</p>
             
-            <pre>DB.extension(:columns_introspection)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
           </div>
           <div id='context'>
           </div>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-04 15:34:16 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -44,10 +44,9 @@
             
             <p>The most common usage is probably in a method that must return a dataset,
             where the method knows the dataset shouldn&#39;t return anything.  With
-            standard <a href="../../../../classes/Sequel.html">Sequel</a>, you&#39;d
-            probably just add a WHERE condition that is always false, but that still
-            results in a query being sent to the database, and can be overridden using
-            unfiltered, the OR operator, or a UNION.</p>
+            standard Sequel, you&#39;d probably just add a WHERE condition that is
+            always false, but that still results in a query being sent to the database,
+            and can be overridden using unfiltered, the OR operator, or a UNION.</p>
             
             <p>Usage:</p>
             
@@ -62,11 +61,11 @@
             
             <p>To add the nullify method to a single dataset:</p>
             
-            <pre>ds = ds.extension(:null_dataset)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">null_dataset</span>)</pre>
             
             <p>To add the nullify method to all datasets on a single database:</p>
             
-            <pre>DB.extension(:null_dataset)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">null_dataset</span>)</pre>
           </div>
           <div id='context'>
           </div>

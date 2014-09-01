@@ -99,7 +99,7 @@
             Before, the default behavior of these plugins allowed for round tripping,
             such that:</p>
             
-            <pre>Album.from_xml(album.to_xml) == album</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>) <span class="ruby-operator">==</span> <span class="ruby-identifier">album</span></pre>
             
             <p>Unfortunately, that requires that the deserialization allow the setting of
             any column.  Since the plugins also handle associations, you could also set

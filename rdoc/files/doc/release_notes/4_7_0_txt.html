@@ -48,7 +48,7 @@
             SQL::QualifiedIdentifier#function, and quoted functions are now supported
             via SQL::Identifier#function on some databases:</p>
             
-            <pre># &quot;func&quot;(&quot;col&quot;)&#x000A;select{func.function(:col)}&#x000A;# &quot;schema&quot;.&quot;func&quot;(&quot;col1&quot;)&#x000A;select{schema__func.function(:col1)}</pre>
+            <pre class="ruby"><span class="ruby-comment"># &quot;func&quot;(&quot;col&quot;)</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">func</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">col</span>)}&#x000A;&#x000A;<span class="ruby-comment"># &quot;schema&quot;.&quot;func&quot;(&quot;col1&quot;)</span>&#x000A;<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema__func</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">col1</span>)}</pre>
             
             <p>If the database does not support quoting function names, then <a
             href="../../../classes/Sequel.html">Sequel</a> will not quote them.</p>

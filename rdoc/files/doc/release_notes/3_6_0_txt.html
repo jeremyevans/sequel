@@ -48,7 +48,7 @@
             
             <p>Sequel&#39;s general support for this syntax is nicer:</p>
             
-            <pre>ds.filter{copies_sold &gt; 500000}</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}</pre>
             
             <p>But named placeholder support can make it easier to port code from other
             database libraries.  Also, it works much better than the ? placeholder
@@ -62,10 +62,9 @@
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;price &lt; :p AND id in :ids&#39;</span>, :<span class="ruby-identifier">p=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">100</span>)&#x000A;<span class="ruby-comment"># WHERE (price &lt; 100 AND id in :ids)</span></pre>
             
             <p>This makes it easier to spot missed placeholders, and avoids issues</p>
-            <dl class="rdoc-list note-list"><dt>with PostgreSQL&#39;s 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>with PostgreSQL&#39;s </td><td>
             <p>casting syntax or : inside string literals.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             </li><li>
             <p>The Model add_ association method now accepts a hash and creates a new
             associated model object associated to the receiver:</p>
@@ -218,7 +217,7 @@
             allow referencing objects in the top level scope. So the following code
             would cause an error on 1.9:</p>
             
-            <pre>DB[:bonds].filter{maturity_date &gt; Time.now}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">bonds</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">maturity_date</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}</pre>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> now uses a <a
             href="../../../classes/Sequel/BasicObject.html">Sequel::BasicObject</a>
@@ -371,10 +370,9 @@
             <hr>
             <ul><li>
             <p>Model::Errors no longer uses a default proc, but emulates one in the</p>
-            <dl class="rdoc-list label-list"><dt>
-            <dd>
+            <table class="rdoc-list label-list"><tbody><tr><td class='label'></td><td>
             <p>method.  This is unlikely to have a negative affect unless you</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>are calling a method on it that doesn&#39;t call [] (maybe using it in a C
             extension?).</p>

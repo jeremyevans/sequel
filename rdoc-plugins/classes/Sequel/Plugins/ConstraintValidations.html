@@ -46,7 +46,7 @@
             the constraints.  For example, if you used the extension and created your
             albums table like this:</p>
             
-            <pre>DB.create_table(:albums) do&#x000A;  primary_key :id&#x000A;  String :name&#x000A;  validate do&#x000A;    min_length 5, :name&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Then when you went to save an album that uses this plugin:</p>
             
@@ -121,17 +121,15 @@
                 <div class='description'>
                   
                   <p>Parse the constraint validations metadata from the database. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:constraint_validations_table 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:constraint_validations_table </td><td>
                   <p>Override the name of the constraint validations metadata table.  Should
                   only be used if the table name was overridden when creating the constraint
                   validations.</p>
-                  </dd><dt>:validation_options 
-                  <dd>
+                  </td></tr><tr><td class='label'>:validation_options </td><td>
                   <p>Override/augment the options stored in the database with the given options.
                   Keys should be validation type symbols (e.g. :presence) and values should
                   be hashes of options specific to that validation type.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">

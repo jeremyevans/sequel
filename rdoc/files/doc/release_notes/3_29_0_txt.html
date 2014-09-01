@@ -122,7 +122,7 @@
             association methods, which return datasets of rows in the associated table
             that are associated to rows in the current dataset.</p>
             
-            <pre># Dataset of tracks from albums with name &lt; &#39;M&#39;&#x000A;# by artists with name &gt; &#39;M&#39;&#x000A;Artist.filter(:name &gt; &#39;M&#39;).albums.filter(:name &lt; &#39;M&#39;).tracks&#x000A;&#x000A;# SELECT * FROM tracks&#x000A;# WHERE (tracks.album_id IN (&#x000A;#   SELECT albums.id FROM albums&#x000A;#   WHERE ((albums.artist_id IN (&#x000A;#     SELECT artists.id FROM artists&#x000A;#     WHERE (name &gt; &#39;M&#39;)))&#x000A;#    AND (name &lt; &#39;M&#39;))))</pre>
+            <pre class="ruby"><span class="ruby-comment"># Dataset of tracks from albums with name &lt; &#39;M&#39;</span>&#x000A;<span class="ruby-comment"># by artists with name &gt; &#39;M&#39;</span>&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>).<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;M&#39;</span>).<span class="ruby-identifier">tracks</span>&#x000A;&#x000A;<span class="ruby-comment"># SELECT * FROM tracks</span>&#x000A;<span class="ruby-comment"># WHERE (tracks.album_id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT albums.id FROM albums</span>&#x000A;<span class="ruby-comment">#   WHERE ((albums.artist_id IN (</span>&#x000A;<span class="ruby-comment">#     SELECT artists.id FROM artists</span>&#x000A;<span class="ruby-comment">#     WHERE (name &gt; &#39;M&#39;)))</span>&#x000A;<span class="ruby-comment">#    AND (name &lt; &#39;M&#39;))))</span></pre>
             </li><li>
             <p>Database#extend_datasets has been added, allowing you to do the equivalent
             of extending all of the database&#39;s future datasets with a module.  For
@@ -135,7 +135,7 @@
             href="../../../classes/Sequel/Model.html">Sequel::Model</a> plugins work.
             The method takes either a module:</p>
             
-            <pre>Sequel.extension :columns_introspection&#x000A;DB.extend_datasets(Sequel::ColumnsIntrospection)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">columns_introspection</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnsIntrospection</span>)</pre>
             
             <p>or a block that it uses to create an anonymous module:</p>
             
@@ -242,7 +242,7 @@
             doesn&#39;t select the columns.  This has been the specified behavior for a
             while, but the spec was broken. This allows you do to:</p>
             
-            <pre>Model.dataset = DB[:table].select(:column1, :column2)&#x000A;Model.select_more(:column3).first.column3</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>)&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">select_more</span>(:<span class="ruby-identifier">column3</span>).<span class="ruby-identifier">first</span>.<span class="ruby-identifier">column3</span></pre>
             </li><li>
             <p>Model.def_dataset_method now correctly handles method names that can&#39;t
             be used directly (such as method names with spaces).  This isn&#39;t so the
@@ -404,7 +404,7 @@
             <p>If you are using like on SQLite and Microsoft SQL Server and want it to be
             case insensitive, switch to using ilike:</p>
             
-            <pre># Case sensitive&#x000A;DB[:foos].where(:name.like(&#39;bar%&#39;))&#x000A;# Case insensitive&#x000A;DB[:foos].where(:name.ilike(&#39;bar%&#39;))</pre>
+            <pre class="ruby"><span class="ruby-comment"># Case sensitive</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foos</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;bar%&#39;</span>))&#x000A;<span class="ruby-comment"># Case insensitive</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foos</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">ilike</span>(<span class="ruby-string">&#39;bar%&#39;</span>))</pre>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> now sets the
             case_sensitive_like PRAGMA to true by default on SQLite.  To set it to

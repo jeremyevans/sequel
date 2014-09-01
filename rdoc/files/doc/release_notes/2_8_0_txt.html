@@ -45,7 +45,7 @@
             stored procedures similar to its support for prepared statements.  The API
             is as follows:</p>
             
-            <pre>DB[:table].call_sproc(:select, :mysp, &#39;param1&#39;, &#39;param2&#39;)&#x000A;# or&#x000A;sp = DB[:table].prepare_sproc(:select, :mysp)&#x000A;sp.call(&#39;param1&#39;, &#39;param2&#39;)&#x000A;sp.call(&#39;param3&#39;, &#39;param4&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">call_sproc</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">mysp</span>, <span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-identifier">sp</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">prepare_sproc</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">mysp</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param1&#39;</span>, <span class="ruby-string">&#39;param2&#39;</span>)&#x000A;<span class="ruby-identifier">sp</span>.<span class="ruby-identifier">call</span>(<span class="ruby-string">&#39;param3&#39;</span>, <span class="ruby-string">&#39;param4&#39;</span>)</pre>
             
             <p>This works with Model datasets as well, allowing them to return model
             objects:</p>
@@ -92,7 +92,7 @@
             future version of PostgreSQL.  If you don&#39;t want for force the use of
             standard strings, use:</p>
             
-            <pre>Sequel::Postgres.force_standard_strings = false</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> = <span class="ruby-keyword">false</span></pre>
             
             <p>You need to do that after you call <a
             href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a> but
@@ -169,7 +169,7 @@
             <p>The Sequel.odbc_mssql method was removed, as the odbc_mssql adapter was
             removed in a previous version.  Instead, use:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">odbc</span>(<span class="ruby-operator">...</span>, :<span class="ruby-identifier">db_type=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;mssql&#39;</span>)</pre>
+            <pre>Sequel.odbc(..., :db_type=&gt;&#39;mssql&#39;)</pre>
             </li></ul>
             
             <p>Backwards Compatibilty</p>

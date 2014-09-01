@@ -76,7 +76,7 @@
             <p>A from_block extension has been added that makes Database#from operate like
             Dataset#from in regards to a passed block, allowing you to write code like:</p>
             
-            <pre>DB.from{table_returning_function(arg1, arg2)}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_returning_function</span>(<span class="ruby-identifier">arg1</span>, <span class="ruby-identifier">arg2</span>)}</pre>
             </li><li>
             <p>Database#supports_partial_indexes? has been added for checking for partial
             index support.  Partial indexes are now supported on SQLite 3.8.0+.</p>
@@ -85,7 +85,7 @@
             PostgreSQL tables.  This uses the system tables and should be fairly
             accurate if the table statistics are up to date:</p>
             
-            <pre>DB.loose_count(:table)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loose_count</span>(:<span class="ruby-identifier">table</span>)</pre>
             </li><li>
             <p>The Dataset#use_cursor method in the postgres adapter now supports a
             :cursor_name option.  You can set this option if you want to use nested

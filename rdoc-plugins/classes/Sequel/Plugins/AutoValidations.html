@@ -53,10 +53,9 @@
             
             <p>To determine the columns to use for the type/not_null/max_length
             validations, the plugin looks at the database schema for the model&#39;s
-            table.  To determine the unique validations, <a
-            href="../../Sequel.html">Sequel</a> looks at the indexes on the table.  In
-            order for this plugin to be fully functional, the underlying database
-            adapter needs to support both schema and index parsing.</p>
+            table.  To determine the unique validations, Sequel looks at the indexes on
+            the table.  In order for this plugin to be fully functional, the underlying
+            database adapter needs to support both schema and index parsing.</p>
             
             <p>This plugin uses the validation_helpers plugin underneath to implement the
             validations.  It does not allow for any per-column validation message
@@ -66,12 +65,12 @@
             <p>You can skip certain types of validations from being automatically added
             via:</p>
             
-            <pre>Model.skip_auto_validations(:not_null)</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">skip_auto_validations</span>(:<span class="ruby-identifier">not_null</span>)</pre>
             
             <p>If you want to skip all auto validations (only useful if loading the plugin
             in a superclass):</p>
             
-            <pre>Model.skip_auto_validations(:all)</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">skip_auto_validations</span>(:<span class="ruby-identifier">all</span>)</pre>
             
             <p>By default, the plugin uses a not_null validation for NOT NULL columns, but
             that can be changed to a presence validation using an option:</p>

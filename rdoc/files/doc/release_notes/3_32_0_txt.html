@@ -53,7 +53,7 @@
             associations where the underlying columns clash with standard ruby method
             names:</p>
             
-            <pre>many_to_one :primary_key_method&#x000A;one_to_many :key_method&#x000A;one_to_many :primary_key_column&#x000A;many_to_many :left_primary_key_column&#x000A;many_to_many :right_primary_key_method</pre>
+            <pre class="ruby"><span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">primary_key_method</span>&#x000A;<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">key_method</span>&#x000A;<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">primary_key_column</span>&#x000A;<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">left_primary_key_column</span>&#x000A;<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">right_primary_key_method</span></pre>
             
             <p>Using these new options, you can now define associations that work
             correctly when the underlying primary/foreign key columns clash with
@@ -178,7 +178,7 @@
             <p>The difference is that the “correct” NULL behavior is more consistent with
             the non-empty array cases.  For example, if b is NULL:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># &quot;Correct&quot; NULL handling</span>&#x000A;<span class="ruby-comment">#  Empty array: where(:b=&gt;[])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">b</span>) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> = <span class="ruby-identifier">b</span>) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-comment">#  Non-empty array: where(:b=&gt;[1, 2])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span>&#x000A;&#x000A;<span class="ruby-comment"># Static boolean handling</span>&#x000A;<span class="ruby-comment">#  Empty array: where(:b=&gt;[])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-value">1</span> = <span class="ruby-value">0</span>) <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-value">1</span> = <span class="ruby-value">1</span>) <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-comment">#  Non-empty array: where(:b=&gt;[1, 2])</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-constant">WHERE</span> (<span class="ruby-identifier">b</span> <span class="ruby-constant">NOT</span> <span class="ruby-constant">IN</span> (<span class="ruby-value">1</span>, <span class="ruby-value">2</span>)) <span class="ruby-comment"># NULL</span></pre>
+            <pre># &quot;Correct&quot; NULL handling&#x000A;#  Empty array: where(:b=&gt;[])&#x000A;WHERE (b != b) # NULL&#x000A;WHERE (b = b) # NULL&#x000A;#  Non-empty array: where(:b=&gt;[1, 2])&#x000A;WHERE (b IN (1, 2)) # NULL&#x000A;WHERE (b NOT IN (1, 2)) # NULL&#x000A;# Static boolean handling&#x000A;#  Empty array: where(:b=&gt;[])&#x000A;WHERE (1 = 0) # false&#x000A;WHERE (1 = 1) # true&#x000A;#  Non-empty array: where(:b=&gt;[1, 2])&#x000A;WHERE (b IN (1, 2)) # NULL&#x000A;WHERE (b NOT IN (1, 2)) # NULL</pre>
             
             <p><a href="../../../classes/Sequel.html">Sequel</a> chooses to default to
             behavior consistent with the non-empty array cases (similar to SQLAlchemy).
@@ -193,7 +193,7 @@
             href="../../../classes/Sequel.html">Sequel</a> defaults to the “correct”
             NULL handling, and allows you to switch to the static boolean handling via:</p>
             
-            <pre>Sequel.empty_array_handle_nulls = false</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">empty_array_handle_nulls</span> = <span class="ruby-keyword">false</span></pre>
             
             <p>This is currently a global setting, it may be made Database or Dataset
             specific later if requested.  Also, it is possible the default will switch

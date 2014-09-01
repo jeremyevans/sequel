@@ -62,42 +62,35 @@
             <code>Function</code> depending on how it is called.</p>
             
             <p>If a block is <em>not</em> given, creates one of the following objects:</p>
-            <dl class="rdoc-list note-list"><dt><code>Function</code> 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>Function</code> </td><td>
             <p>Returned if any arguments are supplied, using the method name as the
             function name, and the arguments as the function arguments.</p>
-            </dd><dt><code>QualifiedIdentifier</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>QualifiedIdentifier</code> </td><td>
             <p>Returned if the method name contains __, with the table being the part
             before __, and the column being the part after.</p>
-            </dd><dt><code>Identifier</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>Identifier</code> </td><td>
             <p>Returned otherwise, using the method name.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>If a block is given, it returns a <code>Function</code>.  Note that the
             block is currently not called by the code, though this may change in a
             future version.  If the first argument is:</p>
-            <dl class="rdoc-list note-list"><dt>no arguments given 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>no arguments given </td><td>
             <p>creates a <code>Function</code> with no arguments.</p>
-            </dd><dt>:* 
-            <dd>
+            </td></tr><tr><td class='label'>:* </td><td>
             <p>creates a <code>Function</code> with a literal wildcard argument (*),
             mostly useful for COUNT.</p>
-            </dd><dt>:distinct 
-            <dd>
+            </td></tr><tr><td class='label'>:distinct </td><td>
             <p>creates a <code>Function</code> that prepends DISTINCT to the rest of the
             arguments, mostly useful for aggregate functions.</p>
-            </dd><dt>:over 
-            <dd>
+            </td></tr><tr><td class='label'>:over </td><td>
             <p>creates a <code>Function</code> with a window.  If a second argument is
             provided, it should be a hash of options which are used to create the
             <code>Window</code> (with possible keys :window, :partition, :order, and
             :frame).  The arguments to the function itself should be specified as
             <code>:*=&gt;true</code> for a wildcard, or via the <code>:args</code>
             option.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Examples:</p>
             
@@ -160,7 +153,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-60-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-60-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1755</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">`</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-60-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1766</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">`</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-method_missing'>
@@ -180,7 +173,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-method_missing-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1762</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:*</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-operator">*</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:distinct</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-identifier">distinct</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:over</span>&#x000A;        <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>]))&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-identifier">f</span>.<span class="ruby-operator">*</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:*</span>]&#x000A;        <span class="ruby-identifier">f</span>.<span class="ruby-identifier">over</span>(<span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;unsupported VirtualRow method argument used with block&#39;</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-constant">DOUBLE_UNDERSCORE</span>, <span class="ruby-value">2</span>)&#x000A;    <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1773</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:*</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-operator">*</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:distinct</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-identifier">distinct</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:over</span>&#x000A;        <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>]))&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-identifier">f</span>.<span class="ruby-operator">*</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:*</span>]&#x000A;        <span class="ruby-identifier">f</span>.<span class="ruby-identifier">over</span>(<span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;unsupported VirtualRow method argument used with block&#39;</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-constant">DOUBLE_UNDERSCORE</span>, <span class="ruby-value">2</span>)&#x000A;    <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

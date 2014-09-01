@@ -89,7 +89,7 @@
             tactical_eager_loading plugins and allows you to create attributes that are
             lazily loaded from the database:</p>
             
-            <pre>Album.plugin :lazy_attributes, :review</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">lazy_attributes</span>, :<span class="ruby-identifier">review</span></pre>
             
             <p>This will remove the :review attribute from being selected by default.  If
             you try to access the attribute after it is selected, it&#39;ll retrieve
@@ -108,7 +108,7 @@
             allows you to create associations to multiple objects through multiple join
             tables.  Here are some examples:</p>
             
-            <pre># Assume the following many to many associations:&#x000A;Artist.many_to_many :albums&#x000A;Album.many_to_many :tags&#x000A;# Same as Artist.many_to_many :albums&#x000A;Artist.many_through_many :albums,&#x000A;  [[:albums_artists, :artist_id, :album_id]]&#x000A;&#x000A;# All tags associated to any album this artist is associated to&#x000A;Artist.many_through_many :tags,&#x000A;  [[:albums_artists, :artist_id, :album_id],&#x000A;   [:albums, :id, :id],&#x000A;   [:albums_tags, :album_id, :tag_id]]&#x000A;&#x000A;# All artists associated to any album this artist is associated to&#x000A;Artist.many_through_many :artists,&#x000A;  [[:albums_artists, :artist_id, :album_id],&#x000A;   [:albums, :id, :id],&#x000A;   [:albums_artists, :album_id, :artist_id]]&#x000A;&#x000A;# All albums by artists that are associated to any album this&#x000A;# artist is associated to&#x000A;Artist.many_through_many :artist_albums,&#x000A;  [[:albums_artists, :artist_id, :album_id],&#x000A;   [:albums, :id, :id],&#x000A;   [:albums_artists, :album_id, :artist_id],&#x000A;   [:artists, :id, :id],&#x000A;   [:albums_artists, :artist_id, :album_id]]</pre>
+            <pre class="ruby"><span class="ruby-comment"># Assume the following many to many associations:</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span>&#x000A;&#x000A;<span class="ruby-comment"># Same as Artist.many_to_many :albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> :<span class="ruby-identifier">albums</span>,&#x000A;  [[:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All tags associated to any album this artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> :<span class="ruby-identifier">tags</span>,&#x000A;  [[:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>],&#x000A;   [:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">id</span>],&#x000A;   [:<span class="ruby-identifier">albums_tags</span>, :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">tag_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All artists associated to any album this artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> :<span class="ruby-identifier">artists</span>,&#x000A;  [[:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>],&#x000A;   [:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">id</span>],&#x000A;   [:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>]]&#x000A;&#x000A;<span class="ruby-comment"># All albums by artists that are associated to any album this</span>&#x000A;<span class="ruby-comment"># artist is associated to</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> :<span class="ruby-identifier">artist_albums</span>,&#x000A;  [[:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>],&#x000A;   [:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">id</span>],&#x000A;   [:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">artist_id</span>],&#x000A;   [:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">id</span>],&#x000A;   [:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>]]</pre>
             
             <p>Basically, for each join table between this model and the associated model,
             you use an array with a join table name, left key name (key closer to this
@@ -180,7 +180,7 @@
             <p>Model plugins can now depend on other plugins, simply by calling the
             Model.plugin method inside the plugin&#39;s apply method:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">LazyAttributes</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;    <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">tactical_eager_loading</span>&#x000A;  <span class="ruby-keyword">end</span></pre>
+            <pre>module LazyAttributes&#x000A;  def self.apply(model)&#x000A;    model.plugin :tactical_eager_loading&#x000A;  end</pre>
             </li><li>
             <p>Model.plugin now takes a block with is passed to the plugin&#39;s apply and
             configure method (see Backwards Compatibility section for more information
@@ -192,7 +192,7 @@
             href="../../../classes/Sequel.html#method-c-extension">Sequel.extension</a>
             method to load extensions:</p>
             
-            <pre>Sequel.extension :pagination, :query</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pagination</span>, :<span class="ruby-identifier">query</span></pre>
             
             <p>This will only load extensions that ship with <a
             href="../../../classes/Sequel.html">Sequel</a>, unlike the Model.plugin
@@ -246,7 +246,7 @@
             set would cause the “commands out of sync” error on the following query. 
             For example, the following code would cause the error:</p>
             
-            <pre>DB &lt;&lt; &quot;SHOW DATABASES&quot;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;SHOW DATABASES&quot;</span></pre>
             
             <p>If for some reason a “commands out of sync” error does occur, <a
             href="../../../classes/Sequel.html">Sequel</a> will disconnect the

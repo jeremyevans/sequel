@@ -106,7 +106,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1630</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">f</span>, <span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">f</span>, <span class="ruby-identifier">sub</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1641</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">f</span>, <span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@sub</span> = <span class="ruby-identifier">f</span>, <span class="ruby-identifier">sub</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -121,13 +121,13 @@
                   <p>Create a new <code>Subscript</code> by accessing a subarray of a
                   multidimensional array.</p>
                   
-                  <pre>:a.sql_subscript(2) # a[2]&#x000A;:a.sql_subscript(2)[1] # a[2][1]</pre>
+                  <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># a[2]</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>)[<span class="ruby-value">1</span>] <span class="ruby-comment"># a[2][1]</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1648</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1659</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-7C'>
@@ -141,13 +141,13 @@
                   <p>Create a new <code>Subscript</code> appending the given subscript(s) to the
                   current array of subscripts.</p>
                   
-                  <pre>:a.sql_subscript(2) # a[2]&#x000A;:a.sql_subscript(2) | 1 # a[2, 1]</pre>
+                  <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-comment"># a[2]</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">2</span>) <span class="ruby-operator">|</span> <span class="ruby-value">1</span> <span class="ruby-comment"># a[2, 1]</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-7C-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1639</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1650</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">sub</span>)&#x000A;  <span class="ruby-constant">Subscript</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@f</span>, <span class="ruby-ivar">@sub</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">sub</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

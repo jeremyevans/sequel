@@ -78,7 +78,7 @@
             <p>Loading a plugin into a model class is generally as simple as calling the
             Sequel::Model.plugin method with the name of the plugin, for example:</p>
             
-            <pre>Sequel::Model.plugin :subclasses</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">subclasses</span></pre>
             
             <p>What is does is require the <code>sequel/plugins/subclasses</code> file,
             and then assumes that that file defines the
@@ -87,7 +87,7 @@
             <p>It&#39;s possible to pass module instances to the plugin method to load
             plugins that are stored in arbitrary files or namespaces:</p>
             
-            <pre>Sequel::Model.plugin MyApp::Plugins::Foo</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-constant">MyApp</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span></pre>
             
             <p>In the examples shown above, the plugin is loaded into <a
             href="../../classes/Sequel/Model.html">Sequel::Model</a>, which means it is
@@ -123,7 +123,7 @@
             the simplest one you can load by name.  The absolute simplest plugin would
             be an empty module:</p>
             
-            <pre>Sequel::Model.plugin Module.new</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-constant">Module</span>.<span class="ruby-identifier">new</span></pre>
             
             <h2 id="label-Example+Formatting">Example Formatting<span><a href="#label-Example+Formatting">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -223,7 +223,7 @@
             
             <p>This requires that the user of the plugin specify the argument:</p>
             
-            <pre>Bar.plugin :foo, :quux</pre>
+            <pre class="ruby"><span class="ruby-constant">Bar</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">foo</span>, :<span class="ruby-identifier">quux</span></pre>
             
             <p>In general you should only require plugin arguments if you absolutely must
             have a value and there is no good default.</p>
@@ -247,20 +247,16 @@
             subclass.  The keys of this hash are instance variable names, including the
             @ symbol (e.g. :@foo_state).  The values of this hash describe how to copy
             it:</p>
-            <dl class="rdoc-list note-list"><dt>nil 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>nil </td><td>
             <p>Use the value directly.</p>
-            </dd><dt>:dup 
-            <dd>
+            </td></tr><tr><td class='label'>:dup </td><td>
             <p>Call dup on the value.</p>
-            </dd><dt>:hash_dup 
-            <dd>
+            </td></tr><tr><td class='label'>:hash_dup </td><td>
             <p>Create a new hash with the same keys, but a dup of all the values.</p>
-            </dd><dt>Proc 
-            <dd>
+            </td></tr><tr><td class='label'>Proc </td><td>
             <p>An arbitrary proc that is called with the parent class value and should
             return the value to set into the subclass.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h2 id="label-Handling+Changes+to+the+Model%27s+Dataset">Handling Changes to the Model&#39;s Dataset<span><a href="#label-Handling+Changes+to+the+Model%27s+Dataset">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -278,11 +274,11 @@
             <p>In some cases, when dataset methods are added, you want to also create a
             model class method that will call the dataset method, so you can write:</p>
             
-            <pre>Model.method</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">method</span></pre>
             
             <p>instead of:</p>
             
-            <pre>Model.dataset.method</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">method</span></pre>
             
             <p>There is an available shortcut that automatically creates the class
             methods:</p>

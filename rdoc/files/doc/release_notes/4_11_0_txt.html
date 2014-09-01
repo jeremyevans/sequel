@@ -96,7 +96,7 @@
             column lists (table aliases that include column aliases) via Sequel.as and
             SQL::AliasedMethods#as:</p>
             
-            <pre>Sequel.as(:table, :alias, [:c1, :c2])&#x000A;# table AS alias(c1, c2)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-keyword">alias</span>, [:<span class="ruby-identifier">c1</span>, :<span class="ruby-identifier">c2</span>])&#x000A;<span class="ruby-comment"># table AS alias(c1, c2)</span></pre>
             
             <p>Not all databases support this, but it is in SQL92 and <a
             href="../../../classes/Sequel.html">Sequel</a> now supports it by default. 

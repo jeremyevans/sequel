@@ -95,7 +95,7 @@
                   call <a href="DatasetMethods.html#method-i-with_pk">#with_pk</a> with the
                   argument.</p>
                   
-                  <pre>Artist.dataset[1] # SELECT * FROM artists WHERE (id = 1) LIMIT 1</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># SELECT * FROM artists WHERE (id = 1) LIMIT 1</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
@@ -117,7 +117,7 @@
                   the dataset, which does a single <a href="../SQL.html">SQL</a> call, but
                   this runs any destroy hooks on each object in the dataset.</p>
                   
-                  <pre>Artist.dataset.destroy&#x000A;# DELETE FROM artists WHERE (id = 1)&#x000A;# DELETE FROM artists WHERE (id = 2)&#x000A;# ...</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">destroy</span>&#x000A;<span class="ruby-comment"># DELETE FROM artists WHERE (id = 1)</span>&#x000A;<span class="ruby-comment"># DELETE FROM artists WHERE (id = 2)</span>&#x000A;<span class="ruby-comment"># ...</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-destroy-source'); return false">
@@ -198,7 +198,7 @@
                   <p>If there is no order already defined on this dataset, order it by the
                   primary key and call last.</p>
                   
-                  <pre>Album.last&#x000A;# SELECT * FROM albums ORDER BY id DESC LIMIT 1</pre>
+                  <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id DESC LIMIT 1</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-last-source'); return false">
@@ -218,7 +218,7 @@
                   <p>If there is no order already defined on this dataset, order it by the
                   primary key and call paged_each.</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">paged_each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 0</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 2000</span>&#x000A;<span class="ruby-comment"># ...</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">paged_each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 0</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 2000</span>&#x000A;<span class="ruby-comment"># ...</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-paged_each-source'); return false">
@@ -259,7 +259,7 @@
                   <p>Given a primary key value, return the first record in the dataset with that
                   primary key value.  If no records matches, returns nil.</p>
                   
-                  <pre># Single primary key&#x000A;Artist.dataset.with_pk(1) # SELECT * FROM artists WHERE (id = 1) LIMIT 1&#x000A;# Composite primary key&#x000A;Artist.dataset.with_pk([1, 2]) # SELECT * FROM artists&#x000A;                               # WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1</pre>
+                  <pre class="ruby"><span class="ruby-comment"># Single primary key</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># SELECT * FROM artists WHERE (id = 1) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-comment"># Composite primary key</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_pk</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]) <span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;                               <span class="ruby-comment"># WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_pk-source'); return false">

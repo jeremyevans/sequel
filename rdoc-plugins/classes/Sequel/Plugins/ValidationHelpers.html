@@ -49,44 +49,35 @@
             have the API explained here:</p>
             
             <p>Arguments:</p>
-            <dl class="rdoc-list note-list"><dt>atts 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>atts </td><td>
             <p>Single attribute symbol or an array of attribute symbols specifying the
             attribute(s) to validate.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Options:</p>
-            <dl class="rdoc-list note-list"><dt>:allow_blank 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_blank </td><td>
             <p>Whether to skip the validation if the value is blank.  You should make sure
             all objects respond to blank if you use this option, which you can do by:</p>
-            </dd></dl>
             
-            <pre>Sequel.extension :blank</pre>
-            <dl class="rdoc-list note-list"><dt>:allow_missing 
-            <dd>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">blank</span></pre>
+            </td></tr><tr><td class='label'>:allow_missing </td><td>
             <p>Whether to skip the validation if the attribute isn&#39;t a key in the
-            values hash.  This is different from allow_nil, because <a
-            href="../../Sequel.html">Sequel</a> only sends the attributes in the values
-            when doing an insert or update.  If the attribute is not present, <a
-            href="../../Sequel.html">Sequel</a> doesn&#39;t specify it, so the database
+            values hash.  This is different from allow_nil, because Sequel only sends
+            the attributes in the values when doing an insert or update.  If the
+            attribute is not present, Sequel doesn&#39;t specify it, so the database
             will use the table&#39;s default value.  This is different from having an
-            attribute in values with a value of nil, which <a
-            href="../../Sequel.html">Sequel</a> will send as NULL. If your database
-            table has a non NULL default, this may be a good option to use.  You
-            don&#39;t want to use allow_nil, because if the attribute is in values but
-            has a value nil, <a href="../../Sequel.html">Sequel</a> will attempt to
-            insert a NULL value into the database, instead of using the database&#39;s
-            default.</p>
-            </dd><dt>:allow_nil 
-            <dd>
+            attribute in values with a value of nil, which Sequel will send as NULL. If
+            your database table has a non NULL default, this may be a good option to
+            use.  You don&#39;t want to use allow_nil, because if the attribute is in
+            values but has a value nil, Sequel will attempt to insert a NULL value into
+            the database, instead of using the database&#39;s default.</p>
+            </td></tr><tr><td class='label'>:allow_nil </td><td>
             <p>Whether to skip the validation if the value is nil.</p>
-            </dd><dt>:message 
-            <dd>
+            </td></tr><tr><td class='label'>:message </td><td>
             <p>The message to use.  Can be a string which is used directly, or a proc
             which is called.  If the validation method takes a argument before the
             array of attributes, that argument is passed as an argument to the proc.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>The default validation options for all models can be modified by changing
             the values of the Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS hash.
@@ -96,7 +87,7 @@
             <p>By changing the default options, you can setup internationalization of the
             error messages.  For example, you would modify the default options:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationHelpers</span><span class="ruby-operator">::</span><span class="ruby-constant">DEFAULT_OPTIONS</span>.<span class="ruby-identifier">merge!</span>(&#x000A;  :<span class="ruby-identifier">exact_length=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">exact</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.exact_length&quot;</span>, :<span class="ruby-identifier">exact</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">exact</span>)}},&#x000A;  :<span class="ruby-identifier">integer=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">lambda</span>{<span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.integer&quot;</span>)}},&#x000A;  <span class="ruby-operator">...</span>&#x000A;)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">ValidationHelpers</span><span class="ruby-operator">::</span><span class="ruby-constant">DEFAULT_OPTIONS</span>.<span class="ruby-identifier">merge!</span>(&#x000A;  :<span class="ruby-identifier">exact_length=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">exact</span><span class="ruby-operator">|</span> <span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.exact_length&quot;</span>, :<span class="ruby-identifier">exact</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">exact</span>)}},&#x000A;  :<span class="ruby-identifier">integer=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">lambda</span>{<span class="ruby-constant">I18n</span>.<span class="ruby-identifier">t</span>(<span class="ruby-string">&quot;errors.integer&quot;</span>)}}&#x000A;)</pre>
             
             <p>and then use something like this in your yaml translation file:</p>
             
@@ -143,10 +134,10 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>Default validation options used by <a href="../../Sequel.html">Sequel</a>. 
-                      Can be modified to change the error messages for all models (e.g. for
-                      internationalization), or to set certain default options for validations
-                      (e.g. :allow_nil=&gt;true for all validates_format).</p>
+                      <p>Default validation options used by Sequel.  Can be modified to change the
+                      error messages for all models (e.g. for internationalization), or to set
+                      certain default options for validations (e.g. :allow_nil=&gt;true for all
+                      validates_format).</p>
                     </td>
                   </tr>
                 </table>

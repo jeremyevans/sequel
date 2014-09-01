@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-03 15:54:13 -0800</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -73,7 +73,7 @@
             <p><a href="../../classes/Sequel.html">Sequel</a> will autogenerate the column
             accessors, so you can do:</p>
             
-            <pre>album = Album.new&#x000A;album.name = &#39;RF&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span> = <span class="ruby-string">&#39;RF&#39;</span></pre>
             
             <p>If the table name for the class doesn&#39;t match the default one <a
             href="../../classes/Sequel.html">Sequel</a> will choose, you can specify it
@@ -131,11 +131,11 @@
             the Database object (we recommend using the DB constant for single database
             applications):</p>
             
-            <pre>DB.transaction do&#x000A;  album.artist.num_albums -= 1&#x000A;  album.artist.save&#x000A;  album.delete&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">num_albums</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>For model classes, you can always access the database via <code>db</code>:</p>
             
-            <pre>Album.db.transaction do&#x000A;  album.artist.num_albums -= 1&#x000A;  album.artist.save&#x000A;  album.delete&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">num_albums</span> <span class="ruby-operator">-=</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">save</span>&#x000A;  <span class="ruby-identifier">album</span>.<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h2 id="label-Reflection">Reflection<span><a href="#label-Reflection">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -150,7 +150,7 @@
             doesn&#39;t use sessions, it lets you modify objects and have them be saved
             inside the call to <code>save</code>:</p>
             
-            <pre>album = Album[1234]&#x000A;# modify album&#x000A;album.save</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1234</span>]&#x000A;<span class="ruby-comment"># modify album</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span></pre>
             
             <h2 id="label-Database+Abstraction">Database Abstraction<span><a href="#label-Database+Abstraction">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -165,14 +165,14 @@
             <p><a href="../../classes/Sequel.html">Sequel</a> supports logging of all
             database queries by allowing multiple loggers for each database:</p>
             
-            <pre>DB.loggers &lt;&lt; Logger.new($stdout)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">loggers</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">Logger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stdout</span>)</pre>
             
             <h2 id="label-Migrations">Migrations<span><a href="#label-Migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports migrations and has
             a migrator similar to ActiveRecord:</p>
             
-            <pre>Sequel.migration do&#x000A;  change do&#x000A;    create_table(:albums) do&#x000A;      primary_key :id&#x000A;      String :name&#x000A;    end&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h2 id="label-Differences">Differences<span><a href="#label-Differences">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -213,12 +213,12 @@
             href="../../classes/Sequel.html">Sequel</a> makes it easy by using the
             <code>Sequel.lit</code> method:</p>
             
-            <pre>Album.select(Sequel.lit(&#39;id, name&#39;))</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;id, name&#39;</span>))</pre>
             
             <p>This usage is not encouraged, though.  The recommended way is to use
             symbols to represent the columns:</p>
             
-            <pre>Album.select(:id, :name)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)</pre>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> keeps datasets in an
             abstract format, allowing for powerful capabilities.  For example,
@@ -232,7 +232,7 @@
             where using an SQL string fragment hurts you is when the SQL syntax cannot
             handle all cases:</p>
             
-            <pre>Album.filter(&#39;id NOT IN ?&#39;, ids_array)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-string">&#39;id NOT IN ?&#39;</span>, <span class="ruby-identifier">ids_array</span>)</pre>
             
             <p>That will work fine if <code>ids_array</code> is not empty, but will not
             work correctly if it is empty.  With <a
@@ -246,13 +246,13 @@
             For example, if you want a case insensitive search that works on both
             PostgreSQL and MySQL, the following won&#39;t work:</p>
             
-            <pre>Album.filter(&#39;name LIKE ?&#39;, &#39;A%&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-string">&#39;name LIKE ?&#39;</span>, <span class="ruby-string">&#39;A%&#39;</span>)</pre>
             
             <p>This is because LIKE is case sensitive on PostgreSQL, but case insensitive
             on MySQL.  With <a href="../../classes/Sequel.html">Sequel</a>, you would
             do:</p>
             
-            <pre>Album.filter(Sequel.ilike(:name, &#39;A%&#39;))</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>))</pre>
             
             <p>This will do a case insensitive search on both databases.  If you want a
             case sensitive search on both, you can use <code>like</code> instead of
@@ -262,7 +262,7 @@
             things differently.  With <a href="../../classes/Sequel.html">Sequel</a>,
             the same code can work on both databases:</p>
             
-            <pre>Album.select(Sequel.join([:name, &#39; - Name&#39;]))</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">select</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39; - Name&#39;</span>]))</pre>
             
             <h2 id="label-Flexible+Overriding">Flexible Overriding<span><a href="#label-Flexible+Overriding">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -296,7 +296,7 @@
             other things, this means <a href="../../classes/Sequel.html">Sequel</a>
             does not support dynamic finders.  So instead of:</p>
             
-            <pre>Album.find_or_create_by_name(&quot;RF&quot;)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">find_or_create_by_name</span>(<span class="ruby-string">&quot;RF&quot;</span>)</pre>
             
             <p>You just use:</p>
             
@@ -314,22 +314,17 @@
             ActiveRecord associations in some ways, and much different in others.  <a
             href="../../classes/Sequel.html">Sequel</a> provides four association
             creation methods that map to ActiveRecord&#39;s associations:</p>
-            <dl class="rdoc-list note-list"><dt>ActiveRecord 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>ActiveRecord </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a></p>
-            </dd><dt><code>belongs_to</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>belongs_to</code> </td><td>
             <p><code>many_to_one</code></p>
-            </dd><dt><code>has_one</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>has_one</code> </td><td>
             <p><code>one_to_one</code></p>
-            </dd><dt><code>has_many</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>has_many</code> </td><td>
             <p><code>one_to_many</code></p>
-            </dd><dt><code>has_and_belongs_to_many</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>has_and_belongs_to_many</code> </td><td>
             <p><code>many_to_many</code></p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Like ActiveRecord, when you create an association in <a
             href="../../classes/Sequel.html">Sequel</a>, it creates an instance method
@@ -344,7 +339,7 @@
             instance methods on the object instead of a proxy to modify the
             association.  Here&#39;s a basic example:</p>
             
-            <pre>Artist.one_to_many :albums&#x000A;Album.many_to_one :artist&#x000A;artist = Artist[1]&#x000A;album = Album[1]&#x000A;&#x000A;artist.albums # array of albums&#x000A;album.artist # Artist instance or nil&#x000A;&#x000A;artist.add_album(album) # associate album to artist&#x000A;artist.remove_album(album) # disassociate album from artist&#x000A;artist.remove_all_albums # disassociate all albums from artist</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums</span> <span class="ruby-comment"># array of albums</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span> <span class="ruby-comment"># Artist instance or nil</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-identifier">album</span>) <span class="ruby-comment"># associate album to artist</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-identifier">album</span>) <span class="ruby-comment"># disassociate album from artist</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">remove_all_albums</span> <span class="ruby-comment"># disassociate all albums from artist</span></pre>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t have a
             <code>has_many :through</code> association, instead you can use a
@@ -390,13 +385,13 @@
             associated objects.  You can access the association dataset using the
             <code>association_dataset</code> method:</p>
             
-            <pre>artist.albums_dataset&#x000A;album.artist_dataset</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums_dataset</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist_dataset</span></pre>
             
             <p>Association datasets are just like any other <a
             href="../../classes/Sequel.html">Sequel</a> dataset, in that you can filter
             them and manipulate them further:</p>
             
-            <pre>gold_albums = artist.albums_dataset.where{copies_sold &gt; 500000}.order(:name).all</pre>
+            <pre class="ruby"><span class="ruby-identifier">gold_albums</span> = <span class="ruby-identifier">artist</span>.<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">all</span></pre>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> caches associated objects
             similarly to ActiveRecord, and you can skip the cache by passing
@@ -420,7 +415,7 @@
             <code>each</code>, <code>all</code> takes a block that iterates over the
             records:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">tags</span>, :<span class="ruby-identifier">tracks</span>]).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>} <span class="ruby-comment"># No cookie</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">tags</span>, :<span class="ruby-identifier">tracks</span>]).<span class="ruby-identifier">all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>} <span class="ruby-comment"># Cookie</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">tags</span>, :<span class="ruby-identifier">tracks</span>]).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> } <span class="ruby-comment"># No cookie</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">tags</span>, :<span class="ruby-identifier">tracks</span>]).<span class="ruby-identifier">all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> } <span class="ruby-comment"># Cookie</span></pre>
             
             <p>Like ActiveRecord, <a href="../../classes/Sequel.html">Sequel</a> supports
             cascading of eager loading for both methods of eager loading.</p>
@@ -461,120 +456,87 @@
             <h3 id="label-Shared+options">Shared options<span><a href="#label-Shared+options">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>These options are shared by more than one ActiveRecord association.</p>
-            <dl class="rdoc-list note-list"><dt>ActiveRecord option 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>ActiveRecord option </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a> option</p>
-            </dd><dt><code>:class_name</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:class_name</code> </td><td>
             <p><code>:class</code></p>
-            </dd><dt><code>:conditions</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:conditions</code> </td><td>
             <p><code>:conditions</code></p>
-            </dd><dt><code>:select</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:select</code> </td><td>
             <p><code>:select</code></p>
-            </dd><dt><code>:order</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:order</code> </td><td>
             <p><code>:order</code></p>
-            </dd><dt><code>:extend</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:extend</code> </td><td>
             <p><code>:extend</code></p>
-            </dd><dt><code>:limit</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:limit</code> </td><td>
             <p><code>:limit</code></p>
-            </dd><dt><code>:offset</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:offset</code> </td><td>
             <p><code>:limit</code> with an array with the second element being the offset</p>
-            </dd><dt><code>:uniq</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:uniq</code> </td><td>
             <p><code>:uniq</code></p>
-            </dd><dt><code>:validate</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:validate</code> </td><td>
             <p><code>:validate</code></p>
-            </dd><dt><code>:dependent</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:dependent</code> </td><td>
             <p>The <code>associations_dependencies</code> plugin</p>
-            </dd><dt><code>:polymorphic</code>, <code>:as</code>, <code>:source_type</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:polymorphic</code>, <code>:as</code>, <code>:source_type</code> </td><td>
             <p>The <code>sequel_polymorphic</code> external plugin</p>
-            </dd><dt><code>:include</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:include</code> </td><td>
             <p><code>:eager</code>, <code>:eager_graph</code></p>
-            </dd><dt><code>:readonly</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:readonly</code> </td><td>
             <p>No equivalent, the <a href="../../classes/Sequel.html">Sequel</a>
             <code>:read_only</code> option just means the modification methods are not
             created (it makes the association read only, not records retrieved through
             the association)</p>
-            </dd><dt><code>:through</code>, <code>:source</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:through</code>, <code>:source</code> </td><td>
             <p>Use a <code>many_to_many</code> or <code>one_through_one</code>
             association, or the <code>many_through_many</code> plugin</p>
-            </dd><dt><code>:touch</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:touch</code> </td><td>
             <p>The <code>touch</code> plugin</p>
-            </dd><dt><code>:autosave</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:autosave</code> </td><td>
             <p>A <code>before_save</code> or <code>after_save</code> hook</p>
-            </dd><dt><code>:finder_sql</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:finder_sql</code> </td><td>
             <p><code>:dataset</code> to set a custom dataset</p>
-            </dd><dt><code>:counter_sql</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:counter_sql</code> </td><td>
             <p>No direct equivalent, but a count on the dataset will use the custom
             dataset specified by <code>:dataset</code></p>
-            </dd><dt><code>:group</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:group</code> </td><td>
             <p>Use the association block to add the group to the dataset</p>
-            </dd><dt><code>:having</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:having</code> </td><td>
             <p>Use the association block to add the having to the dataset</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-belongs_to"><code>belongs_to</code><span><a href="#label-belongs_to">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-            <dl class="rdoc-list note-list"><dt><code>belongs_to</code> option 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>belongs_to</code> option </td><td>
             <p><code>many_to_one</code> option</p>
-            </dd><dt><code>:foreign_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:foreign_key</code> </td><td>
             <p><code>:key</code></p>
-            </dd><dt><code>:primary_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:primary_key</code> </td><td>
             <p><code>:primary_key</code></p>
-            </dd><dt><code>:counter_cache</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:counter_cache</code> </td><td>
             <p>No equivalent</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-has_one%2C+has_many"><code>has_one</code>, <code>has_many</code><span><a href="#label-has_one%2C+has_many">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-            <dl class="rdoc-list note-list"><dt><code>has_one</code>, <code>has_many</code> option 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>has_one</code>, <code>has_many</code> option </td><td>
             <p><code>one_to_one</code>, <code>one_to_many</code> option</p>
-            </dd><dt><code>:foreign_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:foreign_key</code> </td><td>
             <p><code>:key</code></p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-has_and_belongs_to_many"><code>has_and_belongs_to_many</code><span><a href="#label-has_and_belongs_to_many">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-            <dl class="rdoc-list note-list"><dt><code>has_and_belongs_to_many</code> option 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>has_and_belongs_to_many</code> option </td><td>
             <p><code>many_to_many</code> option</p>
-            </dd><dt><code>:foreign_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:foreign_key</code> </td><td>
             <p><code>:left_key</code></p>
-            </dd><dt><code>:association_foreign_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:association_foreign_key</code> </td><td>
             <p><code>:right_key</code></p>
-            </dd><dt><code>:join_table</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:join_table</code> </td><td>
             <p><code>:join_table</code></p>
-            </dd><dt><code>:delete_sql</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:delete_sql</code> </td><td>
             <p><code>:remover</code></p>
-            </dd><dt><code>:insert_sql</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>:insert_sql</code> </td><td>
             <p><code>:adder</code></p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h2 id="label-Validation+Errors">Validation Errors<span><a href="#label-Validation+Errors">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -606,50 +568,43 @@
             global, class, and instance level that change the behavior of <a
             href="../../classes/Sequel.html">Sequel</a>.  Here&#39;s a brief
             description of the flags:</p>
-            <dl class="rdoc-list note-list"><dt><code>raise_on_save_failure</code> 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>raise_on_save_failure</code> </td><td>
             <p>Whether to raise an error instead of returning nil on a failure to
             save/create/save_changes/etc due to a validation failure or a before_* hook
             returning false. By default, an error is raised, when this is set to false,
             nil is returned instead.</p>
-            </dd><dt><code>raise_on_typecast_failure</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>raise_on_typecast_failure</code> </td><td>
             <p>Whether to raise an error when unable to typecast data for a column
             (default: true). This should be set to false if you want to use validations
             to display nice error messages to the user (e.g. most web applications).
             You can use the <code>validates_schema_types</code> validation in
             connection with this option to check for typecast failures.</p>
-            </dd><dt><code>require_modification</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>require_modification</code> </td><td>
             <p>Whether to raise an error if an UPDATE or DELETE query related to a model
             instance does not modify exactly 1 row. If set to false, <a
             href="../../classes/Sequel.html">Sequel</a>  will not check the number of
             rows modified (default: true if the database supports it).</p>
-            </dd><dt><code>strict_param_setting</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>strict_param_setting</code> </td><td>
             <p>Whether new/set/update and their variants should raise an error if an
             invalid key is used. A key is invalid if no setter method exists for that
             key or the access to the setter method is restricted (e.g. due to it being
             a primary key field). If set to false, silently skip any key where the
             setter method doesn&#39;t exist or access to it is restricted.</p>
-            </dd><dt><code>typecast_empty_string_to_nil</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>typecast_empty_string_to_nil</code> </td><td>
             <p>Whether to typecast the empty string (&#39;&#39;) to nil for columns that
             are not string or blob. In most cases the empty string would be the way to
             specify a NULL SQL value in string form (nil.to_s == &#39;&#39;), and an
             empty string would not usually be typecast correctly for other types, so
             the default is true.</p>
-            </dd><dt><code>typecast_on_assignment</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>typecast_on_assignment</code> </td><td>
             <p>Whether to typecast attribute values on assignment (default: true). If set
             to false, no typecasting is done, so it will be left up to the database to
             typecast the value correctly.</p>
-            </dd><dt><code>use_transactions</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>use_transactions</code> </td><td>
             <p>Whether to use a transaction by default when saving/deleting records
             (default: true). If you are sending database queries in before or after
             hooks, you shouldn&#39;t change the default setting without a good reason.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h2 id="label-ActiveRecord+Method+to+Sequel+Method+Mapping+">ActiveRecord Method to <a href="../../classes/Sequel.html">Sequel</a> Method Mapping <span><a href="#label-ActiveRecord+Method+to+Sequel+Method+Mapping+">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -710,7 +665,7 @@
             instantiated a <code>Sequel::Database</code> object before loading the
             model class.  However, if you want to test the connection to the database:</p>
             
-            <pre>Sequel::Model.db.test_connection</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">test_connection</span></pre>
             
             <p>Note that <code>test_connection</code> will return true if a connection can
             be made, but will probably raise an exception if it cannot be made.</p>
@@ -722,7 +677,7 @@
             returning them as soon as the query finishes.  If you do want direct access
             to the connection object:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">connection</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-operator">...</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">connection</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Note that the connection is yielded to the block, and the block ensures it
             is returned to the pool.  <a href="../../classes/Sequel.html">Sequel</a>
@@ -734,7 +689,7 @@
             <p>You can call <code>with_sql</code> to set the SQL to use, and the
             <code>single_value</code> to retrieve the result.</p>
             
-            <pre>Album.with_sql(&quot;SELECT COUNT(*) ...&quot;).single_value</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT COUNT(*) ...&quot;</span>).<span class="ruby-identifier">single_value</span></pre>
             
             <h4 id="label-delete%2C+delete_all"><code>delete</code>, <code>delete_all</code><span><a href="#label-delete%2C+delete_all">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -745,7 +700,7 @@
             <p>If you really want to delete all rows in the table,call <code>delete</code>
             on the Model&#39;s dataset:</p>
             
-            <pre>Album.dataset.delete</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">delete</span></pre>
             
             <h4 id="label-destroy%2C+destroy_all"><code>destroy</code>, <code>destroy_all</code><span><a href="#label-destroy%2C+destroy_all">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -757,19 +712,19 @@
             <p>If you really want to destroy all rows in the table,call
             <code>destroy</code> on the Model&#39;s dataset:</p>
             
-            <pre>Album.dataset.destroy</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">destroy</span></pre>
             
             <h4 id="label-establish_connection"><code>establish_connection</code><span><a href="#label-establish_connection">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>If you want to use a specific <code>Sequel::Database</code> object, you can
             use <code>db=</code>:</p>
             
-            <pre>BACKUP_DB = Sequel.connect(...)&#x000A;Album.db = BACKUP_DB</pre>
+            <pre class="ruby"><span class="ruby-constant">BACKUP_DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">BACKUP_DB</span></pre>
             
             <p>If you want a specific dataset in that database, you can use
             <code>set_dataset</code> or <code>dataset=</code>:</p>
             
-            <pre>Album.set_dataset BACKUP_DB[:albums]&#x000A;Album.dataset = BACKUP_DB[:albums]</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">set_dataset</span> <span class="ruby-constant">BACKUP_DB</span>[:<span class="ruby-identifier">albums</span>]&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-constant">BACKUP_DB</span>[:<span class="ruby-identifier">albums</span>]</pre>
             
             <h4 id="label-exists%3F"><code>exists?</code><span><a href="#label-exists%3F">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -783,13 +738,13 @@
             <p>ActiveRecord&#39;s <code>find</code> can be used for a lot of different
             things.  If you are trying to find a single object given a primary key:</p>
             
-            <pre>Album[1]</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]</pre>
             
             <p>Note that <a href="../../classes/Sequel.html">Sequel</a> returns nil if no
             record is found, it doesn&#39;t raise an exception.  To raise an exception
             if no record is found:</p>
             
-            <pre>Album.with_pk!(1)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_pk!</span>(<span class="ruby-value">1</span>)</pre>
             
             <p>If you want to find multiple objects using an array of primary keys:</p>
             
@@ -813,47 +768,36 @@
             
             <p>Here&#39;s a mapping of ActiveRecord <code>find</code> options to
             <code>Sequel::Dataset</code> methods:</p>
-            <dl class="rdoc-list note-list"><dt>:conditions 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:conditions </td><td>
             <p>filter, where</p>
-            </dd><dt>:order 
-            <dd>
+            </td></tr><tr><td class='label'>:order </td><td>
             <p>order</p>
-            </dd><dt>:group 
-            <dd>
+            </td></tr><tr><td class='label'>:group </td><td>
             <p>group</p>
-            </dd><dt>:limit 
-            <dd>
+            </td></tr><tr><td class='label'>:limit </td><td>
             <p>limit</p>
-            </dd><dt>:offset 
-            <dd>
+            </td></tr><tr><td class='label'>:offset </td><td>
             <p>offset</p>
-            </dd><dt>:joins 
-            <dd>
+            </td></tr><tr><td class='label'>:joins </td><td>
             <p>join, left_join, etc. # many other join methods</p>
-            </dd><dt>:include 
-            <dd>
+            </td></tr><tr><td class='label'>:include </td><td>
             <p>eager, eager_graph # eager does preloading, eager_graph does JOINs</p>
-            </dd><dt>:select 
-            <dd>
+            </td></tr><tr><td class='label'>:select </td><td>
             <p>select</p>
-            </dd><dt>:from 
-            <dd>
+            </td></tr><tr><td class='label'>:from </td><td>
             <p>from</p>
-            </dd><dt>:read_only 
-            <dd>
+            </td></tr><tr><td class='label'>:read_only </td><td>
             <p># No <a href="../../classes/Sequel.html">Sequel</a> equivalent</p>
-            </dd><dt>:lock 
-            <dd>
+            </td></tr><tr><td class='label'>:lock </td><td>
             <p>for_update, lock_style</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h4 id="label-find_by_sql"><code>find_by_sql</code><span><a href="#label-find_by_sql">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p>Similar to <code>count_by_sql</code>, you use <code>with_sql</code>,
             followed by <code>all</code>:</p>
             
-            <pre>Album.with_sql(&quot;SELECT * FROM albums WHERE ...&quot;).all</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT * FROM albums WHERE ...&quot;</span>).<span class="ruby-identifier">all</span></pre>
             
             <h4 id="label-first"><code>first</code><span><a href="#label-first">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -884,7 +828,7 @@
             
             <p>If you want to completely reload the schema for the table:</p>
             
-            <pre>Album.instance_variable_set(:@db_schema, nil)&#x000A;Album.send(:get_db_schema, true)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">instance_variable_set</span>(:<span class="ruby-ivar">@db_schema</span>, <span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">send</span>(:<span class="ruby-identifier">get_db_schema</span>, <span class="ruby-keyword">true</span>)</pre>
             
             <h4 id="label-serialize%2C+seralized_attributes"><code>serialize</code>, <code>seralized_attributes</code><span><a href="#label-serialize%2C+seralized_attributes">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -916,11 +860,11 @@
             
             <p>This is a <code>Sequel::Database</code> method:</p>
             
-            <pre>Album.db.table_exists?(Album.table_name)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">table_exists?</span>(<span class="ruby-constant">Album</span>.<span class="ruby-identifier">table_name</span>)</pre>
             
             <p>With the <code>schema</code> plugin, you can use it directly:</p>
             
-            <pre>Album.plugin :schema&#x000A;Album.table_exists?</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">schema</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">table_exists?</span></pre>
             
             <h4 id="label-transaction"><code>transaction</code><span><a href="#label-transaction">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -928,7 +872,7 @@
             href="../../classes/Sequel.html">Sequel</a>, which you can access via the
             <code>db</code> method:</p>
             
-            <pre>Album.db.transaction{}</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>{}</pre>
             
             <h4 id="label-update%2C+update_all"><code>update</code>, <code>update_all</code><span><a href="#label-update%2C+update_all">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -960,187 +904,131 @@
             <p>Note that <a href="../../classes/Sequel.html">Sequel</a> uses symbols
             almost everywhere to represent columns, while ActiveRecord often returns
             columns as strings.</p>
-            <dl class="rdoc-list note-list"><dt>ActiveRecord Method 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>ActiveRecord Method </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a> Method</p>
-            </dd><dt><code>attr_accessible</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attr_accessible</code> </td><td>
             <p><code>set_allowed_columns</code></p>
-            </dd><dt><code>attr_protected</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attr_protected</code> </td><td>
             <p><code>set_restricted_columns</code></p>
-            </dd><dt><code>average</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>average</code> </td><td>
             <p><code>avg</code></p>
-            </dd><dt><code>belongs_to</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>belongs_to</code> </td><td>
             <p><code>many_to_one</code></p>
-            </dd><dt><code>columns_hash</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>columns_hash</code> </td><td>
             <p><code>db_schema</code></p>
-            </dd><dt><code>count</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>count</code> </td><td>
             <p><code>count</code></p>
-            </dd><dt><code>changed</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>changed</code> </td><td>
             <p><code>changed_columns</code></p>
-            </dd><dt><code>create</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>create</code> </td><td>
             <p><code>create</code></p>
-            </dd><dt><code>has_and_belongs_to_many</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>has_and_belongs_to_many</code> </td><td>
             <p><code>many_to_many</code></p>
-            </dd><dt><code>has_one</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>has_one</code> </td><td>
             <p><code>one_to_one</code></p>
-            </dd><dt><code>has_many</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>has_many</code> </td><td>
             <p><code>one_to_many</code></p>
-            </dd><dt><code>inheritance_column</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>inheritance_column</code> </td><td>
             <p><code>sti_key</code></p>
-            </dd><dt><code>inspect</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>inspect</code> </td><td>
             <p><code>inspect</code></p>
-            </dd><dt><code>maximum</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>maximum</code> </td><td>
             <p><code>max</code></p>
-            </dd><dt><code>minimum</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>minimum</code> </td><td>
             <p><code>min</code></p>
-            </dd><dt><code>new</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>new</code> </td><td>
             <p><code>new</code></p>
-            </dd><dt><code>primary_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>primary_key</code> </td><td>
             <p><code>primary_key</code></p>
-            </dd><dt><code>respond_to?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>respond_to?</code> </td><td>
             <p><code>respond_to?</code></p>
-            </dd><dt><code>set_primary_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>set_primary_key</code> </td><td>
             <p><code>set_primary_key</code></p>
-            </dd><dt><code>sum</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>sum</code> </td><td>
             <p><code>sum</code></p>
-            </dd><dt><code>table_name</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>table_name</code> </td><td>
             <p><code>table_name</code></p>
-            </dd><dt><code>unscoped</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>unscoped</code> </td><td>
             <p><code>unfiltered</code></p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-Class+Methods+without+an+Equivalent">Class Methods without an Equivalent<span><a href="#label-Class+Methods+without+an+Equivalent">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-            <dl class="rdoc-list note-list"><dt>ActiveRecord Method 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>ActiveRecord Method </td><td>
             <p>Notes, Workarounds</p>
-            </dd><dt><code>accepts_nested_attributes_for</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>accepts_nested_attributes_for</code> </td><td>
             <p>Use the <code>nested_attributes</code> plugin</p>
-            </dd><dt><code>attr_readonly</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attr_readonly</code> </td><td>
             <p>Don&#39;t update the columns (duh!), or add a before_update hook that
             deletes them from the values hash</p>
-            </dd><dt><code>attribute_method_suffix</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attribute_method_suffix</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>alias_attribute_with_dirty</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>alias_attribute_with_dirty</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>base_class</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>base_class</code> </td><td>
             <p>Not needed internally, you can probably use <code>sti_dataset.model</code>
             if you are using single table inheritance</p>
-            </dd><dt><code>benchmark</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>benchmark</code> </td><td>
             <p>Just use the <code>benchmark</code> library from ruby&#39;s stdlib</p>
-            </dd><dt><code>calculate</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>calculate</code> </td><td>
             <p>No direct equivalent, just build the query manually and execute it</p>
-            </dd><dt><code>cache</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>cache</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>cache_attribute?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>cache_attribute?</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>cache_attributes</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>cache_attributes</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>cached_attributes</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>cached_attributes</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>changed?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>changed?</code> </td><td>
             <p><code>changed_columns.include?(column)</code></p>
-            </dd><dt><code>changes</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>changes</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>clear_active_connections!</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>clear_active_connections!</code> </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t leak connections
             like ActiveRecord, so you don&#39;t need to worry about this</p>
-            </dd><dt><code>clear_reloadable_connections!</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>clear_reloadable_connections!</code> </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t leak connections
             like ActiveRecord, so you don&#39;t need to worry about this</p>
-            </dd><dt><code>content_columns</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>content_columns</code> </td><td>
             <p>Not needed internally, you can probably do <code>Album.columns.map{|x|&#x000A;x.to_s}.delete_if{|x| x == Album.primary_key || x =~&#x000A;/_(id|count)\z/}</code></p>
-            </dd><dt><code>decrement_counter</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>decrement_counter</code> </td><td>
             <p><code>Album.where(:id=&gt;:id).update(:counter_name=&gt;Sequel.-(:counter_name,&#x000A;1))</code></p>
-            </dd><dt><code>define_attribute_methods</code>, <code>define_read_methods</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>define_attribute_methods</code>, <code>define_read_methods</code> </td><td>
             <p><code>def_column_accessor(*columns)</code>, a private method</p>
-            </dd><dt><code>descends_from_active_record?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>descends_from_active_record?</code> </td><td>
             <p>Not needed internally, if using single table inheritance,
             <code>Album.sti_dataset.model == Album</code></p>
-            </dd><dt><code>find_each</code>, <code>find_in_batches</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>find_each</code>, <code>find_in_batches</code> </td><td>
             <p>Use the <code>pagination</code> extension</p>
-            </dd><dt><code>generated_methods?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>generated_methods?</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>increment_counter</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>increment_counter</code> </td><td>
             <p><code>Album.where(:id=&gt;:id).update(:counter_name=&gt;Sequel.+(:counter_name,&#x000A;1))</code></p>
-            </dd><dt><code>instance_method_already_implemented?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>instance_method_already_implemented?</code> </td><td>
             <p>No equivalent, <a href="../../classes/Sequel.html">Sequel</a> does not
             create column accessors that override other methods, it just skips them.</p>
-            </dd><dt><code>match_attribute_method?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>match_attribute_method?</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>readonly_attributes</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>readonly_attributes</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>remove_connection</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>remove_connection</code> </td><td>
             <p>Not necessary in <a href="../../classes/Sequel.html">Sequel</a>.  If you
             want to disconnect an existing connection: <code>Album.db.disconnect</code></p>
-            </dd><dt><code>require_mysql</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>require_mysql</code> </td><td>
             <p>A public method, really?</p>
-            </dd><dt><code>silence</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>silence</code> </td><td>
             <p>No equivalent.  Because the logger is handled at the
             <code>Sequel::Database</code> level, there is no thread-safe way to turn it
             off for specific blocks.</p>
-            </dd><dt><code>scopes</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>scopes</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>sti_name</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>sti_name</code> </td><td>
             <p>No equivalent.</p>
-            </dd><dt><code>update_counters</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>update_counters</code> </td><td>
             <p><code>Album.where(:id=&gt;:id).update(:counter_name=&gt;:counter_name + 1,&#x000A;:other_counter=&gt;:other_counter - 1)</code></p>
-            </dd><dt><code>uncached</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>uncached</code> </td><td>
             <p>No equivalent</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-Instance+Methods+with+Significantly+Different+Behavior">Instance Methods with Significantly Different Behavior<span><a href="#label-Instance+Methods+with+Significantly+Different+Behavior">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -1154,7 +1042,7 @@
             
             <p>Assuming the record already exists in the database:</p>
             
-            <pre>gold_album = GoldAlbum[1]&#x000A;album = Album.load(gold_album.values)</pre>
+            <pre class="ruby"><span class="ruby-identifier">gold_album</span> = <span class="ruby-constant">GoldAlbum</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">gold_album</span>.<span class="ruby-identifier">values</span>)</pre>
             
             <p>If it is a new record:</p>
             
@@ -1164,7 +1052,7 @@
             
             <p>You can access this through the <code>db_schema</code> hash:</p>
             
-            <pre>album.db_schema[:column]</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">db_schema</span>[:<span class="ruby-identifier">column</span>]</pre>
             
             <h4 id="label-connection"><code>connection</code><span><a href="#label-connection">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -1176,7 +1064,7 @@
             
             <p>You can just modify the values hash directly:</p>
             
-            <pre>album.values[:column] ||= 0&#x000A;album.values[:column] -= 1 # or += 1 for increment</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">values</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">||=</span> <span class="ruby-value">0</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">values</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">-=</span> <span class="ruby-value">1</span> <span class="ruby-comment"># or += 1 for increment</span></pre>
             
             <h4 id="label-decrement%21%2C+increment%21"><code>decrement!</code>, <code>increment!</code><span><a href="#label-decrement%21%2C+increment%21">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -1189,7 +1077,7 @@
             
             <p>You have to check the values hash:</p>
             
-            <pre>album.values.has_key?(:column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">values</span>.<span class="ruby-identifier">has_key?</span>(:<span class="ruby-identifier">column</span>)</pre>
             
             <h4 id="label-invalid%3F"><code>invalid?</code><span><a href="#label-invalid%3F">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -1202,7 +1090,7 @@
             by setting the <code>raise_on_save_failure</code> flag on the class or
             instance:</p>
             
-            <pre>album.raise_on_save_failure = true&#x000A;album.save # raise exception if failure&#x000A;album.raise_on_save_failure = false&#x000A;album.save # return nil if failure</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># raise exception if failure</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">raise_on_save_failure</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># return nil if failure</span></pre>
             
             <p>You can pass the <code>:validate=&gt;false</code> option to not validate
             the object when saving.</p>
@@ -1211,7 +1099,7 @@
             
             <p>No equivalent, but very easy to add:</p>
             
-            <pre>album.column = !album.column</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">column</span> = <span class="ruby-operator">!</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">column</span></pre>
             
             <p>If you want to save just that column:</p>
             
@@ -1222,7 +1110,7 @@
             <p>Just like in the class, you can access the transaction method through the
             <code>db</code>:</p>
             
-            <pre>album.db.transaction{}</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>{}</pre>
             
             <h4 id="label-update_attribute"><code>update_attribute</code><span><a href="#label-update_attribute">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -1242,150 +1130,105 @@
             <p>Note that <a href="../../classes/Sequel.html">Sequel</a> uses symbols
             almost everywhere to represent columns, while ActiveRecord often returns
             columns as strings.</p>
-            <dl class="rdoc-list note-list"><dt>ActiveRecord Method 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>ActiveRecord Method </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a> Method</p>
-            </dd><dt><code>==</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>==</code> </td><td>
             <p><code>===</code>, <code>==</code> compares by all values, not just id</p>
-            </dd><dt><code>[]</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>[]</code> </td><td>
             <p><code>[]</code></p>
-            </dd><dt><code>[]=</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>[]=</code> </td><td>
             <p><code>[]=</code></p>
-            </dd><dt><code>after_create</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>after_create</code> </td><td>
             <p><code>after_create</code></p>
-            </dd><dt><code>after_destroy</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>after_destroy</code> </td><td>
             <p><code>after_destroy</code></p>
-            </dd><dt><code>after_save</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>after_save</code> </td><td>
             <p><code>after_save</code></p>
-            </dd><dt><code>after_update</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>after_update</code> </td><td>
             <p><code>after_update</code></p>
-            </dd><dt><code>after_validation</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>after_validation</code> </td><td>
             <p><code>after_validation</code></p>
-            </dd><dt><code>attributes</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attributes</code> </td><td>
             <p><code>values</code></p>
-            </dd><dt><code>attributes=</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attributes=</code> </td><td>
             <p><code>set</code></p>
-            </dd><dt><code>before_create</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>before_create</code> </td><td>
             <p><code>before_create</code></p>
-            </dd><dt><code>before_destroy</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>before_destroy</code> </td><td>
             <p><code>before_destroy</code></p>
-            </dd><dt><code>before_save</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>before_save</code> </td><td>
             <p><code>before_save</code></p>
-            </dd><dt><code>before_update</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>before_update</code> </td><td>
             <p><code>before_update</code></p>
-            </dd><dt><code>before_validation</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>before_validation</code> </td><td>
             <p><code>before_validation</code></p>
-            </dd><dt><code>cache_key</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>cache_key</code> </td><td>
             <p><code>cache_key</code>, if using the <code>caching</code> plugin</p>
-            </dd><dt><code>destroy</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>destroy</code> </td><td>
             <p><code>destroy</code></p>
-            </dd><dt><code>eql?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>eql?</code> </td><td>
             <p><code>===</code></p>
-            </dd><dt><code>errors</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>errors</code> </td><td>
             <p><code>errors</code></p>
-            </dd><dt><code>freeze</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>freeze</code> </td><td>
             <p><code>freeze</code></p>
-            </dd><dt><code>frozen?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>frozen?</code> </td><td>
             <p><code>frozen?</code></p>
-            </dd><dt><code>hash</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>hash</code> </td><td>
             <p><code>hash</code></p>
-            </dd><dt><code>id</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>id</code> </td><td>
             <p><code>pk</code></p>
-            </dd><dt><code>inspect</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>inspect</code> </td><td>
             <p><code>inspect</code></p>
-            </dd><dt><code>lock!</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>lock!</code> </td><td>
             <p><code>lock!</code></p>
-            </dd><dt><code>new_record?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>new_record?</code> </td><td>
             <p><code>new?</code></p>
-            </dd><dt><code>reload_with_autosave_associations</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>reload_with_autosave_associations</code> </td><td>
             <p><code>reload</code></p>
-            </dd><dt><code>to_param</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>to_param</code> </td><td>
             <p><code>to_param</code>, if using the <code>active_model</code> plugin</p>
-            </dd><dt><code>touch</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>touch</code> </td><td>
             <p><code>touch</code>, if using the <code>touch</code> plugin</p>
-            </dd><dt><code>valid?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>valid?</code> </td><td>
             <p><code>valid?</code></p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-Instance+Methods+without+an+Equivalent">Instance Methods without an Equivalent<span><a href="#label-Instance+Methods+without+an+Equivalent">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-            <dl class="rdoc-list note-list"><dt>ActiveRecord Method 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>ActiveRecord Method </td><td>
             <p>Notes, Workarounds</p>
-            </dd><dt><code>after_validation_on_create</code>, <code>after_validation_on_update</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>after_validation_on_create</code>, <code>after_validation_on_update</code> </td><td>
             <p>Use <code>after_validation</code> and <code>if new?</code> or <code>unless&#x000A;new?</code></p>
-            </dd><dt><code>as_json</code>, <code>from_json</code>, <code>to_json</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>as_json</code>, <code>from_json</code>, <code>to_json</code> </td><td>
             <p>Use the <code>json_serializer</code> plugin</p>
-            </dd><dt><code>from_xml</code>, <code>to_xml</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>from_xml</code>, <code>to_xml</code> </td><td>
             <p>Use the <code>xml_serializer</code> plugin</p>
-            </dd><dt><code>attribute_for_inspect</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attribute_for_inspect</code> </td><td>
             <p><code>album[:column].inspect</code></p>
-            </dd><dt><code>attribute_present?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attribute_present?</code> </td><td>
             <p><code>!album[:column].blank?</code> if using the <code>blank</code>
             extension</p>
-            </dd><dt><code>attributes_before_type_cast</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>attributes_before_type_cast</code> </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a> typecasts at a low level, so
             model objects never see values before they are type cast</p>
-            </dd><dt><code>before_validation_on_create</code>, <code>before_validation_on_update</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>before_validation_on_create</code>, <code>before_validation_on_update</code> </td><td>
             <p>Use <code>before_validation</code> and <code>if new?</code> or <code>unless&#x000A;new?</code></p>
-            </dd><dt><code>id=</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>id=</code> </td><td>
             <p><a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t have a special
             primary key setter method, but you can use:
             <code>album.send(&quot;#{Album.primary_key}=&quot;, value)</code></p>
-            </dd><dt><code>mark_for_destruction</code>, <code>marked_for_destruction?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>mark_for_destruction</code>, <code>marked_for_destruction?</code> </td><td>
             <p>Use a <code>before_save</code> or <code>after_save</code> hook or the
             <code>instance_hooks</code> plugin</p>
-            </dd><dt><code>readonly!</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>readonly!</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>readonly?</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>readonly?</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>rollback_active_record_state!</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>rollback_active_record_state!</code> </td><td>
             <p>No equivalent</p>
-            </dd><dt><code>with_transaction_returning_status</code> 
-            <dd>
+            </td></tr><tr><td class='label'><code>with_transaction_returning_status</code> </td><td>
             <p>No equivalent</p>
-            </dd></dl>
+            </td></tr></tbody></table>
           </div>
           <div id='context'>
           </div>

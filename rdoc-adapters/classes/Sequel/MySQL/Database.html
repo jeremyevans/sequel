@@ -149,35 +149,31 @@
                   
                   <p>Connect to the database.  In addition to the usual database options, the
                   following options have effect:</p>
-                  <ul><li>
-                  <p>:auto_is_null - Set to true to use MySQL default behavior of having a
-                  filter for an autoincrement column equals NULL to return the last inserted
-                  row.</p>
-                  </li><li>
-                  <p>:charset - Same as :encoding (:encoding takes precendence)</p>
-                  </li><li>
-                  <p>:compress - Set to false to not compress results from the server</p>
-                  </li><li>
-                  <p>:config_default_group - The default group to read from the in the MySQL
-                  config file.</p>
-                  </li><li>
-                  <p>:config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE option
-                  on the connection with the given value.</p>
-                  </li><li>
-                  <p>:connect_timeout - Set the timeout in seconds before a connection attempt
-                  is abandoned.</p>
-                  </li><li>
-                  <p>:encoding - Set all the related character sets for this connection
-                  (connection, client, database, server, and results).</p>
-                  </li><li>
-                  <p>:read_timeout - Set the timeout in seconds for reading back results to a
-                  query.</p>
-                  </li><li>
-                  <p>:socket - Use a unix socket file instead of connecting via TCP/IP.</p>
-                  </li><li>
-                  <p>:timeout - Set the timeout in seconds before the server will disconnect
-                  this connection (a.k.a @@wait_timeout).</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
+                  <p>Set to true to use MySQL default behavior of having a filter for an
+                  autoincrement column equals NULL to return the last inserted row.</p>
+                  </td></tr><tr><td class='label'>:charset </td><td>
+                  <p>Same as :encoding (:encoding takes precendence)</p>
+                  </td></tr><tr><td class='label'>:compress </td><td>
+                  <p>Set to false to not compress results from the server</p>
+                  </td></tr><tr><td class='label'>:config_default_group </td><td>
+                  <p>The default group to read from the in the MySQL config file.</p>
+                  </td></tr><tr><td class='label'>:config_local_infile </td><td>
+                  <p>If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with
+                  the given value.</p>
+                  </td></tr><tr><td class='label'>:connect_timeout </td><td>
+                  <p>Set the timeout in seconds before a connection attempt is abandoned.</p>
+                  </td></tr><tr><td class='label'>:encoding </td><td>
+                  <p>Set all the related character sets for this connection (connection, client,
+                  database, server, and results).</p>
+                  </td></tr><tr><td class='label'>:read_timeout </td><td>
+                  <p>Set the timeout in seconds for reading back results to a query.</p>
+                  </td></tr><tr><td class='label'>:socket </td><td>
+                  <p>Use a unix socket file instead of connecting via TCP/IP.</p>
+                  </td></tr><tr><td class='label'>:timeout </td><td>
+                  <p>Set the timeout in seconds before the server will disconnect this
+                  connection (a.k.a @@wait_timeout).</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">

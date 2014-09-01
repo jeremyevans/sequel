@@ -139,7 +139,7 @@
                   href="CreateTableGenerator.html#method-i-column">Sequel::Schema::CreateTableGenerator#column</a>
                   for the available options.</p>
                   
-                  <pre>add_column(:name, String) # ADD COLUMN name varchar(255)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">add_column</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-constant">String</span>) <span class="ruby-comment"># ADD COLUMN name varchar(255)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_column-source'); return false">
@@ -189,18 +189,17 @@
                   <p>NOTE: If you need to add a foreign key constraint to a single existing
                   column use the composite key syntax even if it is only one column.</p>
                   
-                  <pre>add_foreign_key(:artist_id, :table) # ADD COLUMN artist_id integer REFERENCES table&#x000A;add_foreign_key([:name], :table) # ADD FOREIGN KEY (name) REFERENCES table</pre>
+                  <pre class="ruby"><span class="ruby-identifier">add_foreign_key</span>(:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">table</span>) <span class="ruby-comment"># ADD COLUMN artist_id integer REFERENCES table</span>&#x000A;<span class="ruby-identifier">add_foreign_key</span>([:<span class="ruby-identifier">name</span>], :<span class="ruby-identifier">table</span>) <span class="ruby-comment"># ADD FOREIGN KEY (name) REFERENCES table</span></pre>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:not_valid 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:not_valid </td><td>
                   <p>Set to true to add the constraint with the NOT VALID syntax. This makes it
                   so that future inserts must respect referential integrity, but allows the
                   constraint to be added even if existing column values reference rows that
                   do not exist.  After all the existing data has been cleaned up,
                   validate_constraint can be used to mark the constraint as valid.  Note that
                   this option only makes sense when using an array of columns.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_foreign_key-source'); return false">
@@ -240,7 +239,7 @@
                   href="CreateTableGenerator.html#method-i-index">Sequel::Schema::CreateTableGenerator#index</a>
                   for available options.</p>
                   
-                  <pre>add_index(:artist_id) # CREATE INDEX table_artist_id_index ON table (artist_id)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">add_index</span>(:<span class="ruby-identifier">artist_id</span>) <span class="ruby-comment"># CREATE INDEX table_artist_id_index ON table (artist_id)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_index-source'); return false">
@@ -262,7 +261,7 @@
                   for the available options.  Like <code>add_foreign_key</code>, if you
                   specify the column name as an array, it just creates a constraint:</p>
                   
-                  <pre>add_primary_key(:id) # ADD COLUMN id serial PRIMARY KEY&#x000A;add_primary_key([:artist_id, :name]) # ADD PRIMARY KEY (artist_id, name)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">add_primary_key</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># ADD COLUMN id serial PRIMARY KEY</span>&#x000A;<span class="ruby-identifier">add_primary_key</span>([:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">name</span>]) <span class="ruby-comment"># ADD PRIMARY KEY (artist_id, name)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-add_primary_key-source'); return false">
@@ -341,11 +340,10 @@
                   
                   <p>Remove a constraint from the DDL for the table. MySQL/SQLite specific
                   options:</p>
-                  <dl class="rdoc-list note-list"><dt>:type 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:type </td><td>
                   <p>Set the type of constraint to drop, either :primary_key, :foreign_key, or
                   :unique.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">unique_name</span>) <span class="ruby-comment"># DROP CONSTRAINT unique_name</span>&#x000A;<span class="ruby-identifier">drop_constraint</span>(:<span class="ruby-identifier">unique_name</span>, :<span class="ruby-identifier">cascade=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># DROP CONSTRAINT unique_name CASCADE</span></pre>
                 </div>
@@ -366,18 +364,17 @@
                   
                   <p>Remove a foreign key and the associated column from the DDL for the table.
                   General options:</p>
-                  <dl class="rdoc-list note-list"><dt>:name 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name </td><td>
                   <p>The name of the constraint to drop.  If not given, uses the same name that
                   would be used by <a
                   href="AlterTableGenerator.html#method-i-add_foreign_key">#add_foreign_key</a>
                   with the same columns.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>NOTE: If you want to drop only the foreign key constraint but keep the
                   column, use the composite key syntax even if it is only one column.</p>
                   
-                  <pre>drop_foreign_key(:artist_id) # DROP CONSTRAINT table_artist_id_fkey, DROP COLUMN artist_id&#x000A;drop_foreign_key([:name]) # DROP CONSTRAINT table_name_fkey</pre>
+                  <pre class="ruby"><span class="ruby-identifier">drop_foreign_key</span>(:<span class="ruby-identifier">artist_id</span>) <span class="ruby-comment"># DROP CONSTRAINT table_artist_id_fkey, DROP COLUMN artist_id</span>&#x000A;<span class="ruby-identifier">drop_foreign_key</span>([:<span class="ruby-identifier">name</span>]) <span class="ruby-comment"># DROP CONSTRAINT table_name_fkey</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_foreign_key-source'); return false">
@@ -395,26 +392,22 @@
                 <div class='description'>
                   
                   <p>Remove an index from the DDL for the table. General options:</p>
-                  <dl class="rdoc-list note-list"><dt>:name 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name </td><td>
                   <p>The name of the index to drop.  If not given, uses the same name that would
                   be used by <a
                   href="AlterTableGenerator.html#method-i-add_index">#add_index</a> with the
                   same columns.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:cascade 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:cascade </td><td>
                   <p>Cascade the index drop to dependent objects.</p>
-                  </dd><dt>:concurrently 
-                  <dd>
+                  </td></tr><tr><td class='label'>:concurrently </td><td>
                   <p>Drop the index using CONCURRENTLY, which doesn&#39;t block operations on
                   the table.  Supported in PostgreSQL 9.2+.</p>
-                  </dd><dt>:if_exists 
-                  <dd>
+                  </td></tr><tr><td class='label'>:if_exists </td><td>
                   <p>Only drop the index if it already exists.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-identifier">drop_index</span>(:<span class="ruby-identifier">artist_id</span>) <span class="ruby-comment"># DROP INDEX table_artist_id_index</span>&#x000A;<span class="ruby-identifier">drop_index</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>]) <span class="ruby-comment"># DROP INDEX table_a_b_index</span>&#x000A;<span class="ruby-identifier">drop_index</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">foo</span>) <span class="ruby-comment"># DROP INDEX foo</span></pre>
                 </div>
@@ -435,7 +428,7 @@
                   
                   <p>Modify a column&#39;s name in the DDL for the table.</p>
                   
-                  <pre>rename_column(:name, :artist_name) # RENAME COLUMN name TO artist_name</pre>
+                  <pre class="ruby"><span class="ruby-identifier">rename_column</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">artist_name</span>) <span class="ruby-comment"># RENAME COLUMN name TO artist_name</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-rename_column-source'); return false">
@@ -454,13 +447,16 @@
                   
                   <p>Set a given column as allowing NULL values.</p>
                   
-                  <pre>set_column_allow_null(:artist_name) # ALTER COLUMN artist_name DROP NOT NULL</pre>
+                  <pre class="ruby"><span class="ruby-identifier">set_column_allow_null</span>(:<span class="ruby-identifier">artist_name</span>) <span class="ruby-comment"># ALTER COLUMN artist_name DROP NOT NULL</span></pre>
+                  
+                  <p>On MySQL, make sure to use a symbol for the name of the column, as
+                  otherwise you can lose the default and type for the column.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_allow_null-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_allow_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 483</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">allow_null</span>=<span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_null</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:null</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">allow_null</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_allow_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 492</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">allow_null</span>=<span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_null</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:null</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">allow_null</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_default'>
@@ -473,13 +469,16 @@
                   
                   <p>Modify a column&#39;s default value in the DDL for the table.</p>
                   
-                  <pre>set_column_default(:artist_name, &#39;a&#39;) # ALTER COLUMN artist_name SET DEFAULT &#39;a&#39;</pre>
+                  <pre class="ruby"><span class="ruby-identifier">set_column_default</span>(:<span class="ruby-identifier">artist_name</span>, <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># ALTER COLUMN artist_name SET DEFAULT &#39;a&#39;</span></pre>
+                  
+                  <p>On MySQL, make sure to use a symbol for the name of the column, as
+                  otherwise you can lose the type and NULL/NOT NULL setting for the column.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_default-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_default-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 465</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_default</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">default</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_default</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:default</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">default</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_default-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 468</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_default</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">default</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_default</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:default</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">default</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_not_null'>
@@ -492,13 +491,16 @@
                   
                   <p>Set a given column as not allowing NULL values.</p>
                   
-                  <pre>set_column_not_null(:artist_name) # ALTER COLUMN artist_name SET NOT NULL</pre>
+                  <pre class="ruby"><span class="ruby-identifier">set_column_not_null</span>(:<span class="ruby-identifier">artist_name</span>) <span class="ruby-comment"># ALTER COLUMN artist_name SET NOT NULL</span></pre>
+                  
+                  <p>On MySQL, make sure to use a symbol for the name of the column, as
+                  otherwise you can lose the default and type for the column.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_not_null-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_not_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 490</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_not_null</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_not_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 502</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_not_null</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_type'>
@@ -511,20 +513,23 @@
                   
                   <p>Modify a column&#39;s type in the DDL for the table.</p>
                   
-                  <pre>set_column_type(:artist_name, &#39;char(10)&#39;) # ALTER COLUMN artist_name TYPE char(10)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">set_column_type</span>(:<span class="ruby-identifier">artist_name</span>, <span class="ruby-string">&#39;char(10)&#39;</span>) <span class="ruby-comment"># ALTER COLUMN artist_name TYPE char(10)</span></pre>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:using 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:using </td><td>
                   <p>Add a USING clause that specifies how to convert existing values to new
                   values.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
+                  
+                  <p>On MySQL, make sure to use a symbol for the name of the column, as
+                  otherwise you can lose the default and NULL/NOT NULL setting for the
+                  column.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_type-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 476</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_type</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_type</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_type-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 482</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_type</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_type</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

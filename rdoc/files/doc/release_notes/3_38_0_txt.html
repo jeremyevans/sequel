@@ -44,7 +44,7 @@
             row-valued/composite types.  You can register support for specific row
             types:</p>
             
-            <pre>DB.register_row_type(:address)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_row_type</span>(:<span class="ruby-identifier">address</span>)</pre>
             
             <p>Then you can create values of that row type:</p>
             
@@ -72,22 +72,22 @@
             <p>A pg_row_ops extension has been added that adds DSL support for accessing
             members of row-valued/composite types. You first create a row op:</p>
             
-            <pre>r = Sequel.pg_row_op(:row_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_row_op</span>(:<span class="ruby-identifier">row_column</span>)</pre>
             
             <p>Then you can get DSL support for accessing members of that row_column via
             the [] method:</p>
             
-            <pre>r[:a] # (row_column).a</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-comment"># (row_column).a</span></pre>
             
             <p>This works with composite types containing composite types:</p>
             
-            <pre>r[:a][:b] # ((row_column).a).b</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>[:<span class="ruby-identifier">a</span>][:<span class="ruby-identifier">b</span>] <span class="ruby-comment"># ((row_column).a).b</span></pre>
             
             <p>When used in conjunction with the pg_array_ops extension, there is support
             for composite types that include arrays, as well as arrays of composite
             types:</p>
             
-            <pre>r[1][:a] # (row_column[1]).a&#x000A;r[:a][1] # (row_column).a[1]</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>[<span class="ruby-value">1</span>][:<span class="ruby-identifier">a</span>] <span class="ruby-comment"># (row_column[1]).a</span>&#x000A;<span class="ruby-identifier">r</span>[:<span class="ruby-identifier">a</span>][<span class="ruby-value">1</span>] <span class="ruby-comment"># (row_column).a[1]</span></pre>
             
             <p>The extension offers additional support for referencing a table&#39;s type
             when it contains a column with the same name, see the RDoc for details.</p>
@@ -128,7 +128,7 @@
             <p>Identifier#* and QualifiedIdentifier#* when called without any argument now
             represent a selection of all columns from the represented table:</p>
             
-            <pre>Sequel.expr(:table).*          # table.*&#x000A;Sequel.expr(:schema__table).*  # schema.table.*</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-operator">*</span>          <span class="ruby-comment"># table.*</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">schema__table</span>).<span class="ruby-operator">*</span>  <span class="ruby-comment"># schema.table.*</span></pre>
             
             <p>This makes it easier to represent the selection of all columns in a table
             without using the core extensions.</p>
@@ -201,7 +201,7 @@
             loaded.  All methods they added now have equivalent methods on the main <a
             href="../../../classes/Sequel.html">Sequel</a> module:</p>
             
-            <pre>Sequel.pg_array&#x000A;Sequel.pg_array_op&#x000A;Sequel.hstore&#x000A;Sequel.hstore_op&#x000A;Sequel.pg_json&#x000A;Sequel.pg_range&#x000A;Sequel.pg_range_op</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array_op</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_json</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range_op</span></pre>
             </li><li>
             <p>The Sequel::SQL::IdentifierMethods module has been removed.  This module
             was only included in Symbol if the <a
@@ -240,7 +240,7 @@
             <p>The change to make Sequel.expr split symbols can cause the following type
             of code to break:</p>
             
-            <pre>Sequel.expr(:column___alias).desc</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column___alias</span>).<span class="ruby-identifier">desc</span></pre>
             
             <p>This is because expr now returns an AliasedExpression, which doesn&#39;t
             support the desc method.  However, as you can&#39;t apply an order to an

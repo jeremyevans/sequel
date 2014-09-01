@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-06-26 09:16:03 -0700</span>
+          <span class='datetime'>2014-08-18 14:26:55 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -68,11 +68,11 @@
             connection options needed to open the database connection.  The
             scheme/protocol part of the URI is used to determine the adapter to use:</p>
             
-            <pre>DB = Sequel.connect(&#39;postgres://user:password@localhost/blog&#39;) # Uses the postgres adapter</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:password@localhost/blog&#39;</span>) <span class="ruby-comment"># Uses the postgres adapter</span></pre>
             
             <p>You can use URI query parameters to specify options:</p>
             
-            <pre>DB = Sequel.connect(&#39;postgres://localhost/blog?user=user&amp;password=password&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://localhost/blog?user=user&amp;password=password&#39;</span>)</pre>
             
             <p>You can also pass an additional option hash with the connection string:</p>
             
@@ -121,58 +121,45 @@
             <h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>These options are shared by all adapters unless otherwise noted.</p>
-            <dl class="rdoc-list note-list"><dt>:adapter 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:adapter </td><td>
             <p>The adapter to use</p>
-            </dd><dt>:database 
-            <dd>
+            </td></tr><tr><td class='label'>:database </td><td>
             <p>The name of the database to which to connect</p>
-            </dd><dt>:host 
-            <dd>
+            </td></tr><tr><td class='label'>:host </td><td>
             <p>The hostname of the database server to which to connect</p>
-            </dd><dt>:loggers 
-            <dd>
+            </td></tr><tr><td class='label'>:loggers </td><td>
             <p>An array of SQL loggers to log to</p>
-            </dd><dt>:password 
-            <dd>
+            </td></tr><tr><td class='label'>:password </td><td>
             <p>The password for the user account</p>
-            </dd><dt>:servers 
-            <dd>
+            </td></tr><tr><td class='label'>:servers </td><td>
             <p>A hash with symbol keys and hash or proc values, used with
             master/slave/partitioned database configurations</p>
-            </dd><dt>:single_threaded 
-            <dd>
+            </td></tr><tr><td class='label'>:single_threaded </td><td>
             <p>Whether to use a single-threaded (non-thread safe) connection pool</p>
-            </dd><dt>:test 
-            <dd>
+            </td></tr><tr><td class='label'>:test </td><td>
             <p>Whether to test that a valid database connection can be made (false by
             default)</p>
-            </dd><dt>:user 
-            <dd>
+            </td></tr><tr><td class='label'>:user </td><td>
             <p>The user account name to use logging in</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>The following options can be specified and are passed to the database&#39;s
             internal connection pool.</p>
-            <dl class="rdoc-list note-list"><dt>:after_connect 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:after_connect </td><td>
             <p>A callable object called after each new connection is made, with the
             connection object (and server argument if the callable accepts 2
             arguments), useful for customizations that you want to apply to all
             connections (default: nil).</p>
-            </dd><dt>:max_connections 
-            <dd>
+            </td></tr><tr><td class='label'>:max_connections </td><td>
             <p>The maximum size of the connection pool (default: 4 connections on most
             databases)</p>
-            </dd><dt>:pool_sleep_time 
-            <dd>
+            </td></tr><tr><td class='label'>:pool_sleep_time </td><td>
             <p>The number of seconds to sleep before trying to acquire a connection again
             (default: 0.001 seconds)</p>
-            </dd><dt>:pool_timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:pool_timeout </td><td>
             <p>The number of seconds to wait if a connection cannot be acquired before
             raising an error (default: 5 seconds)</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h2 id="label-Adapter+specific+connection+options">Adapter specific connection options<span><a href="#label-Adapter+specific+connection+options">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -190,27 +177,23 @@
             systems (except possibly through WINE, but that&#39;s unlikely).</p>
             
             <p>The following options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:command_timeout 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:command_timeout </td><td>
             <p>Sets the time in seconds to wait while attempting to execute a command
             before cancelling the attempt and generating an error. Specifically, it
             sets the ADO CommandTimeout property. If this property is not set, the
             default of 30 seconds is used.</p>
-            </dd><dt>:driver 
-            <dd>
+            </td></tr><tr><td class='label'>:driver </td><td>
             <p>The driver to use in the ADO connection string.  If not provided, a default
             of “SQL Server” is used.</p>
-            </dd><dt>:conn_string 
-            <dd>
+            </td></tr><tr><td class='label'>:conn_string </td><td>
             <p>The full ADO connection string.  If this is provided, the usual options are
             ignored.</p>
-            </dd><dt>:provider 
-            <dd>
+            </td></tr><tr><td class='label'>:provider </td><td>
             <p>Sets the Provider of this ADO connection (for example, “SQLOLEDB”). If you
             don&#39;t specify a provider, the default one used by WIN32OLE has major
             problems, such as creating a new native database connection for every
             query, which breaks things such as transactions and temporary tables.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Pay special attention to the :provider option, as without specifying a
             provider, many things will be broken.  The SQLNCLI10 provider appears to
@@ -227,17 +210,15 @@
             SQLite, so you don&#39;t need to install SQLite separately.  As amalgalite
             is a file backed database, the :host, :user, and :password options are not
             used.</p>
-            <dl class="rdoc-list note-list"><dt>:database 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:database </td><td>
             <p>The name of the database file</p>
-            </dd><dt>:timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:timeout </td><td>
             <p>The busy timeout period given in milliseconds</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Without a database argument, assumes a memory database, so you can do:</p>
             
-            <pre>Sequel.amalgalite</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">amalgalite</span></pre>
             
             <p>Handles paths in the connection string similar to the SQLite adapter, so
             see the sqlite section below for details.</p>
@@ -259,11 +240,10 @@
             
             <p>Allows access to a multitude of databases via ruby-dbi.  Additional
             options:</p>
-            <dl class="rdoc-list note-list"><dt>:db_type 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:db_type </td><td>
             <p>Specifying &#39;mssql&#39; allows Microsoft SQL Server specific syntax to
             be used.  Otherwise has no effect.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>DBI connection strings are a preprocessed a bit, and are specified with a
             dbi- in front of the protocol.  Examples:</p>
@@ -311,11 +291,11 @@
             <p>Does not support the :host or :port options.  Depending on the
             configuration of your server it may be necessary to either set</p>
             
-            <pre>DB.quote_identifier = false</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifier</span> = <span class="ruby-keyword">false</span></pre>
             
             <p>or set</p>
             
-            <pre>export DELIMIDENT=y</pre>
+            <pre class="ruby"><span class="ruby-identifier">export</span> <span class="ruby-constant">DELIMIDENT</span>=<span class="ruby-identifier">y</span></pre>
             
             <p>in the scripts environment.</p>
             
@@ -359,24 +339,21 @@
             <pre>jdbc:jndi:java:comp/env/jndi_resource_name</pre>
             
             <p>The following additional options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:convert_types 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:convert_types </td><td>
             <p>If set to false, does not attempt to convert some Java types to ruby types.
             Setting to false roughly doubles performance when selecting large numbers
             of rows. Note that you can&#39;t provide this option inside the connection
             string (as that is passed directly to JDBC), you have to pass it as a
             separate option.</p>
-            </dd><dt>:driver 
-            <dd>
+            </td></tr><tr><td class='label'>:driver </td><td>
             <p>Specify the Java driver class to use to connect to the database.  This only
             has an effect if the database type is not recognized from the connection
             string, and only helps cases where
             <code>java.sql.DriverManager.getConnection</code> does not return a
             connection.</p>
-            </dd><dt>:login_timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:login_timeout </td><td>
             <p>Set the login timeout on the JDBC connection (in seconds).</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -386,51 +363,39 @@
             ship with ActiveRecord, it requires the native adapter.</p>
             
             <p>The following additional options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:auto_is_null 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
             <p>If set to true, makes “WHERE primary_key IS NULL” select the last inserted
             id.</p>
-            </dd><dt>:charset 
-            <dd>
+            </td></tr><tr><td class='label'>:charset </td><td>
             <p>Same as :encoding, :encoding takes precedence.</p>
-            </dd><dt>:compress 
-            <dd>
+            </td></tr><tr><td class='label'>:compress </td><td>
             <p>Whether to compress data sent/received via the socket connection.</p>
-            </dd><dt>:config_default_group 
-            <dd>
+            </td></tr><tr><td class='label'>:config_default_group </td><td>
             <p>The default group to read from the in the MySQL config file.</p>
-            </dd><dt>:config_local_infile 
-            <dd>
+            </td></tr><tr><td class='label'>:config_local_infile </td><td>
             <p>If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with
             the given value.</p>
-            </dd><dt>:encoding 
-            <dd>
+            </td></tr><tr><td class='label'>:encoding </td><td>
             <p>Specify the encoding/character set to use for the connection.</p>
-            </dd><dt>:fractional_seconds 
-            <dd>
+            </td></tr><tr><td class='label'>:fractional_seconds </td><td>
             <p>On MySQL 5.6.5+, this option is recognized and will include fractional
             seconds in time/timestamp values, as well as have the schema method create
             columns that can contain fractional seconds by deafult.  This option is
             also supported on other adapters that connect to MySQL.</p>
-            </dd><dt>:socket 
-            <dd>
+            </td></tr><tr><td class='label'>:socket </td><td>
             <p>Can be used to specify a Unix socket file to connect to instead of a TCP
             host and port.</p>
-            </dd><dt>:sql_mode 
-            <dd>
+            </td></tr><tr><td class='label'>:sql_mode </td><td>
             <p>Set the sql_mode(s) for a given connection.  Can be single symbol or
             string, or an array of symbols or strings (e.g.
             <code>:sql_mode=&gt;[:no_zero_date, :pipes_as_concat]</code>).</p>
-            </dd><dt>:timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:timeout </td><td>
             <p>Sets the wait_timeout for the connection, defaults to 1 month.</p>
-            </dd><dt>:read_timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:read_timeout </td><td>
             <p>Set the timeout in seconds for reading back results to a query.</p>
-            </dd><dt>:connect_timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:connect_timeout </td><td>
             <p>Set the timeout in seconds before a connection attempt is abandoned.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -440,11 +405,10 @@
             :read_timeout and :connect_timeout.</p>
             
             <p>The following additional options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:flags 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:flags </td><td>
             <p>Override the flags to use for the connection (e.g.
             ::Mysql2::Client::MULTI_STATEMENTS)</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -458,16 +422,14 @@
             
             <p>The :host and :port options are not respected. The following additional
             options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:db_type 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:db_type </td><td>
             <p>Can be specified as &#39;mssql&#39;, &#39;progress&#39;, or &#39;db2&#39;
             to use SQL syntax specific to those databases.</p>
-            </dd><dt>:drvconnect 
-            <dd>
+            </td></tr><tr><td class='label'>:drvconnect </td><td>
             <p>Can be given an ODBC connection string, and will use
             ODBC::Database#drvconnect to do the connection.  Typical usage would be:
             <code>Sequel.odbc(:drvconnect=&gt;&#39;driver={...};...&#39;)</code></p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-openbase+">openbase <span><a href="#label-openbase+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -478,19 +440,16 @@
             <p>Requires: oci8</p>
             
             <p>The following additional options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:autosequence 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:autosequence </td><td>
             <p>Set to true to use Sequel&#39;s conventions to guess the sequence to use
             for datasets.  False by default.</p>
-            </dd><dt>:prefetch_rows 
-            <dd>
+            </td></tr><tr><td class='label'>:prefetch_rows </td><td>
             <p>The number of rows to prefetch.  Defaults to 100, a larger number can be
             specified and may improve performance when retrieving a large number of
             rows.</p>
-            </dd><dt>:privilege 
-            <dd>
+            </td></tr><tr><td class='label'>:privilege </td><td>
             <p>The Oracle privilege level.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -507,59 +466,54 @@
             to install sequel_pg.</p>
             
             <p>The following additional options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:charset 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:charset </td><td>
             <p>Same as :encoding, :encoding takes precedence</p>
-            </dd><dt>:convert_infinite_timestamps 
-            <dd>
+            </td></tr><tr><td class='label'>:convert_infinite_timestamps </td><td>
             <p>Whether infinite timestamps/dates should be converted on retrieval.  By
             default, no conversion is done, so an error is raised if you attempt to
             retrieve an infinite timestamp/date.  You can set this to :nil to convert
             to nil, :string to leave as a string, or :float to convert to an infinite
             float.</p>
-            </dd><dt>:connect_timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:connect_timeout </td><td>
             <p>Set the number of seconds to wait for a connection (default 20, only
             respected if using the pg library).</p>
-            </dd><dt>:encoding 
-            <dd>
+            </td></tr><tr><td class='label'>:encoding </td><td>
             <p>Set the client_encoding to the given string</p>
-            </dd><dt>:notice_receiver 
-            <dd>
+            </td></tr><tr><td class='label'>:notice_receiver </td><td>
             <p>A proc that be called with the PGresult objects that have notice or warning
             messages. The default notice receiver just prints the messages to stderr,
             but this can be used to handle notice/warning messages differently.  Only
             respected if using the pg library).</p>
-            </dd><dt>:sslmode 
-            <dd>
+            </td></tr><tr><td class='label'>:sslmode </td><td>
             <p>Set to &#39;disable&#39;, &#39;allow&#39;, &#39;prefer&#39;,
             &#39;require&#39; to choose how to treat SSL (only respected if using the
             pg library)</p>
-            </dd><dt>:use_iso_date_format 
-            <dd>
+            </td></tr><tr><td class='label'>:search_path </td><td>
+            <p>Set to the schema search_path.  This can either be a single string
+            containing the schemas separated by commas (for use via a URL:
+            <code>postgres:///?search_path=schema1,schema2</code>), or it can be an
+            array of strings (for use via an option:
+            <code>Sequel.postgres(:search_path=&gt;[&#39;schema1&#39;,&#x000A;&#39;schema2&#39;])</code>).</p>
+            </td></tr><tr><td class='label'>:use_iso_date_format </td><td>
             <p>This can be set to false to not force the ISO date format.  <a
             href="../../classes/Sequel.html">Sequel</a> forces it by default to allow
             for an optimization.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-sqlanywhere">sqlanywhere<span><a href="#label-sqlanywhere">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>The sqlanywhere driver works off connection strings, so a connection string
             is built based on the url/options hash provided.  The following additional
             options are respected:</p>
-            <dl class="rdoc-list note-list"><dt>:commlinks 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:commlinks </td><td>
             <p>specify the CommLinks connection string option</p>
-            </dd><dt>:conn_string 
-            <dd>
+            </td></tr><tr><td class='label'>:conn_string </td><td>
             <p>specify the connection string to use, ignoring all other options</p>
-            </dd><dt>:connection_name 
-            <dd>
+            </td></tr><tr><td class='label'>:connection_name </td><td>
             <p>specify the ConnectionName connection string option</p>
-            </dd><dt>:encoding 
-            <dd>
+            </td></tr><tr><td class='label'>:encoding </td><td>
             <p>specify the CharSet connection string option</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-sqlite">sqlite<span><a href="#label-sqlite">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -570,16 +524,14 @@
             
             <p>Examples:</p>
             
-            <pre># In Memory databases:&#x000A;Sequel.sqlite&#x000A;Sequel.connect(&#39;sqlite:/&#39;) &#x000A;Sequel.sqlite(&#39;:memory:&#39;)&#x000A;# Relative Path&#x000A;Sequel.sqlite(&#39;blog.db&#39;)&#x000A;Sequel.sqlite(&#39;./blog.db&#39;)&#x000A;Sequel.connect(&#39;sqlite://blog.db&#39;)&#x000A;&#x000A;# Absolute Path&#x000A;Sequel.sqlite(&#39;/var/sqlite/blog.db&#39;)&#x000A;Sequel.connect(&#39;sqlite:///var/sqlite/blog.db&#39;)</pre>
+            <pre class="ruby"><span class="ruby-comment"># In Memory databases:</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:/&#39;</span>) &#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;:memory:&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Relative Path</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;./blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Absolute Path</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">sqlite</span>(<span class="ruby-string">&#39;/var/sqlite/blog.db&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite:///var/sqlite/blog.db&#39;</span>)</pre>
             
             <p>The following additional options are supported:</p>
-            <dl class="rdoc-list note-list"><dt>:readonly 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:readonly </td><td>
             <p>open database in read-only mode</p>
-            </dd><dt>:timeout 
-            <dd>
+            </td></tr><tr><td class='label'>:timeout </td><td>
             <p>the busy timeout to use in milliseconds (default: 5000).</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-swift">swift<span><a href="#label-swift">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -614,18 +566,16 @@
             details.</p>
             
             <p>Other <a href="../../classes/Sequel.html">Sequel</a> specific options:</p>
-            <dl class="rdoc-list note-list"><dt>:server_version 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server_version </td><td>
             <p>Override the server version to use (9000000 = SQL Server 2005). This also
             works on any other adapter that connects to Microsoft SQL Server.</p>
-            </dd><dt>:textsize 
-            <dd>
+            </td></tr><tr><td class='label'>:textsize </td><td>
             <p>Override the default TEXTSIZE setting for this connection.  The FreeTDS
             default is small (around 64000 bytes), but can be set up to around 2GB.
             This should be specified as an integer.  If you plan on setting large text
             or blob values via tinytds, you should use this option or modify your
             freetds.conf file.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>The <a href="../../classes/Sequel.html">Sequel</a> tinytds adapter requires
             tiny_tds &gt;= 0.4.5, and if you are using FreeTDS 0.91, you must at least

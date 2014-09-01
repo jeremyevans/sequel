@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-16 09:40:34 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:17 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -67,7 +67,7 @@
             
             <p>Then, the code to retrieve albums related to the artist is simpler:</p>
             
-            <pre>@artist.albums</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums</span></pre>
             
             <p>As is the code to add a related album to an artist:</p>
             
@@ -76,7 +76,7 @@
             <p>It also makes it easier to creating queries that use joins based on the
             association:</p>
             
-            <pre>Artist.association_join(:albums)&#x000A;# SELECT * FROM artists&#x000A;# INNER JOIN albums ON (albums.artist_id = artists.id)</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">association_join</span>(:<span class="ruby-identifier">albums</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># INNER JOIN albums ON (albums.artist_id = artists.id)</span></pre>
             
             <h2 id="label-The+Types+of+Associations">The Types of Associations<span><a href="#label-The+Types+of+Associations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -163,7 +163,7 @@
             
             <p>However, if your schema looks like:</p>
             
-            <pre># Database schema:&#x000A;#  artists            albums&#x000A;#   :id   &lt;----\       :id&#x000A;#   :name       \----- :artistid # Note missing underscore&#x000A;#                      :name</pre>
+            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  artists            albums</span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\       :id</span>&#x000A;<span class="ruby-comment">#   :name       \----- :artistid # Note missing underscore</span>&#x000A;<span class="ruby-comment">#                      :name</span></pre>
             
             <p>Then the default :key option will not be correct.  To fix this, you need to
             specify an explicit :key option:</p>
@@ -207,7 +207,7 @@
             <p>All associations are going to have an instance method added with the same
             name as the association:</p>
             
-            <pre>@artist.albums&#x000A;@album.artists</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span></pre>
             
             <p>many_to_one and one_to_one associations will also have a setter method
             added to change the associated object:</p>
@@ -225,7 +225,7 @@
             
             <p>Examples:</p>
             
-            <pre>@artist.add_album(@album)&#x000A;@artist.remove_album(@album)&#x000A;@artist.remove_all_albums</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_all_albums</span></pre>
             
             <p>one_through_one associations do not have any modification methods added.</p>
             
@@ -233,22 +233,22 @@
             
             <p>Associations are cached after being retrieved:</p>
             
-            <pre>@artist.album # Not cached - Database Query&#x000A;@artist.album # Cached - No Database Query&#x000A;@album.artists # Not cached - Database Query&#x000A;@album.artists # Cached - No Database Query</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">album</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">album</span> <span class="ruby-comment"># Cached - No Database Query</span>&#x000A;&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span></pre>
             
             <p>You can choose to ignore the cached versions and do a database query to
             retrieve results by passing a true argument to the association method:</p>
             
-            <pre>@album.artists # Not cached - Database Query&#x000A;@album.artists # Cached - No Database Query&#x000A;@album.artists(true) # Ignore cache - Database Query</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-keyword">true</span>) <span class="ruby-comment"># Ignore cache - Database Query</span></pre>
             
             <p>If you reload/refresh the object, it will automatically clear the
             associations cache for the object:</p>
             
-            <pre>@album.artists # Not cached - Database Query&#x000A;@album.artists # Cached - No Database Query&#x000A;@album.reload&#x000A;@album.artists # Not Cached - Database Query</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">reload</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not Cached - Database Query</span></pre>
             
             <p>If you want direct access to the associations cache, use the associations
             instance method:</p>
             
-            <pre>@album.associations # {}&#x000A;@album.associations[:artists] # nil&#x000A;@album.artists # [&lt;Artist ...&gt;, ...]&#x000A;@album.associations[:artists] # [&lt;Artist ...&gt;, ...]</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">associations</span> <span class="ruby-comment"># {}</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">artists</span>] <span class="ruby-comment"># nil</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># [&lt;Artist ...&gt;, ...]</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">artists</span>] <span class="ruby-comment"># [&lt;Artist ...&gt;, ...]</span></pre>
             
             <h2 id="label-Dataset+Method">Dataset Method<span><a href="#label-Dataset+Method">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -256,18 +256,18 @@
             ending in <code>_dataset</code> that returns a dataset representing the
             objects in the associated table:</p>
             
-            <pre>@album.artist_id&#x000A;# 10&#x000A;@album.artist_dataset&#x000A;# SELECT * FROM artists WHERE (id = 10) LIMIT 1&#x000A;@artist.id&#x000A;# 20&#x000A;@artist.albums_dataset&#x000A;# SELECT * FROM albums WHERE (artist_id = 20)</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist_id</span>&#x000A;<span class="ruby-comment"># 10</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist_dataset</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id = 10) LIMIT 1</span>&#x000A;&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">id</span>&#x000A;<span class="ruby-comment"># 20</span>&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums_dataset</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (artist_id = 20)</span></pre>
             
             <p>The association dataset is just like any other <a
             href="../../classes/Sequel.html">Sequel</a> dataset, in that it can be
             further filtered, ordered, etc.:</p>
             
-            <pre>@artist.albums_dataset.&#x000A; where(Sequel.like(:name, &#39;A%&#39;)).&#x000A; order(:copies_sold).&#x000A; limit(10)&#x000A;# SELECT * FROM albums&#x000A;# WHERE ((artist_id = 20) AND (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;))&#x000A;# ORDER BY copies_sold LIMIT 10</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums_dataset</span>.&#x000A; <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>)).&#x000A; <span class="ruby-identifier">order</span>(:<span class="ruby-identifier">copies_sold</span>).&#x000A; <span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># WHERE ((artist_id = 20) AND (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;))</span>&#x000A;<span class="ruby-comment"># ORDER BY copies_sold LIMIT 10</span></pre>
             
             <p>Records retrieved using the <code>_dataset</code> method are not cached in
             the associations cache.</p>
             
-            <pre>@album.artists_dataset.all # [&lt;Artist ...&gt;, ...]&#x000A;@album.associations[:artists] # nil</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists_dataset</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># [&lt;Artist ...&gt;, ...]</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">associations</span>[:<span class="ruby-identifier">artists</span>] <span class="ruby-comment"># nil</span></pre>
             
             <h2 id="label-Dynamic+Association+Modification">Dynamic Association Modification<span><a href="#label-Dynamic+Association+Modification">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -290,7 +290,7 @@
             can also use associated objects in filters.  For example, to get all albums
             for a given artist, you would usually do:</p>
             
-            <pre>@artist.albums&#x000A;# or @artist.albums_dataset for a dataset</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-comment"># or @artist.albums_dataset for a dataset</span></pre>
             
             <p>You can also do the following:</p>
             
@@ -347,7 +347,7 @@
             
             <p>Or the array form of condition specifiers:</p>
             
-            <pre>Album.where([[:tags, @tag1], [:tags, @tag2]])</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>([[:<span class="ruby-identifier">tags</span>, <span class="ruby-ivar">@tag1</span>], [:<span class="ruby-identifier">tags</span>, <span class="ruby-ivar">@tag2</span>]])</pre>
             
             <p>These will return albums associated with both @tag1 and @tag2.</p>
             
@@ -395,20 +395,20 @@
             
             <p>You probably want the following database schema:</p>
             
-            <pre>#  albums             artists&#x000A;#   :id           /--&gt; :id&#x000A;#   :artist_id --/     :name&#x000A;#   :name</pre>
+            <pre class="ruby"><span class="ruby-comment">#  albums             artists</span>&#x000A;<span class="ruby-comment">#   :id           /--&gt; :id</span>&#x000A;<span class="ruby-comment">#   :artist_id --/     :name</span>&#x000A;<span class="ruby-comment">#   :name</span></pre>
             
             <p>Which could be created using the following <a
             href="../../classes/Sequel.html">Sequel</a> code:</p>
             
-            <pre>DB.create_table(:artists) do&#x000A;  # Primary key must be set explicitly&#x000A;  primary_key :id&#x000A;  String :name&#x000A;end&#x000A;DB.create_table(:albums) do&#x000A;  primary_key :id&#x000A;  # Table that foreign key references needs to be set explicitly&#x000A;  # for a database foreign key reference to be created.&#x000A;  foreign_key :artist_id, :artists&#x000A;  String :name&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-comment"># Primary key must be set explicitly</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-comment"># Table that foreign key references needs to be set explicitly</span>&#x000A;  <span class="ruby-comment"># for a database foreign key reference to be created.</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>If you already had a schema such as:</p>
             
-            <pre># Database schema:&#x000A;#  albums             artists&#x000A;#   :id                :id&#x000A;#   :name              :name</pre>
+            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums             artists</span>&#x000A;<span class="ruby-comment">#   :id                :id</span>&#x000A;<span class="ruby-comment">#   :name              :name</span></pre>
             
             <p>Then you just need to add the column:</p>
             
-            <pre>DB.alter_table(:albums) do&#x000A;  add_foreign_key :artist_id, :artists&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-many_to_many">many_to_many<span><a href="#label-many_to_many">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -421,12 +421,12 @@
             <p>The default join table name would be <code>albums_artists</code>, not
             <code>artists_albums</code>, because:</p>
             
-            <pre>[&quot;artists&quot;, &quot;albums&quot;].sort.join(&#39;_&#39;)&#x000A;# &quot;albums_artists&quot;</pre>
+            <pre class="ruby">[<span class="ruby-string">&quot;artists&quot;</span>, <span class="ruby-string">&quot;albums&quot;</span>].<span class="ruby-identifier">sort</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;_&#39;</span>)&#x000A;<span class="ruby-comment"># &quot;albums_artists&quot;</span></pre>
             
             <p>Assume you already had the albums and artists tables created, and you just
             wanted to add an albums_artists join table to create the following schema:</p>
             
-            <pre># Database schema:&#x000A;#  albums &#x000A;#   :id   &lt;----\ &#x000A;#   :name       \     albums_artists&#x000A;#                \---- :album_id&#x000A;#  artists       /---- :artist_id&#x000A;#   :id   &lt;-----/&#x000A;#   :name</pre>
+            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  albums </span>&#x000A;<span class="ruby-comment">#   :id   &lt;----\ </span>&#x000A;<span class="ruby-comment">#   :name       \     albums_artists</span>&#x000A;<span class="ruby-comment">#                \---- :album_id</span>&#x000A;<span class="ruby-comment">#  artists       /---- :artist_id</span>&#x000A;<span class="ruby-comment">#   :id   &lt;-----/</span>&#x000A;<span class="ruby-comment">#   :name</span></pre>
             
             <p>You could use the following <a href="../../classes/Sequel.html">Sequel</a>
             code:</p>
@@ -470,13 +470,13 @@
             <em>association</em> method returns either the single object associated, or
             nil if no object is associated.</p>
             
-            <pre>@artist = @album.artist</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span> = <span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist</span></pre>
             
             <p>For <code>one_to_many</code> and <code>many_to_many</code> associations,
             the <em>association</em> method returns an array of associated objects,
             which may be empty if no objects are currently associated.</p>
             
-            <pre>@albums = @artist.albums</pre>
+            <pre class="ruby"><span class="ruby-ivar">@albums</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums</span></pre>
             
             <h3 id="label-association%3D%28object_to_associate%29+%28e.g.+artist%3D%29+%5Bmany_to_one+and+one_to_one%5D"><em>association</em>=(object_to_associate) (e.g. artist=) [<code>many_to_one</code> and <code>one_to_one</code>]<span><a href="#label-association%3D%28object_to_associate%29+%28e.g.+artist%3D%29+%5Bmany_to_one+and+one_to_one%5D">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -485,7 +485,7 @@
             this sets the foreign key for the current object to point to the associated
             object&#39;s primary key.</p>
             
-            <pre>@album.artist = @artist</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist</span> = <span class="ruby-ivar">@artist</span></pre>
             
             <p>For <code>one_to_one</code> associations, this sets the foreign key of the
             associated object to the primary key value of the current object.</p>
@@ -505,14 +505,14 @@
             and associated objects.  Note that the singular form of the association
             name is used in this method.</p>
             
-            <pre>@artist.add_album(@album)</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-ivar">@album</span>)</pre>
             
             <p>In addition to passing an actual associated object, you can pass a hash,
             and a new associated object will be created from them:</p>
             
             <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>) <span class="ruby-comment"># creates Album object</span></pre>
             
-            <p>The add_<em>association</em> method returns the now associated object:</p>
+            <p>The add_<em>association</em> method returns the new associated object:</p>
             
             <pre class="ruby"><span class="ruby-ivar">@album</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>)</pre>
             
@@ -533,13 +533,13 @@
             matching row in the join table. Similar to the add_<em>association</em>
             method, the singular form of the association name is used in this method.</p>
             
-            <pre>@artist.remove_album(@album)</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-ivar">@album</span>)</pre>
             
             <p>Note that this does not delete <code>@album</code> from the database, it
             only disassociates it from the <code>@artist</code>.  To delete
             <code>@album</code> from the database:</p>
             
-            <pre>@album.destroy</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">destroy</span></pre>
             
             <p>The add_<em>association</em> and remove_<em>association</em> methods should
             be thought of as adding and removing from the association, not from the
@@ -548,7 +548,7 @@
             <p>In addition to passing the object directly to remove_<em>association</em>,
             you can also pass the associated object&#39;s primary key:</p>
             
-            <pre>@artist.remove_album(10)</pre>
+            <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-value">10</span>)</pre>
             
             <p>This will look up the associated object using the key, and remove that
             album.</p>
@@ -556,7 +556,7 @@
             <p>The remove_<em>association</em> method returns the now disassociated
             object:</p>
             
-            <pre>@album = @artist.remove_album(10)</pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-value">10</span>)</pre>
             
             <h3 id="label-remove_all_association+%28e.g.+remove_all_albums%29+%5Bone_to_many+and+many_to_many%5D">remove_all_<em>association</em> (e.g. remove_all_albums) [<code>one_to_many</code> and <code>many_to_many</code>]<span><a href="#label-remove_all_association+%28e.g.+remove_all_albums%29+%5Bone_to_many+and+many_to_many%5D">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -570,7 +570,7 @@
             the number of rows updated for <code>one_to_many</code> associations and
             the number of rows deleted for <code>many_to_many</code> associations:</p>
             
-            <pre>@rows_modified = @artist.remove_all_albums</pre>
+            <pre class="ruby"><span class="ruby-ivar">@rows_modified</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_all_albums</span></pre>
             
             <h3 id="label-association_dataset+%28e.g.+albums_dataset%29"><em>association</em>_dataset (e.g. albums_dataset)<span><a href="#label-association_dataset+%28e.g.+albums_dataset%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -579,12 +579,12 @@
             href="../../classes/Sequel.html">Sequel</a> dataset, in that it can be
             filtered, ordered, etc.:</p>
             
-            <pre>ds = @artist.albums_dataset.where(Sequel.like(:name, &#39;A%&#39;)).order(:copies_sold)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">copies_sold</span>)</pre>
             
             <p>Unlike most other <a href="../../classes/Sequel.html">Sequel</a> datasets,
             association datasets have a couple of added methods:</p>
             
-            <pre>ds.model_object # @artist&#x000A;ds.association_reflection # same as Artist.association_reflection(:albums)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">model_object</span> <span class="ruby-comment"># @artist</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">association_reflection</span> <span class="ruby-comment"># same as Artist.association_reflection(:albums)</span></pre>
             
             <p>For a more info on Sequel&#39;s reflection capabilities see the <a
             href="reflection_rdoc.html">Reflection page</a>.</p>
@@ -625,21 +625,21 @@
             
             <h3 id="label-_add_association+%28%3Aadder+option%29">_add_<em>association</em> (:adder option)<span><a href="#label-_add_association+%28%3Aadder+option%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
-            <p>Continuing with the same example, here&#39;s how would you handle the same
+            <p>Continuing with the same example, here&#39;s how you would handle the same
             case if you also wanted to handle the Artist#add_album method:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">_add_album</span>(<span class="ruby-identifier">album</span>)&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">artist_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">id</span>, :<span class="ruby-identifier">file_under=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">&quot;#{name}-#{album.name}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-_remove_association+%28%3Aremover+option%29">_remove_<em>association</em> (:remover option)<span><a href="#label-_remove_association+%28%3Aremover+option%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
-            <p>Continuing with the same example, here&#39;s how would you handle the same
+            <p>Continuing with the same example, here&#39;s how you would handle the same
             case if you also wanted to handle the Artist#remove_album method:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">_remove_album</span>(<span class="ruby-identifier">album</span>)&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">artist_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">file_under=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-_remove_all_association+%28%3Aclearer+option%29">_remove_all_<em>association</em> (:clearer option)<span><a href="#label-_remove_all_association+%28%3Aclearer+option%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
-            <p>Continuing with the same example, here&#39;s how would you handle the same
+            <p>Continuing with the same example, here&#39;s how you would handle the same
             case if you also wanted to handle the Artist#remove_all_albums method:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">_remove_all_albums</span>&#x000A;    <span class="ruby-comment"># This is Dataset#update, not Model#update, so the :file_under=&gt;:name</span>&#x000A;    <span class="ruby-comment"># ends up being &quot;SET file_under = name&quot; in SQL.</span>&#x000A;    <span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">artist_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">file_under=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
@@ -667,7 +667,7 @@
             based on the name of the association.  If a *_to_many association is used,
             uses the singular form of the association name.  For example:</p>
             
-            <pre>Album.many_to_one :artist # guesses Artist&#x000A;Artist.one_to_many :albums # guesses Album</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span> <span class="ruby-comment"># guesses Artist</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span> <span class="ruby-comment"># guesses Album</span></pre>
             
             <p>However, for more complex associations, especially ones that add additional
             filters beyond the foreign/primary key relationships, the default class
@@ -682,10 +682,10 @@
             
             <h4 id="label-%3Akey">:key<span><a href="#label-%3Akey">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p>For <code>many_to_one</code> associations, is the foreign_key in current
-            model&#39;s table that references associated model&#39;s primary key, as a
-            symbol.  Defaults to :<em>association</em>_id.  Can use an array of symbols
-            for a composite key association.</p>
+            <p>For <code>many_to_one</code> associations, this is the foreign_key in the
+            current model&#39;s table that references the associated model&#39;s
+            primary key as a symbol. Defaults to :<em>association</em>_id.  Can use an
+            array of symbols for a composite key association.</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span> <span class="ruby-comment"># :key=&gt;:artist_id</span></pre>
             
@@ -1079,7 +1079,7 @@
             <p>You can override this option on a per-graph basis by specifying the
             association as an SQL::AliasedExpression instead of a symbol:</p>
             
-            <pre>Album.eager_graph(Sequel.as(:artist, :a))</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">eager_graph</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">a</span>))</pre>
             
             <h4 id="label-%3Aeager_grapher">:eager_grapher<span><a href="#label-%3Aeager_grapher">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -1090,29 +1090,23 @@
             
             <p>If specified, should be a proc that accepts a single hash argument, which
             will contain at least the following keys:</p>
-            <dl class="rdoc-list note-list"><dt>:callback 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:callback </td><td>
             <p>A callback proc used to dynamically modify the dataset to graph into the
             current dataset, before such graphing is done. This is nil if no callback
             proc is used.</p>
-            </dd><dt>:implicit_qualifier 
-            <dd>
+            </td></tr><tr><td class='label'>:implicit_qualifier </td><td>
             <p>The alias that was used for the current table (since you can cascade
             associations).</p>
-            </dd><dt>:join_type 
-            <dd>
+            </td></tr><tr><td class='label'>:join_type </td><td>
             <p>Override the join type to use when graphing.</p>
-            </dd><dt>:limit_strategy 
-            <dd>
+            </td></tr><tr><td class='label'>:limit_strategy </td><td>
             <p>The limit strategy symbol to use when graphing (for limited associations
             only)</p>
-            </dd><dt>:self 
-            <dd>
+            </td></tr><tr><td class='label'>:self </td><td>
             <p>The dataset that is doing the eager loading</p>
-            </dd><dt>:table_alias 
-            <dd>
+            </td></tr><tr><td class='label'>:table_alias </td><td>
             <p>An alias to use for the table to graph for this association.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Example:</p>
             
@@ -1253,21 +1247,21 @@
             
             <h4 id="label-%3Aadder+%5B%2A_to_many+associations%5D">:adder [*_to_many associations]<span><a href="#label-%3Aadder+%5B%2A_to_many+associations%5D">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p>Continuing with the same example, here&#39;s how would you handle the same
+            <p>Continuing with the same example, here&#39;s how you would handle the same
             case if you also wanted to handle the Artist#add_album method:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">adder=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">artist_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">id</span>, :<span class="ruby-identifier">file_under=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">&quot;#{name}-#{album.name}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h4 id="label-%3Aremover+%5B%2A_to_many+associations%5D">:remover [*_to_many associations]<span><a href="#label-%3Aremover+%5B%2A_to_many+associations%5D">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p>Continuing with the same example, here&#39;s how would you handle the same
+            <p>Continuing with the same example, here&#39;s how you would handle the same
             case if you also wanted to handle the Artist#remove_album method:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">remover=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">album</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">artist_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">file_under=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">album</span>.<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h4 id="label-%3Aclearer+%5B%2A_to_many+associations%5D">:clearer [*_to_many associations]<span><a href="#label-%3Aclearer+%5B%2A_to_many+associations%5D">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
-            <p>Continuing with the same example, here&#39;s how would you handle the same
+            <p>Continuing with the same example, here&#39;s how you would handle the same
             case if you also wanted to handle the Artist#remove_all_albums method:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">clearer=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">proc</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">artist_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">nil</span>, :<span class="ruby-identifier">file_under=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-keyword">end</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
@@ -1297,7 +1291,7 @@
             <p>In addition to the one_to_many retrieval case, the association modification
             methods affect the reciprocals as well:</p>
             
-            <pre># Sets the cached artist association for @album to @artist&#x000A;@artist.add_album(@album)&#x000A;# Sets the cached artist association for @album to nil&#x000A;@artist.remove_album(@album)&#x000A;&#x000A;# Sets the cached artist association to nil for the @artist&#39;s&#x000A;# cached albums association&#x000A;@artist.remove_all_albums&#x000A;&#x000A;# Remove @album from the artist1&#39;s cached albums association, and add @album&#x000A;# to @artist2&#39;s cached albums association.&#x000A;@album.artist # @artist1&#x000A;@album.artist = @artist2</pre>
+            <pre class="ruby"><span class="ruby-comment"># Sets the cached artist association for @album to @artist</span>&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;&#x000A;<span class="ruby-comment"># Sets the cached artist association for @album to nil</span>&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;&#x000A;<span class="ruby-comment"># Sets the cached artist association to nil for the @artist&#39;s</span>&#x000A;<span class="ruby-comment"># cached albums association</span>&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_all_albums</span>&#x000A;&#x000A;<span class="ruby-comment"># Remove @album from the artist1&#39;s cached albums association, and add @album</span>&#x000A;<span class="ruby-comment"># to @artist2&#39;s cached albums association.</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist</span> <span class="ruby-comment"># @artist1</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artist</span> = <span class="ruby-ivar">@artist2</span></pre>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> can usually guess the
             correct reciprocal, but if you have multiple associations to the same
@@ -1385,22 +1379,18 @@
             href="../../classes/Sequel.html">Sequel</a> choose which strategy to use
             (this is the default).  You can specify a symbol to manually choose a
             strategy.  The available strategies are:</p>
-            <dl class="rdoc-list note-list"><dt>:union 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:union </td><td>
             <p>Uses one or more UNION queries with a subquery for each record you are
             eagerly loading for (this is the default strategy).</p>
-            </dd><dt>:distinct_on 
-            <dd>
+            </td></tr><tr><td class='label'>:distinct_on </td><td>
             <p>Uses DISTINCT ON to ensure only the first matching record is loaded (only
             used for one_*_one associations without offsets on PostgreSQL).</p>
-            </dd><dt>:window_function 
-            <dd>
+            </td></tr><tr><td class='label'>:window_function </td><td>
             <p>Uses a ROW_NUMBER window functions to ensure the correctly limited/offset
             records are returned.</p>
-            </dd><dt>:ruby 
-            <dd>
+            </td></tr><tr><td class='label'>:ruby </td><td>
             <p>Uses ruby array slicing to emulate database limiting/offsetting.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h4 id="label-%3Asubqueries_per_union">:subqueries_per_union<span><a href="#label-%3Asubqueries_per_union">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             

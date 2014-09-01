@@ -49,7 +49,7 @@
             <p>The extension is designed to be used in your migrations/schema modification
             code:</p>
             
-            <pre>DB.extension(:constraint_validations)&#x000A;DB.create_constraint_validations_table&#x000A;DB.create_table(:foos) do&#x000A;  primary_key :id&#x000A;  String :name&#x000A;  validate do&#x000A;    min_length 5, :name&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">constraint_validations</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_constraint_validations_table</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">foos</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;&#x000A;  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This creates a database CHECK constraint that ensures that the minimum
             length for the column is 5 characters.  It also adds metadata about the
@@ -68,7 +68,7 @@
             <p>Dataset#count now takes an argument or a virtual row block, allowing you to
             do:</p>
             
-            <pre>DB[:table].count(:column_name)&#x000A;DB[:table].count{function_name(column1, column2)}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">count</span>(:<span class="ruby-identifier">column_name</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">count</span>{<span class="ruby-identifier">function_name</span>(<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">column2</span>)}</pre>
             
             <p>When count is given an argument, instead of returning the total number of
             rows, it returns the number of rows where the argument has a non-NULL
@@ -81,12 +81,12 @@
             <p>set_table_not_null has been added to the alter table generator, for a nicer
             API:</p>
             
-            <pre>alter_table(:t){set_column_not_null :col}&#x000A;# instead of&#x000A;alter_table(:t){set_column_allow_null :col, false}</pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">t</span>){<span class="ruby-identifier">set_column_not_null</span> :<span class="ruby-identifier">col</span>}&#x000A;<span class="ruby-comment"># instead of</span>&#x000A;<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">t</span>){<span class="ruby-identifier">set_column_allow_null</span> :<span class="ruby-identifier">col</span>, <span class="ruby-keyword">false</span>}</pre>
             
             <p>Additionally, set_column_allow_null now defaults the second argument to
             true for a nicer API:</p>
             
-            <pre>alter_table(:t){set_column_allow_null :col}&#x000A;# instead of&#x000A;alter_table(:t){set_column_allow_null :col, true}</pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">t</span>){<span class="ruby-identifier">set_column_allow_null</span> :<span class="ruby-identifier">col</span>}&#x000A;<span class="ruby-comment"># instead of</span>&#x000A;<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">t</span>){<span class="ruby-identifier">set_column_allow_null</span> :<span class="ruby-identifier">col</span>, <span class="ruby-keyword">true</span>}</pre>
             </li><li>
             <p>Database#supports_regexp? has been added for checking if the database
             supports Regexp in filters.  Currently, only MySQL and PostgreSQL support
@@ -196,7 +196,7 @@
             href="../../../classes/Sequel/SQL/NegativeBooleanConstant.html">Sequel::SQL::NegativeBooleanConstant</a>
             now inherits from Constant instead of BooleanConstant.  This means that</p>
             
-            <pre>Sequel::NULL == Sequel::NOTNULL</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NOTNULL</span></pre>
             
             <p>is now false instead of true.</p>
             </li><li>
@@ -234,7 +234,7 @@
             <p>Users who don&#39;t want this behavior can remove the default values in the
             model:</p>
             
-            <pre>Model.default_values.delete(:column_name)</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">default_values</span>.<span class="ruby-identifier">delete</span>(:<span class="ruby-identifier">column_name</span>)</pre>
             </li><li>
             <p>Plain (non-model) datasets no longer allow insert to accept a single model
             instance argument.  Also, they no longer call values on a single argument

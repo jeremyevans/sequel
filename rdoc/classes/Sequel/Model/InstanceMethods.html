@@ -163,13 +163,11 @@
                   given, yield the instance to the block unless from_db is true.</p>
                   
                   <p>Arguments:</p>
-                  <dl class="rdoc-list note-list"><dt>values 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>values </td><td>
                   <p>should be a hash to pass to set.</p>
-                  </dd><dt>from_db 
-                  <dd>
+                  </td></tr><tr><td class='label'>from_db </td><td>
                   <p>only for backwards compatibility, forget it exists.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)&#x000A;&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">name</span> = <span class="ruby-string">&#39;Bob&#39;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
@@ -546,7 +544,7 @@
                   record.  Returns self. This can be used to make sure no other process is
                   updating the record at the same time.</p>
                   
-                  <pre>a = Artist[1]&#x000A;Artist.db.transaction do&#x000A;  a.lock!&#x000A;  a.update(...)&#x000A;end</pre>
+                  <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">lock!</span>&#x000A;  <span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;A&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-lock-21-source'); return false">
@@ -566,7 +564,7 @@
                   <p>Remove elements of the model object that make marshalling fail. Returns
                   self.</p>
                   
-                  <pre>a = Artist[1]&#x000A;a.marshallable!&#x000A;Marshal.dump(a)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">marshallable!</span>&#x000A;<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">a</span>)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-marshallable-21-source'); return false">
@@ -587,14 +585,14 @@
                   <code>save_changes</code>/<code>update</code> will run callbacks even if no
                   columns have changed.</p>
                   
-                  <pre>a = Artist[1]&#x000A;a.save_changes # No callbacks run, as no changes&#x000A;a.modified!&#x000A;a.save_changes # Callbacks run, even though no changes made</pre>
+                  <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">save_changes</span> <span class="ruby-comment"># No callbacks run, as no changes</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">modified!</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">save_changes</span> <span class="ruby-comment"># Callbacks run, even though no changes made</span></pre>
                   
                   <p>If a column is given, specifically marked that column as modified, so that
                   <code>save_changes</code>/<code>update</code> will include that column in
                   the update. This should be used if you plan on mutating the column value
                   instead of assigning a new column value:</p>
                   
-                  <pre>a.modified!(:name)&#x000A;a.name.gsub!(/[aeou]/, &#39;i&#39;)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">modified!</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">gsub!</span>(<span class="ruby-regexp">/[aeou]/</span>, <span class="ruby-string">&#39;i&#39;</span>)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-modified-21-source'); return false">
@@ -760,28 +758,22 @@
                   only updates those columns, or a options hash.</p>
                   
                   <p>Takes the following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:changed 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:changed </td><td>
                   <p>save all changed columns, instead of all columns or the columns given</p>
-                  </dd><dt>:columns 
-                  <dd>
+                  </td></tr><tr><td class='label'>:columns </td><td>
                   <p>array of specific columns that should be saved.</p>
-                  </dd><dt>:raise_on_failure 
-                  <dd>
+                  </td></tr><tr><td class='label'>:raise_on_failure </td><td>
                   <p>set to true or false to override the current
                   <code>raise_on_save_failure</code> setting</p>
-                  </dd><dt>:server 
-                  <dd>
+                  </td></tr><tr><td class='label'>:server </td><td>
                   <p>set the server/shard on the object before saving, and use that server/shard
                   in any transaction.</p>
-                  </dd><dt>:transaction 
-                  <dd>
+                  </td></tr><tr><td class='label'>:transaction </td><td>
                   <p>set to true or false to override the current <code>use_transactions</code>
                   setting</p>
-                  </dd><dt>:validate 
-                  <dd>
+                  </td></tr><tr><td class='label'>:validate </td><td>
                   <p>set to false to skip validation</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-save-source'); return false">
@@ -866,14 +858,13 @@
                   
                   <p>You can provide an options hash, with the following options currently
                   respected:</p>
-                  <dl class="rdoc-list note-list"><dt>:missing 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:missing </td><td>
                   <p>Can be set to :skip to skip missing entries or :raise to raise an <a
                   href="../Error.html">Error</a> for missing entries.  The default behavior
                   is not to check for missing entries, in which case the default value is
                   used.  To be friendly with most web frameworks, the missing check will also
                   check for the string version of the argument in the hash if given a symbol.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Examples:</p>
                   
@@ -951,7 +942,7 @@
                   
                   <p>Returns (naked) dataset that should return only this instance.</p>
                   
-                  <pre>Artist[1].this&#x000A;# SELECT * FROM artists WHERE (id = 1) LIMIT 1</pre>
+                  <pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">this</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (id = 1) LIMIT 1</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-this-source'); return false">

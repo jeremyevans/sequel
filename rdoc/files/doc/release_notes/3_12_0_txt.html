@@ -62,7 +62,7 @@
             </li><li>
             <p>A new migration DSL was added:</p>
             
-            <pre>Sequel.migration do&#x000A;  up do&#x000A;  end&#x000A;  down do&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>The old style of using a <a
             href="../../../classes/Sequel/Migration.html">Sequel::Migration</a>
@@ -135,7 +135,7 @@
             set_fields and update_fields also handle entries not in the hash
             differently:</p>
             
-            <pre># Doesn&#39;t modify the object, since the hash is empty&#x000A;album.set_only({}, [:b, :c])&#x000A;# Sets album.b and album.c to nil, since they aren&#39;t in the hash&#x000A;album.set_fields({}, [:b, :c])</pre>
+            <pre class="ruby"><span class="ruby-comment"># Doesn&#39;t modify the object, since the hash is empty</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_only</span>({}, [:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">c</span>])&#x000A;&#x000A;<span class="ruby-comment"># Sets album.b and album.c to nil, since they aren&#39;t in the hash</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_fields</span>({}, [:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">c</span>])</pre>
             </li><li>
             <p>The :eager_loader association option has a new API, though the previous API
             still works.  Instead of accepting three arguments, it can now accept a
@@ -154,7 +154,7 @@
             where the columns you provide are equal, uses the existing order to further
             order the dataset:</p>
             
-            <pre>ds.order(:albums__name).order_prepend(:artists__name)&#x000A;# ORDER BY artists.name, albums.name</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">albums__name</span>).<span class="ruby-identifier">order_prepend</span>(:<span class="ruby-identifier">artists__name</span>)&#x000A;<span class="ruby-comment"># ORDER BY artists.name, albums.name</span></pre>
             </li><li>
             <p>When creating foreign key columns, you can now use a :deferrable option to
             set up a foreign key constraint that is not checked until the end of the

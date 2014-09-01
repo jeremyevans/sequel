@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-06-02 14:13:04 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -46,7 +46,7 @@
             
             <p>Basic usage in application code:</p>
             
-            <pre>DB = Sequel.connect(&#39;...&#39;)&#x000A;DB.extension :schema_caching&#x000A;DB.load_schema_cache(&#39;/path/to/schema.dump&#39;)&#x000A;# load model files</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">schema_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_schema_cache</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span></pre>
             
             <p>Then, whenever the database schema is modified, write a new cached file. 
             You can do that with <code>bin/sequel</code>&#39;s -S option:</p>
@@ -57,17 +57,16 @@
             tables, and you don&#39;t worry about race conditions, you can choose to
             use the following in your application code:</p>
             
-            <pre>DB = Sequel.connect(&#39;...&#39;)&#x000A;DB.extension :schema_caching&#x000A;DB.load_schema_cache?(&#39;/path/to/schema.dump&#39;)&#x000A;# load model files&#x000A;&#x000A;DB.dump_schema_cache?(&#39;/path/to/schema.dump&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;...&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">schema_caching</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">load_schema_cache?</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># load model files</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dump_schema_cache?</span>(<span class="ruby-string">&#39;/path/to/schema.dump&#39;</span>)</pre>
             
             <p>With this method, you just have to delete the schema dump file if the
             schema is modified, and the application will recreate it for you using just
             the tables that your models use.</p>
             
             <p>Note that it is up to the application to ensure that the dumped cached
-            schema reflects the current state of the database.  <a
-            href="../../../../classes/Sequel.html">Sequel</a> does no checking to
-            ensure this, as checking would take time and the purpose of this code is to
-            take a shortcut.</p>
+            schema reflects the current state of the database.  Sequel does no checking
+            to ensure this, as checking would take time and the purpose of this code is
+            to take a shortcut.</p>
             
             <p>The cached schema is dumped in Marshal format, since it is the fastest and
             it handles all ruby objects used in the schema hash.  Because of this, you

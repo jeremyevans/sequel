@@ -322,7 +322,7 @@
                   <p>Runs the supplied <a href="SQL.html">SQL</a> statement string on the
                   database server. Returns self so it can be safely chained:</p>
                   
-                  <pre>DB &lt;&lt; &quot;UPDATE albums SET artist_id = NULL&quot; &lt;&lt; &quot;DROP TABLE artists&quot;</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;UPDATE albums SET artist_id = NULL&quot;</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;DROP TABLE artists&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-3C-3C-source'); return false">
@@ -437,12 +437,11 @@
                   
                   <p>Runs the supplied <a href="SQL.html">SQL</a> statement string on the
                   database server. Returns nil. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:server 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server </td><td>
                   <p>The server to run the <a href="SQL.html">SQL</a> on.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
-                  <pre>DB.run(&quot;SET some_server_variable = 42&quot;)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&quot;SET some_server_variable = 42&quot;</span>)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-run-source'); return false">
@@ -463,41 +462,33 @@
                   arrays of length 2, the first member being the column name, and the second
                   member being a hash of column information. The table argument can also be a
                   dataset, as long as it only has one table. Available options are:</p>
-                  <dl class="rdoc-list note-list"><dt>:reload 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:reload </td><td>
                   <p>Ignore any cached results, and get fresh information from the database.</p>
-                  </dd><dt>:schema 
-                  <dd>
+                  </td></tr><tr><td class='label'>:schema </td><td>
                   <p>An explicit schema to use.  It may also be implicitly provided via the
                   table name.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>If schema parsing is supported by the database, the column information
                   should hash at least contain the following entries:</p>
-                  <dl class="rdoc-list note-list"><dt>:allow_null 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_null </td><td>
                   <p>Whether <a href="Database.html#NULL">NULL</a> is an allowed value for the
                   column.</p>
-                  </dd><dt>:db_type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:db_type </td><td>
                   <p>The database type for the column, as a database specific string.</p>
-                  </dd><dt>:default 
-                  <dd>
+                  </td></tr><tr><td class='label'>:default </td><td>
                   <p>The database default for the column, as a database specific string.</p>
-                  </dd><dt>:primary_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:primary_key </td><td>
                   <p>Whether the columns is a primary key column.  If this column is not
                   present, it means that primary key information is unavailable, not that the
                   column is not a primary key.</p>
-                  </dd><dt>:ruby_default 
-                  <dd>
+                  </td></tr><tr><td class='label'>:ruby_default </td><td>
                   <p>The database default for the column, as a ruby object.  In many cases,
                   complex database defaults cannot be parsed into ruby objects, in which case
                   nil will be used as the value.</p>
-                  </dd><dt>:type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:type </td><td>
                   <p>A symbol specifying the type, such as :integer or :string.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Example:</p>
                   
@@ -680,13 +671,11 @@
                   <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_index</span> :<span class="ruby-identifier">posts</span>, :<span class="ruby-identifier">title</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_index</span> :<span class="ruby-identifier">posts</span>, [:<span class="ruby-identifier">author</span>, :<span class="ruby-identifier">title</span>], :<span class="ruby-identifier">unique</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span></pre>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:ignore_errors 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:ignore_errors </td><td>
                   <p>Ignore any DatabaseErrors that are raised</p>
-                  </dd><dt>:name 
-                  <dd>
+                  </td></tr><tr><td class='label'>:name </td><td>
                   <p>Name to use for index instead of default</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>See <code>alter_table</code>.</p>
                 </div>
@@ -773,19 +762,15 @@
                   <pre class="ruby"><span class="ruby-identifier">create_join_table</span>({:<span class="ruby-identifier">cat_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">cats</span>, :<span class="ruby-identifier">dog_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">dogs</span>}, :<span class="ruby-identifier">temp=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)</pre>
                   
                   <p>Some table options are handled specially:</p>
-                  <dl class="rdoc-list note-list"><dt>:index_options 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:index_options </td><td>
                   <p>The options to pass to the index</p>
-                  </dd><dt>:name 
-                  <dd>
+                  </td></tr><tr><td class='label'>:name </td><td>
                   <p>The name of the table to create</p>
-                  </dd><dt>:no_index 
-                  <dd>
+                  </td></tr><tr><td class='label'>:no_index </td><td>
                   <p>Set to true not to create the second index.</p>
-                  </dd><dt>:no_primary_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:no_primary_key </td><td>
                   <p>Set to true to not create the primary key.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_join_table-source'); return false">
@@ -861,46 +846,37 @@
                   
                   <p>Creates a table with the columns given in the provided block:</p>
                   
-                  <pre>DB.create_table :posts do&#x000A;  primary_key :id&#x000A;  column :title, :text&#x000A;  String :content&#x000A;  index :title&#x000A;end</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span> :<span class="ruby-identifier">posts</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-identifier">column</span> :<span class="ruby-identifier">title</span>, :<span class="ruby-identifier">text</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">content</span>&#x000A;  <span class="ruby-identifier">index</span> :<span class="ruby-identifier">title</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                   
                   <p>General options:</p>
-                  <dl class="rdoc-list note-list"><dt>:as 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:as </td><td>
                   <p>Create the table using the value, which should be either a dataset or a
                   literal <a href="SQL.html">SQL</a> string.  If this option is used, a block
                   should not be given to the method.</p>
-                  </dd><dt>:ignore_index_errors 
-                  <dd>
+                  </td></tr><tr><td class='label'>:ignore_index_errors </td><td>
                   <p>Ignore any errors when creating indexes.</p>
-                  </dd><dt>:temp 
-                  <dd>
+                  </td></tr><tr><td class='label'>:temp </td><td>
                   <p>Create the table as a temporary table.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>MySQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:charset 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:charset </td><td>
                   <p>The character set to use for the table.</p>
-                  </dd><dt>:collate 
-                  <dd>
+                  </td></tr><tr><td class='label'>:collate </td><td>
                   <p>The collation to use for the table.</p>
-                  </dd><dt>:engine 
-                  <dd>
+                  </td></tr><tr><td class='label'>:engine </td><td>
                   <p>The table engine to use for the table.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:on_commit 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:on_commit </td><td>
                   <p>Either :preserve_rows (default), :drop or :delete_rows.</p>
-                  </dd><dt>:unlogged 
-                  <dd>
+                  </td></tr><tr><td class='label'>:unlogged </td><td>
                   <p>Create the table as an unlogged table.</p>
-                  </dd><dt>:inherits 
-                  <dd>
+                  </td></tr><tr><td class='label'>:inherits </td><td>
                   <p>Inherit from a different tables.  An array can be specified to inherit from
                   multiple tables.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>See <code>Schema::Generator</code> and the <a
                   href="../../files/doc/schema_modification_rdoc.html">“Schema Modification”
@@ -924,7 +900,7 @@
                   <p>Forcibly create a table, attempting to drop it if it already exists, then
                   creating it.</p>
                   
-                  <pre>DB.create_table!(:a){Integer :a} &#x000A;# SELECT NULL FROM a LIMIT 1 -- check existence&#x000A;# DROP TABLE a -- drop table if already exists&#x000A;# CREATE TABLE a (a integer)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table!</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>} &#x000A;<span class="ruby-comment"># SELECT NULL FROM a LIMIT 1 -- check existence</span>&#x000A;<span class="ruby-comment"># DROP TABLE a -- drop table if already exists</span>&#x000A;<span class="ruby-comment"># CREATE TABLE a (a integer)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_table-21-source'); return false">
@@ -943,7 +919,7 @@
                   
                   <p>Creates the table unless the table already exists.</p>
                   
-                  <pre>DB.create_table?(:a){Integer :a} &#x000A;# SELECT NULL FROM a LIMIT 1 -- check existence&#x000A;# CREATE TABLE a (a integer) -- if it doesn&#39;t already exist</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table?</span>(:<span class="ruby-identifier">a</span>){<span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a</span>} &#x000A;<span class="ruby-comment"># SELECT NULL FROM a LIMIT 1 -- check existence</span>&#x000A;<span class="ruby-comment"># CREATE TABLE a (a integer) -- if it doesn&#39;t already exist</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_table-3F-source'); return false">
@@ -984,37 +960,32 @@
                   <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">cheap_items</span>, <span class="ruby-string">&quot;SELECT * FROM items WHERE price &lt; 100&quot;</span>)&#x000A;<span class="ruby-comment"># CREATE VIEW cheap_items AS</span>&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE price &lt; 100</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">ruby_items</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">category</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;ruby&#39;</span>))&#x000A;<span class="ruby-comment"># CREATE VIEW ruby_items AS</span>&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE (category = &#39;ruby&#39;)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_view</span>(:<span class="ruby-identifier">checked_items</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">foo</span>), :<span class="ruby-identifier">check=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># CREATE VIEW checked_items AS</span>&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE foo</span>&#x000A;<span class="ruby-comment"># WITH CHECK OPTION</span></pre>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:columns 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:columns </td><td>
                   <p>The column names to use for the view.  If not given, automatically
                   determined based on the input dataset.</p>
-                  </dd><dt>:check 
-                  <dd>
+                  </td></tr><tr><td class='label'>:check </td><td>
                   <p>Adds a WITH CHECK OPTION clause, so that attempting to modify  rows in the
                   underlying table that would not be returned by the view is not allowed. 
                   This can be set to :local to use WITH LOCAL CHECK OPTION.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>PostgreSQL/SQLite specific option:</p>
-                  <dl class="rdoc-list note-list"><dt>:temp 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:temp </td><td>
                   <p>Create a temporary view, automatically dropped on disconnect.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:materialized 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:materialized </td><td>
                   <p>Creates a materialized view, similar to a regular view, but backed by a
                   physical table.</p>
-                  </dd><dt>:recursive 
-                  <dd>
+                  </td></tr><tr><td class='label'>:recursive </td><td>
                   <p>Creates a recursive view.  As columns must be specified for recursive
                   views, you can also set them as the value of this option.  Since a
                   recursive view requires a union that isn&#39;t in a subquery, if you are
                   providing a <a href="Dataset.html">Dataset</a> as the source argument, if
                   should probably call the union method with the :all=&gt;true and
                   :from_self=&gt;false options.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-create_view-source'); return false">
@@ -1033,7 +1004,7 @@
                   
                   <p>Removes a column from the specified table:</p>
                   
-                  <pre>DB.drop_column :items, :category</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_column</span> :<span class="ruby-identifier">items</span>, :<span class="ruby-identifier">category</span></pre>
                   
                   <p>See <code>alter_table</code>.</p>
                 </div>
@@ -1054,7 +1025,7 @@
                   
                   <p>Removes an index for the given table and column/s:</p>
                   
-                  <pre>DB.drop_index :posts, :title&#x000A;DB.drop_index :posts, [:author, :title]</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_index</span> :<span class="ruby-identifier">posts</span>, :<span class="ruby-identifier">title</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_index</span> :<span class="ruby-identifier">posts</span>, [:<span class="ruby-identifier">author</span>, :<span class="ruby-identifier">title</span>]</pre>
                   
                   <p>See <code>alter_table</code>.</p>
                 </div>
@@ -1115,7 +1086,7 @@
                   <p>Drops the table if it already exists.  If it doesn&#39;t exist, does
                   nothing.</p>
                   
-                  <pre>DB.drop_table?(:a)&#x000A;# SELECT NULL FROM a LIMIT 1 -- check existence&#x000A;# DROP TABLE a -- if it already exists</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_table?</span>(:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-comment"># SELECT NULL FROM a LIMIT 1 -- check existence</span>&#x000A;<span class="ruby-comment"># DROP TABLE a -- if it already exists</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_table-3F-source'); return false">
@@ -1137,19 +1108,16 @@
                   <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_view</span>(:<span class="ruby-identifier">cheap_items</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_view</span>(:<span class="ruby-identifier">cheap_items</span>, :<span class="ruby-identifier">pricey_items</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_view</span>(:<span class="ruby-identifier">cheap_items</span>, :<span class="ruby-identifier">pricey_items</span>, :<span class="ruby-identifier">cascade=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_view</span>(:<span class="ruby-identifier">cheap_items</span>, :<span class="ruby-identifier">pricey_items</span>, :<span class="ruby-identifier">if_exists=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)</pre>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:cascade 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:cascade </td><td>
                   <p>Also drop objects depending on this view.</p>
-                  </dd><dt>:if_exists 
-                  <dd>
+                  </td></tr><tr><td class='label'>:if_exists </td><td>
                   <p>Do not raise an error if the view does not exist.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:materialized 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:materialized </td><td>
                   <p>Drop a materialized view.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-drop_view-source'); return false">
@@ -1169,7 +1137,7 @@
                   <p>Renames a column in the specified table. This method expects the current
                   column name and the new column name:</p>
                   
-                  <pre>DB.rename_column :items, :cntr, :counter</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rename_column</span> :<span class="ruby-identifier">items</span>, :<span class="ruby-identifier">cntr</span>, :<span class="ruby-identifier">counter</span></pre>
                   
                   <p>See <code>alter_table</code>.</p>
                 </div>
@@ -1209,7 +1177,7 @@
                   
                   <p>Sets the default value for the given column in the given table:</p>
                   
-                  <pre>DB.set_column_default :items, :category, &#39;perl!&#39;</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">set_column_default</span> :<span class="ruby-identifier">items</span>, :<span class="ruby-identifier">category</span>, <span class="ruby-string">&#39;perl!&#39;</span></pre>
                   
                   <p>See <code>alter_table</code>.</p>
                 </div>
@@ -1230,7 +1198,7 @@
                   
                   <p>Set the data type for the given column in the given table:</p>
                   
-                  <pre>DB.set_column_type :items, :price, :float</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">items</span>, :<span class="ruby-identifier">price</span>, :<span class="ruby-identifier">float</span></pre>
                   
                   <p>See <code>alter_table</code>.</p>
                 </div>
@@ -1262,7 +1230,7 @@
                   href="Database.html#method-i-fetch">#fetch</a>, returning a dataset for
                   arbitrary <a href="SQL.html">SQL</a>, with or without placeholders:</p>
                   
-                  <pre>DB[&#39;SELECT * FROM items&#39;].all&#x000A;DB[&#39;SELECT * FROM items WHERE name = ?&#39;, my_name].all</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM items&#39;</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM items WHERE name = ?&#39;</span>, <span class="ruby-identifier">my_name</span>].<span class="ruby-identifier">all</span></pre>
                   
                   <p>Otherwise, acts as an alias for <a
                   href="Database.html#method-i-from">#from</a>, setting the primary table for
@@ -1287,7 +1255,7 @@
                   
                   <p>Returns a blank dataset for this database.</p>
                   
-                  <pre>DB.dataset # SELECT *&#x000A;DB.dataset.from(:items) # SELECT * FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span> <span class="ruby-comment"># SELECT *</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-comment"># SELECT * FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-dataset-source'); return false">
@@ -1311,12 +1279,12 @@
                   
                   <p>The <code>fetch</code> method returns a dataset instance:</p>
                   
-                  <pre>DB.fetch(&#39;SELECT * FROM items&#39;).all</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items&#39;</span>).<span class="ruby-identifier">all</span></pre>
                   
                   <p><code>fetch</code> can also perform parameterized queries for protection
                   against <a href="SQL.html">SQL</a> injection:</p>
                   
-                  <pre>DB.fetch(&#39;SELECT * FROM items WHERE name = ?&#39;, my_name).all</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SELECT * FROM items WHERE name = ?&#39;</span>, <span class="ruby-identifier">my_name</span>).<span class="ruby-identifier">all</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch-source'); return false">
@@ -1336,7 +1304,7 @@
                   <p>Returns a new dataset with the <code>from</code> method invoked. If a block
                   is given, it is used as a filter on the dataset.</p>
                   
-                  <pre>DB.from(:items) # SELECT * FROM items&#x000A;DB.from(:items){id &gt; 2} # SELECT * FROM items WHERE (id &gt; 2)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">items</span>){<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>} <span class="ruby-comment"># SELECT * FROM items WHERE (id &gt; 2)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from-source'); return false">
@@ -1355,7 +1323,7 @@
                   
                   <p>Returns a new dataset with the select method invoked.</p>
                   
-                  <pre>DB.select(1) # SELECT 1&#x000A;DB.select{server_version{}} # SELECT server_version()&#x000A;DB.select(:id).from(:items) # SELECT id FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># SELECT 1</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">server_version</span>{}} <span class="ruby-comment"># SELECT server_version()</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-comment"># SELECT id FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select-source'); return false">
@@ -1485,15 +1453,13 @@
                   href="AdapterNotFound.html">Sequel::AdapterNotFound</a> if the adapter
                   cannot be loaded, or if the adapter isn&#39;t registered correctly after
                   being loaded. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:map 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:map </td><td>
                   <p>The Hash in which to look for an already loaded adapter (defaults to
                   ADAPTER_MAP).</p>
-                  </dd><dt>:subdir 
-                  <dd>
+                  </td></tr><tr><td class='label'>:subdir </td><td>
                   <p>The subdirectory of sequel/adapters to look in, only to be used for loading
                   subadapters.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-load_adapter-source'); return false">
@@ -1586,11 +1552,10 @@
                   
                   <p>Disconnects all available connections from the connection pool.  Any
                   connections currently in use will not be disconnected. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:servers 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:servers </td><td>
                   <p>Should be a symbol specifing the server to disconnect from, or an array of
                   symbols to specify multiple servers.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Example:</p>
                   
@@ -1660,7 +1625,7 @@
                   database, no changes are made. If you attempt to remove the :default
                   server, an error will be raised.</p>
                   
-                  <pre>DB.remove_servers(:f1, :f2)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">remove_servers</span>(:<span class="ruby-identifier">f1</span>, :<span class="ruby-identifier">f2</span>)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-remove_servers-source'); return false">
@@ -1723,7 +1688,7 @@
                   <p>If a server option is given, acquires a connection for that specific
                   server, instead of the :default server.</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-operator">...</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-comment"># ...</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-synchronize-source'); return false">
@@ -1963,7 +1928,7 @@
                   
                   <p>Set the method to call on identifiers going into the database:</p>
                   
-                  <pre>DB[:items] # SELECT * FROM items&#x000A;DB.identifier_input_method = :upcase&#x000A;DB[:items] # SELECT * FROM ITEMS</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>] <span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">identifier_input_method</span> = :<span class="ruby-identifier">upcase</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>] <span class="ruby-comment"># SELECT * FROM ITEMS</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier_input_method-3D-source'); return false">
@@ -2001,7 +1966,7 @@
                   
                   <p>Set whether to quote identifiers (columns and tables) for this database:</p>
                   
-                  <pre>DB[:items] # SELECT * FROM items&#x000A;DB.quote_identifiers = true&#x000A;DB[:items] # SELECT * FROM &quot;items&quot;</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>] <span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifiers</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>] <span class="ruby-comment"># SELECT * FROM &quot;items&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-quote_identifiers-3D-source'); return false">
@@ -2138,7 +2103,7 @@
                   
                   <p>Remove any existing loggers and just use the given logger:</p>
                   
-                  <pre>DB.logger = Logger.new($stdout)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">logger</span> = <span class="ruby-constant">Logger</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">$stdout</span>)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-logger-3D-source'); return false">
@@ -2356,35 +2321,26 @@
                   options hash.</p>
                   
                   <p>Accepts the following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:default_string_column_size 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:default_string_column_size </td><td>
                   <p>The default size of string columns, 255 by default.</p>
-                  </dd><dt>:identifier_input_method 
-                  <dd>
+                  </td></tr><tr><td class='label'>:identifier_input_method </td><td>
                   <p>A string method symbol to call on identifiers going into the database</p>
-                  </dd><dt>:identifier_output_method 
-                  <dd>
+                  </td></tr><tr><td class='label'>:identifier_output_method </td><td>
                   <p>A string method symbol to call on identifiers coming from the database</p>
-                  </dd><dt>:logger 
-                  <dd>
+                  </td></tr><tr><td class='label'>:logger </td><td>
                   <p>A specific logger to use</p>
-                  </dd><dt>:loggers 
-                  <dd>
+                  </td></tr><tr><td class='label'>:loggers </td><td>
                   <p>An array of loggers to use</p>
-                  </dd><dt>:quote_identifiers 
-                  <dd>
+                  </td></tr><tr><td class='label'>:quote_identifiers </td><td>
                   <p>Whether to quote identifiers</p>
-                  </dd><dt>:servers 
-                  <dd>
+                  </td></tr><tr><td class='label'>:servers </td><td>
                   <p>A hash specifying a server/shard specific options, keyed by shard symbol</p>
-                  </dd><dt>:single_threaded 
-                  <dd>
+                  </td></tr><tr><td class='label'>:single_threaded </td><td>
                   <p>Whether to use a single-threaded connection pool</p>
-                  </dd><dt>:sql_log_level 
-                  <dd>
+                  </td></tr><tr><td class='label'>:sql_log_level </td><td>
                   <p>Method to use to log <a href="SQL.html">SQL</a> to a logger, :info by
                   default.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>All options given are also passed to the connection pool.</p>
                 </div>
@@ -2448,10 +2404,9 @@
                   immediately. Otherwise, add the block to the list of blocks to call after
                   the currently in progress transaction commits (and only if it commits).
                   Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:server 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server </td><td>
                   <p>The server/shard to use.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_commit-source'); return false">
@@ -2471,10 +2426,9 @@
                   <p>If a transaction is not currently in progress, ignore the block. Otherwise,
                   add the block to the list of the blocks to call after the currently in
                   progress transaction rolls back (and only if it rolls back). Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:server 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server </td><td>
                   <p>The server/shard to use.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_rollback-source'); return false">
@@ -2493,7 +2447,7 @@
                   
                   <p>Cast the given type to a literal type</p>
                   
-                  <pre>DB.cast_type_literal(Float) # double precision&#x000A;DB.cast_type_literal(:foo) # foo</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">cast_type_literal</span>(<span class="ruby-constant">Float</span>) <span class="ruby-comment"># double precision</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">cast_type_literal</span>(:<span class="ruby-identifier">foo</span>) <span class="ruby-comment"># foo</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_type_literal-source'); return false">
@@ -2589,7 +2543,7 @@
                   
                   <p>Proxy the literal call to the dataset.</p>
                   
-                  <pre>DB.literal(1) # 1&#x000A;DB.literal(:a) # a&#x000A;DB.literal(&#39;a&#39;) # &#39;a&#39;</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># 1</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># a</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># &#39;a&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-literal-source'); return false">
@@ -2938,62 +2892,51 @@
                   Note that MySQL MyISAM tables do not support transactions.</p>
                   
                   <p>The following general options are respected:</p>
-                  <dl class="rdoc-list note-list"><dt>:auto_savepoint 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_savepoint </td><td>
                   <p>Automatically use a savepoint for <a
                   href="Database.html#method-i-transaction">#transaction</a> calls inside
                   this transaction block.</p>
-                  </dd><dt>:isolation 
-                  <dd>
+                  </td></tr><tr><td class='label'>:isolation </td><td>
                   <p>The transaction isolation level to use for this transaction, should be
                   :uncommitted, :committed, :repeatable, or :serializable, used if given and
                   the database/adapter supports customizable transaction isolation levels.</p>
-                  </dd><dt>:num_retries 
-                  <dd>
+                  </td></tr><tr><td class='label'>:num_retries </td><td>
                   <p>The number of times to retry if the :retry_on option is used. The default
                   is 5 times.  Can be set to nil to retry indefinitely, but that is not
                   recommended.</p>
-                  </dd><dt>:prepare 
-                  <dd>
+                  </td></tr><tr><td class='label'>:prepare </td><td>
                   <p>A string to use as the transaction identifier for a prepared transaction
                   (two-phase commit), if the database/adapter supports prepared transactions.</p>
-                  </dd><dt>:retry_on 
-                  <dd>
+                  </td></tr><tr><td class='label'>:retry_on </td><td>
                   <p>An exception class or array of exception classes for which to automatically
                   retry the transaction.  Can only be set if not inside an existing
                   transaction. Note that this should not be used unless the entire
                   transaction block is idempotent, as otherwise it can cause non-idempotent
                   behavior to execute multiple times.</p>
-                  </dd><dt>:rollback 
-                  <dd>
+                  </td></tr><tr><td class='label'>:rollback </td><td>
                   <p>Can the set to :reraise to reraise any <a
                   href="Rollback.html">Sequel::Rollback</a> exceptions raised, or :always to
                   always rollback even if no exceptions occur (useful for testing).</p>
-                  </dd><dt>:server 
-                  <dd>
+                  </td></tr><tr><td class='label'>:server </td><td>
                   <p>The server to use for the transaction.</p>
-                  </dd><dt>:savepoint 
-                  <dd>
+                  </td></tr><tr><td class='label'>:savepoint </td><td>
                   <p>Whether to create a new savepoint for this transaction, only respected if
                   the database/adapter supports savepoints.  By default <a
                   href="../Sequel.html">Sequel</a> will reuse an existing transaction, so if
                   you want to use a savepoint you must use this option.  If the surrounding
                   transaction uses :auto_savepoint, you can set this to false to not use a
                   savepoint.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:deferrable 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:deferrable </td><td>
                   <p>(9.1+) If present, set to DEFERRABLE if true or NOT DEFERRABLE if false.</p>
-                  </dd><dt>:read_only 
-                  <dd>
+                  </td></tr><tr><td class='label'>:read_only </td><td>
                   <p>If present, set to READ ONLY if true or READ WRITE if false.</p>
-                  </dd><dt>:synchronous 
-                  <dd>
+                  </td></tr><tr><td class='label'>:synchronous </td><td>
                   <p>if non-nil, set synchronous_commit appropriately.  Valid values true, :on,
                   false, :off, :local (9.1+), and :remote_write (9.2+).</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-transaction-source'); return false">

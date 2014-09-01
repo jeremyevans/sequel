@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-08-22 12:22:05 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -44,10 +44,9 @@
             (if any) treated as placeholder values. This allows you to write code such
             as:</p>
             
-            <pre>DB[:table].select(&#39;a, b, ?&#39;, 2).group(&#39;a, b&#39;).order(&#39;c&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-string">&#39;a, b, ?&#39;</span>, <span class="ruby-value">2</span>).<span class="ruby-identifier">group</span>(<span class="ruby-string">&#39;a, b&#39;</span>).<span class="ruby-identifier">order</span>(<span class="ruby-string">&#39;c&#39;</span>)</pre>
             
-            <p>The default <a href="../../../../classes/Sequel.html">Sequel</a> behavior
-            would literalize that as:</p>
+            <p>The default Sequel behavior would literalize that as:</p>
             
             <pre>SELECT &#39;a, b, ?&#39;, 2 FROM table GROUP BY &#39;a, b&#39; ORDER BY &#39;c&#39;</pre>
             
@@ -64,12 +63,12 @@
             
             <p>You can load this extension into specific datasets:</p>
             
-            <pre>ds = DB[:table]&#x000A;ds = ds.extension(:query_literals)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">query_literals</span>)</pre>
             
             <p>Or you can load it into all of a database&#39;s datasets, which is probably
             the desired behavior if you are using this extension:</p>
             
-            <pre>DB.extension(:query_literals)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">query_literals</span>)</pre>
           </div>
           <div id='context'>
           </div>

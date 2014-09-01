@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-16 09:40:34 -0700</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -86,13 +86,13 @@
             <p>The <code>Sequel::Model.[]</code> is the easiest method to use to find a
             model instance by its primary key value:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Find artist with primary key (id) 1</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Find artist with primary key (id) 1</span>&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
             <p>If there is no record with the given primary key, nil will be returned. If
             you want to raise an exception if no record is found, you can use
             <code>Sequel::Model.with_pk!</code>:</p>
             
-            <pre>artist = Artist.with_pk!(1)</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">with_pk!</span>(<span class="ruby-value">1</span>)</pre>
             
             <h4 id="label-Using+first">Using <code>first</code><span><a href="#label-Using+first">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -100,11 +100,11 @@
             <code>Sequel::Dataset#first</code> is probably the most obvious method to
             use:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
             <p>Any options you pass to <code>first</code> will be used as a filter:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;) LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span>&#x000A;&#x000A;<span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">first</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
             <p>If there is no matching row, <code>first</code> will return nil.  If you
             want to raise an exception instead, use <code>first!</code>.</p>
@@ -112,7 +112,7 @@
             <p><code>Sequel::Dataset#[]</code> is basically an alias for
             <code>first</code>, except it requires an argument:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>][:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> {:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;YJM&quot;</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>][:<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;YJM&#39;</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE (name = &#39;YJM&#39;) LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;&quot;YJM&quot;, :id=&gt;1}</span></pre>
             
             <p>Note that while Model.[] allows you to pass a primary key directly,
             Dataset#[] does not (unless it is a model dataset).</p>
@@ -125,7 +125,7 @@
             dataset.  For a model dataset, <code>last</code> will do a reverse order by
             the primary key field:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists ORDER BY id DESC LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists ORDER BY id DESC LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; #&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;</span></pre>
             
             <p>Note that what <code>last</code> does is reverse the order of the dataset
             and then call <code>first</code>.  This is why <code>last</code> raises a
@@ -142,7 +142,7 @@
             specific column.  For this <code>Sequel::Dataset#get</code> is the method
             you want:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_name</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-string">&quot;YJM&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_name</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">get</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; &quot;YJM&quot;</span></pre>
             
             <h3 id="label-Retrieving+Multiple+Objects">Retrieving Multiple Objects<span><a href="#label-Retrieving+Multiple+Objects">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -152,7 +152,7 @@
             dataset, in which case <code>Sequel::Dataset#all</code> is the method you
             want to use:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;,</span>&#x000A;    <span class="ruby-comment">#&lt;Artist @values={:name=&gt;&quot;AS&quot;, :id=&gt;2}&gt;]</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artists</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; [#&lt;Artist @values={:name=&gt;&quot;YJM&quot;, :id=&gt;1}&gt;,</span>&#x000A;<span class="ruby-comment">#     #&lt;Artist @values={:name=&gt;&quot;AS&quot;, :id=&gt;2}&gt;]</span></pre>
             
             <h4 id="label-Using+an+Enumerable+Interface">Using an Enumerable Interface<span><a href="#label-Using+an+Enumerable+Interface">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -165,7 +165,7 @@
             <p>This means that all of the methods in the Enumerable module are available,
             such as <code>map</code>:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&quot;YJM&quot;</span>, <span class="ruby-string">&quot;AS&quot;</span>]</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;YJM&quot;, &quot;AS&quot;]</span></pre>
             
             <h4 id="label-As+an+Array+of+Column+Values">As an Array of Column Values<span><a href="#label-As+an+Array+of+Column+Values">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -174,7 +174,7 @@
             to <code>map</code>, it will return an array of values for the given
             column.  So the previous example can be handled more easily with:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">map</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&quot;YJM&quot;</span>, <span class="ruby-string">&quot;AS&quot;</span>]</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">map</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;YJM&quot;, &quot;AS&quot;]</span></pre>
             
             <p>One difference between these two ways of returning an array of values is
             that providing <code>map</code> with an argument is really doing:</p>
@@ -186,31 +186,31 @@
             select a single column and return an array of the columns values, you can
             use <code>select_map</code>:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_map</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&quot;YJM&quot;</span>, <span class="ruby-string">&quot;AS&quot;</span>]</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_map</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;YJM&quot;, &quot;AS&quot;]</span></pre>
             
             <p>It&#39;s also common to want to order such a map, so <a
             href="../../classes/Sequel.html">Sequel</a> provides a
             <code>select_order_map</code> method as well:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_order_map</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists ORDER BY name</span>&#x000A;=<span class="ruby-operator">&gt;</span> [<span class="ruby-string">&quot;AS&quot;</span>, <span class="ruby-string">&quot;YJM&quot;</span>]</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_order_map</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists ORDER BY name</span>&#x000A;<span class="ruby-comment"># =&gt; [&quot;AS&quot;, &quot;YJM&quot;]</span></pre>
             
             <p>In all of these cases, you can provide an array of column symbols and an
             array of arrays of values will be returned:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_map</span>([:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>])&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> [[<span class="ruby-value">1</span>, <span class="ruby-string">&quot;YJM&quot;</span>], [<span class="ruby-value">2</span>, <span class="ruby-string">&quot;AS&quot;</span>]]</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_map</span>([:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>])&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; [[1, &quot;YJM&quot;], [2, &quot;AS&quot;]]</span></pre>
             
             <h4 id="label-As+a+Hash">As a Hash<span><a href="#label-As+a+Hash">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to take an SQL
             query and return it as a ruby hash, using the <code>to_hash</code> method:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;YJM&quot;</span>, <span class="ruby-value">2</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;AS&quot;</span>}</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;&quot;YJM&quot;, 2=&gt;&quot;AS&quot;}</span></pre>
             
             <p>As you can see, the <code>to_hash</code> method uses the first symbol as
             the key and the second symbol as the value.  So if you swap the two
             arguments the hash will have its keys and values transposed:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-string">&quot;YJM&quot;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, <span class="ruby-string">&quot;AS&quot;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;1, &quot;AS&quot;=&gt;2}</span></pre>
             
             <p>Now what if you have multiple values for the same key?  By default,
             <code>to_hash</code> will just have the last matching value.  If you care
@@ -218,23 +218,23 @@
             values of the array an array of matching values, in the order they were
             received:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash_groups</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-string">&quot;YJM&quot;</span>=<span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">10</span>, <span class="ruby-operator">...</span>], <span class="ruby-string">&quot;AS&quot;</span>=<span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">20</span>, <span class="ruby-operator">...</span>]}</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash_groups</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;[1, 10, ...], &quot;AS&quot;=&gt;[2, 20, ...]}</span></pre>
             
             <p>If you only provide one argument to <code>to_hash</code>, it uses the
             entire hash or model object as the value:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-string">&quot;YJM&quot;</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;YJM&quot;</span>}, <span class="ruby-string">&quot;AS&quot;</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;AS&quot;</span>}}</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">to_hash</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;{:id=&gt;1, :name=&gt;&quot;YJM&quot;}, &quot;AS&quot;=&gt;{:id=&gt;2, :name=&gt;&quot;AS&quot;}}</span></pre>
             
             <p>and <code>to_hash_groups</code> works similarly:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">to_hash_groups</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-string">&quot;YJM&quot;</span>=<span class="ruby-operator">&gt;</span>[{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;YJM&quot;</span>}, {:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;YJM&quot;</span>}], <span class="ruby-operator">...</span>}</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">to_hash_groups</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;[{:id=&gt;1, :name=&gt;&quot;YJM&quot;}, {:id=&gt;10, :name=&gt;&quot;YJM&quot;}], ...}</span></pre>
             
             <p>Model datasets have a <code>to_hash</code> method that can be called
             without any arguments, in which case it will use the primary key as the key
             and the model object as the value.  This can be used to easily create an
             identity map:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span><span class="ruby-comment">#&lt;Artist @values={:id=&gt;1, :name=&gt;&quot;YGM&quot;}&gt;,</span>&#x000A;    <span class="ruby-value">2</span>=<span class="ruby-operator">&gt;</span><span class="ruby-comment">#&lt;Artist @values={:id=&gt;2, :name=&gt;&quot;AS&quot;}&gt;}</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">to_hash</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {1=&gt;#&lt;Artist @values={:id=&gt;1, :name=&gt;&quot;YGM&quot;}&gt;,</span>&#x000A;<span class="ruby-comment">#     2=&gt;#&lt;Artist @values={:id=&gt;2, :name=&gt;&quot;AS&quot;}&gt;}</span></pre>
             
             <p>There is no equivalent handling to <code>to_hash_groups</code>, since there
             would only be one matching record, as the primary key must be unique.</p>
@@ -246,11 +246,11 @@
             <code>select_hash</code> method to modify the columns selected and return a
             hash:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_hash</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT name, id FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-string">&quot;YJM&quot;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, <span class="ruby-string">&quot;AS&quot;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_hash</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT name, id FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;1, &quot;AS&quot;=&gt;2}</span></pre>
             
             <p>Likewise, <code>select_hash_groups</code> also exists:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_hash_groups</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT name, id FROM artists</span>&#x000A;=<span class="ruby-operator">&gt;</span> {<span class="ruby-string">&quot;YJM&quot;</span>=<span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">10</span>, <span class="ruby-operator">...</span>], <span class="ruby-string">&quot;AS&quot;</span>=<span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">20</span>, <span class="ruby-operator">...</span>]}</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist_names</span> = <span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_hash_groups</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT name, id FROM artists</span>&#x000A;<span class="ruby-comment"># =&gt; {&quot;YJM&quot;=&gt;[1, 10, ...], &quot;AS&quot;=&gt;[2, 20, ...]}</span></pre>
             
             <h2 id="label-Modifying+datasets+">Modifying datasets <span><a href="#label-Modifying+datasets+">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -274,18 +274,18 @@
             <p>This is a basic dataset that includes all records in the table
             <code>artists</code>:</p>
             
-            <pre>ds1 = DB[:artists]&#x000A;# SELECT * FROM artists</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds1</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <p>Let&#39;s say we are only interested in the artists whose names start with
             “A”:</p>
             
-            <pre>ds2 = ds1.where(Sequel.like(:name, &#39;A%&#39;))&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds2</span> = <span class="ruby-identifier">ds1</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
             
             <p>Here we see that <code>where</code> returns a dataset that adds a
             <code>WHERE</code> clause to the query.  It&#39;s important to note that
             <code>where</code> does not modify the receiver:</p>
             
-            <pre>ds1&#x000A;# SELECT * FROM artists&#x000A;ds2&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds1</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span>&#x000A;<span class="ruby-identifier">ds2</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
             
             <p>In <a href="../../classes/Sequel.html">Sequel</a>, most dataset methods
             that you will be using will not modify the dataset itself, so you can
@@ -296,7 +296,7 @@
             <p>Let&#39;s say we only want to select the id and name columns, and that we
             want to order by name:</p>
             
-            <pre>ds3 = ds.order(:name).select(:id, :name)&#x000A;# SELECT id, name FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39; ORDER BY name</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39; ORDER BY name</span></pre>
             
             <p>Note how you don&#39;t need to assign the returned value of order to a
             variable, and then call select on that.  Because order just returns a
@@ -369,13 +369,13 @@
             only advantage to using an array of two element arrays is that it allows
             you to duplicate keys, so you can do:</p>
             
-            <pre>Artist.where([[:name, /JM$/], [:name, /^YJ/]])&#x000A;# SELECT * FROM artists WHERE name ~ &#39;JM$&#39; AND name ~ &#39;^YJ&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>([[:<span class="ruby-identifier">name</span>, <span class="ruby-regexp">/JM$/</span>], [:<span class="ruby-identifier">name</span>, <span class="ruby-regexp">/^YJ/</span>]])&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name ~ &#39;JM$&#39; AND name ~ &#39;^YJ&#39;</span></pre>
             
             <h3 id="label-Virtual+Row+Blocks">Virtual Row Blocks<span><a href="#label-Virtual+Row+Blocks">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>If a block is passed to a filter, it is treated as a virtual row block:</p>
             
-            <pre>Artist.where{id &gt; 5}&#x000A;# SELECT * FROM artists WHERE id &gt; 5</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id &gt; 5</span></pre>
             
             <p>You can learn more about virtual row blocks in the <a
             href="virtual_rows_rdoc.html">“Virtual Rows” guide</a>.</p>
@@ -390,7 +390,7 @@
             <p>If you have a boolean column in the database, and you want only true
             values, you can just provide the column symbol to filter:</p>
             
-            <pre>Artist.where(:retired)&#x000A;# SELECT * FROM artists WHERE retired</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">retired</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE retired</span></pre>
             
             <h3 id="label-SQL%3A%3AExpression">SQL::Expression<span><a href="#label-SQL%3A%3AExpression">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -400,7 +400,7 @@
             href="../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a>.
             You&#39;ve already seen an example earlier:</p>
             
-            <pre>Artist.where(Sequel.like(:name, &#39;Y%&#39;))&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;Y%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; ESCAPE &#39;\&#39;</span></pre>
             
             <p>In this case Sequel.like returns a <a
             href="../../classes/Sequel/SQL/BooleanExpression.html">Sequel::SQL::BooleanExpression</a>
@@ -418,12 +418,12 @@
             
             <p>You can combine these expression operators with the virtual row support:</p>
             
-            <pre>Artist.where{(a &gt; 1) &amp; ~((b(c) &lt; 1) | d)}&#x000A;# SELECT * FROM artists WHERE a &gt; 1 AND b(c) &gt;= 1 AND NOT d</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>((<span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE a &gt; 1 AND b(c) &gt;= 1 AND NOT d</span></pre>
             
             <p>Note the use of parentheses when using the &amp; and | operators, as they
             have lower precedence than other operators.  The following will not work:</p>
             
-            <pre>Artist.where{a &gt; 1 &amp; ~(b(c) &lt; 1 | d)}&#x000A;# Raises a TypeError, as it calls Integer#| with a Sequel::SQL::Identifier</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;</span> <span class="ruby-operator">~</span>(<span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># Raises a TypeError, as it calls Integer#| with a Sequel::SQL::Identifier</span></pre>
             
             <h3 id="label-Strings+with+Placeholders">Strings with Placeholders<span><a href="#label-Strings+with+Placeholders">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -431,12 +431,12 @@
             href="../../classes/Sequel.html">Sequel</a> allows you to use strings using
             placeholders for the values:</p>
             
-            <pre>Artist.where(&quot;name LIKE ?&quot;, &#39;Y%&#39;)&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;Y%&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name LIKE ?&quot;</span>, <span class="ruby-string">&#39;Y%&#39;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39;</span></pre>
             
             <p>This is the most common type of placeholder, where each question mark is
             substituted with the next argument:</p>
             
-            <pre>Artist.where(&quot;name LIKE ? AND id = ?&quot;, &#39;Y%&#39;, 5)&#x000A;# SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; AND id = 5</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name LIKE ? AND id = ?&quot;</span>, <span class="ruby-string">&#39;Y%&#39;</span>, <span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name LIKE &#39;Y%&#39; AND id = 5</span></pre>
             
             <p>You can also use named placeholders with a hash, where the named
             placeholders use colons before the placeholder names:</p>
@@ -445,7 +445,7 @@
             
             <p>You don&#39;t have to provide any placeholders if you don&#39;t want to:</p>
             
-            <pre>Artist.where(&quot;id = 2&quot;)&#x000A;# SELECT * FROM artists WHERE id = 2</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;id = 2&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 2</span></pre>
             
             <p>However, if you are using any untrusted input, you should definitely be
             using placeholders. In general, unless you are hardcoding values in the
@@ -480,7 +480,7 @@
             
             <p>Or to use the NOT LIKE operator:</p>
             
-            <pre>Artist.exclude(Sequel.like(:name, &#39;%J%&#39;))&#x000A;# SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;%J%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</span></pre>
             
             <h3 id="label-Removing">Removing<span><a href="#label-Removing">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -494,48 +494,48 @@
             to manipulate the SQL ORDER BY clause.  The most basic of these is
             <code>order</code>:</p>
             
-            <pre>Artist.order(:id)&#x000A;# SELECT * FROM artists ORDER BY id</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists ORDER BY id</span></pre>
             
             <p>You can specify multiple arguments to order by more than one column:</p>
             
-            <pre>Album.order(:artist_id, :id)&#x000A;# SELECT * FROM album ORDER BY artist_id, id</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM album ORDER BY artist_id, id</span></pre>
             
             <p>Note that unlike <code>where</code>, <code>order</code> replaces an
             existing order, it does not append to an existing order:</p>
             
-            <pre>Artist.order(:id).order(:name)&#x000A;# SELECT * FROM artists ORDER BY name</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists ORDER BY name</span></pre>
             
             <p>If you want to add a column to the end of the existing order:</p>
             
-            <pre>Artist.order(:id).order_append(:name)&#x000A;# SELECT * FROM artists ORDER BY id, name</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">order_append</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists ORDER BY id, name</span></pre>
             
             <p>If you want to add a column to the beginning of the existing order:</p>
             
-            <pre>Artist.order(:id).order_prepend(:name)&#x000A;# SELECT * FROM artists ORDER BY name, id</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">order_prepend</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists ORDER BY name, id</span></pre>
             
             <h3 id="label-Reversing">Reversing<span><a href="#label-Reversing">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Just like you can invert an existing filter, you can reverse an existing
             order, using <code>reverse</code>:</p>
             
-            <pre>Artist.order(:id).reverse&#x000A;# SELECT FROM artists ORDER BY id DESC</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">reverse</span>&#x000A;<span class="ruby-comment"># SELECT FROM artists ORDER BY id DESC</span></pre>
             
             <p>As you might expect, <code>reverse</code> is not used all that much.  In
             general, <code>Sequel.desc</code> is used more commonly to specify a
             descending order for columns:</p>
             
-            <pre>Artist.order(Sequel.desc(:id))&#x000A;# SELECT FROM artists ORDER BY id DESC</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">id</span>))&#x000A;<span class="ruby-comment"># SELECT FROM artists ORDER BY id DESC</span></pre>
             
             <p>This allows you to easily use both ascending and descending orders:</p>
             
-            <pre>Artist.order(:name, Sequel.desc(:id))&#x000A;# SELECT FROM artists ORDER BY name, id DESC</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">id</span>))&#x000A;<span class="ruby-comment"># SELECT FROM artists ORDER BY name, id DESC</span></pre>
             
             <h3 id="label-Removing">Removing<span><a href="#label-Removing">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Just like you can remove filters with <code>unfiltered</code>, you can
             remove orders with <code>unordered</code>:</p>
             
-            <pre>Artist.order(:name).unordered&#x000A;# SELECT * FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">unordered</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <h2 id="label-Selected+Columns">Selected Columns<span><a href="#label-Selected+Columns">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -543,7 +543,7 @@
             manipulate the columns selected.  As you may be able to guess, the main
             method used is <code>select</code>:</p>
             
-            <pre>Artist.select(:id, :name)&#x000A;# SELECT id, name FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists</span></pre>
             
             <p>You just specify all of the columns that you are selecting as arguments to
             the method.</p>
@@ -561,28 +561,28 @@
             <p>Like <code>order</code>, <code>select</code> replaces the existing selected
             columns:</p>
             
-            <pre>Artist.select(:id).select(:name)&#x000A;# SELECT name FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM artists</span></pre>
             
             <p>To add to the existing selected columns, use <code>select_append</code>:</p>
             
-            <pre>Artist.select(:id).select_append(:name)&#x000A;# SELECT id, name FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">select_append</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists</span></pre>
             
             <p>To remove specifically selected columns, and default back to all columns,
             use <code>select_all</code>:</p>
             
-            <pre>Artist.select(:id).select_all&#x000A;# SELECT * FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">select_all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <p>To select all columns from a given table, provide an argument to
             <code>select_all</code>:</p>
             
-            <pre>Artist.select_all(:artists)&#x000A;# SELECT artists.* FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">select_all</span>(:<span class="ruby-identifier">artists</span>)&#x000A;<span class="ruby-comment"># SELECT artists.* FROM artists</span></pre>
             
             <h3 id="label-Distinct">Distinct<span><a href="#label-Distinct">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>To treat duplicate rows as a single row when retrieving the records, use
             <code>distinct</code>:</p>
             
-            <pre>Artist.distinct.select(:name)&#x000A;# SELECT DISTINCT name FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">distinct</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT DISTINCT name FROM artists</span></pre>
             
             <p>Note that DISTINCT is a separate SQL clause, it&#39;s not a function that
             you pass to select.</p>
@@ -592,23 +592,23 @@
             <p>You can limit the dataset to a given number of rows using
             <code>limit</code>:</p>
             
-            <pre>Artist.limit(5)&#x000A;# SELECT * FROM artists LIMIT 5</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">5</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists LIMIT 5</span></pre>
             
             <p>You can provide a second argument to <code>limit</code> to specify an
             offset:</p>
             
-            <pre>Artist.limit(5, 10)&#x000A;# SELECT * FROM artists LIMIT 5 OFFSET 10</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">5</span>, <span class="ruby-value">10</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists LIMIT 5 OFFSET 10</span></pre>
             
             <p>You can also call the <code>offset</code> method separately:</p>
             
-            <pre>Artist.limit(5).offset(10)&#x000A;# SELECT * FROM artists LIMIT 5 OFFSET 10</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">5</span>).<span class="ruby-identifier">offset</span>(<span class="ruby-value">10</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists LIMIT 5 OFFSET 10</span></pre>
             
             <p>Either of these would return the 11th through 15th records in the original
             dataset.</p>
             
             <p>To remove a limit from a dataset, use <code>unlimited</code>:</p>
             
-            <pre>Artist.limit(5, 10).unlimited&#x000A;# SELECT * FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">limit</span>(<span class="ruby-value">5</span>, <span class="ruby-value">10</span>).<span class="ruby-identifier">unlimited</span>&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <h2 id="label-Grouping">Grouping<span><a href="#label-Grouping">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -618,29 +618,29 @@
             <p>To modify the GROUP BY clause of the SQL statement, you use
             <code>group</code>:</p>
             
-            <pre>Album.group(:artist_id)&#x000A;# SELECT * FROM albums GROUP BY artist_id</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums GROUP BY artist_id</span></pre>
             
             <p>You can remove an existing grouping using <code>ungrouped</code>:</p>
             
-            <pre>Album.group(:artist_id).ungrouped&#x000A;# SELECT * FROM albums</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">ungrouped</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span></pre>
             
             <p>A common use of grouping is to count based on the number of grouped rows,
             and <a href="../../classes/Sequel.html">Sequel</a> provides a
             <code>group_and_count</code> method to make this easier:</p>
             
-            <pre>Album.group_and_count(:artist_id)&#x000A;# SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id</span></pre>
             
             <p>This will return the number of albums for each artist_id.</p>
             
             <p>If you want to select and group on the same columns, you can use
             <code>select_group</code>:</p>
             
-            <pre>Album.select_group(:artist_id)&#x000A;# SELECT artist_id FROM albums GROUP BY artist_id</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">select_group</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT artist_id FROM albums GROUP BY artist_id</span></pre>
             
             <p>Usually you would add a <code>select_append</code> call after that, to add
             some sort of aggregation:</p>
             
-            <pre>Album.select_group(:artist_id).select_append{sum(num_tracks).as(tracks)}&#x000A;# SELECT artist_id, sum(num_tracks) AS tracks FROM albums GROUP BY artist_id</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">select_group</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">select_append</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">num_tracks</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">tracks</span>)}&#x000A;<span class="ruby-comment"># SELECT artist_id, sum(num_tracks) AS tracks FROM albums GROUP BY artist_id</span></pre>
             
             <h2 id="label-Having">Having<span><a href="#label-Having">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -649,12 +649,12 @@
             possible use is if you only wanted to return artists who had at least 10
             albums:</p>
             
-            <pre>Album.group_and_count(:artist_id).having{count(:*){} &gt;= 10}&#x000A;# SELECT artist_id, count(*) AS count FROM albums&#x000A;# GROUP BY artist_id HAVING count(*) &gt;= 10</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">having</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-operator">*</span>){} <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10</span>}&#x000A;<span class="ruby-comment"># SELECT artist_id, count(*) AS count FROM albums</span>&#x000A;<span class="ruby-comment"># GROUP BY artist_id HAVING count(*) &gt;= 10</span></pre>
             
             <p>Both the WHERE clause and the HAVING clause are removed by
             <code>unfiltered</code>:</p>
             
-            <pre>Album.group_and_count(:artist_id).having{count(:*){} &gt;= 10}.&#x000A; where(:name.like(&#39;A%&#39;)).unfiltered&#x000A;# SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group_and_count</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">having</span>{<span class="ruby-identifier">count</span>(:<span class="ruby-operator">*</span>){} <span class="ruby-operator">&gt;=</span> <span class="ruby-value">10</span>}.&#x000A; <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">unfiltered</span>&#x000A;<span class="ruby-comment"># SELECT artist_id, count(*) AS count FROM albums GROUP BY artist_id</span></pre>
             
             <h2 id="label-Joins">Joins<span><a href="#label-Joins">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -732,7 +732,7 @@
             <p>Just like in filters, an array of two element arrays is treated the same as
             a hash, but allows for duplicate keys:</p>
             
-            <pre>Album.join(:artists, [[:id, :artist_id], [:id, 1..5]])&#x000A;# SELECT * FROM albums INNER JOIN artists&#x000A;#  ON artists.id = albums.artist_id&#x000A;#   AND artists.id &gt;= 1 AND artists.id &lt;= 5</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, [[:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>], [:<span class="ruby-identifier">id</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">5</span>]])&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment">#  ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment">#   AND artists.id &gt;= 1 AND artists.id &lt;= 5</span></pre>
             
             <p>And just like in the hash case, unqualified symbol elements in the array
             are implicitly qualified.</p>
@@ -762,7 +762,7 @@
             your <code>artists</code> table and <code>album_id</code> in your
             <code>albums</code> table, you could do:</p>
             
-            <pre>Album.join(:artists, [:artist_id])&#x000A;# SELECT * FROM albums INNER JOIN artists USING (artist_id)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, [:<span class="ruby-identifier">artist_id</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists USING (artist_id)</span></pre>
             
             <p>See here how you specify the USING columns as an array of symbols.</p>
             
@@ -771,7 +771,7 @@
             <p>NATURAL Joins take it one step further than USING joins, by assuming that
             all columns with the same names in both tables should be used for joining:</p>
             
-            <pre>Album.natural_join(:artists)&#x000A;# SELECT * FROM albums NATURAL JOIN artists</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">natural_join</span>(:<span class="ruby-identifier">artists</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums NATURAL JOIN artists</span></pre>
             
             <p>In this case, you don&#39;t even need to specify any conditions.</p>
             
@@ -806,7 +806,7 @@
             <p>However, you can modify the tables you are selecting FROM using
             <code>from</code>:</p>
             
-            <pre>Album.from(:albums, :old_albums)&#x000A;# SELECT * FROM albums, old_albums</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">old_albums</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums, old_albums</span></pre>
             
             <p>Be careful with this, as multiple tables in the FROM clause use a cross
             join by default, so the number of rows will be number of albums times the
@@ -822,11 +822,11 @@
             <p>In some cases, you may want to wrap the current dataset in a subselect.
             Here&#39;s an example using <code>from_self</code>:</p>
             
-            <pre>Album.order(:artist_id).limit(100).from_self.group(:artist_id)&#x000A;# SELECT * FROM (SELECT * FROM albums ORDER BY artist_id LIMIT 100)&#x000A;#  AS t1 GROUP BY artist_id</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">100</span>).<span class="ruby-identifier">from_self</span>.<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM albums ORDER BY artist_id LIMIT 100)</span>&#x000A;<span class="ruby-comment">#  AS t1 GROUP BY artist_id</span></pre>
             
             <p>This is slightly different than without <code>from_self</code>:</p>
             
-            <pre>Album.order(:artist_id).limit(100).group(:artist_id)&#x000A;# SELECT * FROM albums GROUP BY artist_id ORDER BY name LIMIT 100</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">100</span>).<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums GROUP BY artist_id ORDER BY name LIMIT 100</span></pre>
             
             <p>Without <code>from_self</code>, you are doing the grouping, and limiting
             the number of grouped records returned to 100.  So assuming you have albums
@@ -862,12 +862,12 @@
             <p><a href="../../classes/Sequel.html">Sequel</a> makes it easy to use custom
             SQL by providing it to the <code>Database#[]</code> method as a string:</p>
             
-            <pre>DB[&quot;SELECT * FROM artists&quot;]&#x000A;# SELECT * FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM artists&quot;</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <p>You can also use the <code>with_sql</code> dataset method to return a
             dataset that uses that exact SQL:</p>
             
-            <pre>DB[:albums].with_sql(&quot;SELECT * FROM artists&quot;)&#x000A;# SELECT * FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&quot;SELECT * FROM artists&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <p>With either of these methods, you can use placeholders:</p>
             
@@ -877,19 +877,19 @@
             the dataset modification methods, but in many cases they will appear to
             have no affect:</p>
             
-            <pre>DB[&quot;SELECT * FROM artists&quot;].select(:name).order(:id)&#x000A;# SELECT * FROM artists</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM artists&quot;</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM artists</span></pre>
             
             <p>If you must drop down to using custom SQL, it&#39;s recommended that you
             only do so for specific parts of a query.  For example, if the reason you
             are using custom SQL is to use a custom operator in the database in the
             SELECT clause:</p>
             
-            <pre>DB[&quot;SELECT name, (foo !@# ?) AS baz FROM artists&quot;, &#39;bar&#39;]</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-node">&quot;SELECT name, (foo !@# ?) AS baz FROM artists&quot;</span>, <span class="ruby-string">&#39;bar&#39;</span>]</pre>
             
             <p>it&#39;s better to use Sequel&#39;s DSL, and use a literal string for the
             custom operator:</p>
             
-            <pre>DB[:artists].select(:name, Sequel.lit(&quot;(foo !@# ?)&quot;, &#39;bar&#39;).as(:baz))</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-node">&quot;(foo !@# ?)&quot;</span>, <span class="ruby-string">&#39;bar&#39;</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">baz</span>))</pre>
             
             <p>That way Sequel&#39;s method chaining still works, and it increases
             Sequel&#39;s ability to introspect the code.</p>
@@ -899,7 +899,7 @@
             <p>If you just want to know whether the current dataset would return any rows,
             use <code>empty?</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE id = 0 LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;R%&#39;</span>)).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE name LIKE &#39;R%&#39; ESCAPE &#39;\&#39; LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">false</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE id = 0 LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;R%&#39;</span>)).<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-comment"># SELECT 1 FROM albums WHERE name LIKE &#39;R%&#39; ESCAPE &#39;\&#39; LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; false</span></pre>
             
             <h2 id="label-Aggregate+Calculations">Aggregate Calculations<span><a href="#label-Aggregate+Calculations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -910,12 +910,12 @@
             
             <p><code>count</code> just returns the number of records in the dataset.</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">count</span>&#x000A;<span class="ruby-comment"># SELECT count(*) AS count FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">count</span>&#x000A;<span class="ruby-comment"># SELECT count(*) AS count FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 2</span></pre>
             
             <p>The other methods take a column argument and call the aggregate function
             with the argument:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT sum(id) FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">avg</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT avg(id) FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-value">1.5</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">min</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT min(id) FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">max</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT max(id) FROM albums LIMIT 1</span>&#x000A;=<span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT sum(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 3</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">avg</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT avg(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1.5</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">min</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT min(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 1</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">max</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-comment"># SELECT max(id) FROM albums LIMIT 1</span>&#x000A;<span class="ruby-comment"># =&gt; 2</span></pre>
           </div>
           <div id='context'>
           </div>

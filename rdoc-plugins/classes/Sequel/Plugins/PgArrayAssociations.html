@@ -56,36 +56,32 @@
             pg_array_to_many associations do not affect the database, since they
             operate purely on the receiver.  For example:</p>
             
-            <pre>album = Album[1]&#x000A;album.add_tag(Tag[2])</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">add_tag</span>(<span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>])</pre>
             
             <p>does not save the album.  This allows you to call add_tag repeatedly and
             the save after to combine all changes into a single query.  Note that the
             many_to_pg_array association modification methods do save, so:</p>
             
-            <pre>tag = Tag[2]&#x000A;tag.add_album(Album[1])</pre>
+            <pre class="ruby"><span class="ruby-identifier">tag</span> = <span class="ruby-constant">Tag</span>[<span class="ruby-value">2</span>]&#x000A;<span class="ruby-identifier">tag</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-constant">Album</span>[<span class="ruby-value">1</span>])</pre>
             
             <p>will save the changes to the album.</p>
             
             <p>They support some additional options specific to this plugin:</p>
-            <dl class="rdoc-list note-list"><dt>:array_type 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:array_type </td><td>
             <p>This overrides the type of the array.  By default, the type is determined
             by looking at the db_schema for the model, and if that fails, it defaults
             to :integer.</p>
-            </dd><dt>:raise_on_save_failure 
-            <dd>
+            </td></tr><tr><td class='label'>:raise_on_save_failure </td><td>
             <p>Do not raise exceptions for hook or validation failures when saving
             associated objects in the add/remove methods (return nil instead).</p>
-            </dd><dt>:save_after_modify 
-            <dd>
+            </td></tr><tr><td class='label'>:save_after_modify </td><td>
             <p>For pg_array_to_many associations, this makes the the modification methods
             save the current object, so they operate more similarly to the one_to_many
             and many_to_many association modification methods.</p>
-            </dd><dt>:uniq 
-            <dd>
+            </td></tr><tr><td class='label'>:uniq </td><td>
             <p>Similar to many_to_many associations, this can be used to make sure the
             returned associated object array has uniq values.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Note that until PostgreSQL gains the ability to enforce foreign key
             constraints in array columns, this plugin is not recommended for production

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-10-21 11:50:03 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,21 +43,20 @@
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :pg_range_ops</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_range_ops</span></pre>
             
             <p>The most common usage is passing an expression to Sequel.pg_range_op:</p>
             
-            <pre>r = Sequel.pg_range_op(:range)</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range_op</span>(:<span class="ruby-identifier">range</span>)</pre>
             
             <p>If you have also loaded the pg_range extension, you can use Sequel.pg_range
             as well:</p>
             
-            <pre>r = Sequel.pg_range(:range)</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(:<span class="ruby-identifier">range</span>)</pre>
             
-            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
-            expression objects, you can call the pg_range method:</p>
+            <p>Also, on most Sequel expression objects, you can call the pg_range method:</p>
             
-            <pre>r = Sequel.expr(:range).pg_range</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">range</span>).<span class="ruby-identifier">pg_range</span></pre>
             
             <p>If you have loaded the <a
             href="../../../doc/core_extensions_rdoc.html">core_extensions
@@ -65,13 +64,13 @@
             activated refinements for the file, you can also use <a
             href="../../../../classes/Sequel/Postgres/RangeOpMethods.html#method-i-pg_range">Sequel::Postgres::RangeOpMethods#pg_range</a>:</p>
             
-            <pre>r = :range.pg_range</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span> = :<span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span></pre>
             
             <p>This creates a <a
             href="../../../../classes/Sequel/Postgres/RangeOp.html">Sequel::Postgres::RangeOp</a>
             object that can be used for easier querying:</p>
             
-            <pre>r.contains(:other)      # range @&gt; other&#x000A;r.contained_by(:other)  # range &lt;@ other&#x000A;r.overlaps(:other)      # range &amp;&amp; other&#x000A;r.left_of(:other)       # range &lt;&lt; other&#x000A;r.right_of(:other)      # range &gt;&gt; other&#x000A;r.starts_after(:other)  # range &amp;&gt; other&#x000A;r.ends_before(:other)   # range &amp;&lt; other&#x000A;r.adjacent_to(:other)   # range -|- other&#x000A;r.lower            # lower(range)&#x000A;r.upper            # upper(range)&#x000A;r.isempty          # isempty(range)&#x000A;r.lower_inc        # lower_inc(range)&#x000A;r.upper_inc        # upper_inc(range)&#x000A;r.lower_inf        # lower_inf(range)&#x000A;r.upper_inf        # upper_inf(range)</pre>
+            <pre class="ruby"><span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">other</span>)      <span class="ruby-comment"># range @&gt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">other</span>)  <span class="ruby-comment"># range &lt;@ other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">overlaps</span>(:<span class="ruby-identifier">other</span>)      <span class="ruby-comment"># range &amp;&amp; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">left_of</span>(:<span class="ruby-identifier">other</span>)       <span class="ruby-comment"># range &lt;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">right_of</span>(:<span class="ruby-identifier">other</span>)      <span class="ruby-comment"># range &gt;&gt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">starts_after</span>(:<span class="ruby-identifier">other</span>)  <span class="ruby-comment"># range &amp;&gt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">ends_before</span>(:<span class="ruby-identifier">other</span>)   <span class="ruby-comment"># range &amp;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">adjacent_to</span>(:<span class="ruby-identifier">other</span>)   <span class="ruby-comment"># range -|- other</span>&#x000A;&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">lower</span>            <span class="ruby-comment"># lower(range)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">upper</span>            <span class="ruby-comment"># upper(range)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">isempty</span>          <span class="ruby-comment"># isempty(range)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">lower_inc</span>        <span class="ruby-comment"># lower_inc(range)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">upper_inc</span>        <span class="ruby-comment"># upper_inc(range)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">lower_inf</span>        <span class="ruby-comment"># lower_inf(range)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">upper_inf</span>        <span class="ruby-comment"># upper_inf(range)</span></pre>
             
             <p>See the PostgreSQL range function and operator documentation for more
             details on what these functions and operators do.</p>

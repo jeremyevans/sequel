@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-16 09:40:34 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -45,7 +45,7 @@
             
             <p>To use this extension, you first need to load it into the database:</p>
             
-            <pre>DB.extension(:constraint_validations)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">constraint_validations</span>)</pre>
             
             <p>Note that you should only need to do this when modifying the constraint
             validations (i.e. when migrating).  You should probably not load this
@@ -55,7 +55,7 @@
             validations.  By default, this table is called
             sequel_constraint_validations.</p>
             
-            <pre>DB.create_constraint_validations_table</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_constraint_validations_table</span></pre>
             
             <p>This table should only be created once.  For new applications, you
             generally want to create it first, before creating any other application
@@ -64,7 +64,7 @@
             <p>Because migrations instance_eval the up and down blocks on a database,
             using this extension in a migration can be done via:</p>
             
-            <pre>Sequel.migration do&#x000A;  up do&#x000A;    extension(:constraint_validations)&#x000A;    # ...&#x000A;  end&#x000A;  down do&#x000A;    extension(:constraint_validations)&#x000A;    # ...&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">constraint_validations</span>)&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">constraint_validations</span>)&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>However, note that you cannot use change migrations with this extension,
             you need to use separate up/down migrations.</p>
@@ -75,7 +75,7 @@
             block to the schema generators.  Like the create_table and alter_table
             blocks, this block is instance_evaled and offers its own DSL. Example:</p>
             
-            <pre>DB.create_table(:table) do&#x000A;  Integer :id&#x000A;  String :name&#x000A;  validate do&#x000A;    presence :id&#x000A;    min_length 5, :name&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;&#x000A;  <span class="ruby-identifier">validate</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">presence</span> :<span class="ruby-identifier">id</span>&#x000A;    <span class="ruby-identifier">min_length</span> <span class="ruby-value">5</span>, :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>instance_eval is used in this case because create_table and alter_table
             already use instance_eval, so losing access to the surrounding receiver is
@@ -83,55 +83,39 @@
             
             <p>Here&#39;s a breakdown of the constraints created for each constraint
             validation method:</p>
-            <dl class="rdoc-list note-list"><dt>All constraints except unique unless :allow_nil is true 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>All constraints except unique unless :allow_nil is true </td><td>
             <p>CHECK column IS NOT NULL</p>
-            </dd><dt>presence (String column) 
-            <dd>
+            </td></tr><tr><td class='label'>presence (String column) </td><td>
             <p>CHECK trim(column) != &#39;&#39;</p>
-            </dd><dt>exact_length 5 
-            <dd>
+            </td></tr><tr><td class='label'>exact_length 5 </td><td>
             <p>CHECK char_length(column) = 5</p>
-            </dd><dt>min_length 5 
-            <dd>
+            </td></tr><tr><td class='label'>min_length 5 </td><td>
             <p>CHECK char_length(column) &gt;= 5</p>
-            </dd><dt>max_length 5 
-            <dd>
+            </td></tr><tr><td class='label'>max_length 5 </td><td>
             <p>CHECK char_length(column) &lt;= 5</p>
-            </dd><dt>length_range 3..5 
-            <dd>
+            </td></tr><tr><td class='label'>length_range 3..5 </td><td>
             <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt;= 5</p>
-            </dd><dt>length_range 3…5 
-            <dd>
+            </td></tr><tr><td class='label'>length_range 3…5 </td><td>
             <p>CHECK char_length(column) &gt;= 3 AND char_length(column) &lt; 5</p>
-            </dd><dt>format /foo\d+/ 
-            <dd>
+            </td></tr><tr><td class='label'>format /foo\d+/ </td><td>
             <p>CHECK column ~ &#39;foo\d+&#39;</p>
-            </dd><dt>format /foo\d+/i 
-            <dd>
+            </td></tr><tr><td class='label'>format /foo\d+/i </td><td>
             <p>CHECK column ~* &#39;foo\d+&#39;</p>
-            </dd><dt>like &#39;foo%&#39; 
-            <dd>
+            </td></tr><tr><td class='label'>like &#39;foo%&#39; </td><td>
             <p>CHECK column LIKE &#39;foo%&#39; ESCAPE &#39;&#39;</p>
-            </dd><dt>ilike &#39;foo%&#39; 
-            <dd>
+            </td></tr><tr><td class='label'>ilike &#39;foo%&#39; </td><td>
             <p>CHECK column ILIKE &#39;foo%&#39; ESCAPE &#39;&#39;</p>
-            </dd><dt>includes [&#39;a&#39;, &#39;b&#39;] 
-            <dd>
+            </td></tr><tr><td class='label'>includes [&#39;a&#39;, &#39;b&#39;] </td><td>
             <p>CHECK column IN (&#39;a&#39;, &#39;b&#39;)</p>
-            </dd><dt>includes [1, 2] 
-            <dd>
+            </td></tr><tr><td class='label'>includes [1, 2] </td><td>
             <p>CHECK column IN (1, 2)</p>
-            </dd><dt>includes 3..5 
-            <dd>
+            </td></tr><tr><td class='label'>includes 3..5 </td><td>
             <p>CHECK column &gt;= 3 AND column &lt;= 5</p>
-            </dd><dt>includes 3…5 
-            <dd>
+            </td></tr><tr><td class='label'>includes 3…5 </td><td>
             <p>CHECK column &gt;= 3 AND column &lt; 5</p>
-            </dd><dt>unique 
-            <dd>
+            </td></tr><tr><td class='label'>unique </td><td>
             <p>UNIQUE (column)</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>There are some additional API differences:</p>
             <ul><li>

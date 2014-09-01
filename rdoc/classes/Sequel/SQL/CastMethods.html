@@ -69,7 +69,7 @@
                   and it is handled similarly to using a database independent type in the
                   schema methods.</p>
                   
-                  <pre>Sequel.function(:func).cast(:integer) # CAST(func() AS integer)&#x000A;Sequel.function(:func).cast(String) # CAST(func() AS varchar(255))</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">integer</span>) <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-constant">String</span>) <span class="ruby-comment"># CAST(func() AS varchar(255))</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast-source'); return false">
@@ -91,7 +91,7 @@
                   if none given), and return the result as a <code>NumericExpression</code>,
                   so you can use the bitwise operators on the result.</p>
                   
-                  <pre>Sequel.function(:func).cast_numeric # CAST(func() AS integer)&#x000A;Sequel.function(:func).cast_numeric(Float) # CAST(func() AS double precision)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_numeric</span> <span class="ruby-comment"># CAST(func() AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_numeric</span>(<span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(func() AS double precision)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_numeric-source'); return false">
@@ -114,7 +114,7 @@
                   so you can use + directly on the result for <a href="../SQL.html">SQL</a>
                   string concatenation.</p>
                   
-                  <pre>Sequel.function(:func).cast_string # CAST(func() AS varchar(255))&#x000A;Sequel.function(:func).cast_string(:text) # CAST(func() AS text)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_string</span> <span class="ruby-comment"># CAST(func() AS varchar(255))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>).<span class="ruby-identifier">cast_string</span>(:<span class="ruby-identifier">text</span>) <span class="ruby-comment"># CAST(func() AS text)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_string-source'); return false">

@@ -47,13 +47,13 @@
             where you just specify the extension symbol, except that you can specify
             multiple extensions at once:</p>
             
-            <pre>DB.extension(:pg_array, :pg_hstore)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">pg_array</span>, :<span class="ruby-identifier">pg_hstore</span>)</pre>
             
             <p>For databases, these modify the Database itself (and potentially all of its
             datasets).  Dataset#extension operates like other dataset methods,
             returning a modified clone of the dataset with the extension added:</p>
             
-            <pre>dataset = dataset.extension(:columns_introspection)</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">columns_introspection</span>)</pre>
             
             <p>Dataset#extension! has also been added for modifying the receiver instead
             of returning a clone.</p>

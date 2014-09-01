@@ -44,7 +44,7 @@
             instance methods and super instead of this plugin.  What this plugin allows
             you to do is, for example:</p>
             
-            <pre># Block only, can cause duplicate hooks if code is reloaded&#x000A;before_save{self.created_at = Time.now}&#x000A;# Block with tag, safe for reloading&#x000A;before_save(:set_created_at){self.created_at = Time.now}&#x000A;# Tag only, safe for reloading, calls instance method&#x000A;before_save(:set_created_at)</pre>
+            <pre class="ruby"><span class="ruby-comment"># Block only, can cause duplicate hooks if code is reloaded</span>&#x000A;<span class="ruby-identifier">before_save</span>{<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}&#x000A;<span class="ruby-comment"># Block with tag, safe for reloading</span>&#x000A;<span class="ruby-identifier">before_save</span>(:<span class="ruby-identifier">set_created_at</span>){<span class="ruby-keyword">self</span>.<span class="ruby-identifier">created_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}&#x000A;<span class="ruby-comment"># Tag only, safe for reloading, calls instance method</span>&#x000A;<span class="ruby-identifier">before_save</span>(:<span class="ruby-identifier">set_created_at</span>)</pre>
             
             <p>Pretty much anything you can do with a hook class method, you can also do
             with an instance method instead:</p>

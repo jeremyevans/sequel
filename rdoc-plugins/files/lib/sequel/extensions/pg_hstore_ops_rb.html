@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-06 13:15:21 -0800</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,35 +43,34 @@
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :pg_hstore_ops</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_hstore_ops</span></pre>
             
             <p>The most common usage is taking an object that represents an SQL expression
             (such as a :symbol), and calling Sequel.hstore_op with it:</p>
             
-            <pre>h = Sequel.hstore_op(:hstore_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore_op</span>(:<span class="ruby-identifier">hstore_column</span>)</pre>
             
             <p>If you have also loaded the pg_hstore extension, you can use Sequel.hstore
             as well:</p>
             
-            <pre>h = Sequel.hstore(:hstore_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">hstore_column</span>)</pre>
             
-            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
-            expression objects, you can call the hstore  method:</p>
+            <p>Also, on most Sequel expression objects, you can call the hstore  method:</p>
             
-            <pre>h = Sequel.expr(:hstore_column).hstore</pre>
+            <pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">hstore_column</span>).<span class="ruby-identifier">hstore</span></pre>
             
             <p>If you have loaded the <a
             href="../../../doc/core_extensions_rdoc.html">core_extensions
             extension</a>, or you have loaded the core_refinements extension and have
             activated refinements for the file, you can also use Symbol#hstore:</p>
             
-            <pre>h = :hstore_column.hstore</pre>
+            <pre class="ruby"><span class="ruby-identifier">h</span> = :<span class="ruby-identifier">hstore_column</span>.<span class="ruby-identifier">hstore</span></pre>
             
             <p>This creates a <a
             href="../../../../classes/Sequel/Postgres/HStoreOp.html">Sequel::Postgres::HStoreOp</a>
             object that can be used for easier querying:</p>
             
-            <pre>h - &#39;a&#39;    # hstore_column - CAST(&#39;a&#39; AS text)&#x000A;h[&#39;a&#39;]     # hstore_column -&gt; &#39;a&#39;&#x000A;h.concat(:other_hstore_column)       # ||&#x000A;h.has_key?(&#39;a&#39;)                      # ?&#x000A;h.contain_all(:array_column)         # ?&amp;&#x000A;h.contain_any(:array_column)         # ?|&#x000A;h.contains(:other_hstore_column)     # @&gt; &#x000A;h.contained_by(:other_hstore_column) # &lt;@&#x000A;&#x000A;h.defined        # defined(hstore_column)&#x000A;h.delete(&#39;a&#39;)    # delete(hstore_column, &#39;a&#39;)&#x000A;h.each           # each(hstore_column)&#x000A;h.keys           # akeys(hstore_column)&#x000A;h.populate(:a)   # populate_record(a, hstore_column)&#x000A;h.record_set(:a) # (a #= hstore_column)&#x000A;h.skeys          # skeys(hstore_column)&#x000A;h.slice(:a)      # slice(hstore_column, a)&#x000A;h.svals          # svals(hstore_column)&#x000A;h.to_array       # hstore_to_array(hstore_column)&#x000A;h.to_matrix      # hstore_to_matrix(hstore_column)&#x000A;h.values         # avals(hstore_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">h</span> <span class="ruby-operator">-</span> <span class="ruby-string">&#39;a&#39;</span>    <span class="ruby-comment"># hstore_column - CAST(&#39;a&#39; AS text)</span>&#x000A;<span class="ruby-identifier">h</span>[<span class="ruby-string">&#39;a&#39;</span>]     <span class="ruby-comment"># hstore_column -&gt; &#39;a&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">concat</span>(:<span class="ruby-identifier">other_hstore_column</span>)       <span class="ruby-comment"># ||</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-string">&#39;a&#39;</span>)                      <span class="ruby-comment"># ?</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">contain_all</span>(:<span class="ruby-identifier">array_column</span>)         <span class="ruby-comment"># ?&amp;</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">contain_any</span>(:<span class="ruby-identifier">array_column</span>)         <span class="ruby-comment"># ?|</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">other_hstore_column</span>)     <span class="ruby-comment"># @&gt; </span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">other_hstore_column</span>) <span class="ruby-comment"># &lt;@</span>&#x000A;&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">defined</span>        <span class="ruby-comment"># defined(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-string">&#39;a&#39;</span>)    <span class="ruby-comment"># delete(hstore_column, &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">each</span>           <span class="ruby-comment"># each(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">keys</span>           <span class="ruby-comment"># akeys(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">populate</span>(:<span class="ruby-identifier">a</span>)   <span class="ruby-comment"># populate_record(a, hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">record_set</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (a #= hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">skeys</span>          <span class="ruby-comment"># skeys(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">slice</span>(:<span class="ruby-identifier">a</span>)      <span class="ruby-comment"># slice(hstore_column, a)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">svals</span>          <span class="ruby-comment"># svals(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">to_array</span>       <span class="ruby-comment"># hstore_to_array(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">to_matrix</span>      <span class="ruby-comment"># hstore_to_matrix(hstore_column)</span>&#x000A;<span class="ruby-identifier">h</span>.<span class="ruby-identifier">values</span>         <span class="ruby-comment"># avals(hstore_column)</span></pre>
             
             <p>See the PostgreSQL hstore function and operator documentation for more
             details on what these functions and operators do.</p>

@@ -52,12 +52,12 @@
             </li><li>
             <p>You can now use datasets as expressions, allowing things such as:</p>
             
-            <pre>DB[:table1].select(:column1) &gt; DB[:table2].select(:column2)&#x000A;# (SELECT column1 FROM table1) &gt; (SELECT column2 FROM table2)&#x000A;DB[:table1].select(:column1).cast(Integer)&#x000A;# CAST((SELECT column1 FROM table1) AS integer)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table1</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">column1</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table2</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">column2</span>)&#x000A;<span class="ruby-comment"># (SELECT column1 FROM table1) &gt; (SELECT column2 FROM table2)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table1</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">column1</span>).<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Integer</span>)&#x000A;<span class="ruby-comment"># CAST((SELECT column1 FROM table1) AS integer)</span></pre>
             </li><li>
             <p>Dataset#select_group has been added for grouping and selecting on the same
             columns.</p>
             
-            <pre>DB[:a].select_group(:b, :c)&#x000A;# SELECT b, c FROM a GROUP BY b, c</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select_group</span>(:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-comment"># SELECT b, c FROM a GROUP BY b, c</span></pre>
             </li><li>
             <p>Dataset#exclude_where and exclude_having methods have been added, allowing
             you to specify which clause to affect.  exclude&#39;s behavior is still to
@@ -67,11 +67,11 @@
             <p>Dataset#select_all now accepts optional arguments and will select all
             columns from those arguments if present:</p>
             
-            <pre>DB[:a].select_all(:a)&#x000A;# SELECT a.* FROM a&#x000A;DB.from(:a, :b).select_all(:a, :b)&#x000A;# SELECT a.*, b.* FROM a, b</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select_all</span>(:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-comment"># SELECT a.* FROM a</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>).<span class="ruby-identifier">select_all</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-comment"># SELECT a.*, b.* FROM a, b</span></pre>
             </li><li>
             <p>Dataset#group and group_and_count now both accept virtual row blocks:</p>
             
-            <pre>DB[:a].select(:b).group{c(d)}&#x000A;# SELECT b FROM a GROUP BY c(d)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">b</span>).<span class="ruby-identifier">group</span>{<span class="ruby-identifier">c</span>(<span class="ruby-identifier">d</span>)}&#x000A;<span class="ruby-comment"># SELECT b FROM a GROUP BY c(d)</span></pre>
             </li><li>
             <p>If you use a LiteralString as a validation error message, 
             Errors#full_messages will now not add the related column name to the start

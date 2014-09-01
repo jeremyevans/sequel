@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-08-22 12:22:05 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -41,16 +41,15 @@
             <p>The from_block extension changes Database#from so that blocks given to it
             are treated as virtual rows applying to the FROM clause, instead of virtual
             rows applying to the WHERE clause.  This will probably be made the default
-            in the next major version of <a
-            href="../../../../classes/Sequel.html">Sequel</a>.</p>
+            in the next major version of Sequel.</p>
             
             <p>This makes it easier to use table returning functions:</p>
             
-            <pre>DB.from{table_function(1)}&#x000A;# SELECT * FROM table_function(1)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>{<span class="ruby-identifier">table_function</span>(<span class="ruby-value">1</span>)}&#x000A;<span class="ruby-comment"># SELECT * FROM table_function(1)</span></pre>
             
             <p>To load the extension into the database:</p>
             
-            <pre>DB.extension :from_block</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">from_block</span></pre>
           </div>
           <div id='context'>
           </div>

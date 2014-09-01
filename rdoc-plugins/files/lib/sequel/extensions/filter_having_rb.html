@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-08-22 12:22:05 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -40,18 +40,17 @@
             
             <p>The filter_having extension allows Dataset#filter, and, or and exclude to
             operate on the HAVING clause if the dataset already has a HAVING clause,
-            which was the historical behavior before <a
-            href="../../../../classes/Sequel.html">Sequel</a> 4.  It is only
-            recommended to use this for backwards compatibility.</p>
+            which was the historical behavior before Sequel 4.  It is only recommended
+            to use this for backwards compatibility.</p>
             
             <p>You can load this extension into specific datasets:</p>
             
-            <pre>ds = DB[:table]&#x000A;ds = ds.extension(:filter_having)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">filter_having</span>)</pre>
             
             <p>Or you can load it into all of a database&#39;s datasets, which is probably
             the desired behavior if you are using this extension:</p>
             
-            <pre>DB.extension(:filter_having)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">filter_having</span>)</pre>
           </div>
           <div id='context'>
           </div>

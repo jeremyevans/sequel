@@ -87,7 +87,7 @@
             <p>The primary key column(s) is restricted by default. To allow it to be set
             via new/set/update, use:</p>
             
-            <pre>Sequel::Model.unrestrict_primary_key # Global&#x000A;Artist.unrestrict_primary_key # Per Class</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">unrestrict_primary_key</span> <span class="ruby-comment"># Global</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">unrestrict_primary_key</span> <span class="ruby-comment"># Per Class</span></pre>
             </li><li>
             <p>It is now easy to override the one_to_many/many_to_many association methods
             that modify the database (add_/remove_/remove_all_), as they have been
@@ -102,7 +102,7 @@
             <p>Dataset#join_table got a nice overhaul.  You can now use any join type your
             database allows:</p>
             
-            <pre>DB[:artist].join_table(:natural, :albums)&#x000A;DB[:numbers].join_table(:cross, :numbers)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artist</span>].<span class="ruby-identifier">join_table</span>(:<span class="ruby-identifier">natural</span>, :<span class="ruby-identifier">albums</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">numbers</span>].<span class="ruby-identifier">join_table</span>(:<span class="ruby-identifier">cross</span>, :<span class="ruby-identifier">numbers</span>)</pre>
             
             <p>You can now specify the conditions as</p>
             <ul><li>
@@ -133,18 +133,18 @@
             
             <p>SQL Case statements are now supported directly using hashes or arrays:</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>)&#x000A;<span class="ruby-comment"># CASE WHEN x &gt; 1 THEN 1 ELSE 0 END</span>&#x000A;[[{:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-value">0</span>], [:<span class="ruby-identifier">x</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-value">2</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">-1</span>)&#x000A;<span class="ruby-comment"># CASE WHEN x = 1 THEN 0 WHEN x &lt; 1 THEN 1 WHEN x &gt; 1 THEN 2</span>&#x000A;  <span class="ruby-constant">ELSE</span> <span class="ruby-value">-1</span> <span class="ruby-keyword">END</span></pre>
+            <pre>{:x &gt; 1 =&gt; 1}.case(0)&#x000A;# CASE WHEN x &gt; 1 THEN 1 ELSE 0 END&#x000A;[[{:x=&gt;1}, 0], [:x &lt; 1, 1], [:x &gt; 1, 2]].case(-1)&#x000A;# CASE WHEN x = 1 THEN 0 WHEN x &lt; 1 THEN 1 WHEN x &gt; 1 THEN 2&#x000A;  ELSE -1 END</pre>
             
             <p>You should use an array instead of a hash for multiple conditions unless
             all conditions are orthogonal.</p>
             
             <p>The SQL extract function has special syntax:</p>
             
-            <pre>EXTRACT(day FROM date)</pre>
+            <pre class="ruby"><span class="ruby-constant">EXTRACT</span>(<span class="ruby-identifier">day</span> <span class="ruby-constant">FROM</span> <span class="ruby-identifier">date</span>)</pre>
             
             <p>This syntax is now supported via the following ruby code:</p>
             
-            <pre>:date.extract(:day)</pre>
+            <pre class="ruby">:<span class="ruby-identifier">date</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">day</span>)</pre>
             
             <p>Other Notable Changes</p>
             <hr>
@@ -220,12 +220,12 @@
             
             <p>With this set, you can use the expression filters inside of blocks:</p>
             
-            <pre>dataset.filter{((:x + 1) &amp; 10 &lt; :y) &amp; :z}</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{((:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-value">10</span> <span class="ruby-operator">&lt;</span> :<span class="ruby-identifier">y</span>) <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">z</span>}</pre>
             
             <p>That doesn&#39;t gain you all that much, but there are some methods that
             feed block arguments into filter, such as the following:</p>
             
-            <pre>dataset.first(5){((:x + 1) &amp; 10 &lt; :y) &amp; :z}</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">5</span>){((:<span class="ruby-identifier">x</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> <span class="ruby-value">10</span> <span class="ruby-operator">&lt;</span> :<span class="ruby-identifier">y</span>) <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">z</span>}</pre>
             
             <p>Which will get you the first 5 records matching the condition.</p>
             
@@ -234,13 +234,13 @@
             <ul><li>
             <p>To change the datetime classe used from Time to DateTime, you now use:</p>
             
-            <pre>Sequel.datetime_class = DateTime # instead of Sequel.time_class</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> = <span class="ruby-constant">DateTime</span> <span class="ruby-comment"># instead of Sequel.time_class</span></pre>
             </li><li>
             <p>Models now raise errors if you try to access a missing or restricted method
             via new/set/update, instead of just silently skipping that parameter.  To
             get the old behavior:</p>
             
-            <pre>Sequel::Model.strict_param_setting = false</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span></pre>
             </li><li>
             <p>The association_dataset method now takes into account the :eager option and
             the block argument, where it didn&#39;t before. It also takes into account
@@ -252,12 +252,12 @@
             <p>Dataset#join_table used to allow a symbol as a conditions argument as a
             shortcut for a hash:</p>
             
-            <pre>DB[:artist].join(:albums, :artist_id)&#x000A;# ON albums.artist_id = artists.id</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artist</span>].<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># ON albums.artist_id = artists.id</span></pre>
             
             <p>With the changes to join_table, this no longer works.  It would now be
             interpreted as a boolean column:</p>
             
-            <pre>DB[:artist].join(:albums, :artist_id)&#x000A;# ON artists.id</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artist</span>].<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-comment"># ON artists.id</span></pre>
             
             <p>Use the following slightly longer version for the old behavior:</p>
             
@@ -266,11 +266,11 @@
             <p>MySQL users need to be careful when upgrading, the following code will once
             again cause an error:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}}</pre>
+            <pre>DB[:artists].each{|artist| DB[:albums].each{|album| ...}}</pre>
             
             <p>To fix it, change the code to:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">artist</span><span class="ruby-operator">|</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">album</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}}</pre>
+            <pre>DB[:artists].all{|artist| DB[:albums].each{|album| ...}}</pre>
             
             <p>The issue is the MySQL adapter doesn&#39;t release the database connection
             while running each, and the second call to each gets the same database

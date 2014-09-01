@@ -88,15 +88,15 @@
             
             <p>You can override the options for any specific association by making sure
             the plugin options contain one of the following keys:</p>
-            <ul><li>
-            <p>:parent - hash of options for the parent association</p>
-            </li><li>
-            <p>:children - hash of options for the children association</p>
-            </li><li>
-            <p>:ancestors - hash of options for the ancestors association</p>
-            </li><li>
-            <p>:descendants - hash of options for the descendants association</p>
-            </li></ul>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:parent </td><td>
+            <p>hash of options for the parent association</p>
+            </td></tr><tr><td class='label'>:children </td><td>
+            <p>hash of options for the children association</p>
+            </td></tr><tr><td class='label'>:ancestors </td><td>
+            <p>hash of options for the ancestors association</p>
+            </td></tr><tr><td class='label'>:descendants </td><td>
+            <p>hash of options for the descendants association</p>
+            </td></tr></tbody></table>
             
             <p>Note that you can change the name of the above associations by specifying a
             :name key in the appropriate hash of options above.  For example:</p>
@@ -105,22 +105,20 @@
             
             <p>Any other keys in the main options hash are treated as options shared by
             all of the associations.  Here&#39;s a few options that affect the plugin:</p>
-            <ul><li>
-            <p>:key - The foreign key in the table that points to the primary key of the
-            parent (default: :parent_id)</p>
-            </li><li>
-            <p>:primary_key - The primary key to use (default: the model&#39;s primary
-            key)</p>
-            </li><li>
-            <p>:key_alias - The symbol identifier to use for aliasing when eager loading
-            (default: :x_root_x)</p>
-            </li><li>
-            <p>:cte_name - The symbol identifier to use for the common table expression
-            (default: :t)</p>
-            </li><li>
-            <p>:level_alias - The symbol identifier to use when eagerly loading
-            descendants up to a given level (default: :x_level_x)</p>
-            </li></ul>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:key </td><td>
+            <p>The foreign key in the table that points to the primary key of the parent
+            (default: :parent_id)</p>
+            </td></tr><tr><td class='label'>:primary_key </td><td>
+            <p>The primary key to use (default: the model&#39;s primary key)</p>
+            </td></tr><tr><td class='label'>:key_alias </td><td>
+            <p>The symbol identifier to use for aliasing when eager loading (default:
+            :x_root_x)</p>
+            </td></tr><tr><td class='label'>:cte_name </td><td>
+            <p>The symbol identifier to use for the common table expression (default: :t)</p>
+            </td></tr><tr><td class='label'>:level_alias </td><td>
+            <p>The symbol identifier to use when eagerly loading descendants up to a given
+            level (default: :x_level_x)</p>
+            </td></tr></tbody></table>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>

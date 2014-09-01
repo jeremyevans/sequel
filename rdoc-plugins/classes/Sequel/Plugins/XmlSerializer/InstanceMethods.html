@@ -62,17 +62,15 @@
                   
                   <p>Update the contents of this instance based on the given XML. Accepts the
                   following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:name_proc 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name_proc </td><td>
                   <p>Proc or <a href="../../../Hash.html">Hash</a> that accepts a string and
                   returns a string, used to convert tag names to column or association names.</p>
-                  </dd><dt>:underscore 
-                  <dd>
+                  </td></tr><tr><td class='label'>:underscore </td><td>
                   <p>Sets the :name_proc option to one that calls <code>underscore</code> on the
                   input string.  Requires that you load the inflector extension or another
                   library that adds <a
                   href="../../../String.html#method-i-underscore">String#underscore</a>.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml-source'); return false">
@@ -94,18 +92,16 @@
                   hash created from the content of the node.</p>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:associations 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:associations </td><td>
                   <p>Indicates that the associations cache should be updated by creating a new
                   associated object using data from the hash.  Should be a <a
                   href="../../../Symbol.html">Symbol</a> for a single association, an array
                   of symbols for multiple associations, or a hash with symbol keys and
                   dependent association option hash values.</p>
-                  </dd><dt>:fields 
-                  <dd>
+                  </td></tr><tr><td class='label'>:fields </td><td>
                   <p>Changes the behavior to call set_fields using the provided fields, instead
                   of calling set.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_xml_node-source'); return false">
@@ -124,38 +120,31 @@
                   
                   <p>Return a string in XML format.  If a block is given, yields the XML builder
                   object so you can add additional XML tags. Accepts the following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:builder 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:builder </td><td>
                   <p>The builder instance used to build the XML, which should be an instance of
                   Nokogiri::XML::Node.  This is necessary if you are serializing entire
                   object graphs, like associated objects.</p>
-                  </dd><dt>:builder_opts 
-                  <dd>
+                  </td></tr><tr><td class='label'>:builder_opts </td><td>
                   <p>Options to pass to the Nokogiri::XML::Builder initializer, if the :builder
                   option is not provided.</p>
-                  </dd><dt>:camelize
-                  <dd>
+                  </td></tr><tr><td class='label'>:camelize</td><td>
                   <p>Sets the :name_proc option to one that calls <code>camelize</code> on the
                   input string.  Requires that you load the inflector extension or another
                   library that adds <a
                   href="../../../String.html#method-i-camelize">String#camelize</a>.</p>
-                  </dd><dt>:dasherize 
-                  <dd>
+                  </td></tr><tr><td class='label'>:dasherize </td><td>
                   <p>Sets the :name_proc option to one that calls <code>dasherize</code> on the
                   input string.  Requires that you load the inflector extension or another
                   library that adds <a
                   href="../../../String.html#method-i-dasherize">String#dasherize</a>.</p>
-                  </dd><dt>:encoding 
-                  <dd>
+                  </td></tr><tr><td class='label'>:encoding </td><td>
                   <p>The encoding to use for the XML output, passed to the
                   Nokogiri::XML::Builder initializer.</p>
-                  </dd><dt>:except 
-                  <dd>
+                  </td></tr><tr><td class='label'>:except </td><td>
                   <p><a href="../../../Symbol.html">Symbol</a> or <a
                   href="../../../Array.html">Array</a> of Symbols of columns not to include
                   in the XML output.</p>
-                  </dd><dt>:include 
-                  <dd>
+                  </td></tr><tr><td class='label'>:include </td><td>
                   <p><a href="../../../Symbol.html">Symbol</a>, <a
                   href="../../../Array.html">Array</a> of Symbols, or a <a
                   href="../../../Hash.html">Hash</a> with <a
@@ -164,26 +153,22 @@
                   non-column attributes to include in the XML output.  Using a nested hash,
                   you can pass options to associations to affect the XML used for associated
                   objects.</p>
-                  </dd><dt>:name_proc 
-                  <dd>
+                  </td></tr><tr><td class='label'>:name_proc </td><td>
                   <p>Proc or <a href="../../../Hash.html">Hash</a> that accepts a string and
                   returns a string, used to format tag names.</p>
-                  </dd><dt>:only 
-                  <dd>
+                  </td></tr><tr><td class='label'>:only </td><td>
                   <p><a href="../../../Symbol.html">Symbol</a> or <a
                   href="../../../Array.html">Array</a> of Symbols of columns to only include
                   in the JSON output, ignoring all other columns.</p>
-                  </dd><dt>:root_name 
-                  <dd>
+                  </td></tr><tr><td class='label'>:root_name </td><td>
                   <p>The base name to use for the XML tag that contains the data for this
                   instance.  This will be the name of the root node if you are only
                   serializing a single object, but not if you are serializing an array of
                   objects using Model.to_xml or Dataset#to_xml.</p>
-                  </dd><dt>:types 
-                  <dd>
+                  </td></tr><tr><td class='label'>:types </td><td>
                   <p>Set to true to include type information for all of the columns, pulled from
                   the db_schema.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_xml-source'); return false">

@@ -43,7 +43,7 @@
             associated objects directly by calling a method on the current object.
             Nested attributes are defined using the nested_attributes class method:</p>
             
-            <pre>Artist.one_to_many :albums&#x000A;Artist.plugin :nested_attributes&#x000A;Artist.nested_attributes :albums</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">nested_attributes</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span></pre>
             
             <p>The nested_attributes call defines a single method,
             <code><em>association</em>_attributes=</code>, (e.g.
@@ -58,7 +58,7 @@
             <p>Note that this doesn&#39;t send any queries to the database yet.  That
             doesn&#39;t happen till you save the object:</p>
             
-            <pre>a.save</pre>
+            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">save</span></pre>
             
             <p>That will save the artist first, and then save both albums.  If either the
             artist is invalid or one of the albums is invalid, none of the objects will
@@ -95,15 +95,15 @@
             attributes of those attributes). You just need to name your form inputs
             correctly:</p>
             
-            <pre>artist[name]&#x000A;artist[albums_attributes][0][:name]&#x000A;artist[albums_attributes][1][:id]&#x000A;artist[albums_attributes][1][:name]</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span>[<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-identifier">artist</span>[<span class="ruby-identifier">albums_attributes</span>][<span class="ruby-value">0</span>][:<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-identifier">artist</span>[<span class="ruby-identifier">albums_attributes</span>][<span class="ruby-value">1</span>][:<span class="ruby-identifier">id</span>]&#x000A;<span class="ruby-identifier">artist</span>[<span class="ruby-identifier">albums_attributes</span>][<span class="ruby-value">1</span>][:<span class="ruby-identifier">name</span>]</pre>
             
             <p>Your web stack will probably parse that into a nested hash similar to:</p>
             
-            <pre class="ruby">{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">albums_attributes</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-value">0</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">?}</span>, <span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-operator">:</span><span class="ruby-identifier">name</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?}</span>}}}</pre>
+            <pre class="ruby">{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Y&#39;</span>, :<span class="ruby-identifier">albums_attributes=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-value">0</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;X&#39;</span>}, <span class="ruby-value">1</span>=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;2&#39;</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Z&#39;</span>}}}}</pre>
             
             <p>Then you can do:</p>
             
-            <pre>artist.update(params[:artist])</pre>
+            <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">artist</span>])</pre>
             
             <p>To save changes to the artist, create the first album and associate it to
             the artist, and update the other existing associated album.</p>

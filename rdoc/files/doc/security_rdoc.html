@@ -128,7 +128,7 @@
             
             <p>Here are some examples of use:</p>
             
-            <pre>DB.run &#39;SQL&#39;&#x000A;DB &lt;&lt; &#39;SQL&#39;&#x000A;DB.execute &#39;SQL&#39;&#x000A;DB[&#39;SQL&#39;].all&#x000A;DB.fetch(&#39;SQL&#39;).all&#x000A;DB.dataset.with_sql(&#39;SQL&#39;).all</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">execute</span> <span class="ruby-string">&#39;SQL&#39;</span>&#x000A;<span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SQL&#39;</span>].<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&#39;SQL&#39;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&#39;SQL&#39;</span>).<span class="ruby-identifier">all</span></pre>
             
             <p>If you pass a string to these methods that is derived from user input, you
             open yourself up to SQL injection.  The <a
@@ -141,7 +141,7 @@
             href="../../classes/Sequel/Database.html#method-i-literal">Sequel::Database#literal</a>.
             Example:</p>
             
-            <pre>DB.run &quot;SOME SQL #{DB.literal(params[:user].to_s)}&quot;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span> <span class="ruby-node">&quot;SOME SQL #{DB.literal(params[:user].to_s)}&quot;</span></pre>
             
             <p>With <a
             href="../../classes/Sequel/Database.html#method-i-5B-5D">Sequel::Database#[]</a>,
@@ -153,7 +153,7 @@
             href="../../classes/Sequel.html">Sequel</a> automatically literalizes the
             input:</p>
             
-            <pre>DB[&#39;SELECT * FROM foo WHERE bar = ?&#39;, params[:user].to_s]</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo WHERE bar = ?&#39;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user</span>].<span class="ruby-identifier">to_s</span>]</pre>
             
             <h4 id="label-Manually+Created+Literal+Strings">Manually Created Literal Strings<span><a href="#label-Manually+Created+Literal+Strings">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
             
@@ -166,7 +166,7 @@
             href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>
             if they are not in use.</p>
             
-            <pre>&#39;a&#39;.lit&#x000A;Sequel.lit(&#39;a&#39;)</pre>
+            <pre class="ruby"><span class="ruby-string">&#39;a&#39;</span>.<span class="ruby-identifier">lit</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)</pre>
             
             <p>Using String#lit or <a
             href="../../classes/Sequel/SQL/Builders.html#method-i-lit">Sequel.lit</a>
@@ -175,7 +175,7 @@
             can contain placeholders, which you can use to safely include user input
             inside a literal string:</p>
             
-            <pre>&#39;a = ?&#39;.lit(params[:user_id].to_s)&#x000A;Sequel.lit(&#39;a = ?&#39;, params[:user_id].to_s)</pre>
+            <pre class="ruby"><span class="ruby-string">&#39;a = ?&#39;</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user_id</span>].<span class="ruby-identifier">to_s</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a = ?&#39;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user_id</span>].<span class="ruby-identifier">to_s</span>)</pre>
             
             <p>Even though they have similar names, note that <a
             href="../../classes/Sequel/Database.html#method-i-literal">Sequel::Database#literal</a>
@@ -195,17 +195,17 @@
             <p>The most common way to use raw SQL with <a
             href="../../classes/Sequel.html">Sequel</a> is in filters:</p>
             
-            <pre>DB[:table].where(&quot;name &gt; &#39;M&#39;&quot;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; &#39;M&#39;&quot;</span>)</pre>
             
             <p>If a filter method is passed a string as the first argument, it treats the
             rest of the arguments (if any) as placeholders to the string.  So you
             should never do:</p>
             
-            <pre>DB[:table].where(&quot;name &gt; #{params[:id].to_s}&quot;) # SQL Injection!</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-node">&quot;name &gt; #{params[:id].to_s}&quot;</span>) <span class="ruby-comment"># SQL Injection!</span></pre>
             
             <p>Instead, you should use a placeholder:</p>
             
-            <pre>DB[:table].where(&quot;name &gt; ?&quot;, params[:id].to_s) # Safe</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&quot;name &gt; ?&quot;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">id</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span></pre>
             
             <p>Note that for that type of query, <a
             href="../../classes/Sequel.html">Sequel</a> generally encourages the
@@ -268,11 +268,11 @@
             href="../../classes/Sequel/Dataset.html#method-i-update">Sequel::Dataset#update</a>
             also treats a string argument as raw SQL:</p>
             
-            <pre>DB[:table].update(&quot;column = 1&quot;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-string">&quot;column = 1&quot;</span>)</pre>
             
             <p>So you should not do:</p>
             
-            <pre>DB[:table].update(&quot;column = #{params[:value].to_s}&quot;) # SQL Injection!</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(<span class="ruby-node">&quot;column = #{params[:value].to_s}&quot;</span>) <span class="ruby-comment"># SQL Injection!</span></pre>
             
             <p>Instead, you should do:</p>
             
@@ -313,7 +313,7 @@
             href="../../classes/Sequel/Dataset.html#method-i-from">Sequel::Dataset#from</a>
             will treat a string as a table name:</p>
             
-            <pre>DB.from(&#39;t&#39;) # SELECT * FROM &quot;t&quot;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(<span class="ruby-string">&#39;t&#39;</span>) <span class="ruby-comment"># SELECT * FROM &quot;t&quot;</span></pre>
             
             <p>Another place where <a href="../../classes/Sequel.html">Sequel</a> treats
             ruby strings as identifiers are the <a
@@ -378,7 +378,7 @@
             that the database server gives the column. These names are generally
             static.  For example:</p>
             
-            <pre>SELECT column FROM table</pre>
+            <pre class="ruby"><span class="ruby-constant">SELECT</span> <span class="ruby-identifier">column</span> <span class="ruby-constant">FROM</span> <span class="ruby-identifier">table</span></pre>
             
             <p>The database will generally use “column” as the name in the result set.</p>
             
@@ -389,7 +389,7 @@
             <p>The database will generally use “alias” as the name in the result set. So
             if you allow the user to control the alias name:</p>
             
-            <pre>DB[:table].select(:column.as(params[:alias]))</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-keyword">alias</span>]))</pre>
             
             <p>Then you have a denial of service vulnerability.  In general, such a
             vulnerability is unlikely, because you are probably indexing into the
@@ -432,7 +432,7 @@
             
             <p>Example:</p>
             
-            <pre>album = Album.new&#x000A;album.set(params[:album]) # Mass Assignment</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>]) <span class="ruby-comment"># Mass Assignment</span></pre>
             
             <p>Both <a
             href="../../classes/Sequel/Model/InstanceMethods.html#method-c-new">Model.new</a>
@@ -442,7 +442,7 @@
             href="../../classes/Sequel/Model/InstanceMethods.html#method-i-set">Model#set</a>
             internally, so they also allow mass assignment:</p>
             
-            <pre>Album.new(params[:album]) # Mass Assignment&#x000A;Album.create(params[:album]) # Mass Assignment</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>]) <span class="ruby-comment"># Mass Assignment</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>]) <span class="ruby-comment"># Mass Assignment</span></pre>
             
             <p>Instead of these methods, it is encouraged to either use the <a
             href="../../classes/Sequel/Model/InstanceMethods.html#method-i-set_only">Model#set_only</a>,
@@ -456,7 +456,7 @@
             basis.  This pretty much eliminates the chance that the user will be able
             to set a column you did not intend to allow:</p>
             
-            <pre>album.set_only(params[:album], [:name, :copies_sold])&#x000A;album.set_fields(params[:album], [:name, :copies_sold])</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_only</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>], [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>])&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>], [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>])</pre>
             
             <p>You can override the columns to allow by default during mass assignment via
             the <a
@@ -464,7 +464,7 @@
             class method.  This is a good practice, though being explicit on a per-call
             basis is still recommended:</p>
             
-            <pre>Album.set_allowed_columns(:name, :copies_sold)&#x000A;Album.create(params[:album]) # Only name and copies_sold set</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">set_allowed_columns</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">copies_sold</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>]) <span class="ruby-comment"># Only name and copies_sold set</span></pre>
             
             <p>For more details on the mass assignment methods, see the <a
             href="mass_assignment_rdoc.html">Mass Assignment Guide</a>.</p>
@@ -503,7 +503,7 @@
             
             <p>It allows the attacker to choose to do any of the following queries:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">id</span> <span class="ruby-constant">IS</span> <span class="ruby-constant">NULL</span> <span class="ruby-comment"># nil</span>&#x000A;<span class="ruby-identifier">id</span> = <span class="ruby-string">&#39;1&#39;</span> <span class="ruby-comment"># &#39;1&#39;</span>&#x000A;<span class="ruby-identifier">id</span> <span class="ruby-constant">IN</span> (<span class="ruby-string">&#39;1&#39;</span>, <span class="ruby-string">&#39;2&#39;</span>, <span class="ruby-string">&#39;3&#39;</span>) <span class="ruby-comment"># [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]</span>&#x000A;<span class="ruby-identifier">id</span> = (<span class="ruby-string">&#39;a&#39;</span> = <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-comment"># {&#39;a&#39;=&gt;&#39;b&#39;}</span>&#x000A;<span class="ruby-identifier">id</span> = (<span class="ruby-string">&#39;a&#39;</span> <span class="ruby-constant">IN</span> (<span class="ruby-string">&#39;a&#39;</span>, <span class="ruby-string">&#39;b&#39;</span>) <span class="ruby-constant">AND</span> <span class="ruby-string">&#39;c&#39;</span> = <span class="ruby-string">&#39;&#39;</span>) <span class="ruby-comment"># {&#39;a&#39;=&gt;[&#39;a&#39;, &#39;b&#39;], &#39;c&#39;=&gt;&#39;&#39;}</span></pre>
+            <pre>id IS NULL # nil&#x000A;id = &#39;1&#39; # &#39;1&#39;&#x000A;id IN (&#39;1&#39;, &#39;2&#39;, &#39;3&#39;) # [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]&#x000A;id = (&#39;a&#39; = &#39;b&#39;) # {&#39;a&#39;=&gt;&#39;b&#39;}&#x000A;id = (&#39;a&#39; IN (&#39;a&#39;, &#39;b&#39;) AND &#39;c&#39; = &#39;&#39;) # {&#39;a&#39;=&gt;[&#39;a&#39;, &#39;b&#39;], &#39;c&#39;=&gt;&#39;&#39;}</pre>
             
             <p>While none of those allow for SQL injection, it&#39;s possible that they
             might have an issue in your application.  For example, a long array or

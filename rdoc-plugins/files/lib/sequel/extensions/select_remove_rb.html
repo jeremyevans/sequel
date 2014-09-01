@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-08-22 12:22:05 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -39,18 +39,18 @@
           <div id='description'>
             
             <p>The select_remove extension adds Sequel::Dataset#select_remove for removing
-            existing selected columns from a dataset.  It&#39;s not part of <a
-            href="../../../../classes/Sequel.html">Sequel</a> core as it is rarely
-            needed and has some corner cases where it can&#39;t work correctly.</p>
+            existing selected columns from a dataset.  It&#39;s not part of Sequel core
+            as it is rarely needed and has some corner cases where it can&#39;t work
+            correctly.</p>
             
             <p>You can load this extension into specific datasets:</p>
             
-            <pre>ds = DB[:table]&#x000A;ds = ds.extension(:select_remove)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">select_remove</span>)</pre>
             
             <p>Or you can load it into all of a database&#39;s datasets, which is probably
             the desired behavior if you are using this extension:</p>
             
-            <pre>DB.extension(:select_remove)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">select_remove</span>)</pre>
           </div>
           <div id='context'>
           </div>

@@ -46,36 +46,28 @@
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Project</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">portfolio</span>&#x000A;  <span class="ruby-comment"># or: one_to_one :portfolio</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">milestones</span>&#x000A;  <span class="ruby-comment"># or: many_to_many :milestones </span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>The project class now has the following instance methods:</p>
-            <dl class="rdoc-list note-list"><dt>portfolio 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>portfolio </td><td>
             <p>Returns the associated portfolio.</p>
-            </dd><dt>portfolio=(obj) 
-            <dd>
+            </td></tr><tr><td class='label'>portfolio=(obj) </td><td>
             <p>Sets the associated portfolio to the object, but the change is not
             persisted until you save the record (for <a
             href="ClassMethods.html#method-i-many_to_one">#many_to_one</a>
             associations).</p>
-            </dd><dt>portfolio_dataset 
-            <dd>
+            </td></tr><tr><td class='label'>portfolio_dataset </td><td>
             <p>Returns a dataset that would return the associated portfolio, only useful
             in fairly specific circumstances.</p>
-            </dd><dt>milestones 
-            <dd>
+            </td></tr><tr><td class='label'>milestones </td><td>
             <p>Returns an array of associated milestones</p>
-            </dd><dt>add_milestone(obj) 
-            <dd>
+            </td></tr><tr><td class='label'>add_milestone(obj) </td><td>
             <p>Associates the passed milestone with this object.</p>
-            </dd><dt>remove_milestone(obj) 
-            <dd>
+            </td></tr><tr><td class='label'>remove_milestone(obj) </td><td>
             <p>Removes the association with the passed milestone.</p>
-            </dd><dt>remove_all_milestones 
-            <dd>
+            </td></tr><tr><td class='label'>remove_all_milestones </td><td>
             <p>Removes associations with all associated milestones.</p>
-            </dd><dt>milestones_dataset 
-            <dd>
+            </td></tr><tr><td class='label'>milestones_dataset </td><td>
             <p>Returns a dataset that would return the associated milestones, allowing for
             further filtering/limiting/etc.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>If you want to override the behavior of the add_/remove_/remove_all_/
             methods or the association setter method, use the :adder, :remover,
@@ -90,7 +82,7 @@
             
             <p>Association definitions are also reflected by the class, e.g.:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Project</span>.<span class="ruby-identifier">associations</span>&#x000A;=<span class="ruby-operator">&gt;</span> [:<span class="ruby-identifier">portfolio</span>, :<span class="ruby-identifier">milestones</span>]&#x000A;<span class="ruby-constant">Project</span>.<span class="ruby-identifier">association_reflection</span>(:<span class="ruby-identifier">portfolio</span>)&#x000A;=<span class="ruby-operator">&gt;</span> {:<span class="ruby-identifier">type</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">many_to_one</span>, :<span class="ruby-identifier">name</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">portfolio</span>, <span class="ruby-operator">...</span>}</pre>
+            <pre>Project.associations&#x000A;=&gt; [:portfolio, :milestones]&#x000A;Project.association_reflection(:portfolio)&#x000A;=&gt; {:type =&gt; :many_to_one, :name =&gt; :portfolio, ...}</pre>
             
             <p><a href="../Associations.html">Associations</a> should not have the same
             names as any of the columns in the model&#39;s current table they
@@ -199,27 +191,23 @@
                   
                   <p>Associates a related model with the current model. The following types are
                   supported:</p>
-                  <dl class="rdoc-list note-list"><dt>:many_to_one 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:many_to_one </td><td>
                   <p>Foreign key in current model&#39;s table points to  associated model&#39;s
                   primary key.  Each associated model object can be associated with more than
                   one current model objects.  Each current model object can be associated
                   with only one associated model object.</p>
-                  </dd><dt>:one_to_many 
-                  <dd>
+                  </td></tr><tr><td class='label'>:one_to_many </td><td>
                   <p>Foreign key in associated model&#39;s table points to this model&#39;s
                   primary key.   Each current model object can be associated with more than
                   one associated model objects.  Each associated model object can be
                   associated with only one current model object.</p>
-                  </dd><dt>:one_through_one 
-                  <dd>
+                  </td></tr><tr><td class='label'>:one_through_one </td><td>
                   <p>Similar to <a
                   href="ClassMethods.html#method-i-many_to_many">#many_to_many</a> in terms
                   of foreign keys, but only one object is associated to the current object
                   through the association. Provides only getter methods, no setter or
                   modification methods.</p>
-                  </dd><dt>:one_to_one 
-                  <dd>
+                  </td></tr><tr><td class='label'>:one_to_one </td><td>
                   <p>Similar to <a
                   href="ClassMethods.html#method-i-one_to_many">#one_to_many</a> in terms of
                   foreign keys, but only one object is associated to the current object
@@ -227,57 +215,46 @@
                   href="ClassMethods.html#method-i-many_to_one">#many_to_one</a>, except that
                   the <a href="ClassMethods.html#method-i-one_to_one">#one_to_one</a> setter
                   method saves the passed object.</p>
-                  </dd><dt>:many_to_many 
-                  <dd>
+                  </td></tr><tr><td class='label'>:many_to_many </td><td>
                   <p>A join table is used that has a foreign key that points to this model&#39;s
                   primary key and a foreign key that points to the associated model&#39;s
                   primary key.  Each current model object can be associated with many
                   associated model objects, and each associated model object can be
                   associated with many current model objects.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>The following options can be supplied:</p>
                   
                   <h3 id="method-i-associate-label-Multiple+Types">Multiple Types<span><a href="#method-i-associate-label-Multiple+Types">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-                  <dl class="rdoc-list note-list"><dt>:adder 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:adder </td><td>
                   <p>Proc used to define the private <em>add</em>* method for doing the database
                   work to associate the given object to the current object (*_to_many
                   assocations).</p>
-                  </dd><dt>:after_add 
-                  <dd>
+                  </td></tr><tr><td class='label'>:after_add </td><td>
                   <p>Symbol, Proc, or array of both/either specifying a callback to call after a
                   new item is added to the association.</p>
-                  </dd><dt>:after_load 
-                  <dd>
+                  </td></tr><tr><td class='label'>:after_load </td><td>
                   <p>Symbol, Proc, or array of both/either specifying a callback to call after
                   the associated record(s) have been retrieved from the database.</p>
-                  </dd><dt>:after_remove 
-                  <dd>
+                  </td></tr><tr><td class='label'>:after_remove </td><td>
                   <p>Symbol, Proc, or array of both/either specifying a callback to call after
                   an item is removed from the association.</p>
-                  </dd><dt>:after_set 
-                  <dd>
+                  </td></tr><tr><td class='label'>:after_set </td><td>
                   <p>Symbol, Proc, or array of both/either specifying a callback to call after
                   an item is set using the association setter method.</p>
-                  </dd><dt>:allow_eager 
-                  <dd>
+                  </td></tr><tr><td class='label'>:allow_eager </td><td>
                   <p>If set to false, you cannot load the association eagerly via eager or
                   eager_graph</p>
-                  </dd><dt>:before_add 
-                  <dd>
+                  </td></tr><tr><td class='label'>:before_add </td><td>
                   <p>Symbol, Proc, or array of both/either specifying a callback to call before
                   a new item is added to the association.</p>
-                  </dd><dt>:before_remove 
-                  <dd>
+                  </td></tr><tr><td class='label'>:before_remove </td><td>
                   <p>Symbol, Proc, or array of both/either specifying a callback to call before
                   an item is removed from the association.</p>
-                  </dd><dt>:before_set 
-                  <dd>
+                  </td></tr><tr><td class='label'>:before_set </td><td>
                   <p>Symbol, Proc, or array of both/either specifying a callback to call before
                   an item is set using the association setter method.</p>
-                  </dd><dt>:cartesian_product_number 
-                  <dd>
+                  </td></tr><tr><td class='label'>:cartesian_product_number </td><td>
                   <p>the number of joins completed by this association that could cause more
                   than one row for each row in the current table (default: 0 for <a
                   href="ClassMethods.html#method-i-many_to_one">#many_to_one</a>, <a
@@ -287,68 +264,56 @@
                   href="ClassMethods.html#method-i-one_to_many">#one_to_many</a> and <a
                   href="ClassMethods.html#method-i-many_to_many">#many_to_many</a>
                   associations).</p>
-                  </dd><dt>:class 
-                  <dd>
+                  </td></tr><tr><td class='label'>:class </td><td>
                   <p>The associated class or its name as a string or symbol. If not given, uses
                   the association&#39;s name, which is camelized (and singularized unless the
                   type is :many_to_one, :one_to_one, or <a
                   href="ClassMethods.html#method-i-one_through_one">#one_through_one</a>). 
                   If this is specified as a string or symbol, you must specify the full class
                   name (e.g. “SomeModule::MyModel”).</p>
-                  </dd><dt>:clearer 
-                  <dd>
+                  </td></tr><tr><td class='label'>:clearer </td><td>
                   <p>Proc used to define the private <em>remove_all</em>* method for doing the
                   database work to remove all objects associated to the current object
                   (*_to_many assocations).</p>
-                  </dd><dt>:clone 
-                  <dd>
+                  </td></tr><tr><td class='label'>:clone </td><td>
                   <p>Merge the current options and block into the options and block used in
                   defining the given association.  Can be used to DRY up a bunch of similar
                   associations that all share the same options such as :class and :key, while
                   changing the order and block used.</p>
-                  </dd><dt>:conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>:conditions </td><td>
                   <p>The conditions to use to filter the association, can be any argument passed
                   to where.</p>
-                  </dd><dt>:dataset 
-                  <dd>
+                  </td></tr><tr><td class='label'>:dataset </td><td>
                   <p>A proc that is instance_execed to get the base dataset to use (before the
                   other options are applied).  If the proc accepts an argument, it is passed
                   the related association reflection.</p>
-                  </dd><dt>:distinct 
-                  <dd>
+                  </td></tr><tr><td class='label'>:distinct </td><td>
                   <p>Use the DISTINCT clause when selecting associating object, both when lazy
                   loading and eager loading via .eager (but not when using .eager_graph).</p>
-                  </dd><dt>:eager 
-                  <dd>
+                  </td></tr><tr><td class='label'>:eager </td><td>
                   <p>The associations to eagerly load via <code>eager</code> when loading the
                   associated object(s).</p>
-                  </dd><dt>:eager_block 
-                  <dd>
+                  </td></tr><tr><td class='label'>:eager_block </td><td>
                   <p>If given, use the block instead of the default block when eagerly loading. 
                   To not use a block when eager loading (when one is used normally), set to
                   nil.</p>
-                  </dd><dt>:eager_graph 
-                  <dd>
+                  </td></tr><tr><td class='label'>:eager_graph </td><td>
                   <p>The associations to eagerly load via <code>eager_graph</code> when loading
                   the associated object(s). <a
                   href="ClassMethods.html#method-i-many_to_many">#many_to_many</a>
                   associations with this option cannot be eagerly loaded via
                   <code>eager</code>.</p>
-                  </dd><dt>:eager_grapher 
-                  <dd>
+                  </td></tr><tr><td class='label'>:eager_grapher </td><td>
                   <p>A proc to use to implement eager loading via <code>eager_graph</code>,
                   overriding the default. Takes an options hash with at least the entries
                   :self (the receiver of the eager_graph call), :table_alias (the alias to
                   use for table to graph into the association), and :implicit_qualifier (the
                   alias that was used for the current table). Should return a copy of the
                   dataset with the association graphed into it.</p>
-                  </dd><dt>:eager_limit_strategy 
-                  <dd>
+                  </td></tr><tr><td class='label'>:eager_limit_strategy </td><td>
                   <p>Determines the strategy used for enforcing limits and offsets when eager
                   loading associations via the <code>eager</code> method.</p>
-                  </dd><dt>:eager_loader 
-                  <dd>
+                  </td></tr><tr><td class='label'>:eager_loader </td><td>
                   <p>A proc to use to implement eager loading, overriding the default.  Takes a
                   single hash argument, with at least the keys: :rows, which is an array of
                   current model instances, :associations, which is a hash of dependent
@@ -358,78 +323,63 @@
                   model instances. In the proc, the associated records should be queried from
                   the database and the associations cache for each record should be
                   populated.</p>
-                  </dd><dt>:eager_loader_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:eager_loader_key </td><td>
                   <p>A symbol for the key column to use to populate the key_hash for the eager
                   loader.  Can be set to nil to not populate the key_hash.</p>
-                  </dd><dt>:extend 
-                  <dd>
+                  </td></tr><tr><td class='label'>:extend </td><td>
                   <p>A module or array of modules to extend the dataset with.</p>
-                  </dd><dt>:filter_limit_strategy 
-                  <dd>
+                  </td></tr><tr><td class='label'>:filter_limit_strategy </td><td>
                   <p>Determines the strategy used for enforcing limits and offsets when
                   filtering by limited associations.  Possible options are :window_function,
                   :distinct_on, or :correlated_subquery depending on association type and
                   database type.</p>
-                  </dd><dt>:graph_alias_base 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_alias_base </td><td>
                   <p>The base name to use for the table alias when eager graphing.  Defaults to
                   the name of the association.  If the alias name has already been used in
                   the query, <a href="../../../Sequel.html">Sequel</a> will create a unique
                   alias by appending a numeric suffix (e.g. alias_0, alias_1, …) until the
                   alias is unique.</p>
-                  </dd><dt>:graph_block 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_block </td><td>
                   <p>The block to pass to join_table when eagerly loading the association via
                   <code>eager_graph</code>.</p>
-                  </dd><dt>:graph_conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_conditions </td><td>
                   <p>The additional conditions to use on the <a href="../../SQL.html">SQL</a>
                   join when eagerly loading the association via <code>eager_graph</code>. 
                   Should be a hash or an array of two element arrays. If not specified, the
                   :conditions option is used if it is a hash or array of two element arrays.</p>
-                  </dd><dt>:graph_join_type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_join_type </td><td>
                   <p>The type of <a href="../../SQL.html">SQL</a> join to use when eagerly
                   loading the association via eager_graph.  Defaults to :left_outer.</p>
-                  </dd><dt>:graph_only_conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_only_conditions </td><td>
                   <p>The conditions to use on the <a href="../../SQL.html">SQL</a> join when
                   eagerly loading the association via <code>eager_graph</code>, instead of
                   the default conditions specified by the foreign/primary keys.  This option
                   causes the :graph_conditions option to be ignored.</p>
-                  </dd><dt>:graph_order 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_order </td><td>
                   <p>Over the order to use when using eager_graph, instead of the default order.
                   This should be used in the case where :order contains an identifier
                   qualified by the table&#39;s name, which may not match the alias used when
                   eager graphing.  By setting this to the unqualified identifier, it will be
                   automatically qualified when using eager_graph.</p>
-                  </dd><dt>:graph_select 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_select </td><td>
                   <p>A column or array of columns to select from the associated table when
                   eagerly loading the association via <code>eager_graph</code>. Defaults to
                   all columns in the associated table.</p>
-                  </dd><dt>:limit 
-                  <dd>
+                  </td></tr><tr><td class='label'>:limit </td><td>
                   <p>Limit the number of records to the provided value.  Use an array with two
                   elements for the value to specify a limit (first element) and an offset
                   (second element).</p>
-                  </dd><dt>:methods_module 
-                  <dd>
+                  </td></tr><tr><td class='label'>:methods_module </td><td>
                   <p>The module that methods the association creates will be placed into.
                   Defaults to the module containing the model&#39;s columns.</p>
-                  </dd><dt>:order 
-                  <dd>
+                  </td></tr><tr><td class='label'>:order </td><td>
                   <p>the column(s) by which to order the association dataset.  Can be a singular
                   column symbol or an array of column symbols.</p>
-                  </dd><dt>:order_eager_graph 
-                  <dd>
+                  </td></tr><tr><td class='label'>:order_eager_graph </td><td>
                   <p>Whether to add the association&#39;s order to the graphed dataset&#39;s
                   order when graphing via <code>eager_graph</code>.  Defaults to true, so set
                   to false to disable.</p>
-                  </dd><dt>:read_only 
-                  <dd>
+                  </td></tr><tr><td class='label'>:read_only </td><td>
                   <p>Do not add a setter method (for <a
                   href="ClassMethods.html#method-i-many_to_one">#many_to_one</a> or <a
                   href="ClassMethods.html#method-i-one_to_one">#one_to_one</a> associations),
@@ -439,20 +389,17 @@
                   associations). Always true for <a
                   href="ClassMethods.html#method-i-one_through_one">#one_through_one</a>
                   associations.</p>
-                  </dd><dt>:reciprocal 
-                  <dd>
+                  </td></tr><tr><td class='label'>:reciprocal </td><td>
                   <p>the symbol name of the reciprocal association, if it exists.  By default,
                   <a href="../../../Sequel.html">Sequel</a> will try to determine it by
                   looking at the associated model&#39;s assocations for a association that
                   matches the current association&#39;s key(s).  Set to nil to not use a
                   reciprocal.</p>
-                  </dd><dt>:remover 
-                  <dd>
+                  </td></tr><tr><td class='label'>:remover </td><td>
                   <p>Proc used to define the private <em>remove</em>* method for doing the
                   database work to remove the association between the given object and the
                   current object (*_to_many assocations).</p>
-                  </dd><dt>:select 
-                  <dd>
+                  </td></tr><tr><td class='label'>:select </td><td>
                   <p>the columns to select.  Defaults to the associated class&#39;s table_name.*
                   in an association that uses joins, which means it doesn&#39;t include the
                   attributes from the join table.  If you want to include the join table
@@ -460,150 +407,124 @@
                   attributes can clash with attributes from the model table, so you should
                   alias any attributes that have the same name in both the join table and the
                   associated table.</p>
-                  </dd><dt>:setter 
-                  <dd>
+                  </td></tr><tr><td class='label'>:setter </td><td>
                   <p>Proc used to define the private _*= method for doing the work to setup the
                   assocation between the given object and the current object (*_to_one
                   associations).</p>
-                  </dd><dt>:subqueries_per_union 
-                  <dd>
+                  </td></tr><tr><td class='label'>:subqueries_per_union </td><td>
                   <p>The number of subqueries to use in each UNION query, for eager loading
                   limited associations using the default :union strategy.</p>
-                  </dd><dt>:validate 
-                  <dd>
+                  </td></tr><tr><td class='label'>:validate </td><td>
                   <p>Set to false to not validate when implicitly saving any associated object.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <h3 id="method-i-associate-label-%3Amany_to_one">:many_to_one<span><a href="#method-i-associate-label-%3Amany_to_one">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-                  <dl class="rdoc-list note-list"><dt>:key 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:key </td><td>
                   <p>foreign key in current model&#39;s table that references associated
                   model&#39;s primary key, as a symbol.  Defaults to :“#{name}_id”.  Can use
                   an array of symbols for a composite key association.</p>
-                  </dd><dt>:key_column 
-                  <dd>
+                  </td></tr><tr><td class='label'>:key_column </td><td>
                   <p>Similar to, and usually identical to, :key, but :key refers to the model
                   method to call, where :key_column refers to the underlying column.  Should
                   only be used if the model method differs from the foreign key column, in
                   conjunction with defining a model alias method for the key column.</p>
-                  </dd><dt>:primary_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:primary_key </td><td>
                   <p>column in the associated table that :key option references, as a symbol.
                   Defaults to the primary key of the associated table. Can use an array of
                   symbols for a composite key association.</p>
-                  </dd><dt>:primary_key_method 
-                  <dd>
+                  </td></tr><tr><td class='label'>:primary_key_method </td><td>
                   <p>the method symbol or array of method symbols to call on the associated
                   object to get the foreign key values.  Defaults to :primary_key option.</p>
-                  </dd><dt>:qualify 
-                  <dd>
+                  </td></tr><tr><td class='label'>:qualify </td><td>
                   <p>Whether to use qualifier primary keys when loading the association.  The
                   default is true, so you must set to false to not qualify.  Qualification
                   rarely causes problems, but it&#39;s necessary to disable in some cases,
                   such as when you are doing a JOIN USING operation on the column on Oracle.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <h3 id="method-i-associate-label-%3Aone_to_many+and+%3Aone_to_one">:one_to_many and :one_to_one<span><a href="#method-i-associate-label-%3Aone_to_many+and+%3Aone_to_one">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-                  <dl class="rdoc-list note-list"><dt>:key 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:key </td><td>
                   <p>foreign key in associated model&#39;s table that references current
                   model&#39;s primary key, as a symbol.  Defaults to
                   :“#{self.name.underscore}_id”.  Can use an array of symbols for a composite
                   key association.</p>
-                  </dd><dt>:key_method 
-                  <dd>
+                  </td></tr><tr><td class='label'>:key_method </td><td>
                   <p>the method symbol or array of method symbols to call on the associated
                   object to get the foreign key values.  Defaults to :key option.</p>
-                  </dd><dt>:primary_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:primary_key </td><td>
                   <p>column in the current table that :key option references, as a symbol.
                   Defaults to primary key of the current table. Can use an array of symbols
                   for a composite key association.</p>
-                  </dd><dt>:primary_key_column 
-                  <dd>
+                  </td></tr><tr><td class='label'>:primary_key_column </td><td>
                   <p>Similar to, and usually identical to, :primary_key, but :primary_key refers
                   to the model method call, where :primary_key_column refers to the
                   underlying column. Should only be used if the model method differs from the
                   primary key column, in conjunction with defining a model alias method for
                   the primary key column.</p>
-                  </dd><dt>:raise_on_save_failure 
-                  <dd>
+                  </td></tr><tr><td class='label'>:raise_on_save_failure </td><td>
                   <p>Do not raise exceptions for hook or validation failures when saving
                   associated objects in the add/remove methods (return nil instead)
                   [one_to_many only].</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <h3 id="method-i-associate-label-%3Amany_to_many+and+%3Aone_through_one">:many_to_many and :one_through_one<span><a href="#method-i-associate-label-%3Amany_to_many+and+%3Aone_through_one">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
-                  <dl class="rdoc-list note-list"><dt>:graph_join_table_block 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:graph_join_table_block </td><td>
                   <p>The block to pass to <code>join_table</code> for the join table when
                   eagerly loading the association via <code>eager_graph</code>.</p>
-                  </dd><dt>:graph_join_table_conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_join_table_conditions </td><td>
                   <p>The additional conditions to use on the <a href="../../SQL.html">SQL</a>
                   join for the join table when eagerly loading the association via
                   <code>eager_graph</code>. Should be a hash or an array of two element
                   arrays.</p>
-                  </dd><dt>:graph_join_table_join_type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_join_table_join_type </td><td>
                   <p>The type of <a href="../../SQL.html">SQL</a> join to use for the join table
                   when eagerly loading the association via <code>eager_graph</code>. 
                   Defaults to the :graph_join_type option or :left_outer.</p>
-                  </dd><dt>:graph_join_table_only_conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>:graph_join_table_only_conditions </td><td>
                   <p>The conditions to use on the <a href="../../SQL.html">SQL</a> join for the
                   join table when eagerly loading the association via
                   <code>eager_graph</code>, instead of the default conditions specified by
                   the foreign/primary keys.  This option causes the
                   :graph_join_table_conditions option to be ignored.</p>
-                  </dd><dt>:join_table 
-                  <dd>
+                  </td></tr><tr><td class='label'>:join_table </td><td>
                   <p>name of table that includes the foreign keys to both the current model and
                   the associated model, as a symbol.  Defaults to the name of current model
                   and name of associated model, pluralized, underscored, sorted, and joined
                   with &#39;_&#39;.</p>
-                  </dd><dt>:join_table_block 
-                  <dd>
+                  </td></tr><tr><td class='label'>:join_table_block </td><td>
                   <p>proc that can be used to modify the dataset used in the
                   add/remove/remove_all methods.  Should accept a dataset argument and return
                   a modified dataset if present.</p>
-                  </dd><dt>:left_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:left_key </td><td>
                   <p>foreign key in join table that points to current model&#39;s primary key,
                   as a symbol. Defaults to :“#{self.name.underscore}_id”. Can use an array of
                   symbols for a composite key association.</p>
-                  </dd><dt>:left_primary_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:left_primary_key </td><td>
                   <p>column in current table that :left_key points to, as a symbol. Defaults to
                   primary key of current table.  Can use an array of symbols for a composite
                   key association.</p>
-                  </dd><dt>:left_primary_key_column 
-                  <dd>
+                  </td></tr><tr><td class='label'>:left_primary_key_column </td><td>
                   <p>Similar to, and usually identical to, :left_primary_key, but
                   :left_primary_key refers to the model method to call, where
                   :left_primary_key_column refers to the underlying column.  Should only be
                   used if the model method differs from the left primary key column, in
                   conjunction with defining a model alias method for the left primary key
                   column.</p>
-                  </dd><dt>:right_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:right_key </td><td>
                   <p>foreign key in join table that points to associated model&#39;s primary
                   key, as a symbol.  Defaults to :“#{name.to_s.singularize}_id”. Can use an
                   array of symbols for a composite key association.</p>
-                  </dd><dt>:right_primary_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:right_primary_key </td><td>
                   <p>column in associated table that :right_key points to, as a symbol. Defaults
                   to primary key of the associated table.  Can use an array of symbols for a
                   composite key association.</p>
-                  </dd><dt>:right_primary_key_method 
-                  <dd>
+                  </td></tr><tr><td class='label'>:right_primary_key_method </td><td>
                   <p>the method symbol or array of method symbols to call on the associated
                   object to get the foreign key values for the join table. Defaults to
                   :right_primary_key option.</p>
-                  </dd><dt>:uniq 
-                  <dd>
+                  </td></tr><tr><td class='label'>:uniq </td><td>
                   <p>Adds a after_load callback that makes the array of objects unique.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-associate-source'); return false">

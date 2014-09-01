@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-09-19 07:06:56 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -39,36 +39,30 @@
           <div id='description'>
             
             <p>This adds the following dataset methods:</p>
-            <dl class="rdoc-list note-list"><dt>[]= 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>[]= </td><td>
             <p>filter with the first argument, update with the second</p>
-            </dd><dt>insert_multiple 
-            <dd>
+            </td></tr><tr><td class='label'>insert_multiple </td><td>
             <p>insert multiple rows at once</p>
-            </dd><dt>set 
-            <dd>
+            </td></tr><tr><td class='label'>set </td><td>
             <p>alias for update</p>
-            </dd><dt>to_csv 
-            <dd>
+            </td></tr><tr><td class='label'>to_csv </td><td>
             <p>return string in csv format for the dataset</p>
-            </dd><dt>db= 
-            <dd>
+            </td></tr><tr><td class='label'>db= </td><td>
             <p>change the dataset&#39;s database</p>
-            </dd><dt>opts= 
-            <dd>
+            </td></tr><tr><td class='label'>opts= </td><td>
             <p>change the dataset&#39;s opts</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>It is only recommended to use this for backwards compatibility.</p>
             
             <p>You can load this extension into specific datasets:</p>
             
-            <pre>ds = DB[:table]&#x000A;ds = ds.extension(:sequel_3_dataset_methods)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">sequel_3_dataset_methods</span>)</pre>
             
             <p>Or you can load it into all of a database&#39;s datasets, which is probably
             the desired behavior if you are using this extension:</p>
             
-            <pre>DB.extension(:sequel_3_dataset_methods)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">sequel_3_dataset_methods</span>)</pre>
           </div>
           <div id='context'>
           </div>

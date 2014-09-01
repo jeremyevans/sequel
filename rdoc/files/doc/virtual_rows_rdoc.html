@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-20 15:40:47 -0700</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -53,7 +53,7 @@
             following <a href="../../classes/Sequel.html">Sequel</a> code historically
             worked on ruby 1.8, but not ruby 1.9:</p>
             
-            <pre>dataset.where(:a &gt; :b[:c])&#x000A;# WHERE a &gt; b(c)</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">b</span>[:<span class="ruby-identifier">c</span>])&#x000A;<span class="ruby-comment"># WHERE a &gt; b(c)</span></pre>
             
             <p>This code does not work on ruby 1.9 for two reasons.  First, Symbol#&gt;
             (like other inequality methods) is already defined in ruby 1.9, so <a
@@ -65,11 +65,11 @@
             <p>It&#39;s possible to use Sequel&#39;s DSL to represent such expressions,
             but it is a little verbose:</p>
             
-            <pre>dataset.where(Sequel.expr(:a) &gt; Sequel.function(:b, :c))&#x000A;# WHERE a &gt; b(c)</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">c</span>))&#x000A;<span class="ruby-comment"># WHERE a &gt; b(c)</span></pre>
             
             <p>The virtual row DSL makes such code more concise:</p>
             
-            <pre>dataset.where{a &gt; b(c)}</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>)}</pre>
             
             <h2 id="label-Regular+Procs+vs+Instance+Evaled+Procs">Regular Procs vs Instance Evaled Procs<span><a href="#label-Regular+Procs+vs+Instance+Evaled+Procs">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -120,7 +120,7 @@
             from the local variable access.  This is mostly useful in instance_evaled
             procs:</p>
             
-            <pre>b = 32&#x000A;ds.where{b() &gt; b}&#x000A;# WHERE b &gt; 32</pre>
+            <pre class="ruby"><span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">b</span>() <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}&#x000A;<span class="ruby-comment"># WHERE b &gt; 32</span></pre>
             
             <h2 id="label-VirtualRow+Methods">VirtualRow Methods<span><a href="#label-VirtualRow+Methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -175,7 +175,7 @@
             <p>To append the DISTINCT keyword before the method arguments, just call the
             distinct method on the returned Function:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1)</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1, col2)</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1)</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1, col2)</span></pre>
             
             <h2 id="label-SQL%3A%3AFunctions+with+windows+-+SQL+window+function+calls">SQL::Functions with windows - SQL window function calls<span><a href="#label-SQL%3A%3AFunctions+with+windows+-+SQL+window+function+calls">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -218,12 +218,12 @@
             <p>The backtick operator can be used inside an instance-evaled virtual row
             block to create a literal string:</p>
             
-            <pre>ds.where{a &gt; `some SQL`}&#x000A;# WHERE (a &gt; some SQL)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">%xsome SQL`</span>}&#x000A;<span class="ruby-comment"># WHERE (a &gt; some SQL)</span></pre>
             
             <p>You can use this on a regular virtual row block too, but it doesn&#39;t
             look as nice:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&gt;</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-identifier">o</span>.<span class="ruby-value">%x(&#39;some SQL&#39;)}&#x000A;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&gt;</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-identifier">o</span>.<span class="ruby-value">%x(&#39;some SQL&#39;))}&#x000A;</span></pre>
             
             <h2 id="label-Returning+multiple+values">Returning multiple values<span><a href="#label-Returning+multiple+values">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -236,7 +236,7 @@
             <p>Note that if you forget the array brackets, you&#39;ll end up with a syntax
             error:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Invalid ruby syntax</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">column2</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">column1</span>, <span class="ruby-identifier">sum</span>(<span class="ruby-identifier">column2</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">sum</span>)}</pre>
+            <pre># Invalid ruby syntax&#x000A;ds.select{|o| o.column1, o.sum(o.column2).as(o.sum)}&#x000A;ds.select{column1, sum(column2).as(sum)}</pre>
             
             <h2 id="label-Alternative+Description+of+the+VirtualRow+method+call+rules">Alternative Description of the VirtualRow method call rules<span><a href="#label-Alternative+Description+of+the+VirtualRow+method+call+rules">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             <ul><li>

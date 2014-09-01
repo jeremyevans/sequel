@@ -76,7 +76,7 @@
             <p>The prepared_statements_associations plugin allows normal association
             method calls to use prepared statements if possible. For example:</p>
             
-            <pre>Artist.plugin :prepared_statements_associations&#x000A;Artist.many_to_one :albums&#x000A;Artist[1].albums</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements_associations</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums</span></pre>
             
             <p>Will use a prepared statement to return the albums for that artist. This
             plugin works for all supported association types.  There are some
@@ -173,12 +173,12 @@
             <p>Dataset#with_pk has been added to model datasets that allows you to find
             the object with the matching primary key:</p>
             
-            <pre>Artist.filter(:name.like(&#39;A%&#39;)).with_pk(1)</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)).<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">1</span>)</pre>
             
             <p>This should make easier the common case where you want to find a particular
             object that is associated to another object:</p>
             
-            <pre>Artist[1].albums_dataset.with_pk(2)</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">with_pk</span>(<span class="ruby-value">2</span>)</pre>
             
             <p>Before, there was no way to do that without manually specifying the primary
             key:</p>
@@ -187,12 +187,12 @@
             
             <p>To use a composite primary key with with_pk, you have to provide an array:</p>
             
-            <pre>Artist[1].albums_dataset.with_pk([1, 2])</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>.<span class="ruby-identifier">with_pk</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>])</pre>
             </li><li>
             <p>Dataset#[] for model datasets will now call with_pk if given a single
             Integer argument.  This makes the above case even easier:</p>
             
-            <pre>Artist[1].albums_dataset[2]</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">albums_dataset</span>[<span class="ruby-value">2</span>]</pre>
             
             <p>Note that for backwards compatibility, this only works for single integer
             primary keys.  If you have a composite primary key or a string/varchar
@@ -212,7 +212,7 @@
             <p>The purpose of doing this is that you can then use prepare or call on the
             returned dataset with the returned bound variables:</p>
             
-            <pre>ds.call(:select, bv)&#x000A;# SELECT * FROM table WHERE (a = ?); [1]&#x000A;ps = ds.prepare(:select, :ps_name)&#x000A;# PREPARE ps_name AS SELECT * FROM table WHERE (a = ?)&#x000A;ps.call(bv)&#x000A;# EXECUTE ps_name(1)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">select</span>, <span class="ruby-identifier">bv</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE (a = ?); [1]</span>&#x000A;&#x000A;<span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(:<span class="ruby-identifier">select</span>, :<span class="ruby-identifier">ps_name</span>)&#x000A;<span class="ruby-comment"># PREPARE ps_name AS SELECT * FROM table WHERE (a = ?)</span>&#x000A;<span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bv</span>)&#x000A;<span class="ruby-comment"># EXECUTE ps_name(1)</span></pre>
             
             <p>Basically, Dataset#unbind takes a specific statement and attempts to turn
             it into a generic statement, along with the placeholder values it
@@ -220,7 +220,7 @@
             
             <p>Unfortunately, Dataset#unbind cannot handle all cases.  For example:</p>
             
-            <pre>DB[:table].filter{a + 1 &gt; 10}.unbind</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>}.<span class="ruby-identifier">unbind</span></pre>
             
             <p>will not unbind any values.  Also, if you have a query with multiple
             different values for a variable, it will raise an UnbindDuplicate
@@ -270,7 +270,7 @@
             </li><li>
             <p>You can now correctly invert SQL::Constant instances:</p>
             
-            <pre>Sequel::NULL # NULL&#x000A;~Sequel::NULL # NOT NULL&#x000A;Sequel::TRUE # TRUE&#x000A;~Sequel::TRUE # FALSE</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-comment"># NULL</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">NULL</span> <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span> <span class="ruby-comment"># TRUE</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span> <span class="ruby-comment"># FALSE</span></pre>
             </li><li>
             <p>A bug in the association_pks plugin has been fixed in the case where the
             associated table had a different primary key column name than the current
@@ -308,28 +308,28 @@
             necessarily have the same type oid on different databases.  This hash uses
             symbol keys and proc values:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_NAMED_TYPES</span>[:<span class="ruby-identifier">interval</span>] = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}</pre>
+            <pre>Sequel::Postgres::PG_NAMED_TYPES[:interval] = proc{|v| ...}</pre>
             
             <p>The conversion procs now use a separate hash per Database object instead of
             a hash shared across all Database objects.  You can now modify the types
             for a particular Database object, but you have to use the type oid:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">conversion_procs</span>[<span class="ruby-value">42</span>] = <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}</pre>
+            <pre>DB.conversion_procs[42] = proc{|v| ...}</pre>
             </li><li>
             <p>On SQLite and MSSQL, literalization of true and false values given directly
             to Dataset#filter has been fixed.  So the following now works correctly on
             those databases:</p>
             
-            <pre>DB[:table].filter(true)&#x000A;DB[:table].filter(false)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>(<span class="ruby-keyword">false</span>)</pre>
             
             <p>Unfortunately, because SQLite and MSSQL don&#39;t have a real boolean type,
             these will not work:</p>
             
-            <pre>DB[:table].filter{a &amp; true}&#x000A;DB[:table].filter{a &amp; false}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-keyword">false</span>}</pre>
             
             <p>You currently have to work around the issue by doing:</p>
             
-            <pre>DB[:table].filter{a &amp; Sequel::TRUE}&#x000A;DB[:table].filter{a &amp; Sequel::FALSE}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">TRUE</span>}&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">FALSE</span>}</pre>
             
             <p>It is possible that a future version of <a
             href="../../../classes/Sequel.html">Sequel</a> will remove the need for

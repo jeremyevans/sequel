@@ -41,22 +41,19 @@
             
             <p>The sharding plugin augments Sequel&#39;s default model sharding support in
             the following ways:</p>
-            
-            <p>1) It automatically sets model instances to be saved back to the</p>
-            
-            <pre>shard they were retreived from.</pre>
-            
-            <p>2) It makes model associations use the same shard as the model</p>
-            
-            <pre>object.</pre>
-            
-            <p>3) It adds a slightly nicer API for creating model instances on</p>
-            
-            <pre>specific shards.</pre>
+            <ul><li>
+            <p>It automatically sets model instances to be saved back to the shard they
+            were retreived from.</p>
+            </li><li>
+            <p>It makes model associations use the same shard as the model object.</p>
+            </li><li>
+            <p>It adds a slightly nicer API for creating model instances on specific
+            shards.</p>
+            </li></ul>
             
             <p>Usage:</p>
             
-            <pre># Add the sharding support to all model subclasses (called before loading subclasses)&#x000A;Sequel::Model.plugin :sharding&#x000A;# Add the sharding support to the Album class&#x000A;Album.plugin :sharding</pre>
+            <pre class="ruby"><span class="ruby-comment"># Add the sharding support to all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">sharding</span>&#x000A;&#x000A;<span class="ruby-comment"># Add the sharding support to the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">sharding</span></pre>
           </div>
           <div id='context'>
           </div>

@@ -43,7 +43,7 @@
             multiple columns to have separate error entries, one per column.  For
             example, a multiple column uniqueness entry:</p>
             
-            <pre>validates_unique([:artist_id, :name])</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_unique</span>([:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">name</span>])</pre>
             
             <p>would by default result in errors entries such as:</p>
             
@@ -57,7 +57,7 @@
             are checking for validation errors.  If you don&#39;t split the errors,
             then:</p>
             
-            <pre>errors.on(:artist_id)</pre>
+            <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(:<span class="ruby-identifier">artist_id</span>)</pre>
             
             <p>would not return the uniqueness error.</p>
             

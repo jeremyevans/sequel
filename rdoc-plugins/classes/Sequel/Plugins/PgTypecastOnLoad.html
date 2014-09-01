@@ -41,11 +41,10 @@
             
             <p>The <a href="PgTypecastOnLoad.html">PgTypecastOnLoad</a> plugin exists
             because when you connect to PostgreSQL using the do, swift, or jdbc
-            adapter, <a href="../../Sequel.html">Sequel</a> doesn&#39;t have complete
-            control over typecasting, and may return columns as strings instead of how
-            the native postgres adapter would typecast them.  This is mostly needed for
-            the additional support that the pg_* extensions add for advanced PostgreSQL
-            types such as arrays.</p>
+            adapter, Sequel doesn&#39;t have complete control over typecasting, and may
+            return columns as strings instead of how the native postgres adapter would
+            typecast them.  This is mostly needed for the additional support that the
+            pg_* extensions add for advanced PostgreSQL types such as arrays.</p>
             
             <p>This plugin makes model loading to do the same conversion that the native
             postgres adapter would do for all columns given.  You can either specify

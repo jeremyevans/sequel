@@ -78,11 +78,11 @@
             <p>The :dataset association option can now take accept an optional association
             reflection option.  Instead of doing:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">artists</span>,&#x000A;  :<span class="ruby-identifier">dataset=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-constant">Artist</span><span class="ruby-operator">...</span>}</pre>
+            <pre>Album.one_to_many :artists,&#x000A;  :dataset=&gt;{Artist...}</pre>
             
             <p>you can now do:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">artists</span>,&#x000A;  :<span class="ruby-identifier">dataset=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">associated_dataset</span><span class="ruby-operator">...</span>}</pre>
+            <pre>Album.one_to_many :artists,&#x000A;  :dataset=&gt;{|r| r.associated_dataset...}</pre>
             
             <p>This second form will preform better.</p>
             </li><li>
@@ -102,7 +102,7 @@
             supported.  For example, the following code previously didn&#39;t work
             correctly with emulated offsets:</p>
             
-            <pre># Second 5 rows ordered by column2 of the second 10 rows ordered&#x000A;# by column 1.&#x000A;DB[:table].order(:column1).limit(10, 10).&#x000A;  from_self.order(:column2).limit(5, 5)</pre>
+            <pre class="ruby"><span class="ruby-comment"># Second 5 rows ordered by column2 of the second 10 rows ordered</span>&#x000A;<span class="ruby-comment"># by column 1.</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">column1</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span>, <span class="ruby-value">10</span>).&#x000A;  <span class="ruby-identifier">from_self</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">column2</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">5</span>, <span class="ruby-value">5</span>)</pre>
             
             <p>Row processing speed has been increased slightly for all adapters that
             supported databases where offsets are emulated.</p>

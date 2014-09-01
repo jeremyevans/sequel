@@ -50,7 +50,7 @@
             
             <p>Usage:</p>
             
-            <pre># Force all strings to be UTF8 encoded in a all model subclasses&#x000A;# (called before loading subclasses)&#x000A;Sequel::Model.plugin :force_encoding, &#39;UTF-8&#39;&#x000A;# Force the encoding for the Album model to UTF8&#x000A;Album.plugin :force_encoding&#x000A;Album.forced_encoding = &#39;UTF-8&#39;</pre>
+            <pre class="ruby"><span class="ruby-comment"># Force all strings to be UTF8 encoded in a all model subclasses</span>&#x000A;<span class="ruby-comment"># (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">force_encoding</span>, <span class="ruby-string">&#39;UTF-8&#39;</span>&#x000A;&#x000A;<span class="ruby-comment"># Force the encoding for the Album model to UTF8</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">force_encoding</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">forced_encoding</span> = <span class="ruby-string">&#39;UTF-8&#39;</span></pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>

@@ -54,6 +54,7 @@
             </ol>
             <h3>Public Instance</h3>
             <ol>
+              <li><a target="docwin" href="#method-i-call">call</a></li>
               <li><a target="docwin" href="#attribute-i-callable">callable</a></li>
             </ol>
           </div>
@@ -94,6 +95,25 @@
                     [show source]
                   </a>
                   <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1219</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">callable</span>)&#x000A;  <span class="ruby-ivar">@callable</span> = <span class="ruby-identifier">callable</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-call'>
+                <a name='method-i-call'></a>
+                <div class='synopsis'>
+                  <span class='name'>call</span>
+                  <span class='arguments'>(ds)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Call the underlying callable and return the result.  If the underlying
+                  callable only accepts a single argument, call it with the given dataset.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1226</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:arity</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">arity</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@callable</span>.<span class="ruby-identifier">call</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-09-19 07:06:56 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -49,7 +49,7 @@
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :named_timezones</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">named_timezones</span></pre>
             
             <p>Let&#39;s say you have the database server in New York and the application
             server in Los Angeles.  For historical reasons, data is stored in local New
@@ -57,7 +57,7 @@
             so you want to use New York time in the database and Los Angeles time in
             the application.  This is easily done via:</p>
             
-            <pre>Sequel.database_timezone = &#39;America/New_York&#39;&#x000A;Sequel.application_timezone = &#39;America/Los_Angeles&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = <span class="ruby-string">&#39;America/New_York&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> = <span class="ruby-string">&#39;America/Los_Angeles&#39;</span></pre>
             
             <p>Then, before data is stored in the database, it is converted to New York
             time.  When data is retrieved from the database, it is converted to Los
@@ -66,13 +66,12 @@
             <p>If you are using database specific timezones, you may want to load this
             extension into the database in order to support similar API:</p>
             
-            <pre>DB.extension :named_timezones&#x000A;DB.timezone = &#39;America/New_York&#39;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">named_timezones</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">timezone</span> = <span class="ruby-string">&#39;America/New_York&#39;</span></pre>
             
             <p>Note that typecasting from the database timezone to the application
             timezone when fetching rows is dependent on the database adapter, and only
-            works on adapters where <a
-            href="../../../../classes/Sequel.html">Sequel</a> itself does the
-            conversion. It should work on mysql, postgres, sqlite, ibmdb, and jdbc.</p>
+            works on adapters where Sequel itself does the conversion. It should work
+            on mysql, postgres, sqlite, ibmdb, and jdbc.</p>
           </div>
           <div id='context'>
             <div id='requires'>

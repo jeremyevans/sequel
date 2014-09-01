@@ -90,7 +90,7 @@
                   <p>Create an <a href="AliasedExpression.html">SQL::AliasedExpression</a> for
                   the given expression and alias.</p>
                   
-                  <pre>Sequel.as(:column, :alias) # &quot;column&quot; AS &quot;alias&quot;&#x000A;Sequel.as(:column, :alias, [:col_alias1, :col_alias2]) # &quot;column&quot; AS &quot;alias&quot;(&quot;col_alias1&quot;, &quot;col_alias2&quot;)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>, [:<span class="ruby-identifier">col_alias1</span>, :<span class="ruby-identifier">col_alias2</span>]) <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;(&quot;col_alias1&quot;, &quot;col_alias2&quot;)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-as-source'); return false">
@@ -108,12 +108,11 @@
                 <div class='description'>
                   
                   <p>Order the given argument ascending. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:nulls 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:nulls </td><td>
                   <p>Set to :first to use NULLS FIRST (so NULL values are ordered before other
                   values), or :last to use NULLS LAST (so NULL values are ordered after other
                   values).</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># a ASC</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">last</span>) <span class="ruby-comment"># b ASC NULLS LAST</span></pre>
                 </div>
@@ -176,7 +175,7 @@
                   and it is handled similarly to using a database independent type in the
                   schema methods.</p>
                   
-                  <pre>Sequel.cast(:a, :integer) # CAST(a AS integer)&#x000A;Sequel.cast(:a, String) # CAST(a AS varchar(255))</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">integer</span>) <span class="ruby-comment"># CAST(a AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">String</span>) <span class="ruby-comment"># CAST(a AS varchar(255))</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast-source'); return false">
@@ -198,7 +197,7 @@
                   if none given), and return the result as a <code>NumericExpression</code>,
                   so you can use the bitwise operators on the result.</p>
                   
-                  <pre>Sequel.cast_numeric(:a) # CAST(a AS integer)&#x000A;Sequel.cast_numeric(:a, Float) # CAST(a AS double precision)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># CAST(a AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_numeric</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">Float</span>) <span class="ruby-comment"># CAST(a AS double precision)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_numeric-source'); return false">
@@ -221,7 +220,7 @@
                   so you can use + directly on the result for <a href="../SQL.html">SQL</a>
                   string concatenation.</p>
                   
-                  <pre>Sequel.cast_string(:a) # CAST(a AS varchar(255))&#x000A;Sequel.cast_string(:a, :text) # CAST(a AS text)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># CAST(a AS varchar(255))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">text</span>) <span class="ruby-comment"># CAST(a AS text)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_string-source'); return false">
@@ -241,7 +240,7 @@
                   <p>Return an emulated function call for getting the number of characters in
                   the argument:</p>
                   
-                  <pre>Sequel.char_length(:a) # char_length(a) -- Most databases&#x000A;Sequel.char_length(:a) # length(a) -- SQLite</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">char_length</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># char_length(a) -- Most databases</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">char_length</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># length(a) -- SQLite</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-char_length-source'); return false">
@@ -261,7 +260,7 @@
                   <p>Do a deep qualification of the argument using the qualifier.  This recurses
                   into nested structures.</p>
                   
-                  <pre>Sequel.deep_qualify(:table, :column) # &quot;table&quot;.&quot;column&quot;&#x000A;Sequel.deep_qualify(:table, Sequel.+(:column, 1)) # &quot;table&quot;.&quot;column&quot; + 1&#x000A;Sequel.deep_qualify(:table, Sequel.like(:a, &#39;b&#39;)) # &quot;table&quot;.&quot;a&quot; LIKE &#39;b&#39; ESCAPE &#39;\&#39;</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(:<span class="ruby-identifier">table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>)) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; + 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">deep_qualify</span>(:<span class="ruby-identifier">table</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b&#39;</span>)) <span class="ruby-comment"># &quot;table&quot;.&quot;a&quot; LIKE &#39;b&#39; ESCAPE &#39;\&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-deep_qualify-source'); return false">
@@ -282,14 +281,14 @@
                   delay evaluations of the code to runtime.  For example, with the following
                   code:</p>
                   
-                  <pre>ds = DB[:table].where{column &gt; Time.now}</pre>
+                  <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}</pre>
                   
                   <p>The filter is fixed to the time that where was called. Unless you are only
                   using the dataset once immediately after creating it, that&#39;s probably
                   not desired.  If you just want to set it to the time when the query is sent
                   to the database, you can wrap it in Sequel.delay:</p>
                   
-                  <pre>ds = DB[:table].where{column &gt; Sequel.delay{Time.now}}</pre>
+                  <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span>{<span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}}</pre>
                   
                   <p>Note that for dates and timestamps, you are probably better off using
                   Sequel::CURRENT_DATE and Sequel::CURRENT_TIMESTAMP instead of this generic
@@ -311,12 +310,11 @@
                 <div class='description'>
                   
                   <p>Order the given argument descending. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:nulls 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:nulls </td><td>
                   <p>Set to :first to use NULLS FIRST (so NULL values are ordered before other
                   values), or :last to use NULLS LAST (so NULL values are ordered after other
                   values).</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># b DESC</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">b</span>, :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">first</span>) <span class="ruby-comment"># b DESC NULLS FIRST</span></pre>
                 </div>
@@ -348,7 +346,7 @@
                   expressions that are difficult to construct via other methods.  For
                   example:</p>
                   
-                  <pre>Sequel.expr(1) - :a # SQL: (1 - a)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(<span class="ruby-value">1</span>) <span class="ruby-operator">-</span> :<span class="ruby-identifier">a</span> <span class="ruby-comment"># SQL: (1 - a)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-expr-source'); return false">
@@ -367,7 +365,7 @@
                   
                   <p>Extract a datetime_part (e.g. year, month) from the given expression:</p>
                   
-                  <pre>Sequel.extract(:year, :date) # extract(year FROM &quot;date&quot;)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">date</span>) <span class="ruby-comment"># extract(year FROM &quot;date&quot;)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-extract-source'); return false">
@@ -387,7 +385,7 @@
                   <p>Returns a <code>Sequel::SQL::Function</code> with the function name and the
                   given arguments.</p>
                   
-                  <pre>Sequel.function(:now) # SQL: now()&#x000A;Sequel.function(:substr, :a, 1) # SQL: substr(a, 1)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">now</span>) <span class="ruby-comment"># SQL: now()</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">substr</span>, :<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># SQL: substr(a, 1)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-function-source'); return false">
@@ -406,7 +404,7 @@
                   
                   <p>Return the argument wrapped as an <code>SQL::Identifier</code>.</p>
                   
-                  <pre>Sequel.identifier(:a__b) # &quot;a__b&quot;</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(:<span class="ruby-identifier">a__b</span>) <span class="ruby-comment"># &quot;a__b&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-identifier-source'); return false">
@@ -427,7 +425,7 @@
                   supports it) pattern match of the receiver with the given patterns.  See
                   <code>SQL::StringExpression.like</code>.</p>
                   
-                  <pre>Sequel.ilike(:a, &#39;A%&#39;) # &quot;a&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-ilike-source'); return false">
@@ -449,7 +447,7 @@
                   array&#39;s elements.  If an argument is passed, it is used in between each
                   element of the array in the <a href="../SQL.html">SQL</a> concatenation.</p>
                   
-                  <pre>Sequel.join([:a]) # SQL: a&#x000A;Sequel.join([:a, :b]) # SQL: a || b&#x000A;Sequel.join([:a, &#39;b&#39;]) # SQL: a || &#39;b&#39;&#x000A;Sequel.join([&#39;a&#39;, :b], &#39; &#39;) # SQL: &#39;a&#39; || &#39; &#39; || b</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">a</span>]) <span class="ruby-comment"># SQL: a</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>]) <span class="ruby-comment"># SQL: a || b</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;b&#39;</span>]) <span class="ruby-comment"># SQL: a || &#39;b&#39;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([<span class="ruby-string">&#39;a&#39;</span>, :<span class="ruby-identifier">b</span>], <span class="ruby-string">&#39; &#39;</span>) <span class="ruby-comment"># SQL: &#39;a&#39; || &#39; &#39; || b</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-join-source'); return false">
@@ -470,7 +468,7 @@
                   database supports it) pattern match of the receiver with the given
                   patterns.  See <code>SQL::StringExpression.like</code>.</p>
                   
-                  <pre>Sequel.like(:a, &#39;A%&#39;) # &quot;a&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># &quot;a&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-like-source'); return false">
@@ -554,7 +552,7 @@
                   
                   <p>Create a qualified identifier with the given qualifier and identifier</p>
                   
-                  <pre>Sequel.qualify(:table, :column) # &quot;table&quot;.&quot;column&quot;&#x000A;Sequel.qualify(:schema, :table) # &quot;schema&quot;.&quot;table&quot;&#x000A;Sequel.qualify(:table, :column).qualify(:schema) # &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>, :<span class="ruby-identifier">table</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-qualify-source'); return false">
@@ -574,7 +572,7 @@
                   <p>Return an <code>SQL::Subscript</code> with the given arguments,
                   representing an <a href="../SQL.html">SQL</a> array access.</p>
                   
-                  <pre>Sequel.subscript(:array, 1) # array[1]&#x000A;Sequel.subscript(:array, 1, 2) # array[1, 2]&#x000A;Sequel.subscript(:array, [1, 2]) # array[1, 2]&#x000A;Sequel.subscript(:array, 1..2) # array[1:2]&#x000A;Sequel.subscript(:array, 1...3) # array[1:2]</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">array</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># array[1]</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">array</span>, <span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># array[1, 2]</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">array</span>, [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]) <span class="ruby-comment"># array[1, 2]</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">array</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># array[1:2]</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">array</span>, <span class="ruby-value">1</span><span class="ruby-operator">...</span><span class="ruby-value">3</span>) <span class="ruby-comment"># array[1:2]</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-subscript-source'); return false">
@@ -594,7 +592,7 @@
                   <p>Return an emulated function call for trimming a string of spaces from both
                   sides (similar to ruby&#39;s String#strip).</p>
                   
-                  <pre>Sequel.trim(:a) # trim(a) -- Most databases&#x000A;Sequel.trim(:a) # ltrim(rtrim(a)) -- Microsoft SQL Server</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">trim</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># trim(a) -- Most databases</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">trim</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># ltrim(rtrim(a)) -- Microsoft SQL Server</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-trim-source'); return false">

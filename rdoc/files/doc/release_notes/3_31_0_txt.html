@@ -142,7 +142,7 @@
             LiteralString, which could potentially break some code.  If you would like
             a String returned, you can pass the returned object to Dataset#literal:</p>
             
-            <pre>dataset.literal(dataset.exists)</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">exists</span>)</pre>
             </li><li>
             <p>Dataset#from no longer handles :a__b__c___d as “a.b.c AS d”.  This was not
             the intended behavior, and nowhere else in <a

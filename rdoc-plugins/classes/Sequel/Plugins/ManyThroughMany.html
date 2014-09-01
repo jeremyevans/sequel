@@ -42,34 +42,32 @@
             <p>The many_through_many plugin allow you to create an association using
             multiple join tables. For example, assume the following associations:</p>
             
-            <pre>Artist.many_to_many :albums&#x000A;Album.many_to_many :tags</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span></pre>
             
             <p>The many_through_many plugin would allow this:</p>
             
-            <pre>Artist.plugin :many_through_many&#x000A;Artist.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums_tags, :album_id, :tag_id]]</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">many_through_many</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">many_through_many</span> :<span class="ruby-identifier">tags</span>, [[:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>], [:<span class="ruby-identifier">albums_tags</span>, :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">tag_id</span>]]</pre>
             
             <p>Which will give you the tags for all of the artist&#39;s albums.</p>
             
             <p>Let&#39;s break down the 2nd argument of the many_through_many call:</p>
             
-            <pre>[[:albums_artists, :artist_id, :album_id],&#x000A; [:albums_tags, :album_id, :tag_id]]</pre>
+            <pre class="ruby">[[:<span class="ruby-identifier">albums_artists</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">album_id</span>],&#x000A; [:<span class="ruby-identifier">albums_tags</span>, :<span class="ruby-identifier">album_id</span>, :<span class="ruby-identifier">tag_id</span>]]</pre>
             
             <p>This argument is an array of arrays with three elements.  Each entry in the
             main array represents a JOIN in SQL:</p>
-            <ul><li>
-            <p>The first element in each array represents the name of the table to join.</p>
-            </li><li>
-            <p>The second element in each array represents the column used to join to the
-            previous table.</p>
-            </li><li>
-            <p>The third element in each array represents the column used to join to the
-            next table.</p>
-            </li></ul>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>first element </td><td>
+            <p>represents the name of the table to join.</p>
+            </td></tr><tr><td class='label'>second element </td><td>
+            <p>represents the column used to join to the previous table.</p>
+            </td></tr><tr><td class='label'>third element </td><td>
+            <p>represents the column used to join to the next table.</p>
+            </td></tr></tbody></table>
             
             <p>So the “Artist.many_through_many :tags” is translated into something
             similar to:</p>
             
-            <pre>FROM artists&#x000A;JOIN albums_artists ON (artists.id = albums_artists.artist_id)&#x000A;JOIN albums_tags ON (albums_artists.album_id = albums_tag.album_id)&#x000A;JOIN tags ON (albums_tags.tag_id = tags.id)</pre>
+            <pre class="ruby"><span class="ruby-constant">FROM</span> <span class="ruby-identifier">artists</span>&#x000A;<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">albums_artists</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">artists</span>.<span class="ruby-identifier">id</span> = <span class="ruby-identifier">albums_artists</span>.<span class="ruby-identifier">artist_id</span>)&#x000A;<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">albums_tags</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">albums_artists</span>.<span class="ruby-identifier">album_id</span> = <span class="ruby-identifier">albums_tag</span>.<span class="ruby-identifier">album_id</span>)&#x000A;<span class="ruby-constant">JOIN</span> <span class="ruby-identifier">tags</span> <span class="ruby-constant">ON</span> (<span class="ruby-identifier">albums_tags</span>.<span class="ruby-identifier">tag_id</span> = <span class="ruby-identifier">tags</span>.<span class="ruby-identifier">id</span>)</pre>
             
             <p>The “artists.id” and “tags.id” criteria come from other association options
             (defaulting to the primary keys of the current and associated tables), but

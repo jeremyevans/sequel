@@ -50,7 +50,7 @@
             default for backwards compatibility.  You can change it at both the dataset
             and database level:</p>
             
-            <pre>DB.mssql_unicode_strings = false # default for datasets&#x000A;dataset.mssql_unicode_strings = false # just this dataset</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># default for datasets</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">mssql_unicode_strings</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># just this dataset</span></pre>
             </li><li>
             <p>In the oracle adapter, if Sequel.application_timezone is :utc, set the
             timezone for the connection to use the 00:00 timezone.</p>

@@ -185,15 +185,6 @@
             <p>For a more expanded introduction, see the <a
             href="../files/README_rdoc.html">README</a>. For a quicker introduction,
             see the <a href="../files/doc/cheat_sheet_rdoc.html">cheat sheet</a>.</p>
-            
-            <p>Adds the <a href="Sequel/Migration.html">Sequel::Migration</a> and <a
-            href="Sequel/Migrator.html">Sequel::Migrator</a> classes, which allow the
-            user to easily group schema changes and migrate the database to a newer
-            version or revert to a previous version.</p>
-            
-            <p>To load the extension:</p>
-            
-            <pre>Sequel.extension :migration</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -421,7 +412,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MINOR</td>
                     <td>=</td>
-                    <td class='context-item-value'>13</td>
+                    <td class='context-item-value'>14</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -507,7 +498,7 @@
                       13, 1999. You can override this to treat those dates as January 2nd, 0003
                       and December 13, 0099, respectively, by:</p>
                       
-                      <pre>Sequel.convert_two_digit_years = false</pre>
+                      <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_two_digit_years</span> = <span class="ruby-keyword">false</span></pre>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -521,7 +512,7 @@
                       <code>DateTime</code> for times returned from the database.  It defaults to
                       <code>Time</code>.  To change it to <code>DateTime</code>:</p>
                       
-                      <pre>Sequel.datetime_class = DateTime</pre>
+                      <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">datetime_class</span> = <span class="ruby-constant">DateTime</span></pre>
                       
                       <p>For ruby versions less than 1.9.2, <code>Time</code> has a limited range
                       (1901 to 2038), so if you use datetimes out of that range, you need to
@@ -549,20 +540,17 @@
                   <p>Lets you create a <a href="Sequel/Model.html">Model</a> subclass with its
                   dataset already set. <code>source</code> should be an instance of one of
                   the following classes:</p>
-                  <dl class="rdoc-list note-list"><dt><a href="Sequel/Database.html">Database</a> 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="Sequel/Database.html">Database</a> </td><td>
                   <p>Sets the database for this model to <code>source</code>. Generally only
                   useful when subclassing directly from the returned class, where the name of
                   the subclass sets the table name (which is combined with the
                   <code>Database</code> in <code>source</code> to create the dataset to use)</p>
-                  </dd><dt><a href="Sequel/Dataset.html">Dataset</a> 
-                  <dd>
+                  </td></tr><tr><td class='label'><a href="Sequel/Dataset.html">Dataset</a> </td><td>
                   <p>Sets the dataset for this model to <code>source</code>.</p>
-                  </dd><dt>other 
-                  <dd>
+                  </td></tr><tr><td class='label'>other </td><td>
                   <p>Sets the table name for this model to <code>source</code>. The class will
                   use the default database for model classes in order to create the dataset.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>The purpose of this method is to set the dataset/database automatically for
                   a model class, if the table name doesn&#39;t match the implicit name.  This
@@ -689,7 +677,7 @@
                   that you can extend other classes with.  Consult the documentation for each
                   extension you plan on using for usage.</p>
                   
-                  <pre>Sequel.extension(:schema_dumper)&#x000A;Sequel.extension(:pagination, :query)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">schema_dumper</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">pagination</span>, :<span class="ruby-identifier">query</span>)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-extension-source'); return false">
@@ -712,11 +700,11 @@
                   in all <a href="Sequel/SQL.html">SQL</a> strings for most databases, so to
                   turn that off:</p>
                   
-                  <pre>Sequel.identifier_input_method = nil</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier_input_method</span> = <span class="ruby-keyword">nil</span></pre>
                   
                   <p>to downcase instead:</p>
                   
-                  <pre>Sequel.identifier_input_method = :downcase</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier_input_method</span> = :<span class="ruby-identifier">downcase</span></pre>
                   
                   <p>Other String instance methods work as well.</p>
                 </div>
@@ -741,11 +729,11 @@
                   href="Sequel.html">Sequel</a> downcases identifiers retrieved for most
                   databases, so to turn that off:</p>
                   
-                  <pre>Sequel.identifier_output_method = nil</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier_output_method</span> = <span class="ruby-keyword">nil</span></pre>
                   
                   <p>to upcase instead:</p>
                   
-                  <pre>Sequel.identifier_output_method = :upcase</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier_output_method</span> = :<span class="ruby-identifier">upcase</span></pre>
                   
                   <p>Other String instance methods work as well.</p>
                 </div>
@@ -804,7 +792,7 @@
                   <p>The preferred method for writing <a href="Sequel.html">Sequel</a>
                   migrations, using a DSL:</p>
                   
-                  <pre>Sequel.migration do&#x000A;  up do&#x000A;    create_table(:artists) do&#x000A;      primary_key :id&#x000A;      String :name&#x000A;    end&#x000A;  end&#x000A;  down do&#x000A;    drop_table(:artists)&#x000A;  end&#x000A;end</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;      <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">drop_table</span>(:<span class="ruby-identifier">artists</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                   
                   <p>Designed to be used with the <code>Migrator</code> class, part of the
                   <code>migration</code> extension.</p>
@@ -813,7 +801,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-migration-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-migration-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 280</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-migration-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 281</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-object_to_json'>
@@ -864,7 +852,7 @@
                   <a href="Sequel.html">Sequel</a> quotes identifiers in all <a
                   href="Sequel/SQL.html">SQL</a> strings, so to turn that off:</p>
                   
-                  <pre>Sequel.quote_identifiers = false</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">quote_identifiers</span> = <span class="ruby-keyword">false</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-quote_identifiers-3D-source'); return false">
@@ -928,7 +916,7 @@
                   your program will only have one thread, and speed is a priority, you should
                   set this to true:</p>
                   
-                  <pre>Sequel.single_threaded = true</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">single_threaded</span> = <span class="ruby-keyword">true</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-single_threaded-3D-source'); return false">
@@ -968,7 +956,7 @@
                   
                   <p>Converts the given <code>string</code> into a <code>Date</code> object.</p>
                   
-                  <pre>Sequel.string_to_date(&#39;2010-09-10&#39;) # Date.civil(2010, 09, 10)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_date</span>(<span class="ruby-string">&#39;2010-09-10&#39;</span>) <span class="ruby-comment"># Date.civil(2010, 09, 10)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-string_to_date-source'); return false">
@@ -989,7 +977,7 @@
                   <code>DateTime</code> object, depending on the value of
                   <code>Sequel.datetime_class</code>.</p>
                   
-                  <pre>Sequel.string_to_datetime(&#39;2010-09-10 10:20:30&#39;) # Time.local(2010, 09, 10, 10, 20, 30)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">string_to_datetime</span>(<span class="ruby-string">&#39;2010-09-10 10:20:30&#39;</span>) <span class="ruby-comment"># Time.local(2010, 09, 10, 10, 20, 30)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-string_to_datetime-source'); return false">

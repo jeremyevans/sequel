@@ -103,12 +103,12 @@
             the :default shard.  However, you can specify a different shard using the
             :servers_hash option when connecting to the database:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">...</span>, :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">some_shard</span>))</pre>
+            <pre>DB = Sequel.connect(..., :servers_hash=&gt;Hash.new(:some_shard))</pre>
             
             <p>You can also use this feature to raise an exception if an unconfigured
             shard is used:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-operator">...</span>, :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-operator">...</span>})</pre>
+            <pre>DB = Sequel.connect(..., :servers_hash=&gt;Hash.new{raise ...})</pre>
             </li><li>
             <p>The mysql and mysql2 adapters now both support the :read_timeout and
             :connect_timeout options.  read_timeout is the timeout in seconds for

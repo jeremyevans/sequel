@@ -229,60 +229,48 @@
                   <p>You can also create columns via method missing, so the following are
                   equivalent:</p>
                   
-                  <pre>column :number, :integer&#x000A;integer :number</pre>
+                  <pre class="ruby"><span class="ruby-identifier">column</span> :<span class="ruby-identifier">number</span>, :<span class="ruby-identifier">integer</span>&#x000A;<span class="ruby-identifier">integer</span> :<span class="ruby-identifier">number</span></pre>
                   
                   <p>The following options are supported:</p>
-                  <dl class="rdoc-list note-list"><dt>:default 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:default </td><td>
                   <p>The default value for the column.</p>
-                  </dd><dt>:deferrable 
-                  <dd>
+                  </td></tr><tr><td class='label'>:deferrable </td><td>
                   <p>For foreign key columns, this ensures referential integrity will work even
                   if referencing table uses a foreign key value that does not yet exist on
                   referenced table (but will exist before the transaction commits). Basically
                   it adds DEFERRABLE INITIALLY DEFERRED on key creation. If you use
                   :immediate as the value, uses DEFERRABLE INITIALLY IMMEDIATE.</p>
-                  </dd><dt>:index 
-                  <dd>
+                  </td></tr><tr><td class='label'>:index </td><td>
                   <p>Create an index on this column.  If given a hash, use the hash as the
                   options for the index.</p>
-                  </dd><dt>:key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:key </td><td>
                   <p>For foreign key columns, the column in the associated table that this
                   column references.  Unnecessary if this column references the primary key
                   of the associated table, except if you are using MySQL.</p>
-                  </dd><dt>:null 
-                  <dd>
+                  </td></tr><tr><td class='label'>:null </td><td>
                   <p>Mark the column as allowing NULL values (if true), or not allowing NULL
                   values (if false).  If unspecified, will default to whatever the database
                   default is.</p>
-                  </dd><dt>:on_delete 
-                  <dd>
+                  </td></tr><tr><td class='label'>:on_delete </td><td>
                   <p>Specify the behavior of this column when being deleted (:restrict,
                   :cascade, :set_null, :set_default, :no_action).</p>
-                  </dd><dt>:on_update 
-                  <dd>
+                  </td></tr><tr><td class='label'>:on_update </td><td>
                   <p>Specify the behavior of this column when being updated (:restrict,
                   :cascade, :set_null, :set_default, :no_action).</p>
-                  </dd><dt>:primary_key 
-                  <dd>
+                  </td></tr><tr><td class='label'>:primary_key </td><td>
                   <p>Make the column as a single primary key column.  This should only be used
                   if you have a single, nonautoincrementing primary key column.</p>
-                  </dd><dt>:primary_key_constraint_name 
-                  <dd>
+                  </td></tr><tr><td class='label'>:primary_key_constraint_name </td><td>
                   <p>The name to give the primary key constraint</p>
-                  </dd><dt>:type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:type </td><td>
                   <p>Overrides the type given as the argument.  Generally not used by column
                   itself, but can be passed as an option to other methods that call column.</p>
-                  </dd><dt>:unique 
-                  <dd>
+                  </td></tr><tr><td class='label'>:unique </td><td>
                   <p>Mark the column as unique, generally has the same effect as creating a
                   unique index on the column.</p>
-                  </dd><dt>:unique_constraint_name 
-                  <dd>
+                  </td></tr><tr><td class='label'>:unique_constraint_name </td><td>
                   <p>The name to give the unique key constraint</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-column-source'); return false">
@@ -326,10 +314,9 @@
                   <pre class="ruby"><span class="ruby-identifier">foreign_key</span>(:<span class="ruby-identifier">artist_id</span>) <span class="ruby-comment"># artist_id INTEGER</span>&#x000A;<span class="ruby-identifier">foreign_key</span>(:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>) <span class="ruby-comment"># artist_id INTEGER REFERENCES artists</span>&#x000A;<span class="ruby-identifier">foreign_key</span>(:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># artist_id INTEGER REFERENCES artists(id)</span>&#x000A;<span class="ruby-identifier">foreign_key</span>(:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">String</span>) <span class="ruby-comment"># artist_id varchar(255) REFERENCES artists(id)</span></pre>
                   
                   <p>Additional Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:foreign_key_constraint_name 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:foreign_key_constraint_name </td><td>
                   <p>The name to give the foreign key constraint</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>If you want a foreign key constraint without adding a column (usually
                   because it is a composite foreign key), you can provide an array of columns
@@ -356,19 +343,16 @@
                   <p>Add a full text index on the given columns to the DDL.</p>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:index_type 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:index_type </td><td>
                   <p>Can be set to :gist to use a GIST index instead of the default GIN index.</p>
-                  </dd><dt>:language 
-                  <dd>
+                  </td></tr><tr><td class='label'>:language </td><td>
                   <p>Set a language to use for the index (default: simple).</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Microsoft <a href="../SQL.html">SQL</a> Server specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:key_index 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:key_index </td><td>
                   <p>The KEY INDEX to use for the full text index.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-full_text_index-source'); return false">
@@ -404,39 +388,32 @@
                   
                   <p>Add an index on the given column(s) with the given options to the DDL.
                   General options:</p>
-                  <dl class="rdoc-list note-list"><dt>:name 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name </td><td>
                   <p>The name to use for the index. If not given, a default name based on the
                   table and columns is used.</p>
-                  </dd><dt>:type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:type </td><td>
                   <p>The type of index to use (only supported by some databases)</p>
-                  </dd><dt>:unique 
-                  <dd>
+                  </td></tr><tr><td class='label'>:unique </td><td>
                   <p>Make the index unique, so duplicate values are not allowed.</p>
-                  </dd><dt>:where 
-                  <dd>
+                  </td></tr><tr><td class='label'>:where </td><td>
                   <p>Create a partial index (only supported by some databases)</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>PostgreSQL specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:concurrently 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:concurrently </td><td>
                   <p>Create the index concurrently, so it doesn&#39;t block operations on the
                   table while the index is being built.</p>
-                  </dd><dt>:opclass 
-                  <dd>
+                  </td></tr><tr><td class='label'>:opclass </td><td>
                   <p>Use a specific operator class in the index.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Microsoft <a href="../SQL.html">SQL</a> Server specific options:</p>
-                  <dl class="rdoc-list note-list"><dt>:include 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:include </td><td>
                   <p>Include additional column values in the index, without actually indexing on
                   those values.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
-                  <pre>index :name&#x000A;# CREATE INDEX table_name_index ON table (name)&#x000A;index [:artist_id, :name]&#x000A;# CREATE INDEX table_artist_id_name_index ON table (artist_id, name)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">index</span> :<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-comment"># CREATE INDEX table_name_index ON table (name)</span>&#x000A;&#x000A;<span class="ruby-identifier">index</span> [:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-comment"># CREATE INDEX table_artist_id_name_index ON table (artist_id, name)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-index-source'); return false">
@@ -487,7 +464,7 @@
                   
                   <p>Examples:</p>
                   
-                  <pre class="ruby"><span class="ruby-identifier">primary_key</span>(:<span class="ruby-identifier">id</span>)&#x000A;<span class="ruby-identifier">primary_key</span>([:<span class="ruby-identifier">street_number</span>, :<span class="ruby-identifier">house_number</span>], :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">some</span> <span class="ruby-identifier">constraint_name</span>)</pre>
+                  <pre>primary_key(:id)&#x000A;primary_key([:street_number, :house_number], :name=&gt;:some constraint_name)</pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-primary_key-source'); return false">
@@ -557,7 +534,7 @@
                   
                   <p>Add a unique constraint on the given columns to the DDL.</p>
                   
-                  <pre>unique(:name) # UNIQUE (name)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">unique</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># UNIQUE (name)</span></pre>
                   
                   <p>Supports the same :deferrable option as <a
                   href="CreateTableGenerator.html#method-i-column">column</a>. The :name

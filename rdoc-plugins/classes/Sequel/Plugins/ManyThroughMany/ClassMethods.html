@@ -62,46 +62,38 @@
                   <p>Create a <a
                   href="ClassMethods.html#method-i-many_through_many">#many_through_many</a>
                   association.  Arguments:</p>
-                  <ul><li>
-                  <p>name - Same as associate, the name of the association.</p>
-                  </li><li>
-                  <p>through - The tables and keys to join between the current table and the
-                  associated table. Must be an array, with elements that are either 3 element
-                  arrays, or hashes with keys :table, :left, and :right. The required entries
-                  in the array/hash are:</p>
-                  <dl class="rdoc-list note-list"><dt>:table (first array element) 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>name </td><td>
+                  <p>Same as associate, the name of the association.</p>
+                  </td></tr><tr><td class='label'>through </td><td>
+                  <p>The tables and keys to join between the current table and the associated
+                  table. Must be an array, with elements that are either 3 element arrays, or
+                  hashes with keys :table, :left, and :right. The required entries in the
+                  array/hash are:</p>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:table (first array element) </td><td>
                   <p>The name of the table to join.</p>
-                  </dd><dt>:left (middle array element) 
-                  <dd>
+                  </td></tr><tr><td class='label'>:left (middle array element) </td><td>
                   <p>The key joining the table to the previous table. Can use an array of
                   symbols for a composite key association.</p>
-                  </dd><dt>:right (last array element) 
-                  <dd>
+                  </td></tr><tr><td class='label'>:right (last array element) </td><td>
                   <p>The key joining the table to the next table. Can use an array of symbols
                   for a composite key association.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>If a hash is provided, the following keys are respected when using
                   eager_graph:</p>
-                  <dl class="rdoc-list note-list"><dt>:block 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:block </td><td>
                   <p>A proc to use as the block argument to join.</p>
-                  </dd><dt>:conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>:conditions </td><td>
                   <p>Extra conditions to add to the JOIN ON clause.  Must be a hash or array of
                   two pairs.</p>
-                  </dd><dt>:join_type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:join_type </td><td>
                   <p>The join type to use for the join, defaults to :left_outer.</p>
-                  </dd><dt>:only_conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>:only_conditions </td><td>
                   <p>Conditions to use for the join instead of the ones specified by the keys.</p>
-                  </dd></dl>
-                  </li><li>
-                  <p>opts - The options for the associaion.  Takes the same options as
-                  many_to_many.</p>
-                  </li></ul>
+                  </td></tr></tbody></table>
+                  </td></tr><tr><td class='label'>opts </td><td>
+                  <p>The options for the associaion.  Takes the same options as many_to_many.</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-many_through_many-source'); return false">

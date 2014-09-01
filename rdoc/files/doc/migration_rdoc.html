@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-09 15:36:41 -0700</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -187,7 +187,7 @@
             <code>bin/sequel</code> tool, you need to load the migration extension
             manually:</p>
             
-            <pre>Sequel.extension :migration</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">migration</span></pre>
             
             <h2 id="label-Schema+methods">Schema methods<span><a href="#label-Schema+methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -228,7 +228,7 @@
             modification SQL.  If you need to drop down to SQL to execute some database
             specific code, you can use the <code>run</code> method:</p>
             
-            <pre>Sequel.migration do&#x000A;  up{run &#39;CREATE TRIGGER ...&#39;}&#x000A;  down{run &#39;DROP TRIGGER ...&#39;}&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span>{<span class="ruby-identifier">run</span> <span class="ruby-string">&#39;CREATE TRIGGER ...&#39;</span>}&#x000A;  <span class="ruby-identifier">down</span>{<span class="ruby-identifier">run</span> <span class="ruby-string">&#39;DROP TRIGGER ...&#39;</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>In this case, we are using { and } instead of do and end to define the
             blocks. Just as before, the <code>run</code> methods inside the blocks are
@@ -255,11 +255,11 @@
             href="../../classes/Sequel.html#method-c-migration">Sequel.migration</a>
             block:</p>
             
-            <pre>Sequel.migration do&#x000A;  transaction&#x000A;  change do&#x000A;    # ...&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">transaction</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Likewise, you can disable transaction use via no_transaction:</p>
             
-            <pre>Sequel.migration do&#x000A;  no_transaction&#x000A;  change do&#x000A;    # ...&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">no_transaction</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-comment"># ...</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>This is necessary in some cases, such as when attempting to use CREATE
             INDEX CONCURRENTLY on PostgreSQL (which supports transactional schema, but
@@ -336,7 +336,7 @@
             href="../../classes/Sequel.html">Sequel</a>, they must be specified as
             follows:</p>
             
-            <pre>version_name.rb</pre>
+            <pre class="ruby"><span class="ruby-identifier">version_name</span>.<span class="ruby-identifier">rb</span></pre>
             
             <p>where <code>version</code> is an integer and <code>name</code> is a string
             which should be a very brief description of what the migration does.  Each
@@ -465,18 +465,18 @@
             migrations directory that contains a <code>Sequel.migration</code> call. 
             The minimal do-nothing migration is:</p>
             
-            <pre>Sequel.migration{}</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span>{}</pre>
             
             <p>However, the migrations you write should contain an <code>up</code> block
             that does something, and a <code>down</code> block that reverses the
             changes made by the <code>up</code> block:</p>
             
-            <pre>Sequel.migration do&#x000A;  up{...}&#x000A;  down{...}&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span>{}&#x000A;  <span class="ruby-identifier">down</span>{}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>or they should use the reversible migrations feature with a
             <code>change</code> block:</p>
             
-            <pre>Sequel.migration do&#x000A;  change{...}&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span>{}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h2 id="label-What+to+put+in+your+migration%27s+down+block">What to put in your migration&#39;s <code>down</code> block<span><a href="#label-What+to+put+in+your+migration%27s+down+block">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -533,12 +533,12 @@
             
             <p>To migrate to the latest version, run:</p>
             
-            <pre>rake db:migrate</pre>
+            <pre class="ruby"><span class="ruby-identifier">rake</span> <span class="ruby-identifier">db</span>:<span class="ruby-identifier">migrate</span></pre>
             
             <p>This Rake task takes an optional argument specifying the target version. To
             migrate to version 42, run:</p>
             
-            <pre>rake db:migrate[42]</pre>
+            <pre class="ruby"><span class="ruby-identifier">rake</span> <span class="ruby-identifier">db</span>:<span class="ruby-identifier">migrate</span>[<span class="ruby-value">42</span>]</pre>
             
             <h2 id="label-Verbose+migrations">Verbose migrations<span><a href="#label-Verbose+migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -617,7 +617,7 @@
             <p>If you want to ensure that your application code is up to date, you may
             want to add the following code after connecting to your database:</p>
             
-            <pre>Sequel.extension :migration&#x000A;Sequel::Migrator.check_current(DB, &#39;/path/to/migrations&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">migration</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">check_current</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;/path/to/migrations&#39;</span>)</pre>
             
             <p>This will cause your application to raise an error when you start it if you
             have any outstanding migrations.</p>

@@ -67,7 +67,7 @@
             
             <p>The most basic dataset is the simple selection of all columns in a table:</p>
             
-            <pre>ds = DB[:posts]&#x000A;# SELECT * FROM posts</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">posts</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span></pre>
             
             <p>Here, DB represents your <a
             href="../../classes/Sequel/Database.html">Sequel::Database</a> object, and
@@ -96,14 +96,14 @@
             Only dataset methods that return or yield results will execute the code on
             the database:</p>
             
-            <pre># No SQL queries sent:&#x000A;ds3 = ds.select(:id, :name).order(:name).filter{id &lt; 100}&#x000A;# Until you call a method that returns results&#x000A;results = ds3.all</pre>
+            <pre class="ruby"><span class="ruby-comment"># No SQL queries sent:</span>&#x000A;<span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}&#x000A;&#x000A;<span class="ruby-comment"># Until you call a method that returns results</span>&#x000A;<span class="ruby-identifier">results</span> = <span class="ruby-identifier">ds3</span>.<span class="ruby-identifier">all</span></pre>
             
             <p>One important consequence of this API style is that if you use a method
             chain that includes both methods that return modified copies and a method
             that executes the SQL, the method that executes the SQL should generally be
             the last method in the chain:</p>
             
-            <pre># Good&#x000A;ds.select(:id, :name).order(:name).filter{id &lt; 100}.all&#x000A;# Bad&#x000A;ds.all.select(:id, :name).order(:name).filter{id &lt; 100}</pre>
+            <pre class="ruby"><span class="ruby-comment"># Good</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Bad</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}</pre>
             
             <p>This is because all will return an array of hashes, and select, order, and
             filter are dataset methods, not array methods.</p>
@@ -121,77 +121,57 @@
             
             <p>Most dataset methods fall into this category, which can be further broken
             down by the clause they affect:</p>
-            <dl class="rdoc-list note-list"><dt>SELECT
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>SELECT</td><td>
             <p>select, select_all, select_append, select_group, select_more</p>
-            </dd><dt>FROM
-            <dd>
+            </td></tr><tr><td class='label'>FROM</td><td>
             <p>from, from_self</p>
-            </dd><dt>JOIN
-            <dd>
+            </td></tr><tr><td class='label'>JOIN</td><td>
             <p>join, left_join, right_join, full_join, natural_join, natural_left_join,
             natural_right_join, natural_full_join, cross_join, inner_join,
             left_outer_join, right_outer_join, full_outer_join, join_table</p>
-            </dd><dt>WHERE
-            <dd>
+            </td></tr><tr><td class='label'>WHERE</td><td>
             <p>where, filter, exclude, exclude_where, and, or, grep, invert, unfiltered</p>
-            </dd><dt>GROUP
-            <dd>
+            </td></tr><tr><td class='label'>GROUP</td><td>
             <p>group, group_by, group_and_count, select_group, ungrouped</p>
-            </dd><dt>HAVING
-            <dd>
+            </td></tr><tr><td class='label'>HAVING</td><td>
             <p>having, exclude_having, invert, unfiltered</p>
-            </dd><dt>ORDER
-            <dd>
+            </td></tr><tr><td class='label'>ORDER</td><td>
             <p>order, order_by, order_append, order_prepend, order_more, reverse,
             reverse_order, unordered</p>
-            </dd><dt>LIMIT/OFFSET
-            <dd>
+            </td></tr><tr><td class='label'>LIMIT/OFFSET</td><td>
             <p>limit, offset, unlimited</p>
-            </dd><dt>compounds
-            <dd>
+            </td></tr><tr><td class='label'>compounds</td><td>
             <p>union, intersect, except</p>
-            </dd><dt>locking
-            <dd>
+            </td></tr><tr><td class='label'>locking</td><td>
             <p>for_update, lock_style</p>
-            </dd><dt>common table expressions
-            <dd>
+            </td></tr><tr><td class='label'>common table expressions</td><td>
             <p>with, with_recursive</p>
-            </dd><dt>other
-            <dd>
+            </td></tr><tr><td class='label'>other</td><td>
             <p>clone, distinct, naked, qualify, server, with_sql</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-Methods+that+execute+code+on+the+database">Methods that execute code on the database<span><a href="#label-Methods+that+execute+code+on+the+database">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Most other dataset methods commonly used will execute the dataset&#39;s SQL
             on the database:</p>
-            <dl class="rdoc-list note-list"><dt>SELECT (All Records)
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>SELECT (All Records)</td><td>
             <p>all, each, map, to_hash, to_hash_groups, select_map, select_order_map,
             select_hash, select_hash_groups</p>
-            </dd><dt>SELECT (First Record)
-            <dd>
+            </td></tr><tr><td class='label'>SELECT (First Record)</td><td>
             <p>first, last, [], single_record</p>
-            </dd><dt>SELECT (Single Value)
-            <dd>
+            </td></tr><tr><td class='label'>SELECT (Single Value)</td><td>
             <p>get, single_value</p>
-            </dd><dt>SELECT (Aggregates)
-            <dd>
+            </td></tr><tr><td class='label'>SELECT (Aggregates)</td><td>
             <p>count, avg, max, min, sum, range, interval</p>
-            </dd><dt>INSERT
-            <dd>
+            </td></tr><tr><td class='label'>INSERT</td><td>
             <p>insert, &lt;&lt;, import, multi_insert</p>
-            </dd><dt>UPDATE
-            <dd>
+            </td></tr><tr><td class='label'>UPDATE</td><td>
             <p>update</p>
-            </dd><dt>DELETE
-            <dd>
+            </td></tr><tr><td class='label'>DELETE</td><td>
             <p>delete</p>
-            </dd><dt>other
-            <dd>
+            </td></tr><tr><td class='label'>other</td><td>
             <p>columns, columns!, truncate</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h3 id="label-Other+methods">Other methods<span><a href="#label-Other+methods">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             

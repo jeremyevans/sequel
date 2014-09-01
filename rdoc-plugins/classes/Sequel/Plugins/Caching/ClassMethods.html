@@ -46,6 +46,7 @@
               <li><a target="docwin" href="#method-i-cache_get_pk">cache_get_pk</a></li>
               <li><a target="docwin" href="#attribute-i-cache_ignore_exceptions">cache_ignore_exceptions</a></li>
               <li><a target="docwin" href="#method-i-cache_key">cache_key</a></li>
+              <li><a target="docwin" href="#method-i-cache_key_prefix">cache_key_prefix</a></li>
               <li><a target="docwin" href="#attribute-i-cache_store">cache_store</a></li>
               <li><a target="docwin" href="#attribute-i-cache_ttl">cache_ttl</a></li>
               <li><a target="docwin" href="#method-i-set_cache_ttl">set_cache_ttl</a></li>
@@ -144,7 +145,24 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cache_key-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-node">&quot;#{self}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cache_key-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-node">&quot;#{cache_key_prefix}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-cache_key_prefix'>
+                <a name='method-i-cache_key_prefix'></a>
+                <div class='synopsis'>
+                  <span class='name'>cache_key_prefix</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Returns the prefix used to namespace this class in the cache.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_key_prefix-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-cache_key_prefix-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key_prefix</span>&#x000A;  <span class="ruby-node">&quot;#{self}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_cache_ttl'>
@@ -162,7 +180,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_cache_ttl-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_cache_ttl-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;  <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_cache_ttl-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;  <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

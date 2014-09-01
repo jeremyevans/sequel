@@ -52,8 +52,7 @@
         <div id='text'>
           <div id='description'>
             
-            <p><a href="Sequel.html">Sequel</a> extends <code>Hash</code> to add methods
-            to implement the SQL DSL.</p>
+            <p>Sequel extends <code>Hash</code> to add methods to implement the SQL DSL.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -131,7 +130,7 @@
                   HStore created will not use the receiver as the backing store, since it has
                   to modify the hash.  To get the new backing store, use:</p>
                   
-                  <pre>hash.hstore.to_hash</pre>
+                  <pre class="ruby"><span class="ruby-identifier">hash</span>.<span class="ruby-identifier">hstore</span>.<span class="ruby-identifier">to_hash</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-hstore-source'); return false">
@@ -190,8 +189,8 @@
                   
                   <p>Return a <code>Sequel::SQL::BooleanExpression</code> created from this
                   hash, matching all of the conditions.  Rarely do you need to call this
-                  explicitly, as <a href="Sequel.html">Sequel</a> generally assumes that
-                  hashes specify this type of condition.</p>
+                  explicitly, as Sequel generally assumes that hashes specify this type of
+                  condition.</p>
                   
                   <pre class="ruby">{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}.<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: a IS TRUE</span>&#x000A;{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]}.<span class="ruby-identifier">sql_expr</span> <span class="ruby-comment"># SQL: a = 1 AND b IN (2, 3)</span></pre>
                 </div>

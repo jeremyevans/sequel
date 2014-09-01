@@ -528,8 +528,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Returns a new clone of the dataset with with the given options merged. If
-                  the options changed include options in <a
+                  <p>Returns a new clone of the dataset with the given options merged. If the
+                  options changed include options in <a
                   href="Dataset.html#COLUMN_CHANGE_OPTS">COLUMN_CHANGE_OPTS</a>, the cached
                   columns are deleted.  This method should generally not be called directly
                   by user code.</p>
@@ -559,7 +559,7 @@
                   href="Dataset.html#DISTINCT">DISTINCT</a> <a href="Dataset.html#ON">ON</a>
                   is not supported.</p>
                   
-                  <pre>DB[:items].distinct # SQL: SELECT DISTINCT * FROM items&#x000A;DB[:items].order(:id).distinct(:id) # SQL: SELECT DISTINCT ON (id) * FROM items ORDER BY id</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">distinct</span> <span class="ruby-comment"># SQL: SELECT DISTINCT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">distinct</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># SQL: SELECT DISTINCT ON (id) * FROM items ORDER BY id</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-distinct-source'); return false">
@@ -580,19 +580,16 @@
                   dataset returns all rows in the current dataset that are not in the given
                   dataset. Raises an <code>InvalidOperation</code> if the operation is not
                   supported. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:alias 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:alias </td><td>
                   <p>Use the given value as the <a
                   href="Dataset.html#method-i-from_self">#from_self</a> alias</p>
-                  </dd><dt>:all 
-                  <dd>
+                  </td></tr><tr><td class='label'>:all </td><td>
                   <p>Set to true to use EXCEPT <a href="Dataset.html#ALL">ALL</a> instead of
                   EXCEPT, so duplicate rows can occur</p>
-                  </dd><dt>:from_self 
-                  <dd>
+                  </td></tr><tr><td class='label'>:from_self </td><td>
                   <p>Set to false to not wrap the returned dataset in a <a
                   href="Dataset.html#method-i-from_self">#from_self</a>, use with care.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">except</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM items EXCEPT SELECT * FROM other_items) AS t1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">except</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>], :<span class="ruby-identifier">all=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">from_self=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items EXCEPT ALL SELECT * FROM other_items</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">except</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>], :<span class="ruby-keyword">alias</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">i</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM items EXCEPT SELECT * FROM other_items) AS i</span></pre>
                 </div>
@@ -635,7 +632,7 @@
                   <p>Inverts the given conditions and adds them to the <a
                   href="Dataset.html#HAVING">HAVING</a> clause.</p>
                   
-                  <pre>DB[:items].select_group(:name).exclude_having{count(name) &lt; 2}&#x000A;# SELECT name FROM items GROUP BY name HAVING (count(name) &gt;= 2)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select_group</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">exclude_having</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span>}&#x000A;<span class="ruby-comment"># SELECT name FROM items GROUP BY name HAVING (count(name) &gt;= 2)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-exclude_having-source'); return false">
@@ -706,7 +703,7 @@
                   
                   <p>Returns a cloned dataset with a :update lock style.</p>
                   
-                  <pre>DB[:table].for_update # SELECT * FROM table FOR UPDATE</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">for_update</span> <span class="ruby-comment"># SELECT * FROM table FOR UPDATE</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-for_update-source'); return false">
@@ -728,7 +725,7 @@
                   as using a CROSS JOIN (cartesian product) between all tables. If a block is
                   given, it is treated as a virtual row block, similar to <code>where</code>.</p>
                   
-                  <pre>DB[:items].from # SQL: SELECT *&#x000A;DB[:items].from(:blah) # SQL: SELECT * FROM blah&#x000A;DB[:items].from(:blah, :foo) # SQL: SELECT * FROM blah, foo&#x000A;DB[:items].from{fun(arg)} # SQL: SELECT * FROM fun(arg)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">from</span> <span class="ruby-comment"># SQL: SELECT *</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">blah</span>) <span class="ruby-comment"># SQL: SELECT * FROM blah</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">blah</span>, :<span class="ruby-identifier">foo</span>) <span class="ruby-comment"># SQL: SELECT * FROM blah, foo</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">from</span>{<span class="ruby-identifier">fun</span>(<span class="ruby-identifier">arg</span>)} <span class="ruby-comment"># SQL: SELECT * FROM fun(arg)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from-source'); return false">
@@ -772,17 +769,14 @@
                   issues.</p>
                   
                   <p>Options (all are boolean):</p>
-                  <dl class="rdoc-list note-list"><dt>:all_columns 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:all_columns </td><td>
                   <p>All columns must be matched to any of the given patterns.</p>
-                  </dd><dt>:all_patterns 
-                  <dd>
+                  </td></tr><tr><td class='label'>:all_patterns </td><td>
                   <p>All patterns must match at least one of the columns.</p>
-                  </dd><dt>:case_insensitive 
-                  <dd>
+                  </td></tr><tr><td class='label'>:case_insensitive </td><td>
                   <p>Use a case insensitive pattern match (the default is case sensitive if the
                   database supports it).</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>If both :all_columns and :all_patterns are true, all columns must match all
                   patterns.</p>
@@ -810,7 +804,7 @@
                   given columns.  If a block is given, it is treated as a virtual row block,
                   similar to <code>where</code>.</p>
                   
-                  <pre>DB[:items].group(:id) # SELECT * FROM items GROUP BY id&#x000A;DB[:items].group(:id, :name) # SELECT * FROM items GROUP BY id, name&#x000A;DB[:items].group{[a, sum(b)]} # SELECT * FROM items GROUP BY a, sum(b)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># SELECT * FROM items GROUP BY id</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>) <span class="ruby-comment"># SELECT * FROM items GROUP BY id, name</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">group</span>{[<span class="ruby-identifier">a</span>, <span class="ruby-identifier">sum</span>(<span class="ruby-identifier">b</span>)]} <span class="ruby-comment"># SELECT * FROM items GROUP BY a, sum(b)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-group-source'); return false">
@@ -927,19 +921,16 @@
                   compound dataset returns all rows in both the current dataset and the given
                   dataset. Raises an <code>InvalidOperation</code> if the operation is not
                   supported. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:alias 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:alias </td><td>
                   <p>Use the given value as the <a
                   href="Dataset.html#method-i-from_self">#from_self</a> alias</p>
-                  </dd><dt>:all 
-                  <dd>
+                  </td></tr><tr><td class='label'>:all </td><td>
                   <p>Set to true to use INTERSECT <a href="Dataset.html#ALL">ALL</a> instead of
                   INTERSECT, so duplicate rows can occur</p>
-                  </dd><dt>:from_self 
-                  <dd>
+                  </td></tr><tr><td class='label'>:from_self </td><td>
                   <p>Set to false to not wrap the returned dataset in a <a
                   href="Dataset.html#method-i-from_self">#from_self</a>, use with care.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">intersect</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM items INTERSECT SELECT * FROM other_items) AS t1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">intersect</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>], :<span class="ruby-identifier">all=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">from_self=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items INTERSECT ALL SELECT * FROM other_items</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">intersect</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>], :<span class="ruby-keyword">alias</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">i</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM items INTERSECT SELECT * FROM other_items) AS i</span></pre>
                 </div>
@@ -1003,90 +994,73 @@
                   cross_join) which fills in the <code>type</code> argument.</p>
                   
                   <p>Takes the following arguments:</p>
-                  <dl class="rdoc-list note-list"><dt>type 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>type </td><td>
                   <p>The type of join to do (e.g. :inner)</p>
-                  </dd><dt>table 
-                  <dd>
+                  </td></tr><tr><td class='label'>table </td><td>
                   <p>table to join into the current dataset.  Generally one of the following
                   types:</p>
-                  <dl class="rdoc-list note-list"><dt>String, Symbol 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>String, Symbol </td><td>
                   <p>identifier used as table or view name</p>
-                  </dd><dt><a href="Dataset.html">Dataset</a> 
-                  <dd>
+                  </td></tr><tr><td class='label'><a href="Dataset.html">Dataset</a> </td><td>
                   <p>a subselect is performed with an alias of tN for some value of N</p>
-                  </dd><dt><a href="SQL/Function.html">SQL::Function</a> 
-                  <dd>
+                  </td></tr><tr><td class='label'><a href="SQL/Function.html">SQL::Function</a> </td><td>
                   <p>set returning function</p>
-                  </dd><dt><a href="SQL/AliasedExpression.html">SQL::AliasedExpression</a> 
-                  <dd>
+                  </td></tr><tr><td class='label'><a href="SQL/AliasedExpression.html">SQL::AliasedExpression</a> </td><td>
                   <p>already aliased expression.  Uses given alias unless overridden by the
                   :table_alias option.</p>
-                  </dd></dl>
-                  </dd><dt>expr 
-                  <dd>
+                  </td></tr></tbody></table>
+                  </td></tr><tr><td class='label'>expr </td><td>
                   <p>conditions used when joining, depends on type:</p>
-                  <dl class="rdoc-list note-list"><dt>Hash, Array of pairs 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>Hash, Array of pairs </td><td>
                   <p>Assumes key (1st arg) is column of joined table (unless already qualified),
                   and value (2nd arg) is column of the last joined or primary table (or the
                   :implicit_qualifier option). To specify multiple conditions on a single
                   joined table column, you must use an array.  Uses a JOIN with an <a
                   href="Dataset.html#ON">ON</a> clause.</p>
-                  </dd><dt>Array 
-                  <dd>
+                  </td></tr><tr><td class='label'>Array </td><td>
                   <p>If all members of the array are symbols, considers them as columns and 
                   uses a JOIN with a <a href="Dataset.html#USING">USING</a> clause.  Most
                   databases will remove duplicate columns from the result set if this is
                   used.</p>
-                  </dd><dt>nil 
-                  <dd>
+                  </td></tr><tr><td class='label'>nil </td><td>
                   <p>If a block is not given, doesn&#39;t use <a href="Dataset.html#ON">ON</a>
                   or <a href="Dataset.html#USING">USING</a>, so the JOIN should be a NATURAL
                   or CROSS join. If a block is given, uses an <a
                   href="Dataset.html#ON">ON</a> clause based on the block, see below.</p>
-                  </dd><dt>otherwise 
-                  <dd>
+                  </td></tr><tr><td class='label'>otherwise </td><td>
                   <p>Treats the argument as a filter expression, so strings are considered
                   literal, symbols specify boolean columns, and <a
                   href="../Sequel.html">Sequel</a> expressions can be used. Uses a JOIN with
                   an <a href="Dataset.html#ON">ON</a> clause.</p>
-                  </dd></dl>
-                  </dd><dt>options 
-                  <dd>
+                  </td></tr></tbody></table>
+                  </td></tr><tr><td class='label'>options </td><td>
                   <p>a hash of options, with the following keys supported:</p>
-                  <dl class="rdoc-list note-list"><dt>:table_alias 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:table_alias </td><td>
                   <p>Override the table alias used when joining.  In general you shouldn&#39;t
                   use this option, you should provide the appropriate <a
                   href="SQL/AliasedExpression.html">SQL::AliasedExpression</a> as the table
                   argument.</p>
-                  </dd><dt>:implicit_qualifier 
-                  <dd>
+                  </td></tr><tr><td class='label'>:implicit_qualifier </td><td>
                   <p>The name to use for qualifying implicit conditions.  By default, the last
                   joined or primary table is used.</p>
-                  </dd><dt>:reset_implicit_qualifier 
-                  <dd>
+                  </td></tr><tr><td class='label'>:reset_implicit_qualifier </td><td>
                   <p>Can set to false to ignore this join when future joins determine qualifier
                   for implicit conditions.</p>
-                  </dd><dt>:qualify 
-                  <dd>
+                  </td></tr><tr><td class='label'>:qualify </td><td>
                   <p>Can be set to false to not do any implicit qualification.  Can be set to
                   :deep to use the <a href="Qualifier.html">Qualifier</a> AST Transformer,
                   which will attempt to qualify subexpressions of the expression tree.  Can
                   be set to :symbol to only qualify symbols. Defaults to the value of
                   default_join_table_qualification.</p>
-                  </dd></dl>
-                  </dd><dt>block 
-                  <dd>
+                  </td></tr></tbody></table>
+                  </td></tr><tr><td class='label'>block </td><td>
                   <p>The block argument should only be given if a JOIN with an <a
                   href="Dataset.html#ON">ON</a> clause is used, in which case it yields the
                   table alias/name for the table currently being joined, the table alias/name
                   for the last joined (or first table), and an array of previous <a
                   href="SQL/JoinClause.html">SQL::JoinClause</a>. Unlike <code>where</code>,
                   this block is not treated as a virtual row block.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Examples:</p>
                   
@@ -1134,7 +1108,7 @@
                   a second argument is given, it is used as an offset. To use an offset
                   without a limit, pass nil as the first argument.</p>
                   
-                  <pre>DB[:items].limit(10) # SELECT * FROM items LIMIT 10&#x000A;DB[:items].limit(10, 20) # SELECT * FROM items LIMIT 10 OFFSET 20&#x000A;DB[:items].limit(10...20) # SELECT * FROM items LIMIT 10 OFFSET 10&#x000A;DB[:items].limit(10..20) # SELECT * FROM items LIMIT 11 OFFSET 10&#x000A;DB[:items].limit(nil, 20) # SELECT * FROM items OFFSET 20</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span>) <span class="ruby-comment"># SELECT * FROM items LIMIT 10</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span>, <span class="ruby-value">20</span>) <span class="ruby-comment"># SELECT * FROM items LIMIT 10 OFFSET 20</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span><span class="ruby-operator">...</span><span class="ruby-value">20</span>) <span class="ruby-comment"># SELECT * FROM items LIMIT 10 OFFSET 10</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span><span class="ruby-operator">..</span><span class="ruby-value">20</span>) <span class="ruby-comment"># SELECT * FROM items LIMIT 11 OFFSET 10</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">limit</span>(<span class="ruby-keyword">nil</span>, <span class="ruby-value">20</span>) <span class="ruby-comment"># SELECT * FROM items OFFSET 20</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-limit-source'); return false">
@@ -1160,7 +1134,7 @@
                   supported symbols have separate methods (e.g. <a
                   href="Dataset.html#method-i-for_update">#for_update</a>).</p>
                   
-                  <pre>DB[:items].lock_style(&#39;FOR SHARE NOWAIT&#39;) # SELECT * FROM items FOR SHARE NOWAIT</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">lock_style</span>(<span class="ruby-string">&#39;FOR SHARE NOWAIT&#39;</span>) <span class="ruby-comment"># SELECT * FROM items FOR SHARE NOWAIT</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-lock_style-source'); return false">
@@ -1200,7 +1174,7 @@
                   combined with limit. If you call limit with an offset, it will override
                   override the offset if you&#39;ve called offset first.</p>
                   
-                  <pre>DB[:items].offset(10) # SELECT * FROM items OFFSET 10</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">offset</span>(<span class="ruby-value">10</span>) <span class="ruby-comment"># SELECT * FROM items OFFSET 10</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-offset-source'); return false">
@@ -1220,7 +1194,7 @@
                   <p>Adds an alternate filter to an existing filter using OR. If no filter 
                   exists an <code>Error</code> is raised.</p>
                   
-                  <pre>DB[:items].where(:a).or(:b) # SELECT * FROM items WHERE a OR b</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">or</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT * FROM items WHERE a OR b</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-or-source'); return false">
@@ -1299,7 +1273,7 @@
                   <p>Returns a copy of the dataset with the order columns added to the end of
                   the existing order.</p>
                   
-                  <pre>DB[:items].order(:a).order(:b) # SELECT * FROM items ORDER BY b&#x000A;DB[:items].order(:a).order_more(:b) # SELECT * FROM items ORDER BY a, b</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT * FROM items ORDER BY b</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">order_more</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT * FROM items ORDER BY a, b</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-order_more-source'); return false">
@@ -1319,7 +1293,7 @@
                   <p>Returns a copy of the dataset with the order columns added to the beginning
                   of the existing order.</p>
                   
-                  <pre>DB[:items].order(:a).order(:b) # SELECT * FROM items ORDER BY b&#x000A;DB[:items].order(:a).order_prepend(:b) # SELECT * FROM items ORDER BY b, a</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT * FROM items ORDER BY b</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">order_prepend</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT * FROM items ORDER BY b, a</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-order_prepend-source'); return false">
@@ -1361,7 +1335,7 @@
                   number of modified rows, results are returned using
                   <code>fetch_rows</code>.</p>
                   
-                  <pre>DB[:items].returning # RETURNING *&#x000A;DB[:items].returning(nil) # RETURNING NULL&#x000A;DB[:items].returning(:id, :name) # RETURNING id, name</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">returning</span> <span class="ruby-comment"># RETURNING *</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">returning</span>(<span class="ruby-keyword">nil</span>) <span class="ruby-comment"># RETURNING NULL</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">returning</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>) <span class="ruby-comment"># RETURNING id, name</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-returning-source'); return false">
@@ -1381,7 +1355,7 @@
                   <p>Returns a copy of the dataset with the order reversed. If no order is
                   given, the existing order is inverted.</p>
                   
-                  <pre>DB[:items].reverse(:id) # SELECT * FROM items ORDER BY id DESC&#x000A;DB[:items].reverse{foo(bar)} # SELECT * FROM items ORDER BY foo(bar) DESC&#x000A;DB[:items].order(:id).reverse # SELECT * FROM items ORDER BY id DESC&#x000A;DB[:items].order(:id).reverse(Sequel.desc(:name)) # SELECT * FROM items ORDER BY name ASC</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">reverse</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># SELECT * FROM items ORDER BY id DESC</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">reverse</span>{<span class="ruby-identifier">foo</span>(<span class="ruby-identifier">bar</span>)} <span class="ruby-comment"># SELECT * FROM items ORDER BY foo(bar) DESC</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">reverse</span> <span class="ruby-comment"># SELECT * FROM items ORDER BY id DESC</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">reverse</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">name</span>)) <span class="ruby-comment"># SELECT * FROM items ORDER BY name ASC</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-reverse-source'); return false">
@@ -1419,7 +1393,7 @@
                   given columns. This also takes a virtual row block, similar to
                   <code>where</code>.</p>
                   
-                  <pre>DB[:items].select(:a) # SELECT a FROM items&#x000A;DB[:items].select(:a, :b) # SELECT a, b FROM items&#x000A;DB[:items].select{[a, sum(b)]} # SELECT a, sum(b) FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># SELECT a FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT a, b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>{[<span class="ruby-identifier">a</span>, <span class="ruby-identifier">sum</span>(<span class="ruby-identifier">b</span>)]} <span class="ruby-comment"># SELECT a, sum(b) FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select-source'); return false">
@@ -1440,7 +1414,7 @@
                   given.  If arguments are given, treat them as tables and select all columns
                   (using the wildcard) from each table.</p>
                   
-                  <pre>DB[:items].select(:a).select_all # SELECT * FROM items&#x000A;DB[:items].select_all(:items) # SELECT items.* FROM items&#x000A;DB[:items].select_all(:items, :foo) # SELECT items.*, foo.* FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">select_all</span> <span class="ruby-comment"># SELECT * FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select_all</span>(:<span class="ruby-identifier">items</span>) <span class="ruby-comment"># SELECT items.* FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select_all</span>(:<span class="ruby-identifier">items</span>, :<span class="ruby-identifier">foo</span>) <span class="ruby-comment"># SELECT items.*, foo.* FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select_all-source'); return false">
@@ -1461,7 +1435,7 @@
                   selected columns.  If no columns are currently selected, it will select the
                   columns given in addition to *.</p>
                   
-                  <pre>DB[:items].select(:a).select(:b) # SELECT b FROM items&#x000A;DB[:items].select(:a).select_append(:b) # SELECT a, b FROM items&#x000A;DB[:items].select_append(:b) # SELECT *, b FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">select_append</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT a, b FROM items</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select_append</span>(:<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SELECT *, b FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select_append-source'); return false">
@@ -1482,7 +1456,7 @@
                   Column aliases may be supplied, and will be included in the select clause.
                   This also takes a virtual row block similar to <code>where</code>.</p>
                   
-                  <pre>DB[:items].select_group(:a, :b)&#x000A;# SELECT a, b FROM items GROUP BY a, b&#x000A;DB[:items].select_group(:c___a){f(c2)}&#x000A;# SELECT c AS a, f(c2) FROM items GROUP BY c, f(c2)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select_group</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-comment"># SELECT a, b FROM items GROUP BY a, b</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select_group</span>(:<span class="ruby-identifier">c___a</span>){<span class="ruby-identifier">f</span>(<span class="ruby-identifier">c2</span>)}&#x000A;<span class="ruby-comment"># SELECT c AS a, f(c2) FROM items GROUP BY c, f(c2)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select_group-source'); return false">
@@ -1522,7 +1496,7 @@
                   other queries use the :default database).  This method is always available
                   but is only useful when database sharding is being used.</p>
                   
-                  <pre>DB[:items].all # Uses the :read_only or :default server &#x000A;DB[:items].delete # Uses the :default server&#x000A;DB[:items].server(:blah).delete # Uses the :blah server</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses the :read_only or :default server </span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses the :default server</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">blah</span>).<span class="ruby-identifier">delete</span> <span class="ruby-comment"># Uses the :blah server</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-server-source'); return false">
@@ -1605,19 +1579,16 @@
                   <p>Adds a UNION clause using a second dataset object. A UNION compound dataset
                   returns all rows in either the current dataset or the given dataset.
                   Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:alias 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:alias </td><td>
                   <p>Use the given value as the <a
                   href="Dataset.html#method-i-from_self">#from_self</a> alias</p>
-                  </dd><dt>:all 
-                  <dd>
+                  </td></tr><tr><td class='label'>:all </td><td>
                   <p>Set to true to use UNION <a href="Dataset.html#ALL">ALL</a> instead of
                   UNION, so duplicate rows can occur</p>
-                  </dd><dt>:from_self 
-                  <dd>
+                  </td></tr><tr><td class='label'>:from_self </td><td>
                   <p>Set to false to not wrap the returned dataset in a <a
                   href="Dataset.html#method-i-from_self">#from_self</a>, use with care.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">union</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM items UNION SELECT * FROM other_items) AS t1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">union</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>], :<span class="ruby-identifier">all=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">from_self=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items UNION ALL SELECT * FROM other_items</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">union</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">other_items</span>], :<span class="ruby-keyword">alias</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">i</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM (SELECT * FROM items UNION SELECT * FROM other_items) AS i</span></pre>
                 </div>
@@ -1638,7 +1609,7 @@
                   
                   <p>Returns a copy of the dataset with no limit or offset.</p>
                   
-                  <pre>DB[:items].limit(10, 20).unlimited # SELECT * FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">limit</span>(<span class="ruby-value">10</span>, <span class="ruby-value">20</span>).<span class="ruby-identifier">unlimited</span> <span class="ruby-comment"># SELECT * FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-unlimited-source'); return false">
@@ -1657,7 +1628,7 @@
                   
                   <p>Returns a copy of the dataset with no order.</p>
                   
-                  <pre>DB[:items].order(:a).unordered # SELECT * FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">a</span>).<span class="ruby-identifier">unordered</span> <span class="ruby-comment"># SELECT * FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-unordered-source'); return false">
@@ -1678,10 +1649,10 @@
                   href="Dataset.html#WHERE">WHERE</a> conditions imposed upon it.</p>
                   
                   <p>Accepts the following argument types:</p>
-                  <ul><li>
-                  <p>Hash - list of equality/inclusion expressions</p>
-                  </li><li>
-                  <p>Array - depends:</p>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>Hash </td><td>
+                  <p>list of equality/inclusion expressions</p>
+                  </td></tr><tr><td class='label'>Array </td><td>
+                  <p>depends:</p>
                   <ul><li>
                   <p>If first member is a string, assumes the rest of the arguments are
                   parameters and interpolates them into the string.</p>
@@ -1691,16 +1662,15 @@
                   </li><li>
                   <p>Otherwise, treats each argument as a separate condition.</p>
                   </li></ul>
-                  </li><li>
-                  <p>String - taken literally</p>
-                  </li><li>
-                  <p>Symbol - taken as a boolean column argument (e.g. <a
+                  </td></tr><tr><td class='label'>String </td><td>
+                  <p>taken literally</p>
+                  </td></tr><tr><td class='label'>Symbol </td><td>
+                  <p>taken as a boolean column argument (e.g. <a
                   href="Dataset.html#WHERE">WHERE</a> active)</p>
-                  </li><li>
-                  <p><a href="SQL/BooleanExpression.html">Sequel::SQL::BooleanExpression</a> -
-                  an existing condition expression, probably created using the <a
+                  </td></tr><tr><td class='label'><a href="SQL/BooleanExpression.html">Sequel::SQL::BooleanExpression</a> </td><td>
+                  <p>an existing condition expression, probably created using the <a
                   href="../Sequel.html">Sequel</a> expression filter DSL.</p>
-                  </li></ul>
+                  </td></tr></tbody></table>
                   
                   <p>where also accepts a block, which should return one of the above argument
                   types, and is treated the same way.  This block yields a virtual row
@@ -1739,15 +1709,13 @@
                   <p>Add a common table expression (CTE) with the given name and a dataset that
                   defines the CTE. A common table expression acts as an inline view for the
                   query. Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:args 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:args </td><td>
                   <p>Specify the arguments/columns for the CTE, should be an array of symbols.</p>
-                  </dd><dt>:recursive 
-                  <dd>
+                  </td></tr><tr><td class='label'>:recursive </td><td>
                   <p>Specify that this is a recursive CTE</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
-                  <pre>DB[:items].with(:items, DB[:syx].where(:name.like(&#39;A%&#39;)))&#x000A;# WITH items AS (SELECT * FROM syx WHERE (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;)) SELECT * FROM items</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">with</span>(:<span class="ruby-identifier">items</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">syx</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;A%&#39;</span>)))&#x000A;<span class="ruby-comment"># WITH items AS (SELECT * FROM syx WHERE (name LIKE &#39;A%&#39; ESCAPE &#39;\&#39;)) SELECT * FROM items</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with-source'); return false">
@@ -1767,15 +1735,13 @@
                   <p>Add a recursive common table expression (CTE) with the given name, a
                   dataset that defines the nonrecursive part of the CTE, and a dataset that
                   defines the recursive part of the CTE.  Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:args 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:args </td><td>
                   <p>Specify the arguments/columns for the CTE, should be an array of symbols.</p>
-                  </dd><dt>:union_all 
-                  <dd>
+                  </td></tr><tr><td class='label'>:union_all </td><td>
                   <p>Set to false to use UNION instead of UNION <a
                   href="Dataset.html#ALL">ALL</a> combining the nonrecursive and recursive
                   parts.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">t</span>].<span class="ruby-identifier">with_recursive</span>(:<span class="ruby-identifier">t</span>,&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">i1</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">parent_id</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">parent_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>),&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">i1</span>].<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">t</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">parent_id</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">i1__id</span>, :<span class="ruby-identifier">i1__parent_id</span>),&#x000A;  :<span class="ruby-identifier">args=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">parent_id</span>])&#x000A;&#x000A;<span class="ruby-comment"># WITH RECURSIVE &quot;t&quot;(&quot;id&quot;, &quot;parent_id&quot;) AS (</span>&#x000A;<span class="ruby-comment">#   SELECT &quot;id&quot;, &quot;parent_id&quot; FROM &quot;i1&quot; WHERE (&quot;parent_id&quot; IS NULL)</span>&#x000A;<span class="ruby-comment">#   UNION ALL</span>&#x000A;<span class="ruby-comment">#   SELECT &quot;i1&quot;.&quot;id&quot;, &quot;i1&quot;.&quot;parent_id&quot; FROM &quot;i1&quot; INNER JOIN &quot;t&quot; ON (&quot;t&quot;.&quot;id&quot; = &quot;i1&quot;.&quot;parent_id&quot;)</span>&#x000A;<span class="ruby-comment"># ) SELECT * FROM &quot;t&quot;</span></pre>
                 </div>
@@ -1799,12 +1765,12 @@
                   change the <a href="SQL.html">SQL</a> used to custom <a
                   href="SQL.html">SQL</a>.</p>
                   
-                  <pre>DB[:items].with_sql(&#39;SELECT * FROM foo&#39;) # SELECT * FROM foo</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&#39;SELECT * FROM foo&#39;</span>) <span class="ruby-comment"># SELECT * FROM foo</span></pre>
                   
                   <p>You can use placeholders in your <a href="SQL.html">SQL</a> and provide
                   arguments for those placeholders:</p>
                   
-                  <pre>DB[:items].with_sql(&#39;SELECT ? FROM foo&#39;, 1) # SELECT 1 FROM foo</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">with_sql</span>(<span class="ruby-string">&#39;SELECT ? FROM foo&#39;</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># SELECT 1 FROM foo</span></pre>
                   
                   <p>You can also provide a method name and arguments to call to get the SQL:</p>
                   
@@ -2215,28 +2181,24 @@
                   
                   <p>This method is called with a columns array and an array of value arrays:</p>
                   
-                  <pre>DB[:table].import([:x, :y], [[1, 2], [3, 4]])&#x000A;# INSERT INTO table (x, y) VALUES (1, 2) &#x000A;# INSERT INTO table (x, y) VALUES (3, 4)</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">import</span>([:<span class="ruby-identifier">x</span>, :<span class="ruby-identifier">y</span>], [[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])&#x000A;<span class="ruby-comment"># INSERT INTO table (x, y) VALUES (1, 2) </span>&#x000A;<span class="ruby-comment"># INSERT INTO table (x, y) VALUES (3, 4)</span></pre>
                   
                   <p>This method also accepts a dataset instead of an array of value arrays:</p>
                   
-                  <pre>DB[:table].import([:x, :y], DB[:table2].select(:a, :b))&#x000A;# INSERT INTO table (x, y) SELECT a, b FROM table2</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">import</span>([:<span class="ruby-identifier">x</span>, :<span class="ruby-identifier">y</span>], <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table2</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>))&#x000A;<span class="ruby-comment"># INSERT INTO table (x, y) SELECT a, b FROM table2</span></pre>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:commit_every 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:commit_every </td><td>
                   <p>Open a new transaction for every given number of records. For example, if
                   you provide a value of 50, will commit after every 50 records.</p>
-                  </dd><dt>:return 
-                  <dd>
+                  </td></tr><tr><td class='label'>:return </td><td>
                   <p>When the :value is :primary_key, returns an array of autoincremented
                   primary key values for the rows inserted.</p>
-                  </dd><dt>:server 
-                  <dd>
+                  </td></tr><tr><td class='label'>:server </td><td>
                   <p>Set the server/shard to use for the transaction and insert queries.</p>
-                  </dd><dt>:slice 
-                  <dd>
+                  </td></tr><tr><td class='label'>:slice </td><td>
                   <p>Same as :commit_every, :commit_every takes precedence.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-import-source'); return false">
@@ -2258,28 +2220,22 @@
                   dependent.</p>
                   
                   <p><code>insert</code> handles a number of different argument formats:</p>
-                  <dl class="rdoc-list note-list"><dt>no arguments or single empty hash 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>no arguments or single empty hash </td><td>
                   <p>Uses <a href="Dataset.html#DEFAULT">DEFAULT</a> <a
                   href="Dataset.html#VALUES">VALUES</a></p>
-                  </dd><dt>single hash 
-                  <dd>
+                  </td></tr><tr><td class='label'>single hash </td><td>
                   <p>Most common format, treats keys as columns an values as values</p>
-                  </dd><dt>single array 
-                  <dd>
+                  </td></tr><tr><td class='label'>single array </td><td>
                   <p>Treats entries as values, with no columns</p>
-                  </dd><dt>two arrays 
-                  <dd>
+                  </td></tr><tr><td class='label'>two arrays </td><td>
                   <p>Treats first array as columns, second array as values</p>
-                  </dd><dt>single <a href="Dataset.html">Dataset</a> 
-                  <dd>
+                  </td></tr><tr><td class='label'>single <a href="Dataset.html">Dataset</a> </td><td>
                   <p>Treats as an insert based on a selection from the dataset given, with no
                   columns</p>
-                  </dd><dt>array and dataset 
-                  <dd>
+                  </td></tr><tr><td class='label'>array and dataset </td><td>
                   <p>Treats as an insert based on a selection from the dataset given, with the
                   columns given by the array.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Examples:</p>
                   
@@ -2451,11 +2407,9 @@
                   method have an order, but it cannot ensure that the order is unambiguous.</p>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:rows_per_fetch 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:rows_per_fetch </td><td>
                   <p>The number of rows to fetch per query.  Defaults to 1000.</p>
-                  </dd><dt>:strategy 
-                  <dd>
+                  </td></tr><tr><td class='label'>:strategy </td><td>
                   <p>The strategy to use for paging of results.  By default this is :offset, for
                   using an approach with a limit and offset for every page.  This can be set
                   to :filter, which uses a limit and a filter that excludes rows from
@@ -2464,8 +2418,7 @@
                   Note that some <a href="../Sequel.html">Sequel</a> adapters have optimized
                   implementations that will use cursors or streaming regardless of the
                   :strategy option used.</p>
-                  </dd><dt>:filter_values 
-                  <dd>
+                  </td></tr><tr><td class='label'>:filter_values </td><td>
                   <p>If the :strategy=&gt;:filter option is used, this option should be a proc
                   that accepts the last retreived row for the previous page and an array of
                   ORDER BY expressions, and returns an array of values relating to those
@@ -2474,11 +2427,11 @@
                   qualified identifiers that would be ambiguous unqualified, if they contain
                   any identifiers that are aliased in <a
                   href="Dataset.html#SELECT">SELECT</a>, and potentially other cases.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Examples:</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">paged_each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000 OFFSET 1000</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">paged_each</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">100</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 100</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 100 OFFSET 100</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">paged_each</span>(:<span class="ruby-identifier">strategy=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">filter</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE id &gt; 1001 ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">table__id</span>).<span class="ruby-identifier">paged_each</span>(:<span class="ruby-identifier">strategy=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">filter</span>,&#x000A;  :<span class="ruby-identifier">filter_values=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">exprs</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">row</span>[:<span class="ruby-identifier">id</span>]]}){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> <span class="ruby-operator">...</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE id &gt; 1001 ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># ...</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">paged_each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000 OFFSET 1000</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">paged_each</span>(:<span class="ruby-identifier">rows_per_fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">100</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 100</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 100 OFFSET 100</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">paged_each</span>(:<span class="ruby-identifier">strategy=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">filter</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE id &gt; 1001 ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># ...</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">table__id</span>).<span class="ruby-identifier">paged_each</span>(:<span class="ruby-identifier">strategy=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">filter</span>,&#x000A;  :<span class="ruby-identifier">filter_values=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">row</span>, <span class="ruby-identifier">exprs</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">row</span>[:<span class="ruby-identifier">id</span>]]}){<span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-comment"># SELECT * FROM table ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># SELECT * FROM table WHERE id &gt; 1001 ORDER BY id LIMIT 1000</span>&#x000A;<span class="ruby-comment"># ...</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-paged_each-source'); return false">
@@ -2979,7 +2932,7 @@
                   as an <a
                   href="SQL/PlaceholderLiteralString.html">SQL::PlaceholderLiteralString</a>.</p>
                   
-                  <pre>DB.select(1).where(DB[:items].exists)&#x000A;# SELECT 1 WHERE (EXISTS (SELECT * FROM items))</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">select</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">where</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">exists</span>)&#x000A;<span class="ruby-comment"># SELECT 1 WHERE (EXISTS (SELECT * FROM items))</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-exists-source'); return false">
@@ -3700,59 +3653,52 @@
                   aliases for use in other methods.</p>
                   
                   <p>Arguments:</p>
-                  <dl class="rdoc-list note-list"><dt>dataset 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>dataset </td><td>
                   <p>Can be a symbol (specifying a table), another dataset, or an <a
                   href="SQL/Identifier.html">SQL::Identifier</a>, <a
                   href="SQL/QualifiedIdentifier.html">SQL::QualifiedIdentifier</a>, or <a
                   href="SQL/AliasedExpression.html">SQL::AliasedExpression</a>.</p>
-                  </dd><dt>join_conditions 
-                  <dd>
+                  </td></tr><tr><td class='label'>join_conditions </td><td>
                   <p>Any condition(s) allowed by <code>join_table</code>.</p>
-                  </dd><dt>block 
-                  <dd>
+                  </td></tr><tr><td class='label'>block </td><td>
                   <p>A block that is passed to <code>join_table</code>.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:from_self_alias 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:from_self_alias </td><td>
                   <p>The alias to use when the receiver is not a graphed dataset but it contains
                   multiple <a href="Dataset.html#FROM">FROM</a> tables or a JOIN.  In this
                   case, the receiver is wrapped in a <a
                   href="Dataset.html#method-i-from_self">#from_self</a> before graphing, and
                   this option determines the alias to use.</p>
-                  </dd><dt>:implicit_qualifier 
-                  <dd>
+                  </td></tr><tr><td class='label'>:implicit_qualifier </td><td>
                   <p>The qualifier of implicit conditions, see <a
                   href="Dataset.html#method-i-join_table">join_table</a>.</p>
-                  </dd><dt>:join_type 
-                  <dd>
+                  </td></tr><tr><td class='label'>:join_only </td><td>
+                  <p>Only join the tables, do not change the selected columns.</p>
+                  </td></tr><tr><td class='label'>:join_type </td><td>
                   <p>The type of join to use (passed to <code>join_table</code>).  Defaults to
                   :left_outer.</p>
-                  </dd><dt>:qualify
-                  <dd>
+                  </td></tr><tr><td class='label'>:qualify</td><td>
                   <p>The type of qualification to do, see <a
                   href="Dataset.html#method-i-join_table">join_table</a>.</p>
-                  </dd><dt>:select 
-                  <dd>
+                  </td></tr><tr><td class='label'>:select </td><td>
                   <p>An array of columns to select.  When not used, selects all columns in the
                   given dataset.  When set to false, selects no columns and is like simply
                   joining the tables, though graph keeps some metadata about the join that
                   makes it important to use <code>graph</code> instead of
                   <code>join_table</code>.</p>
-                  </dd><dt>:table_alias 
-                  <dd>
+                  </td></tr><tr><td class='label'>:table_alias </td><td>
                   <p>The alias to use for the table.  If not specified, doesn&#39;t alias the
                   table.  You will get an error if the alias (or table) name is used more
                   than once.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-graph-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-graph-source'><span class="ruby-comment"># File lib/sequel/dataset/graph.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">graph</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">join_conditions</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">options</span> = <span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-comment"># Allow the use of a dataset or symbol as the first argument</span>&#x000A;  <span class="ruby-comment"># Find the table name/dataset based on the argument</span>&#x000A;  <span class="ruby-identifier">table_alias</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:table_alias</span>]&#x000A;  <span class="ruby-identifier">table</span> = <span class="ruby-identifier">dataset</span>&#x000A;  <span class="ruby-identifier">create_dataset</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">dataset</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>&#x000A;    <span class="ruby-comment"># let alias be the same as the table name (sans any optional schema)</span>&#x000A;    <span class="ruby-comment"># unless alias explicitly given in the symbol using ___ notation</span>&#x000A;    <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">split_symbol</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">last</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Dataset</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">simple_select_all?</span>&#x000A;      <span class="ruby-identifier">table</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:from</span>].<span class="ruby-identifier">first</span>&#x000A;      <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">table</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">dataset_alias</span>((<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:num_dataset_sources</span>] <span class="ruby-operator">||</span> <span class="ruby-value">0</span>)<span class="ruby-operator">+</span><span class="ruby-value">1</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">create_dataset</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>&#x000A;    <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">table</span>.<span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>&#x000A;    <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">last</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">graph</span>(<span class="ruby-identifier">table</span>.<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">join_conditions</span>, {<span class="ruby-value">:table_alias=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">table</span>.<span class="ruby-identifier">alias</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;The dataset argument should be a symbol or dataset&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">table_alias</span> = <span class="ruby-identifier">table_alias</span>.<span class="ruby-identifier">to_sym</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">create_dataset</span>&#x000A;    <span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Raise Sequel::Error with explanation that the table alias has been used</span>&#x000A;  <span class="ruby-identifier">raise_alias_error</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;this #{options[:table_alias] ? &#39;alias&#39; : &#39;table&#39;} has already been been used, please specify &quot;</span>            <span class="ruby-node">&quot;#{options[:table_alias] ? &#39;a different alias&#39; : &#39;an alias via the :table_alias option&#39;}&quot;</span>) &#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Only allow table aliases that haven&#39;t been used</span>&#x000A;  <span class="ruby-identifier">raise_alias_error</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>][<span class="ruby-value">:table_aliases</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>][<span class="ruby-value">:table_aliases</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">table_alias</span>)&#x000A;  &#x000A;  <span class="ruby-identifier">table_alias_qualifier</span> = <span class="ruby-identifier">qualifier_from_alias_symbol</span>(<span class="ruby-identifier">table_alias</span>, <span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">implicit_qualifier</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:implicit_qualifier</span>]&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">self</span>&#x000A;&#x000A;  <span class="ruby-comment"># Use a from_self if this is already a joined table (or from_self specifically disabled for graphs)</span>&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph_from_self</span>] <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">joined_dataset?</span>)&#x000A;    <span class="ruby-identifier">from_selfed</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">implicit_qualifier</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:from_self_alias</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">first_source</span>&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">implicit_qualifier</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  &#x000A;  <span class="ruby-comment"># Join the table early in order to avoid cloning the dataset twice</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join_table</span>(<span class="ruby-identifier">options</span>[<span class="ruby-value">:join_type</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:left_outer</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">join_conditions</span>, <span class="ruby-value">:table_alias=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">table_alias_qualifier</span>, <span class="ruby-value">:implicit_qualifier=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">implicit_qualifier</span>, <span class="ruby-value">:qualify=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">options</span>[<span class="ruby-value">:qualify</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>&#x000A;&#x000A;  <span class="ruby-comment"># Whether to include the table in the result set</span>&#x000A;  <span class="ruby-identifier">add_table</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:select</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-comment"># Whether to add the columns to the list of column aliases</span>&#x000A;  <span class="ruby-identifier">add_columns</span> = <span class="ruby-operator">!</span><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:graph_aliases</span>)&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">graph</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph</span>] = <span class="ruby-identifier">graph</span> = <span class="ruby-identifier">graph</span>.<span class="ruby-identifier">dup</span>&#x000A;    <span class="ruby-identifier">select</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>].<span class="ruby-identifier">dup</span>&#x000A;    [<span class="ruby-value">:column_aliases</span>, <span class="ruby-value">:table_aliases</span>, <span class="ruby-value">:column_alias_num</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">graph</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">graph</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">dup</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Setup the initial graph data structure if it doesn&#39;t exist</span>&#x000A;    <span class="ruby-identifier">qualifier</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first_source_alias</span>&#x000A;    <span class="ruby-identifier">master</span> = <span class="ruby-identifier">alias_symbol</span>(<span class="ruby-identifier">qualifier</span>)&#x000A;    <span class="ruby-identifier">raise_alias_error</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">master</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">table_alias</span>&#x000A;&#x000A;    <span class="ruby-comment"># Master hash storing all .graph related information</span>&#x000A;    <span class="ruby-identifier">graph</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph</span>] = {}&#x000A;&#x000A;    <span class="ruby-comment"># Associates column aliases back to tables and columns</span>&#x000A;    <span class="ruby-identifier">column_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_aliases</span>] = {}&#x000A;&#x000A;    <span class="ruby-comment"># Associates table alias (the master is never aliased)</span>&#x000A;    <span class="ruby-identifier">table_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:table_aliases</span>] = {<span class="ruby-identifier">master</span>=<span class="ruby-operator">&gt;</span><span class="ruby-keyword">self</span>}&#x000A;&#x000A;    <span class="ruby-comment"># Keep track of the alias numbers used</span>&#x000A;    <span class="ruby-identifier">ca_num</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_alias_num</span>] = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>)&#x000A;&#x000A;    <span class="ruby-comment"># All columns in the master table are never</span>&#x000A;    <span class="ruby-comment"># aliased, but are not included if set_graph_aliases</span>&#x000A;    <span class="ruby-comment"># has been used.</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">add_columns</span>&#x000A;      <span class="ruby-keyword">if</span> (<span class="ruby-identifier">select</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">select</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span>(<span class="ruby-identifier">select</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">select</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>)))&#x000A;        <span class="ruby-identifier">select</span> = <span class="ruby-identifier">select</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sel</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;can&#39;t figure out alias to use for graphing for #{sel.inspect}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">column</span> = <span class="ruby-identifier">_hash_key_symbol</span>(<span class="ruby-identifier">sel</span>)&#x000A;          <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column</span>] = [<span class="ruby-identifier">master</span>, <span class="ruby-identifier">column</span>]&#x000A;          <span class="ruby-keyword">if</span> <span class="ruby-identifier">from_selfed</span>&#x000A;            <span class="ruby-comment"># Initial dataset was wrapped in subselect, selected all</span>&#x000A;            <span class="ruby-comment"># columns in the subselect, qualified by the subselect alias.</span>&#x000A;            <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">column</span>))&#x000A;          <span class="ruby-keyword">else</span>&#x000A;            <span class="ruby-comment"># Initial dataset not wrapped in subslect, just make</span>&#x000A;            <span class="ruby-comment"># sure columns are qualified in some way.</span>&#x000A;            <span class="ruby-identifier">qualified_expression</span>(<span class="ruby-identifier">sel</span>, <span class="ruby-identifier">qualifier</span>)&#x000A;          <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">select</span> = <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column</span>] = [<span class="ruby-identifier">master</span>, <span class="ruby-identifier">column</span>]&#x000A;          <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-identifier">column</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Add the table alias to the list of aliases</span>&#x000A;  <span class="ruby-comment"># Even if it isn&#39;t been used in the result set,</span>&#x000A;  <span class="ruby-comment"># we add a key for it with a nil value so we can check if it</span>&#x000A;  <span class="ruby-comment"># is used more than once</span>&#x000A;  <span class="ruby-identifier">table_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:table_aliases</span>]&#x000A;  <span class="ruby-identifier">table_aliases</span>[<span class="ruby-identifier">table_alias</span>] = <span class="ruby-identifier">add_table</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">dataset</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>&#x000A;&#x000A;  <span class="ruby-comment"># Add the columns to the selection unless we are ignoring them</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">add_table</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">add_columns</span>&#x000A;    <span class="ruby-identifier">column_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_aliases</span>]&#x000A;    <span class="ruby-identifier">ca_num</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_alias_num</span>]&#x000A;    <span class="ruby-comment"># Which columns to add to the result set</span>&#x000A;    <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:select</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">columns</span>&#x000A;    <span class="ruby-comment"># If the column hasn&#39;t been used yet, don&#39;t alias it.</span>&#x000A;    <span class="ruby-comment"># If it has been used, try table_column.</span>&#x000A;    <span class="ruby-comment"># If that has been used, try table_column_N </span>&#x000A;    <span class="ruby-comment"># using the next value of N that we know hasn&#39;t been</span>&#x000A;    <span class="ruby-comment"># used</span>&#x000A;    <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">col_alias</span>, <span class="ruby-identifier">identifier</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column</span>]&#x000A;        <span class="ruby-identifier">column_alias</span> = <span class="ruby-value">:&quot;#{table_alias}_#{column}&quot;</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column_alias</span>]&#x000A;          <span class="ruby-identifier">column_alias_num</span> = <span class="ruby-identifier">ca_num</span>[<span class="ruby-identifier">column_alias</span>]&#x000A;          <span class="ruby-identifier">column_alias</span> = <span class="ruby-value">:&quot;#{column_alias}_#{column_alias_num}&quot;</span> &#x000A;          <span class="ruby-identifier">ca_num</span>[<span class="ruby-identifier">column_alias</span>] <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;        [<span class="ruby-identifier">column_alias</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table_alias_qualifier</span>, <span class="ruby-identifier">column</span>), <span class="ruby-identifier">column_alias</span>)]&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">ident</span> = <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table_alias_qualifier</span>, <span class="ruby-identifier">column</span>)&#x000A;        [<span class="ruby-identifier">column</span>, <span class="ruby-identifier">ident</span>]&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">col_alias</span>] = [<span class="ruby-identifier">table_alias</span>, <span class="ruby-identifier">column</span>]&#x000A;      <span class="ruby-identifier">select</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">identifier</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">add_columns</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">select</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-graph-source'><span class="ruby-comment"># File lib/sequel/dataset/graph.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">graph</span>(<span class="ruby-identifier">dataset</span>, <span class="ruby-identifier">join_conditions</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">options</span> = <span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-comment"># Allow the use of a dataset or symbol as the first argument</span>&#x000A;  <span class="ruby-comment"># Find the table name/dataset based on the argument</span>&#x000A;  <span class="ruby-identifier">table_alias</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:table_alias</span>]&#x000A;  <span class="ruby-identifier">table</span> = <span class="ruby-identifier">dataset</span>&#x000A;  <span class="ruby-identifier">create_dataset</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">dataset</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Symbol</span>&#x000A;    <span class="ruby-comment"># let alias be the same as the table name (sans any optional schema)</span>&#x000A;    <span class="ruby-comment"># unless alias explicitly given in the symbol using ___ notation</span>&#x000A;    <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">split_symbol</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">compact</span>.<span class="ruby-identifier">last</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Dataset</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">simple_select_all?</span>&#x000A;      <span class="ruby-identifier">table</span> = <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:from</span>].<span class="ruby-identifier">first</span>&#x000A;      <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">table</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">dataset_alias</span>((<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:num_dataset_sources</span>] <span class="ruby-operator">||</span> <span class="ruby-value">0</span>)<span class="ruby-operator">+</span><span class="ruby-value">1</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">create_dataset</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Identifier</span>&#x000A;    <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">table</span>.<span class="ruby-identifier">value</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>&#x000A;    <span class="ruby-identifier">table_alias</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-identifier">table</span>).<span class="ruby-identifier">last</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">graph</span>(<span class="ruby-identifier">table</span>.<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">join_conditions</span>, {<span class="ruby-value">:table_alias=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">table</span>.<span class="ruby-identifier">alias</span>}.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;The dataset argument should be a symbol or dataset&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">table_alias</span> = <span class="ruby-identifier">table_alias</span>.<span class="ruby-identifier">to_sym</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">create_dataset</span>&#x000A;    <span class="ruby-identifier">dataset</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">from</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Raise Sequel::Error with explanation that the table alias has been used</span>&#x000A;  <span class="ruby-identifier">raise_alias_error</span> = <span class="ruby-identifier">lambda</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;this #{options[:table_alias] ? &#39;alias&#39; : &#39;table&#39;} has already been been used, please specify &quot;</span>            <span class="ruby-node">&quot;#{options[:table_alias] ? &#39;a different alias&#39; : &#39;an alias via the :table_alias option&#39;}&quot;</span>) &#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Only allow table aliases that haven&#39;t been used</span>&#x000A;  <span class="ruby-identifier">raise_alias_error</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>][<span class="ruby-value">:table_aliases</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>][<span class="ruby-value">:table_aliases</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">table_alias</span>)&#x000A;  &#x000A;  <span class="ruby-identifier">table_alias_qualifier</span> = <span class="ruby-identifier">qualifier_from_alias_symbol</span>(<span class="ruby-identifier">table_alias</span>, <span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">implicit_qualifier</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:implicit_qualifier</span>]&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-keyword">self</span>&#x000A;&#x000A;  <span class="ruby-comment"># Use a from_self if this is already a joined table (or from_self specifically disabled for graphs)</span>&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph_from_self</span>] <span class="ruby-operator">!=</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">joined_dataset?</span>)&#x000A;    <span class="ruby-identifier">from_selfed</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">implicit_qualifier</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:from_self_alias</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">first_source</span>&#x000A;    <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">from_self</span>(<span class="ruby-value">:alias</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">implicit_qualifier</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  &#x000A;  <span class="ruby-comment"># Join the table early in order to avoid cloning the dataset twice</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">join_table</span>(<span class="ruby-identifier">options</span>[<span class="ruby-value">:join_type</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:left_outer</span>, <span class="ruby-identifier">table</span>, <span class="ruby-identifier">join_conditions</span>, <span class="ruby-value">:table_alias=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">table_alias_qualifier</span>, <span class="ruby-value">:implicit_qualifier=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">implicit_qualifier</span>, <span class="ruby-value">:qualify=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">options</span>[<span class="ruby-value">:qualify</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-identifier">ds</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-value">:join_only</span>]&#x000A;&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>&#x000A;&#x000A;  <span class="ruby-comment"># Whether to include the table in the result set</span>&#x000A;  <span class="ruby-identifier">add_table</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:select</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-comment"># Whether to add the columns to the list of column aliases</span>&#x000A;  <span class="ruby-identifier">add_columns</span> = <span class="ruby-operator">!</span><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-value">:graph_aliases</span>)&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">graph</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph</span>]&#x000A;    <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph</span>] = <span class="ruby-identifier">graph</span> = <span class="ruby-identifier">graph</span>.<span class="ruby-identifier">dup</span>&#x000A;    <span class="ruby-identifier">select</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:select</span>].<span class="ruby-identifier">dup</span>&#x000A;    [<span class="ruby-value">:column_aliases</span>, <span class="ruby-value">:table_aliases</span>, <span class="ruby-value">:column_alias_num</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">graph</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">graph</span>[<span class="ruby-identifier">k</span>].<span class="ruby-identifier">dup</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Setup the initial graph data structure if it doesn&#39;t exist</span>&#x000A;    <span class="ruby-identifier">qualifier</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">first_source_alias</span>&#x000A;    <span class="ruby-identifier">master</span> = <span class="ruby-identifier">alias_symbol</span>(<span class="ruby-identifier">qualifier</span>)&#x000A;    <span class="ruby-identifier">raise_alias_error</span>.<span class="ruby-identifier">call</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">master</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">table_alias</span>&#x000A;&#x000A;    <span class="ruby-comment"># Master hash storing all .graph related information</span>&#x000A;    <span class="ruby-identifier">graph</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph</span>] = {}&#x000A;&#x000A;    <span class="ruby-comment"># Associates column aliases back to tables and columns</span>&#x000A;    <span class="ruby-identifier">column_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_aliases</span>] = {}&#x000A;&#x000A;    <span class="ruby-comment"># Associates table alias (the master is never aliased)</span>&#x000A;    <span class="ruby-identifier">table_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:table_aliases</span>] = {<span class="ruby-identifier">master</span>=<span class="ruby-operator">&gt;</span><span class="ruby-keyword">self</span>}&#x000A;&#x000A;    <span class="ruby-comment"># Keep track of the alias numbers used</span>&#x000A;    <span class="ruby-identifier">ca_num</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_alias_num</span>] = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>)&#x000A;&#x000A;    <span class="ruby-comment"># All columns in the master table are never</span>&#x000A;    <span class="ruby-comment"># aliased, but are not included if set_graph_aliases</span>&#x000A;    <span class="ruby-comment"># has been used.</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">add_columns</span>&#x000A;      <span class="ruby-keyword">if</span> (<span class="ruby-identifier">select</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">select</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span>(<span class="ruby-identifier">select</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">select</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>)))&#x000A;        <span class="ruby-identifier">select</span> = <span class="ruby-identifier">select</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sel</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;can&#39;t figure out alias to use for graphing for #{sel.inspect}&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">column</span> = <span class="ruby-identifier">_hash_key_symbol</span>(<span class="ruby-identifier">sel</span>)&#x000A;          <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column</span>] = [<span class="ruby-identifier">master</span>, <span class="ruby-identifier">column</span>]&#x000A;          <span class="ruby-keyword">if</span> <span class="ruby-identifier">from_selfed</span>&#x000A;            <span class="ruby-comment"># Initial dataset was wrapped in subselect, selected all</span>&#x000A;            <span class="ruby-comment"># columns in the subselect, qualified by the subselect alias.</span>&#x000A;            <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(<span class="ruby-identifier">column</span>))&#x000A;          <span class="ruby-keyword">else</span>&#x000A;            <span class="ruby-comment"># Initial dataset not wrapped in subslect, just make</span>&#x000A;            <span class="ruby-comment"># sure columns are qualified in some way.</span>&#x000A;            <span class="ruby-identifier">qualified_expression</span>(<span class="ruby-identifier">sel</span>, <span class="ruby-identifier">qualifier</span>)&#x000A;          <span class="ruby-keyword">end</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">select</span> = <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>&#x000A;          <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column</span>] = [<span class="ruby-identifier">master</span>, <span class="ruby-identifier">column</span>]&#x000A;          <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-identifier">column</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-comment"># Add the table alias to the list of aliases</span>&#x000A;  <span class="ruby-comment"># Even if it isn&#39;t been used in the result set,</span>&#x000A;  <span class="ruby-comment"># we add a key for it with a nil value so we can check if it</span>&#x000A;  <span class="ruby-comment"># is used more than once</span>&#x000A;  <span class="ruby-identifier">table_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:table_aliases</span>]&#x000A;  <span class="ruby-identifier">table_aliases</span>[<span class="ruby-identifier">table_alias</span>] = <span class="ruby-identifier">add_table</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">dataset</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>&#x000A;&#x000A;  <span class="ruby-comment"># Add the columns to the selection unless we are ignoring them</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">add_table</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">add_columns</span>&#x000A;    <span class="ruby-identifier">column_aliases</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_aliases</span>]&#x000A;    <span class="ruby-identifier">ca_num</span> = <span class="ruby-identifier">graph</span>[<span class="ruby-value">:column_alias_num</span>]&#x000A;    <span class="ruby-comment"># Which columns to add to the result set</span>&#x000A;    <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">options</span>[<span class="ruby-value">:select</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">columns</span>&#x000A;    <span class="ruby-comment"># If the column hasn&#39;t been used yet, don&#39;t alias it.</span>&#x000A;    <span class="ruby-comment"># If it has been used, try table_column.</span>&#x000A;    <span class="ruby-comment"># If that has been used, try table_column_N </span>&#x000A;    <span class="ruby-comment"># using the next value of N that we know hasn&#39;t been</span>&#x000A;    <span class="ruby-comment"># used</span>&#x000A;    <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">col_alias</span>, <span class="ruby-identifier">identifier</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column</span>]&#x000A;        <span class="ruby-identifier">column_alias</span> = <span class="ruby-value">:&quot;#{table_alias}_#{column}&quot;</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">column_alias</span>]&#x000A;          <span class="ruby-identifier">column_alias_num</span> = <span class="ruby-identifier">ca_num</span>[<span class="ruby-identifier">column_alias</span>]&#x000A;          <span class="ruby-identifier">column_alias</span> = <span class="ruby-value">:&quot;#{column_alias}_#{column_alias_num}&quot;</span> &#x000A;          <span class="ruby-identifier">ca_num</span>[<span class="ruby-identifier">column_alias</span>] <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>&#x000A;        <span class="ruby-keyword">end</span>&#x000A;        [<span class="ruby-identifier">column_alias</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">AliasedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table_alias_qualifier</span>, <span class="ruby-identifier">column</span>), <span class="ruby-identifier">column_alias</span>)]&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-identifier">ident</span> = <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table_alias_qualifier</span>, <span class="ruby-identifier">column</span>)&#x000A;        [<span class="ruby-identifier">column</span>, <span class="ruby-identifier">ident</span>]&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-identifier">column_aliases</span>[<span class="ruby-identifier">col_alias</span>] = [<span class="ruby-identifier">table_alias</span>, <span class="ruby-identifier">column</span>]&#x000A;      <span class="ruby-identifier">select</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">identifier</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">add_columns</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">select</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_graph_aliases'>
@@ -3768,8 +3714,7 @@
                   columns mapped to specific aliases in the result set.  This is the
                   equivalent of <code>select</code> for a graphed dataset, and must be used
                   instead of <code>select</code> whenever graphing is used.</p>
-                  <dl class="rdoc-list note-list"><dt>graph_aliases 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>graph_aliases </td><td>
                   <p>Should be a hash with keys being symbols of column aliases, and values
                   being either symbols or arrays with one to three elements. If the value is
                   a symbol, it is assumed to be the same as a one element array containing
@@ -3778,7 +3723,7 @@
                   only has a single element the column name symbol will be assumed to be the
                   same as the corresponding hash key. If the array has a third element, it is
                   used as the value returned, instead of table_alias.column_name.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">artists</span>].<span class="ruby-identifier">graph</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">id</span>).&#x000A;  <span class="ruby-identifier">set_graph_aliases</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artists</span>,&#x000A;                    :<span class="ruby-identifier">album_name=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">name</span>],&#x000A;                    :<span class="ruby-identifier">forty_two=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">fourtwo</span>, <span class="ruby-value">42</span>]).<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># SELECT artists.name, albums.name AS album_name, 42 AS forty_two ...</span></pre>
                 </div>
@@ -3786,7 +3731,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_graph_aliases-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_graph_aliases-source'><span class="ruby-comment"># File lib/sequel/dataset/graph.rb, line 223</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_graph_aliases</span>(<span class="ruby-identifier">graph_aliases</span>)&#x000A;  <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">graph_aliases</span> = <span class="ruby-identifier">graph_alias_columns</span>(<span class="ruby-identifier">graph_aliases</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_aliases</span>] = <span class="ruby-identifier">graph_aliases</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_graph_aliases-source'><span class="ruby-comment"># File lib/sequel/dataset/graph.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_graph_aliases</span>(<span class="ruby-identifier">graph_aliases</span>)&#x000A;  <span class="ruby-identifier">columns</span>, <span class="ruby-identifier">graph_aliases</span> = <span class="ruby-identifier">graph_alias_columns</span>(<span class="ruby-identifier">graph_aliases</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">opts</span>[<span class="ruby-value">:graph_aliases</span>] = <span class="ruby-identifier">graph_aliases</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-ungraphed'>
@@ -3804,7 +3749,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-ungraphed-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-ungraphed-source'><span class="ruby-comment"># File lib/sequel/dataset/graph.rb, line 232</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">ungraphed</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:graph=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>, <span class="ruby-value">:graph_aliases=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-ungraphed-source'><span class="ruby-comment"># File lib/sequel/dataset/graph.rb, line 236</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">ungraphed</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:graph=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>, <span class="ruby-value">:graph_aliases=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -3892,7 +3837,7 @@
                   invoking the <a href="Database.html#method-i-5B-5D">Sequel::Database#[]</a>
                   method:</p>
                   
-                  <pre>DB[:posts]</pre>
+                  <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">posts</span>]</pre>
                   
                   <p><a href="Dataset.html">Sequel::Dataset</a> is an abstract class that is not
                   useful by itself. Each database adapter provides a subclass of <a
@@ -4013,7 +3958,7 @@
                   for when the LIKE term is a user-provided string where metacharacters
                   should not be recognized. Example:</p>
                   
-                  <pre>ds.escape_like(&quot;foo\\%_&quot;) # &#39;foo\\\%\_&#39;</pre>
+                  <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">escape_like</span>(<span class="ruby-string">&quot;foo\\%_&quot;</span>) <span class="ruby-comment"># &#39;foo\\\%\_&#39;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-escape_like-source'); return false">
@@ -5395,21 +5340,18 @@
                   module, using the given clauses.</p>
                   
                   <p>Arguments:</p>
-                  <dl class="rdoc-list note-list"><dt>mod 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>mod </td><td>
                   <p>Module in which to define method</p>
-                  </dd><dt>type 
-                  <dd>
+                  </td></tr><tr><td class='label'>type </td><td>
                   <p>Type of <a href="SQL.html">SQL</a> literalization method to create, either
                   :select, :insert, :update, or :delete</p>
-                  </dd><dt>clauses 
-                  <dd>
+                  </td></tr><tr><td class='label'>clauses </td><td>
                   <p>array of clauses that make up the <a href="SQL.html">SQL</a> query for the
                   type.  This can either be a single array of symbols/strings, or it can be
                   an array of pairs, with the first element in each pair being an
                   if/elsif/else code fragment, and the second element in each pair being an
                   array of symbol/strings for the appropriate branch.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-def_sql_method-source'); return false">
@@ -5565,7 +5507,7 @@
                 <a name='method-i-delayed_evaluation_sql_append'></a>
                 <div class='synopsis'>
                   <span class='name'>delayed_evaluation_sql_append</span>
-                  <span class='arguments'>(sql, callable)</span>
+                  <span class='arguments'>(sql, delay)</span>
                 </div>
                 <div class='description'>
                   
@@ -5576,7 +5518,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-delayed_evaluation_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-delayed_evaluation_sql_append-source'><span class="ruby-comment"># File lib/sequel/dataset/sql.rb, line 520</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delayed_evaluation_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">callable</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">recorder</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:placeholder_literalizer</span>]&#x000A;    <span class="ruby-identifier">recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">callable</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">callable</span>.<span class="ruby-identifier">call</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-delayed_evaluation_sql_append-source'><span class="ruby-comment"># File lib/sequel/dataset/sql.rb, line 520</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delayed_evaluation_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">delay</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">recorder</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:placeholder_literalizer</span>]&#x000A;    <span class="ruby-identifier">recorder</span>.<span class="ruby-identifier">use</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">lambda</span>{<span class="ruby-identifier">delay</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>)}, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">delay</span>.<span class="ruby-identifier">call</span>(<span class="ruby-keyword">self</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-function_sql_append'>
@@ -5819,7 +5761,7 @@
                   
                   <p>Splits table_name into an array of strings.</p>
                   
-                  <pre>ds.split_qualifiers(:s) # [&#39;s&#39;]&#x000A;ds.split_qualifiers(:t__s) # [&#39;t&#39;, &#39;s&#39;]&#x000A;ds.split_qualifiers(Sequel.qualify(:d, :t__s)) # [&#39;d&#39;, &#39;t&#39;, &#39;s&#39;]&#x000A;ds.split_qualifiers(Sequel.qualify(:h__d, :t__s)) # [&#39;h&#39;, &#39;d&#39;, &#39;t&#39;, &#39;s&#39;]</pre>
+                  <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">split_qualifiers</span>(:<span class="ruby-identifier">s</span>) <span class="ruby-comment"># [&#39;s&#39;]</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">split_qualifiers</span>(:<span class="ruby-identifier">t__s</span>) <span class="ruby-comment"># [&#39;t&#39;, &#39;s&#39;]</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">d</span>, :<span class="ruby-identifier">t__s</span>)) <span class="ruby-comment"># [&#39;d&#39;, &#39;t&#39;, &#39;s&#39;]</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">split_qualifiers</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">h__d</span>, :<span class="ruby-identifier">t__s</span>)) <span class="ruby-comment"># [&#39;h&#39;, &#39;d&#39;, &#39;t&#39;, &#39;s&#39;]</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-split_qualifiers-source'); return false">

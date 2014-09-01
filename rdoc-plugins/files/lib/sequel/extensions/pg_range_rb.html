@@ -39,8 +39,7 @@
           <div id='description'>
             
             <p>The pg_range extension adds support for the PostgreSQL 9.2+ range types to
-            <a href="../../../../classes/Sequel.html">Sequel</a>.  PostgreSQL range
-            types are similar to ruby&#39;s <a
+            Sequel.  PostgreSQL range types are similar to ruby&#39;s <a
             href="../../../../classes/Range.html">Range</a> class, representating an
             array of values.  However, they are more flexible than ruby&#39;s ranges,
             allowing exclusive beginnings and endings (ruby&#39;s range only allows
@@ -62,13 +61,12 @@
             
             <p>In addition to the parser, this extension comes with literalizers for both
             PGRange and <a href="../../../../classes/Range.html">Range</a> that use the
-            standard <a href="../../../../classes/Sequel.html">Sequel</a>
-            literalization callbacks, so they work on all adapters.</p>
+            standard Sequel literalization callbacks, so they work on all adapters.</p>
             
             <p>To turn an existing <a href="../../../../classes/Range.html">Range</a> into
             a PGRange, use Sequel.pg_range:</p>
             
-            <pre>Sequel.pg_range(range)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>)</pre>
             
             <p>If you have loaded the <a
             href="../../../doc/core_extensions_rdoc.html">core_extensions
@@ -76,21 +74,20 @@
             activated refinements for the file, you can also use <a
             href="../../../../classes/Range.html#method-i-pg_range">Range#pg_range</a>:</p>
             
-            <pre>range.pg_range</pre>
+            <pre class="ruby"><span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span></pre>
             
             <p>You may want to specify a specific range type:</p>
             
-            <pre>Sequel.pg_range(range, :daterange)&#x000A;range.pg_range(:daterange)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">range</span>, :<span class="ruby-identifier">daterange</span>)&#x000A;<span class="ruby-identifier">range</span>.<span class="ruby-identifier">pg_range</span>(:<span class="ruby-identifier">daterange</span>)</pre>
             
-            <p>If you specify the range database type, <a
-            href="../../../../classes/Sequel.html">Sequel</a> will automatically cast
-            the value to that type when literalizing.</p>
+            <p>If you specify the range database type, Sequel will automatically cast the
+            value to that type when literalizing.</p>
             
             <p>If you would like to use range columns in your model objects, you probably
             want to modify the schema parsing/typecasting so that it recognizes and
             correctly handles the range type columns, which you can do by:</p>
             
-            <pre>DB.extension :pg_range</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_range</span></pre>
             
             <p>If you are not using the native postgres or jdbc/postgresql adapters and
             are using range types as model column values you probably should use the
@@ -103,7 +100,7 @@
             arrays of range types, load the pg_array extension before the pg_range
             extension:</p>
             
-            <pre>DB.extension :pg_array, :pg_range</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span>, :<span class="ruby-identifier">pg_range</span></pre>
           </div>
           <div id='context'>
             <div id='requires'>

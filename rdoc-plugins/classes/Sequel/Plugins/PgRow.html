@@ -43,11 +43,11 @@
             href="../Model.html">Sequel::Model</a> classes as composite type classes,
             via the pg_row extension.  So if you have an address table:</p>
             
-            <pre>DB.create_table(:address) do&#x000A;  String :street&#x000A;  String :city&#x000A;  String :zip&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">address</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">street</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">city</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">zip</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>and a company table with an address:</p>
             
-            <pre>DB.create_table(:company) do&#x000A;  String :name&#x000A;  address :address&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">company</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-identifier">address</span> :<span class="ruby-identifier">address</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>You can create a <a href="../Model.html">Sequel::Model</a> for the address
             table, and load the plugin, which registers the row type:</p>
@@ -57,16 +57,16 @@
             <p>Then when you select from the company table (even using a plain dataset),
             it will return address values as instances of Address:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">company</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;&#39;MS&#39;, :address=&gt;</span>&#x000A;  <span class="ruby-constant">Address</span>.<span class="ruby-identifier">load</span>(:<span class="ruby-identifier">street=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;123 Foo St&#39;</span>, :<span class="ruby-identifier">city=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar Town&#39;</span>, :<span class="ruby-identifier">zip=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;12345&#39;</span>)}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">company</span>].<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># =&gt; {:name=&gt;&#39;MS&#39;, :address=&gt;</span>&#x000A;<span class="ruby-comment">#  Address.load(:street=&gt;&#39;123 Foo St&#39;, :city=&gt;&#39;Bar Town&#39;, :zip=&gt;&#39;12345&#39;)}</span></pre>
             
             <p>If you want a lot of your models to be used as row types, you can load the
             plugin into <a href="../Model.html">Sequel::Model</a> itself:</p>
             
-            <pre>Sequel::Model.plugin :pg_row</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">pg_row</span></pre>
             
             <p>And then call register_row_type in the class</p>
             
-            <pre>Address.register_row_type</pre>
+            <pre class="ruby"><span class="ruby-constant">Address</span>.<span class="ruby-identifier">register_row_type</span></pre>
             
             <p>Note that automatic conversion only works with the native postgres adapter.
             For other adapters that connect to PostgreSQL, you need to call the

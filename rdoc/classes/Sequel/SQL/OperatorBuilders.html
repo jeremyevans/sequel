@@ -73,7 +73,7 @@
                   <code>Sequel::SQL::BooleanExpression</code> created from this argument, not
                   matching all of the conditions.</p>
                   
-                  <pre>Sequel.~(nil) # SQL: NOT NULL&#x000A;Sequel.~([[:a, true]]) # SQL: a IS NOT TRUE&#x000A;Sequel.~([[:a, 1], [:b, [2, 3]]]) # SQL: a != 1 OR b NOT IN (2, 3)</pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(<span class="ruby-keyword">nil</span>) <span class="ruby-comment"># SQL: NOT NULL</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>([[:<span class="ruby-identifier">a</span>, <span class="ruby-keyword">true</span>]]) <span class="ruby-comment"># SQL: a IS NOT TRUE</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>([[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, [<span class="ruby-value">2</span>, <span class="ruby-value">3</span>]]]) <span class="ruby-comment"># SQL: a != 1 OR b NOT IN (2, 3)</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-7E-source'); return false">

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-09-19 07:06:56 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -46,23 +46,22 @@
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :thread_local_timezones</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">thread_local_timezones</span></pre>
             
             <p>The most common example is having the database always store time in UTC,
             but have the application deal with the timezone of the current user.  That
             can be done with:</p>
             
-            <pre>Sequel.database_timezone = :utc&#x000A;# In each thread:&#x000A;Sequel.thread_application_timezone = current_user.timezone</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = :<span class="ruby-identifier">utc</span>&#x000A;<span class="ruby-comment"># In each thread:</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">thread_application_timezone</span> = <span class="ruby-identifier">current_user</span>.<span class="ruby-identifier">timezone</span></pre>
             
             <p>This extension is designed to work with the named_timezones extension.</p>
             
             <p>This extension adds the thread_application_timezone=,
-            thread_database_timezone=, and thread_typecast_timezone= methods to the <a
-            href="../../../../classes/Sequel.html">Sequel</a> module.  It overrides the
-            application_timezone, database_timezone, and typecast_timezone methods to
-            check the related thread local timezone first, and use it if present. If
-            the related thread local timezone is not present, it falls back to the
-            default global timezone.</p>
+            thread_database_timezone=, and thread_typecast_timezone= methods to the
+            Sequel module.  It overrides the application_timezone, database_timezone,
+            and typecast_timezone methods to check the related thread local timezone
+            first, and use it if present. If the related thread local timezone is not
+            present, it falls back to the default global timezone.</p>
             
             <p>There is one special case of note.  If you have a default global timezone
             and you want to have a nil thread local timezone, you have to set the

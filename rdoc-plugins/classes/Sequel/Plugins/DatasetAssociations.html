@@ -47,12 +47,11 @@
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">dataset_associations</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">id</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>).<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># WHERE (albums.artist_id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT id FROM artists</span>&#x000A;<span class="ruby-comment">#   WHERE ((id &gt;= 1) AND (id &lt;= 100))))</span></pre>
             
-            <p>This works for all of the association types that ship with <a
-            href="../../Sequel.html">Sequel</a>, including ones implemented in other
-            plugins.  Most association options that are supported when eager loading
-            are supported when using a dataset association. However, it will only work
-            for limited associations or *_one associations with orders if the database
-            supports window functions.</p>
+            <p>This works for all of the association types that ship with Sequel,
+            including ones implemented in other plugins.  Most association options that
+            are supported when eager loading are supported when using a dataset
+            association. However, it will only work for limited associations or *_one
+            associations with orders if the database supports window functions.</p>
             
             <p>As the dataset methods return datasets, you can easily chain the methods to
             get associated datasets of associated datasets:</p>

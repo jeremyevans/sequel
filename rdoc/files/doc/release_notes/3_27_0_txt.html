@@ -91,7 +91,7 @@
             <p>The prepared_statements_safe plugin now works on classes without datasets,
             so you can now do the following to load it for all models:</p>
             
-            <pre>Sequel::Model.plugin :prepared_statements_safe</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements_safe</span></pre>
             </li><li>
             <p>Dataset#hash now works correctly when handling SQL::Expression instances.</p>
             </li><li>
@@ -107,11 +107,11 @@
             objects and then calling exists? to see if the instance is already in the
             database, you need to change your code from:</p>
             
-            <pre>model.exists?</pre>
+            <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">exists?</span></pre>
             
             <p>to:</p>
             
-            <pre>model.this.get(1).nil?</pre>
+            <pre class="ruby"><span class="ruby-identifier">model</span>.<span class="ruby-identifier">this</span>.<span class="ruby-identifier">get</span>(<span class="ruby-value">1</span>).<span class="ruby-identifier">nil?</span></pre>
             </li></ul>
           </div>
           <div id='context'>

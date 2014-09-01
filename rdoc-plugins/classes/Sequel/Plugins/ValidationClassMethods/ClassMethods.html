@@ -208,12 +208,11 @@
                   to be true instead of false.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:accept - The value required for the object to be valid (default:
-                  &#39;1&#39;)</p>
-                  </li><li>
-                  <p>:message - The message to use (default: &#39;is not accepted&#39;)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:accept </td><td>
+                  <p>The value required for the object to be valid (default: &#39;1&#39;)</p>
+                  </td></tr><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is not accepted&#39;)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_acceptance_of-source'); return false">
@@ -233,15 +232,15 @@
                   <p>Validates confirmation of an attribute. Checks that the object has a
                   _confirmation value matching the current value.  For example:</p>
                   
-                  <pre>validates_confirmation_of :blah</pre>
+                  <pre class="ruby"><span class="ruby-identifier">validates_confirmation_of</span> :<span class="ruby-identifier">blah</span></pre>
                   
                   <p>Just makes sure that object.blah = object.blah_confirmation.  Often used
                   for passwords or email addresses on web forms.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:message - The message to use (default: &#39;is not confirmed&#39;)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is not confirmed&#39;)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_confirmation_of-source'); return false">
@@ -265,30 +264,27 @@
                   <pre class="ruby"><span class="ruby-identifier">validates_each</span> :<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">password</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">object</span>, <span class="ruby-identifier">attribute</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">object</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(<span class="ruby-identifier">attribute</span>, <span class="ruby-string">&#39;is not nice&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nice?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:allow_blank - Whether to skip the validation if the value is blank.</p>
-                  </li><li>
-                  <p>:allow_missing - Whether to skip the validation if the attribute isn&#39;t
-                  a key in the values hash.  This is different from allow_nil, because <a
-                  href="../../../Sequel.html">Sequel</a> only sends the attributes in the
-                  values when doing an insert or update.  If the attribute is not present, <a
-                  href="../../../Sequel.html">Sequel</a> doesn&#39;t specify it, so the
-                  database will use the table&#39;s default value.  This is different from
-                  having an attribute in values with a value of nil, which <a
-                  href="../../../Sequel.html">Sequel</a> will send as NULL. If your database
-                  table has a non NULL default, this may be a good option to use.  You
-                  don&#39;t want to use allow_nil, because if the attribute is in values but
-                  has a value nil, <a href="../../../Sequel.html">Sequel</a> will attempt to
-                  insert a NULL value into the database, instead of using the database&#39;s
-                  default.</p>
-                  </li><li>
-                  <p>:allow_nil - Whether to skip the validation if the value is nil.</p>
-                  </li><li>
-                  <p>:if - A symbol (indicating an instance_method) or proc (which is
-                  instance_evaled) skipping this validation if it returns nil or false.</p>
-                  </li><li>
-                  <p>:tag - The tag to use for this validation.</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_blank </td><td>
+                  <p>Whether to skip the validation if the value is blank.</p>
+                  </td></tr><tr><td class='label'>:allow_missing </td><td>
+                  <p>Whether to skip the validation if the attribute isn&#39;t a key in the
+                  values hash.  This is different from allow_nil, because Sequel only sends
+                  the attributes in the values when doing an insert or update.  If the
+                  attribute is not present, Sequel doesn&#39;t specify it, so the database
+                  will use the table&#39;s default value.  This is different from having an
+                  attribute in values with a value of nil, which Sequel will send as NULL. If
+                  your database table has a non NULL default, this may be a good option to
+                  use.  You don&#39;t want to use allow_nil, because if the attribute is in
+                  values but has a value nil, Sequel will attempt to insert a NULL value into
+                  the database, instead of using the database&#39;s default.</p>
+                  </td></tr><tr><td class='label'>:allow_nil </td><td>
+                  <p>Whether to skip the validation if the value is nil.</p>
+                  </td></tr><tr><td class='label'>:if </td><td>
+                  <p>A symbol (indicating an instance_method) or proc (which is instance_evaled)
+                  skipping this validation if it returns nil or false.</p>
+                  </td></tr><tr><td class='label'>:tag </td><td>
+                  <p>The tag to use for this validation.</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_each-source'); return false">
@@ -309,11 +305,11 @@
                   the value against the regular expression provided by the :with option.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:message - The message to use (default: &#39;is invalid&#39;)</p>
-                  </li><li>
-                  <p>:with - The regular expression to validate the value with (required).</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is invalid&#39;)</p>
+                  </td></tr><tr><td class='label'>:with </td><td>
+                  <p>The regular expression to validate the value with (required).</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_format_of-source'); return false">
@@ -333,12 +329,12 @@
                   <p>Validates that an attribute is within a specified range or set of values.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:in - An array or range of values to check for validity (required)</p>
-                  </li><li>
-                  <p>:message - The message to use (default: &#39;is not in range or set:
-                  &lt;specified range&gt;&#39;)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:in </td><td>
+                  <p>An array or range of values to check for validity (required)</p>
+                  </td></tr><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is not in range or set: &lt;specified
+                  range&gt;&#39;)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_inclusion_of-source'); return false">
@@ -358,31 +354,31 @@
                   <p>Validates the length of an attribute.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:is - The exact size required for the value to be valid (no default)</p>
-                  </li><li>
-                  <p>:maximum - The maximum size allowed for the value (no default)</p>
-                  </li><li>
-                  <p>:message - The message to use (no default, overrides :nil_message,
-                  :too_long, :too_short, and :wrong_length options if present)</p>
-                  </li><li>
-                  <p>:minimum - The minimum size allowed for the value (no default)</p>
-                  </li><li>
-                  <p>:nil_message - The message to use use if :maximum option is used and the
-                  value is nil (default: &#39;is not present&#39;)</p>
-                  </li><li>
-                  <p>:too_long - The message to use use if it the value is too long (default:
-                  &#39;is too long&#39;)</p>
-                  </li><li>
-                  <p>:too_short - The message to use use if it the value is too short (default:
-                  &#39;is too short&#39;)</p>
-                  </li><li>
-                  <p>:within - The array/range that must include the size of the value for it to
-                  be valid (no default)</p>
-                  </li><li>
-                  <p>:wrong_length - The message to use use if it the value is not valid
-                  (default: &#39;is the wrong length&#39;)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:is </td><td>
+                  <p>The exact size required for the value to be valid (no default)</p>
+                  </td></tr><tr><td class='label'>:maximum </td><td>
+                  <p>The maximum size allowed for the value (no default)</p>
+                  </td></tr><tr><td class='label'>:message </td><td>
+                  <p>The message to use (no default, overrides :nil_message, :too_long,
+                  :too_short, and :wrong_length options if present)</p>
+                  </td></tr><tr><td class='label'>:minimum </td><td>
+                  <p>The minimum size allowed for the value (no default)</p>
+                  </td></tr><tr><td class='label'>:nil_message </td><td>
+                  <p>The message to use use if :maximum option is used and the value is nil
+                  (default: &#39;is not present&#39;)</p>
+                  </td></tr><tr><td class='label'>:too_long </td><td>
+                  <p>The message to use use if it the value is too long (default: &#39;is too
+                  long&#39;)</p>
+                  </td></tr><tr><td class='label'>:too_short </td><td>
+                  <p>The message to use use if it the value is too short (default: &#39;is too
+                  short&#39;)</p>
+                  </td></tr><tr><td class='label'>:within </td><td>
+                  <p>The array/range that must include the size of the value for it to be valid
+                  (no default)</p>
+                  </td></tr><tr><td class='label'>:wrong_length </td><td>
+                  <p>The message to use use if it the value is not valid (default: &#39;is the
+                  wrong length&#39;)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_length_of-source'); return false">
@@ -402,11 +398,11 @@
                   <p>Validates whether an attribute is a number.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:message - The message to use (default: &#39;is not a number&#39;)</p>
-                  </li><li>
-                  <p>:only_integer - Whether only integers are valid values (default: false)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is not a number&#39;)</p>
+                  </td></tr><tr><td class='label'>:only_integer </td><td>
+                  <p>Whether only integers are valid values (default: false)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_numericality_of-source'); return false">
@@ -427,9 +423,9 @@
                   with false considered present instead of absent.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:message - The message to use (default: &#39;is not present&#39;)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is not present&#39;)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_presence_of-source'); return false">
@@ -452,10 +448,10 @@
                   validation time instead of at setter time.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:message - The message to use (default: &#39;is not a valid
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is not a valid
                   (integer|datetime|etc.)&#39;)</p>
-                  </li></ul>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_schema_type-source'); return false">
@@ -479,11 +475,11 @@
                   
                   <p>This means that the code:</p>
                   
-                  <pre>validates_uniqueness_of([:column1, :column2])</pre>
+                  <pre class="ruby"><span class="ruby-identifier">validates_uniqueness_of</span>([:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>])</pre>
                   
                   <p>validates the grouping of column1 and column2 while</p>
                   
-                  <pre>validates_uniqueness_of(:column1, :column2)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">validates_uniqueness_of</span>(:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>)</pre>
                   
                   <p>validates them separately.</p>
                   
@@ -491,9 +487,9 @@
                   fairly obvious race condition.</p>
                   
                   <p>Possible Options:</p>
-                  <ul><li>
-                  <p>:message - The message to use (default: &#39;is already taken&#39;)</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:message </td><td>
+                  <p>The message to use (default: &#39;is already taken&#39;)</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-validates_uniqueness_of-source'); return false">

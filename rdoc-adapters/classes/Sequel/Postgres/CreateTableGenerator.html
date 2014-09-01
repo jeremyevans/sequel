@@ -69,21 +69,18 @@
                   
                   <p>Example:</p>
                   
-                  <pre>exclude([[:col1, &#39;&amp;&amp;&#39;], [:col2, &#39;=&#39;]])&#x000A;# EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)</pre>
+                  <pre class="ruby"><span class="ruby-identifier">exclude</span>([[:<span class="ruby-identifier">col1</span>, <span class="ruby-string">&#39;&amp;&amp;&#39;</span>], [:<span class="ruby-identifier">col2</span>, <span class="ruby-string">&#39;=&#39;</span>]])&#x000A;<span class="ruby-comment"># EXCLUDE USING gist (col1 WITH &amp;&amp;, col2 WITH =)</span></pre>
                   
                   <p>Options supported:</p>
-                  <dl class="rdoc-list note-list"><dt>:name 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:name </td><td>
                   <p>Name the constraint with the given name (useful if you may need to drop the
                   constraint later)</p>
-                  </dd><dt>:using 
-                  <dd>
+                  </td></tr><tr><td class='label'>:using </td><td>
                   <p>Override the index_method for the exclusion constraint (defaults to gist).</p>
-                  </dd><dt>:where 
-                  <dd>
+                  </td></tr><tr><td class='label'>:where </td><td>
                   <p>Create a partial exclusion constraint, which only affects a subset of table
                   rows, value should be a filter expression.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-exclude-source'); return false">

@@ -68,7 +68,7 @@
             example, if you want all Database instances to use the query_literals
             extension, run the following before creating your Database instances:</p>
             
-            <pre>Sequel::Database.extension :query_literals</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">query_literals</span></pre>
             </li><li>
             <p>Database.after_initialize has been added for running a hook on all new
             databases created.</p>
@@ -141,7 +141,7 @@
             per-Database basis, the oids can be looked up automatically, making it
             possible to register array types with just a type name:</p>
             
-            <pre>DB.register_array_type(:interval)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_array_type</span>(:<span class="ruby-identifier">interval</span>)</pre>
             </li><li>
             <p>The pg_array extension now automatically creates conversion procs for array
             types of all named types used by the database.  This means that if you use

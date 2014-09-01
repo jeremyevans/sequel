@@ -47,7 +47,7 @@
             
             <p>You can get the adapter in use using Database#adapter_scheme:</p>
             
-            <pre>DB.adapter_scheme # e.g. :postgres, :jdbc, :odbc</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">adapter_scheme</span> <span class="ruby-comment"># e.g. :postgres, :jdbc, :odbc</span></pre>
             
             <h2 id="label-Database+Connected+To">Database Connected To<span><a href="#label-Database+Connected+To">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -56,19 +56,19 @@
             You can use the Database#database_type method to get the type of database
             to which you are connecting:</p>
             
-            <pre>DB.database_type # :postgres, :h2, :mssql</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">database_type</span> <span class="ruby-comment"># :postgres, :h2, :mssql</span></pre>
             
             <h2 id="label-Tables+in+the+Database">Tables in the Database<span><a href="#label-Tables+in+the+Database">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database#tables gives an array of table name symbols:</p>
             
-            <pre>DB.tables # [:table1, :table2, :table3, ...]</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">tables</span> <span class="ruby-comment"># [:table1, :table2, :table3, ...]</span></pre>
             
             <h2 id="label-Views+in+the+Database">Views in the Database<span><a href="#label-Views+in+the+Database">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
             <p>Database#views and gives an array of view name symbols:</p>
             
-            <pre>DB.views # [:view1, :view2, :view3, ...]</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">views</span> <span class="ruby-comment"># [:view1, :view2, :view3, ...]</span></pre>
             
             <h2 id="label-Indexes+on+a+table">Indexes on a table<span><a href="#label-Indexes+on+a+table">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -89,32 +89,25 @@
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">foreign_key_list</span>(:<span class="ruby-identifier">table1</span>) <span class="ruby-comment"># [{:columns=&gt;[:column1], :table=&gt;:referenced_table, :key=&gt;[:referenced_column1]}]</span></pre>
             
             <p>At least the following entries will be present in the hash:</p>
-            <dl class="rdoc-list note-list"><dt>:columns 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:columns </td><td>
             <p>An array of columns in the given table</p>
-            </dd><dt>:table 
-            <dd>
+            </td></tr><tr><td class='label'>:table </td><td>
             <p>The table referenced by the columns</p>
-            </dd><dt>:key 
-            <dd>
+            </td></tr><tr><td class='label'>:key </td><td>
             <p>An array of columns referenced (in the table specified by :table), but can
             be nil on certain adapters if the primary key is referenced.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>The hash may also contain entries for:</p>
-            <dl class="rdoc-list note-list"><dt>:deferrable 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:deferrable </td><td>
             <p>Whether the constraint is deferrable</p>
-            </dd><dt>:name 
-            <dd>
+            </td></tr><tr><td class='label'>:name </td><td>
             <p>The name of the constraint</p>
-            </dd><dt>:on_delete 
-            <dd>
+            </td></tr><tr><td class='label'>:on_delete </td><td>
             <p>The action to take ON DELETE</p>
-            </dd><dt>:on_update 
-            <dd>
+            </td></tr><tr><td class='label'>:on_update </td><td>
             <p>The action to take ON UPDATE</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h2 id="label-Column+Information+for+a+Table">Column Information for a Table<span><a href="#label-Column+Information+for+a+Table">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -123,33 +116,27 @@
             elements of the subarray is a column symbol, and the second element is a
             hash of information about that column.  The hash should include the
             following keys:</p>
-            <dl class="rdoc-list note-list"><dt>:allow_null 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_null </td><td>
             <p>Whether NULL/nil is an allowed value for this column. Used by the <a
             href="../../classes/Sequel/Model.html">Sequel::Model</a> typecasting code.</p>
-            </dd><dt>:db_type 
-            <dd>
+            </td></tr><tr><td class='label'>:db_type </td><td>
             <p>The type of column the database provided, as a string.  Used by the
             schema_dumper plugin for a more specific type translation.</p>
-            </dd><dt>:default 
-            <dd>
+            </td></tr><tr><td class='label'>:default </td><td>
             <p>The default value of the column, as either a string or nil.  Uses a
             database specific format. Used by the schema_dumper plugin for converting
             to a ruby value.</p>
-            </dd><dt>:primary_key 
-            <dd>
+            </td></tr><tr><td class='label'>:primary_key </td><td>
             <p>Whether this column is one of the primary key columns for the table.  Used
             by the <a href="../../classes/Sequel/Model.html">Sequel::Model</a> code to
             determine primary key columns.</p>
-            </dd><dt>:ruby_default 
-            <dd>
+            </td></tr><tr><td class='label'>:ruby_default </td><td>
             <p>The default value of the column as a ruby object, or nil if there is no
             default or the default could not be successfully parsed into a ruby object.</p>
-            </dd><dt>:type 
-            <dd>
+            </td></tr><tr><td class='label'>:type </td><td>
             <p>The type of column, as a symbol (e.g. :string).  Used by the <a
             href="../../classes/Sequel/Model.html">Sequel::Model</a> typecasting code.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>Example:</p>
             
@@ -167,18 +154,18 @@
             <p>Dataset#columns returns the columns of the current dataset as an array of
             symbols:</p>
             
-            <pre>DB[:table].columns # [:column1, :column2, :column3, ...]</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">columns</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span></pre>
             
             <p>Dataset#columns! does the same thing, except it ignores any cached value. 
             In general, the cached value should never be incorrect, unless the database
             schema is changed after the dataset is created.</p>
             
-            <pre>DB[:table].columns! # [:column1, :column2, :column3, ...]</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">columns!</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span></pre>
             
             <p>Model.columns does the same thing as Dataset#columns, using the model&#39;s
             dataset:</p>
             
-            <pre>Model.columns # [:column1, :column2, :column3, ...]</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">columns</span> <span class="ruby-comment"># [:column1, :column2, :column3, ...]</span></pre>
             
             <h2 id="label-Associations+Defined">Associations Defined<span><a href="#label-Associations+Defined">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -187,7 +174,7 @@
             
             <p>You can get an array of association symbols with Model.associations:</p>
             
-            <pre>Model.associations # [:association1, :association2, ...]</pre>
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">associations</span> <span class="ruby-comment"># [:association1, :association2, ...]</span></pre>
             
             <p>You can get the association reflection for a single association via the
             Model.association_reflection.  Association reflections are subclasses of

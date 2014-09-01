@@ -203,30 +203,25 @@
                   <p>Execute the given stored procedure with the given name.</p>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:args 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:args </td><td>
                   <p>Arguments to stored procedure.  For named argumetns, this should be a hash
                   keyed by argument named.  For unnamed arguments, this should be an array. 
                   Output parameters to the function are specified using :output. You can also
                   name output parameters and provide a type by using an array containing
                   :output, the type name, and the parameter name.</p>
-                  </dd><dt>:server 
-                  <dd>
+                  </td></tr><tr><td class='label'>:server </td><td>
                   <p>The server/shard on which to execute the procedure.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>This method returns a single hash with the following keys:</p>
-                  <dl class="rdoc-list note-list"><dt>:result 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:result </td><td>
                   <p>The result code of the stored procedure</p>
-                  </dd><dt>:numrows 
-                  <dd>
+                  </td></tr><tr><td class='label'>:numrows </td><td>
                   <p>The number of rows affected by the stored procedure</p>
-                  </dd><dt>output params 
-                  <dd>
+                  </td></tr><tr><td class='label'>output params </td><td>
                   <p>Values for any output paramters, using the name given for the output
                   parameter</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                   
                   <p>Examples:</p>
                   

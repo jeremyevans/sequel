@@ -72,12 +72,12 @@
             
             <p>Previously, to get something equivalent to this, you had to do:</p>
             
-            <pre class="ruby">{{:<span class="ruby-identifier">x=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}=<span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>)&#x000A;<span class="ruby-comment"># =&gt; CASE WHEN (x = 1) THEN 2 ELSE 0 END</span>&#x000A;[[{:<span class="ruby-identifier">y=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>}, <span class="ruby-value">1</span>], [{:<span class="ruby-identifier">y=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">b</span>}, <span class="ruby-value">2</span>], [{:<span class="ruby-identifier">y=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">c</span>}, <span class="ruby-value">3</span>]].<span class="ruby-identifier">case</span>(<span class="ruby-value">4</span>)&#x000A;<span class="ruby-comment"># =&gt; CASE WHEN (y = a) THEN 1 WHEN (y = b) THEN 2 WHEN (y = c)</span>&#x000A;     <span class="ruby-constant">THEN</span> <span class="ruby-value">3</span> <span class="ruby-constant">ELSE</span> <span class="ruby-value">4</span> <span class="ruby-keyword">END</span></pre>
+            <pre>{{:x=&gt;1}=&gt;2}.case(0)&#x000A;# =&gt; CASE WHEN (x = 1) THEN 2 ELSE 0 END&#x000A;[[{:y=&gt;:a}, 1], [{:y=&gt;:b}, 2], [{:y=&gt;:c}, 3]].case(4)&#x000A;# =&gt; CASE WHEN (y = a) THEN 1 WHEN (y = b) THEN 2 WHEN (y = c)&#x000A;     THEN 3 ELSE 4 END</pre>
             </li><li>
             <p>You can now change the NULL/NOT NULL value of an existing column using the
             set_column_allow_null method.</p>
             
-            <pre># Set NOT NULL&#x000A;DB.alter_table(:artists){set_column_allow_null :name, false}&#x000A;# Set NULL&#x000A;DB.alter_table(:artists){set_column_allow_null :name, true}</pre>
+            <pre class="ruby"><span class="ruby-comment"># Set NOT NULL</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">artists</span>){<span class="ruby-identifier">set_column_allow_null</span> :<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>}&#x000A;<span class="ruby-comment"># Set NULL</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">artists</span>){<span class="ruby-identifier">set_column_allow_null</span> :<span class="ruby-identifier">name</span>, <span class="ruby-keyword">true</span>}</pre>
             </li><li>
             <p>You can now get the schema information for a table in a non-public schema
             in PostgreSQL using the implicit :schema__table syntax. Before, the :schema

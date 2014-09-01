@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-25 11:18:28 -0800</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -53,11 +53,11 @@
             
             <p>You can load this extension into specific datasets:</p>
             
-            <pre>ds = DB[:table]&#x000A;ds = ds.extension(:mssql_emulate_lateral_with_apply)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">mssql_emulate_lateral_with_apply</span>)</pre>
             
             <p>Or you can load it into all of a database&#39;s datasets:</p>
             
-            <pre>DB.extension(:mssql_emulate_lateral_with_apply)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">mssql_emulate_lateral_with_apply</span>)</pre>
           </div>
           <div id='context'>
           </div>

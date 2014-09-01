@@ -57,7 +57,7 @@
             where the deprecation messages go and how many lines of backtrace are given
             using the following:</p>
             
-            <pre># Log deprecation information to a file&#x000A;Sequel::Deprecation.output = File.open(&#39;deprecated.txt&#39;, &#39;wb&#39;)&#x000A;# Use 5 lines of backtrace when logging deprecation messages&#x000A;Sequel::Deprecation.backtraces = 5&#x000A;&#x000A;# Use all backtrace lines when logging deprecation messages&#x000A;Sequel::Deprecation.backtraces = true&#x000A;&#x000A;# Don&#39;t include backtraces in the deprecation logging&#x000A;Sequel.Deprecation.backtraces = false&#x000A;&#x000A;# Turn off all deprecation logging&#x000A;Sequel::Deprecation.output = nil</pre>
+            <pre class="ruby"><span class="ruby-comment"># Log deprecation information to a file</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-constant">File</span>.<span class="ruby-identifier">open</span>(<span class="ruby-string">&#39;deprecated.txt&#39;</span>, <span class="ruby-string">&#39;wb&#39;</span>)&#x000A;&#x000A;<span class="ruby-comment"># Use 5 lines of backtrace when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-value">5</span>&#x000A;&#x000A;<span class="ruby-comment"># Use all backtrace lines when logging deprecation messages</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-comment"># Don&#39;t include backtraces in the deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">backtraces</span> = <span class="ruby-keyword">false</span>&#x000A;&#x000A;<span class="ruby-comment"># Turn off all deprecation logging</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">output</span> = <span class="ruby-keyword">nil</span></pre>
             
             <p>Deprecated Features Moving to Extensions</p>
             <hr>
@@ -96,7 +96,7 @@
             Features section.  If you want to continue using the validation class
             methods:</p>
             
-            <pre>Sequel::Model.plugin :validation_class_methods</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_class_methods</span></pre>
             </li><li>
             <p>Model hook class methods have been moved to a plugin.  <a
             href="../../../classes/Sequel.html">Sequel</a> users are encouraged to
@@ -104,29 +104,29 @@
             specified in superclasses or plugins.  If you want to continue using the
             hook class methods:</p>
             
-            <pre>Sequel::Model.plugin :hook_class_methods</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">hook_class_methods</span></pre>
             </li><li>
             <p>Model schema methods (e.g. Model.set_schema, Model.create_table, 
             Model.drop_table) have been moved to a plugin.  The use of these methods
             has been discouraged for a long time.  If you want to use them:</p>
             
-            <pre>Sequel::Model.plugin :schema</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">schema</span></pre>
             </li><li>
             <p>Model.set_sti_key has been moved to a plugin.  So you should change:</p>
             
-            <pre>MyModel.set_sti_key :key_column</pre>
+            <pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">set_sti_key</span> :<span class="ruby-identifier">key_column</span></pre>
             
             <p>to:</p>
             
-            <pre>MyModel.plugin :single_table_inheritance, :key_column</pre>
+            <pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">single_table_inheritance</span>, :<span class="ruby-identifier">key_column</span></pre>
             </li><li>
             <p>Model.set_cache has been moved to a plugin.  So you should change:</p>
             
-            <pre>MyModel.set_cache cache_store, opts</pre>
+            <pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">set_cache</span> <span class="ruby-identifier">cache_store</span>, <span class="ruby-identifier">opts</span></pre>
             
             <p>to:</p>
             
-            <pre>MyModel.plugin :caching, cache_store, opts</pre>
+            <pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">caching</span>, <span class="ruby-identifier">cache_store</span>, <span class="ruby-identifier">opts</span></pre>
             </li><li>
             <p>Model.serialize has been moved to a plugin.  So you should change:</p>
             
@@ -134,7 +134,7 @@
             
             <p>to:</p>
             
-            <pre>MyModel.plugin :serialization, :yaml, :column</pre>
+            <pre class="ruby"><span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">serialization</span>, :<span class="ruby-identifier">yaml</span>, :<span class="ruby-identifier">column</span></pre>
             
             <p>Because the previous serialization support depended on dataset transforms,
             the new serialization support is implemented differently, and behavior may
@@ -294,7 +294,7 @@
             
             <p>to:</p>
             
-            <pre>dataset.filter{(number &gt; 10) &amp; (name &gt; &#39;M&#39;)}</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">number</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">10</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">name</span> <span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;M&#39;</span>)}</pre>
             
             <p>When instance_eval is used, only local variables are available to the
             block.  Any calls to instance methods will be interpreted as calling
@@ -302,7 +302,7 @@
             virtual_row_instance_eval is enabled, the following type of code will
             break:</p>
             
-            <pre># amount is a instance method&#x000A;dataset.filter{:number + amount &gt; 0}</pre>
+            <pre class="ruby"><span class="ruby-comment"># amount is a instance method</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">filter</span>{:<span class="ruby-identifier">number</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">amount</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">0</span>}</pre>
             
             <p>Just like this example, the only type of code that should break is when a
             virtual row block was used when it wasn&#39;t necessary (since it
@@ -337,7 +337,7 @@
             validations work with code reloading without workarounds. The :if option is
             also not needed for instance level validations:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Old</span>&#x000A;<span class="ruby-identifier">validates_presence_of</span> :<span class="ruby-identifier">name</span>, :<span class="ruby-keyword">if</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">new?</span>&#x000A;<span class="ruby-identifier">validates_presence_of</span> :<span class="ruby-identifier">pass</span>, :<span class="ruby-keyword">if</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-identifier">flag</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}&#x000A;&#x000A;<span class="ruby-comment"># New</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;  <span class="ruby-identifier">validates_presence</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span>&#x000A;  <span class="ruby-identifier">validates_presence</span>(:<span class="ruby-identifier">pass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">flag</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre># Old&#x000A;validates_presence_of :name, :if=&gt;:new?&#x000A;validates_presence_of :pass, :if=&gt;{flag &gt; 3}&#x000A;# New&#x000A;def validate&#x000A;  validates_presence(:name) if new?&#x000A;  validates_presence(:pass) if flag &gt; 3&#x000A;end</pre>
             
             <p>The validates_each also doesn&#39;t have an equivalent instance method,
             since it is much easier to just write your own validation:</p>
@@ -350,7 +350,7 @@
             </li><li>
             <p>If you use the MySQL native adapter, you can set:</p>
             
-            <pre>Sequel::MySQL.convert_invalid_date_time = nil</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MySQL</span>.<span class="ruby-identifier">convert_invalid_date_time</span> = <span class="ruby-keyword">nil</span></pre>
             
             <p>to return dates like “0000-00-00” and times like “25:00:00” as nil values
             instead of raising an error.  You can also set it to :string to return the
@@ -392,7 +392,7 @@
             href="../../../classes/Sequel.html">Sequel</a> options, it&#39;s settable
             on a global, per model, and per object basis:</p>
             
-            <pre>Sequel::Model.use_transactions = false&#x000A;MyModel.use_transactions = true&#x000A;my_model.use_transactions = false</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-constant">MyModel</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">my_model</span>.<span class="ruby-identifier">use_transactions</span> = <span class="ruby-keyword">false</span></pre>
             
             <p>You can also turn it on or off for specific save calls:</p>
             

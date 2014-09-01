@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-02-11 12:09:28 -0800</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -41,16 +41,16 @@
             <p>The query extension adds a query method which allows a different way to
             construct queries instead of the usual method chaining:</p>
             
-            <pre>dataset = DB[:items].query do&#x000A;  select :x, :y, :z&#x000A;  filter{(x &gt; 1) &amp; (y &gt; 2)}&#x000A;  reverse :z&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">query</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">select</span> :<span class="ruby-identifier">x</span>, :<span class="ruby-identifier">y</span>, :<span class="ruby-identifier">z</span>&#x000A;  <span class="ruby-identifier">filter</span>{(<span class="ruby-identifier">x</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">y</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)}&#x000A;  <span class="ruby-identifier">reverse</span> :<span class="ruby-identifier">z</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>You can load this extension into specific datasets:</p>
             
-            <pre>ds = DB[:table]&#x000A;ds = ds.extension(:query)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">query</span>)</pre>
             
             <p>Or you can load it into all of a database&#39;s datasets, which is probably
             the desired behavior if you are using this extension:</p>
             
-            <pre>DB.extension(:query)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">query</span>)</pre>
           </div>
           <div id='context'>
           </div>

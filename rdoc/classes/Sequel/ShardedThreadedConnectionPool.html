@@ -83,15 +83,15 @@
                 <div class='description'>
                   
                   <p>The following additional options are respected:</p>
-                  <ul><li>
-                  <p>:servers - A hash of servers to use.  Keys should be symbols.  If not
-                  present, will use a single :default server.</p>
-                  </li><li>
-                  <p>:servers_hash - The base hash to use for the servers.  By default, <a
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:servers </td><td>
+                  <p>A hash of servers to use.  Keys should be symbols.  If not present, will
+                  use a single :default server.</p>
+                  </td></tr><tr><td class='label'>:servers_hash </td><td>
+                  <p>The base hash to use for the servers.  By default, <a
                   href="../Sequel.html">Sequel</a> uses Hash.new(:default).  You can use a
                   hash with a default proc that raises an error if you want to catch all
                   cases where a nonexistent server is used.</p>
-                  </li></ul>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
@@ -197,10 +197,10 @@
                   <p>Once a connection is requested using <a
                   href="ShardedThreadedConnectionPool.html#method-i-hold">hold</a>, the
                   connection pool creates new connections to the database. Options:</p>
-                  <ul><li>
-                  <p>:server - Should be a symbol specifing the server to disconnect from, or an
-                  array of symbols to specify multiple servers.</p>
-                  </li></ul>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:server </td><td>
+                  <p>Should be a symbol specifing the server to disconnect from, or an array of
+                  symbols to specify multiple servers.</p>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-disconnect-source'); return false">

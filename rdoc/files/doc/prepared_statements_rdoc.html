@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-07-06 16:17:44 -0700</span>
+          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -87,7 +87,7 @@
             directly.  For example, if you want to use placeholders while also using
             raw SQL, you can do:</p>
             
-            <pre>ds = DB[&quot;SELECT * FROM items WHERE name = ?&quot;, :$n]</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE name = ?&quot;</span>, :<span class="ruby-identifier">$n</span>]</pre>
             
             <h2 id="label-Bound+Variables">Bound Variables<span><a href="#label-Bound+Variables">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -106,7 +106,7 @@
             <p>For inserting/updating records, you should also specify a value hash, which
             may itself contain placeholders:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Insert record with &#39;Jim&#39;, note that the previous filter is ignored</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">insert</span>, {:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$n</span>)&#x000A;<span class="ruby-comment"># Change name to &#39;Bob&#39; for all records with name of &#39;Jim&#39;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">update</span>, {:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>, :<span class="ruby-identifier">new_n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>}, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">$:</span><span class="ruby-identifier">new_n</span>)</pre>
+            <pre class="ruby"><span class="ruby-comment"># Insert record with &#39;Jim&#39;, note that the previous filter is ignored</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">insert</span>, {:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$n</span>)&#x000A;<span class="ruby-comment"># Change name to &#39;Bob&#39; for all records with name of &#39;Jim&#39;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">update</span>, {:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>, :<span class="ruby-identifier">new_n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>}, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$new_n</span>)</pre>
             
             <h2 id="label-Prepared+Statements">Prepared Statements<span><a href="#label-Prepared+Statements">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             

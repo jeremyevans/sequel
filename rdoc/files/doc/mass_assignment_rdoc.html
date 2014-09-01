@@ -56,14 +56,14 @@
             use of primary key setters, you need to call
             <code>unrestrict_primary_key</code> for that model:</p>
             
-            <pre>Post.unrestrict_primary_key</pre>
+            <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">unrestrict_primary_key</span></pre>
             
             <p>Since mass assignment by default allows modification of all column values
             except for primary key columns, it can be a security risk in some cases. <a
             href="../../classes/Sequel.html">Sequel</a> has multiple ways of securing
             mass assignment. The first way is using <code>set_allowed_columns</code>:</p>
             
-            <pre>Post.set_allowed_columns :title, :body, :category</pre>
+            <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">set_allowed_columns</span> :<span class="ruby-identifier">title</span>, :<span class="ruby-identifier">body</span>, :<span class="ruby-identifier">category</span></pre>
             
             <p>This explicitly sets which methods are allowed (<code>title=</code>,
             <code>body=</code>, and <code>category=</code>), all other methods will not
@@ -73,7 +73,7 @@
             access). To handle cases where different columns are allowed in different
             cases, you can use <code>set_only</code> or <code>update_only</code>:</p>
             
-            <pre># user case&#x000A;post.set_only(params[:post], :title, :body)&#x000A;# admin case&#x000A;post.set_only(params[:post], :title, :body, :deleted)</pre>
+            <pre class="ruby"><span class="ruby-comment"># user case</span>&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_only</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">post</span>], :<span class="ruby-identifier">title</span>, :<span class="ruby-identifier">body</span>)&#x000A;<span class="ruby-comment"># admin case</span>&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_only</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">post</span>], :<span class="ruby-identifier">title</span>, :<span class="ruby-identifier">body</span>, :<span class="ruby-identifier">deleted</span>)</pre>
             
             <p>In this case, only the <code>title=</code> and <code>body=</code> methods
             will be allowed in the mass assignment in the user case, and only
@@ -86,7 +86,7 @@
             href="../../classes/Sequel.html">Sequel</a> silently ignore invalid calls
             by doing:</p>
             
-            <pre># Global default&#x000A;Sequel::Model.strict_param_setting = false&#x000A;# Class level&#x000A;Post.strict_param_setting = false&#x000A;# Instance level&#x000A;post.strict_param_setting = false</pre>
+            <pre class="ruby"><span class="ruby-comment"># Global default</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-comment"># Class level</span>&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-comment"># Instance level</span>&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">strict_param_setting</span> = <span class="ruby-keyword">false</span></pre>
             
             <p>In addition to <code>set_only</code> and <code>update_only</code>, <a
             href="../../classes/Sequel.html">Sequel</a> also has
@@ -95,7 +95,7 @@
             two arguments, the attributes hash as the first argument, and a single
             array of valid field names as the second argument:</p>
             
-            <pre>post.set_fields(params[:post], [:title, :body])</pre>
+            <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">set_fields</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">post</span>], [:<span class="ruby-identifier">title</span>, :<span class="ruby-identifier">body</span>])</pre>
             
             <p><code>set_fields</code> and <code>update_fields</code> differ in
             implementation from <code>set_only</code> and <code>update_only</code>.

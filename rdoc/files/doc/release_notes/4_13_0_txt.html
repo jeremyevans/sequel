@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-01 09:04:01 -0700</span>
+          <span class='datetime'>2014-08-01 10:46:54 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -64,7 +64,7 @@
             <p>A dataset_source_alias extension has been added, for automatically aliasing
             datasets to their first source, instead of using t1, t2. Example:</p>
             
-            <pre>DB.from(:a, DB[:b]).sql&#x000A;# SELECT * FROM a, (SELECT * FROM b) AS t1&#x000A;DB.extension(:dataset_source_alias)&#x000A;DB.from(:a, DB[:b]).sql&#x000A;# SELECT * FROM a, (SELECT * FROM b) AS b</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS t1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">dataset_source_alias</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">b</span>]).<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM a, (SELECT * FROM b) AS b</span></pre>
             </li><li>
             <p>On Microsoft SQL Server, <a href="../../../classes/Sequel.html">Sequel</a>
             now emulates RETURNING support using the OUTPUT clause, as long as only
@@ -119,7 +119,7 @@
             the unqualified version of a possibly qualified column.</p>
             </li><li>
             <p>The composition and serialization plugins now support validations on the
-            underlying columns.  Previously, the didn&#39;t update the underlying
+            underlying columns.  Previously, they didn&#39;t update the underlying
             columns until after validations were performed.  This works better when
             using the auto_validations plugin.</p>
             </li><li>

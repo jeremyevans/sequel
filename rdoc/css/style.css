@@ -233,6 +233,18 @@ div.header {
     list-style: decimal; }
     #content #description ol li, #content .method .description ol li {
       white-space: normal; }
+  #content table.rdoc-list {
+    border-collapse: collapse;
+    border-spacing: 0; }
+    #content table.rdoc-list tr {
+      background-color: white; }
+      #content table.rdoc-list tr:nth-child(2n) {
+        background-color: #f8f8f8; }
+    #content table.rdoc-list td.label {
+      font-weight: bold; }
+    #content table.rdoc-list td {
+      border: 1px solid #dddddd;
+      padding: 6px 13px; }
 
 #method-list {
   position: absolute;
@@ -291,38 +303,41 @@ div.header {
   color: #eeeeee;
   background: #336699; }
 
-#content .method .source pre {
+#content .method .source pre, #content pre.ruby, #methods .method .description pre.ruby {
   background: #262626;
   color: #ffdead;
   margin: 1em;
   padding: 0.5em;
   border: 1px dashed #999999;
   overflow: auto; }
-  #content .method .source pre .ruby-constant {
+  #content .method .source pre .ruby-constant, #content pre.ruby .ruby-constant, #methods .method .description pre.ruby .ruby-constant {
     color: #7fffd4;
     background: transparent; }
-  #content .method .source pre .ruby-keyword {
+  #content .method .source pre .ruby-keyword, #content pre.ruby .ruby-keyword, #methods .method .description pre.ruby .ruby-keyword {
     color: aqua;
     background: transparent; }
-  #content .method .source pre .ruby-ivar {
+  #content .method .source pre .ruby-ivar, #content pre.ruby .ruby-ivar, #methods .method .description pre.ruby .ruby-ivar {
     color: #eedd82;
     background: transparent; }
-  #content .method .source pre .ruby-operator {
+  #content .method .source pre .ruby-operator, #content pre.ruby .ruby-operator, #methods .method .description pre.ruby .ruby-operator {
     color: #00ffee;
     background: transparent; }
-  #content .method .source pre .ruby-identifier {
+  #content .method .source pre .ruby-identifier, #content pre.ruby .ruby-identifier, #methods .method .description pre.ruby .ruby-identifier {
     color: #ffdead;
     background: transparent; }
-  #content .method .source pre .ruby-node {
+  #content .method .source pre .ruby-string, #content pre.ruby .ruby-string, #methods .method .description pre.ruby .ruby-string {
+    color: #ffaaaa;
+    background: transparent; }
+  #content .method .source pre .ruby-node, #content pre.ruby .ruby-node, #methods .method .description pre.ruby .ruby-node {
     color: #ffa07a;
     background: transparent; }
-  #content .method .source pre .ruby-comment {
-    color: #b22222;
+  #content .method .source pre .ruby-comment, #content pre.ruby .ruby-comment, #methods .method .description pre.ruby .ruby-comment {
+    color: #ffddff;
     font-weight: bold;
     background: transparent; }
-  #content .method .source pre .ruby-regexp {
+  #content .method .source pre .ruby-regexp, #content pre.ruby .ruby-regexp, #methods .method .description pre.ruby .ruby-regexp {
     color: #ffa07a;
     background: transparent; }
-  #content .method .source pre .ruby-value {
+  #content .method .source pre .ruby-value, #content pre.ruby .ruby-value, #methods .method .description pre.ruby .ruby-value {
     color: #7fffd4;
     background: transparent; }

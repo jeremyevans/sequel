@@ -64,7 +64,7 @@
             <p>Model classes also now support virtual attributes, letting you assign
             values to any attribute (virtual or persistent) at initialization time:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">attr_accessor</span> :<span class="ruby-identifier">password</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">u</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;blah&#39;</span>, <span class="ruby-operator">...</span>)&#x000A;<span class="ruby-identifier">u</span>.<span class="ruby-identifier">password</span> <span class="ruby-comment">#=&gt; &#39;blah&#39;</span></pre>
+            <pre>class User &lt; Sequel::Model&#x000A;  attr_accessor :password&#x000A;end&#x000A;u = User.new(:password =&gt; &#39;blah&#39;, ...)&#x000A;u.password #=&gt; &#39;blah&#39;</pre>
             
             <p>Also, virtual attributes can be validated just like persistent attributes.</p>
             

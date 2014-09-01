@@ -51,7 +51,7 @@
             time (1 hour by default).  You can choose to validate connections on every
             checkout via:</p>
             
-            <pre>DB.pool.connection_validation_timeout = -1</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_validation_timeout</span> = <span class="ruby-value">-1</span></pre>
             
             <p>However, this can cause a substantial performance hit unless you are
             purposely using coarse connection checkouts via manual calls to

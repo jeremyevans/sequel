@@ -38,11 +38,10 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The pg_hstore extension adds support for the PostgreSQL hstore type to <a
-            href="../../../../classes/Sequel.html">Sequel</a>.  hstore is an extension
-            that ships with PostgreSQL, and the hstore type stores an arbitrary
-            key-value table, where the keys are strings and the values are strings or
-            NULL.</p>
+            <p>The pg_hstore extension adds support for the PostgreSQL hstore type to
+            Sequel.  hstore is an extension that ships with PostgreSQL, and the hstore
+            type stores an arbitrary key-value table, where the keys are strings and
+            the values are strings or NULL.</p>
             
             <p>This extension integrates with Sequel&#39;s native postgres and
             jdbc/postgresql adapters, so that when hstore fields are retrieved, they
@@ -50,19 +49,18 @@
             is a DelegateClass of <a href="../../../../classes/Hash.html">Hash</a>, so
             it mostly acts like a hash, but not completely (is_a?(Hash) is false).  If
             you want the actual hash, you can call Hstore#to_hash.  This is done so
-            that <a href="../../../../classes/Sequel.html">Sequel</a> does not treat a
-            HStore like a <a href="../../../../classes/Hash.html">Hash</a> by default,
-            which would cause issues.</p>
+            that Sequel does not treat a HStore like a <a
+            href="../../../../classes/Hash.html">Hash</a> by default, which would cause
+            issues.</p>
             
             <p>In addition to the parsers, this extension comes with literalizers for
-            HStore using the standard <a
-            href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
-            so they work with on all adapters.</p>
+            HStore using the standard Sequel literalization callbacks, so they work
+            with on all adapters.</p>
             
             <p>To turn an existing <a href="../../../../classes/Hash.html">Hash</a> into
             an HStore, use Sequel.hstore:</p>
             
-            <pre>Sequel.hstore(hash)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(<span class="ruby-identifier">hash</span>)</pre>
             
             <p>If you have loaded the <a
             href="../../../doc/core_extensions_rdoc.html">core_extensions
@@ -70,7 +68,7 @@
             activated refinements for the file, you can also use <a
             href="../../../../classes/Hash.html#method-i-hstore">Hash#hstore</a>:</p>
             
-            <pre>hash.hstore</pre>
+            <pre class="ruby"><span class="ruby-identifier">hash</span>.<span class="ruby-identifier">hstore</span></pre>
             
             <p>Since the hstore type only supports strings, non string keys and values are
             converted to strings</p>
@@ -133,7 +131,7 @@
             want to modify the schema parsing/typecasting so that it recognizes and
             correctly handles the hstore columns, which you can do by:</p>
             
-            <pre>DB.extension :pg_hstore</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_hstore</span></pre>
             
             <p>See the schema modification guide for details on using hstore columns in
             CREATE/ALTER TABLE statements.</p>

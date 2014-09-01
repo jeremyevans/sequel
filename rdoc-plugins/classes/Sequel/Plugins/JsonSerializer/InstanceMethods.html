@@ -82,18 +82,16 @@
                   hash. By default, just calls set with the hash values.</p>
                   
                   <p>Options:</p>
-                  <dl class="rdoc-list note-list"><dt>:associations 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:associations </td><td>
                   <p>Indicates that the associations cache should be updated by creating a new
                   associated object using data from the hash.  Should be a <a
                   href="../../../Symbol.html">Symbol</a> for a single association, an array
                   of symbols for multiple associations, or a hash with symbol keys and
                   dependent association option hash values.</p>
-                  </dd><dt>:fields 
-                  <dd>
+                  </td></tr><tr><td class='label'>:fields </td><td>
                   <p>Changes the behavior to call set_fields using the provided fields, instead
                   of calling set.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_json_node-source'); return false">
@@ -111,13 +109,11 @@
                 <div class='description'>
                   
                   <p>Return a string in JSON format.  Accepts the following options:</p>
-                  <dl class="rdoc-list note-list"><dt>:except 
-                  <dd>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:except </td><td>
                   <p><a href="../../../Symbol.html">Symbol</a> or <a
                   href="../../../Array.html">Array</a> of Symbols of columns not to include
                   in the JSON output.</p>
-                  </dd><dt>:include 
-                  <dd>
+                  </td></tr><tr><td class='label'>:include </td><td>
                   <p><a href="../../../Symbol.html">Symbol</a>, <a
                   href="../../../Array.html">Array</a> of Symbols, or a <a
                   href="../../../Hash.html">Hash</a> with <a
@@ -126,15 +122,13 @@
                   non-column attributes to include in the JSON output.  Using a nested hash,
                   you can pass options to associations to affect the JSON used for associated
                   objects.</p>
-                  </dd><dt>:only 
-                  <dd>
+                  </td></tr><tr><td class='label'>:only </td><td>
                   <p><a href="../../../Symbol.html">Symbol</a> or <a
                   href="../../../Array.html">Array</a> of Symbols of columns to only include
                   in the JSON output, ignoring all other columns.</p>
-                  </dd><dt>:root 
-                  <dd>
+                  </td></tr><tr><td class='label'>:root </td><td>
                   <p>Qualify the JSON with the name of the object.</p>
-                  </dd></dl>
+                  </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_json-source'); return false">

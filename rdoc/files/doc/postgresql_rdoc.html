@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-03-05 09:51:37 -0800</span>
+          <span class='datetime'>2014-08-11 08:23:34 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -82,33 +82,26 @@
             load these extensions via <code>Database#extension</code>.  For example, to
             load support for arrays, you would do:</p>
             
-            <pre>DB.extension :pg_array</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span></pre>
             
             <p>The following PostgreSQL-specific type extensions are available:</p>
-            <dl class="rdoc-list note-list"><dt>pg_array 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>pg_array </td><td>
             <p>arrays (single and multidimensional, for any scalar type), as a ruby
             Array-like object</p>
-            </dd><dt>pg_hstore 
-            <dd>
+            </td></tr><tr><td class='label'>pg_hstore </td><td>
             <p>hstore, as a ruby Hash-like object</p>
-            </dd><dt>pg_inet 
-            <dd>
+            </td></tr><tr><td class='label'>pg_inet </td><td>
             <p>inet/cidr, as ruby IPAddr objects</p>
-            </dd><dt>pg_interval 
-            <dd>
+            </td></tr><tr><td class='label'>pg_interval </td><td>
             <p>interval, as ActiveSupport::Duration objects</p>
-            </dd><dt>pg_json 
-            <dd>
+            </td></tr><tr><td class='label'>pg_json </td><td>
             <p>json, as either ruby Array-like or Hash-like objects</p>
-            </dd><dt>pg_range 
-            <dd>
+            </td></tr><tr><td class='label'>pg_range </td><td>
             <p>ranges (for any scalar type), as a ruby Range-like object</p>
-            </dd><dt>pg_row 
-            <dd>
+            </td></tr><tr><td class='label'>pg_row </td><td>
             <p>row-valued/composite types, as a ruby Hash-like or <a
             href="../../classes/Sequel/Model.html">Sequel::Model</a> object</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>In general, these extensions just add support for Database objects to
             return retrieved column values as the appropriate type (<code>postgres and&#x000A;jdbc/postgres only</code>), and support for literalizing the objects
@@ -117,22 +110,17 @@
             
             <p>There are also type-specific extensions that make it easy to use database
             functions and operators related to the type.  These extensions are:</p>
-            <dl class="rdoc-list note-list"><dt>pg_array_ops 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>pg_array_ops </td><td>
             <p>array-related functions and operators</p>
-            </dd><dt>pg_hstore_ops 
-            <dd>
+            </td></tr><tr><td class='label'>pg_hstore_ops </td><td>
             <p>hstore-related functions and operators</p>
-            </dd><dt>pg_json_ops 
-            <dd>
+            </td></tr><tr><td class='label'>pg_json_ops </td><td>
             <p>json-related functions and operators</p>
-            </dd><dt>pg_range_ops 
-            <dd>
+            </td></tr><tr><td class='label'>pg_range_ops </td><td>
             <p>range-related functions and operators</p>
-            </dd><dt>pg_row_ops 
-            <dd>
+            </td></tr><tr><td class='label'>pg_row_ops </td><td>
             <p>row-valued/composite type syntax support</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h2 id="label-PostgreSQL-specific+DDL+Support">PostgreSQL-specific DDL Support<span><a href="#label-PostgreSQL-specific+DDL+Support">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -160,7 +148,7 @@
             not for existing rows. After all existing rows have been fixed, you can
             validate the constraint:</p>
             
-            <pre>DB.alter_table(:table) do&#x000A;  validate_constraint(:table_fk)&#x000A;  validate_constraint(:col_123)&#x000A;end&#x000A;# ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;table_fk&quot;&#x000A;# ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;col_123&quot;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">validate_constraint</span>(:<span class="ruby-identifier">table_fk</span>)&#x000A;  <span class="ruby-identifier">validate_constraint</span>(:<span class="ruby-identifier">col_123</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;table_fk&quot;</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;table&quot; VALIDATE CONSTRAINT &quot;col_123&quot;</span></pre>
             
             <h3 id="label-Creating+Indexes+Concurrently">Creating Indexes Concurrently<span><a href="#label-Creating+Indexes+Concurrently">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -197,7 +185,7 @@
             creating and dropping PostgreSQL schemas, procedural languages, functions,
             and triggers:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_schema</span>(:<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-comment"># CREATE SCHEMA &quot;s&quot;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_schema</span>(:<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-comment"># DROP SCHEMA &quot;s&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_language</span>(:<span class="ruby-identifier">plperl</span>)&#x000A;<span class="ruby-comment"># CREATE LANGUAGE plperl</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_language</span>(:<span class="ruby-identifier">plperl</span>)&#x000A;<span class="ruby-comment"># DROP LANGUAGE plperl</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_function</span>(:<span class="ruby-identifier">set_updated_at</span>, <span class="ruby-string">&quot;  BEGIN&#x000A;    NEW.updated_at := CURRENT_TIMESTAMP;&#x000A;    RETURN NEW;&#x000A;  END;&#x000A;&quot;</span>, :<span class="ruby-identifier">language=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">plpgsql</span>, :<span class="ruby-identifier">returns=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">trigger</span>)&#x000A;<span class="ruby-comment"># CREATE FUNCTION set_updated_at() RETURNS trigger LANGUAGE plpgsql AS &#39;</span>&#x000A;<span class="ruby-comment">#  BEGIN</span>&#x000A;<span class="ruby-comment">#    NEW.updated_at := CURRENT_TIMESTAMP;</span>&#x000A;<span class="ruby-comment">#    RETURN NEW;</span>&#x000A;<span class="ruby-comment">#  END;&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_function</span>(:<span class="ruby-identifier">set_updated_at</span>)&#x000A;<span class="ruby-comment"># DROP FUNCTION set_updated_at()</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_trigger</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">trg_updated_at</span>, :<span class="ruby-identifier">set_updated_at</span>, :<span class="ruby-identifier">events=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">insert</span>, :<span class="ruby-identifier">update</span>], :<span class="ruby-identifier">each_row=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-comment"># CREATE TRIGGER trg_updated_at BEFORE INSERT OR UPDATE ON &quot;table&quot; FOR EACH ROW EXECUTE PROCEDURE set_updated_at()</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_trigger</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">trg_updated_at</span>)&#x000A;<span class="ruby-comment"># DROP TRIGGER trg_updated_at ON &quot;table&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_schema</span>(:<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-comment"># CREATE SCHEMA &quot;s&quot;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_schema</span>(:<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-comment"># DROP SCHEMA &quot;s&quot;</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_language</span>(:<span class="ruby-identifier">plperl</span>)&#x000A;<span class="ruby-comment"># CREATE LANGUAGE plperl</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_language</span>(:<span class="ruby-identifier">plperl</span>)&#x000A;<span class="ruby-comment"># DROP LANGUAGE plperl</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_function</span>(:<span class="ruby-identifier">set_updated_at</span>, <span class="ruby-string">&quot;  BEGIN&#x000A;    NEW.updated_at := CURRENT_TIMESTAMP;&#x000A;    RETURN NEW;&#x000A;  END;&#x000A;&quot;</span>, :<span class="ruby-identifier">language=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">plpgsql</span>, :<span class="ruby-identifier">returns=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">trigger</span>)&#x000A;<span class="ruby-comment"># CREATE FUNCTION set_updated_at() RETURNS trigger LANGUAGE plpgsql AS &#39;</span>&#x000A;<span class="ruby-comment">#  BEGIN</span>&#x000A;<span class="ruby-comment">#    NEW.updated_at := CURRENT_TIMESTAMP;</span>&#x000A;<span class="ruby-comment">#    RETURN NEW;</span>&#x000A;<span class="ruby-comment">#  END;&#39;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_function</span>(:<span class="ruby-identifier">set_updated_at</span>)&#x000A;<span class="ruby-comment"># DROP FUNCTION set_updated_at()</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_trigger</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">trg_updated_at</span>, :<span class="ruby-identifier">set_updated_at</span>, :<span class="ruby-identifier">events=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">update</span>, :<span class="ruby-identifier">each_row=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-keyword">when</span> =<span class="ruby-operator">&gt;</span> {:<span class="ruby-identifier">new__updated_at</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">old__updated_at</span>})&#x000A;<span class="ruby-comment"># CREATE TRIGGER trg_updated_at BEFORE UPDATE ON &quot;table&quot; FOR EACH ROW WHEN (&quot;new&quot;.&quot;updated_at&quot; = &quot;old&quot;.&quot;updated_at&quot;) EXECUTE PROCEDURE set_updated_at()</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_trigger</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">trg_updated_at</span>)&#x000A;<span class="ruby-comment"># DROP TRIGGER trg_updated_at ON &quot;table&quot;</span></pre>
             
             <h2 id="label-PostgreSQL-specific+DML+Support">PostgreSQL-specific DML Support<span><a href="#label-PostgreSQL-specific+DML+Support">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -219,7 +207,7 @@
             <code>Dataset#distinct</code>, which will make the dataset return rows that
             are distinct on just those columns:</p>
             
-            <pre>DB[:table].distinct(:id).all&#x000A;# SELECT DISTINCT ON (&quot;id&quot;) * FROM &quot;table&quot;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">distinct</span>(:<span class="ruby-identifier">id</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT DISTINCT ON (&quot;id&quot;) * FROM &quot;table&quot;</span></pre>
             
             <h3 id="label-Using+a+Cursor+to+Process+Large+Datasets+postgres+only">Using a Cursor to Process Large Datasets <code>postgres only</code><span><a href="#label-Using+a+Cursor+to+Process+Large+Datasets+postgres+only">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -265,19 +253,19 @@
             <p>You can execute anonymous functions using a database procedural language
             via <code>Database#do</code> (the plpgsql language is the default):</p>
             
-            <pre>DB.do &lt;&lt;-SQL&#x000A;  DECLARE r record;&#x000A;  BEGIN&#x000A;   FOR r IN SELECT table_schema, table_name FROM information_schema.tables&#x000A;     WHERE table_type = &#39;VIEW&#39; AND table_schema = &#39;public&#39;&#x000A;   LOOP&#x000A;     EXECUTE &#39;GRANT ALL ON &#39; || quote_ident(r.table_schema) || &#39;.&#39; || quote_ident(r.table_name) || &#39; TO webuser&#39;;&#x000A;   END LOOP;&#x000A;  END;&#x000A;SQL</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">do</span> <span class="ruby-value">&lt;&lt;-SQL&#x000A;  DECLARE r record;&#x000A;  BEGIN&#x000A;   FOR r IN SELECT table_schema, table_name FROM information_schema.tables&#x000A;     WHERE table_type = &#39;VIEW&#39; AND table_schema = &#39;public&#39;&#x000A;   LOOP&#x000A;     EXECUTE &#39;GRANT ALL ON &#39; || quote_ident(r.table_schema) || &#39;.&#39; || quote_ident(r.table_name) || &#39; TO webuser&#39;;&#x000A;   END LOOP;&#x000A;  END;&#x000A;SQL</span></pre>
             
             <h3 id="label-Listening+On+and+Notifying+Channels">Listening On and Notifying Channels<span><a href="#label-Listening+On+and+Notifying+Channels">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>You can use <code>Database#notify</code> to send notification to channels:</p>
             
-            <pre>DB.notify(:channel)&#x000A;# NOTIFY &quot;channel&quot;</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">notify</span>(:<span class="ruby-identifier">channel</span>)&#x000A;<span class="ruby-comment"># NOTIFY &quot;channel&quot;</span></pre>
             
             <p><code>postgres/pg only</code> You can listen on channels via
             <code>Database#listen</code>.  Note that this blocks until the listening
             thread is notified:</p>
             
-            <pre>DB.listen(:channel)&#x000A;# LISTEN &quot;channel&quot;&#x000A;# after notification received:&#x000A;# UNLISTEN *</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">listen</span>(:<span class="ruby-identifier">channel</span>)&#x000A;<span class="ruby-comment"># LISTEN &quot;channel&quot;</span>&#x000A;<span class="ruby-comment"># after notification received:</span>&#x000A;<span class="ruby-comment"># UNLISTEN *</span></pre>
             
             <p>Note that <code>listen</code> by default only listens for a single
             notification.  If you want to loop and process notifications:</p>
@@ -317,7 +305,7 @@
             
             <p>You can enable the streaming support:</p>
             
-            <pre>DB.extension(:pg_streaming)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">pg_streaming</span>)</pre>
             
             <p>Then you can stream individual datasets:</p>
             
@@ -325,7 +313,7 @@
             
             <p>Or stream all datasets by default:</p>
             
-            <pre>DB.stream_all_queries = true</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">stream_all_queries</span> = <span class="ruby-keyword">true</span></pre>
             
             <p>When streaming is enabled, <code>Dataset#paged_each</code> will use
             streaming to implement paging.</p>

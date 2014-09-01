@@ -54,13 +54,13 @@
             the composition (e.g. :date -&gt; Date). When the <code>date</code> method
             is called, it will return a Date object by calling:</p>
             
-            <pre>Date.new(year, month, day)</pre>
+            <pre class="ruby"><span class="ruby-constant">Date</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">year</span>, <span class="ruby-identifier">month</span>, <span class="ruby-identifier">day</span>)</pre>
             
             <p>When saving the object, if the date composition has been used (by calling
             either the getter or setter method), it will populate the related columns
             of the object before saving:</p>
             
-            <pre>self.year = date.year&#x000A;self.month = date.month&#x000A;self.day = date.day</pre>
+            <pre class="ruby"><span class="ruby-keyword">self</span>.<span class="ruby-identifier">year</span> = <span class="ruby-identifier">date</span>.<span class="ruby-identifier">year</span>&#x000A;<span class="ruby-keyword">self</span>.<span class="ruby-identifier">month</span> = <span class="ruby-identifier">date</span>.<span class="ruby-identifier">month</span>&#x000A;<span class="ruby-keyword">self</span>.<span class="ruby-identifier">day</span> = <span class="ruby-identifier">date</span>.<span class="ruby-identifier">day</span></pre>
             
             <p>The :mapping option is just a shortcut that works in particular cases.  To
             handle any case, you can define a custom :composer and :decomposer procs. 

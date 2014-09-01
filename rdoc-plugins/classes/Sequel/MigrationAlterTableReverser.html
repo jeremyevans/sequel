@@ -41,60 +41,10 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Handles reversing an alter_table block in a reversible migration.</p>
-          </div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Class</h3>
-            <ol>
-              <li><a target="docwin" href="#method-c-new">new</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a target="docwin" href="#method-i-reverse">reverse</a></li>
-            </ol>
-          </div>
+          <div id='description'></div>
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='methods'>
-              <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-new'>
-                <a name='method-c-new'></a>
-                <div class='synopsis'>
-                  <span class='name'>new</span>
-                  <span class='arguments'>()</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 224</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>&#x000A;  <span class="ruby-ivar">@actions</span> = []&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-reverse'>
-                <a name='method-i-reverse'></a>
-                <div class='synopsis'>
-                  <span class='name'>reverse</span>
-                  <span class='arguments'>(&block)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-reverse-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-reverse-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 228</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">actions</span> = <span class="ruby-ivar">@actions</span>.<span class="ruby-identifier">reverse</span>&#x000A;  <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">actions</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>

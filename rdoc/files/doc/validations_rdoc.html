@@ -182,15 +182,13 @@
             <p>Other than <code>validates_unique</code>, which has it&#39;s own API, the
             methods defined by <code>validation_helpers</code> have one of the
             following two APIs:</p>
-            <dl class="rdoc-list note-list"><dt><code>(atts, opts={})</code>
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>(atts, opts={})</code></td><td>
             <p>For methods such as <code>validates_presence</code>, which do not take an
             additional argument.</p>
-            </dd><dt><code>(arg, atts, opts={})</code>
-            <dd>
+            </td></tr><tr><td class='label'><code>(arg, atts, opts={})</code></td><td>
             <p>For methods such as <code>validates_format</code>, which take an additional
             argument.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>For both of these APIs, <code>atts</code> is either a column symbol or
             array of column symbols, and <code>opts</code> is an optional options hash.</p>
@@ -317,7 +315,7 @@
             depending on whether you call the object with an array or with separate
             arguments.  For example:</p>
             
-            <pre>validates_unique(:name, :artist_id)</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_unique</span>(:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">artist_id</span>)</pre>
             
             <p>Will set up a 2 separate uniqueness validations.  It will make it so that
             no two albums can have the same name, and that each artist can only be
@@ -325,7 +323,7 @@
             want.  You probably want it so that two albums can have the same name,
             unless they are by the same artist.  To do that, you need to use an array:</p>
             
-            <pre>validates_unique([:name, :artist_id])</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_unique</span>([:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">artist_id</span>])</pre>
             
             <p>That sets up a single uniqueness validation for the combination of the
             fields.</p>
@@ -333,7 +331,7 @@
             <p>You can mix and match the two approaches.  For example, if all albums
             should have a unique UPC, and no artist can have duplicate album names:</p>
             
-            <pre>validates_unique(:upc, [:name, :artist_id])</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_unique</span>(:<span class="ruby-identifier">upc</span>, [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">artist_id</span>])</pre>
             
             <p><code>validates_unique</code> also accepts a block to scope the uniqueness
             constraint.  For example, if you want to ensure that all active albums have
@@ -348,26 +346,22 @@
             <p>You can also include an options hash as the last argument.  Unlike the
             other validations, the options hash for <code>validates_unique</code> only
             recognizes for these options:</p>
-            <dl class="rdoc-list note-list"><dt>:dataset 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:dataset </td><td>
             <p>The base dataset to use for the unique query, defaults to the model&#39;s
             dataset</p>
-            </dd><dt>:message 
-            <dd>
+            </td></tr><tr><td class='label'>:message </td><td>
             <p>The message to use</p>
-            </dd><dt>:only_if_modified 
-            <dd>
+            </td></tr><tr><td class='label'>:only_if_modified </td><td>
             <p>Only check the uniqueness if the object is new or one of the columns has
             been modified.</p>
-            </dd><dt>:where 
-            <dd>
+            </td></tr><tr><td class='label'>:where </td><td>
             <p>A callable object where call takes three arguments, a dataset, the current
             object, and an array of columns, and should return a modified dataset that
             is filtered to include only rows with the same values as the current object
             for each column in the array. This is useful any time the unique
             constraints are derived from the columns and not the columns themselves
             (such as unique constraints on lower(column)).</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p><code>validates_unique</code> is the only method in
             <code>validation_helpers</code> that checks with the database.  Attempting
@@ -454,27 +448,27 @@
             standard conditionals.  For example, if you only want to validate an
             attribute when creating an object:</p>
             
-            <pre>validates_presence :name if new?</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_presence</span> :<span class="ruby-identifier">name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">new?</span></pre>
             
             <p>If you only want to validate the attribute when updating an existing
             object:</p>
             
-            <pre>validates_integer :copies_sold unless new?</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_integer</span> :<span class="ruby-identifier">copies_sold</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">new?</span></pre>
             
             <p>Let&#39;s say you only to make a validation conditional on the status of
             the object:</p>
             
-            <pre>validates_presence :name if status_id &gt; 1&#x000A;validates_integer :copies_sold if status_id &gt; 3</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_presence</span> :<span class="ruby-identifier">name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-identifier">validates_integer</span> :<span class="ruby-identifier">copies_sold</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span></pre>
             
             <p>You can use all the standard ruby conditional expressions, such as
             <code>case</code>:</p>
             
-            <pre>case status_id&#x000A;when 1&#x000A;  validates_presence :name&#x000A;when 2&#x000A;  validates_presence [:name, :artist_id]&#x000A;when 3&#x000A;  validates_presence [:name, :artist_id, :copies_sold]&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-keyword">case</span> <span class="ruby-identifier">status_id</span>&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> :<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">2</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">artist_id</span>]&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">3</span>&#x000A;  <span class="ruby-identifier">validates_presence</span> [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">copies_sold</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>You can make the input to some validations dependent on the values of
             another attribute:</p>
             
-            <pre>validates_min_length(status_id &gt; 2 ? 5 : 10, [:name])&#x000A;validates_presence(status_id &lt; 2 ? :name : [:name, :artist_id])</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_min_length</span>(<span class="ruby-identifier">status_id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">?</span> <span class="ruby-value">5</span> <span class="ruby-operator">:</span> <span class="ruby-value">10</span>, [:<span class="ruby-identifier">name</span>])&#x000A;<span class="ruby-identifier">validates_presence</span>(<span class="ruby-identifier">status_id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">2</span> <span class="ruby-operator">?</span> :<span class="ruby-identifier">name</span> <span class="ruby-operator">:</span> [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">artist_id</span>])</pre>
             
             <p>Basically, there&#39;s no special syntax you have to use for conditional
             validations.  Just handle conditionals the way you would in other ruby
@@ -484,46 +478,33 @@
             
             <p>These are the default error messages for all of the helper methods in
             <code>validation_helpers</code>:</p>
-            <dl class="rdoc-list note-list"><dt>:exact_length 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:exact_length </td><td>
             <p>is not #{arg} characters</p>
-            </dd><dt>:format 
-            <dd>
+            </td></tr><tr><td class='label'>:format </td><td>
             <p>is invalid</p>
-            </dd><dt>:includes 
-            <dd>
+            </td></tr><tr><td class='label'>:includes </td><td>
             <p>is not in range or set: #{arg.inspect}</p>
-            </dd><dt>:integer 
-            <dd>
+            </td></tr><tr><td class='label'>:integer </td><td>
             <p>is not a number</p>
-            </dd><dt>:length_range 
-            <dd>
+            </td></tr><tr><td class='label'>:length_range </td><td>
             <p>is too short or too long</p>
-            </dd><dt>:max_length 
-            <dd>
+            </td></tr><tr><td class='label'>:max_length </td><td>
             <p>is longer than #{arg} characters</p>
-            </dd><dt>:min_length 
-            <dd>
+            </td></tr><tr><td class='label'>:min_length </td><td>
             <p>is shorter than #{arg} characters</p>
-            </dd><dt>:not_null 
-            <dd>
+            </td></tr><tr><td class='label'>:not_null </td><td>
             <p>is not present</p>
-            </dd><dt>:numeric 
-            <dd>
+            </td></tr><tr><td class='label'>:numeric </td><td>
             <p>is not a number</p>
-            </dd><dt>:schema_types 
-            <dd>
+            </td></tr><tr><td class='label'>:schema_types </td><td>
             <p>is not a valid #{schema_type}</p>
-            </dd><dt>:type 
-            <dd>
+            </td></tr><tr><td class='label'>:type </td><td>
             <p>is not a #{arg}</p>
-            </dd><dt>:presence 
-            <dd>
+            </td></tr><tr><td class='label'>:presence </td><td>
             <p>is not present</p>
-            </dd><dt>:unique 
-            <dd>
+            </td></tr><tr><td class='label'>:unique </td><td>
             <p>is already taken</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <h2 id="label-Modifying+the+Default+Options">Modifying the Default Options<span><a href="#label-Modifying+the+Default+Options">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -599,7 +580,7 @@
             column.  It takes the column symbol as the first argument and the error
             message as the second argument:</p>
             
-            <pre>errors.add(:name, &#39;is not valid&#39;)</pre>
+            <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;is not valid&#39;</span>)</pre>
             
             <h3 id="label-on"><code>on</code><span><a href="#label-on">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -608,13 +589,13 @@
             takes the column value, and returns an array of error messages if there
             were any, or nil if not:</p>
             
-            <pre>errors.on(:name)</pre>
+            <pre class="ruby"><span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(:<span class="ruby-identifier">name</span>)</pre>
             
             <p>If you want to make some validations dependent upon the results of other
             validations, you may want to use <code>on</code> inside your validates
             method:</p>
             
-            <pre>validates_integer(:release_date) if errors.on(:record_date)</pre>
+            <pre class="ruby"><span class="ruby-identifier">validates_integer</span>(:<span class="ruby-identifier">release_date</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">on</span>(:<span class="ruby-identifier">record_date</span>)</pre>
             
             <p>Here, you don&#39;t care about validating the release date if there were
             validation errors for the record date.</p>

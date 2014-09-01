@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-16 16:27:33 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -43,21 +43,20 @@
             
             <p>To load the extension:</p>
             
-            <pre>Sequel.extension :pg_array_ops</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array_ops</span></pre>
             
             <p>The most common usage is passing an expression to Sequel.pg_array_op:</p>
             
-            <pre>ia = Sequel.pg_array_op(:int_array_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ia</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array_op</span>(:<span class="ruby-identifier">int_array_column</span>)</pre>
             
             <p>If you have also loaded the pg_array extension, you can use Sequel.pg_array
             as well:</p>
             
-            <pre>ia = Sequel.pg_array(:int_array_column)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ia</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(:<span class="ruby-identifier">int_array_column</span>)</pre>
             
-            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
-            expression objects, you can call the pg_array method:</p>
+            <p>Also, on most Sequel expression objects, you can call the pg_array method:</p>
             
-            <pre>ia = Sequel.expr(:int_array_column).pg_array</pre>
+            <pre class="ruby"><span class="ruby-identifier">ia</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">int_array_column</span>).<span class="ruby-identifier">pg_array</span></pre>
             
             <p>If you have loaded the <a
             href="../../../doc/core_extensions_rdoc.html">core_extensions
@@ -65,13 +64,13 @@
             activated refinements for the file, you can also use <a
             href="../../../../classes/Sequel/Postgres/ArrayOpMethods.html#method-i-pg_array">Sequel::Postgres::ArrayOpMethods#pg_array</a>:</p>
             
-            <pre>ia = :int_array_column.pg_array</pre>
+            <pre class="ruby"><span class="ruby-identifier">ia</span> = :<span class="ruby-identifier">int_array_column</span>.<span class="ruby-identifier">pg_array</span></pre>
             
             <p>This creates a <a
             href="../../../../classes/Sequel/Postgres/ArrayOp.html">Sequel::Postgres::ArrayOp</a>
             object that can be used for easier querying:</p>
             
-            <pre>ia[1]     # int_array_column[1]&#x000A;ia[1][2]  # int_array_column[1][2]&#x000A;ia.contains(:other_int_array_column)     # @&gt; &#x000A;ia.contained_by(:other_int_array_column) # &lt;@&#x000A;ia.overlaps(:other_int_array_column)     # &amp;&amp;&#x000A;ia.concat(:other_int_array_column)       # ||&#x000A;&#x000A;ia.push(1)         # int_array_column || 1&#x000A;ia.unshift(1)      # 1 || int_array_column&#x000A;&#x000A;ia.any             # ANY(int_array_column)&#x000A;ia.all             # ALL(int_array_column)&#x000A;ia.cardinality     # cardinality(int_array_column)&#x000A;ia.dims            # array_dims(int_array_column)&#x000A;ia.hstore          # hstore(int_array_column)&#x000A;ia.hstore(:a)      # hstore(int_array_column, a)&#x000A;ia.length          # array_length(int_array_column, 1)&#x000A;ia.length(2)       # array_length(int_array_column, 2)&#x000A;ia.lower           # array_lower(int_array_column, 1)&#x000A;ia.lower(2)        # array_lower(int_array_column, 2)&#x000A;ia.join            # array_to_string(int_array_column, &#39;&#39;, NULL)&#x000A;ia.join(&#39;:&#39;)       # array_to_string(int_array_column, &#39;:&#39;, NULL)&#x000A;ia.join(&#39;:&#39;, &#39; &#39;)  # array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)&#x000A;ia.unnest          # unnest(int_array_column)&#x000A;ia.unnest(:b)      # unnest(int_array_column, b)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ia</span>[<span class="ruby-value">1</span>]     <span class="ruby-comment"># int_array_column[1]</span>&#x000A;<span class="ruby-identifier">ia</span>[<span class="ruby-value">1</span>][<span class="ruby-value">2</span>]  <span class="ruby-comment"># int_array_column[1][2]</span>&#x000A;&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">other_int_array_column</span>)     <span class="ruby-comment"># @&gt; </span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">other_int_array_column</span>) <span class="ruby-comment"># &lt;@</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">overlaps</span>(:<span class="ruby-identifier">other_int_array_column</span>)     <span class="ruby-comment"># &amp;&amp;</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">concat</span>(:<span class="ruby-identifier">other_int_array_column</span>)       <span class="ruby-comment"># ||</span>&#x000A;&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">push</span>(<span class="ruby-value">1</span>)         <span class="ruby-comment"># int_array_column || 1</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-value">1</span>)      <span class="ruby-comment"># 1 || int_array_column</span>&#x000A;&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">any</span>             <span class="ruby-comment"># ANY(int_array_column)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">all</span>             <span class="ruby-comment"># ALL(int_array_column)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">cardinality</span>     <span class="ruby-comment"># cardinality(int_array_column)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">dims</span>            <span class="ruby-comment"># array_dims(int_array_column)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">hstore</span>          <span class="ruby-comment"># hstore(int_array_column)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">a</span>)      <span class="ruby-comment"># hstore(int_array_column, a)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">length</span>          <span class="ruby-comment"># array_length(int_array_column, 1)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">length</span>(<span class="ruby-value">2</span>)       <span class="ruby-comment"># array_length(int_array_column, 2)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">lower</span>           <span class="ruby-comment"># array_lower(int_array_column, 1)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">lower</span>(<span class="ruby-value">2</span>)        <span class="ruby-comment"># array_lower(int_array_column, 2)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">join</span>            <span class="ruby-comment"># array_to_string(int_array_column, &#39;&#39;, NULL)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;:&#39;</span>)       <span class="ruby-comment"># array_to_string(int_array_column, &#39;:&#39;, NULL)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&#39;:&#39;</span>, <span class="ruby-string">&#39; &#39;</span>)  <span class="ruby-comment"># array_to_string(int_array_column, &#39;:&#39;, &#39; &#39;)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">unnest</span>          <span class="ruby-comment"># unnest(int_array_column)</span>&#x000A;<span class="ruby-identifier">ia</span>.<span class="ruby-identifier">unnest</span>(:<span class="ruby-identifier">b</span>)      <span class="ruby-comment"># unnest(int_array_column, b)</span></pre>
             
             <p>See the PostgreSQL array function and operator documentation for more
             details on what these functions and operators do.</p>

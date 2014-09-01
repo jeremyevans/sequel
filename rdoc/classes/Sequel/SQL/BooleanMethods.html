@@ -44,13 +44,13 @@
             in <a href="../SQL.html">SQL</a> (<code>Symbol</code>,
             <code>LiteralString</code>, and <code>SQL::GenericExpression</code>).</p>
             
-            <pre>:a &amp; :b # &quot;a&quot; AND &quot;b&quot;&#x000A;:a | :b # &quot;a&quot; OR &quot;b&quot;&#x000A;~:a # NOT &quot;a&quot;</pre>
+            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; AND &quot;b&quot;</span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># &quot;a&quot; OR &quot;b&quot;</span>&#x000A;<span class="ruby-operator">~</span>:<span class="ruby-identifier">a</span> <span class="ruby-comment"># NOT &quot;a&quot;</span></pre>
             
             <p>One exception to this is when a <a
             href="NumericExpression.html">NumericExpression</a> or Integer is the
             argument to &amp; or |, in which case a bitwise method will be used:</p>
             
-            <pre>:a &amp; 1 # &quot;a&quot; &amp; 1 &#x000A;:a | (:b + 1) # &quot;a&quot; | (&quot;b&quot; + 1)</pre>
+            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">&amp;</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;a&quot; &amp; 1 </span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">|</span> (:<span class="ruby-identifier">b</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;a&quot; | (&quot;b&quot; + 1)</span></pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -75,7 +75,7 @@
                   <p>Create a new <a href="BooleanExpression.html">BooleanExpression</a> with
                   NOT, representing the inversion of whatever self represents.</p>
                   
-                  <pre>~:a # NOT :a</pre>
+                  <pre class="ruby"><span class="ruby-operator">~</span>:<span class="ruby-identifier">a</span> <span class="ruby-comment"># NOT :a</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-7E-source'); return false">

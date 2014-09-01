@@ -57,8 +57,8 @@
             registers the :marshal, :yaml, and :json serialization formats.  To
             register your own serialization formats, use <a
             href="Serialization.html#method-c-register_format">::register_format</a>.
-            If you use yaml or json format, you need to require the libraries, <a
-            href="../../Sequel.html">Sequel</a> does not do the requiring for you.</p>
+            If you use yaml or json format, you need to require the libraries, Sequel
+            does not do the requiring for you.</p>
             
             <p>You can specify the columns to serialize when loading the plugin, or later
             using the serialize_attributes class method.</p>
@@ -76,7 +76,7 @@
             those changes won&#39;t be picked up by <code>Model#save_changes</code> or
             <code>Model#update</code>.  Example:</p>
             
-            <pre>user = User[1]&#x000A;user.permissions[:global] = &#39;foo&#39;&#x000A;user.save_changes # Will not pick up changes to permissions</pre>
+            <pre class="ruby"><span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">permissions</span>[:<span class="ruby-identifier">global</span>] = <span class="ruby-string">&#39;foo&#39;</span>&#x000A;<span class="ruby-identifier">user</span>.<span class="ruby-identifier">save_changes</span> <span class="ruby-comment"># Will not pick up changes to permissions</span></pre>
             
             <p>You can use the <code>serialization_modification_detection</code> plugin to
             pick up such changes.</p>

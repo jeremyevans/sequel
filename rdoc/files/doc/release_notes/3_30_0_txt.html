@@ -66,7 +66,7 @@
             in the sharding plugin), which allows you to set the shard on which to
             save/delete the model instance:</p>
             
-            <pre>foo1.set_server(:server_a).save&#x000A;foo2.set_server(:server_a).destroy</pre>
+            <pre class="ruby"><span class="ruby-identifier">foo1</span>.<span class="ruby-identifier">set_server</span>(:<span class="ruby-identifier">server_a</span>).<span class="ruby-identifier">save</span>&#x000A;<span class="ruby-identifier">foo2</span>.<span class="ruby-identifier">set_server</span>(:<span class="ruby-identifier">server_a</span>).<span class="ruby-identifier">destroy</span></pre>
             </li><li>
             <p>Model#save now accepts a :server option that uses set_server to set the
             shard to use.  Unlike most other save options, this option persists past

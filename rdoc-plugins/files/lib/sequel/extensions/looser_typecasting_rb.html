@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-05-04 17:31:16 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -40,23 +40,19 @@
             
             <p>The LooserTypecasting extension loosens the default database typecasting
             for the following types:</p>
-            <dl class="rdoc-list note-list"><dt>:float 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:float </td><td>
             <p>use to_f instead of Float()</p>
-            </dd><dt>:integer 
-            <dd>
+            </td></tr><tr><td class='label'>:integer </td><td>
             <p>use to_i instead of Integer()</p>
-            </dd><dt>:decimal 
-            <dd>
+            </td></tr><tr><td class='label'>:decimal </td><td>
             <p>don&#39;t check string conversion with Float()</p>
-            </dd><dt>:string 
-            <dd>
+            </td></tr><tr><td class='label'>:string </td><td>
             <p>silently allow hash and array conversion to string</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>To load the extension into the database:</p>
             
-            <pre>DB.extension :looser_typecasting</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">looser_typecasting</span></pre>
           </div>
           <div id='context'>
           </div>

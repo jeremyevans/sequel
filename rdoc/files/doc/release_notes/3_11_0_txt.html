@@ -48,7 +48,7 @@
             WARN  level.  By using different log levels, you can now only log queries
             that raise errors, or only log queries that take a long time.</p>
             
-            <pre># The default - Log all successful queries at INFO level&#x000A;DB.log_warn_duration = nil&#x000A;# Log all successful queries at WARN level&#x000A;DB.log_warn_duration = 0&#x000A;&#x000A;# Log successful queries that take the database more than half a&#x000A;# second at WARN level, other successful queries at INFO level&#x000A;DB.log_warn_duration = 0.5</pre>
+            <pre class="ruby"><span class="ruby-comment"># The default - Log all successful queries at INFO level</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_warn_duration</span> = <span class="ruby-keyword">nil</span>&#x000A;&#x000A;<span class="ruby-comment"># Log all successful queries at WARN level</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_warn_duration</span> = <span class="ruby-value">0</span>&#x000A;&#x000A;<span class="ruby-comment"># Log successful queries that take the database more than half a</span>&#x000A;<span class="ruby-comment"># second at WARN level, other successful queries at INFO level</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">log_warn_duration</span> = <span class="ruby-value">0.5</span></pre>
             
             <p>All adapters included with <a
             href="../../../classes/Sequel.html">Sequel</a> have been modified to
@@ -72,7 +72,7 @@
             href="../../../classes/Sequel/Model.html">Sequel::Model</a> settings, this
             can be set on a global, per class, and per instance level:</p>
             
-            <pre>Sequel::Model.require_modification = false # global&#x000A;Album.require_modification = true # class&#x000A;album.require_modification = false # instance</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># global</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">true</span> <span class="ruby-comment"># class</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">require_modification</span> = <span class="ruby-keyword">false</span> <span class="ruby-comment"># instance</span></pre>
             </li><li>
             <p>An instance_filters plugin was added to the list of built in plugins,
             allowing you to add arbitrary filters when updating or destroying an
@@ -139,7 +139,7 @@
             if you give Dataset#filter or related method an empty argument such as {},
             [], or &#39;&#39;. This allows code such as the following to work:</p>
             
-            <pre>h = {}&#x000A;h[:name] = name if name&#x000A;h[:number] = number if number&#x000A;ds = ds.filter(h)</pre>
+            <pre class="ruby"><span class="ruby-identifier">h</span> = {}&#x000A;<span class="ruby-identifier">h</span>[:<span class="ruby-identifier">name</span>] = <span class="ruby-identifier">name</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;<span class="ruby-identifier">h</span>[:<span class="ruby-identifier">number</span>] = <span class="ruby-identifier">number</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">number</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">h</span>)</pre>
             
             <p>Before, this would raise an error if both name and number were nil.</p>
             </li><li>

@@ -51,12 +51,12 @@
             
             <p>In addition, you can provide options to control the JSON output:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">except=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>])&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;=&quot;Album&quot;,&quot;name&quot;=&gt;&quot;RF&quot;}&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist</span>)&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;:&quot;Album&quot;,&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2,</span>&#x000A;       <span class="ruby-string">&quot;artist&quot;</span><span class="ruby-operator">:</span>{<span class="ruby-string">&quot;json_class&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;Artist&quot;</span>,<span class="ruby-string">&quot;id&quot;</span><span class="ruby-operator">:</span><span class="ruby-value">2</span>,<span class="ruby-string">&quot;name&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;YJM&quot;</span>}}<span class="ruby-string">&#39;&#x000A;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">except=</span><span class="ruby-operator">&gt;</span>[:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">artist_id</span>])&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;=&quot;Album&quot;,&quot;name&quot;=&gt;&quot;RF&quot;}&#39;</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist</span>)&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;:&quot;Album&quot;,&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2,</span>&#x000A;<span class="ruby-comment">#      &quot;artist&quot;:{&quot;json_class&quot;:&quot;Artist&quot;,&quot;id&quot;:2,&quot;name&quot;:&quot;YJM&quot;}}&#39;</span></pre>
             
             <p>You can use a hash value with <code>:include</code> to pass options to
             associations:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>}})&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;:&quot;Album&quot;,&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2,</span>&#x000A;       <span class="ruby-string">&quot;artist&quot;</span><span class="ruby-operator">:</span>{<span class="ruby-string">&quot;json_class&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;Artist&quot;</span>,<span class="ruby-string">&quot;name&quot;</span><span class="ruby-operator">:</span><span class="ruby-string">&quot;YJM&quot;</span>}}<span class="ruby-string">&#39;&#x000A;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>}})&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;json_class&quot;:&quot;Album&quot;,&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2,</span>&#x000A;<span class="ruby-comment">#      &quot;artist&quot;:{&quot;json_class&quot;:&quot;Artist&quot;,&quot;name&quot;:&quot;YJM&quot;}}&#39;</span></pre>
             
             <p>You can specify the <code>:root</code> option to nest the JSON under the
             name of the model:</p>
@@ -77,7 +77,7 @@
             href="../Model.html">Sequel::Model</a> classes to create instances directly
             from JSON using the from_json class method:</p>
             
-            <pre>json = album.to_json&#x000A;album = Album.from_json(json)</pre>
+            <pre class="ruby"><span class="ruby-identifier">json</span> = <span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">json</span>)</pre>
             
             <p>The array_from_json class method exists to parse arrays of model instances
             from json:</p>
@@ -95,7 +95,7 @@
             <p>If you want to update an existing instance, you can use the from_json
             instance method:</p>
             
-            <pre>album.from_json(json)</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">json</span>)</pre>
             
             <p>Both of these allow creation of cached associated objects, if you provide
             the :associations option:</p>

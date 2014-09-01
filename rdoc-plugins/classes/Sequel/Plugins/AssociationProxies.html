@@ -39,12 +39,12 @@
         <div id='text'>
           <div id='description'>
             
-            <p><a href="../../Sequel.html">Sequel</a> by default does not use proxies for
-            associations.  The association method for *_to_many associations returns an
-            array, and the association_dataset method returns a dataset.  This plugin
-            makes the association method return a proxy that will load the association
-            and call a method on the association array if sent an array method, and
-            otherwise send the method to the association&#39;s dataset.</p>
+            <p>Sequel by default does not use proxies for associations.  The association
+            method for *_to_many associations returns an array, and the
+            association_dataset method returns a dataset.  This plugin makes the
+            association method return a proxy that will load the association and call a
+            method on the association array if sent an array method, and otherwise send
+            the method to the association&#39;s dataset.</p>
             
             <p>You can override which methods to forward to the dataset by passing a block
             to the plugin:</p>
@@ -54,28 +54,21 @@
             <p>If the block returns false or nil, the method is sent to the array of
             associated objects.  Otherwise, the method is sent to the association
             dataset.  Here are the entries in the hash passed to the block:</p>
-            <dl class="rdoc-list note-list"><dt>:method 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:method </td><td>
             <p>The name of the method</p>
-            </dd><dt>:arguments 
-            <dd>
+            </td></tr><tr><td class='label'>:arguments </td><td>
             <p>The arguments to the method</p>
-            </dd><dt>:block 
-            <dd>
+            </td></tr><tr><td class='label'>:block </td><td>
             <p>The block given to the method</p>
-            </dd><dt>:instance 
-            <dd>
+            </td></tr><tr><td class='label'>:instance </td><td>
             <p>The model instance related to the call</p>
-            </dd><dt>:reflection 
-            <dd>
+            </td></tr><tr><td class='label'>:reflection </td><td>
             <p>The reflection for the association related to the call</p>
-            </dd><dt>:proxy_argument 
-            <dd>
+            </td></tr><tr><td class='label'>:proxy_argument </td><td>
             <p>The argument given to the association method call</p>
-            </dd><dt>:proxy_block 
-            <dd>
+            </td></tr><tr><td class='label'>:proxy_block </td><td>
             <p>The block given to the association method call</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>For example, in a call like:</p>
             
@@ -83,11 +76,11 @@
             
             <p>The opts passed to the block would be:</p>
             
-            <pre class="ruby">{&#x000A;  :<span class="ruby-identifier">method</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">foo</span>,&#x000A;  :<span class="ruby-identifier">arguments</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value">2</span>],&#x000A;  :<span class="ruby-identifier">block</span> =<span class="ruby-operator">&gt;</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-value">3</span>},&#x000A;  :<span class="ruby-identifier">instance</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">artist</span>,&#x000A;  :<span class="ruby-identifier">reflection</span> =<span class="ruby-operator">&gt;</span> {:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums</span>, <span class="ruby-operator">...</span>},&#x000A;  :<span class="ruby-identifier">proxy_argument</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>,&#x000A;  :<span class="ruby-identifier">proxy_block</span> =<span class="ruby-operator">&gt;</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>}&#x000A;}</pre>
+            <pre>{&#x000A;  :method =&gt; :foo,&#x000A;  :arguments =&gt; [2],&#x000A;  :block =&gt; {|x| 3},&#x000A;  :instance =&gt; artist,&#x000A;  :reflection =&gt; {:name=&gt;:albums} # AssociationReflection instance &#x000A;  :proxy_argument =&gt; 1,&#x000A;  :proxy_block =&gt; {|ds| ds}&#x000A;}</pre>
             
             <p>Usage:</p>
             
-            <pre># Use association proxies in all model subclasses (called before loading subclasses)&#x000A;Sequel::Model.plugin :association_proxies&#x000A;# Use association proxies in a specific model subclass&#x000A;Album.plugin :association_proxies</pre>
+            <pre class="ruby"><span class="ruby-comment"># Use association proxies in all model subclasses (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_proxies</span>&#x000A;&#x000A;<span class="ruby-comment"># Use association proxies in a specific model subclass</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_proxies</span></pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>

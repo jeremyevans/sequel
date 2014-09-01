@@ -59,7 +59,7 @@
             <p>Dataset#get can now take an array of multiple expressions to get an array
             of values, similar to map/select_map:</p>
             
-            <pre>value1, value2 = DB[:table].get([:column1, :column2])</pre>
+            <pre class="ruby"><span class="ruby-identifier">value1</span>, <span class="ruby-identifier">value2</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">get</span>([:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>])</pre>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> can now handle
             [host.]database.schema.table qualified tables on Microsoft SQL Server.  To
@@ -125,7 +125,7 @@
             and it wasn&#39;t designed for external use.  If you have code that uses
             meta_def, you should now load the extension manually:</p>
             
-            <pre>Sequel.extension :meta_def</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">meta_def</span></pre>
             </li><li>
             <p>The private _*_dataset_helper model association methods are no longer
             defined.  The AssociationReflection#dataset_helper_method public method is
@@ -137,11 +137,11 @@
             <p>Using a conditions specifier array with Dataset#get no longer works due to
             the new multiple values support in Database#get. So code such as:</p>
             
-            <pre>DB[:table].get([[:a, 1], [:b, 2]])</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">get</span>([[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, <span class="ruby-value">2</span>]])</pre>
             
             <p>should be changed to:</p>
             
-            <pre>DB[:table].get(Sequel.expr([[:a, 1], [:b, 2]]))</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>([[:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>], [:<span class="ruby-identifier">b</span>, <span class="ruby-value">2</span>]]))</pre>
             </li></ul>
           </div>
           <div id='context'>

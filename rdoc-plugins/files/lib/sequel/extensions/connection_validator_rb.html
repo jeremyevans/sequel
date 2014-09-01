@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-02-21 21:43:08 -0800</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -45,7 +45,7 @@
             creating a new connection if no available connection is valid.  Example of
             use:</p>
             
-            <pre>DB.extension(:connection_validator)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">connection_validator</span>)</pre>
             
             <p>As checking connections for validity involves issuing a query, which is
             potentially an expensive operation, the validation checks are only run if
@@ -53,7 +53,7 @@
             default, that threshold is 3600 seconds (1 hour), but it can be modified by
             the user, set to -1 to always validate connections on checkout:</p>
             
-            <pre>DB.pool.connection_validation_timeout = -1</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_validation_timeout</span> = <span class="ruby-value">-1</span></pre>
             
             <p>Note that if you set the timeout to validate connections on every checkout,
             you should probably manually control connection checkouts on a coarse

@@ -91,7 +91,7 @@
             that you can pattern match columns to other columns. Before, it always
             transformed the argument to a string.</p>
             
-            <pre>:a.like(:b)&#x000A;# 2.6.0: a LIKE &#39;b&#39;&#x000A;# 2.7.0: a LIKE b</pre>
+            <pre class="ruby">:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-comment"># 2.6.0: a LIKE &#39;b&#39;</span>&#x000A;<span class="ruby-comment"># 2.7.0: a LIKE b</span></pre>
             </li><li>
             <p>Array#sql_array was added, allowing you to specify that an array in ruby be
             treated like an array in SQL.  This is true anyway, except for arrays of
@@ -155,7 +155,7 @@
             use nil.  For example, the following code will break if :album is not in
             params:</p>
             
-            <pre>Album.new(params[:album])</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">params</span>[:<span class="ruby-identifier">album</span>])</pre>
             
             <p>Additionally, Model#initialize does not call the block if the second
             argument is true.</p>

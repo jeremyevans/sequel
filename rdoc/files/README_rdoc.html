@@ -84,7 +84,7 @@
             
             <h2 id="label-Installation">Installation<span><a href="#label-Installation">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <pre>gem install sequel</pre>
+            <pre class="ruby"><span class="ruby-identifier">gem</span> <span class="ruby-identifier">install</span> <span class="ruby-identifier">sequel</span></pre>
             
             <h2 id="label-A+Short+Example">A Short Example<span><a href="#label-A+Short+Example">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -156,7 +156,7 @@
             <p>The connection URL can also include such stuff as the user name, password,
             and port:</p>
             
-            <pre>DB = Sequel.connect(&#39;postgres://user:password@host:port/database_name&#39;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://user:password@host:port/database_name&#39;</span>)</pre>
             
             <p>You can also specify optional parameters, such as the connection pool size,
             or loggers for logging SQL queries:</p>
@@ -190,11 +190,11 @@
             
             <p>You can execute arbitrary SQL code using <code>Database#run</code>:</p>
             
-            <pre>DB.run(&quot;create table t (a text, b text)&quot;)&#x000A;DB.run(&quot;insert into t values (&#39;a&#39;, &#39;b&#39;)&quot;)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&quot;create table t (a text, b text)&quot;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">run</span>(<span class="ruby-string">&quot;insert into t values (&#39;a&#39;, &#39;b&#39;)&quot;</span>)</pre>
             
             <p>You can also create datasets based on raw SQL:</p>
             
-            <pre>dataset = DB[&#39;select id from items&#39;]&#x000A;dataset.count # will return the number of records in the result set&#x000A;dataset.map(:id) # will return an array containing all values of the id column in the result set</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;select id from items&#39;</span>]&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">count</span> <span class="ruby-comment"># will return the number of records in the result set</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">map</span>(:<span class="ruby-identifier">id</span>) <span class="ruby-comment"># will return an array containing all values of the id column in the result set</span></pre>
             
             <p>You can also fetch records with raw SQL through the dataset:</p>
             
@@ -210,7 +210,7 @@
             are generally created via the <code>Database#from</code> or
             <code>Database#[]</code> methods:</p>
             
-            <pre>posts = DB.from(:posts)&#x000A;posts = DB[:posts] # same</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">posts</span>)&#x000A;<span class="ruby-identifier">posts</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">posts</span>] <span class="ruby-comment"># same</span></pre>
             
             <p>Datasets will only fetch records when you tell them to. They can be
             manipulated to filter records, change ordering, join tables, etc..</p>
@@ -219,7 +219,7 @@
             
             <p>You can retrieve all records by using the <code>all</code> method:</p>
             
-            <pre>posts.all&#x000A;# SELECT * FROM posts</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span></pre>
             
             <p>The all method returns an array of hashes, where each hash corresponds to a
             record.</p>
@@ -234,7 +234,7 @@
             
             <p>You can also retrieve the first record in a dataset:</p>
             
-            <pre>posts.first&#x000A;# SELECT * FROM posts LIMIT 1</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts LIMIT 1</span></pre>
             
             <p>Or retrieve a single record with a specific value:</p>
             
@@ -242,7 +242,7 @@
             
             <p>If the dataset is ordered, you can also ask for the last record:</p>
             
-            <pre>posts.order(:stamp).last&#x000A;# SELECT * FROM posts ORDER BY stamp DESC LIMIT 1</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">stamp</span>).<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts ORDER BY stamp DESC LIMIT 1</span></pre>
             
             <h3 id="label-Filtering+Records">Filtering Records<span><a href="#label-Filtering+Records">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -261,7 +261,7 @@
             
             <p><a href="../classes/Sequel.html">Sequel</a> also accepts expressions:</p>
             
-            <pre>my_posts = posts.where{stamp &gt; Date.today &lt;&lt; 1}&#x000A;# WHERE stamp &gt; &#39;2010-06-14&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">my_posts</span> = <span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">stamp</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE stamp &gt; &#39;2010-06-14&#39;</span></pre>
             
             <p>Some adapters will also let you specify Regexps:</p>
             
@@ -273,15 +273,15 @@
             
             <p>You can also specify a custom WHERE clause using a string:</p>
             
-            <pre>posts.where(&#39;stamp IS NOT NULL&#39;)&#x000A;# WHERE stamp IS NOT NULL</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;stamp IS NOT NULL&#39;</span>)&#x000A;<span class="ruby-comment"># WHERE stamp IS NOT NULL</span></pre>
             
             <p>You can use parameters in your string, as well:</p>
             
-            <pre>author_name = &#39;JKR&#39;&#x000A;posts.where(&#39;(stamp &lt; ?) AND (author != ?)&#39;, Date.today - 3, author_name)&#x000A;# WHERE (stamp &lt; &#39;2010-07-11&#39;) AND (author != &#39;JKR&#39;)</pre>
+            <pre class="ruby"><span class="ruby-identifier">author_name</span> = <span class="ruby-string">&#39;JKR&#39;</span>&#x000A;<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;(stamp &lt; ?) AND (author != ?)&#39;</span>, <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">3</span>, <span class="ruby-identifier">author_name</span>)&#x000A;<span class="ruby-comment"># WHERE (stamp &lt; &#39;2010-07-11&#39;) AND (author != &#39;JKR&#39;)</span></pre>
             
             <p>Datasets can also be used as subqueries:</p>
             
-            <pre>DB[:items].where(&#39;price &gt; ?&#39;, DB[:items].select{avg(price) + 100})&#x000A;# WHERE price &gt; (SELECT avg(price) + 100 FROM items)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;price &gt; ?&#39;</span>, <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">avg</span>(<span class="ruby-identifier">price</span>) <span class="ruby-operator">+</span> <span class="ruby-value">100</span>})&#x000A;<span class="ruby-comment"># WHERE price &gt; (SELECT avg(price) + 100 FROM items)</span></pre>
             
             <p>After filtering, you can retrieve the matching records by using any of the
             retrieval methods:</p>
@@ -302,39 +302,39 @@
             
             <p>Counting records is easy using <code>count</code>:</p>
             
-            <pre>posts.where(:category.like(&#39;%ruby%&#39;)).count&#x000A;# SELECT COUNT(*) FROM posts WHERE category LIKE &#39;%ruby%&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">category</span>.<span class="ruby-identifier">like</span>(<span class="ruby-string">&#39;%ruby%&#39;</span>)).<span class="ruby-identifier">count</span>&#x000A;<span class="ruby-comment"># SELECT COUNT(*) FROM posts WHERE category LIKE &#39;%ruby%&#39;</span></pre>
             
             <p>And you can also query maximum/minimum values via <code>max</code> and
             <code>min</code>:</p>
             
-            <pre>max = DB[:history].max(:value)&#x000A;# SELECT max(value) FROM history&#x000A;min = DB[:history].min(:value)&#x000A;# SELECT min(value) FROM history</pre>
+            <pre class="ruby"><span class="ruby-identifier">max</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">history</span>].<span class="ruby-identifier">max</span>(:<span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-comment"># SELECT max(value) FROM history</span>&#x000A;&#x000A;<span class="ruby-identifier">min</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">history</span>].<span class="ruby-identifier">min</span>(:<span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-comment"># SELECT min(value) FROM history</span></pre>
             
             <p>Or calculate a sum or average via <code>sum</code> and <code>avg</code>:</p>
             
-            <pre>sum = DB[:items].sum(:price)&#x000A;# SELECT sum(price) FROM items&#x000A;avg = DB[:items].avg(:price)&#x000A;# SELECT avg(price) FROM items</pre>
+            <pre class="ruby"><span class="ruby-identifier">sum</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">price</span>)&#x000A;<span class="ruby-comment"># SELECT sum(price) FROM items</span>&#x000A;<span class="ruby-identifier">avg</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">avg</span>(:<span class="ruby-identifier">price</span>)&#x000A;<span class="ruby-comment"># SELECT avg(price) FROM items</span></pre>
             
             <h3 id="label-Ordering+Records">Ordering Records<span><a href="#label-Ordering+Records">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Ordering datasets is simple using <code>order</code>:</p>
             
-            <pre>posts.order(:stamp)&#x000A;# ORDER BY stamp&#x000A;posts.order(:stamp, :name)&#x000A;# ORDER BY stamp, name</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">stamp</span>)&#x000A;<span class="ruby-comment"># ORDER BY stamp</span>&#x000A;<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">stamp</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># ORDER BY stamp, name</span></pre>
             
             <p>Chaining <code>order</code> doesn&#39;t work the same as
             <code>where</code>:</p>
             
-            <pre>posts.order(:stamp).order(:name)&#x000A;# ORDER BY name</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">stamp</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># ORDER BY name</span></pre>
             
             <p>The <code>order_append</code> method chains this way, though:</p>
             
-            <pre>posts.order(:stamp).order_append(:name)&#x000A;# ORDER BY stamp, name</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">stamp</span>).<span class="ruby-identifier">order_append</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># ORDER BY stamp, name</span></pre>
             
             <p>The <code>order_prepend</code> method can be used as well:</p>
             
-            <pre>posts.order(:stamp).order_prepend(:name)&#x000A;# ORDER BY name, stamp</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">stamp</span>).<span class="ruby-identifier">order_prepend</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># ORDER BY name, stamp</span></pre>
             
             <p>You can also specify descending order:</p>
             
-            <pre>posts.reverse_order(:stamp)&#x000A;# ORDER BY stamp DESC&#x000A;posts.order(Sequel.desc(:stamp))&#x000A;# ORDER BY stamp DESC</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">reverse_order</span>(:<span class="ruby-identifier">stamp</span>)&#x000A;<span class="ruby-comment"># ORDER BY stamp DESC</span>&#x000A;<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">stamp</span>))&#x000A;<span class="ruby-comment"># ORDER BY stamp DESC</span></pre>
             
             <h3 id="label-Core+Extensions">Core Extensions<span><a href="#label-Core+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -346,39 +346,39 @@
             integrates Sequel&#39;s DSL better into the ruby language, allowing you to
             write:</p>
             
-            <pre>:stamp.desc</pre>
+            <pre class="ruby">:<span class="ruby-identifier">stamp</span>.<span class="ruby-identifier">desc</span></pre>
             
             <p>instead of:</p>
             
-            <pre>Sequel.desc(:stamp)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">stamp</span>)</pre>
             
             <h3 id="label-Selecting+Columns">Selecting Columns<span><a href="#label-Selecting+Columns">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Selecting specific columns to be returned is also simple using
             <code>select</code>:</p>
             
-            <pre>posts.select(:stamp)&#x000A;# SELECT stamp FROM posts&#x000A;posts.select(:stamp, :name)&#x000A;# SELECT stamp, name FROM posts</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">stamp</span>)&#x000A;<span class="ruby-comment"># SELECT stamp FROM posts</span>&#x000A;<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">stamp</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT stamp, name FROM posts</span></pre>
             
             <p>Chaining <code>select</code> works like <code>order</code>, not
             <code>where</code>:</p>
             
-            <pre>posts.select(:stamp).select(:name)&#x000A;# SELECT name FROM posts</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">stamp</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT name FROM posts</span></pre>
             
             <p>As you might expect, there is an <code>order_append</code> equivalent for
             <code>select</code> called <code>select_append</code>:</p>
             
-            <pre>posts.select(:stamp).select_append(:name)&#x000A;# SELECT stamp, name FROM posts</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">stamp</span>).<span class="ruby-identifier">select_append</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT stamp, name FROM posts</span></pre>
             
             <h3 id="label-Deleting+Records">Deleting Records<span><a href="#label-Deleting+Records">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
             <p>Deleting records from the table is done with <code>delete</code>:</p>
             
-            <pre>posts.where(&#39;stamp &lt; ?&#39;, Date.today - 3).delete&#x000A;# DELETE FROM posts WHERE stamp &lt; &#39;2010-07-11&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;stamp &lt; ?&#39;</span>, <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">3</span>).<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># DELETE FROM posts WHERE stamp &lt; &#39;2010-07-11&#39;</span></pre>
             
             <p>Be very careful when deleting, as <code>delete</code> affects all rows in
             the dataset. Call <code>where</code> first and <code>delete</code> second:</p>
             
-            <pre># DO THIS:&#x000A;posts.where(&#39;stamp &lt; ?&#39;, Date.today - 7).delete&#x000A;# NOT THIS:&#x000A;posts.delete.where(&#39;stamp &lt; ?&#39;, Date.today - 7)</pre>
+            <pre class="ruby"><span class="ruby-comment"># DO THIS:</span>&#x000A;<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;stamp &lt; ?&#39;</span>, <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>).<span class="ruby-identifier">delete</span>&#x000A;<span class="ruby-comment"># NOT THIS:</span>&#x000A;<span class="ruby-identifier">posts</span>.<span class="ruby-identifier">delete</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;stamp &lt; ?&#39;</span>, <span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span> <span class="ruby-operator">-</span> <span class="ruby-value">7</span>)</pre>
             
             <h3 id="label-Inserting+Records">Inserting Records<span><a href="#label-Inserting+Records">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -428,7 +428,7 @@
             
             <p>You can then do anything you like with the dataset:</p>
             
-            <pre>order_total = order_items.sum(:price)&#x000A;# SELECT sum(price) FROM items INNER JOIN order_items&#x000A;# ON order_items.item_id = items.id&#x000A;# WHERE order_items.order_id = 1234</pre>
+            <pre class="ruby"><span class="ruby-identifier">order_total</span> = <span class="ruby-identifier">order_items</span>.<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">price</span>)&#x000A;<span class="ruby-comment"># SELECT sum(price) FROM items INNER JOIN order_items</span>&#x000A;<span class="ruby-comment"># ON order_items.item_id = items.id</span>&#x000A;<span class="ruby-comment"># WHERE order_items.order_id = 1234</span></pre>
             
             <h2 id="label-Column+references+in+Sequel">Column references in <a href="../classes/Sequel.html">Sequel</a><span><a href="#label-Column+references+in+Sequel">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -450,18 +450,18 @@
             Identifiers can be qualified by using the double underscore special
             notation <code>:table__column</code>:</p>
             
-            <pre>items.literal(:items__price)&#x000A;# items.price</pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">items__price</span>)&#x000A;<span class="ruby-comment"># items.price</span></pre>
             
             <p>Another way to qualify columns is to use the <code>Sequel.qualify</code>
             method:</p>
             
-            <pre>items.literal(Sequel.qualify(:items, :price))&#x000A;# items.price</pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">items</span>, :<span class="ruby-identifier">price</span>))&#x000A;<span class="ruby-comment"># items.price</span></pre>
             
             <p>While it is more common to qualify column identifiers with table
             identifiers, you can also qualify table identifiers with schema identifiers
             to select from a qualified table:</p>
             
-            <pre>posts = DB[:some_schema__posts]&#x000A;# SELECT * FROM some_schema.posts</pre>
+            <pre class="ruby"><span class="ruby-identifier">posts</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">some_schema__posts</span>]&#x000A;<span class="ruby-comment"># SELECT * FROM some_schema.posts</span></pre>
             
             <h3 id="label-Identifier+aliases">Identifier aliases<span><a href="#label-Identifier+aliases">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -469,16 +469,16 @@
             notation <code>:column___alias</code> or
             <code>:table__column___alias</code>:</p>
             
-            <pre>items.literal(:price___p)&#x000A;# price AS p&#x000A;items.literal(:items__price___p)&#x000A;# items.price AS p</pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">price___p</span>)&#x000A;<span class="ruby-comment"># price AS p</span>&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">items__price___p</span>)&#x000A;<span class="ruby-comment"># items.price AS p</span></pre>
             
             <p>Another way to alias columns is to use the <code>Sequel.as</code> method:</p>
             
-            <pre>items.literal(Sequel.as(:price, :p))&#x000A;# price AS p</pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">price</span>, :<span class="ruby-identifier">p</span>))&#x000A;<span class="ruby-comment"># price AS p</span></pre>
             
             <p>You can use the <code>Sequel.as</code> method to alias arbitrary
             expressions, not just identifiers:</p>
             
-            <pre>items.literal(Sequel.as(DB[:posts].select{max(id)}, :p))&#x000A;# (SELECT max(id) FROM posts) AS p</pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">posts</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">max</span>(<span class="ruby-identifier">id</span>)}, :<span class="ruby-identifier">p</span>))&#x000A;<span class="ruby-comment"># (SELECT max(id) FROM posts) AS p</span></pre>
             
             <h2 id="label-Sequel+Models"><a href="../classes/Sequel.html">Sequel</a> Models<span><a href="#label-Sequel+Models">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -517,7 +517,7 @@
             <code>:id</code>. The <code>Model.[]</code> method can be used to fetch
             records by their primary key:</p>
             
-            <pre>post = Post[123]</pre>
+            <pre class="ruby"><span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>[<span class="ruby-value">123</span>]</pre>
             
             <p>The <code>pk</code> method is used to retrieve the record&#39;s primary key
             value:</p>
@@ -534,7 +534,7 @@
             <code>no_primary_key</code>, but then you lose the ability to easily update
             and delete records:</p>
             
-            <pre>Post.no_primary_key</pre>
+            <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">no_primary_key</span></pre>
             
             <p>A single model instance can also be fetched by specifying a condition:</p>
             
@@ -574,13 +574,13 @@
             <p>You can also modify record values using attribute setters or the
             <code>[]=</code> method.</p>
             
-            <pre>post.title = &#39;hey there&#39;&#x000A;post[:title] = &#39;hey there&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">title</span> = <span class="ruby-string">&#39;hey there&#39;</span>&#x000A;<span class="ruby-identifier">post</span>[:<span class="ruby-identifier">title</span>] = <span class="ruby-string">&#39;hey there&#39;</span></pre>
             
             <p>That will just change the value for the object, it will not update the row
             in the database.  To update the database row, call the <code>save</code>
             method:</p>
             
-            <pre>post.save</pre>
+            <pre class="ruby"><span class="ruby-identifier">post</span>.<span class="ruby-identifier">save</span></pre>
             
             <h3 id="label-Mass+assignment">Mass assignment<span><a href="#label-Mass+assignment">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             
@@ -605,7 +605,7 @@
             
             <p>Another way is to construct a new instance and save it later:</p>
             
-            <pre>post = Post.new&#x000A;post.title = &#39;hello world&#39;&#x000A;post.save</pre>
+            <pre class="ruby"><span class="ruby-identifier">post</span> = <span class="ruby-constant">Post</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">title</span> = <span class="ruby-string">&#39;hello world&#39;</span>&#x000A;<span class="ruby-identifier">post</span>.<span class="ruby-identifier">save</span></pre>
             
             <p>You can also supply a block to <code>Model.new</code> and
             <code>Model.create</code>:</p>
@@ -732,11 +732,11 @@
             <p>You can use the association_join method to add a join to the model&#39;s
             dataset based on the assocation:</p>
             
-            <pre>Post.association_join(:author)&#x000A;# SELECT * FROM posts&#x000A;# INNER JOIN authors AS author ON (author.id = posts.author_id)</pre>
+            <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">association_join</span>(:<span class="ruby-identifier">author</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span>&#x000A;<span class="ruby-comment"># INNER JOIN authors AS author ON (author.id = posts.author_id)</span></pre>
             
             <p>This comes with variants for different join types:</p>
             
-            <pre>Post.association_left_join(:replies)&#x000A;# SELECT * FROM posts&#x000A;# LEFT JOIN replies ON (replies.post_id = posts.id)</pre>
+            <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">association_left_join</span>(:<span class="ruby-identifier">replies</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span>&#x000A;<span class="ruby-comment"># LEFT JOIN replies ON (replies.post_id = posts.id)</span></pre>
             
             <p>Similar to the eager loading methods, you can use multiple associations and
             nested associations:</p>

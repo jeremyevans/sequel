@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-06-19 11:13:26 -0700</span>
+          <span class='datetime'>2014-08-26 13:03:18 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -46,7 +46,7 @@
             tables for the classes where you want the caches updated automatically. 
             You would generally do this during a migration:</p>
             
-            <pre>Sequel.migration do&#x000A;  up do&#x000A;    extension :pg_static_cache_updater&#x000A;    create_static_cache_update_function&#x000A;    create_static_cache_update_trigger(:table_1)&#x000A;    create_static_cache_update_trigger(:table_2)&#x000A;  end&#x000A;  down do&#x000A;    extension :pg_static_cache_updater&#x000A;    drop_trigger(:table_2, default_static_cache_update_name)&#x000A;    drop_trigger(:table_1, default_static_cache_update_name)&#x000A;    drop_function(default_static_cache_update_name)&#x000A;  end&#x000A;end</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_function</span>&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(:<span class="ruby-identifier">table_1</span>)&#x000A;    <span class="ruby-identifier">create_static_cache_update_trigger</span>(:<span class="ruby-identifier">table_2</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_static_cache_updater</span>&#x000A;    <span class="ruby-identifier">drop_trigger</span>(:<span class="ruby-identifier">table_2</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_trigger</span>(:<span class="ruby-identifier">table_1</span>, <span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;    <span class="ruby-identifier">drop_function</span>(<span class="ruby-identifier">default_static_cache_update_name</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>After the triggers have been added, in your application process, after
             setting up your models, you need to listen for changes to the underlying

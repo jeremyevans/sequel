@@ -86,7 +86,7 @@
             <p>An instance_hooks plugin was added for adding hooks to specific w model
             instances:</p>
             
-            <pre>obj = Model.new&#x000A;obj.after_save_hook{do_something}&#x000A;obj.save # calls do_something after the obj has been saved</pre>
+            <pre class="ruby"><span class="ruby-identifier">obj</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">after_save_hook</span>{<span class="ruby-identifier">do_something</span>}&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># calls do_something after the obj has been saved</span></pre>
             
             <p>All of the standard hooks are supported, except for after_initialize. 
             Instance level before hooks are executed in reverse order of addition
@@ -100,7 +100,7 @@
             <p>A boolean_readers plugin was added for creating attribute? methods for
             boolean columns.  This can provide a nicer API:</p>
             
-            <pre>obj = Model[1]&#x000A;obj.active  # Sequel default column reader&#x000A;obj.active? # Using the boolean_readers plugin</pre>
+            <pre class="ruby"><span class="ruby-identifier">obj</span> = <span class="ruby-constant">Model</span>[<span class="ruby-value">1</span>]&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">active</span>  <span class="ruby-comment"># Sequel default column reader</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">active?</span> <span class="ruby-comment"># Using the boolean_readers plugin</span></pre>
             
             <p>You can provide a block when loading the plugin to change the criteria used
             to determine if the column is boolean:</p>
@@ -150,11 +150,11 @@
             <p>So if you want to store times in the database as UTC, but deal with them in
             local time in the application:</p>
             
-            <pre>Sequel.application_timezone = :local&#x000A;Sequel.database_timezone = :utc</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> = :<span class="ruby-identifier">local</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">database_timezone</span> = :<span class="ruby-identifier">utc</span></pre>
             
             <p>If you want to set all three timezones to the same value:</p>
             
-            <pre>Sequel.default_timezone = :utc</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">default_timezone</span> = :<span class="ruby-identifier">utc</span></pre>
             
             <p>There are three conversion methods that are called:</p>
             <ul><li>
@@ -191,15 +191,15 @@
             entry of these database types into separate from fields. With this code,
             you can just have field names like:</p>
             
-            <pre>date[year]&#x000A;date[month]&#x000A;date[day]</pre>
+            <pre class="ruby"><span class="ruby-identifier">date</span>[<span class="ruby-identifier">year</span>]&#x000A;<span class="ruby-identifier">date</span>[<span class="ruby-identifier">month</span>]&#x000A;<span class="ruby-identifier">date</span>[<span class="ruby-identifier">day</span>]</pre>
             
             <p>Rack will parse that into:</p>
             
-            <pre class="ruby">{<span class="ruby-string">&#39;date&#39;</span>=<span class="ruby-operator">&gt;</span>{<span class="ruby-string">&#39;year&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-string">&#39;month&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?,</span> <span class="ruby-string">&#39;day&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">?}</span>}</pre>
+            <pre>{&#39;date&#39;=&gt;{&#39;year&#39;=&gt;?, &#39;month&#39;=&gt;?, &#39;day&#39;=&gt;?}}</pre>
             
             <p>So then you can do:</p>
             
-            <pre>obj.date = params[&#39;date&#39;]&#x000A;# or&#x000A;obj.set(params)</pre>
+            <pre class="ruby"><span class="ruby-identifier">obj</span>.<span class="ruby-identifier">date</span> = <span class="ruby-identifier">params</span>[<span class="ruby-string">&#39;date&#39;</span>]&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-identifier">obj</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">params</span>)</pre>
             </li><li>
             <p>validates_unique now takes a block that can be used to scope the uniqueness
             constraint. This allows you to easily set up uniqueness validations that
@@ -225,17 +225,17 @@
             top level scope, allowing you to reference the constants directly (e.g.
             CURRENT_TIMESTAMP).</p>
             
-            <pre>DB[:events].filter{date &lt; ::Sequel::CURRENT_DATE}&#x000A;# or:&#x000A;include Sequel::SQL::Constants&#x000A;DB[:events].filter{date &lt; ::CURRENT_DATE}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">events</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">date</span> <span class="ruby-operator">&lt;</span> <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span>}&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-identifier">include</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Constants</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">events</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">date</span> <span class="ruby-operator">&lt;</span> <span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_DATE</span>}</pre>
             </li><li>
             <p>Database#run was added for executing arbitrary SQL on a database. It&#39;s
             an alias for Database#<<, but it allows for a nicer API inside migrations,
             since you can now do:</p>
             
-            <pre>run &#39;SQL&#39;</pre>
+            <pre class="ruby"><span class="ruby-identifier">run</span> <span class="ruby-string">&#39;SQL&#39;</span></pre>
             
             <p>instead of:</p>
             
-            <pre>self &lt;&lt; &#39;SQL&#39;</pre>
+            <pre class="ruby"><span class="ruby-keyword">self</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&#39;SQL&#39;</span></pre>
             
             <p>You can also provide a :server option to run the SQL on the given
             server/shard:</p>

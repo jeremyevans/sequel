@@ -45,7 +45,7 @@
             it a Time value with greater than microsecond precision, it will round it
             appropriately:</p>
             
-            <pre>Time.at(1405341161.917999982833862)&#x000A;# default: 2014-07-14 14:32:41.917999&#x000A;# with extension: 2014-07-14 14:32:41.918000</pre>
+            <pre class="ruby"><span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1405341161.917999982833862</span>)&#x000A;<span class="ruby-comment"># default: 2014-07-14 14:32:41.917999</span>&#x000A;<span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span></pre>
             
             <p>The round_timestamps extension correctly deals with databases that support
             millisecond or second precision.  In addition to handling Time values, it
@@ -54,11 +54,11 @@
             
             <p>To round timestamps for a single dataset:</p>
             
-            <pre>ds = ds.extension(:round_timestamps)</pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">round_timestamps</span>)</pre>
             
             <p>To round timestamps for all datasets on a single database:</p>
             
-            <pre>DB.extension(:round_timestamps)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">round_timestamps</span>)</pre>
           </div>
           <div id='context'>
           </div>

@@ -41,38 +41,31 @@
             <p>The base connection pool class, which all other connection pools are based
             on.  This class is not instantiated directly, but subclasses should at the
             very least implement the following API:</p>
-            <dl class="rdoc-list note-list"><dt>initialize(Database, Hash) 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>initialize(Database, Hash) </td><td>
             <p>Initialize using the passed <a
             href="../../../classes/Sequel/Database.html">Sequel::Database</a> object
             and options hash.</p>
-            </dd><dt>hold(Symbol, &amp;block) 
-            <dd>
+            </td></tr><tr><td class='label'>hold(Symbol, &amp;block) </td><td>
             <p>Yield a connection object (obtained from calling the block passed to
             <code>initialize</code>) to the current block. For sharded connection
             pools, the Symbol passed is the shard/server to use.</p>
-            </dd><dt>disconnect(Symbol) 
-            <dd>
+            </td></tr><tr><td class='label'>disconnect(Symbol) </td><td>
             <p>Disconnect the connection object.  For sharded connection pools, the Symbol
             passed is the shard/server to use.</p>
-            </dd><dt>servers 
-            <dd>
+            </td></tr><tr><td class='label'>servers </td><td>
             <p>An array of shard/server symbols for all shards/servers that this
             connection pool recognizes.</p>
-            </dd><dt>size 
-            <dd>
+            </td></tr><tr><td class='label'>size </td><td>
             <p>an integer representing the total number of connections in the pool, or for
             the given shard/server if sharding is supported.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
             
             <p>For sharded connection pools, the sharded API adds the following methods:</p>
-            <dl class="rdoc-list note-list"><dt>add_servers(Array of Symbols) 
-            <dd>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>add_servers(Array of Symbols) </td><td>
             <p>start recognizing all shards/servers specified by the array of symbols.</p>
-            </dd><dt>remove_servers(Array of Symbols) 
-            <dd>
+            </td></tr><tr><td class='label'>remove_servers(Array of Symbols) </td><td>
             <p>no longer recognize all shards/servers specified by the array of symbols.</p>
-            </dd></dl>
+            </td></tr></tbody></table>
           </div>
           <div id='context'>
           </div>
