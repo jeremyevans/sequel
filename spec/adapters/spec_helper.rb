@@ -16,6 +16,7 @@ rescue LoadError
 end
 
 Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']
+Sequel::Model.cache_associations = false if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
 Sequel.cache_anonymous_models = false
 
 class Sequel::Database

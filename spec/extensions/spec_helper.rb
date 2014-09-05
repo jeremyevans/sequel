@@ -91,3 +91,6 @@ if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel::Database.extension :columns_introspection
   Sequel::Mock::Dataset.send(:include, Sequel::ColumnsIntrospection)
 end
+if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
+  Sequel::Model.cache_associations = false
+end

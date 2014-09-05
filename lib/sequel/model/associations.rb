@@ -8,8 +8,11 @@ module Sequel
     
       # Set an empty association reflection hash in the model
       def self.apply(model)
-        model.instance_variable_set(:@association_reflections, {})
-        model.instance_variable_set(:@autoreloading_associations, {})
+        model.instance_eval do
+          @association_reflections = {}
+          @autoreloading_associations = {}
+          @cache_associations = true
+        end
       end
 
       # AssociationReflection is a Hash subclass that keeps information on Sequel::Model associations. It
@@ -397,7 +400,7 @@ module Sequel
             end
 
             if possible_recips.length == 1
-              cached_set(:reciprocal_type, possible_recips.first[:type]) if reciprocal_type.is_a?(Array)
+              cached_set(:reciprocal_type, possible_recips.first[:type]) if ambiguous_reciprocal_type?
               possible_recips.first[:name]
             end
           end
@@ -468,7 +471,7 @@ module Sequel
           # in a special sub-hash that always uses this method to synchronize access.
           def cached_fetch(key)
             fetch(key) do
-              h = self[:cache]
+              return yield unless h = self[:cache]
               Sequel.synchronize{return h[key] if h.has_key?(key)}
               value = yield
               Sequel.synchronize{h[key] = value}
@@ -477,7 +480,7 @@ module Sequel
 
           # Cache the value at the given key, synchronizing access.
           def cached_set(key, value)
-            h = self[:cache]
+            return unless h = self[:cache]
             Sequel.synchronize{h[key] = value}
           end
         # :nocov:
@@ -485,7 +488,7 @@ module Sequel
           # On MRI, use a plain fetch, since the GVL will synchronize access.
           def cached_fetch(key)
             fetch(key) do 
-              h = self[:cache]
+              return yield unless h = self[:cache]
               h.fetch(key){h[key] = yield}
             end
           end
@@ -493,7 +496,8 @@ module Sequel
           # On MRI, just set the value at the key in the cache, since the GVL
           # will synchronize access.
           def cached_set(key, value)
-            self[:cache][key] = value
+            return unless h = self[:cache]
+            h[key] = value
           end
         end
 
@@ -501,6 +505,12 @@ module Sequel
         # options have been applied.
         def _associated_dataset
           associated_class.dataset.clone
+        end
+
+        # Whether for the reciprocal type for the given association can not be
+        # known in advantage, false by default.
+        def ambiguous_reciprocal_type?
+          false
         end
 
         # Apply a limit strategy to the given dataset so that filter by
@@ -645,10 +655,16 @@ module Sequel
           end
         end
 
+        # The reciprocal type as an array, should be overridden in reflection subclasses that
+        # have ambiguous reciprocal types.
+        def possible_reciprocal_types
+          [reciprocal_type]
+        end
+
         # Whether the given association reflection is possible reciprocal
         # association for the current association reflection.
         def reciprocal_association?(assoc_reflect)
-          Array(reciprocal_type).include?(assoc_reflect[:type]) &&
+          possible_reciprocal_types.include?(assoc_reflect[:type]) &&
             assoc_reflect.associated_class == self[:model] &&
             assoc_reflect[:conditions].nil? &&
             assoc_reflect[:block].nil?
@@ -804,6 +820,12 @@ module Sequel
     
         private
     
+        # Reciprocals of many_to_one associations could be either one_to_many or one_to_one,
+        # and which is not known in advance.
+        def ambiguous_reciprocal_type?
+          true
+        end
+
         def filter_by_associations_conditions_associated_keys
           qualify(associated_class.table_name, primary_keys)
         end
@@ -822,14 +844,36 @@ module Sequel
           self[:keys]
         end
     
+        # The reciprocal type of a many_to_one association is either
+        # a one_to_many or a one_to_one association.
+        def possible_reciprocal_types
+          [:one_to_many, :one_to_one]
+        end
+
+        # Whether the given association reflection is possible reciprocal
         def reciprocal_association?(assoc_reflect)
           super && self[:keys] == assoc_reflect[:keys] && primary_key == assoc_reflect.primary_key
         end
 
         # The reciprocal type of a many_to_one association is either
-        # a one_to_many or a one_to_one association.
+        # a one_to_many or a one_to_one association, look in the associated class
+        # to try to figure out which.
         def reciprocal_type
-          cached_fetch(:reciprocal_type){[:one_to_many, :one_to_one]}
+          cached_fetch(:reciprocal_type) do
+            possible_recips = []
+
+            associated_class.all_association_reflections.each do |assoc_reflect|
+              if reciprocal_association?(assoc_reflect)
+                possible_recips << assoc_reflect
+              end
+            end
+
+            if possible_recips.length == 1
+              possible_recips.first[:type]
+            else
+              possible_reciprocal_types
+            end
+          end
         end
       end
     
@@ -1367,6 +1411,12 @@ module Sequel
         # value changes.
         attr_reader :autoreloading_associations
 
+        # Whether association metadata should be cached in the association reflection.  If not cached, it will be computed
+        # on demand.  In general you only want to set this to default when using code reloading.  When using code reloading,
+        # setting this will make sure that if an associated class is removed or modified, this class will not hang on to
+        # the previous class.
+        attr_accessor :cache_associations
+
         # The default :eager_limit_strategy option to use for limited or offset associations (default: true, causing Sequel
         # to use what it considers the most appropriate strategy).
         attr_accessor :default_eager_limit_strategy
@@ -1600,7 +1650,7 @@ module Sequel
             orig_opts = cloned_assoc[:orig_opts].merge(orig_opts)
           end
 
-          opts = orig_opts.merge(:type => type, :name => name, :cache=>{}, :model => self)
+          opts = orig_opts.merge(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
           opts[:block] = block if block
           if block || orig_opts[:block] || orig_opts[:dataset]
             # It's possible the association is instance specific, in that it depends on
@@ -1683,7 +1733,7 @@ module Sequel
           associate(:one_to_one, name, opts, &block)
         end
 
-        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_eager_limit_strategy=>nil)
+        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@cache_associations=>nil, :@default_eager_limit_strategy=>nil)
         Plugins.def_dataset_methods(self, [:eager, :eager_graph, :eager_graph_with_options, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
         
         private

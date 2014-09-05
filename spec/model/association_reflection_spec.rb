@@ -469,3 +469,25 @@ describe Sequel::Model, " association reflection methods" do
     c.instance_methods.map{|x| x.to_s}.should include('parent')
   end
 end
+
+describe Sequel::Model::Associations::AssociationReflection, "with caching disabled" do
+  before do
+    @c = Class.new(Sequel::Model(:foo))
+  end
+  after do
+    Object.send(:remove_const, :ParParent)
+  end
+
+  it "should not cache metadata" do
+    class ::ParParent < Sequel::Model; end
+    c = ParParent
+    @c.cache_associations = false
+    @c.many_to_one :c, :class=>:ParParent
+    @c.association_reflection(:c).associated_class.should == c
+    Object.send(:remove_const, :ParParent)
+    class ::ParParent < Sequel::Model; end
+    c = ParParent
+    @c.association_reflection(:c).associated_class.should == c
+  end
+end
+

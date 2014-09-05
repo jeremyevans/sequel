@@ -330,7 +330,7 @@ describe "Polymorphic Associations" do
     end
     class ::Asset < Sequel::Model
       m = method(:constantize)
-      many_to_one :attachable, :reciprocal=>:assets,
+      many_to_one :attachable, :reciprocal=>:assets, :reciprocal_type=>:one_to_many,
         :setter=>(proc do |attachable|
           self[:attachable_id] = (attachable.pk if attachable)
           self[:attachable_type] = (attachable.class.name if attachable)

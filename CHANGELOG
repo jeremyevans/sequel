@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::Model.cache_associations accessor, which can be set to false to not cache association metadata (jeremyevans)
+
 * Add split_values plugin, for moving noncolumn entries from the values hash into a separate hash (jeremyevans) (#868)
 
 === 4.14.0 (2014-09-01)
