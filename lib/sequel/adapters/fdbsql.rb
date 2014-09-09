@@ -24,7 +24,6 @@
 # FoundationDB SQL Layer currently uses the Postgres protocol
 require 'pg'
 
-require 'sequel/adapters/fdbsql/features'
 require 'sequel/adapters/fdbsql/prepared_statements'
 require 'sequel/adapters/fdbsql/schema_parsing'
 require 'sequel/adapters/utils/pg_types'
@@ -230,6 +229,26 @@ module Sequel
         super
       end
 
+      # indexes are namespaced per table
+      def global_index_namespace?
+        false
+      end
+
+      # Fdbsql supports deferrable fk constraints
+      def supports_deferrable_foreign_key_constraints?
+        true
+      end
+
+      # the sql layer supports CREATE TABLE IF NOT EXISTS syntax,
+      def supports_create_table_if_not_exists?
+        true
+      end
+
+      # the sql layer supports DROP TABLE IF EXISTS
+      def supports_drop_table_if_exists?
+        true
+      end
+
       private
 
       # Convert exceptions raised from the block into DatabaseErrors.
@@ -354,6 +373,25 @@ module Sequel
         else
           sql << "x'#{v.unpack('H*').first}'"
         end
+      end
+
+      # FDBSQL does: supports_regexp? (but with functions)
+      def supports_regexp?
+        true
+      end
+
+      # Returning is always supported.
+      def supports_returning?(type)
+        true
+      end
+
+      # FDBSQL truncates all seconds
+      def supports_timestamp_usecs?
+        false
+      end
+
+      def supports_quoted_function_names?
+        true
       end
 
       private
