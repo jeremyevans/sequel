@@ -42,8 +42,6 @@ module Sequel
     class NotCommittedError < RetryError; end
 
     class Database < Sequel::Database
-      include DatabaseFeatures
-      include DatabasePreparedStatements
       include SchemaParsing
       DatasetClass = Dataset
 
@@ -296,8 +294,6 @@ module Sequel
     end
 
     class Dataset < Sequel::Dataset
-      include DatasetFeatures
-      include DatasetPreparedStatements
 
       def fetch_rows(sql)
         execute(sql) do |res|
