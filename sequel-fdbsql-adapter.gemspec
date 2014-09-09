@@ -45,7 +45,7 @@ EOF
   s.required_ruby_version = '>= 1.9.3'
 
   s.add_dependency 'sequel', '~> 4.12'
-  s.add_dependency 'pg', '~> 0.17'
+  s.add_dependency 'pg', '~> 0.17' unless RUBY_PLATFORM == 'java'
 
   s.add_development_dependency "rake", ">= 10"
   s.add_development_dependency 'rspec', '~> 2.14', '<2.99.0'
