@@ -41,7 +41,6 @@ module Sequel
     class NotCommittedError < RetryError; end
 
     class Database < Sequel::Database
-      DatasetClass = Dataset
 
       # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
       # it should just be the timestamp, so we need whole new formats here.
@@ -504,6 +503,7 @@ module Sequel
     end
 
     class Dataset < Sequel::Dataset
+      Database::DatasetClass = Dataset
 
       def fetch_rows(sql)
         execute(sql) do |res|
