@@ -24,6 +24,7 @@
 # FoundationDB SQL Layer currently uses the Postgres protocol
 require 'pg'
 
+require 'sequel/extensions/date_arithmetic'
 require 'sequel/adapters/utils/pg_types'
 
 module Sequel
