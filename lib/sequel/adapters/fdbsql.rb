@@ -35,7 +35,7 @@ module Sequel
   def_adapter_method(:fdbsql)
 
   module Fdbsql
-    CONVERTED_EXCEPTIONS  = [PGError]
+    CONVERTED_EXCEPTIONS << PGError
 
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
     class RetryError < Sequel::DatabaseError; end

@@ -24,7 +24,7 @@
 module Sequel
 
   module Fdbsql
-    CONVERTED_EXCEPTIONS  = [PGError]
+    CONVERTED_EXCEPTIONS  = []
 
     module DatabaseMethods
 
