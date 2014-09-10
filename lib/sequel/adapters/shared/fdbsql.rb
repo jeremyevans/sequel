@@ -128,8 +128,8 @@ module Sequel
       # set it at the sequel layer
       def column_definition_null_sql(sql, column)
         null = column.fetch(:null, column[:allow_null])
-        sql << NOT_NULL if null == false
-        sql << NULL if null == true
+        sql << Sequel::Database::NOT_NULL if null == false
+        sql << Sequel::Database::NULL if null == true
       end
 
       def alter_table_op_sql(table, op)
@@ -615,12 +615,12 @@ module Sequel
         when :'~'
           function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
         when :'!~'
-          sql << NOT_SPACE
+          sql << Sequel::Dataset::NOT_SPACE
           function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
         when :'~*'
           function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
         when :'!~*'
-          sql << NOT_SPACE
+          sql << Sequel::Dataset::NOT_SPACE
           function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
         else
           super
