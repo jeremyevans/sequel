@@ -21,6 +21,8 @@
 # THE SOFTWARE.
 #
 
+require 'sequel/adapters/utils/pg_types'
+
 module Sequel
 
   module Fdbsql
