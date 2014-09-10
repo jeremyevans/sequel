@@ -45,6 +45,29 @@ module Sequel
       include Sequel::Fdbsql::DatabaseMethods
 
       set_adapter_scheme :fdbsql
+
+      def connect(server)
+        opts = server_opts(server)
+        Connection.new(self, opts)
+      end
+
+      def execute(sql, opts = {}, &block)
+        res = nil
+        synchronize(opts[:server]) do |conn|
+          res = check_database_errors do
+            if sql.is_a?(Symbol)
+              execute_prepared_statement(conn, sql, opts, &block)
+            else
+              log_yield(sql) do
+                conn.query(sql, opts[:arguments])
+              end
+            end
+          end
+          yield res if block_given?
+          res.cmd_tuples
+        end
+      end
+
     end
 
     class Dataset < Sequel::Dataset
