@@ -28,6 +28,10 @@ module Sequel
   module Fdbsql
     CONVERTED_EXCEPTIONS  = []
 
+    class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
+    class RetryError < Sequel::DatabaseError; end
+    class NotCommittedError < RetryError; end
+
     module DatabaseMethods
 
       # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it

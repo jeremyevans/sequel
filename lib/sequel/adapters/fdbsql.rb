@@ -37,10 +37,6 @@ module Sequel
   module Fdbsql
     CONVERTED_EXCEPTIONS << PGError
 
-    class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
-    class RetryError < Sequel::DatabaseError; end
-    class NotCommittedError < RetryError; end
-
     class Database < Sequel::Database
       include Sequel::Fdbsql::DatabaseMethods
 
