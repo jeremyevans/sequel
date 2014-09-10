@@ -652,6 +652,14 @@ module Sequel
         end
       end
 
+      # The SQL to use for an insert_select, adds a RETURNING clause to the insert
+      # unless the RETURNING clause is already present.
+      def insert_select_sql(*values)
+        ds = opts[:returning] ? self : returning
+        ds.insert_sql(*values)
+      end
+
+
       # For multiple table support, PostgreSQL requires at least
       # two from tables, with joins allowed.
       def join_from_sql(type, sql)

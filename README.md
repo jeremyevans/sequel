@@ -15,7 +15,7 @@ All previous releases are unsupported.
 
 ### Supported Sequel Versions
 
-This project currently supports Sequel v4.11.0
+This project currently supports Sequel v4.12.0 and v4.13.0
 
 ### Quick Start
 

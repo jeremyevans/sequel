@@ -16,4 +16,4 @@
 
 ### Expected Failures
 
-There are 42 failing tests in the spec_integration. Some of these will be fixed as part of the 1.9.6 release of the sql-layer, others will be removed by a patch to the specs.
+Using the forked version of Sequel for testing, there are no expected failures. Sometimes, if the sql-layer is under load you may get a test failure due to past_version; rerunning the test should work.
