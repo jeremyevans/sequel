@@ -64,6 +64,38 @@ module Sequel
         end
       end
 
+      def execute_prepared_statement(conn, name, opts=OPTS, &block)
+        statement = prepared_statement(name)
+        sql = statement.prepared_sql
+        ps_name = name.to_s
+        if args = opts[:arguments]
+          args = args.map{|arg| bound_variable_arg(arg, conn)}
+        end
+        begin
+          # create prepared statement if it doesn't exist, or has new sql
+          unless conn.prepared_statements[ps_name] == sql
+            conn.execute("DEALLOCATE #{ps_name}") if conn.prepared_statements.include?(ps_name)
+            log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}
+            conn.prepared_statements[ps_name] = sql
+          end
+
+          log_sql = "EXECUTE #{ps_name}"
+          if statement.log_sql
+            log_sql << " ("
+            log_sql << sql
+            log_sql << ")"
+          end
+          log_yield(sql, args) do
+            conn.execute_prepared_statement(ps_name, args)
+          end
+        rescue PGError => e
+          if (database_exception_sqlstate(e, opts) == STALE_STATEMENT_SQLSTATE)
+            conn.prepared_statements[ps_name] = nil
+            retry
+          end
+        end
+      end
+
       def begin_transaction(conn, opts=OPTS)
         super
         # TODO add functionality to jdbc
