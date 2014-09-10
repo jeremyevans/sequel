@@ -22,15 +22,17 @@
 #
 
 Sequel::JDBC.load_driver('com.foundationdb.sql.jdbc.Driver')
-Sequel.require 'adapters/shared/fdbsql'
-
+# TODO when merged into Sequel, switch to Sequel.require 'adapters/shared/fdbsql'
+require 'sequel/adapters/shared/fdbsql'
 
 module Sequel
   Fdbsql::CONVERTED_EXCEPTIONS << NativeException
 
   module JDBC
     Sequel.synchronize do
-      DATABASE_SETUP[:jdbcfdbsql] = proc do |db|
+      puts 'setting proc'
+      DATABASE_SETUP[:fdbsql] = proc do |db|
+        puts "setting up"
         db.extend(Sequel::JDBC::Fdbsql::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Fdbsql::Dataset
         com.foundationdb.sql.jdbc.Driver

@@ -21,12 +21,10 @@
 # THE SOFTWARE.
 #
 
-
 module Sequel
 
   module Fdbsql
     CONVERTED_EXCEPTIONS  = [PGError]
-
 
     module DatabaseMethods
 
@@ -490,6 +488,297 @@ module Sequel
       end
     end
 
+    module Dataset
 
+      def fetch_rows(sql)
+        execute(sql) do |res|
+          columns = set_columns(res)
+          yield_hash_rows(res, columns) {|h| yield h}
+        end
+      end
+
+      Dataset.def_sql_method(self, :delete, %w'with delete from using where returning')
+      Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
+      Dataset.def_sql_method(self, :update, %w'with update table set from where returning')
+
+      # Insert given values into the database.
+      def insert(*values)
+        if @opts[:returning]
+          # Already know which columns to return, let the standard code handle it
+          super
+        elsif @opts[:sql] || @opts[:disable_insert_returning]
+          # Raw SQL used or RETURNING disabled, just use the default behavior
+          # and return nil since sequence is not known.
+          super
+          nil
+        else
+          # Force the use of RETURNING with the primary key value,
+          # unless it has been disabled.
+          returning(*insert_pk).insert(*values){|r| return r.values.first}
+        end
+      end
+      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
+
+      # FDBSQL specific argument mapper used for mapping the named
+      # argument hash to a array with numbered arguments.
+      module ArgumentMapper
+        include Sequel::Dataset::ArgumentMapper
+
+        protected
+
+        # An array of bound variable values for this query, in the correct order.
+        def map_to_prepared_args(hash)
+          prepared_args.map{|k| hash[k.to_sym]}
+        end
+
+        private
+
+        def prepared_arg(k)
+          y = k
+          if i = prepared_args.index(y)
+            i += 1
+          else
+            prepared_args << y
+            i = prepared_args.length
+          end
+          LiteralString.new("#{prepared_arg_placeholder}#{i}")
+        end
+
+        # Always assume a prepared argument.
+        def prepared_arg?(k)
+          true
+        end
+      end
+
+      # Allow use of bind arguments for FDBSQL using the pg driver.
+      module BindArgumentMethods
+
+        include ArgumentMapper
+
+        # Override insert action to use RETURNING if the server supports it.
+        def run
+          if @prepared_type == :insert
+            fetch_rows(prepared_sql){|r| return r.values.first}
+          else
+            super
+          end
+        end
+
+        def prepared_sql
+          return @prepared_sql if @prepared_sql
+          @opts[:returning] = insert_pk if @prepared_type == :insert
+          super
+          @prepared_sql
+        end
+
+        private
+
+        # Execute the given SQL with the stored bind arguments.
+        def execute(sql, opts=OPTS, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts=OPTS, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+      end
+
+      # Allow use of server side prepared statements for FDBSQL using the
+      # pg driver.
+      module PreparedStatementMethods
+        include BindArgumentMethods
+
+        # Raise a more obvious error if you attempt to call a unnamed prepared statement.
+        def call(*)
+          raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
+          super
+        end
+
+        private
+
+        # Execute the stored prepared statement name and the stored bind
+        # arguments instead of the SQL given.
+        def execute(sql, opts=OPTS, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts=OPTS, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+      end
+
+      # Execute the given type of statement with the hash of values.
+      def call(type, bind_vars=OPTS, *values, &block)
+        ps = to_prepared_statement(type, values)
+        ps.extend(BindArgumentMethods)
+        ps.call(bind_vars, &block)
+      end
+
+      # Prepare the given type of statement with the given name, and store
+      # it in the database to be called later.
+      def prepare(type, name=nil, *values)
+        ps = to_prepared_statement(type, values)
+        ps.extend(PreparedStatementMethods)
+        if name
+          ps.prepared_statement_name = name
+          db.set_prepared_statement(name, ps)
+        end
+        ps
+      end
+
+      # Insert a record returning the record inserted.  Always returns nil without
+      # inserting a query if disable_insert_returning is used.
+      def insert_select(*values)
+        unless @opts[:disable_insert_returning]
+          ds = opts[:returning] ? self : returning
+          ds.insert(*values){|r| return r}
+        end
+      end
+
+      # The SQL to use for an insert_select, adds a RETURNING clause to the insert
+      # unless the RETURNING clause is already present.
+      def insert_select_sql(*values)
+        ds = opts[:returning] ? self : returning
+        ds.insert_sql(*values)
+      end
+
+
+      # For multiple table support, PostgreSQL requires at least
+      # two from tables, with joins allowed.
+      def join_from_sql(type, sql)
+        if(from = @opts[:from][1..-1]).empty?
+          raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
+        else
+          sql << SPACE << type.to_s << SPACE
+          source_list_append(sql, from)
+          select_join_sql(sql)
+        end
+      end
+
+      # Use FROM to specify additional tables in an update query
+      def update_from_sql(sql)
+        join_from_sql(:FROM, sql)
+      end
+
+      # Use USING to specify additional tables in a delete query
+      def delete_using_sql(sql)
+        join_from_sql(:USING, sql)
+      end
+
+      # fdbsql does not support FOR UPDATE, because it's unnecessary with the transaction model
+      def select_lock_sql(sql)
+        @opts[:lock] == :update ? sql : super
+      end
+
+      # Emulate the bitwise operators.
+      def complex_expression_sql_append(sql, op, args)
+        case op
+        when :&, :|, :^, :<<, :>>, :'B~'
+          complex_expression_emulate_append(sql, op, args)
+        # REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*']
+        when :'~'
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'!~'
+          sql << NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'~*'
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
+        when :'!~*'
+          sql << NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
+        else
+          super
+        end
+      end
+
+      # Append the SQL fragment for the DateAdd expression to the SQL query.
+      def date_add_sql_append(sql, da)
+        h = da.interval
+        expr = da.expr
+        interval = ""
+        each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
+          interval << "#{value} #{sql_unit} "
+        end
+        if interval.empty?
+          return literal_append(sql, Sequel.cast(expr, Time))
+        else
+          return complex_expression_sql_append(sql, :+, [Sequel.cast(expr, Time), Sequel.cast(interval, :interval)])
+        end
+      end
+
+      # FDBSQL uses a preceding x for hex escaping strings
+      def literal_blob_append(sql, v)
+        if v.empty?
+          sql << "''"
+        else
+          sql << "x'#{v.unpack('H*').first}'"
+        end
+      end
+
+      # FDBSQL does: supports_regexp? (but with functions)
+      def supports_regexp?
+        true
+      end
+
+      # Returning is always supported.
+      def supports_returning?(type)
+        true
+      end
+
+      # FDBSQL truncates all seconds
+      def supports_timestamp_usecs?
+        false
+      end
+
+      def supports_quoted_function_names?
+        true
+      end
+
+      private
+
+      # PostgreSQL uses $N for placeholders instead of ?, so use a $
+      # as the placeholder.
+      def prepared_arg_placeholder
+        PREPARED_ARG_PLACEHOLDER
+      end
+
+      # For each row in the result set, yield a hash with column name symbol
+      # keys and typecasted values.
+      def yield_hash_rows(res, cols)
+        res.ntuples.times do |recnum|
+          converted_rec = {}
+          cols.each do |fieldnum, type_proc, fieldsym|
+            value = res.getvalue(recnum, fieldnum)
+            converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
+          end
+          yield converted_rec
+        end
+      end
+
+      def set_columns(res)
+        cols = []
+        procs = db.conversion_procs
+        res.nfields.times do |fieldnum|
+          cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
+        end
+        @columns = cols.map{|c| c[2]}
+        cols
+      end
+
+      # Return the primary key to use for RETURNING in an INSERT statement
+      def insert_pk
+        if (f = opts[:from]) && !f.empty?
+          case t = f.first
+          when Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier
+            if pk = db.primary_key(t)
+              pk
+            end
+          end
+        end
+      end
+
+    end
   end
 end
