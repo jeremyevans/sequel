@@ -44,6 +44,13 @@ module Sequel
       # JDBC.
       module DatabaseMethods
         include Sequel::Fdbsql::DatabaseMethods
+
+        # Add the primary_keys and primary_key_sequences instance variables,
+        # so we can get the correct return values for inserted rows.
+        def self.extended(db)
+          super
+          db.send(:adapter_initialize)
+        end
       end
 
       class Dataset < JDBC::Dataset
