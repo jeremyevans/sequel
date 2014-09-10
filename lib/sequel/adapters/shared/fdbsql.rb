@@ -33,7 +33,6 @@ module Sequel
       BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
       BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
 
-      set_adapter_scheme :fdbsql
 
       attr_reader :conversion_procs
 

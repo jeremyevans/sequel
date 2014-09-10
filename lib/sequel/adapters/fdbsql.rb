@@ -43,6 +43,8 @@ module Sequel
 
     class Database < Sequel::Database
       include Sequel::Fdbsql::DatabaseMethods
+
+      set_adapter_scheme :fdbsql
     end
 
     class Dataset < Sequel::Dataset
