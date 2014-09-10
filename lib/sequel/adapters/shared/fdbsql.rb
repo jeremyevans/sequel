@@ -487,7 +487,7 @@ module Sequel
       end
     end
 
-    module Dataset
+    module DatasetMethods
 
       def fetch_rows(sql)
         execute(sql) do |res|
