@@ -41,9 +41,11 @@ module Sequel
       # Methods to add to Database instances that access Fdbsql via
       # JDBC.
       module DatabaseMethods
+        include Sequel::Fdbsql::DatabaseMethods
       end
 
       class Dataset < JDBC::Dataset
+        include Sequel::Fdbsql::DatasetMethods
       end
     end
 
