@@ -21,7 +21,7 @@
 # THE SOFTWARE.
 #
 
-Sequel::JDBC.load_driver('org.postgresql.Driver', :Fdbsql)
+Sequel::JDBC.load_driver('com.foundationdb.sql.jdbc.Driver')
 Sequel.require 'adapters/shared/fdbsql'
 
 
@@ -33,7 +33,7 @@ module Sequel
       DATABASE_SETUP[:jdbcfdbsql] = proc do |db|
         db.extend(Sequel::JDBC::Fdbsql::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Fdbsql::Dataset
-        org.postgresql.Driver
+        com.foundationdb.sql.jdbc.Driver
       end
     end
 
