@@ -26,7 +26,7 @@ require 'pg'
 
 require 'sequel/extensions/date_arithmetic'
 require 'sequel/adapters/utils/pg_types'
-Sequel.require 'adapters/shared/fdbsql'
+require 'sequel/adapters/shared/fdbsql'
 
 module Sequel
 
