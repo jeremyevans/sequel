@@ -462,12 +462,6 @@ module Sequel
 
     module DatasetMethods
 
-      def fetch_rows(sql)
-        execute(sql) do |res|
-          columns = set_columns(res)
-          yield_hash_rows(res, columns) {|h| yield h}
-        end
-      end
 
       Dataset.def_sql_method(self, :delete, %w'with delete from using where returning')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
@@ -714,29 +708,6 @@ module Sequel
       # as the placeholder.
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER
-      end
-
-      # For each row in the result set, yield a hash with column name symbol
-      # keys and typecasted values.
-      def yield_hash_rows(res, cols)
-        res.ntuples.times do |recnum|
-          converted_rec = {}
-          cols.each do |fieldnum, type_proc, fieldsym|
-            value = res.getvalue(recnum, fieldnum)
-            converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
-          end
-          yield converted_rec
-        end
-      end
-
-      def set_columns(res)
-        cols = []
-        procs = db.conversion_procs
-        res.nfields.times do |fieldnum|
-          cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
-        end
-        @columns = cols.map{|c| c[2]}
-        cols
       end
 
       # Return the primary key to use for RETURNING in an INSERT statement
