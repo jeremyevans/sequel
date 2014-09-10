@@ -64,6 +64,18 @@ module Sequel
         end
       end
 
+      def begin_transaction(conn, opts=OPTS)
+        super
+        # TODO add functionality to jdbc
+        conn.in_transaction = true
+      end
+
+      def remove_transaction(conn, committed)
+        conn.in_transaction = false
+      ensure
+        super
+      end
+
     end
 
     class Dataset < Sequel::Dataset
