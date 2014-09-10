@@ -21,36 +21,31 @@
 # THE SOFTWARE.
 #
 
-version = File.read(File.expand_path('../VERSION', __FILE__)).strip
+Sequel::JDBC.load_driver('org.postgresql.Driver', :Fdbsql)
+Sequel.require 'adapters/shared/fdbsql'
 
-FDBSQL_GEMSPEC = Gem::Specification.new do |s|
-  s.name         = 'sequel-fdbsql-adapter'
-  s.version      = version
-  s.date         = Time.new.strftime '%Y-%m-%d'
-  s.summary      = "Sequel Adapter for the FoundationDB SQL Layer"
-  s.description  = <<-EOF
-Sequel Adapter for the FoundationDB SQL Layer.
 
-Complete documentation of the FoundationDB SQL Layer can be found at:
-https://foundationdb.com/layers/sql/
-EOF
-  s.authors      = ["FoundationDB"]
-  s.email        = 'distribution@foundationdb.com'
-  s.files        = Dir['LICENSE', 'README.md', 'VERSION', 'lib/**/*']
-  s.homepage     = 'https://github.com/FoundationDB/sql-layer-adapter-sequel'
-  s.license      = 'MIT'
-  s.platform     = Gem::Platform::RUBY
+module Sequel
+  Fdbsql::CONVERTED_EXCEPTIONS << NativeException
 
-  s.requirements = 'FoundationDB SQL Layer version 1.9.6'
-  s.required_ruby_version = '>= 1.9.3'
+  module JDBC
+    Sequel.synchronize do
+      DATABASE_SETUP[:jdbcfdbsql] = proc do |db|
+        db.extend(Sequel::JDBC::Fdbsql::DatabaseMethods)
+        db.dataset_class = Sequel::JDBC::Fdbsql::Dataset
+        org.postgresql.Driver
+      end
+    end
 
-  s.add_dependency 'sequel', '~> 4.12'
-  if (RUBY_ENGINE == 'jruby')
-    s.add_dependency 'jdbc-postgres', '~> 9.3'
-  else
-    s.add_dependency 'pg', '~> 0.17'
+    module Fdbsql
+      # Methods to add to Database instances that access Fdbsql via
+      # JDBC.
+      module DatabaseMethods
+      end
+
+      class Dataset < JDBC::Dataset
+      end
+    end
+
   end
-
-  s.add_development_dependency "rake", ">= 10"
-  s.add_development_dependency 'rspec', '~> 2.14', '<2.99.0'
 end
