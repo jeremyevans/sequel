@@ -69,7 +69,7 @@ module Sequel
       end
 
       def database_error_classes
-        [PGError]
+        CONVERTED_EXCEPTIONS
       end
 
       NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
