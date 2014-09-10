@@ -30,9 +30,7 @@ module Sequel
 
   module JDBC
     Sequel.synchronize do
-      puts 'setting proc'
       DATABASE_SETUP[:fdbsql] = proc do |db|
-        puts "setting up"
         db.extend(Sequel::JDBC::Fdbsql::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Fdbsql::Dataset
         com.foundationdb.sql.jdbc.Driver
