@@ -41,6 +41,7 @@ module Sequel
       # Methods to add to Database instances that access Fdbsql via
       # JDBC.
       module DatabaseMethods
+        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Fdbsql::DatabaseMethods
 
         DISCONNECT_ERROR_RE = /\A(?:This connection has been closed|An I\/O error occurred while sending to the backend)/
