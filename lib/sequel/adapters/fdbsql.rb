@@ -121,6 +121,116 @@ module Sequel
           yield_hash_rows(res, columns) {|h| yield h}
         end
       end
+      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
+
+      # FDBSQL specific argument mapper used for mapping the named
+      # argument hash to a array with numbered arguments.
+      module ArgumentMapper
+        include Sequel::Dataset::ArgumentMapper
+
+        protected
+
+        # An array of bound variable values for this query, in the correct order.
+        def map_to_prepared_args(hash)
+          prepared_args.map{|k| hash[k.to_sym]}
+        end
+
+        private
+
+        def prepared_arg(k)
+          y = k
+          if i = prepared_args.index(y)
+            i += 1
+          else
+            prepared_args << y
+            i = prepared_args.length
+          end
+          LiteralString.new("#{prepared_arg_placeholder}#{i}")
+        end
+
+        # Always assume a prepared argument.
+        def prepared_arg?(k)
+          true
+        end
+      end
+
+      # Allow use of bind arguments for FDBSQL using the pg driver.
+      module BindArgumentMethods
+
+        include ArgumentMapper
+
+        # Override insert action to use RETURNING if the server supports it.
+        def run
+          if @prepared_type == :insert
+            fetch_rows(prepared_sql){|r| return r.values.first}
+          else
+            super
+          end
+        end
+
+        def prepared_sql
+          return @prepared_sql if @prepared_sql
+          @opts[:returning] = insert_pk if @prepared_type == :insert
+          super
+          @prepared_sql
+        end
+
+        private
+
+        # Execute the given SQL with the stored bind arguments.
+        def execute(sql, opts=OPTS, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts=OPTS, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+      end
+
+      # Allow use of server side prepared statements for FDBSQL using the
+      # pg driver.
+      module PreparedStatementMethods
+        include BindArgumentMethods
+
+        # Raise a more obvious error if you attempt to call a unnamed prepared statement.
+        def call(*)
+          raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
+          super
+        end
+
+        private
+
+        # Execute the stored prepared statement name and the stored bind
+        # arguments instead of the SQL given.
+        def execute(sql, opts=OPTS, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts=OPTS, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+      end
+
+      # Execute the given type of statement with the hash of values.
+      def call(type, bind_vars=OPTS, *values, &block)
+        ps = to_prepared_statement(type, values)
+        ps.extend(BindArgumentMethods)
+        ps.call(bind_vars, &block)
+      end
+
+      # Prepare the given type of statement with the given name, and store
+      # it in the database to be called later.
+      def prepare(type, name=nil, *values)
+        ps = to_prepared_statement(type, values)
+        ps.extend(PreparedStatementMethods)
+        if name
+          ps.prepared_statement_name = name
+          db.set_prepared_statement(name, ps)
+        end
+        ps
+      end
 
       # For each row in the result set, yield a hash with column name symbol
       # keys and typecasted values.
@@ -145,6 +255,13 @@ module Sequel
         cols
       end
 
+      private
+
+      # PostgreSQL uses $N for placeholders instead of ?, so use a $
+      # as the placeholder.
+      def prepared_arg_placeholder
+        PREPARED_ARG_PLACEHOLDER
+      end
     end
 
     class Connection
