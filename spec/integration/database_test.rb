@@ -53,7 +53,7 @@ describe Sequel::Database do
       proc{@db[:test].update(:a=>'1', :b=>'2')}.should raise_error(Sequel::UniqueConstraintViolation)
     end
 
-    cspecify "should raise Sequel::CheckConstraintViolation when a check constraint is violated", :mysql, [:db2], [proc{|db| db.sqlite_version < 30802}, :sqlite], :fdbsql do
+    cspecify "should raise Sequel::CheckConstraintViolation when a check constraint is violated", :mysql, [:db2], [proc{|db| db.sqlite_version < 30802}, :sqlite], :fdbsql, [:jdbc, :fdbsql] do
       @db.create_table!(:test){String :a; check Sequel.~(:a=>'1')}
       proc{@db[:test].insert('1')}.should raise_error(Sequel::CheckConstraintViolation)
       @db[:test].insert('2')
