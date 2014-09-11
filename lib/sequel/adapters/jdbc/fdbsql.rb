@@ -43,11 +43,16 @@ module Sequel
       module DatabaseMethods
         include Sequel::Fdbsql::DatabaseMethods
 
+        DISCONNECT_ERROR_RE = /\A(?:This connection has been closed|An I\/O error occurred while sending to the backend)/
         # Add the primary_keys and primary_key_sequences instance variables,
         # so we can get the correct return values for inserted rows.
         def self.extended(db)
           super
           db.send(:adapter_initialize)
+        end
+
+        def disconnect_error?(exception, opts)
+          super || exception.message =~ DISCONNECT_ERROR_RE
         end
       end
 

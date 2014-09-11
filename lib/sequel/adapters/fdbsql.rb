@@ -266,6 +266,7 @@ module Sequel
 
     class Connection
       CONNECTION_OK = -1
+
       DISCONNECT_ERROR_RE = /\A(?:could not receive data from server|no connection to the server|connection not open|connection is closed)/
 
       # These sql states are used to indicate that fdbvql should automatically
