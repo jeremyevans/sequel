@@ -8,4 +8,4 @@ gemspec
 # even if I had put this under group :test it would install
 # you can point this to fdbsql-4.xx.0 for the different versions
 # the fdbsql branch points to master + the changes
-gem 'sequel', :git => 'https://github.com/ScottDugas/sequel', :tag => 'fdbsql-4.13.0'
+gem 'sequel', :git => 'https://github.com/ScottDugas/sequel', :branch => 'fdbsql-jdbc'
