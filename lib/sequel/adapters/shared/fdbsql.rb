@@ -39,6 +39,10 @@ module Sequel
       BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
       BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
 
+      # Fdbsql uses the :fdbsql database type.
+      def database_type
+        :fdbsql
+      end
 
       attr_reader :conversion_procs
 
