@@ -203,7 +203,7 @@ module Sequel
             procs = conversion_procs
             procs[1115] = Creator.new("timestamp without time zone", procs[1114])
             procs[1185] = Creator.new("timestamp with time zone", procs[1184])
-            copy_conversion_procs([1009, 1007, 1016, 1231, 1022, 1000, 1001, 1182, 1183, 1270, 1005, 1028, 1021, 1014, 1015])
+            copy_conversion_procs([143, 791, 1000, 1001, 1003, 1005, 1006, 1007, 1009, 1010, 1011, 1012, 1013, 1014, 1015, 1016, 1021, 1022, 1028, 1182, 1183, 1231, 1270, 1561, 1563, 2951])
             [:string_array, :integer_array, :decimal_array, :float_array, :boolean_array, :blob_array, :date_array, :time_array, :datetime_array].each do |v|
               @schema_type_classes[v] = PGArray
             end
@@ -542,6 +542,20 @@ module Sequel
       register('real', :oid=>1021, :scalar_oid=>700, :scalar_typecast=>:float)
       register('character', :oid=>1014, :array_type=>:text, :scalar_typecast=>:string)
       register('character varying', :oid=>1015, :scalar_typecast=>:string, :type_symbol=>:varchar)
+
+      register('xml', :oid=>143, :scalar_oid=>142)
+      register('money', :oid=>791, :scalar_oid=>790)
+      register('bit', :oid=>1561, :scalar_oid=>1560)
+      register('bit varying', :oid=>1563, :scalar_oid=>1562, :type_symbol=>:varbit)
+      register('uuid', :oid=>2951, :scalar_oid=>2950)
+
+      register('xid', :oid=>1011, :scalar_oid=>28)
+      register('cid', :oid=>1012, :scalar_oid=>29)
+
+      register('name', :oid=>1003, :scalar_oid=>19)
+      register('tid', :oid=>1010, :scalar_oid=>27)
+      register('int2vector', :oid=>1006, :scalar_oid=>22)
+      register('oidvector', :oid=>1013, :scalar_oid=>30)
     end
   end
 
