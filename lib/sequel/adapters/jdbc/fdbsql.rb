@@ -60,6 +60,8 @@ module Sequel
       class Dataset < JDBC::Dataset
         include Sequel::Fdbsql::DatasetMethods
       end
+
+      Dataset.register_extension(:date_arithmetic, Sequel::Fdbsql::DateArithmeticDatasetMethods)
     end
 
   end
