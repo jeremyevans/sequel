@@ -29,6 +29,8 @@ module Sequel
   module Fdbsql
     CONVERTED_EXCEPTIONS  = []
 
+    NUMBER_OF_NOT_COMMITTED_RETRIES = 10
+
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
     class RetryError < Sequel::DatabaseError; end
     class NotCommittedError < RetryError; end

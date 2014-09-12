@@ -278,8 +278,6 @@ module Sequel
       # retry the statement if it's not in a transaction
       RETRY_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
 
-      NUMBER_OF_NOT_COMMITTED_RETRIES = 10
-
       attr_accessor :in_transaction
 
       attr_accessor :prepared_statements

@@ -75,10 +75,11 @@ module Sequel
         end
 
         def retry_on_not_committed(conn)
+          retries = Sequel::Fdbsql::NUMBER_OF_NOT_COMMITTED_RETRIES
           begin
             yield
           rescue Sequel::Fdbsql::NotCommittedError => e
-            if (conn.auto_commit)
+            if (conn.auto_commit and (retries -= 1) > 0)
               retry
             else
               raise
