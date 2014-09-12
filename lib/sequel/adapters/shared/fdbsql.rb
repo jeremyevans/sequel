@@ -67,12 +67,6 @@ module Sequel
         nil
       end
 
-      def database_exception_sqlstate(exception, opts)
-        if exception.respond_to?(:result) && (result = exception.result)
-          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
-        end
-      end
-
       def database_error_classes
         CONVERTED_EXCEPTIONS
       end

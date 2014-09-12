@@ -63,6 +63,12 @@ module Sequel
         end
       end
 
+      def database_exception_sqlstate(exception, opts)
+        if exception.respond_to?(:result) && (result = exception.result)
+          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+        end
+      end
+
       def execute_prepared_statement(conn, name, opts=OPTS, &block)
         statement = prepared_statement(name)
         sql = statement.prepared_sql

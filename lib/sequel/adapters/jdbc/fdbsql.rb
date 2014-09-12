@@ -55,6 +55,13 @@ module Sequel
         def disconnect_error?(exception, opts)
           super || exception.message =~ DISCONNECT_ERROR_RE
         end
+
+        def database_exception_sqlstate(exception, opts)
+          if exception.respond_to?(:sql_state)
+            exception.sql_state
+          end
+        end
+
       end
 
       class Dataset < JDBC::Dataset
