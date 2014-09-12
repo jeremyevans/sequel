@@ -41,39 +41,88 @@ describe 'Fdbsql' do
       end
     end
 
-    describe 'connection.in_transaction' do
-      before(:all) do
-        raise 'too many servers' if @db.servers.count > 1
-        @db.drop_table?(:some_table)
-        @db.create_table(:some_table) {text :name; primary_key :id}
-        @conn = @db.pool.hold(@db.servers.first) {|conn| conn}
-      end
-      after(:all) do
-        @db.drop_table?(:some_table)
+    # JDBC knows whether it's in autocommit mode or not
+    # just look at the connection
+    if (DB.adapter_scheme == :fdbsql)
+      describe 'PG connection.in_transaction' do
+        before(:all) do
+          raise 'too many servers' if @db.servers.count > 1
+          @db.drop_table?(:some_table)
+          @db.create_table(:some_table) {text :name; primary_key :id}
+          @conn = @db.pool.hold(@db.servers.first) {|conn| conn}
+        end
+        after(:all) do
+          @db.drop_table?(:some_table)
+        end
+
+        specify 'is unset by default' do
+          @conn.in_transaction.should be_false
+        end
+        specify 'is set in a transaction' do
+          @db.transaction do
+            @conn.in_transaction.should be_true
+          end
+        end
+        specify 'is unset after a commit' do
+          @db.transaction do
+            @db[:some_table].insert(name: 'a')
+            @conn.in_transaction.should be_true
+          end
+          @conn.in_transaction.should be_false
+        end
+        specify 'is unset after a rollback' do
+          @db.transaction do
+            raise Sequel::Rollback.new
+          end
+          @conn.in_transaction.should be_false
+        end
       end
 
-      specify 'is unset by default' do
-        @conn.in_transaction.should be_false
-      end
-      specify 'is set in a transaction' do
-        @db.transaction do
-          @conn.in_transaction.should be_true
+      describe 'PG connecting' do
+        specify '#fdbsql' do
+          db2 = Sequel.fdbsql(DB.uri)
         end
-      end
-      specify 'is unset after a commit' do
-        @db.transaction do
-          @db[:some_table].insert(name: 'a')
-          @conn.in_transaction.should be_true
-        end
-        @conn.in_transaction.should be_false
-      end
-      specify 'is unset after a rollback' do
-        @db.transaction do
-          raise Sequel::Rollback.new
-        end
-        @conn.in_transaction.should be_false
-      end
 
+        describe 'opts' do
+          before do
+            @fake_conn = double('connection class')
+            stub_const('PG::Connection', @fake_conn)
+          end
+
+          def fake_conn(args)
+            fake_conn_instance = double("fake connection")
+            fake_conn_instance.stub(:set_notice_receiver)
+            fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).
+              and_return(double(cmd_tuples: 1, first: {'_SQL_COL_1' => 'FoundationDB 1.9.6'}))
+            @fake_conn.should_receive(:new).with(args).once.and_return(fake_conn_instance)
+            fake_conn_instance.should_receive(:close).once
+          end
+
+          [['database', {:database => 'mydb'}, {:dbname => 'mydb'}],
+           ['host', {:host => 'somewhere.com'}, {:host => 'somewhere.com'}],
+           ['host', {:host => nil}, {:host => 'localhost'}],
+           ['password', {:password => 'mypw'}, {:password => 'mypw'}],
+           ['user', {:user => 'uxt'}, {:user => 'uxt'}],
+           ['username', {:username => 'uxt'}, {:user => 'uxt'}],
+           ['hostaddr', {:hostaddr => '192.168.1.35'}, {:hostaddr => '192.168.1.35'}],
+           ['port', {:port => 3487}, {:port => 3487}],
+           ['default port', {}, {:port => 15432}],
+           ['connect_timeout', {:connect_timeout => 4890}, {:connect_timeout => 4890}],
+           ['default connect_timeout', {}, {:connect_timeout => 20}],
+           ['sslmode', {:sslmode => 'require'}, {:sslmode => 'require'}], # (disable|allow|prefer|require)
+          ].each do |opts|
+            specify opts[0] do
+              fake_conn(include(opts[2]))
+              default = {:adapter => 'fdbsql', :database => 'the database', :host => 'localhost'}
+              Sequel.connect(default.merge(opts[1])) do |db|
+                db.run('SELECT VERSION()')
+              end
+            end
+          end
+        end
+      end
+    elsif (DB.adapter_scheme == :jdbc)
+      specify 'connection options...?'
     end
 
     describe 'schema_parsing' do
@@ -363,50 +412,6 @@ describe 'Fdbsql' do
       end
     end
 
-    describe 'connecting' do
-      specify '#fdbsql' do
-        db2 = Sequel.fdbsql(DB.uri)
-      end
-
-      describe 'opts' do
-        before do
-          @fake_conn = double('connection class')
-          stub_const('PG::Connection', @fake_conn)
-        end
-
-        def fake_conn(args)
-          fake_conn_instance = double("fake connection")
-          fake_conn_instance.stub(:set_notice_receiver)
-          fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).
-            and_return(double(cmd_tuples: 1, first: {'_SQL_COL_1' => 'FoundationDB 1.9.6'}))
-          @fake_conn.should_receive(:new).with(args).once.and_return(fake_conn_instance)
-          fake_conn_instance.should_receive(:close).once
-        end
-
-        [['database', {:database => 'mydb'}, {:dbname => 'mydb'}],
-         ['host', {:host => 'somewhere.com'}, {:host => 'somewhere.com'}],
-         ['host', {:host => nil}, {:host => 'localhost'}],
-         ['password', {:password => 'mypw'}, {:password => 'mypw'}],
-         ['user', {:user => 'uxt'}, {:user => 'uxt'}],
-         ['username', {:username => 'uxt'}, {:user => 'uxt'}],
-         ['hostaddr', {:hostaddr => '192.168.1.35'}, {:hostaddr => '192.168.1.35'}],
-         ['port', {:port => 3487}, {:port => 3487}],
-         ['default port', {}, {:port => 15432}],
-         ['connect_timeout', {:connect_timeout => 4890}, {:connect_timeout => 4890}],
-         ['default connect_timeout', {}, {:connect_timeout => 20}],
-         ['sslmode', {:sslmode => 'require'}, {:sslmode => 'require'}], # (disable|allow|prefer|require)
-        ].each do |opts|
-          specify opts[0] do
-            fake_conn(include(opts[2]))
-            default = {:adapter => 'fdbsql', :database => 'the database', :host => 'localhost'}
-            Sequel.connect(default.merge(opts[1])) do |db|
-              db.run('SELECT VERSION()')
-            end
-          end
-        end
-      end
-    end
-
     describe 'Database schema modifiers' do
       # this test was copied from sequel's integration/schema_test because that one drops a serial primary key which is not
       # currently supported in fdbsql
@@ -451,7 +456,6 @@ describe 'Fdbsql' do
       end
 
     end
-
 
     describe 'intersect and except ALL' do
       before do
@@ -541,95 +545,102 @@ describe 'Fdbsql' do
     end
   end
 
-  describe 'Connection' do
-    before do
-      @fake_conn = double('connection class')
-      stub_const('PG::Connection', @fake_conn)
-    end
-
-    def fake_conn
-      fake_conn_instance = double("fake connection")
-      fake_conn_instance.stub(:set_notice_receiver)
-      fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 1.9.6'}])
-      yield fake_conn_instance
-      @fake_conn.stub(:new).and_return(fake_conn_instance)
-    end
-
-    describe 'Automatic retry on NotCommitted' do
-
-      describe 'outside a transaction' do
-        specify 'retries a finite number of times' do
-          result = double('result')
-          e = PG::TRIntegrityConstraintViolation.new
-          e.stub(:result).and_return(result)
-          result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-          fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).ordered.and_raise(e)}
-          conn = Sequel::Fdbsql::Connection.new(nil, {})
-          proc do
-            conn.query('SELECT 3')
-          end.should raise_error(PG::TRIntegrityConstraintViolation)
-        end
-
-        specify 'retries more than 5 times' do
-          result = double('result')
-          e = PG::TRIntegrityConstraintViolation.new
-          e.stub(:result).and_return(result)
-          result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-          time = 0
-          fake_conn do |conn|
-            conn.stub(:query).with('SELECT 3', nil).ordered do
-              raise e if (time += 1) < 5
-              3
-            end
-          end
-          conn = Sequel::Fdbsql::Connection.new(nil, {})
-          conn.query('SELECT 3')
-        end
+  # jdbc and pg have different connection objects
+  if (DB.adapter_scheme == :fdbsql)
+    describe 'PG Connection' do
+      before do
+        @fake_conn = double('connection class')
+        stub_const('PG::Connection', @fake_conn)
       end
-      describe 'inside a transaction' do
-        specify 'does not retry' do
-          result = double('result')
-          e = PG::TRIntegrityConstraintViolation.new
-          e.stub(:result).and_return(result)
-          result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-          fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).once.ordered.and_raise(e)}
-          conn = Sequel::Fdbsql::Connection.new(nil, {})
-          conn.in_transaction = true
-          proc do
-            conn.query('SELECT 3')
-          end.should raise_error(PG::TRIntegrityConstraintViolation)
-        end
-      end
-    end
 
-    describe 'checks sql layer version' do
-      ['1.9.5', '0.9.6', '1.8.6'].each do |version|
-        it "throws error for #{version}" do
-          fake_conn {|conn| conn.stub(:query).with('SELECT VERSION()', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
-          proc do
+      def fake_conn
+        fake_conn_instance = double("fake connection")
+        fake_conn_instance.stub(:set_notice_receiver)
+        fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 1.9.6'}])
+        yield fake_conn_instance
+        @fake_conn.stub(:new).and_return(fake_conn_instance)
+      end
+
+      describe 'Automatic retry on NotCommitted' do
+
+        describe 'outside a transaction' do
+          specify 'retries a finite number of times' do
+            result = double('result')
+            e = PG::TRIntegrityConstraintViolation.new
+            e.stub(:result).and_return(result)
+            result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
+            fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).ordered.and_raise(e)}
             conn = Sequel::Fdbsql::Connection.new(nil, {})
-          end.should raise_error(Sequel::DatabaseError, /Unsupported.*version.*#{version}/)
+            proc do
+              conn.query('SELECT 3')
+            end.should raise_error(PG::TRIntegrityConstraintViolation)
+          end
+
+          specify 'retries more than 5 times' do
+            result = double('result')
+            e = PG::TRIntegrityConstraintViolation.new
+            e.stub(:result).and_return(result)
+            result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
+            time = 0
+            fake_conn do |conn|
+              conn.stub(:query).with('SELECT 3', nil).ordered do
+                raise e if (time += 1) < 5
+                3
+              end
+            end
+            conn = Sequel::Fdbsql::Connection.new(nil, {})
+            conn.query('SELECT 3')
+          end
+        end
+        describe 'inside a transaction' do
+          specify 'does not retry' do
+            result = double('result')
+            e = PG::TRIntegrityConstraintViolation.new
+            e.stub(:result).and_return(result)
+            result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
+            fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).once.ordered.and_raise(e)}
+            conn = Sequel::Fdbsql::Connection.new(nil, {})
+            conn.in_transaction = true
+            proc do
+              conn.query('SELECT 3')
+            end.should raise_error(PG::TRIntegrityConstraintViolation)
+          end
         end
       end
-      ['1.9.6', '1.9.7', '1.10.0', '2.0.0', '2.9.5'].each do |version|
-        it "does not throw error for #{version}" do
-          fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
-          conn = Sequel::Fdbsql::Connection.new(nil, {})
+
+      describe 'checks sql layer version' do
+        ['1.9.5', '0.9.6', '1.8.6'].each do |version|
+          it "throws error for #{version}" do
+            fake_conn {|conn| conn.stub(:query).with('SELECT VERSION()', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
+            proc do
+              conn = Sequel::Fdbsql::Connection.new(nil, {})
+            end.should raise_error(Sequel::DatabaseError, /Unsupported.*version.*#{version}/)
+          end
+        end
+        ['1.9.6', '1.9.7', '1.10.0', '2.0.0', '2.9.5'].each do |version|
+          it "does not throw error for #{version}" do
+            fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
+            conn = Sequel::Fdbsql::Connection.new(nil, {})
+          end
+        end
+      end
+
+      describe 'receiver' do
+        specify "should set notice receiver when connecting" do
+          receiver = proc {|x| puts x}
+
+          fake_conn do |conn|
+            conn.should_receive(:set_notice_receiver).once.with(receiver)
+            # because we give it a block for our default receiver
+            conn.should_not_receive(:set_notice_receiver).with(no_args())
+          end
+
+          conn = Sequel::Fdbsql::Connection.new(nil, notice_receiver: receiver)
         end
       end
     end
-    describe 'receiver' do
-      specify "should set notice receiver when connecting" do
-        receiver = proc {|x| puts x}
-
-        fake_conn do |conn|
-          conn.should_receive(:set_notice_receiver).once.with(receiver)
-          # because we give it a block for our default receiver
-          conn.should_not_receive(:set_notice_receiver).with(no_args())
-        end
-
-        conn = Sequel::Fdbsql::Connection.new(nil, notice_receiver: receiver)
-      end
-    end
+  elsif (DB.adapter_scheme == :jdbc)
+    specify 'automatic retry'
+    specify 'checks sql layer version'
   end
 end
