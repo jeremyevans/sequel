@@ -123,16 +123,6 @@ module Sequel
         {:primary_key => true, :serial => true, :type=>Integer}
       end
 
-      # Add null/not null SQL fragment to column creation SQL.
-      # FDBSQL 1.9.5 doesn't implicitly set NOT NULL for primary keys
-      # this may be changed in the future, but for now we need to
-      # set it at the sequel layer
-      def column_definition_null_sql(sql, column)
-        null = column.fetch(:null, column[:allow_null])
-        sql << Sequel::Database::NOT_NULL if null == false
-        sql << Sequel::Database::NULL if null == true
-      end
-
       def alter_table_op_sql(table, op)
         quoted_name = quote_identifier(op[:name]) if op[:name]
         case op[:op]
