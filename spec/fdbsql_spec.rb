@@ -690,7 +690,6 @@ describe 'Fdbsql' do
             end
             DB << 'SELECT 3'
           end
-          specify 'with a prepared statement'
         end
         describe 'inside a transaction' do
           before do
@@ -711,7 +710,6 @@ describe 'Fdbsql' do
               end
             end.should raise_error(Sequel::Fdbsql::NotCommittedError)
           end
-          specify 'does not retry prepared statement'
         end
       end
       specify 'checks sql layer version'
