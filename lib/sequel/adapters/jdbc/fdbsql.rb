@@ -68,7 +68,7 @@ module Sequel
           synchronize(opts[:server]) do |conn|
             retry_on_not_committed(conn) do
               statement(conn) do |stmt|
-                execute_on_statement(conn, stmt, sql, opts, &block)
+                execute_on_connection(conn, sql, opts, &block)
               end
             end
           end
