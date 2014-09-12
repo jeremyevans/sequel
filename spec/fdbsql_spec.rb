@@ -684,13 +684,38 @@ describe 'Fdbsql' do
             time = 0
             fake_stmt do |stmt|
               stmt.stub(:execute).with('SELECT 3').ordered do
-                  raise e if (time += 1) < 5
-                  3
+                raise e if (time += 1) < 5
+                3
               end
             end
             DB << 'SELECT 3'
+            time.should eq 5
+          end
+
+          specify 'retries a prepared statement' do
+            e = NativeException.new
+            e.stub(:sql_state).and_return("40002")
+            ps = double('fake prepared statement')
+            @fake_conn.stub(:prepareStatement).with('SELECT $n').and_return(ps)
+            ps.stub(:setLong).with(0, 3).at_least(:once)
+            rs = double('faux resultset')
+            rs.stub(:close)
+            md = double('fake metadat')
+            rs.stub(:getMetaData).and_return(md)
+            md.stub(:getColumnCount).and_return(0)
+            rs.stub(:next).and_return(false)
+            time = 0
+            ps.stub(:executeQuery) do
+              raise e if (time += 1) < 5
+              rs
+            end
+            ds = DB["SELECT $n"]
+            ds.prepare(:select, :select_n)
+            DB.call(:select_n, n: 3)
+            time.should eq 5
           end
         end
+
         describe 'inside a transaction' do
           before do
             @fake_conn.stub(:auto_commit).and_return(false)
@@ -707,6 +732,26 @@ describe 'Fdbsql' do
             proc do
               DB.transaction do
                 DB << 'SELECT 3'
+              end
+            end.should raise_error(Sequel::Fdbsql::NotCommittedError)
+          end
+
+          specify 'does not retry prepared statement' do
+            e = NativeException.new
+            e.stub(:sql_state).and_return("40002")
+            ps = double('fake prepared statement')
+            fake_stmt do |stmt|
+              stmt.stub(:execute).with('BEGIN').once
+              stmt.stub(:execute).with('ROLLBACK').once
+            end
+            @fake_conn.stub(:prepareStatement).with('SELECT $n').and_return(ps)
+            ps.stub(:setLong).with(0, 3).at_least(:once)
+            ps.stub(:executeQuery).once.and_raise(e)
+            proc do
+              DB.transaction do
+                ds = DB["SELECT $n"]
+                ds.prepare(:select, :select_n)
+                DB.call(:select_n, n: 3)
               end
             end.should raise_error(Sequel::Fdbsql::NotCommittedError)
           end

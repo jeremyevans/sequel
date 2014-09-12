@@ -74,6 +74,22 @@ module Sequel
           end
         end
 
+        private
+        def execute_prepared_statement(name, opts=OPTS, &block)
+          if name.is_a?(Dataset)
+            ps = name
+            name = ps.prepared_statement_name
+          else
+            ps = prepared_statement(name)
+          end
+          sql = ps.prepared_sql
+          synchronize(opts[:server]) do |conn|
+            retry_on_not_committed(conn) do
+              execute_prepared_statement_on_connection(conn, ps, name, sql, opts, &block)
+            end
+          end
+        end
+
         def retry_on_not_committed(conn)
           retries = Sequel::Fdbsql::NUMBER_OF_NOT_COMMITTED_RETRIES
           begin
