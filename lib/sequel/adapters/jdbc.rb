@@ -242,28 +242,28 @@ module Sequel
         return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
         synchronize(opts[:server]) do |conn|
-          statement(conn) do |stmt|
-            execute_on_statement(conn, stmt, sql, opts, &block)
-          end
+          execute_on_connection(conn, sql, opts, &block)
         end
       end
       alias execute_dui execute
 
-      def execute_on_statement(conn, stmt, sql, opts, &block)
-        if block
-          if size = fetch_size
-            stmt.setFetchSize(size)
-          end
-          yield log_yield(sql){stmt.executeQuery(sql)}
-        else
-          case opts[:type]
-          when :ddl
-            log_yield(sql){stmt.execute(sql)}
-          when :insert
-            log_yield(sql){execute_statement_insert(stmt, sql)}
-            last_insert_id(conn, opts.merge(:stmt=>stmt))
+      def execute_on_connection(conn, sql, opts, &block)
+        statement(conn) do |stmt|
+          if block
+            if size = fetch_size
+              stmt.setFetchSize(size)
+            end
+            yield log_yield(sql){stmt.executeQuery(sql)}
           else
-            log_yield(sql){stmt.executeUpdate(sql)}
+            case opts[:type]
+            when :ddl
+              log_yield(sql){stmt.execute(sql)}
+            when :insert
+              log_yield(sql){execute_statement_insert(stmt, sql)}
+              last_insert_id(conn, opts.merge(:stmt=>stmt))
+            else
+              log_yield(sql){stmt.executeUpdate(sql)}
+            end
           end
         end
       end
