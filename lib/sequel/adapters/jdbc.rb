@@ -433,7 +433,6 @@ module Sequel
           cps.close unless name
         end
       end
-    end
 
       # Execute the prepared insert statement
       def execute_prepared_statement_insert(stmt)
