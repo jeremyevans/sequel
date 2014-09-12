@@ -15,6 +15,11 @@ def logger.method_missing(m, msg)
 end
 DB.loggers << logger
 
+if (DB.adapter_scheme == :jdbc)
+  require 'java'
+  require 'sequel/adapters/jdbc'
+end
+
 describe 'Fdbsql' do
   describe 'Database' do
     before(:all) do
@@ -640,7 +645,46 @@ describe 'Fdbsql' do
       end
     end
   elsif (DB.adapter_scheme == :jdbc)
-    specify 'automatic retry'
-    specify 'checks sql layer version'
+    describe 'JDBC' do
+      before do
+        @fake_conn = double('fake connection')
+        DB.stub(:connect).and_return(@fake_conn)
+        # clears all the existing real connection
+        DB.disconnect
+      end
+
+      def fake_stmt
+        fake_stmt = double("fake statement")
+        @fake_conn.stub(:createStatement).and_return(fake_stmt)
+#        fake_stmt.stub(:executeQuery).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 1.9.6'}])
+        yield fake_stmt
+        fake_stmt.stub(:close)
+      end
+      describe 'automatic retry on NotCommitted' do
+        describe 'outside a transaction' do
+          specify 'retries a finite number of times'
+          specify 'retries at least 5 times'
+          specify 'with a prepared statement'
+        end
+        describe 'inside a transaction' do
+          specify 'does not retry' do
+            e = NativeException.new
+            e.stub(:sql_state).and_return("40002")
+            fake_stmt do |stmt|
+              stmt.stub(:execute).with('BEGIN').once.ordered
+              stmt.stub(:execute).with('SELECT 3').once.ordered.and_raise(e)
+              stmt.stub(:execute).with('ROLLBACK').once.ordered
+            end
+            proc do
+              DB.transaction do
+                DB << 'SELECT 3'
+              end
+            end.should raise_error(Sequel::Fdbsql::NotCommittedError)
+          end
+          specify 'does not retry prepared statement'
+        end
+      end
+      specify 'checks sql layer version'
+    end
   end
 end
