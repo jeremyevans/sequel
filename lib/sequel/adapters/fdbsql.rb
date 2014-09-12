@@ -126,43 +126,11 @@ module Sequel
           yield_hash_rows(res, columns) {|h| yield h}
         end
       end
-      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
-
-      # FDBSQL specific argument mapper used for mapping the named
-      # argument hash to a array with numbered arguments.
-      module ArgumentMapper
-        include Sequel::Dataset::ArgumentMapper
-
-        protected
-
-        # An array of bound variable values for this query, in the correct order.
-        def map_to_prepared_args(hash)
-          prepared_args.map{|k| hash[k.to_sym]}
-        end
-
-        private
-
-        def prepared_arg(k)
-          y = k
-          if i = prepared_args.index(y)
-            i += 1
-          else
-            prepared_args << y
-            i = prepared_args.length
-          end
-          LiteralString.new("#{prepared_arg_placeholder}#{i}")
-        end
-
-        # Always assume a prepared argument.
-        def prepared_arg?(k)
-          true
-        end
-      end
 
       # Allow use of bind arguments for FDBSQL using the pg driver.
       module BindArgumentMethods
 
-        include ArgumentMapper
+        include Sequel::Dataset::UnnumberedArgumentMapper
         include DatasetMethods::PreparedStatementMethods
 
         private
@@ -245,13 +213,6 @@ module Sequel
         cols
       end
 
-      private
-
-      # PostgreSQL uses $N for placeholders instead of ?, so use a $
-      # as the placeholder.
-      def prepared_arg_placeholder
-        PREPARED_ARG_PLACEHOLDER
-      end
     end
 
     class Connection
