@@ -45,9 +45,7 @@ EOF
   s.required_ruby_version = '>= 1.9.3'
 
   s.add_dependency 'sequel', '>= 4.12', '< 4.14'
-  if (RUBY_ENGINE == 'jruby')
-    s.add_dependency 'jdbc-postgres', '~> 9.3'
-  else
+  unless (RUBY_ENGINE == 'jruby')
     s.add_dependency 'pg', '~> 0.17'
   end
 
