@@ -247,26 +247,6 @@ module Sequel
       end
       alias execute_dui execute
 
-      def execute_on_connection(conn, sql, opts, &block)
-        statement(conn) do |stmt|
-          if block
-            if size = fetch_size
-              stmt.setFetchSize(size)
-            end
-            yield log_yield(sql){stmt.executeQuery(sql)}
-          else
-            case opts[:type]
-            when :ddl
-              log_yield(sql){stmt.execute(sql)}
-            when :insert
-              log_yield(sql){execute_statement_insert(stmt, sql)}
-              last_insert_id(conn, opts.merge(:stmt=>stmt))
-            else
-              log_yield(sql){stmt.executeUpdate(sql)}
-            end
-          end
-        end
-      end
       # Execute the given DDL SQL, which should not return any
       # values or rows.
       def execute_ddl(sql, opts=OPTS)
@@ -458,6 +438,27 @@ module Sequel
       # Execute the insert SQL using the statement
       def execute_statement_insert(stmt, sql)
         stmt.executeUpdate(sql)
+      end
+
+      def execute_on_connection(conn, sql, opts, &block)
+        statement(conn) do |stmt|
+          if block
+            if size = fetch_size
+              stmt.setFetchSize(size)
+            end
+            yield log_yield(sql){stmt.executeQuery(sql)}
+          else
+            case opts[:type]
+            when :ddl
+              log_yield(sql){stmt.execute(sql)}
+            when :insert
+              log_yield(sql){execute_statement_insert(stmt, sql)}
+              last_insert_id(conn, opts.merge(:stmt=>stmt))
+            else
+              log_yield(sql){stmt.executeUpdate(sql)}
+            end
+          end
+        end
       end
 
       # The default fetch size to use for statements.  Nil by default, so that the
