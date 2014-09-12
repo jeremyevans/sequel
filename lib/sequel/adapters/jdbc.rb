@@ -380,7 +380,7 @@ module Sequel
       # statement, use that statement instead of creating another.
       # Otherwise, prepare a new statement for the connection, bind the
       # variables, and execute it.
-      def execute_prepared_statement(name, opts=OPTS)
+      def execute_prepared_statement(name, opts=OPTS, &block)
         if name.is_a?(Dataset)
           ps = name
           name = ps.prepared_statement_name
@@ -389,7 +389,7 @@ module Sequel
         end
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
-          execute_prepared_statement_on_connection(conn, ps, name, sql, opts)
+          execute_prepared_statement_on_connection(conn, ps, name, sql, opts, &block)
         end
       end
 
