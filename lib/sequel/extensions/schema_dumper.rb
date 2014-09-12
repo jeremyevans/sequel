@@ -171,7 +171,15 @@ END_MIG
           gen.primary_key(name, type_hash)
         end
       else
-        col_opts = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
+        col_opts = if options[:same_db]
+          h = {:type=>schema[:db_type]}
+          if database_type == :mysql && h[:type] =~ /\Atimestamp/
+            h[:null] = true
+          end
+          h
+        else
+          column_schema_to_ruby_type(schema)
+        end
         type = col_opts.delete(:type)
         col_opts.delete(:size) if col_opts[:size].nil?
         col_opts[:default] = if schema[:ruby_default].nil?

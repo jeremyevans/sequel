@@ -753,6 +753,15 @@ end
 END_MIG
   end
 
+  it "should force specify :null option for MySQL timestamp columns when using :same_db" do
+    @d.meta_def(:database_type){:mysql}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'timestamp', :primary_key=>true, :allow_null=>true}]]}
+    @d.dump_table_schema(:t3, :same_db=>true).should == "create_table(:t3) do\n  column :c1, \"timestamp\", :null=>true\n  \n  primary_key [:c1]\nend"
+
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'timestamp', :primary_key=>true, :allow_null=>false}]]}
+    @d.dump_table_schema(:t3, :same_db=>true).should == "create_table(:t3) do\n  column :c1, \"timestamp\", :null=>false\n  \n  primary_key [:c1]\nend"
+  end
+
   it "should use separate primary_key call with non autoincrementable types" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'varchar(8)', :primary_key=>true}]]}
     @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  String :c1, :size=>8\n  \n  primary_key [:c1]\nend"

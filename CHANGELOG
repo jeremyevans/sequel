@@ -1,5 +1,7 @@
 === HEAD
 
+* Work around bug in old versions of MySQL when schema dumping a table with multiple timestamp columns (jeremyevans) (#882)
+
 * Support more array types by default in the pg_array extension, such as xml[] and uuid[] (jeremyevans)
 
 * Add Sequel::Model.cache_associations accessor, which can be set to false to not cache association metadata (jeremyevans)
