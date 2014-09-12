@@ -126,8 +126,6 @@ describe 'Fdbsql' do
           end
         end
       end
-    elsif (DB.adapter_scheme == :jdbc)
-      specify 'connection options...?'
     end
 
     describe 'schema_parsing' do
