@@ -666,6 +666,10 @@ describe 'Fdbsql' do
       end
       describe 'automatic retry on NotCommitted' do
         describe 'outside a transaction' do
+          before do
+            @fake_conn.stub(:auto_commit).and_return(true)
+          end
+
           specify 'retries a finite number of times' do
             e = NativeException.new
             e.stub(:sql_state).and_return("40002")
@@ -689,6 +693,10 @@ describe 'Fdbsql' do
           specify 'with a prepared statement'
         end
         describe 'inside a transaction' do
+          before do
+            @fake_conn.stub(:auto_commit).and_return(false)
+          end
+
           specify 'does not retry' do
             e = NativeException.new
             e.stub(:sql_state).and_return("40002")

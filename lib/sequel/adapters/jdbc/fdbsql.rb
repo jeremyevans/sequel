@@ -63,24 +63,26 @@ module Sequel
         end
 
         def execute(sql, opts=OPTS, &block)
-          retry_on_not_committed do
-            return call_sproc(sql, opts, &block) if opts[:sproc]
-            return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
-            synchronize(opts[:server]) do |conn|
-              retry_on_not_committed do
-                statement(conn) do |stmt|
-                  execute_on_statement(conn, stmt, sql, opts, &block)
-                end
+          return call_sproc(sql, opts, &block) if opts[:sproc]
+          return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
+          synchronize(opts[:server]) do |conn|
+            retry_on_not_committed(conn) do
+              statement(conn) do |stmt|
+                execute_on_statement(conn, stmt, sql, opts, &block)
               end
             end
           end
         end
 
-        def retry_on_not_committed
+        def retry_on_not_committed(conn)
           begin
             yield
           rescue Sequel::Fdbsql::NotCommittedError => e
-            retry
+            if (conn.auto_commit)
+              retry
+            else
+              raise
+            end
           end
         end
 
