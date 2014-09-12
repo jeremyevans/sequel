@@ -85,7 +85,16 @@ module Sequel
           sql = ps.prepared_sql
           synchronize(opts[:server]) do |conn|
             retry_on_not_committed(conn) do
-              execute_prepared_statement_on_connection(conn, ps, name, sql, opts, &block)
+              begin
+                execute_prepared_statement_on_connection(conn, ps, name, sql, opts, &block)
+              rescue Sequel::DatabaseError => e
+                if (e.wrapped_exception && database_exception_sqlstate(e.wrapped_exception, opts) == STALE_STATEMENT_SQLSTATE)
+                  cps_sync(conn){|cpsh| cpsh[name] = nil}
+                  retry
+                else
+                  raise
+                end
+              end
             end
           end
         end
