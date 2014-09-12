@@ -116,6 +116,18 @@ module Sequel
 
       class Dataset < JDBC::Dataset
         include Sequel::Fdbsql::DatasetMethods
+
+        # Add the shared PostgreSQL prepared statement methods
+        def prepare(type, name=nil, *values)
+          ps = to_prepared_statement(type, values)
+          ps.extend(JDBC::Dataset::PreparedStatementMethods)
+          ps.extend(::Sequel::Fdbsql::DatasetMethods::PreparedStatementMethods)
+          if name
+            ps.prepared_statement_name = name
+            db.set_prepared_statement(name, ps)
+          end
+          ps
+        end
       end
 
       Dataset.register_extension(:date_arithmetic, Sequel::Fdbsql::DateArithmeticDatasetMethods)

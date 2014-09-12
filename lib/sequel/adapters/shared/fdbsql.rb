@@ -562,6 +562,24 @@ module Sequel
         true
       end
 
+      module PreparedStatementMethods
+        # Override insert action to use RETURNING if the server supports it.
+        def run
+          if @prepared_type == :insert
+            fetch_rows(prepared_sql){|r| return r.values.first}
+          else
+            super
+          end
+        end
+
+        def prepared_sql
+          return @prepared_sql if @prepared_sql
+          @opts[:returning] = insert_pk if @prepared_type == :insert
+          super
+          @prepared_sql
+        end
+      end
+
       private
 
       # Return the primary key to use for RETURNING in an INSERT statement
