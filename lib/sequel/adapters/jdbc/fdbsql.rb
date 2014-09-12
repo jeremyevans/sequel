@@ -62,6 +62,20 @@ module Sequel
           end
         end
 
+        def execute(sql, opts=OPTS, &block)
+          retry_on_not_committed do
+            super(sql, opts, &block)
+          end
+        end
+
+        def retry_on_not_committed
+          begin
+            yield
+          rescue Sequel::Fdbsql::NotCommittedError => e
+            retry
+          end
+        end
+
       end
 
       class Dataset < JDBC::Dataset

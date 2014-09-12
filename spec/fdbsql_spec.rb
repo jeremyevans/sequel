@@ -674,7 +674,18 @@ describe 'Fdbsql' do
               DB << 'SELECT 3'
             end.should raise_error(Sequel::Fdbsql::NotCommittedError)
           end
-          specify 'retries at least 5 times'
+          specify 'retries at least 5 times' do
+            e = NativeException.new
+            e.stub(:sql_state).and_return("40002")
+            time = 0
+            fake_stmt do |stmt|
+              stmt.stub(:execute).with('SELECT 3').ordered do
+                  raise e if (time += 1) < 5
+                  3
+              end
+            end
+            DB << 'SELECT 3'
+          end
           specify 'with a prepared statement'
         end
         describe 'inside a transaction' do
