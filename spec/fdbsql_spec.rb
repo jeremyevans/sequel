@@ -648,8 +648,12 @@ describe 'Fdbsql' do
     describe 'JDBC' do
       before do
         @fake_conn = double('fake connection')
+        @fake_conn.stub(:close)
         DB.stub(:connect).and_return(@fake_conn)
         # clears all the existing real connection
+        DB.disconnect
+      end
+      after do
         DB.disconnect
       end
 
@@ -662,7 +666,14 @@ describe 'Fdbsql' do
       end
       describe 'automatic retry on NotCommitted' do
         describe 'outside a transaction' do
-          specify 'retries a finite number of times'
+          specify 'retries a finite number of times' do
+            e = NativeException.new
+            e.stub(:sql_state).and_return("40002")
+            fake_stmt {|stmt| stmt.stub(:execute).with('SELECT 3').at_most(10).times.ordered.and_raise(e) }
+            proc do
+              DB << 'SELECT 3'
+            end.should raise_error(Sequel::Fdbsql::NotCommittedError)
+          end
           specify 'retries at least 5 times'
           specify 'with a prepared statement'
         end
