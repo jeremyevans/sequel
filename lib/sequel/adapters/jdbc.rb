@@ -381,7 +381,6 @@ module Sequel
       # Otherwise, prepare a new statement for the connection, bind the
       # variables, and execute it.
       def execute_prepared_statement(name, opts=OPTS)
-        args = opts[:arguments]
         if name.is_a?(Dataset)
           ps = name
           name = ps.prepared_statement_name
@@ -395,6 +394,7 @@ module Sequel
       end
 
       def execute_prepared_statement_on_connection(conn, name, sql, opts)
+        args = opts[:arguments]
         if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
           cps = cps[1]
         else
