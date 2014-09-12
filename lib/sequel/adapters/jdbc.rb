@@ -389,11 +389,11 @@ module Sequel
         end
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
-          execute_prepared_statement_on_connection(conn, name, sql, opts)
+          execute_prepared_statement_on_connection(conn, ps, name, sql, opts)
         end
       end
 
-      def execute_prepared_statement_on_connection(conn, name, sql, opts)
+      def execute_prepared_statement_on_connection(conn, ps, name, sql, opts)
         args = opts[:arguments]
         if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
           cps = cps[1]
