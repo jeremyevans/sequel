@@ -757,7 +757,6 @@ describe 'Fdbsql' do
           end
         end
       end
-      specify 'checks sql layer version'
     end
   end
 end
