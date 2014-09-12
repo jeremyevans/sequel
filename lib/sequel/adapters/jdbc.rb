@@ -390,45 +390,50 @@ module Sequel
         end
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
-          if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
-            cps = cps[1]
-          else
-            log_yield("CLOSE #{name}"){cps[1].close} if cps
-            cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){prepare_jdbc_statement(conn, sql, opts)}
-            if size = fetch_size
-              cps.setFetchSize(size)
-            end
-            cps_sync(conn){|cpsh| cpsh[name] = [sql, cps]} if name
-          end
-          i = 0
-          args.each{|arg| set_ps_arg(cps, arg, i+=1)}
-          msg = "EXECUTE#{" #{name}" if name}"
-          if ps.log_sql
-            msg << " ("
-            msg << sql
-            msg << ")"
-          end
-          begin
-            if block_given?
-              yield log_yield(msg, args){cps.executeQuery}
-            else
-              case opts[:type]
-              when :ddl
-                log_yield(msg, args){cps.execute}
-              when :insert
-                log_yield(msg, args){execute_prepared_statement_insert(cps)}
-                last_insert_id(conn, opts.merge(:prepared=>true, :stmt=>cps))
-              else
-                log_yield(msg, args){cps.executeUpdate}
-              end
-            end
-          rescue NativeException, JavaSQL::SQLException => e
-            raise_error(e)
-          ensure
-            cps.close unless name
-          end
+          execute_prepared_statement_on_connection(conn, name, opts)
         end
       end
+
+      def execute_prepared_statement_on_connection(conn, name, opts)
+        if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
+          cps = cps[1]
+        else
+          log_yield("CLOSE #{name}"){cps[1].close} if cps
+          cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){prepare_jdbc_statement(conn, sql, opts)}
+          if size = fetch_size
+            cps.setFetchSize(size)
+          end
+          cps_sync(conn){|cpsh| cpsh[name] = [sql, cps]} if name
+        end
+        i = 0
+        args.each{|arg| set_ps_arg(cps, arg, i+=1)}
+        msg = "EXECUTE#{" #{name}" if name}"
+        if ps.log_sql
+          msg << " ("
+          msg << sql
+          msg << ")"
+        end
+        begin
+          if block_given?
+            yield log_yield(msg, args){cps.executeQuery}
+          else
+            case opts[:type]
+            when :ddl
+              log_yield(msg, args){cps.execute}
+            when :insert
+              log_yield(msg, args){execute_prepared_statement_insert(cps)}
+              last_insert_id(conn, opts.merge(:prepared=>true, :stmt=>cps))
+            else
+              log_yield(msg, args){cps.executeUpdate}
+            end
+          end
+        rescue NativeException, JavaSQL::SQLException => e
+          raise_error(e)
+        ensure
+          cps.close unless name
+        end
+      end
+    end
 
       # Execute the prepared insert statement
       def execute_prepared_statement_insert(stmt)
