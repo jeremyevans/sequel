@@ -369,15 +369,6 @@ module Sequel
         end
       end
 
-      def query(sql, args=nil)
-        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
-        check_disconnect_errors do
-          retry_on_not_committed do
-            @connection.query(sql, args)
-          end
-        end
-      end
-
       def retry_on_not_committed
         retries = NUMBER_OF_NOT_COMMITTED_RETRIES
         begin
