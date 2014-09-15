@@ -37,16 +37,6 @@ module Sequel
 
     module DatabaseMethods
 
-      # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
-      # it should just be the timestamp, so we need whole new formats here.
-      BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
-      BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
-
-      # Fdbsql uses the :fdbsql database type.
-      def database_type
-        :fdbsql
-      end
-
       attr_reader :conversion_procs
 
       def adapter_initialize
@@ -59,62 +49,9 @@ module Sequel
         @conversion_procs.freeze
       end
 
-      # Like PostgreSQL fdbsql folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
-      def identifier_input_method_default
-        nil
-      end
-
-      # Like PostgreSQL fdbsql folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
-      def identifier_output_method_default
-        nil
-      end
-
-      def database_error_classes
-        CONVERTED_EXCEPTIONS
-      end
-
-      NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
-      FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
-      UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
-      NOT_COMMITTED_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
-      # Given the SQLState, return the appropriate DatabaseError subclass.
-      def database_specific_error_class_from_sqlstate(sqlstate)
-        # There is also a CheckConstraintViolation in Sequel, but the sql layer doesn't support check constraints
-        case sqlstate
-        when *NOT_NULL_CONSTRAINT_SQLSTATES
-          NotNullConstraintViolation
-        when *FOREIGN_KEY_CONSTRAINT_SQLSTATES
-          ForeignKeyConstraintViolation
-        when *UNIQUE_CONSTRAINT_SQLSTATES
-          UniqueConstraintViolation
-        when *NOT_COMMITTED_SQLSTATES
-          NotCommittedError
-        end
-      end
-
-      # This is a fallback used by the base class if the sqlstate fails to figure out
-      # what error type it is.
-      DATABASE_ERROR_REGEXPS = [
-        # Add this check first, since otherwise it's possible for users to control
-        # which exception class is generated.
-        [/invalid input syntax/, DatabaseError],
-        # the rest of these are backups in case the sqlstate fails
-        [/[dD]uplicate key violates unique constraint/, UniqueConstraintViolation],
-        [/due (?:to|for) foreign key constraint/, ForeignKeyConstraintViolation],
-        [/NULL value not permitted/, NotNullConstraintViolation],
-      ].freeze
-      def database_error_regexps
-        DATABASE_ERROR_REGEXPS
-      end
-
-      # Remove the cached entries for primary keys and sequences when a table is
-      # changed.
-      def remove_cached_schema(table)
-        tab = quote_schema_table(table)
-        Sequel.synchronize do
-          @primary_keys.delete(tab)
-        end
-        super
+      # Fdbsql uses the :fdbsql database type.
+      def database_type
+        :fdbsql
       end
 
       # like PostgreSQL fdbsql uses SERIAL psuedo-type instead of AUTOINCREMENT for
@@ -123,100 +60,9 @@ module Sequel
         {:primary_key => true, :serial => true, :type=>Integer}
       end
 
-      def alter_table_op_sql(table, op)
-        quoted_name = quote_identifier(op[:name]) if op[:name]
-        case op[:op]
-        when :set_column_type
-          "ALTER COLUMN #{quoted_name} SET DATA TYPE #{type_literal(op)}"
-        when :set_column_null
-          "ALTER COLUMN #{quoted_name} #{op[:null] ? '' : 'NOT'} NULL"
-        else
-          super
-        end
-      end
-
-
-      # FDBSQL requires parens around the SELECT, and the WITH DATA syntax.
-      def create_table_as_sql(name, sql, options)
-        "#{create_table_prefix_sql(name, options)} AS (#{sql}) WITH DATA"
-      end
-
-      # Handle bigserial type if :serial option is present
-      def type_literal_generic_bignum(column)
-        column[:serial] ? :bigserial : super
-      end
-
-      # Handle serial type if :serial option is present
-      def type_literal_generic_integer(column)
-        column[:serial] ? :serial : super
-      end
-
-      # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
-      # handle fractional seconds in Time/DateTime or blobs with "\0", and it won't ever
-      # handle Sequel::SQLTime values correctly.  Only public for use by the adapter, shouldn't
-      # be used by external code.
-      def bound_variable_arg(arg, conn)
-        case arg
-        # TODO TDD it:
-        when Sequel::SQL::Blob
-          # the 1 means treat this as a binary blob
-          {:value => arg, :format => 1}
-        when Sequel::SQLTime
-          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
-          arg.strftime(BOUND_VARIABLE_SQLTIME_FORMAT)
-        when DateTime, Time
-          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
-          from_application_timestamp(arg).strftime(BOUND_VARIABLE_TIMESTAMP_FORMAT)
-        else
-           arg
-        end
-      end
-
-      STALE_STATEMENT_SQLSTATE = '0A50A'
-
       # indexes are namespaced per table
       def global_index_namespace?
         false
-      end
-
-      # Fdbsql supports deferrable fk constraints
-      def supports_deferrable_foreign_key_constraints?
-        true
-      end
-
-      # the sql layer supports CREATE TABLE IF NOT EXISTS syntax,
-      def supports_create_table_if_not_exists?
-        true
-      end
-
-      # the sql layer supports DROP TABLE IF EXISTS
-      def supports_drop_table_if_exists?
-        true
-      end
-
-      # Array of symbols specifying table names in the current database.
-      # The dataset used is yielded to the block if one is provided,
-      # otherwise, an array of symbols of table names is returned.
-      #
-      # Options:
-      # :qualify :: Return the tables as Sequel::SQL::QualifiedIdentifier instances,
-      #             using the schema the table is located in as the qualifier.
-      # :schema :: The schema to search
-      # :server :: The server to use
-      def tables(opts=OPTS, &block)
-        tables_or_views('TABLE', opts, &block)
-      end
-
-
-      # Array of symbols specifying view names in the current database.
-      #
-      # Options:
-      # :qualify :: Return the views as Sequel::SQL::QualifiedIdentifier instances,
-      #             using the schema the view is located in as the qualifier.
-      # :schema :: The schema to search
-      # :server :: The server to use
-      def views(opts=OPTS, &block)
-        tables_or_views('VIEW', opts, &block)
       end
 
       # Return primary key for the given table.
@@ -244,34 +90,43 @@ module Sequel
         Sequel.synchronize{@primary_keys[quoted_table] = value}
       end
 
-      # returns an array of column information with each column being of the form:
-      # [:column_name, {:db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}]
-      def schema_parse_table(table, opts = {})
-        out_identifier, in_identifier = identifier_convertors(opts)
-        schema, table = schema_or_current_and_table(table, opts)
-        dataset = metadata_dataset.
-          select(:c__column_name,
-                 Sequel.as({:c__is_nullable => 'YES'}, 'allow_null'),
-                 :c__column_default___default,
-                 :c__data_type___db_type,
-                 :c__character_maximum_length___max_length,
-                 :c__numeric_scale,
-                 Sequel.as({:tc__constraint_type => 'PRIMARY KEY'}, 'primary_key')).
-          from(Sequel.as(:information_schema__key_column_usage, 'kc')).
-          join(Sequel.as(:information_schema__table_constraints, 'tc'),
-               tc__constraint_type: 'PRIMARY KEY',
-               tc__table_name: :kc__table_name,
-               tc__table_schema: :kc__table_schema,
-               tc__constraint_name: :kc__constraint_name).
-          right_outer_join(Sequel.as(:information_schema__columns, 'c'),
-                           [:table_name, :table_schema, :column_name]).
-          where(c__table_name: in_identifier.call(table),
-                c__table_schema: schema)
-        dataset.map do |row|
-          row[:default] = nil if blank_object?(row[:default])
-          row[:type] = schema_column_type(normalize_decimal_to_integer(row[:db_type], row[:numeric_scale]))
-          [out_identifier.call(row.delete(:column_name)), row]
-        end
+      # the sql layer supports CREATE TABLE IF NOT EXISTS syntax,
+      def supports_create_table_if_not_exists?
+        true
+      end
+
+      # Fdbsql supports deferrable fk constraints
+      def supports_deferrable_foreign_key_constraints?
+        true
+      end
+
+      # the sql layer supports DROP TABLE IF EXISTS
+      def supports_drop_table_if_exists?
+        true
+      end
+
+      # Array of symbols specifying table names in the current database.
+      # The dataset used is yielded to the block if one is provided,
+      # otherwise, an array of symbols of table names is returned.
+      #
+      # Options:
+      # :qualify :: Return the tables as Sequel::SQL::QualifiedIdentifier instances,
+      #             using the schema the table is located in as the qualifier.
+      # :schema :: The schema to search
+      # :server :: The server to use
+      def tables(opts=OPTS, &block)
+        tables_or_views('TABLE', opts, &block)
+      end
+
+      # Array of symbols specifying view names in the current database.
+      #
+      # Options:
+      # :qualify :: Return the views as Sequel::SQL::QualifiedIdentifier instances,
+      #             using the schema the view is located in as the qualifier.
+      # :schema :: The schema to search
+      # :server :: The server to use
+      def views(opts=OPTS, &block)
+        tables_or_views('VIEW', opts, &block)
       end
 
       # Return full foreign key information, including
@@ -364,15 +219,45 @@ module Sequel
         indexes
       end
 
-      def column_schema_normalize_default(default, type)
-        # the default value returned by schema parsing is not escaped or quoted
-        # in any way, it's just the value of the string
-        # the base implementation assumes it would come back "'my ''default'' value'"
-        # fdbsql returns "my 'default' value" (Not including double quotes for either)
-        return default
+      private
+
+      def alter_table_op_sql(table, op)
+        quoted_name = quote_identifier(op[:name]) if op[:name]
+        case op[:op]
+        when :set_column_type
+          "ALTER COLUMN #{quoted_name} SET DATA TYPE #{type_literal(op)}"
+        when :set_column_null
+          "ALTER COLUMN #{quoted_name} #{op[:null] ? '' : 'NOT'} NULL"
+        else
+          super
+        end
       end
 
-      private
+      # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
+      # it should just be the timestamp, so we need whole new formats here.
+      BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
+      BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
+
+      # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
+      # handle fractional seconds in Time/DateTime or blobs with "\0", and it won't ever
+      # handle Sequel::SQLTime values correctly.  Only public for use by the adapter, shouldn't
+      # be used by external code.
+      def bound_variable_arg(arg, conn)
+        case arg
+        # TODO TDD it:
+        when Sequel::SQL::Blob
+          # the 1 means treat this as a binary blob
+          {:value => arg, :format => 1}
+        when Sequel::SQLTime
+          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
+          arg.strftime(BOUND_VARIABLE_SQLTIME_FORMAT)
+        when DateTime, Time
+          # the literal methods put quotes around things, but this is a bound variable, so we can't use those
+          from_application_timestamp(arg).strftime(BOUND_VARIABLE_TIMESTAMP_FORMAT)
+        else
+           arg
+        end
+      end
 
       # Convert exceptions raised from the block into DatabaseErrors.
       def check_database_errors
@@ -383,12 +268,126 @@ module Sequel
         end
       end
 
+      def column_schema_normalize_default(default, type)
+        # the default value returned by schema parsing is not escaped or quoted
+        # in any way, it's just the value of the string
+        # the base implementation assumes it would come back "'my ''default'' value'"
+        # fdbsql returns "my 'default' value" (Not including double quotes for either)
+        return default
+      end
+
+      # FDBSQL requires parens around the SELECT, and the WITH DATA syntax.
+      def create_table_as_sql(name, sql, options)
+        "#{create_table_prefix_sql(name, options)} AS (#{sql}) WITH DATA"
+      end
+
+      def database_error_classes
+        CONVERTED_EXCEPTIONS
+      end
+
+      STALE_STATEMENT_SQLSTATE = '0A50A'.freeze
+      NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
+      FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
+      UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
+      NOT_COMMITTED_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
+
+      # Given the SQLState, return the appropriate DatabaseError subclass.
+      def database_specific_error_class_from_sqlstate(sqlstate)
+        # There is also a CheckConstraintViolation in Sequel, but the sql layer doesn't support check constraints
+        case sqlstate
+        when *NOT_NULL_CONSTRAINT_SQLSTATES
+          NotNullConstraintViolation
+        when *FOREIGN_KEY_CONSTRAINT_SQLSTATES
+          ForeignKeyConstraintViolation
+        when *UNIQUE_CONSTRAINT_SQLSTATES
+          UniqueConstraintViolation
+        when *NOT_COMMITTED_SQLSTATES
+          NotCommittedError
+        end
+      end
+
+      # This is a fallback used by the base class if the sqlstate fails to figure out
+      # what error type it is.
+      DATABASE_ERROR_REGEXPS = [
+        # Add this check first, since otherwise it's possible for users to control
+        # which exception class is generated.
+        [/invalid input syntax/, DatabaseError],
+        # the rest of these are backups in case the sqlstate fails
+        [/[dD]uplicate key violates unique constraint/, UniqueConstraintViolation],
+        [/due (?:to|for) foreign key constraint/, ForeignKeyConstraintViolation],
+        [/NULL value not permitted/, NotNullConstraintViolation],
+      ].freeze
+
+      def database_error_regexps
+        DATABASE_ERROR_REGEXPS
+      end
+
+      def identifier_convertors(opts=OPTS)
+        [output_identifier_meth(opts[:dataset]), input_identifier_meth(opts[:dataset])]
+      end
+
+      # Like PostgreSQL fdbsql folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
+      def identifier_input_method_default
+        nil
+      end
+
+      # Like PostgreSQL fdbsql folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
+      def identifier_output_method_default
+        nil
+      end
+
       # If the given type is DECIMAL with scale 0, say that it's an integer
       def normalize_decimal_to_integer(type, scale)
         if (type == 'DECIMAL' and scale == 0)
           'integer'
         else
           type
+        end
+      end
+
+      # Remove the cached entries for primary keys and sequences when a table is
+      # changed.
+      def remove_cached_schema(table)
+        tab = quote_schema_table(table)
+        Sequel.synchronize do
+          @primary_keys.delete(tab)
+        end
+        super
+      end
+
+      def schema_or_current_and_table(table, opts=OPTS)
+        schema, table = schema_and_table(table)
+        schema = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
+        [schema, table]
+      end
+
+      # returns an array of column information with each column being of the form:
+      # [:column_name, {:db_type=>"integer", :default=>nil, :allow_null=>false, :primary_key=>true, :type=>:integer}]
+      def schema_parse_table(table, opts = {})
+        out_identifier, in_identifier = identifier_convertors(opts)
+        schema, table = schema_or_current_and_table(table, opts)
+        dataset = metadata_dataset.
+          select(:c__column_name,
+                 Sequel.as({:c__is_nullable => 'YES'}, 'allow_null'),
+                 :c__column_default___default,
+                 :c__data_type___db_type,
+                 :c__character_maximum_length___max_length,
+                 :c__numeric_scale,
+                 Sequel.as({:tc__constraint_type => 'PRIMARY KEY'}, 'primary_key')).
+          from(Sequel.as(:information_schema__key_column_usage, 'kc')).
+          join(Sequel.as(:information_schema__table_constraints, 'tc'),
+               tc__constraint_type: 'PRIMARY KEY',
+               tc__table_name: :kc__table_name,
+               tc__table_schema: :kc__table_schema,
+               tc__constraint_name: :kc__constraint_name).
+          right_outer_join(Sequel.as(:information_schema__columns, 'c'),
+                           [:table_name, :table_schema, :column_name]).
+          where(c__table_name: in_identifier.call(table),
+                c__table_schema: schema)
+        dataset.map do |row|
+          row[:default] = nil if blank_object?(row[:default])
+          row[:type] = schema_column_type(normalize_decimal_to_integer(row[:db_type], row[:numeric_scale]))
+          [out_identifier.call(row.delete(:column_name)), row]
         end
       end
 
@@ -408,15 +407,16 @@ module Sequel
         end
       end
 
-      def identifier_convertors(opts=OPTS)
-        [output_identifier_meth(opts[:dataset]), input_identifier_meth(opts[:dataset])]
+      # Handle bigserial type if :serial option is present
+      def type_literal_generic_bignum(column)
+        column[:serial] ? :bigserial : super
       end
 
-      def schema_or_current_and_table(table, opts=OPTS)
-        schema, table = schema_and_table(table)
-        schema = opts.fetch(:schema, schema || Sequel.lit('CURRENT_SCHEMA'))
-        [schema, table]
+      # Handle serial type if :serial option is present
+      def type_literal_generic_integer(column)
+        column[:serial] ? :serial : super
       end
+
     end
 
     module DatasetMethods
