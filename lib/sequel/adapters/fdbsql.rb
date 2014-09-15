@@ -1,7 +1,7 @@
 require 'pg'
 
-require 'sequel/adapters/utils/pg_types'
-require 'sequel/adapters/shared/fdbsql'
+Sequel.require 'adapters/utils/pg_types'
+Sequel.require 'adapters/shared/fdbsql'
 
 module Sequel
 

@@ -1,6 +1,5 @@
 Sequel::JDBC.load_driver('com.foundationdb.sql.jdbc.Driver')
-# TODO when merged into Sequel, switch to Sequel.require 'adapters/shared/fdbsql'
-require 'sequel/adapters/shared/fdbsql'
+Sequel.require 'adapters/shared/fdbsql'
 
 module Sequel
   Fdbsql::CONVERTED_EXCEPTIONS << NativeException
