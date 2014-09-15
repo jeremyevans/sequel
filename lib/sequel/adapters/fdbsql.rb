@@ -280,15 +280,6 @@ module Sequel
         end
       end
 
-      def query(sql, args=nil)
-        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
-        check_disconnect_errors do
-          retry_on_not_committed do
-            @connection.query(sql, args)
-          end
-        end
-      end
-
       private
 
       def check_version
@@ -361,6 +352,15 @@ module Sequel
 
       def status
         CONNECTION_OK
+      end
+
+      def query(sql, args=nil)
+        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.query(sql, args)
+          end
+        end
       end
 
     end
