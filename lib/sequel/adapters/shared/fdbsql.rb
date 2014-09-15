@@ -26,22 +26,31 @@ require 'sequel/adapters/utils/pg_types'
 
 module Sequel
 
+  # Top level module for holding all FoundationDB SQL Layer related modules and
+  # classes for Sequel.
   module Fdbsql
+
+    # Array of exceptions that need to be converted.  JDBC
+    # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS  = []
 
+    # When the connection is in autocommit mode, and the server returns a retryable
+    # error, the adapter will retry. At most it will retry this many times
     NUMBER_OF_NOT_COMMITTED_RETRIES = 10
 
+    # Error raised when Sequel determines a Fdbsql exclusion constraint has been violated.
     class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
+    # Base class for all retryable errors
     class RetryError < Sequel::DatabaseError; end
+    # Error thrown when the FoundationDB SQL Layer returns a NotCommitted status
     class NotCommittedError < RetryError; end
 
+    # Methods shared by Database instances that connect to
+    # the FoundationDB SQL Layer
     module DatabaseMethods
 
-      # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
-      # it should just be the timestamp, so we need whole new formats here.
-      BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
-      BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
-
+      # A hash of conversion procs, keyed by type integer (oid) and
+      # having callable values for the conversion proc for that type.
       attr_reader :conversion_procs
 
       # Convert given argument so that it can be used directly by pg.  Currently, pg doesn't
@@ -237,6 +246,11 @@ module Sequel
 
       private
 
+      # the literal methods put quotes around things, but when we bind a variable there shouldn't be quotes around it
+      # it should just be the timestamp, so we need whole new formats here.
+      BOUND_VARIABLE_TIMESTAMP_FORMAT = "%Y-%m-%d %H:%M:%S".freeze
+      BOUND_VARIABLE_SQLTIME_FORMAT = "%H:%M:%S".freeze
+
       def adapter_initialize
         @primary_keys = {}
         # Postgres supports named types in the db, if we want to support anything that's not built in, this
@@ -419,12 +433,14 @@ module Sequel
 
     end
 
+    # Instance methods for datasets that connect to the FoundationDB SQL Layer.
     module DatasetMethods
 
       Dataset.def_sql_method(self, :delete, %w'with delete from using where returning')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
       Dataset.def_sql_method(self, :update, %w'with update table set from where returning')
 
+      # Shared methods for prepared statements used with the FoundationDB SQL Layer
       module PreparedStatementMethods
 
         def prepared_sql
@@ -498,7 +514,7 @@ module Sequel
         ds.insert_sql(*values)
       end
 
-      # FDBSQL does: supports_regexp? (but with functions)
+      # FDBSQL has functions to support regular expression pattern matching.
       def supports_regexp?
         true
       end
@@ -513,6 +529,7 @@ module Sequel
         false
       end
 
+      # FDBSQL supports quoted function names
       def supports_quoted_function_names?
         true
       end
@@ -584,10 +601,13 @@ module Sequel
 
     end
 
+    # Methods to support date arithmetic with the FoundationDB SQL Layer.
     module DateArithmeticDatasetMethods
       include Sequel::SQL::DateAdd::DatasetMethods
+
       # chop off the s at the end of each of the units
       FDBSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s.chop.freeze}).freeze
+
       # Append the SQL fragment for the DateAdd expression to the SQL query.
       def date_add_sql_append(sql, da)
         h = da.interval
