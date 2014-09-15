@@ -37,6 +37,8 @@ module Sequel
       end
     end
 
+    # Adapter, Database, and Dataset support for accessing the FoundationDB SQL Layer
+    # via JDBC
     module Fdbsql
       # Methods to add to Database instances that access Fdbsql via
       # JDBC.
@@ -51,6 +53,7 @@ module Sequel
           db.send(:adapter_initialize)
         end
 
+        # Execute the given SQL with the given args on an available connection.
         def execute(sql, opts=OPTS, &block)
           return call_sproc(sql, opts, &block) if opts[:sproc]
           return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
@@ -115,10 +118,12 @@ module Sequel
 
       end
 
+      # Methods to add to Dataset instances that access the FoundationDB SQL Layer via
+      # JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Fdbsql::DatasetMethods
 
-        # Add our prepared statement methods
+        # Add the shared Fdbsql prepared statement methods
         def prepare(type, name=nil, *values)
           ps = to_prepared_statement(type, values)
           ps.extend(JDBC::Dataset::PreparedStatementMethods)
