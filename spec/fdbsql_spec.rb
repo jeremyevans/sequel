@@ -98,7 +98,7 @@ describe 'Fdbsql' do
             fake_conn_instance = double("fake connection")
             fake_conn_instance.stub(:set_notice_receiver)
             fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).
-              and_return(double(cmd_tuples: 1, first: {'_SQL_COL_1' => 'FoundationDB 1.9.6'}))
+              and_return(double(cmd_tuples: 1, first: {'_SQL_COL_1' => 'FoundationDB 2.0.0'}))
             @fake_conn.should_receive(:new).with(args).once.and_return(fake_conn_instance)
             fake_conn_instance.should_receive(:close).once
           end
@@ -559,7 +559,7 @@ describe 'Fdbsql' do
       def fake_conn
         fake_conn_instance = double("fake connection")
         fake_conn_instance.stub(:set_notice_receiver)
-        fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 1.9.6'}])
+        fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 2.0.0'}])
         yield fake_conn_instance
         @fake_conn.stub(:new).and_return(fake_conn_instance)
       end
@@ -612,7 +612,7 @@ describe 'Fdbsql' do
       end
 
       describe 'checks sql layer version' do
-        ['1.9.5', '0.9.6', '1.8.6'].each do |version|
+        ['1.9.5', '0.9.6', '1.8.6', '1.9.6', '1.9.7', '1.10.0'].each do |version|
           it "throws error for #{version}" do
             fake_conn {|conn| conn.stub(:query).with('SELECT VERSION()', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
             proc do
@@ -620,7 +620,7 @@ describe 'Fdbsql' do
             end.should raise_error(Sequel::DatabaseError, /Unsupported.*version.*#{version}/)
           end
         end
-        ['1.9.6', '1.9.7', '1.10.0', '2.0.0', '2.9.5'].each do |version|
+        ['2.0.0', '2.9.5', '3.0.0'].each do |version|
           it "does not throw error for #{version}" do
             fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
             conn = Sequel::Fdbsql::Connection.new(nil, {})
