@@ -2091,6 +2091,48 @@ describe 'PostgreSQL array handling' do
       @ds.insert(rs.first)
       @ds.all.should == rs
     end
+
+    @db.create_table!(:items) do
+      column :x, 'xml[]'
+      column :m, 'money[]'
+      column :b, 'bit[]'
+      column :vb, 'bit varying[]'
+      column :u, 'uuid[]'
+      column :xi, 'xid[]'
+      column :c, 'cid[]'
+      column :n, 'name[]'
+      column :t, 'tid[]'
+      column :i, 'int2vector[]'
+      column :o, 'oidvector[]'
+    end
+    @tp.call.should == [:xml_array, :money_array, :bit_array, :varbit_array, :uuid_array, :xid_array, :cid_array, :name_array, :tid_array, :int2vector_array, :oidvector_array]
+    @ds.insert(Sequel.pg_array(['<a></a>'], :xml),
+               Sequel.pg_array(['1'], :money),
+               Sequel.pg_array(['1'], :bit),
+               Sequel.pg_array(['10'], :varbit),
+               Sequel.pg_array(['c0f24910-39e7-11e4-916c-0800200c9a66'], :uuid),
+               Sequel.pg_array(['12'], :xid),
+               Sequel.pg_array(['12'], :cid),
+               Sequel.pg_array(['N'], :name),
+               Sequel.pg_array(['(1,2)'], :tid),
+               Sequel.pg_array(['1 2'], :int2vector),
+               Sequel.pg_array(['1 2'], :oidvector))
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      r = rs.first
+      m = r.delete(:m)
+      m.should_not be_a_kind_of(Array)
+      m.to_a.should be_a_kind_of(Array)
+      m.first.should be_a_kind_of(String)
+      r.should == {:x=>['<a></a>'], :b=>['1'], :vb=>['10'], :u=>['c0f24910-39e7-11e4-916c-0800200c9a66'], :xi=>['12'], :c=>['12'], :n=>['N'], :t=>['(1,2)'], :i=>['1 2'], :o=>['1 2']}
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      r[:m] = m
+      @ds.delete
+      @ds.insert(r)
+      @ds.all.should == rs
+    end
   end
 
   specify 'insert and retrieve empty arrays' do

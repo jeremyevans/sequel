@@ -720,16 +720,15 @@ shared_examples_for "Database#transaction" do
     @db.sqls.should == ['BEGIN', 'DROP TABLE test;', 'ROLLBACK']
   end
   
-  specify "should handle errors when sending ROLLBACK" do
+  specify "should raise original exception if there is an exception raised when rolling back" do
     ec = Class.new(StandardError)
     meta_def(@db, :database_error_classes){[ec]}
     meta_def(@db, :log_connection_execute){|c, sql| sql =~ /ROLLBACK/ ? raise(ec, 'bad') : super(c, sql)}
     begin
       @db.transaction{raise ArgumentError, 'asdf'}
-    rescue Sequel::DatabaseError => e
+    rescue => e
     end
-    e.should_not be_nil
-    e.wrapped_exception.should be_a_kind_of(ec)
+    e.should be_a_kind_of(ArgumentError)
     @db.sqls.should == ['BEGIN']
   end
   

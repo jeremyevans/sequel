@@ -1,5 +1,17 @@
 === HEAD
 
+* Work around bug in old versions of MySQL when schema dumping a table with multiple timestamp columns (jeremyevans) (#882)
+
+* Support more array types by default in the pg_array extension, such as xml[] and uuid[] (jeremyevans)
+
+* Add Sequel::Model.cache_associations accessor, which can be set to false to not cache association metadata (jeremyevans)
+
+* Add split_values plugin, for moving noncolumn entries from the values hash into a separate hash (jeremyevans) (#868)
+
+=== 4.14.0 (2014-09-01)
+
+* Raise original exception if there is an exception raised when rolling back transaction/savepoint (jeremyevans) (#875)
+
 * Allow delayed evaluation blocks to take dataset as an argument (jeremyevans)
 
 * Allow more types as filter expressions, only specifically disallow Numeric/String expressions (jeremyevans)
