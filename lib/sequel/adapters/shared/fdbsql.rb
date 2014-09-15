@@ -444,6 +444,27 @@ module Sequel
         end
       end
 
+      # Emulate the bitwise operators.
+      def complex_expression_sql_append(sql, op, args)
+        case op
+        when :&, :|, :^, :<<, :>>, :'B~'
+          complex_expression_emulate_append(sql, op, args)
+        # REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*']
+        when :'~'
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'!~'
+          sql << Sequel::Dataset::NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
+        when :'~*'
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
+        when :'!~*'
+          sql << Sequel::Dataset::NOT_SPACE
+          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
+        else
+          super
+        end
+      end
+
       # Insert given values into the database.
       def insert(*values)
         if @opts[:returning]
@@ -497,27 +518,6 @@ module Sequel
       end
 
       private
-
-      # Emulate the bitwise operators.
-      def complex_expression_sql_append(sql, op, args)
-        case op
-        when :&, :|, :^, :<<, :>>, :'B~'
-          complex_expression_emulate_append(sql, op, args)
-        # REGEXP_OPERATORS = [:~, :'!~', :'~*', :'!~*']
-        when :'~'
-          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
-        when :'!~'
-          sql << Sequel::Dataset::NOT_SPACE
-          function_sql_append(sql, SQL::Function.new(:REGEX, args.at(0), args.at(1)))
-        when :'~*'
-          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
-        when :'!~*'
-          sql << Sequel::Dataset::NOT_SPACE
-          function_sql_append(sql, SQL::Function.new(:IREGEX, args.at(0), args.at(1)))
-        else
-          super
-        end
-      end
 
       # Append the SQL fragment for the DateAdd expression to the SQL query.
       def date_add_sql_append(sql, da)
