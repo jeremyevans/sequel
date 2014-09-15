@@ -5,8 +5,6 @@ Sequel.require 'adapters/shared/fdbsql'
 
 module Sequel
 
-  Database::ADAPTERS << :fdbsql
-
   def_adapter_method(:fdbsql)
 
   module Fdbsql
