@@ -36,16 +36,23 @@ module Sequel
   module Fdbsql
     CONVERTED_EXCEPTIONS << PGError
 
+    # Database class for the FoundationDB SQL Layer used with Sequel and the
+    # pg driver
     class Database < Sequel::Database
       include Sequel::Fdbsql::DatabaseMethods
 
       set_adapter_scheme :fdbsql
 
+      # Connects to the database. In addition to the standard database options,
+      # :connect_timeout is a connection timeout in seconds,
+      # :sslmode sets whether to use ssl, and
+      # :notice_receiver handles server notices in a proc.
       def connect(server)
         opts = server_opts(server)
         Connection.new(self, opts)
       end
 
+      # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts = {}, &block)
         res = nil
         synchronize(opts[:server]) do |conn|
@@ -116,6 +123,7 @@ module Sequel
 
     end
 
+    # Dataset class for the FoundationDB SQL Layer that uses the pg driver.
     class Dataset < Sequel::Dataset
       include Sequel::Fdbsql::DatasetMethods
 
@@ -173,6 +181,8 @@ module Sequel
         ps.call(bind_vars, &block)
       end
 
+      # Yield all rows returned by executing the given SQL and converting
+      # the types.
       def fetch_rows(sql)
         execute(sql) do |res|
           columns = set_columns(res)
@@ -219,19 +229,26 @@ module Sequel
 
     end
 
+    # Connection specific methods for Fdbsql with pg
     class Connection
       CONNECTION_OK = -1
 
+      # Regular expression for error messages that note that the connection is closed.
       DISCONNECT_ERROR_RE = /\A(?:could not receive data from server|no connection to the server|connection not open|connection is closed)/
 
       # These sql states are used to indicate that fdbvql should automatically
       # retry the statement if it's not in a transaction
       RETRY_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
 
+      # Whether or not this connection is in a transaction.
       attr_accessor :in_transaction
 
+      # Hash of prepared statements for this connection.  Keys are
+      # string names of the server side prepared statement, and values
+      # are SQL strings.
       attr_accessor :prepared_statements
 
+      # Create a new connection to the FoundationDB SQL Layer. See Database#connect.
       def initialize(db, opts)
         @db = db
         @config = opts
@@ -249,6 +266,7 @@ module Sequel
         connect
       end
 
+      # Close the connection.
       def close
         # Just like postgres, ignore any errors here
         begin
@@ -264,6 +282,8 @@ module Sequel
         block_given? ? yield(q) : q.cmd_tuples
       end
 
+      # Execute the prepared statement of the given name, binding the given
+      # args.
       def execute_prepared_statement(name, args)
         check_disconnect_errors do
           retry_on_not_committed do
@@ -272,6 +292,7 @@ module Sequel
         end
       end
 
+      # Prepare a statement for later use.
       def prepare(name, sql)
         check_disconnect_errors do
           retry_on_not_committed do
@@ -280,6 +301,7 @@ module Sequel
         end
       end
 
+      # Execute the given query and return the results.
       def query(sql, args=nil)
         args = args.map{|v| @db.bound_variable_arg(v, self)} if args
         check_disconnect_errors do
@@ -344,6 +366,15 @@ module Sequel
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
           result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+        end
+      end
+
+      def query(sql, args=nil)
+        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.query(sql, args)
+          end
         end
       end
 
