@@ -63,6 +63,13 @@ module Sequel
         end
       end
 
+      private
+
+      def begin_transaction(conn, opts=OPTS)
+        super
+        conn.in_transaction = true
+      end
+
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
           result.error_field(::PGresult::PG_DIAG_SQLSTATE)
@@ -101,12 +108,6 @@ module Sequel
         end
       end
 
-      def begin_transaction(conn, opts=OPTS)
-        super
-        # TODO add functionality to jdbc
-        conn.in_transaction = true
-      end
-
       def remove_transaction(conn, committed)
         conn.in_transaction = false
       ensure
@@ -119,13 +120,6 @@ module Sequel
       include Sequel::Fdbsql::DatasetMethods
 
       Database::DatasetClass = self
-
-      def fetch_rows(sql)
-        execute(sql) do |res|
-          columns = set_columns(res)
-          yield_hash_rows(res, columns) {|h| yield h}
-        end
-      end
 
       # Allow use of bind arguments for FDBSQL using the pg driver.
       module BindArgumentMethods
@@ -171,11 +165,19 @@ module Sequel
         end
       end
 
+
       # Execute the given type of statement with the hash of values.
       def call(type, bind_vars=OPTS, *values, &block)
         ps = to_prepared_statement(type, values)
         ps.extend(BindArgumentMethods)
         ps.call(bind_vars, &block)
+      end
+
+      def fetch_rows(sql)
+        execute(sql) do |res|
+          columns = set_columns(res)
+          yield_hash_rows(res, columns) {|h| yield h}
+        end
       end
 
       # Prepare the given type of statement with the given name, and store
@@ -190,6 +192,18 @@ module Sequel
         ps
       end
 
+      private
+
+      def set_columns(res)
+        cols = []
+        procs = db.conversion_procs
+        res.nfields.times do |fieldnum|
+          cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
+        end
+        @columns = cols.map{|c| c[2]}
+        cols
+      end
+
       # For each row in the result set, yield a hash with column name symbol
       # keys and typecasted values.
       def yield_hash_rows(res, cols)
@@ -201,16 +215,6 @@ module Sequel
           end
           yield converted_rec
         end
-      end
-
-      def set_columns(res)
-        cols = []
-        procs = db.conversion_procs
-        res.nfields.times do |fieldnum|
-          cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
-        end
-        @columns = cols.map{|c| c[2]}
-        cols
       end
 
     end
@@ -253,28 +257,11 @@ module Sequel
         end
       end
 
-      def query(sql, args=nil)
-        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
-        check_disconnect_errors do
-          retry_on_not_committed do
-            @connection.query(sql, args)
-          end
-        end
-      end
-
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
         q = query(sql, args)
         block_given? ? yield(q) : q.cmd_tuples
-      end
-
-      def prepare(name, sql)
-        check_disconnect_errors do
-          retry_on_not_committed do
-            @connection.prepare(name, sql)
-          end
-        end
       end
 
       def execute_prepared_statement(name, args)
@@ -285,18 +272,24 @@ module Sequel
         end
       end
 
-      private
-
-      def connect
-        @connection = PG::Connection.new(@connection_hash)
-        if (@config[:notice_receiver])
-          @connection.set_notice_receiver(@config[:notice_receiver])
-        else
-          # Swallow warnings
-          @connection.set_notice_receiver { |proc| }
+      def prepare(name, sql)
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.prepare(name, sql)
+          end
         end
-        check_version
       end
+
+      def query(sql, args=nil)
+        args = args.map{|v| @db.bound_variable_arg(v, self)} if args
+        check_disconnect_errors do
+          retry_on_not_committed do
+            @connection.query(sql, args)
+          end
+        end
+      end
+
+      private
 
       def check_version
         ver = execute('SELECT VERSION()') do |res|
@@ -315,26 +308,15 @@ module Sequel
         end
       end
 
-      def status
-        CONNECTION_OK
-      end
-
-      def database_exception_sqlstate(exception, opts)
-        if exception.respond_to?(:result) && (result = exception.result)
-          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+      def connect
+        @connection = PG::Connection.new(@connection_hash)
+        if (@config[:notice_receiver])
+          @connection.set_notice_receiver(@config[:notice_receiver])
+        else
+          # Swallow warnings
+          @connection.set_notice_receiver { |proc| }
         end
-      end
-
-      def retry_on_not_committed
-        retries = NUMBER_OF_NOT_COMMITTED_RETRIES
-        begin
-          yield
-        rescue PG::TRIntegrityConstraintViolation => e
-          if (!in_transaction and RETRY_SQLSTATES.include? database_exception_sqlstate(e, :classes=>CONVERTED_EXCEPTIONS))
-            retry if (retries -= 1) > 0
-          end
-          raise
-        end
+        check_version
       end
 
       # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and
@@ -357,6 +339,28 @@ module Sequel
           disconnect = true
           raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
         end
+      end
+
+      def database_exception_sqlstate(exception, opts)
+        if exception.respond_to?(:result) && (result = exception.result)
+          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+        end
+      end
+
+      def retry_on_not_committed
+        retries = NUMBER_OF_NOT_COMMITTED_RETRIES
+        begin
+          yield
+        rescue PG::TRIntegrityConstraintViolation => e
+          if (!in_transaction and RETRY_SQLSTATES.include? database_exception_sqlstate(e, :classes=>CONVERTED_EXCEPTIONS))
+            retry if (retries -= 1) > 0
+          end
+          raise
+        end
+      end
+
+      def status
+        CONNECTION_OK
       end
 
     end
