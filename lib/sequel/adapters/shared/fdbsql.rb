@@ -421,10 +421,28 @@ module Sequel
 
     module DatasetMethods
 
-
       Dataset.def_sql_method(self, :delete, %w'with delete from using where returning')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values returning')
       Dataset.def_sql_method(self, :update, %w'with update table set from where returning')
+
+      module PreparedStatementMethods
+
+        def prepared_sql
+          return @prepared_sql if @prepared_sql
+          @opts[:returning] = insert_pk if @prepared_type == :insert
+          super
+          @prepared_sql
+        end
+
+        # Override insert action to use RETURNING if the server supports it.
+        def run
+          if @prepared_type == :insert
+            fetch_rows(prepared_sql){|r| return r.values.first}
+          else
+            super
+          end
+        end
+      end
 
       # Insert given values into the database.
       def insert(*values)
@@ -443,7 +461,6 @@ module Sequel
         end
       end
 
-
       # Insert a record returning the record inserted.  Always returns nil without
       # inserting a query if disable_insert_returning is used.
       def insert_select(*values)
@@ -460,33 +477,26 @@ module Sequel
         ds.insert_sql(*values)
       end
 
-
-      # For multiple table support, PostgreSQL requires at least
-      # two from tables, with joins allowed.
-      def join_from_sql(type, sql)
-        if(from = @opts[:from][1..-1]).empty?
-          raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
-        else
-          sql << SPACE << type.to_s << SPACE
-          source_list_append(sql, from)
-          select_join_sql(sql)
-        end
+      # FDBSQL does: supports_regexp? (but with functions)
+      def supports_regexp?
+        true
       end
 
-      # Use FROM to specify additional tables in an update query
-      def update_from_sql(sql)
-        join_from_sql(:FROM, sql)
+      # Returning is always supported.
+      def supports_returning?(type)
+        true
       end
 
-      # Use USING to specify additional tables in a delete query
-      def delete_using_sql(sql)
-        join_from_sql(:USING, sql)
+      # FDBSQL truncates all seconds
+      def supports_timestamp_usecs?
+        false
       end
 
-      # fdbsql does not support FOR UPDATE, because it's unnecessary with the transaction model
-      def select_lock_sql(sql)
-        @opts[:lock] == :update ? sql : super
+      def supports_quoted_function_names?
+        true
       end
+
+      private
 
       # Emulate the bitwise operators.
       def complex_expression_sql_append(sql, op, args)
@@ -524,53 +534,10 @@ module Sequel
         end
       end
 
-      # FDBSQL uses a preceding x for hex escaping strings
-      def literal_blob_append(sql, v)
-        if v.empty?
-          sql << "''"
-        else
-          sql << "x'#{v.unpack('H*').first}'"
-        end
+      # Use USING to specify additional tables in a delete query
+      def delete_using_sql(sql)
+        join_from_sql(:USING, sql)
       end
-
-      # FDBSQL does: supports_regexp? (but with functions)
-      def supports_regexp?
-        true
-      end
-
-      # Returning is always supported.
-      def supports_returning?(type)
-        true
-      end
-
-      # FDBSQL truncates all seconds
-      def supports_timestamp_usecs?
-        false
-      end
-
-      def supports_quoted_function_names?
-        true
-      end
-
-      module PreparedStatementMethods
-        # Override insert action to use RETURNING if the server supports it.
-        def run
-          if @prepared_type == :insert
-            fetch_rows(prepared_sql){|r| return r.values.first}
-          else
-            super
-          end
-        end
-
-        def prepared_sql
-          return @prepared_sql if @prepared_sql
-          @opts[:returning] = insert_pk if @prepared_type == :insert
-          super
-          @prepared_sql
-        end
-      end
-
-      private
 
       # Return the primary key to use for RETURNING in an INSERT statement
       def insert_pk
@@ -582,6 +549,37 @@ module Sequel
             end
           end
         end
+      end
+
+      # For multiple table support, PostgreSQL requires at least
+      # two from tables, with joins allowed.
+      def join_from_sql(type, sql)
+        if(from = @opts[:from][1..-1]).empty?
+          raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
+        else
+          sql << SPACE << type.to_s << SPACE
+          source_list_append(sql, from)
+          select_join_sql(sql)
+        end
+      end
+
+      # FDBSQL uses a preceding x for hex escaping strings
+      def literal_blob_append(sql, v)
+        if v.empty?
+          sql << "''"
+        else
+          sql << "x'#{v.unpack('H*').first}'"
+        end
+      end
+
+      # fdbsql does not support FOR UPDATE, because it's unnecessary with the transaction model
+      def select_lock_sql(sql)
+        @opts[:lock] == :update ? sql : super
+      end
+
+      # Use FROM to specify additional tables in an update query
+      def update_from_sql(sql)
+        join_from_sql(:FROM, sql)
       end
 
     end
