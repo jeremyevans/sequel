@@ -206,6 +206,18 @@ Connection string examples:
   do:postgres://user:password@host/database
   do:mysql://user:password@host/database
 
+=== fdbsql
+
+Requires: pg
+
+The following additional options are supported:
+
+:connect_timeout :: Set the number of seconds to wait for a connection (default 20).
+:notice_receiver :: A proc that be called with the PGresult objects that have notice or warning messages.
+                    The default notice receiver just prints the messages to stderr, but this can be used
+                    to handle notice/warning messages differently.
+:sslmode :: Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL.
+
 === firebird 
 
 Requires: fb (using code at http://github.com/wishdev/fb)
