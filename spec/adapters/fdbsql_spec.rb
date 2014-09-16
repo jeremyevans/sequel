@@ -2,20 +2,6 @@ SEQUEL_ADAPTER_TEST = :fdbsql
 
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
-def DB.sqls
-  (@sqls ||= [])
-end
-logger = Object.new
-def logger.method_missing(m, msg)
-  DB.sqls << msg
-end
-DB.loggers << logger
-
-if (DB.adapter_scheme == :jdbc)
-  require 'java'
-  require 'sequel/adapters/jdbc'
-end
-
 describe 'Fdbsql' do
   describe 'Database' do
     before(:all) do

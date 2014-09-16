@@ -4,9 +4,6 @@ Sequel.require 'adapters/utils/pg_types'
 Sequel.require 'adapters/shared/fdbsql'
 
 module Sequel
-
-  def_adapter_method(:fdbsql)
-
   module Fdbsql
     CONVERTED_EXCEPTIONS << PGError
 
@@ -204,8 +201,6 @@ module Sequel
 
     # Connection specific methods for Fdbsql with pg
     class Connection < PG::Connection
-      CONNECTION_OK = -1
-
       # Regular expression for error messages that note that the connection is closed.
       DISCONNECT_ERROR_RE = /\A(?:could not receive data from server|no connection to the server|connection not open|connection is closed)/
 
