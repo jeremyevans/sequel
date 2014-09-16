@@ -144,7 +144,7 @@ begin
   spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"].sort_by{rand}, "Run extension/plugin specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|adapters|connection_pool|database|dataset|model)"')}
   spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
 
-  %w'postgres sqlite mysql informix oracle firebird mssql db2 sqlanywhere'.each do |adapter|
+  %w'postgres sqlite mysql informix oracle fdbsql firebird mssql db2 sqlanywhere'.each do |adapter|
     spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|connection_pool|database|dataset|model|extensions|plugins)"')}
   end
 
