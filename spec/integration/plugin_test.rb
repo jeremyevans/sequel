@@ -455,6 +455,7 @@ describe "Tactical Eager Loading Plugin" do
   before(:all) do
     @db = DB
     @db.instance_variable_set(:@schemas, {})
+    @db.drop_table?(:albums_artists) # work around fdbsql disconnect bug
     @db.create_table!(:artists) do
       primary_key :id
       String :name
