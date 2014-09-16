@@ -499,21 +499,6 @@ module Sequel
 
       private
 
-      # Append the SQL fragment for the DateAdd expression to the SQL query.
-      def date_add_sql_append(sql, da)
-        h = da.interval
-        expr = da.expr
-        interval = ""
-        each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
-          interval << "#{value} #{sql_unit} "
-        end
-        if interval.empty?
-          return literal_append(sql, Sequel.cast(expr, Time))
-        else
-          return complex_expression_sql_append(sql, :+, [Sequel.cast(expr, Time), Sequel.cast(interval, :interval)])
-        end
-      end
-
       # Use USING to specify additional tables in a delete query
       def delete_using_sql(sql)
         join_from_sql(:USING, sql)
@@ -561,48 +546,6 @@ module Sequel
       def update_from_sql(sql)
         join_from_sql(:FROM, sql)
       end
-
     end
-
-    # Methods to support date arithmetic with the FoundationDB SQL Layer.
-    module DateArithmeticDatasetMethods
-      include Sequel::SQL::DateAdd::DatasetMethods
-
-      # chop off the s at the end of each of the units
-      FDBSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| s.to_s.chop.freeze}).freeze
-
-      # Append the SQL fragment for the DateAdd expression to the SQL query.
-      def date_add_sql_append(sql, da)
-        h = da.interval
-        expr = da.expr
-        if db.database_type == :fdbsql
-          expr = Sequel.cast(expr, Time)
-          each_valid_interval_unit(h, FDBSQL_DURATION_UNITS) do |value, sql_unit|
-            expr = Sequel.+(expr, Sequel.lit(["INTERVAL ", " "], value, Sequel.lit(sql_unit)))
-          end
-          literal_append(sql, expr)
-        else
-          super
-        end
-      end
-
-      private
-
-      # Yield the value in the interval for each of the units
-      # present in the interval, along with the SQL fragment
-      # representing the unit name.  Returns false if any
-      # values were yielded, true otherwise
-      def each_valid_interval_unit(interval, units)
-        cast = true
-        units.each do |unit, sql_unit|
-          if (value = interval[unit]) && value != 0
-            cast = false
-            yield value, sql_unit
-          end
-        end
-        cast
-      end
-    end
-
   end
 end

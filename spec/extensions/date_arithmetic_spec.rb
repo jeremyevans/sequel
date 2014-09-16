@@ -142,6 +142,13 @@ describe "date_arithmetic extension" do
     db.literal(Sequel.date_add(:a, @h2)).should == "(CAST(a AS timestamp) + 1 years + 1 months + 1 days + 1 hours + 1 minutes + 1 seconds)"
   end
 
+  it "should correctly literalize on Fdbsql" do
+    db = dbf.call(:fdbsql)
+    db.literal(Sequel.date_add(:a, @h0)).should == "CAST(a AS timestamp)"
+    db.literal(Sequel.date_add(:a, @h1)).should == "(a + INTERVAL 1 day)"
+    db.literal(Sequel.date_add(:a, @h2)).should == "(a + INTERVAL 1 year + INTERVAL 1 month + INTERVAL 1 day + INTERVAL 1 hour + INTERVAL 1 minute + INTERVAL 1 second)"
+  end
+
   specify "should raise error if literalizing on an unsupported database" do
     db = Sequel.mock
     db.extension :date_arithmetic

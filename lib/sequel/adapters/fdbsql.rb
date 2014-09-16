@@ -281,7 +281,5 @@ module Sequel
         end
       end
     end
-
-    Dataset.register_extension(:date_arithmetic, Sequel::Fdbsql::DateArithmeticDatasetMethods)
   end
 end

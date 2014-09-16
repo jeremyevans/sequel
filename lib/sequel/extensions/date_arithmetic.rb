@@ -62,6 +62,7 @@ module Sequel
         DERBY_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit("SQL_TSI_#{s.to_s.upcase[0...-1]}").freeze}).freeze
         ACCESS_DURATION_UNITS = DURATION_UNITS.zip(%w'yyyy m d h n s'.map{|s| s.freeze}).freeze
         DB2_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s).freeze}).freeze
+        FDBSQL_DURATION_UNITS = DURATION_UNITS.zip(DURATION_UNITS.map{|s| Sequel.lit(s.to_s.chop).freeze}).freeze
 
         # Append the SQL fragment for the DateAdd expression to the SQL query.
         def date_add_sql_append(sql, da)
@@ -122,6 +123,10 @@ module Sequel
               expr = Sequel.+(expr, Sequel.lit(["", " "], value, sql_unit))
             end
             false
+          when :fdbsql
+            each_valid_interval_unit(h, FDBSQL_DURATION_UNITS) do |value, sql_unit|
+              expr = Sequel.+(expr, Sequel.lit(["INTERVAL ", " "], value, sql_unit))
+            end
           else
             raise Error, "date arithmetic is not implemented on #{db.database_type}"
           end

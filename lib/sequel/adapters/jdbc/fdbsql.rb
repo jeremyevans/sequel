@@ -60,9 +60,6 @@ module Sequel
           ps
         end
       end
-
-      Dataset.register_extension(:date_arithmetic, Sequel::Fdbsql::DateArithmeticDatasetMethods)
     end
-
   end
 end
