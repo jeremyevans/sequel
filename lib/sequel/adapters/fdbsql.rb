@@ -260,18 +260,14 @@ module Sequel
       # args.
       def execute_prepared_statement(name, args)
         check_disconnect_errors do
-          retry_on_not_committed do
-            @connection.exec_prepared(name, args)
-          end
+          @connection.exec_prepared(name, args)
         end
       end
 
       # Prepare a statement for later use.
       def prepare(name, sql)
         check_disconnect_errors do
-          retry_on_not_committed do
-            @connection.prepare(name, sql)
-          end
+          @connection.prepare(name, sql)
         end
       end
 
@@ -279,9 +275,7 @@ module Sequel
       def query(sql, args=nil)
         args = args.map{|v| @db.bound_variable_arg(v, self)} if args
         check_disconnect_errors do
-          retry_on_not_committed do
-            @connection.query(sql, args)
-          end
+          @connection.query(sql, args)
         end
       end
 
@@ -340,18 +334,6 @@ module Sequel
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
           result.error_field(::PGresult::PG_DIAG_SQLSTATE)
-        end
-      end
-
-      def retry_on_not_committed
-        retries = NUMBER_OF_NOT_COMMITTED_RETRIES
-        begin
-          yield
-        rescue PG::TRIntegrityConstraintViolation => e
-          if (!in_transaction and RETRY_SQLSTATES.include? database_exception_sqlstate(e, :classes=>CONVERTED_EXCEPTIONS))
-            retry if (retries -= 1) > 0
-          end
-          raise
         end
       end
 

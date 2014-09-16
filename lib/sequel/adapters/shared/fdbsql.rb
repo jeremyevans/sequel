@@ -11,17 +11,6 @@ module Sequel
     # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS  = []
 
-    # When the connection is in autocommit mode, and the server returns a retryable
-    # error, the adapter will retry. At most it will retry this many times
-    NUMBER_OF_NOT_COMMITTED_RETRIES = 10
-
-    # Error raised when Sequel determines a Fdbsql exclusion constraint has been violated.
-    class ExclusionConstraintViolation < Sequel::ConstraintViolation; end
-    # Base class for all retryable errors
-    class RetryError < Sequel::DatabaseError; end
-    # Error thrown when the FoundationDB SQL Layer returns a NotCommitted status
-    class NotCommittedError < RetryError; end
-
     # Methods shared by Database instances that connect to
     # the FoundationDB SQL Layer
     module DatabaseMethods
@@ -280,7 +269,6 @@ module Sequel
       NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
       FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
       UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
-      NOT_COMMITTED_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
 
       # Given the SQLState, return the appropriate DatabaseError subclass.
       def database_specific_error_class_from_sqlstate(sqlstate)
@@ -292,8 +280,6 @@ module Sequel
           ForeignKeyConstraintViolation
         when *UNIQUE_CONSTRAINT_SQLSTATES
           UniqueConstraintViolation
-        when *NOT_COMMITTED_SQLSTATES
-          NotCommittedError
         end
       end
 

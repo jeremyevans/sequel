@@ -242,7 +242,24 @@ module Sequel
         return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
         synchronize(opts[:server]) do |conn|
-          execute_on_connection(conn, sql, opts, &block)
+          statement(conn) do |stmt|
+            if block
+              if size = fetch_size
+                stmt.setFetchSize(size)
+              end
+              yield log_yield(sql){stmt.executeQuery(sql)}
+            else
+              case opts[:type]
+              when :ddl
+                log_yield(sql){stmt.execute(sql)}
+              when :insert
+                log_yield(sql){execute_statement_insert(stmt, sql)}
+                last_insert_id(conn, opts.merge(:stmt=>stmt))
+              else
+                log_yield(sql){stmt.executeUpdate(sql)}
+              end
+            end
+          end
         end
       end
       alias execute_dui execute
@@ -380,7 +397,8 @@ module Sequel
       # statement, use that statement instead of creating another.
       # Otherwise, prepare a new statement for the connection, bind the
       # variables, and execute it.
-      def execute_prepared_statement(name, opts=OPTS, &block)
+      def execute_prepared_statement(name, opts=OPTS)
+        args = opts[:arguments]
         if name.is_a?(Dataset)
           ps = name
           name = ps.prepared_statement_name
@@ -389,48 +407,43 @@ module Sequel
         end
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
-          execute_prepared_statement_on_connection(conn, ps, name, sql, opts, &block)
-        end
-      end
-
-      def execute_prepared_statement_on_connection(conn, ps, name, sql, opts)
-        args = opts[:arguments]
-        if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
-          cps = cps[1]
-        else
-          log_yield("CLOSE #{name}"){cps[1].close} if cps
-          cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){prepare_jdbc_statement(conn, sql, opts)}
-          if size = fetch_size
-            cps.setFetchSize(size)
-          end
-          cps_sync(conn){|cpsh| cpsh[name] = [sql, cps]} if name
-        end
-        i = 0
-        args.each{|arg| set_ps_arg(cps, arg, i+=1)}
-        msg = "EXECUTE#{" #{name}" if name}"
-        if ps.log_sql
-          msg << " ("
-          msg << sql
-          msg << ")"
-        end
-        begin
-          if block_given?
-            yield log_yield(msg, args){cps.executeQuery}
+          if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
+            cps = cps[1]
           else
-            case opts[:type]
-            when :ddl
-              log_yield(msg, args){cps.execute}
-            when :insert
-              log_yield(msg, args){execute_prepared_statement_insert(cps)}
-              last_insert_id(conn, opts.merge(:prepared=>true, :stmt=>cps))
-            else
-              log_yield(msg, args){cps.executeUpdate}
+            log_yield("CLOSE #{name}"){cps[1].close} if cps
+            cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){prepare_jdbc_statement(conn, sql, opts)}
+            if size = fetch_size
+              cps.setFetchSize(size)
             end
+            cps_sync(conn){|cpsh| cpsh[name] = [sql, cps]} if name
           end
-        rescue NativeException, JavaSQL::SQLException => e
-          raise_error(e)
-        ensure
-          cps.close unless name
+          i = 0
+          args.each{|arg| set_ps_arg(cps, arg, i+=1)}
+          msg = "EXECUTE#{" #{name}" if name}"
+          if ps.log_sql
+            msg << " ("
+            msg << sql
+            msg << ")"
+          end
+          begin
+            if block_given?
+              yield log_yield(msg, args){cps.executeQuery}
+            else
+              case opts[:type]
+              when :ddl
+                log_yield(msg, args){cps.execute}
+              when :insert
+                log_yield(msg, args){execute_prepared_statement_insert(cps)}
+                last_insert_id(conn, opts.merge(:prepared=>true, :stmt=>cps))
+              else
+                log_yield(msg, args){cps.executeUpdate}
+              end
+            end
+          rescue NativeException, JavaSQL::SQLException => e
+            raise_error(e)
+          ensure
+            cps.close unless name
+          end
         end
       end
 
@@ -442,27 +455,6 @@ module Sequel
       # Execute the insert SQL using the statement
       def execute_statement_insert(stmt, sql)
         stmt.executeUpdate(sql)
-      end
-
-      def execute_on_connection(conn, sql, opts, &block)
-        statement(conn) do |stmt|
-          if block
-            if size = fetch_size
-              stmt.setFetchSize(size)
-            end
-            yield log_yield(sql){stmt.executeQuery(sql)}
-          else
-            case opts[:type]
-            when :ddl
-              log_yield(sql){stmt.execute(sql)}
-            when :insert
-              log_yield(sql){execute_statement_insert(stmt, sql)}
-              last_insert_id(conn, opts.merge(:stmt=>stmt))
-            else
-              log_yield(sql){stmt.executeUpdate(sql)}
-            end
-          end
-        end
       end
 
       # The default fetch size to use for statements.  Nil by default, so that the

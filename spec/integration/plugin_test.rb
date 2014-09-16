@@ -277,7 +277,7 @@ describe "Many Through Many Plugin" do
     c.exclude(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
   end
 
-  cspecify "should handle typical case with 3 join tables", :fdbsql do
+  specify "should handle typical case with 3 join tables" do
     Artist.many_through_many :related_artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]], :class=>Artist, :distinct=>true
     Artist[@artist1.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
     Artist[@artist2.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'

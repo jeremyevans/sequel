@@ -22,64 +22,6 @@ describe 'Fdbsql' do
       @db = DB
     end
 
-    describe 'automatic NotCommitted retry' do
-      before do
-        @db.drop_table?(:some_table)
-        @db.create_table(:some_table) {text :name; primary_key :id}
-        @db2 = Sequel.connect(@db.url)
-      end
-      after do
-        @db2.disconnect
-        @db.drop_table?(:some_table)
-      end
-      specify 'within a transaction' do
-        proc do
-          @db.transaction do
-            @db[:some_table].insert(:name => 'a')
-            @db2.drop_table(:some_table)
-          end
-        end.should raise_error(Sequel::Fdbsql::NotCommittedError)
-      end
-    end
-
-    # JDBC knows whether it's in autocommit mode or not
-    # just look at the connection
-    if (DB.adapter_scheme == :fdbsql)
-      describe 'PG connection.in_transaction' do
-        before(:all) do
-          raise 'too many servers' if @db.servers.count > 1
-          @db.drop_table?(:some_table)
-          @db.create_table(:some_table) {text :name; primary_key :id}
-          @conn = @db.pool.hold(@db.servers.first) {|conn| conn}
-        end
-        after(:all) do
-          @db.drop_table?(:some_table)
-        end
-
-        specify 'is unset by default' do
-          @conn.in_transaction.should == false
-        end
-        specify 'is set in a transaction' do
-          @db.transaction do
-            @conn.in_transaction.should == true
-          end
-        end
-        specify 'is unset after a commit' do
-          @db.transaction do
-            @db[:some_table].insert(:name => 'a')
-            @conn.in_transaction.should == true
-          end
-          @conn.in_transaction.should == false
-        end
-        specify 'is unset after a rollback' do
-          @db.transaction do
-            raise Sequel::Rollback.new
-          end
-          @conn.in_transaction.should == false
-        end
-      end
-    end
-
     describe 'schema_parsing' do
       after do
         @db.drop_table?(:test)

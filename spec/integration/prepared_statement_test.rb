@@ -161,7 +161,7 @@ describe "Prepared Statements and Bound Arguments" do
     @db.call(:select_n, :n=>10){|r| r[:numb] *= 2}.should == [20]
   end
     
-  specify "should support prepared statements being called multiple times with different arguments" do
+  cspecify "should support prepared statements being called multiple times with different arguments", [:jdbc, :fdbsql] do
     @ds.filter(:numb=>:$n).prepare(:select, :select_n)
     @db.call(:select_n, :n=>10).should == [{:id=>1, :numb=>10}]
     @db.call(:select_n, :n=>0).should == []
