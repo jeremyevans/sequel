@@ -44,12 +44,18 @@ module Sequel
         end
       end
 
-      private
+      def server_version
+        return @server_version if @server_version
 
-      def begin_transaction(conn, opts=OPTS)
-        super
-        conn.in_transaction = true
+        version = get{VERSION{}}
+        unless ver = version.match(/(\d+)\.(\d+)\.(\d+)/)
+          raise Error, "No match when checking FDB SQL Layer version: #{version}"
+        end
+
+        @server_version = (100 * ver[1].to_i + ver[2].to_i) * 100 + ver[3].to_i
       end
+
+      private
 
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
@@ -88,13 +94,6 @@ module Sequel
           end
         end
       end
-
-      def remove_transaction(conn, committed)
-        conn.in_transaction = false
-      ensure
-        super
-      end
-
     end
 
     # Dataset class for the FoundationDB SQL Layer that uses the pg driver.
@@ -204,18 +203,11 @@ module Sequel
     end
 
     # Connection specific methods for Fdbsql with pg
-    class Connection
+    class Connection < PG::Connection
       CONNECTION_OK = -1
 
       # Regular expression for error messages that note that the connection is closed.
       DISCONNECT_ERROR_RE = /\A(?:could not receive data from server|no connection to the server|connection not open|connection is closed)/
-
-      # These sql states are used to indicate that fdbvql should automatically
-      # retry the statement if it's not in a transaction
-      RETRY_SQLSTATES = %w'40002'.freeze.each{|s| s.freeze}
-
-      # Whether or not this connection is in a transaction.
-      attr_accessor :in_transaction
 
       # Hash of prepared statements for this connection.  Keys are
       # string names of the server side prepared statement, and values
@@ -224,29 +216,33 @@ module Sequel
 
       # Create a new connection to the FoundationDB SQL Layer. See Database#connect.
       def initialize(db, opts)
+        connect_opts = {
+          :host => opts[:host] || 'localhost',
+          :port => opts[:port] || 15432,
+          :dbname => opts[:database],
+          :user => opts[:user],
+          :password => opts[:password],
+          :hostaddr => opts[:hostaddr],
+          :connect_timeout => opts[:connect_timeout] || 20,
+          :sslmode => opts[:sslmode]
+        }.delete_if{|key, value| value.nil? or (value.respond_to?(:empty?) and value.empty?)}
+	super(connect_opts)
+
         @db = db
-        @config = opts
-        @connection_hash = {
-          :host => @config[:host] || 'localhost',
-          :port => @config[:port] || 15432,
-          :dbname => @config[:database],
-          :user => @config[:user],
-          :password => @config[:password],
-          :hostaddr => @config[:hostaddr],
-          :connect_timeout => @config[:connect_timeout] || 20,
-          :sslmode => @config[:sslmode]
-        }.delete_if { |key, value| value.nil? or (value.respond_to?(:empty?) and value.empty?)}
         @prepared_statements = {}
-        connect
+
+        if opts[:notice_receiver]
+          set_notice_receiver(opts[:notice_receiver])
+        else
+          # Swallow warnings
+          set_notice_receiver{|proc| }
+        end
       end
 
       # Close the connection.
       def close
-        # Just like postgres, ignore any errors here
-        begin
-          @connection.close
-        rescue PGError, IOError
-        end
+        super
+      rescue PGError, IOError
       end
 
       # Execute the given SQL with this connection.  If a block is given,
@@ -259,55 +255,21 @@ module Sequel
       # Execute the prepared statement of the given name, binding the given
       # args.
       def execute_prepared_statement(name, args)
-        check_disconnect_errors do
-          @connection.exec_prepared(name, args)
-        end
+        check_disconnect_errors{exec_prepared(name, args)}
       end
 
       # Prepare a statement for later use.
       def prepare(name, sql)
-        check_disconnect_errors do
-          @connection.prepare(name, sql)
-        end
+        check_disconnect_errors{super}
       end
 
       # Execute the given query and return the results.
       def query(sql, args=nil)
         args = args.map{|v| @db.bound_variable_arg(v, self)} if args
-        check_disconnect_errors do
-          @connection.query(sql, args)
-        end
+        check_disconnect_errors{super}
       end
 
       private
-
-      def check_version
-        ver = execute('SELECT VERSION()') do |res|
-          version = res.first['_SQL_COL_1']
-          m = version.match('^.* (\d+)\.(\d+)\.(\d+)')
-          if m.nil?
-            raise "No match when checking FDB SQL Layer version: #{version}"
-          end
-          m
-        end
-
-        # Combine into single number, two digits per part: 1.9.3 => 10903
-        @sql_layer_version = (100 * ver[1].to_i + ver[2].to_i) * 100 + ver[3].to_i
-        if @sql_layer_version < 20000
-          raise Sequel::DatabaseError.new("Unsupported FDB SQL Layer version: #{ver[1]}.#{ver[2]}.#{ver[3]}")
-        end
-      end
-
-      def connect
-        @connection = PG::Connection.new(@connection_hash)
-        if (@config[:notice_receiver])
-          @connection.set_notice_receiver(@config[:notice_receiver])
-        else
-          # Swallow warnings
-          @connection.set_notice_receiver { |proc| }
-        end
-        check_version
-      end
 
       # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and
       # the connection status cannot be determined or it is not OK.
@@ -316,13 +278,6 @@ module Sequel
           yield
         rescue PGError => e
           disconnect = false
-          begin
-            s = status
-          rescue PGError
-            disconnect = true
-          end
-          status_ok = (s == CONNECTION_OK)
-          disconnect ||= !status_ok
           disconnect ||= e.message =~ DISCONNECT_ERROR_RE
           disconnect ? raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)) : raise
         rescue IOError, Errno::EPIPE, Errno::ECONNRESET => e
@@ -330,17 +285,6 @@ module Sequel
           raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
         end
       end
-
-      def database_exception_sqlstate(exception, opts)
-        if exception.respond_to?(:result) && (result = exception.result)
-          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
-        end
-      end
-
-      def status
-        CONNECTION_OK
-      end
-
     end
 
     Dataset.register_extension(:date_arithmetic, Sequel::Fdbsql::DateArithmeticDatasetMethods)
