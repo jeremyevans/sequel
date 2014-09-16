@@ -35,7 +35,7 @@ describe 'Fdbsql' do
       specify 'within a transaction' do
         proc do
           @db.transaction do
-            @db[:some_table].insert(name: 'a')
+            @db[:some_table].insert(:name => 'a')
             @db2.drop_table(:some_table)
           end
         end.should raise_error(Sequel::Fdbsql::NotCommittedError)
@@ -66,7 +66,7 @@ describe 'Fdbsql' do
         end
         specify 'is unset after a commit' do
           @db.transaction do
-            @db[:some_table].insert(name: 'a')
+            @db[:some_table].insert(:name => 'a')
             @conn.in_transaction.should == true
           end
           @conn.in_transaction.should == false
@@ -94,7 +94,7 @@ describe 'Fdbsql' do
             fake_conn_instance = double("fake connection")
             fake_conn_instance.stub(:set_notice_receiver)
             fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).
-              and_return(double(cmd_tuples: 1, first: {'_SQL_COL_1' => 'FoundationDB 2.0.0'}))
+              and_return(double(:cmd_tuples => 1, :first => {'_SQL_COL_1' => 'FoundationDB 2.0.0'}))
             @fake_conn.should_receive(:new).with(args).once.and_return(fake_conn_instance)
             fake_conn_instance.should_receive(:close).once
           end
@@ -134,7 +134,7 @@ describe 'Fdbsql' do
           text :name
           int :value
         end
-        schema = DB.schema(:test, reload: true)
+        schema = DB.schema(:test, :reload => true)
         schema.count.should eq 2
         schema[0][0].should eq :name
         schema[1][0].should eq :value
@@ -146,7 +146,7 @@ describe 'Fdbsql' do
           text :name
           primary_key :id
         end
-        schema = DB.schema(:test, reload: true)
+        schema = DB.schema(:test, :reload => true)
         schema.count.should eq 2
         id_col = schema[0]
         name_col = schema[1]
@@ -162,7 +162,7 @@ describe 'Fdbsql' do
           Integer :id2
           primary_key [:id, :id2]
         end
-        schema = DB.schema(:test, reload: true)
+        schema = DB.schema(:test, :reload => true)
         schema.count.should eq 2
         id_col = schema[0]
         id2_col = schema[1]
@@ -175,9 +175,9 @@ describe 'Fdbsql' do
       specify 'with other constraints' do
         @db.create_table(:test) do
           primary_key :id
-          Integer :unique, unique: true
+          Integer :unique, :unique => true
         end
-        schema = DB.schema(:test, reload: true)
+        schema = DB.schema(:test, :reload => true)
         schema.count.should eq 2
         id_col = schema[0]
         unique_col = schema[1]
@@ -196,9 +196,9 @@ describe 'Fdbsql' do
         end
         @db.create_table(:other_table) do
           primary_key :id
-          varchar :name, unique: true
+          varchar :name, :unique => true
         end
-        schema = DB.schema(:test, reload: true)
+        schema = DB.schema(:test, :reload => true)
         schema.count.should eq 2
         schema.each {|col| col[1][:primary_key].should == nil}
       end
@@ -221,7 +221,7 @@ describe 'Fdbsql' do
         end
 
         specify 'gets info for correct table' do
-          schema = DB.schema(:test, reload: true, schema: @second_schema)
+          schema = DB.schema(:test, :reload => true, :schema => @second_schema)
           schema.count.should eq 2
           id2_col = schema[0]
           id_col = schema[1]
@@ -268,7 +268,7 @@ describe 'Fdbsql' do
       specify 'with other constraints' do
         @db.create_table(:test) do
           primary_key :id
-          Integer :unique, unique: true
+          Integer :unique, :unique => true
         end
         DB.primary_key(:test).should eq :id
       end
@@ -280,7 +280,7 @@ describe 'Fdbsql' do
         end
         @db.create_table(:other_table) do
           primary_key :id
-          varchar :name, unique: true
+          varchar :name, :unique => true
         end
         DB.primary_key(:other_table).should eq :id
       end
@@ -313,7 +313,7 @@ describe 'Fdbsql' do
         end
 
         specify 'gets correct primary key' do
-          DB.primary_key(:test, schema: @second_schema).should eq :id2
+          DB.primary_key(:test, :schema => @second_schema).should eq :id2
         end
       end
     end
@@ -334,12 +334,12 @@ describe 'Fdbsql' do
         @db.drop_table?(:test)
       end
       specify 'on explicit schema' do
-        tables = @db.tables(schema: @second_schema)
+        tables = @db.tables(:schema => @second_schema)
         tables.should include(:test2)
         tables.should_not include(:test)
       end
       specify 'qualified' do
-        tables = @db.tables(qualify: true)
+        tables = @db.tables(:qualify => true)
         tables.should include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test))
         tables.should_not include(:test)
       end
@@ -347,9 +347,9 @@ describe 'Fdbsql' do
 
     describe '#views' do
       def drop_things
-        @db.drop_view(Sequel.qualify(@second_schema,:test_view2), if_exists: true)
+        @db.drop_view(Sequel.qualify(@second_schema,:test_view2), :if_exists => true)
         @db.drop_table?(Sequel.qualify(@second_schema,:test_table))
-        @db.drop_view(:test_view, if_exists: true)
+        @db.drop_view(:test_view, :if_exists => true)
         @db.drop_table?(:test_table)
       end
       before do
@@ -368,12 +368,12 @@ describe 'Fdbsql' do
         drop_things
       end
       specify 'on explicit schema' do
-        views = @db.views(schema: @second_schema)
+        views = @db.views(:schema => @second_schema)
         views.should include(:test_view2)
         views.should_not include(:test_view)
       end
       specify 'qualified' do
-        views = @db.views(qualify: true)
+        views = @db.views(:qualify => true)
         views.should include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test_view))
         views.should_not include(:test)
       end
@@ -443,15 +443,15 @@ describe 'Fdbsql' do
       end
 
       specify '#delete' do
-        DB[:test].where(a: 8..10).delete.should eq 0
-        DB[:test].where(a: 5).delete.should eq 1
-        DB[:test].where(a: 1..3).delete.should eq 3
+        DB[:test].where(:a => 8..10).delete.should eq 0
+        DB[:test].where(:a => 5).delete.should eq 1
+        DB[:test].where(:a => 1..3).delete.should eq 3
       end
 
       specify '#update' do
-        DB[:test].where(a: 8..10).update(a: Sequel.+(:a, 10)).should eq 0
-        DB[:test].where(a: 5).update(a: Sequel.+(:a, 1000)).should eq 1
-        DB[:test].where(a: 1..3).update(a: Sequel.+(:a, 100)).should eq 3
+        DB[:test].where(:a => 8..10).update(:a => Sequel.+(:a, 10)).should eq 0
+        DB[:test].where(:a => 5).update(:a => Sequel.+(:a, 1000)).should eq 1
+        DB[:test].where(:a => 1..3).update(:a => Sequel.+(:a, 100)).should eq 3
       end
 
     end
@@ -480,11 +480,11 @@ describe 'Fdbsql' do
       end
 
       specify 'intersect all' do
-        @db[:test].intersect(@db[:test2], all: true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[1, 10], [1,10], [2, 10]]
+        @db[:test].intersect(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[1, 10], [1,10], [2, 10]]
       end
 
       specify 'except all' do
-        @db[:test].except(@db[:test2], all: true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[8, 15], [2,10], [2, 10]]
+        @db[:test].except(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[8, 15], [2,10], [2, 10]]
       end
     end
 
@@ -634,7 +634,7 @@ describe 'Fdbsql' do
             conn.should_not_receive(:set_notice_receiver).with(no_args())
           end
 
-          conn = Sequel::Fdbsql::Connection.new(nil, notice_receiver: receiver)
+          conn = Sequel::Fdbsql::Connection.new(nil, :notice_receiver => receiver)
         end
       end
     end
@@ -705,7 +705,7 @@ describe 'Fdbsql' do
             end
             ds = DB["SELECT $n"]
             ds.prepare(:select, :select_n)
-            DB.call(:select_n, n: 3)
+            DB.call(:select_n, :n => 3)
             time.should eq 5
           end
         end
@@ -745,7 +745,7 @@ describe 'Fdbsql' do
               DB.transaction do
                 ds = DB["SELECT $n"]
                 ds.prepare(:select, :select_n)
-                DB.call(:select_n, n: 3)
+                DB.call(:select_n, :n => 3)
               end
             end.should raise_error(Sequel::Fdbsql::NotCommittedError)
           end
