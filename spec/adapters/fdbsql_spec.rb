@@ -78,50 +78,6 @@ describe 'Fdbsql' do
           @conn.in_transaction.should == false
         end
       end
-
-      describe 'PG connecting' do
-        specify '#fdbsql' do
-          db2 = Sequel.fdbsql(DB.uri)
-        end
-
-        describe 'opts' do
-          before do
-            @fake_conn = double('connection class')
-            stub_const('PG::Connection', @fake_conn)
-          end
-
-          def fake_conn(args)
-            fake_conn_instance = double("fake connection")
-            fake_conn_instance.stub(:set_notice_receiver)
-            fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).
-              and_return(double(:cmd_tuples => 1, :first => {'_SQL_COL_1' => 'FoundationDB 2.0.0'}))
-            @fake_conn.should_receive(:new).with(args).once.and_return(fake_conn_instance)
-            fake_conn_instance.should_receive(:close).once
-          end
-
-          [['database', {:database => 'mydb'}, {:dbname => 'mydb'}],
-           ['host', {:host => 'somewhere.com'}, {:host => 'somewhere.com'}],
-           ['host', {:host => nil}, {:host => 'localhost'}],
-           ['password', {:password => 'mypw'}, {:password => 'mypw'}],
-           ['user', {:user => 'uxt'}, {:user => 'uxt'}],
-           ['username', {:username => 'uxt'}, {:user => 'uxt'}],
-           ['hostaddr', {:hostaddr => '192.168.1.35'}, {:hostaddr => '192.168.1.35'}],
-           ['port', {:port => 3487}, {:port => 3487}],
-           ['default port', {}, {:port => 15432}],
-           ['connect_timeout', {:connect_timeout => 4890}, {:connect_timeout => 4890}],
-           ['default connect_timeout', {}, {:connect_timeout => 20}],
-           ['sslmode', {:sslmode => 'require'}, {:sslmode => 'require'}], # (disable|allow|prefer|require)
-          ].each do |opts|
-            specify opts[0] do
-              fake_conn(include(opts[2]))
-              default = {:adapter => 'fdbsql', :database => 'the database', :host => 'localhost'}
-              Sequel.connect(default.merge(opts[1])) do |db|
-                db.run('SELECT VERSION()')
-              end
-            end
-          end
-        end
-      end
     end
 
     describe 'schema_parsing' do
@@ -135,9 +91,9 @@ describe 'Fdbsql' do
           int :value
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should eq 2
-        schema[0][0].should eq :name
-        schema[1][0].should eq :value
+        schema.count.should == 2
+        schema[0][0].should == :name
+        schema[1][0].should == :value
         schema.each {|col| col[1][:primary_key].should == nil}
       end
 
@@ -147,11 +103,11 @@ describe 'Fdbsql' do
           primary_key :id
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should eq 2
+        schema.count.should == 2
         id_col = schema[0]
         name_col = schema[1]
-        name_col[0].should eq :name
-        id_col[0].should eq :id
+        name_col[0].should == :name
+        id_col[0].should == :id
         name_col[1][:primary_key].should == nil
         id_col[1][:primary_key].should == true
       end
@@ -163,11 +119,11 @@ describe 'Fdbsql' do
           primary_key [:id, :id2]
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should eq 2
+        schema.count.should == 2
         id_col = schema[0]
         id2_col = schema[1]
-        id_col[0].should eq :id
-        id2_col[0].should eq :id2
+        id_col[0].should == :id
+        id2_col[0].should == :id2
         id_col[1][:primary_key].should == true
         id2_col[1][:primary_key].should == true
       end
@@ -178,11 +134,11 @@ describe 'Fdbsql' do
           Integer :unique, :unique => true
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should eq 2
+        schema.count.should == 2
         id_col = schema[0]
         unique_col = schema[1]
-        id_col[0].should eq :id
-        unique_col[0].should eq :unique
+        id_col[0].should == :id
+        unique_col[0].should == :unique
         id_col[1][:primary_key].should == true
         unique_col[1][:primary_key].should == nil
       end
@@ -199,7 +155,7 @@ describe 'Fdbsql' do
           varchar :name, :unique => true
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should eq 2
+        schema.count.should == 2
         schema.each {|col| col[1][:primary_key].should == nil}
       end
 
@@ -222,11 +178,11 @@ describe 'Fdbsql' do
 
         specify 'gets info for correct table' do
           schema = DB.schema(:test, :reload => true, :schema => @second_schema)
-          schema.count.should eq 2
+          schema.count.should == 2
           id2_col = schema[0]
           id_col = schema[1]
-          id_col[0].should eq :id
-          id2_col[0].should eq :id2
+          id_col[0].should == :id
+          id2_col[0].should == :id2
           id_col[1][:primary_key].should == nil
           id2_col[1][:primary_key].should == true
         end
@@ -244,7 +200,7 @@ describe 'Fdbsql' do
           text :name
           int :value
         end
-        DB.primary_key(:test).should eq nil
+        DB.primary_key(:test).should == nil
       end
 
       specify 'with one primary key' do
@@ -252,7 +208,7 @@ describe 'Fdbsql' do
           text :name
           primary_key :id
         end
-        DB.primary_key(:test).should eq :id
+        DB.primary_key(:test).should == :id
       end
 
       specify 'with multiple primary keys' do
@@ -261,8 +217,7 @@ describe 'Fdbsql' do
           Integer :id2
           primary_key [:id, :id2]
         end
-        primary_key = DB.primary_key(:test)
-        primary_key.should match_array([:id, :id2])
+        DB.primary_key(:test).should == [:id, :id2]
       end
 
       specify 'with other constraints' do
@@ -270,7 +225,7 @@ describe 'Fdbsql' do
           primary_key :id
           Integer :unique, :unique => true
         end
-        DB.primary_key(:test).should eq :id
+        DB.primary_key(:test).should == :id
       end
 
       specify 'with other tables' do
@@ -282,7 +237,7 @@ describe 'Fdbsql' do
           primary_key :id
           varchar :name, :unique => true
         end
-        DB.primary_key(:other_table).should eq :id
+        DB.primary_key(:other_table).should == :id
       end
 
       specify 'responds to alter table' do
@@ -293,7 +248,7 @@ describe 'Fdbsql' do
         @db.alter_table(:test) do
           add_primary_key :quid
         end
-        DB.primary_key(:test).should eq :quid
+        DB.primary_key(:test).should == :quid
       end
 
       describe 'with explicit schema' do
@@ -313,7 +268,7 @@ describe 'Fdbsql' do
         end
 
         specify 'gets correct primary key' do
-          DB.primary_key(:test, :schema => @second_schema).should eq :id2
+          DB.primary_key(:test, :schema => @second_schema).should == :id2
         end
       end
     end
@@ -443,15 +398,15 @@ describe 'Fdbsql' do
       end
 
       specify '#delete' do
-        DB[:test].where(:a => 8..10).delete.should eq 0
-        DB[:test].where(:a => 5).delete.should eq 1
-        DB[:test].where(:a => 1..3).delete.should eq 3
+        DB[:test].where(:a => 8..10).delete.should == 0
+        DB[:test].where(:a => 5).delete.should == 1
+        DB[:test].where(:a => 1..3).delete.should == 3
       end
 
       specify '#update' do
-        DB[:test].where(:a => 8..10).update(:a => Sequel.+(:a, 10)).should eq 0
-        DB[:test].where(:a => 5).update(:a => Sequel.+(:a, 1000)).should eq 1
-        DB[:test].where(:a => 1..3).update(:a => Sequel.+(:a, 100)).should eq 3
+        DB[:test].where(:a => 8..10).update(:a => Sequel.+(:a, 10)).should == 0
+        DB[:test].where(:a => 5).update(:a => Sequel.+(:a, 1000)).should == 1
+        DB[:test].where(:a => 1..3).update(:a => Sequel.+(:a, 100)).should == 3
       end
 
     end
@@ -480,11 +435,11 @@ describe 'Fdbsql' do
       end
 
       specify 'intersect all' do
-        @db[:test].intersect(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[1, 10], [1,10], [2, 10]]
+        @db[:test].intersect(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.sort.should == [[1, 10], [1,10], [2, 10]]
       end
 
       specify 'except all' do
-        @db[:test].except(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.should match_array [[8, 15], [2,10], [2, 10]]
+        @db[:test].except(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.sort.should == [[2,10], [2, 10], [8,15]]
       end
     end
 
@@ -500,11 +455,11 @@ describe 'Fdbsql' do
       end
 
       specify 'true' do
-        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:IS, :b, true)).map{|r| r[:a]}.should match_array [2]
+        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:IS, :b, true)).map{|r| r[:a]}.should == [2]
       end
 
       specify 'not true' do
-        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:'IS NOT', :b, true)).map{|r| r[:a]}.should match_array [1, 3]
+        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:'IS NOT', :b, true)).map{|r| r[:a]}.should == [1, 3]
       end
     end
 
@@ -517,7 +472,7 @@ describe 'Fdbsql' do
       end
 
       specify 'inserts defaults and returns pk' do
-        DB[:test].insert().should eq 1 # 1 should be the pk
+        DB[:test].insert().should == 1 # 1 should be the pk
       end
     end
 
@@ -534,222 +489,12 @@ describe 'Fdbsql' do
 
       specify 'evaluate' do
         DB[:test].select(Sequel.function(:now)).count == 1
-        DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b), :c)).map{|r| r[:c]}.should match_array ['1','2trucks','3foxes']
+        DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b), :c)).map{|r| r[:c]}.should == ['1','2trucks','3foxes']
       end
 
       specify 'get quoted' do
         DB[:test].select(Sequel.function(:now).quoted).sql.should =~ /"now"\(\)/
         DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b).quoted, :c)).sql.should =~ /"concat"\("a", "b"\)/
-      end
-    end
-  end
-
-  # jdbc and pg have different connection objects
-  if (DB.adapter_scheme == :fdbsql)
-    describe 'PG Connection' do
-      before do
-        @fake_conn = double('connection class')
-        stub_const('PG::Connection', @fake_conn)
-      end
-
-      def fake_conn
-        fake_conn_instance = double("fake connection")
-        fake_conn_instance.stub(:set_notice_receiver)
-        fake_conn_instance.stub(:query).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 2.0.0'}])
-        yield fake_conn_instance
-        @fake_conn.stub(:new).and_return(fake_conn_instance)
-      end
-
-      describe 'Automatic retry on NotCommitted' do
-
-        describe 'outside a transaction' do
-          specify 'retries a finite number of times' do
-            result = double('result')
-            e = PG::TRIntegrityConstraintViolation.new
-            e.stub(:result).and_return(result)
-            result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-            fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).ordered.and_raise(e)}
-            conn = Sequel::Fdbsql::Connection.new(nil, {})
-            proc do
-              conn.query('SELECT 3')
-            end.should raise_error(PG::TRIntegrityConstraintViolation)
-          end
-
-          specify 'retries more than 5 times' do
-            result = double('result')
-            e = PG::TRIntegrityConstraintViolation.new
-            e.stub(:result).and_return(result)
-            result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-            time = 0
-            fake_conn do |conn|
-              conn.stub(:query).with('SELECT 3', nil).ordered do
-                raise e if (time += 1) < 5
-                3
-              end
-            end
-            conn = Sequel::Fdbsql::Connection.new(nil, {})
-            conn.query('SELECT 3')
-          end
-        end
-        describe 'inside a transaction' do
-          specify 'does not retry' do
-            result = double('result')
-            e = PG::TRIntegrityConstraintViolation.new
-            e.stub(:result).and_return(result)
-            result.stub(:error_field).with(::PGresult::PG_DIAG_SQLSTATE).and_return("40002")
-            fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).once.ordered.and_raise(e)}
-            conn = Sequel::Fdbsql::Connection.new(nil, {})
-            conn.in_transaction = true
-            proc do
-              conn.query('SELECT 3')
-            end.should raise_error(PG::TRIntegrityConstraintViolation)
-          end
-        end
-      end
-
-      describe 'checks sql layer version' do
-        ['1.9.5', '0.9.6', '1.8.6', '1.9.6', '1.9.7', '1.10.0'].each do |version|
-          it "throws error for #{version}" do
-            fake_conn {|conn| conn.stub(:query).with('SELECT VERSION()', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
-            proc do
-              conn = Sequel::Fdbsql::Connection.new(nil, {})
-            end.should raise_error(Sequel::DatabaseError, /Unsupported.*version.*#{version}/)
-          end
-        end
-        ['2.0.0', '2.9.5', '3.0.0'].each do |version|
-          it "does not throw error for #{version}" do
-            fake_conn {|conn| conn.stub(:query).with('SELECT 3', nil).and_return([{'_SQL_COL_1' => "FoundationDB #{version}"}])}
-            conn = Sequel::Fdbsql::Connection.new(nil, {})
-          end
-        end
-      end
-
-      describe 'receiver' do
-        specify "should set notice receiver when connecting" do
-          receiver = proc {|x| puts x}
-
-          fake_conn do |conn|
-            conn.should_receive(:set_notice_receiver).once.with(receiver)
-            # because we give it a block for our default receiver
-            conn.should_not_receive(:set_notice_receiver).with(no_args())
-          end
-
-          conn = Sequel::Fdbsql::Connection.new(nil, :notice_receiver => receiver)
-        end
-      end
-    end
-  elsif (DB.adapter_scheme == :jdbc)
-    describe 'JDBC' do
-      before do
-        @fake_conn = double('fake connection')
-        @fake_conn.stub(:close)
-        DB.stub(:connect).and_return(@fake_conn)
-        # clears all the existing real connection
-        DB.disconnect
-      end
-      after do
-        DB.disconnect
-      end
-
-      def fake_stmt
-        fake_stmt = double("fake statement")
-        @fake_conn.stub(:createStatement).and_return(fake_stmt)
-#        fake_stmt.stub(:executeQuery).with('SELECT VERSION()', nil).ordered.and_return([{'_SQL_COL_1' => 'FoundationDB 1.9.6'}])
-        yield fake_stmt
-        fake_stmt.stub(:close)
-      end
-      describe 'automatic retry on NotCommitted' do
-        describe 'outside a transaction' do
-          before do
-            @fake_conn.stub(:auto_commit).and_return(true)
-          end
-
-          specify 'retries a finite number of times' do
-            e = NativeException.new
-            e.stub(:sql_state).and_return("40002")
-            fake_stmt {|stmt| stmt.stub(:execute).with('SELECT 3').at_most(10).times.ordered.and_raise(e) }
-            proc do
-              DB << 'SELECT 3'
-            end.should raise_error(Sequel::Fdbsql::NotCommittedError)
-          end
-          specify 'retries at least 5 times' do
-            e = NativeException.new
-            e.stub(:sql_state).and_return("40002")
-            time = 0
-            fake_stmt do |stmt|
-              stmt.stub(:execute).with('SELECT 3').ordered do
-                raise e if (time += 1) < 5
-                3
-              end
-            end
-            DB << 'SELECT 3'
-            time.should eq 5
-          end
-
-          specify 'retries a prepared statement' do
-            e = NativeException.new
-            e.stub(:sql_state).and_return("40002")
-            ps = double('fake prepared statement')
-            @fake_conn.stub(:prepareStatement).with('SELECT $n').and_return(ps)
-            ps.stub(:setLong).with(0, 3).at_least(:once)
-            rs = double('faux resultset')
-            rs.stub(:close)
-            md = double('fake metadat')
-            rs.stub(:getMetaData).and_return(md)
-            md.stub(:getColumnCount).and_return(0)
-            rs.stub(:next).and_return(false)
-            time = 0
-            ps.stub(:executeQuery) do
-              raise e if (time += 1) < 5
-              rs
-            end
-            ds = DB["SELECT $n"]
-            ds.prepare(:select, :select_n)
-            DB.call(:select_n, :n => 3)
-            time.should eq 5
-          end
-        end
-
-        describe 'inside a transaction' do
-          before do
-            @fake_conn.stub(:auto_commit).and_return(false)
-          end
-
-          specify 'does not retry' do
-            e = NativeException.new
-            e.stub(:sql_state).and_return("40002")
-            fake_stmt do |stmt|
-              stmt.stub(:execute).with('BEGIN').once.ordered
-              stmt.stub(:execute).with('SELECT 3').once.ordered.and_raise(e)
-              stmt.stub(:execute).with('ROLLBACK').once.ordered
-            end
-            proc do
-              DB.transaction do
-                DB << 'SELECT 3'
-              end
-            end.should raise_error(Sequel::Fdbsql::NotCommittedError)
-          end
-
-          specify 'does not retry prepared statement' do
-            e = NativeException.new
-            e.stub(:sql_state).and_return("40002")
-            ps = double('fake prepared statement')
-            fake_stmt do |stmt|
-              stmt.stub(:execute).with('BEGIN').once
-              stmt.stub(:execute).with('ROLLBACK').once
-            end
-            @fake_conn.stub(:prepareStatement).with('SELECT $n').and_return(ps)
-            ps.stub(:setLong).with(0, 3).at_least(:once)
-            ps.stub(:executeQuery).once.and_raise(e)
-            proc do
-              DB.transaction do
-                ds = DB["SELECT $n"]
-                ds.prepare(:select, :select_n)
-                DB.call(:select_n, :n => 3)
-              end
-            end.should raise_error(Sequel::Fdbsql::NotCommittedError)
-          end
-        end
       end
     end
   end
