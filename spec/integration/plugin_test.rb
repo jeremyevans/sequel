@@ -1890,188 +1890,185 @@ describe "Caching plugins" do
   end
 end
 
-# fdbsql does not support check constraint, so the before blocks here won't work
-unless (DB.database_type == :fdbsql)
-  describe "Sequel::Plugins::ConstraintValidations" do
-    before(:all) do
-      @db = DB
-      @db.extension(:constraint_validations)
-      @db.create_constraint_validations_table
-      @ds = @db[:cv_test]
-      @regexp = regexp = @db.dataset.supports_regexp?
-      @validation_opts = {}
-      opts_proc = proc{@validation_opts}
-      @validate_block = proc do |opts|
-        opts = opts_proc.call
-        presence :pre, opts.merge(:name=>:p)
-        exact_length 5, :exactlen, opts.merge(:name=>:el)
-        min_length 5, :minlen, opts.merge(:name=>:minl)
-        max_length 5, :maxlen, opts.merge(:name=>:maxl)
-        length_range 3..5, :lenrange, opts.merge(:name=>:lr)
-        if regexp
-          format(/^foo\d+/, :form, opts.merge(:name=>:f))
-        end
-        like 'foo%', :lik, opts.merge(:name=>:l)
-        ilike 'foo%', :ilik, opts.merge(:name=>:il)
-        includes %w'abc def', :inc, opts.merge(:name=>:i)
-        unique :uniq, opts.merge(:name=>:u)
-        max_length 6, :minlen, opts.merge(:name=>:maxl2)
+describe "Sequel::Plugins::ConstraintValidations" do
+  before(:all) do
+    @db = DB
+    @db.extension(:constraint_validations)
+    @db.create_constraint_validations_table
+    @ds = @db[:cv_test]
+    @regexp = regexp = @db.dataset.supports_regexp?
+    @validation_opts = {}
+    opts_proc = proc{@validation_opts}
+    @validate_block = proc do |opts|
+      opts = opts_proc.call
+      presence :pre, opts.merge(:name=>:p)
+      exact_length 5, :exactlen, opts.merge(:name=>:el)
+      min_length 5, :minlen, opts.merge(:name=>:minl)
+      max_length 5, :maxlen, opts.merge(:name=>:maxl)
+      length_range 3..5, :lenrange, opts.merge(:name=>:lr)
+      if regexp
+        format(/^foo\d+/, :form, opts.merge(:name=>:f))
       end
-      @valid_row = {:pre=>'a', :exactlen=>'12345', :minlen=>'12345', :maxlen=>'12345', :lenrange=>'1234', :lik=>'fooabc', :ilik=>'FooABC', :inc=>'abc', :uniq=>'u'}
-      @violations = [
-                     [:pre, [nil, '', ' ']],
-                     [:exactlen, [nil, '', '1234', '123456']],
-                     [:minlen, [nil, '', '1234']],
-                     [:maxlen, [nil, '123456']],
-                     [:lenrange, [nil, '', '12', '123456']],
-                     [:lik, [nil, '', 'fo', 'fotabc', 'FOOABC']],
-                     [:ilik, [nil, '', 'fo', 'fotabc']],
-                     [:inc, [nil, '', 'ab', 'abcd']],
-                    ]
+      like 'foo%', :lik, opts.merge(:name=>:l)
+      ilike 'foo%', :ilik, opts.merge(:name=>:il)
+      includes %w'abc def', :inc, opts.merge(:name=>:i)
+      unique :uniq, opts.merge(:name=>:u)
+      max_length 6, :minlen, opts.merge(:name=>:maxl2)
+    end
+    @valid_row = {:pre=>'a', :exactlen=>'12345', :minlen=>'12345', :maxlen=>'12345', :lenrange=>'1234', :lik=>'fooabc', :ilik=>'FooABC', :inc=>'abc', :uniq=>'u'}
+    @violations = [
+      [:pre, [nil, '', ' ']],
+      [:exactlen, [nil, '', '1234', '123456']],
+      [:minlen, [nil, '', '1234']],
+      [:maxlen, [nil, '123456']],
+      [:lenrange, [nil, '', '12', '123456']],
+      [:lik, [nil, '', 'fo', 'fotabc', 'FOOABC']],
+      [:ilik, [nil, '', 'fo', 'fotabc']],
+      [:inc, [nil, '', 'ab', 'abcd']],
+    ]
 
-      if @regexp
-        @valid_row[:form] = 'foo1'
-        @violations << [:form, [nil, '', 'foo', 'fooa']]
+    if @regexp
+      @valid_row[:form] = 'foo1'
+      @violations << [:form, [nil, '', 'foo', 'fooa']]
+    end
+  end
+  after(:all) do
+    @db.drop_constraint_validations_table
+  end
+
+  shared_examples_for "constraint validations" do
+    cspecify "should set up constraints that work even outside the model", :mysql do 
+      proc{@ds.insert(@valid_row)}.should_not raise_error
+
+      # Test for unique constraint
+      proc{@ds.insert(@valid_row)}.should raise_error(Sequel::DatabaseError)
+
+      @ds.delete
+      @violations.each do |col, vals|
+        try = @valid_row.dup
+        vals += ['1234567'] if col == :minlen
+        vals.each do |val|
+          next if val.nil? && @validation_opts[:allow_nil]
+          try[col] = val
+          proc{@ds.insert(try)}.should raise_error(Sequel::DatabaseError)
+        end
+      end
+
+      # Test for dropping of constraint
+      @db.alter_table(:cv_test){validate{drop :maxl2}}
+      proc{@ds.insert(@valid_row.merge(:minlen=>'1234567'))}.should_not raise_error
+    end
+
+    it "should set up automatic validations inside the model" do 
+      c = Class.new(Sequel::Model(@ds))
+      c.plugin :constraint_validations
+      c.dataset.delete
+      proc{c.create(@valid_row)}.should_not raise_error
+
+      # Test for unique validation 
+      c.new(@valid_row).should_not be_valid
+
+      c.dataset.delete
+      @violations.each do |col, vals|
+        try = @valid_row.dup
+        vals.each do |val|
+          next if val.nil? && @validation_opts[:allow_nil]
+          try[col] = val
+          c.new(try).should_not be_valid
+        end
+      end
+      c.db.constraint_validations = nil
+    end
+  end
+
+  describe "via create_table" do
+    before(:all) do
+      @table_block = proc do
+        regexp = @regexp
+        validate_block = @validate_block
+        @db.create_table!(:cv_test) do
+          primary_key :id
+          String :pre
+          String :exactlen
+          String :minlen
+          String :maxlen
+          String :lenrange
+          if regexp
+            String :form
+          end
+          String :lik
+          String :ilik
+          String :inc
+          String :uniq, :null=>false
+          validate(&validate_block)
+        end
       end
     end
     after(:all) do
-      @db.drop_constraint_validations_table
+      @db.drop_table?(:cv_test)
+      @db.drop_constraint_validations_for(:table=>:cv_test)
     end
 
-    shared_examples_for "constraint validations" do
-      cspecify "should set up constraints that work even outside the model", :mysql do 
-        proc{@ds.insert(@valid_row)}.should_not raise_error
-
-        # Test for unique constraint
-        proc{@ds.insert(@valid_row)}.should raise_error(Sequel::DatabaseError)
-
-        @ds.delete
-        @violations.each do |col, vals|
-          try = @valid_row.dup
-          vals += ['1234567'] if col == :minlen
-          vals.each do |val|
-            next if val.nil? && @validation_opts[:allow_nil]
-            try[col] = val
-            proc{@ds.insert(try)}.should raise_error(Sequel::DatabaseError)
-          end
-        end
-
-        # Test for dropping of constraint
-        @db.alter_table(:cv_test){validate{drop :maxl2}}
-        proc{@ds.insert(@valid_row.merge(:minlen=>'1234567'))}.should_not raise_error
-      end
-
-      it "should set up automatic validations inside the model" do 
-        c = Class.new(Sequel::Model(@ds))
-        c.plugin :constraint_validations
-        c.dataset.delete
-        proc{c.create(@valid_row)}.should_not raise_error
-
-        # Test for unique validation 
-        c.new(@valid_row).should_not be_valid
-
-        c.dataset.delete
-        @violations.each do |col, vals|
-          try = @valid_row.dup
-          vals.each do |val|
-            next if val.nil? && @validation_opts[:allow_nil]
-            try[col] = val
-            c.new(try).should_not be_valid
-          end
-        end
-        c.db.constraint_validations = nil
-      end
-    end
-
-    describe "via create_table" do
+    describe "with :allow_nil=>true" do
       before(:all) do
-        @table_block = proc do
-          regexp = @regexp
-          validate_block = @validate_block
-          @db.create_table!(:cv_test) do
-            primary_key :id
-            String :pre
-            String :exactlen
-            String :minlen
-            String :maxlen
-            String :lenrange
-            if regexp
-              String :form
-            end
-            String :lik
-            String :ilik
-            String :inc
-            String :uniq, :null=>false
-            validate(&validate_block)
-          end
-        end
+        @validation_opts = {:allow_nil=>true}
+        @table_block.call
       end
-      after(:all) do
-        @db.drop_table?(:cv_test)
-        @db.drop_constraint_validations_for(:table=>:cv_test)
-      end
-
-      describe "with :allow_nil=>true" do
-        before(:all) do
-          @validation_opts = {:allow_nil=>true}
-          @table_block.call
-        end
-        it_should_behave_like "constraint validations"
-      end
-      describe "with :allow_nil=>false" do
-        before(:all) do
-          @table_block.call
-        end
-        it_should_behave_like "constraint validations"
-      end
+      it_should_behave_like "constraint validations"
     end
-
-    describe "via alter_table" do
+    describe "with :allow_nil=>false" do
       before(:all) do
-        @table_block = proc do
-          regexp = @regexp
-          validate_block = @validate_block
-          @db.create_table!(:cv_test) do
-            primary_key :id
-            String :lik
-            String :ilik
-            String :inc
-            String :uniq, :null=>false
-          end
-          @db.alter_table(:cv_test) do
-            add_column :pre, String
-            add_column :exactlen, String
-            add_column :minlen, String
-            add_column :maxlen, String
-            add_column :lenrange, String
-            if regexp
-              add_column :form, String
-            end
-            validate(&validate_block)
-          end
-        end
+        @table_block.call
       end
-      after(:all) do
-        @db.drop_table?(:cv_test)
-        @db.drop_constraint_validations_for(:table=>:cv_test)
-      end
-
-      describe "with :allow_nil=>true" do
-        before(:all) do
-          @validation_opts = {:allow_nil=>true}
-          @table_block.call
-        end
-        it_should_behave_like "constraint validations"
-      end
-      describe "with :allow_nil=>false" do
-        before(:all) do
-          @table_block.call
-        end
-        it_should_behave_like "constraint validations"
-      end
+      it_should_behave_like "constraint validations"
     end
   end
-end
+
+  describe "via alter_table" do
+    before(:all) do
+      @table_block = proc do
+        regexp = @regexp
+        validate_block = @validate_block
+        @db.create_table!(:cv_test) do
+          primary_key :id
+          String :lik
+          String :ilik
+          String :inc
+          String :uniq, :null=>false
+        end
+        @db.alter_table(:cv_test) do
+          add_column :pre, String
+          add_column :exactlen, String
+          add_column :minlen, String
+          add_column :maxlen, String
+          add_column :lenrange, String
+          if regexp
+            add_column :form, String
+          end
+          validate(&validate_block)
+        end
+      end
+    end
+    after(:all) do
+      @db.drop_table?(:cv_test)
+      @db.drop_constraint_validations_for(:table=>:cv_test)
+    end
+
+    describe "with :allow_nil=>true" do
+      before(:all) do
+        @validation_opts = {:allow_nil=>true}
+        @table_block.call
+      end
+      it_should_behave_like "constraint validations"
+    end
+    describe "with :allow_nil=>false" do
+      before(:all) do
+        @table_block.call
+      end
+      it_should_behave_like "constraint validations"
+    end
+  end
+end unless DB.database_type == :fdbsql # doesn't handle check constraints
 
 describe "date_arithmetic extension" do
   asd = begin
