@@ -57,25 +57,25 @@ describe 'Fdbsql' do
         end
 
         specify 'is unset by default' do
-          @conn.in_transaction.should be_false
+          @conn.in_transaction.should == false
         end
         specify 'is set in a transaction' do
           @db.transaction do
-            @conn.in_transaction.should be_true
+            @conn.in_transaction.should == true
           end
         end
         specify 'is unset after a commit' do
           @db.transaction do
             @db[:some_table].insert(name: 'a')
-            @conn.in_transaction.should be_true
+            @conn.in_transaction.should == true
           end
-          @conn.in_transaction.should be_false
+          @conn.in_transaction.should == false
         end
         specify 'is unset after a rollback' do
           @db.transaction do
             raise Sequel::Rollback.new
           end
-          @conn.in_transaction.should be_false
+          @conn.in_transaction.should == false
         end
       end
 
@@ -138,7 +138,7 @@ describe 'Fdbsql' do
         schema.count.should eq 2
         schema[0][0].should eq :name
         schema[1][0].should eq :value
-        schema.each {|col| col[1][:primary_key].should be_false}
+        schema.each {|col| col[1][:primary_key].should == nil}
       end
 
       specify 'with one primary key' do
@@ -152,8 +152,8 @@ describe 'Fdbsql' do
         name_col = schema[1]
         name_col[0].should eq :name
         id_col[0].should eq :id
-        name_col[1][:primary_key].should be_false
-        id_col[1][:primary_key].should be_true
+        name_col[1][:primary_key].should == nil
+        id_col[1][:primary_key].should == true
       end
 
       specify 'with multiple primary keys' do
@@ -168,8 +168,8 @@ describe 'Fdbsql' do
         id2_col = schema[1]
         id_col[0].should eq :id
         id2_col[0].should eq :id2
-        id_col[1][:primary_key].should be_true
-        id2_col[1][:primary_key].should be_true
+        id_col[1][:primary_key].should == true
+        id2_col[1][:primary_key].should == true
       end
 
       specify 'with other constraints' do
@@ -183,8 +183,8 @@ describe 'Fdbsql' do
         unique_col = schema[1]
         id_col[0].should eq :id
         unique_col[0].should eq :unique
-        id_col[1][:primary_key].should be_true
-        unique_col[1][:primary_key].should be_false
+        id_col[1][:primary_key].should == true
+        unique_col[1][:primary_key].should == nil
       end
       after do
         @db.drop_table?(:other_table)
@@ -200,7 +200,7 @@ describe 'Fdbsql' do
         end
         schema = DB.schema(:test, reload: true)
         schema.count.should eq 2
-        schema.each {|col| col[1][:primary_key].should be_false}
+        schema.each {|col| col[1][:primary_key].should == nil}
       end
 
       describe 'with explicit schema' do
@@ -227,8 +227,8 @@ describe 'Fdbsql' do
           id_col = schema[1]
           id_col[0].should eq :id
           id2_col[0].should eq :id2
-          id_col[1][:primary_key].should be_false
-          id2_col[1][:primary_key].should be_true
+          id_col[1][:primary_key].should == nil
+          id2_col[1][:primary_key].should == true
         end
       end
     end
