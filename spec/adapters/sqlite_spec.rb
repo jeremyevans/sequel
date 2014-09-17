@@ -123,7 +123,7 @@ describe "An SQLite database" do
     proc {@db.temp_store = :invalid}.should raise_error(Sequel::Error)
   end
   
-  cspecify "should support timestamps and datetimes and respect datetime_class", :do, :jdbc, :amalgalite, :swift do
+  cspecify "should support timestamps and datetimes and respect datetime_class", :do, :jdbc, :swift do
     @db.create_table!(:fk){timestamp :t; datetime :d}
     @db.use_timestamp_timezones = true
     t1 = Time.at(1)
