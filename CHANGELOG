@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for FoundationDB SQL Layer, via fdbsql and jdbc/fdbsql adapters (ScottDugas, jeremyevans) (#884)
+
 * Work around bug in old versions of MySQL when schema dumping a table with multiple timestamp columns (jeremyevans) (#882)
 
 * Support more array types by default in the pg_array extension, such as xml[] and uuid[] (jeremyevans)
