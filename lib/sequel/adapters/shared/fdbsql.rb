@@ -1,4 +1,3 @@
-Sequel.require 'extensions/date_arithmetic'
 Sequel.require 'adapters/utils/pg_types'
 
 module Sequel
