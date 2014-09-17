@@ -51,7 +51,11 @@ RSPEC_EXAMPLE_GROUP.class_eval do
       end
     end
     if pending
-      specify(message){pending("Not yet working on #{Array(pending).join(', ')}", &block)}
+      specify(message) do
+        method = RSPEC_SKIP_PENDING && !ENV['SEQUEL_NO_SKIP_PENDING'] ? :skip : :pending
+        send(method, "Not yet working on #{Array(pending).join(', ')}")
+        instance_eval(&block)
+      end
     else
       specify(message, &block)
     end

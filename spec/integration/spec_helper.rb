@@ -76,8 +76,9 @@ RSPEC_EXAMPLE_GROUP.class_eval do
   def self.cspecify(message, *checked, &block)
     if pending = Sequel.guarded?(*checked)
       specify(message) do
-        pending("Not yet working on #{Array(pending).map{|x| x.is_a?(Proc) ? :proc : x}.join(', ')}", &(block unless RSPEC_AFTER_PENDING_BLOCK))
-        instance_eval(&block) if RSPEC_AFTER_PENDING_BLOCK
+        method = RSPEC_SKIP_PENDING && !ENV['SEQUEL_NO_SKIP_PENDING'] ? :skip : :pending
+        send(method, "Not yet working on #{Array(pending).map{|x| x.is_a?(Proc) ? :proc : x}.join(', ')}")
+        instance_eval(&block)
       end
     else
       specify(message, &block)
