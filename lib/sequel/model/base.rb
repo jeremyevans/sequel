@@ -1147,6 +1147,10 @@ module Sequel
         @values = {}
         @new = true
         @modified = true
+        if (defaults = db.default_model_settings)
+          defaults.each { |k,v| instance_variable_set("@#{k}", v) }
+        end
+ 
         initialize_set(values)
         changed_columns.clear 
         yield self if block_given?
