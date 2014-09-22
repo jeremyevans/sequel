@@ -2735,7 +2735,7 @@ describe 'PostgreSQL json type' do
         @db.get(jo.typeof).should == 'object'
         @db.get(ja.typeof).should == 'array'
         @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.should == ['2', '3', '["a","b"]']
-        @db.from(jo.to_record(true).as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).should == [1]
+        @db.from(jo.to_record.as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).should == [1]
         @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).should == [1]
 
         if json_type == :jsonb

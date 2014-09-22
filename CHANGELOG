@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove optional argument for Postgres::{JSON,JSONB}Op#to_record and #to_recordset (jeremyevans)
+
 * Add support for FoundationDB SQL Layer, via fdbsql and jdbc/fdbsql adapters (ScottDugas, jeremyevans) (#884)
 
 * Work around bug in old versions of MySQL when schema dumping a table with multiple timestamp columns (jeremyevans) (#882)

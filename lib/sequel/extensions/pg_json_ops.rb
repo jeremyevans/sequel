@@ -188,16 +188,16 @@ module Sequel
       # structure of the record using #as on the resulting object:
       #
       #   json_op.to_record.as(:x, [Sequel.lit('a integer'), Sequel.lit('b text')]) # json_to_record(json) AS x(a integer, b text)
-      def to_record(nested_as_text=false)
-        function(:to_record, nested_as_text)
+      def to_record
+        function(:to_record)
       end
 
       # Builds arbitrary set of records from json array of objects.  You need to define the
       # structure of the records using #as on the resulting object:
       #
       #   json_op.to_recordset.as(:x, [Sequel.lit('a integer'), Sequel.lit('b text')]) # json_to_recordset(json) AS x(a integer, b text)
-      def to_recordset(nested_as_text=false)
-        function(:to_recordset, nested_as_text)
+      def to_recordset
+        function(:to_recordset)
       end
 
       # Returns the type of the outermost json value as text.

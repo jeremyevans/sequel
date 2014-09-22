@@ -112,17 +112,13 @@ describe "Sequel::Postgres::JSONOp" do
   end
 
   it "should have #to_record use the json_to_record function" do
-    @l[@j.to_record].should == "json_to_record(j, false)"
-    @l[@jb.to_record].should == "jsonb_to_record(j, false)"
-    @l[@j.to_record(true)].should == "json_to_record(j, true)"
-    @l[@jb.to_record(true)].should == "jsonb_to_record(j, true)"
+    @l[@j.to_record].should == "json_to_record(j)"
+    @l[@jb.to_record].should == "jsonb_to_record(j)"
   end
 
   it "should have #to_recordset use the json_to_recordsetfunction" do
-    @l[@j.to_recordset].should == "json_to_recordset(j, false)"
-    @l[@jb.to_recordset].should == "jsonb_to_recordset(j, false)"
-    @l[@j.to_recordset(true)].should == "json_to_recordset(j, true)"
-    @l[@jb.to_recordset(true)].should == "jsonb_to_recordset(j, true)"
+    @l[@j.to_recordset].should == "json_to_recordset(j)"
+    @l[@jb.to_recordset].should == "jsonb_to_recordset(j)"
   end
 
   it "should have #populate use the json_populate_record function" do
