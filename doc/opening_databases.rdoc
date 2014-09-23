@@ -243,6 +243,10 @@ or set
    export DELIMIDENT=y
 
 in the scripts environment.
+
+The following additional options are supported:
+
+:nolog :: Disable transactions for the database.
  
 === jdbc 
 

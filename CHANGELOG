@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Dataset#insert in the informix adapter return last inserted id (jihwans) (#887)
+
+* Support :nolog option in the informix adapter to disable transactions (jihwans) (#887)
+
 * Remove optional argument for Postgres::{JSON,JSONB}Op#to_record and #to_recordset (jeremyevans)
 
 * Add support for FoundationDB SQL Layer, via fdbsql and jdbc/fdbsql adapters (ScottDugas, jeremyevans) (#884)
