@@ -500,6 +500,20 @@ describe Sequel::Model, "#eager" do
     a.first.track.album2.track.should == EagerTrack.load(:id => 3, :album_id=>1)
     DB.sqls.should == []
   end
+
+  it "should call post_load when eager loading limited associations" do
+    EagerTrack.many_to_one :album2, :clone=>:album
+    a = []
+    m = Module.new do
+      define_method(:post_load) do |objs|
+        a << 1
+        super(objs)
+      end
+    end
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:a, :extend=>m
+    EagerAlbum.eager(:track).all
+    a.should == [1]
+  end
   
   it "should cascade eagerly loading when the :eager association option is used" do
     a = EagerBand.eager(:albums).all

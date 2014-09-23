@@ -247,7 +247,6 @@ module Sequel
           if eo[:eager_block] || eo[:loader] == false
             strategy = true_eager_graph_limit_strategy if strategy == :union
             objects = apply_eager_limit_strategy(eager_loading_dataset(eo), strategy).all
-            cascade = nil
           elsif strategy == :union
             objects = []
             ds = associated_dataset
@@ -256,12 +255,12 @@ module Sequel
             eo[:id_map].keys.each_slice(subqueries_per_union).each do |slice|
               objects.concat(ds.with_sql(slice.map{|k| loader.sql(*k)}.join(joiner)).to_a)
             end
+            ds = ds.eager(cascade) if cascade
+            ds.send(:post_load, objects)
           else
-            objects = placeholder_eager_loader.all(eo[:id_map].keys)
-          end
-
-          if cascade && !(cascade = associated_dataset.send(:eager_options_for_associations, [cascade])).empty?
-            associated_eager_dataset.send(:eager_load, objects, cascade)
+            loader = placeholder_eager_loader
+            loader = loader.with_dataset{|ds| ds.eager(cascade)} if cascade
+            objects = loader.all(eo[:id_map].keys)
           end
 
           objects.each(&block)

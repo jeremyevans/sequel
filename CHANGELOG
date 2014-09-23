@@ -1,5 +1,7 @@
 === HEAD
 
+* Make tactical_eager_loading plugin work for limited associations (jeremyevans)
+
 * Add PlaceholderLiteralizer#with_dataset, for returning a new literalizer using a modified dataset (jeremyevans)
 
 * Support active_model 4.2.0beta1 in the active_model plugin (jeremyevans)
