@@ -125,6 +125,13 @@ module Sequel
         @arity = arity
       end
 
+      # Return a new PlaceholderLiteralizer with a modified dataset.  This yields the
+      # receiver's dataset to the block, and the block should return the new dataset
+      # to use.
+      def with_dataset
+        dup.instance_exec{@dataset = yield @dataset; self}
+      end
+
       # Return an array of all objects by running the SQL query for the given arguments.
       # If a block is given, yields all objects to the block after loading them.
       def all(*args, &block)

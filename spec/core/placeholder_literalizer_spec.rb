@@ -121,6 +121,16 @@ describe "Dataset::PlaceholderLiteralizer" do
     @db.sqls.should == ["SELECT * FROM items WHERE (a = 2)"]
   end
 
+  specify "should support modifying dataset used on per-call basis with #run" do
+    loader = @c.loader(@ds){|pl, ds| ds.where(:a=>pl.arg)}
+    loader.with_dataset do |ds|
+      ds = ds.clone
+      ds.row_proc = lambda{|row| [row]}
+      ds
+    end.all(1).should == [[@h]]
+    @db.sqls.should == ["SELECT * FROM items WHERE (a = 1)"]
+  end
+  
   specify "should literalize args as NULL if :placeholder_literal_null is set" do
     loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg=>:a).clone(:placeholder_literal_null=>true)}
     loader.sql(1).should == "SELECT * FROM items WHERE (NULL = a)"

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add PlaceholderLiteralizer#with_dataset, for returning a new literalizer using a modified dataset (jeremyevans)
+
 * Support active_model 4.2.0beta1 in the active_model plugin (jeremyevans)
 
 * Make Dataset#insert in the informix adapter return last inserted id (jihwans) (#887)
