@@ -1,5 +1,7 @@
 === HEAD
 
+* Support active_model 4.2.0beta1 in the active_model plugin (jeremyevans)
+
 * Make Dataset#insert in the informix adapter return last inserted id (jihwans) (#887)
 
 * Support :nolog option in the informix adapter to disable transactions (jihwans) (#887)

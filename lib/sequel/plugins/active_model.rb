@@ -4,7 +4,7 @@ module Sequel
     # The ActiveModel plugin makes Sequel::Model objects
     # pass the ActiveModel::Lint tests, which should
     # hopefully mean full ActiveModel compliance.  This should
-    # allow the full support of Sequel::Model objects in Rails 3.
+    # allow the full support of Sequel::Model objects in Rails 3+.
     # This plugin requires active_model in order to use
     # ActiveModel::Naming.
     # 
@@ -43,7 +43,12 @@ module Sequel
           super
           @destroyed = true
         end
-        
+
+        # Return ::ActiveModel::Name instance for the class.
+        def model_name
+          model.model_name
+        end
+
         # False if the object is new? or has been destroyed, true otherwise.
         def persisted?
           !new? && @destroyed != true
