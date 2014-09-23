@@ -14,7 +14,7 @@ module Sequel
       end
     
       def transaction(opts=OPTS)
-        if opts[:nolog]
+        if @opts[:nolog]
           yield
         else
           super
