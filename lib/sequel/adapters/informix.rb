@@ -10,6 +10,9 @@ module Sequel
       
       def connect(server)
         opts = server_opts(server)
+        if opts[:nolog]
+          self.class.class_eval { def transaction (*) yield end }
+        end
         ::Informix.connect(opts[:database], opts[:user], opts[:password])
       end
     
@@ -18,6 +21,13 @@ module Sequel
         synchronize(opts[:server]){|c| log_yield(sql){c.immediate(sql)}}
       end
       
+      def execute_insert(sql, opts=OPTS)
+        synchronize(opts[:server]){|c|
+          log_yield(sql){c.immediate(sql)}
+          c.cursor(%q{select first 1 dbinfo('sqlca.sqlerrd1') from systables}).open.fetch
+        }
+      end
+
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]){|c| yield log_yield(sql){c.cursor(sql)}}
       end
