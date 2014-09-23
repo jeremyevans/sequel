@@ -14,7 +14,13 @@ module Sequel
       end
     
       def transaction(opts=OPTS)
-        if opts[:nolog]
+        nolog = false
+        if opts.has_key?(:nolog)
+          nolog = opts[:nolog]
+        elsif (sopts = server_opts(opts[:server])).has_key?(:nolog)
+          nolog = sopts[:nolog]
+        end
+        if nolog
           yield
         else
           super
