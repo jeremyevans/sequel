@@ -10,12 +10,17 @@ module Sequel
       
       def connect(server)
         opts = server_opts(server)
-        if opts[:nolog]
-          self.class.class_eval { def transaction (*) yield end }
-        end
         ::Informix.connect(opts[:database], opts[:user], opts[:password])
       end
     
+      def transaction(opts=OPTS)
+        if opts[:nolog]
+          yield
+        else
+          super
+        end
+      end
+
       # Returns number of rows affected
       def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]){|c| log_yield(sql){c.immediate(sql)}}

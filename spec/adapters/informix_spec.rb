@@ -91,4 +91,10 @@ describe "A Informix dataset" do
     @d.order(:value).first.should == {:name => 'abc', :value => 123}
     @d.order(:value).last.should == {:name => 'def', :value => 789}
   end
+
+  specify "should return last inserted id" do
+    first = @d.insert :name => 'abc', :value => 123
+    second = @d.insert :name => 'abc', :value => 123
+    (second - first).should == 1
+  end
 end
