@@ -56,6 +56,9 @@
 #
 #   DB.extension :pg_array, :pg_json
 #
+# Note that when accessing json hashes, you should always use strings for keys.
+# Attempting to use other values (such as symbols) will not work correctly.
+#
 # This extension requires both the json and delegate libraries.
 
 require 'delegate'
