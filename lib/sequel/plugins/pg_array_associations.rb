@@ -240,7 +240,7 @@ module Sequel
     
         # The primary key of the associated model.
         def primary_key
-          cached_fetch(:primary_key){associated_class.primary_key}
+          cached_fetch(:primary_key){associated_class.primary_key || raise(Error, "no primary key specified for #{associated_class.inspect}")}
         end
 
         # The method to call to get value of the primary key of the associated model.
@@ -301,6 +301,7 @@ module Sequel
           name = opts[:name]
           model = self
           pk = opts[:eager_loader_key] = opts[:primary_key] ||= model.primary_key
+          raise(Error, "no primary key specified for #{inspect}") unless pk
           opts[:key] = opts.default_key unless opts.has_key?(:key)
           key = opts[:key]
           key_column = opts[:key_column] ||= opts[:key]

@@ -229,6 +229,7 @@ module Sequel
           opts[:left_keys] = Array(left_key)
           opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
+          raise(Error, "no primary key specified for #{inspect}") unless left_pk
           opts[:eager_loader_key] = left_pk unless opts.has_key?(:eager_loader_key)
           opts[:left_primary_keys] = Array(left_pk)
           lpkc = opts[:left_primary_key_column] ||= left_pk

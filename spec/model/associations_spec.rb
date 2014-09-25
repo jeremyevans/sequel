@@ -192,6 +192,22 @@ describe Sequel::Model, "many_to_one" do
     DB.reset
   end
 
+  it "should raise an error if associated class does not have a primary key, and :primary_key is not specified" do
+    @c2.no_primary_key
+    @c2.many_to_one :parent, :class => @c2
+    d = @c2.new(:id => 1, :parent_id => 234)
+    proc{d.parent}.should raise_error(Sequel::Error)
+    DB.sqls.should == []
+  end
+  
+  it "should raise an error if associated class does not have a primary key, and :primary_key is not specified, with an association block" do
+    @c2.no_primary_key
+    @c2.many_to_one :parent, :class => @c2 do |ds| ds end
+    d = @c2.new(:id => 1, :parent_id => 234)
+    proc{d.parent}.should raise_error(Sequel::Error)
+    DB.sqls.should == []
+  end
+  
   it "should use implicit key if omitted" do
     @c2.many_to_one :parent, :class => @c2
 
@@ -1129,6 +1145,12 @@ describe Sequel::Model, "one_to_many" do
     DB.reset
   end
 
+  it "should raise an error if current class does not have a primary key, and :primary_key is not specified" do
+    @c2.no_primary_key
+    proc{@c2.one_to_many :attributes, :class => @c1}.should raise_error(Sequel::Error)
+    DB.sqls.should == []
+  end
+  
   it "should use implicit key if omitted" do
     @c2.one_to_many :attributes, :class => @c1 
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE (attributes.node_id = 1234)'
@@ -1858,6 +1880,20 @@ describe Sequel::Model, "many_to_many" do
     DB.reset
   end
 
+  it "should raise an error if current class does not have a primary key, and :left_primary_key is not specified" do
+    @c2.no_primary_key
+    proc{@c2.many_to_many :attributes, :class => @c1}.should raise_error(Sequel::Error)
+    DB.sqls.should == []
+  end
+  
+  it "should raise an error if associated class does not have a primary key, and :right_primary_key is not specified" do
+    @c1.no_primary_key
+    @c2.many_to_many :attributes, :class => @c1
+    d = @c2.new(:id => 1234)
+    proc{d.attributes}.should raise_error(Sequel::Error)
+    DB.sqls.should == []
+  end
+  
   it "should use implicit key values and join table if omitted" do
     @c2.many_to_many :attributes, :class => @c1 
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)'

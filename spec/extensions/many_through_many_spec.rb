@@ -21,6 +21,20 @@ describe Sequel::Model, "many_through_many" do
     Object.send(:remove_const, :Tag)
   end
 
+  it "should raise an error if current class does not have a primary key, and :left_primary_key is not specified" do
+    @c1.no_primary_key
+    proc{@c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]}.should raise_error(Sequel::Error)
+    DB.sqls.should == []
+  end
+  
+  it "should raise an error if associated class does not have a primary key, and :right_primary_key is not specified" do
+    @c2.no_primary_key
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    n = @c1.load(:id => 1234)
+    proc{n.tags}.should raise_error(Sequel::Error)
+    DB.sqls.should == []
+  end
+  
   it "should populate :key_hash and :id_map option correctly for custom eager loaders" do
     khs = []
     pr = proc{|h| khs << [h[:key_hash], h[:id_map]]}

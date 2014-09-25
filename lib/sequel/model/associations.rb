@@ -774,7 +774,7 @@ module Sequel
 
         # The column(s) in the associated table that the key in the current table references (either a symbol or an array).
         def primary_key
-         cached_fetch(:primary_key){associated_class.primary_key}
+         cached_fetch(:primary_key){associated_class.primary_key || raise(Error, "no primary key specified for #{associated_class.inspect}")}
         end
        
         # The columns in the associated table that the key in the current table references (always an array).
@@ -1227,7 +1227,7 @@ module Sequel
     
         # The primary key column(s) to use in the associated table (can be symbol or array).
         def right_primary_key
-          cached_fetch(:right_primary_key){associated_class.primary_key}
+          cached_fetch(:right_primary_key){associated_class.primary_key || raise(Error, "no primary key specified for #{associated_class.inspect}")}
         end
         
         # The primary key columns to use in the associated table (always array).

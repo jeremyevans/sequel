@@ -148,6 +148,15 @@ describe Sequel::Model, "pg_array_associations" do
     @c2.filter(:artists=>@c1.where(:id=>1)).sql.should == "SELECT * FROM tags WHERE ((tags.id * 3) IN (SELECT unnest(artists.tag_ids[1:2]) FROM artists WHERE (id = 1)))"
   end
   
+  it "should raise an error if associated model does not have a primary key, and :primary_key is not specified" do
+    @c1.no_primary_key
+    @c2.no_primary_key
+    @c1.pg_array_to_many :tags, :clone=>:tags
+    proc{@o1.tags}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_pg_array :artists, :clone=>:artists}.should raise_error(Sequel::Error)
+    @db.sqls.should == []
+  end
+  
   it "should support a :key option" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :key=>:tag2_ids
     @c2.many_to_pg_array :artists, :clone=>:artists, :key=>:tag2_ids

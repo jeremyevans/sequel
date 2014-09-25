@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise Error if a primary key is necessary to use an association, but the model doesn't have a primary key (jeremyevans)
+
 * Make tactical_eager_loading plugin work for limited associations (jeremyevans)
 
 * Add PlaceholderLiteralizer#with_dataset, for returning a new literalizer using a modified dataset (jeremyevans)
