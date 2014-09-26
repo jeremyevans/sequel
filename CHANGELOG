@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for creating foreign tables on PostgreSQL using :foreign and :options create_table options (jeremyevans)
+
 * Raise Error if a primary key is necessary to use an association, but the model doesn't have a primary key (jeremyevans)
 
 * Make tactical_eager_loading plugin work for limited associations (jeremyevans)

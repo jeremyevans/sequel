@@ -809,27 +809,40 @@ module Sequel
 
       # DDL statement for creating a table with the given name, columns, and options
       def create_table_prefix_sql(name, options)
-        if on_commit = options[:on_commit]
-          raise(Error, "can't provide :on_commit without :temp to create_table") unless options[:temp]
-          raise(Error, "unsupported on_commit option: #{on_commit.inspect}") unless ON_COMMIT.has_key? on_commit
+        prefix_sql = if options[:temp]
+          raise(Error, "can't provide both :temp and :unlogged to create_table") if options[:unlogged]
+          raise(Error, "can't provide both :temp and :foreign to create_table") if options[:foreign]
+          temporary_table_sql
+        elsif options[:foreign]
+          raise(Error, "can't provide both :foreign and :unlogged to create_table") if options[:unlogged]
+          'FOREIGN '
+        elsif options[:unlogged]
+          UNLOGGED
         end
-        temp_or_unlogged_sql = if options[:temp]
-         raise(Error, "can't provide both :temp and :unlogged to create_table") if options[:unlogged]
-         temporary_table_sql
-       elsif options[:unlogged]
-         UNLOGGED
-       end
-        "CREATE #{temp_or_unlogged_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
+
+        "CREATE #{prefix_sql}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)}"
       end
 
       def create_table_sql(name, generator, options)
         sql = super
+
         if inherits = options[:inherits]
           sql << " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
         end
+
         if on_commit = options[:on_commit]
+          raise(Error, "can't provide :on_commit without :temp to create_table") unless options[:temp]
+          raise(Error, "unsupported on_commit option: #{on_commit.inspect}") unless ON_COMMIT.has_key?(on_commit)
           sql << " ON COMMIT #{ON_COMMIT[on_commit]}"
         end
+
+        if server = options[:foreign]
+          sql << " SERVER #{quote_identifier(server)}"
+          if foreign_opts = options[:options]
+            sql << " OPTIONS (#{foreign_opts.map{|k, v| "#{k} #{literal(v.to_s)}"}.join(', ')})"
+          end
+        end
+
         sql
       end
 

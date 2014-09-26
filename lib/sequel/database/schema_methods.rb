@@ -171,10 +171,17 @@ module Sequel
     # :engine :: The table engine to use for the table.
     #
     # PostgreSQL specific options:
-    # :on_commit :: Either :preserve_rows (default), :drop or :delete_rows.
-    # :unlogged :: Create the table as an unlogged table.
-    # :inherits :: Inherit from a different tables.  An array can be
+    # :on_commit :: Either :preserve_rows (default), :drop or :delete_rows. Should
+    #               only be specified when creating a temporary table.
+    # :foreign :: Create a foreign table.  The value should be the name of the
+    #             foreign server that was specified in CREATE SERVER.
+    # :inherits :: Inherit from a different table.  An array can be
     #              specified to inherit from multiple tables.
+    # :unlogged :: Create the table as an unlogged table.
+    # :options :: The OPTIONS clause to use for foreign tables.  Should be a hash
+    #             where keys are option names and values are option values.  Note
+    #             that option names are unquoted, so you should not use untrusted
+    #             keys.
     #
     # See <tt>Schema::Generator</tt> and the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     def create_table(name, options=OPTS, &block)

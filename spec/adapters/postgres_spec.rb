@@ -276,6 +276,12 @@ describe "A PostgreSQL database" do
     Sequel.connect(DB.opts.merge(:notice_receiver=>proc{|r| a = r.result_error_message})){|db| db.do("BEGIN\nRAISE WARNING 'foo';\nEND;")}
     a.should == "WARNING:  foo\n"
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
+
+  specify "should support creating foreign tables" do
+    # This only tests the SQL created, because a true test using file_fdw or postgres_fdw
+    # requires superuser permissions, and you should not be running the tests as a superuser.
+    DB.send(:create_table_sql, :t, DB.create_table_generator{Integer :a}, :foreign=>:f, :options=>{:o=>1}).should == 'CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')'
+  end
 end
 
 describe "A PostgreSQL database with domain types" do
