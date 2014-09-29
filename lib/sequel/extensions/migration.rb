@@ -207,8 +207,8 @@ module Sequel
       @actions << [:drop_table, args.first]
     end
 
-    def create_view(*args)
-      @actions << [:drop_view, args.first]
+    def create_view(name, _, options={})
+      @actions << [:drop_view, name, options]
     end
 
     def rename_column(table, name, new_name)
