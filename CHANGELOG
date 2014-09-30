@@ -1,5 +1,7 @@
 === HEAD
 
+* Make AssociationReflection#reciprocal not raise error if associated class contains association with invalid associated class (jeremyevans)
+
 * Make create_view(:view_name, dataset, :materialized=>true) reversible on PostgreSQL (jeremyevans)
 
 * Add support for creating foreign tables on PostgreSQL using :foreign and :options create_table options (jeremyevans)

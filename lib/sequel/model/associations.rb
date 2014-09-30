@@ -664,7 +664,7 @@ module Sequel
         # association for the current association reflection.
         def reciprocal_association?(assoc_reflect)
           possible_reciprocal_types.include?(assoc_reflect[:type]) &&
-            assoc_reflect.associated_class == self[:model] &&
+            (begin; assoc_reflect.associated_class; rescue NameError; end) == self[:model] &&
             assoc_reflect[:conditions].nil? &&
             assoc_reflect[:block].nil?
         end

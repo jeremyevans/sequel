@@ -64,6 +64,13 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     @c.association_reflection(:c).reciprocal.should == :xx
   end
 
+  it "should not raise an error if some reciprocal associations have invalid associated classes" do
+    @c = Class.new(Sequel::Model(:foo))
+    @c.one_to_many :sadfakloasdfioas
+    @c.many_to_one :c, :class=>@c
+    proc{@c.association_reflection(:c).reciprocal}.should_not raise_error
+  end
+
   it "should require the associated class is the current class to be a reciprocal" do
     ParParent.many_to_one :par_parent_two, :key=>:blah
     ParParent.many_to_one :par_parent_three, :key=>:blah
