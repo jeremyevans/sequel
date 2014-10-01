@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.15.0 (2014-10-01)
 
 * Make AssociationReflection#reciprocal not raise error if associated class contains association with invalid associated class (jeremyevans)
 
