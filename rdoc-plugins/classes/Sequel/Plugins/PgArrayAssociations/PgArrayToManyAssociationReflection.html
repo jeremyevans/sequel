@@ -271,7 +271,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-primary_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 242</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:primary_key</span>){<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">primary_key</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 242</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:primary_key</span>){<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">primary_key</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no primary key specified for #{associated_class.inspect}&quot;</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-primary_key_method'>

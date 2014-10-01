@@ -31,12 +31,59 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-09-01 08:59:17 -0700</span>
+          <span class='datetime'>2014-10-01 08:46:53 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.15.0+%282014-10-01%29">4.15.0 (2014-10-01)<span><a href="#label-4.15.0+%282014-10-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make AssociationReflection#reciprocal not raise error if associated class
+            contains association with invalid associated class (jeremyevans)</p>
+            </li><li>
+            <p>Make create_view(:view_name, dataset, :materialized=&gt;true) reversible on
+            PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Add support for creating foreign tables on PostgreSQL using :foreign and
+            :options create_table options (jeremyevans)</p>
+            </li><li>
+            <p>Raise Error if a primary key is necessary to use an association, but the
+            model doesn&#39;t have a primary key (jeremyevans)</p>
+            </li><li>
+            <p>Make tactical_eager_loading plugin work for limited associations
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add PlaceholderLiteralizer#with_dataset, for returning a new literalizer
+            using a modified dataset (jeremyevans)</p>
+            </li><li>
+            <p>Support active_model 4.2.0beta1 in the active_model plugin (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#insert in the informix adapter return last inserted id
+            (jihwans) (#887)</p>
+            </li><li>
+            <p>Support :nolog option in the informix adapter to disable transactions
+            (jihwans) (#887)</p>
+            </li><li>
+            <p>Remove optional argument for Postgres::{JSON,JSONB}Op#to_record and
+            to_recordset (jeremyevans)</p>
+            </li><li>
+            <p>Add support for FoundationDB SQL Layer, via fdbsql and jdbc/fdbsql adapters
+            (ScottDugas, jeremyevans) (#884)</p>
+            </li><li>
+            <p>Work around bug in old versions of MySQL when schema dumping a table with
+            multiple timestamp columns (jeremyevans) (#882)</p>
+            </li><li>
+            <p>Support more array types by default in the pg_array extension, such as
+            xml[] and uuid[] (jeremyevans)</p>
+            </li><li>
+            <p>Add Sequel::Model.cache_associations accessor, which can be set to false to
+            not cache association metadata (jeremyevans)</p>
+            </li><li>
+            <p>Add split_values plugin, for moving noncolumn entries from the values hash
+            into a separate hash (jeremyevans) (#868)</p>
+            </li></ul>
             
             <h3 id="label-4.14.0+%282014-09-01%29">4.14.0 (2014-09-01)<span><a href="#label-4.14.0+%282014-09-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             <ul><li>

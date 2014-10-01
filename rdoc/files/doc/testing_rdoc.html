@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-04-09 15:04:48 -0700</span>
+          <span class='datetime'>2014-09-17 09:20:16 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -124,12 +124,16 @@
             <p><a href="../../classes/Sequel.html">Sequel</a> has multiple separate test
             suites.  All test suites run under rspec &gt;=1.3.</p>
             
+            <h2 id="label-rake">rake<span><a href="#label-rake">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            
+            <p>The default rake task runs Sequel&#39;s core, model, plugin, and extension
+            specs, the same as <code>rake spec spec_plugin</code>.</p>
+            
             <h2 id="label-rake+spec">rake spec<span><a href="#label-rake+spec">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <p>The <code>spec</code> rake task (which is also the default rake task) runs
-            Sequel&#39;s core and model specs.  These specs use a mocked database
-            connection, and test for specific SQL used and for generally correct
-            behavior.</p>
+            <p>The <code>spec</code> rake task runs Sequel&#39;s core and model specs. 
+            These specs use a mocked database connection, and test for specific SQL
+            used and for generally correct behavior.</p>
             
             <h2 id="label-rake+spec_plugin">rake spec_plugin<span><a href="#label-rake+spec_plugin">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
@@ -169,13 +173,13 @@
             
             <h2 id="label-Environment+variables">Environment variables<span><a href="#label-Environment+variables">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
             
-            <p><a href="../../classes/Sequel.html">Sequel</a> often uses environment
-            variables when testing to specify either the database to be tested or
-            specify how testing should be done.  You can also specify the databases to
-            test by copying spec/spec_config.rb.example to spec/spec_config.rb and
-            modifying it.  See that file for details.  It may be necessary to use
-            spec_config.rb as opposed to an environment variable if your database
-            connection cannot be specified by a connection string.</p>
+            <p><a href="../../classes/Sequel.html">Sequel</a> uses environment variables
+            when testing to specify either the database to be tested or specify how
+            testing should be done.  You can also specify the databases to test by
+            copying spec/spec_config.rb.example to spec/spec_config.rb and modifying
+            it.  See that file for details.  It may be necessary to use spec_config.rb
+            as opposed to an environment variable if your database connection cannot be
+            specified by a connection string.</p>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> does not create test
             databases automatically, except for file-based databases such as
@@ -194,16 +198,21 @@
             
             <h3 id="label-Other">Other<span><a href="#label-Other">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>SEQUEL_COLUMNS_INTROSPECTION </td><td>
-            <p>Whether to run the specs with the columns_introspection extension loaded by
-            default</p>
+            <p>Use the columns_introspection extension when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_CONNECTION_VALIDATOR </td><td>
             <p>Use the connection validator extension when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_ERROR_SQL </td><td>
             <p>Use the error_sql extension when running the specs</p>
+            </td></tr><tr><td class='label'>SEQUEL_NO_CACHE_ASSOCIATIONS </td><td>
+            <p>Don&#39;t cache association metadata when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_NO_CHECK_SQLS </td><td>
             <p>Don&#39;t check for specific SQL syntax when running the specs</p>
             </td></tr><tr><td class='label'>SEQUEL_NO_PENDING </td><td>
-            <p>Don&#39;t mark any specs as pending, try running all specs</p>
+            <p>Don&#39;t mark any specs as pending, try running all specs (note, can cause
+            lockups for some adapters)</p>
+            </td></tr><tr><td class='label'>SEQUEL_NO_SKIP_PENDING </td><td>
+            <p>On RSpec 3, run specs marked as pending, and fail the pending spec if it
+            passes (note, can cause lockups for some adapters)</p>
             </td></tr><tr><td class='label'>SKIPPED_TEST_WARN </td><td>
             <p>Warn when skipping any tests because libraries aren&#39;t available</p>
             </td></tr></tbody></table>

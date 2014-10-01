@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Fdbsql::Connection</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Fdbsql::Connection
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/adapters/fdbsql_rb.html">lib/sequel/adapters/fdbsql.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Superclass:
+          <strong>PG::Connection</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p><a href="Connection.html">Connection</a> specific methods for <a
+            href="../Fdbsql.html">Fdbsql</a> with pg</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-close">close</a></li>
+              <li><a target="docwin" href="#method-i-execute">execute</a></li>
+              <li><a target="docwin" href="#method-i-execute_prepared_statement">execute_prepared_statement</a></li>
+              <li><a target="docwin" href="#method-i-prepare">prepare</a></li>
+              <li><a target="docwin" href="#attribute-i-prepared_statements">prepared_statements</a></li>
+              <li><a target="docwin" href="#method-i-query">query</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DISCONNECT_ERROR_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/\A(?:could not receive data from server|no connection to the server|connection not open|connection is closed)/</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Regular expression for error messages that note that the connection is
+                      closed.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-prepared_statements'>prepared_statements</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Hash of prepared statements for this connection.  Keys are string names of
+                      the server side prepared statement, and values are SQL strings.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(db, opts)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Create a new connection to the FoundationDB SQL Layer. See <a
+                  href="Database.html#method-i-connect">Sequel::Fdbsql::Database#connect</a>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/fdbsql.rb, line 213</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">connect_opts</span> = {&#x000A;    <span class="ruby-value">:host</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:host</span>] <span class="ruby-operator">||</span> <span class="ruby-string">&#39;localhost&#39;</span>,&#x000A;    <span class="ruby-value">:port</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:port</span>] <span class="ruby-operator">||</span> <span class="ruby-value">15432</span>,&#x000A;    <span class="ruby-value">:dbname</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:database</span>],&#x000A;    <span class="ruby-value">:user</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:user</span>],&#x000A;    <span class="ruby-value">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:password</span>],&#x000A;    <span class="ruby-value">:hostaddr</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:hostaddr</span>],&#x000A;    <span class="ruby-value">:connect_timeout</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:connect_timeout</span>] <span class="ruby-operator">||</span> <span class="ruby-value">20</span>,&#x000A;    <span class="ruby-value">:sslmode</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:sslmode</span>]&#x000A;  }.<span class="ruby-identifier">delete_if</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">key</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-keyword">or</span> (<span class="ruby-identifier">value</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:empty?</span>) <span class="ruby-keyword">and</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">empty?</span>)}&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">connect_opts</span>)&#x000A;&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@prepared_statements</span> = {}&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:notice_receiver</span>]&#x000A;    <span class="ruby-identifier">set_notice_receiver</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:notice_receiver</span>])&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-comment"># Swallow warnings</span>&#x000A;    <span class="ruby-identifier">set_notice_receiver</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">proc</span><span class="ruby-operator">|</span> }&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-close'>
+                <a name='method-i-close'></a>
+                <div class='synopsis'>
+                  <span class='name'>close</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Close the connection.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-close-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-close-source'><span class="ruby-comment"># File lib/sequel/adapters/fdbsql.rb, line 238</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">close</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span>, <span class="ruby-constant">IOError</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute'>
+                <a name='method-i-execute'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute</span>
+                  <span class='arguments'>(sql, args=nil)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Execute the given SQL with this connection.  If a block is given, yield the
+                  results, otherwise, return the number of changed rows.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/fdbsql.rb, line 245</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">q</span> = <span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">block_given?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">q</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">cmd_tuples</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute_prepared_statement'>
+                <a name='method-i-execute_prepared_statement'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute_prepared_statement</span>
+                  <span class='arguments'>(name, args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Execute the prepared statement of the given name, binding the given args.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_prepared_statement-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute_prepared_statement-source'><span class="ruby-comment"># File lib/sequel/adapters/fdbsql.rb, line 252</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">check_disconnect_errors</span>{<span class="ruby-identifier">exec_prepared</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">args</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-prepare'>
+                <a name='method-i-prepare'></a>
+                <div class='synopsis'>
+                  <span class='name'>prepare</span>
+                  <span class='arguments'>(name, sql)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Prepare a statement for later use.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/fdbsql.rb, line 257</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">check_disconnect_errors</span>{<span class="ruby-keyword">super</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-query'>
+                <a name='method-i-query'></a>
+                <div class='synopsis'>
+                  <span class='name'>query</span>
+                  <span class='arguments'>(sql, args=nil)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Execute the given query and return the results.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-query-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-query-source'><span class="ruby-comment"># File lib/sequel/adapters/fdbsql.rb, line 262</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">query</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">v</span>, <span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">check_disconnect_errors</span>{<span class="ruby-keyword">super</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

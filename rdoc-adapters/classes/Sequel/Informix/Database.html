@@ -49,6 +49,8 @@
               <li><a target="docwin" href="#method-i-connect">connect</a></li>
               <li><a target="docwin" href="#method-i-execute">execute</a></li>
               <li><a target="docwin" href="#method-i-execute_dui">execute_dui</a></li>
+              <li><a target="docwin" href="#method-i-execute_insert">execute_insert</a></li>
+              <li><a target="docwin" href="#method-i-transaction">transaction</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -105,7 +107,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">cursor</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">cursor</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_dui'>
@@ -122,7 +124,39 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">immediate</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">immediate</span>(<span class="ruby-identifier">sql</span>)}}&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute_insert'>
+                <a name='method-i-execute_insert'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute_insert</span>
+                  <span class='arguments'>(sql, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">immediate</span>(<span class="ruby-identifier">sql</span>)}&#x000A;    <span class="ruby-identifier">c</span>.<span class="ruby-identifier">cursor</span>(<span class="ruby-string">%q{select first 1 dbinfo(&#39;sqlca.sqlerrd1&#39;) from systables}</span>).<span class="ruby-identifier">open</span>.<span class="ruby-identifier">fetch</span>&#x000A;  }&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-transaction'>
+                <a name='method-i-transaction'></a>
+                <div class='synopsis'>
+                  <span class='name'>transaction</span>
+                  <span class='arguments'>(opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-transaction-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-transaction-source'><span class="ruby-comment"># File lib/sequel/adapters/informix.rb, line 16</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:nolog</span>]&#x000A;    <span class="ruby-keyword">yield</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
