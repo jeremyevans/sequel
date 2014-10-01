@@ -279,11 +279,8 @@ describe "A PostgreSQL database" do
 
   # These only test the SQL created, because a true test using file_fdw or postgres_fdw
   # requires superuser permissions, and you should not be running the tests as a superuser.
-  specify "should support creating foreign tables" do
-    DB.send(:create_table_sql, :t, DB.send(:create_table_generator){Integer :a}, :foreign=>:f, :options=>{:o=>1}).should == 'CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')'
-  end
-
-  specify "should support dropping foreign tables" do
+  specify "should support creating and dropping foreign tables" do
+    DB.send(:create_table_sql, :t, DB.create_table_generator{Integer :a}, :foreign=>:f, :options=>{:o=>1}).should == 'CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')'
     DB.send(:drop_table_sql, :t, :foreign=>true).should == 'DROP FOREIGN TABLE "t"'
   end
 end

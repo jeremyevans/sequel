@@ -203,12 +203,12 @@ module Sequel
       @actions << [:drop_join_table, *args]
     end
 
-    def create_table(*args)
-      @actions << [:drop_table, args.first]
+    def create_table(name, opts=OPTS)
+      @actions << [:drop_table, name, opts]
     end
 
-    def create_view(name, _, options={})
-      @actions << [:drop_view, name, options]
+    def create_view(name, _, opts=OPTS)
+      @actions << [:drop_view, name, opts]
     end
 
     def rename_column(table, name, new_name)

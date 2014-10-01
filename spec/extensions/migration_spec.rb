@@ -121,7 +121,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
     end
     @db = @c.new
     @p = Proc.new do
-      create_table(:a){Integer :a}
+      create_table(:a, :foo=>:bar){Integer :a}
       add_column :a, :b, String
       add_index :a, :b
       rename_column :a, :b, :c
@@ -146,7 +146,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
   specify "should apply up with normal actions in normal order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :up)
-    @db.actions.should == [[:create_table, :a],
+    @db.actions.should == [[:create_table, :a, {:foo=>:bar}],
       [:add_column, :a, :b, String],
       [:add_index, :a, :b],
       [:rename_column, :a, :b, :c],
@@ -189,7 +189,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:rename_column, :a, :c, :b],
       [:drop_index, :a, :b],
       [:drop_column, :a, :b],
-      [:drop_table, :a]]
+      [:drop_table, :a, {:foo=>:bar}]]
   end
   
   specify "should raise in the down direction if migration uses unsupported method" do
