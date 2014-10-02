@@ -144,7 +144,7 @@ module Sequel
                   :rc__name___referenced_column, 
                   object_schema_name(:fk__referenced_object_id).as(:schema), 
                   object_name(:fk__referenced_object_id).as(:table)]}.
-          order(:name, :fkc__constraint_column_id)
+          order(:fk__name, :fkc__constraint_column_id)
         h = {}
         ds.each do |row|
           if r = h[row[:name]]

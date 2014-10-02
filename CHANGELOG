@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#foreign_key_list work on Microsoft SQL Server 2005 (jeremyevans)
+
 * Make create_table with :foreign option reversible on PostgreSQL (jeremyevans)
 
 * Make drop_table with :foreign option on PostgreSQL drop a foreign table (johnnyt) (#892)
