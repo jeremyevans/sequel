@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Sequel::Model.cache_associations = false skip the database's schema cache when loading the schema (jeremyevans)
+
 * Make Database#foreign_key_list work on Microsoft SQL Server 2005 (jeremyevans)
 
 * Make create_table with :foreign option reversible on PostgreSQL (jeremyevans)

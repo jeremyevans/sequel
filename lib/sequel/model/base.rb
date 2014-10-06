@@ -891,7 +891,7 @@ module Sequel
       # Get the schema from the database, fall back on checking the columns
       # via the database if that will return inaccurate results or if
       # it raises an error.
-      def get_db_schema(reload = false)
+      def get_db_schema(reload = reload_db_schema?)
         set_columns(nil)
         return nil unless @dataset
         schema_hash = {}
@@ -933,7 +933,7 @@ module Sequel
         end
         schema_hash
       end
-      
+
       # Uncached version of setter_methods, to be overridden by plugins
       # that want to modify the methods used.
       def get_setter_methods
@@ -1045,6 +1045,11 @@ module Sequel
         end
       end
 
+      # Whether to reload the database schema by default, ignoring any cached value.
+      def reload_db_schema?
+        false
+      end
+      
       # Reset the cached fast primary lookup SQL if a simple table and primary key
       # are used, or set it to nil if not used.
       def reset_fast_pk_lookup_sql

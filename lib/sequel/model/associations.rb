@@ -2036,6 +2036,12 @@ module Sequel
           end
           ds
         end
+
+        # If not caching associations, reload the database schema by default,
+        # ignoring any cached values.
+        def reload_db_schema?
+          !@cache_associations
+        end
       end
 
       # Instance methods used to implement the associations support.

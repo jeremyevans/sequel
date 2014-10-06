@@ -479,22 +479,38 @@ end
 
 describe Sequel::Model::Associations::AssociationReflection, "with caching disabled" do
   before do
-    @c = Class.new(Sequel::Model(:foo))
-  end
-  after do
-    Object.send(:remove_const, :ParParent)
+    @db = Sequel.mock
+    @c = Class.new(Sequel::Model)
+    @c.dataset = @db[:foo]
+    @c.cache_associations = false
   end
 
   it "should not cache metadata" do
-    class ::ParParent < Sequel::Model; end
-    c = ParParent
-    @c.cache_associations = false
-    @c.many_to_one :c, :class=>:ParParent
-    @c.association_reflection(:c).associated_class.should == c
-    Object.send(:remove_const, :ParParent)
-    class ::ParParent < Sequel::Model; end
-    c = ParParent
-    @c.association_reflection(:c).associated_class.should == c
+    begin
+      class ::ParParent < Sequel::Model; end
+      c = ParParent
+      @c.many_to_one :c, :class=>:ParParent
+      @c.association_reflection(:c).associated_class.should == c
+      Object.send(:remove_const, :ParParent)
+      class ::ParParent < Sequel::Model; end
+      c = ParParent
+      @c.association_reflection(:c).associated_class.should == c
+    ensure
+      Object.send(:remove_const, :ParParent)
+    end
+  end
+
+  it "should not used cached schema" do
+    def @db.supports_schema_parsing?; true end
+    def @db.schema(table, opts={})
+      [[opts[:reload] ? :reload : :id, {}]]
+    end
+    @c.dataset = @db[:items]
+    @c.columns.should == [:reload]
+
+    @c.cache_associations = true
+    @c.dataset = @db[:items]
+    @c.columns.should == [:id]
   end
 end
 
