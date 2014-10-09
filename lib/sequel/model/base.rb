@@ -580,14 +580,15 @@ module Sequel
       #   Artist.primary_key_hash(1) # => {:id=>1}
       #   Artist.primary_key_hash([1, 2]) # => {:id1=>1, :id2=>2}
       def primary_key_hash(value)
-        raise(Error, "#{self} does not have a primary key") unless key = @primary_key
-        case key
+        case key = @primary_key
+        when Symbol
+          {key => value}
         when Array
           hash = {}
-          key.each_with_index{|k,i| hash[k] = value[i]}
+          key.zip(Array(value)){|k,v| hash[k] = v}
           hash
         else
-          {key => value}
+          raise(Error, "#{self} does not have a primary key")
         end
       end
 
@@ -599,9 +600,16 @@ module Sequel
       #   Artist.filter(Artist.qualified_primary_key_hash(1))
       #   # SELECT * FROM artists WHERE (artists.id = 1)
       def qualified_primary_key_hash(value, qualifier=table_name)
-        h = primary_key_hash(value)
-        h.to_a.each{|k,v| h[SQL::QualifiedIdentifier.new(qualifier, k)] = h.delete(k)}
-        h
+        case key = @primary_key
+        when Symbol
+          {SQL::QualifiedIdentifier.new(qualifier, key) => value}
+        when Array
+          hash = {}
+          key.zip(Array(value)){|k,v| hash[SQL::QualifiedIdentifier.new(qualifier, k)] = v}
+          hash
+        else
+          raise(Error, "#{self} does not have a primary key")
+        end
       end
   
       # Similar to finder, but uses a prepared statement instead of a placeholder
