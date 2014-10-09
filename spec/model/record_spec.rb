@@ -873,11 +873,50 @@ describe "Model#pk_hash" do
   it "should raise if no primary key" do
     @m.set_primary_key nil
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk_hash}.should raise_error(Sequel::Error)
+    proc{m.pk_hash}.should raise_error(Sequel::Error)
 
     @m.no_primary_key
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk_hash}.should raise_error(Sequel::Error)
+    proc{m.pk_hash}.should raise_error(Sequel::Error)
+  end
+end
+
+describe "Model#qualified_pk_hash" do
+  before do
+    @m = Class.new(Sequel::Model(:items))
+    @m.columns :id, :x, :y
+  end
+  
+  it "should by default return a hash with the value of the :id column" do
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.qualified_pk_hash.should == {Sequel.qualify(:items, :id) => 111}
+  end
+
+  it "should accept a custom qualifier" do
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.qualified_pk_hash(:foo).should == {Sequel.qualify(:foo, :id) => 111}
+  end
+
+  it "should return a hash with the primary key value for custom primary key" do
+    @m.set_primary_key :x
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.qualified_pk_hash.should == {Sequel.qualify(:items, :x) => 2}
+  end
+
+  it "should return a hash with the primary key values for composite primary key" do
+    @m.set_primary_key [:y, :x]
+    m = @m.load(:id => 111, :x => 2, :y => 3)
+    m.qualified_pk_hash.should == {Sequel.qualify(:items, :y) => 3, Sequel.qualify(:items, :x) => 2}
+  end
+
+  it "should raise if no primary key" do
+    @m.set_primary_key nil
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    proc{m.qualified_pk_hash}.should raise_error(Sequel::Error)
+
+    @m.no_primary_key
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    proc{m.qualified_pk_hash}.should raise_error(Sequel::Error)
   end
 end
 

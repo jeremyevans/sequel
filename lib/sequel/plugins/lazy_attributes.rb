@@ -83,7 +83,7 @@ module Sequel
           end
 
           if base_ds = opts[:dataset]
-            ds = base_ds.where(model.qualified_primary_key_hash(pk, table))
+            ds = base_ds.where(qualified_pk_hash(table))
           else
             base_ds = model.dataset
             ds = this

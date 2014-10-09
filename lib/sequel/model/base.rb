@@ -1450,6 +1450,16 @@ module Sequel
         model.primary_key_hash(pk)
       end
       
+      # Returns a hash mapping the receivers primary key column(s) to their values.
+      # 
+      #   Artist[1].qualified_pk_hash
+      #   # => {Sequel.qualify(:artists, :id)=>1}
+      #   Artist[[1, 2]].qualified_pk_hash
+      #   # => {Sequel.qualify(:artists, :id1)=>1, Sequel.qualify(:artists, :id2)=>2}
+      def qualified_pk_hash(qualifier=model.table_name)
+        model.qualified_primary_key_hash(pk, qualifier)
+      end
+      
       # Reloads attributes from database and returns self. Also clears all
       # changed_columns information.  Raises an +Error+ if the record no longer
       # exists in the database.
@@ -1636,7 +1646,7 @@ module Sequel
         raise Error, "No dataset for model #{model}" unless ds = model.instance_dataset
 
         cond = if ds.joined_dataset?
-          model.qualified_primary_key_hash(pk)
+          qualified_pk_hash
         else
           pk_hash
         end
@@ -2288,11 +2298,12 @@ module Sequel
       # value.  If no records matches, returns nil.
       #
       #   # Single primary key
-      #   Artist.dataset.with_pk(1) # SELECT * FROM artists WHERE (id = 1) LIMIT 1
+      #   Artist.dataset.with_pk(1)
+      #   # SELECT * FROM artists WHERE (artists.id = 1) LIMIT 1
       #
       #   # Composite primary key
-      #   Artist.dataset.with_pk([1, 2]) # SELECT * FROM artists
-      #                                  # WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1
+      #   Artist.dataset.with_pk([1, 2])
+      #   # SELECT * FROM artists WHERE ((artists.id1 = 1) AND (artists.id2 = 2)) LIMIT 1
       def with_pk(pk)
         first(model.qualified_primary_key_hash(pk))
       end

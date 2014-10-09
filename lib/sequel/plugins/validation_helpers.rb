@@ -242,7 +242,7 @@ module Sequel
             end
             ds = yield(ds) if block_given?
             unless new?
-              h = ds.joined_dataset? ? model.qualified_primary_key_hash(pk) : pk_hash
+              h = ds.joined_dataset? ? qualified_pk_hash : pk_hash
               ds = ds.exclude(h)
             end
             errors.add(a, message) unless ds.count == 0
