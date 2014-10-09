@@ -241,7 +241,10 @@ module Sequel
               ds.where(arr.zip(vals))
             end
             ds = yield(ds) if block_given?
-            ds = ds.exclude(pk_hash) unless new?
+            unless new?
+              h = ds.joined_dataset? ? model.qualified_primary_key_hash(pk) : pk_hash
+              ds = ds.exclude(h)
+            end
             errors.add(a, message) unless ds.count == 0
           end
         end

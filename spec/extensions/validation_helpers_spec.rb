@@ -477,6 +477,20 @@ describe "Sequel::Plugins::ValidationHelpers" do
                     "SELECT count(*) AS count FROM items WHERE ((a IN (1, 2, 3)) AND (username = '0records') AND (id != 3)) LIMIT 1"]
   end
 
+  it "should use qualified primary keys for validates_unique when the dataset is joined" do
+    @c.columns(:id, :username, :password)
+    @c.set_dataset DB[:items]
+    c = @c
+    @c.set_validations{validates_unique(:username, :dataset=>c.cross_join(:a))}
+    @c.dataset._fetch = {:v=>0}
+    
+    DB.reset
+    @c.new(:username => "0records", :password => "anothertest").should be_valid
+    @c.load(:id=>3, :username => "0records", :password => "anothertest").should be_valid
+    DB.sqls.should == ["SELECT count(*) AS count FROM items CROSS JOIN a WHERE (username = '0records') LIMIT 1",
+                    "SELECT count(*) AS count FROM items CROSS JOIN a WHERE ((username = '0records') AND (items.id != 3)) LIMIT 1"]
+  end
+
   it "should support :only_if_modified option for validates_unique, and not check uniqueness for existing records if values haven't changed" do
     @c.columns(:id, :username, :password)
     @c.set_dataset DB[:items]

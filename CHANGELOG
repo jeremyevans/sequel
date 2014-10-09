@@ -1,5 +1,7 @@
 === HEAD
 
+* Make validates_unique use a qualified primary key if the dataset is joined (jeremyevans) (#895)
+
 * Make Sequel::Model.cache_associations = false skip the database's schema cache when loading the schema (jeremyevans)
 
 * Make Database#foreign_key_list work on Microsoft SQL Server 2005 (jeremyevans)
