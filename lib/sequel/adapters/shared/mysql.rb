@@ -464,7 +464,6 @@ module Sequel
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
           row[:primary_key] = row.delete(:Key) == 'PRI'
-          row[:default] = nil if blank_object?(row[:default])
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
           [m.call(row.delete(:Field)), row]
