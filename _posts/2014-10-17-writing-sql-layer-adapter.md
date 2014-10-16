@@ -21,7 +21,7 @@ My basic approach was simple:
 ## Injection
 Since the SQL Layer ended up being merged in, this step ended up being unnecessary, but if you want to add a less standard or less complete SQL implementation that doesn't fit with actually being merged into Sequel proper, this might be a necessary approach.
 
-It seemed like it could be tricky, but I poked around the internet and found [Sequel Vertica](https://github.com/camilo/sequel-vertica), another external adapter for Sequel. This made the injection pretty easy, thanks in part to sequel. Just push the new adapter protocol onto `Sequel::Database::Adapters` and define the `Sequel::Fdbsql::Database` class and put it at the relative path of `sequel/adapters/fdbsql.rb`. Now, ignoring the fact that every function in Sequel falls over with the new adapter, it works great.
+It seemed like it could be tricky, but I poked around the internet and found [Sequel Vertica](https://github.com/camilo/sequel-vertica), another external adapter for Sequel. This made the injection pretty easy, thanks in part to Sequel. Just push the new adapter protocol onto `Sequel::Database::Adapters` and define the `Sequel::Fdbsql::Database` class and put it at the relative path of `sequel/adapters/fdbsql.rb`. Now, ignoring the fact that every function in Sequel falls over with the new adapter, it works great.
 
 ## Running Tests
 Fortunately [SQL Layer adapter for ActiveRecord](https://github.com/FoundationDB/sql-layer-adapter-activerecord), runs the ActiveRecord tests using our adapter and the underlying SQL Layer. Thanks to ruby's power you can get the path to any gem after requiring it:
