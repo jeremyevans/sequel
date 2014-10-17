@@ -38,7 +38,7 @@ module Sequel
       set_adapter_scheme :db2
 
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
-      rc, NullHandle = DB2CLI.SQLAllocHandle(DB2CLI::SQL_HANDLE_ENV, DB2CLI::SQL_NULL_HANDLE)
+      _, NullHandle = DB2CLI.SQLAllocHandle(DB2CLI::SQL_HANDLE_ENV, DB2CLI::SQL_NULL_HANDLE)
       
       # Hash of connection procs for converting
       attr_reader :conversion_procs
@@ -64,7 +64,7 @@ module Sequel
           log_connection_execute(conn, sql)
           sql = "SELECT IDENTITY_VAL_LOCAL() FROM SYSIBM.SYSDUMMY1"
           log_connection_execute(conn, sql) do |sth|
-            name, buflen, datatype, size, digits, nullable = checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, 1, 256)}
+            _, _, datatype, size, _, _ = checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, 1, 256)}
             if DB2CLI.SQLFetch(sth) != DB2CLI::SQL_NO_DATA_FOUND
               v, _ = checked_error("Could not get data"){DB2CLI.SQLGetData(sth, 1, datatype, size)}
               if v.is_a?(String) 
@@ -180,7 +180,6 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |sth|
           db = @db
-          i = 1
           column_info = get_column_info(sth)
           cols = column_info.map{|c| c.at(1)}
           @columns = cols
@@ -213,7 +212,7 @@ module Sequel
         cps = db.conversion_procs
 
         (1..column_count).map do |i| 
-          name, buflen, datatype, size, digits, nullable = db.checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, i, MAX_COL_SIZE)}
+          name, _, datatype, size, digits, _ = db.checked_error("Could not describe column"){DB2CLI.SQLDescribeCol(sth, i, MAX_COL_SIZE)}
           pr = if datatype == DB2CLI::SQL_SMALLINT && convert && size <= 5 && digits <= 1
             cps[:boolean]
           elsif datatype == DB2CLI::SQL_CLOB && Sequel::DB2.use_clob_as_blob

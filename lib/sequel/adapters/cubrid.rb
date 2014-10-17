@@ -124,7 +124,6 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |stmt|
           begin
-            procs = 
             cols = stmt.column_info.map{|c| [output_identifier(c[COLUMN_INFO_NAME]), CUBRID_TYPE_PROCS[c[COLUMN_INFO_TYPE]]]}
             @columns = cols.map{|c| c.first}
             stmt.each do |r|

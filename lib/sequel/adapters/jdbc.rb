@@ -595,7 +595,6 @@ module Sequel
       # Parse the table schema for the given table.
       def schema_parse_table(table, opts=OPTS)
         m = output_identifier_meth(opts[:dataset])
-        ds = dataset
         schema, table = metadata_schema_and_table(table, opts)
         pks, ts = [], []
         metadata(:getPrimaryKeys, nil, schema, table) do |h|
