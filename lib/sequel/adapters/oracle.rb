@@ -111,7 +111,6 @@ module Sequel
         'decimal'.freeze=>Float, 'date'.freeze=>Time, 'datetime'.freeze=>Time,
         'time'.freeze=>Time, 'boolean'.freeze=>String, 'blob'.freeze=>OCI8::BLOB}
       def cursor_bind_params(conn, cursor, args)
-        cursor
         i = 0
         args.map do |arg, type|
           i += 1
