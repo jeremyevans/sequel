@@ -259,7 +259,7 @@ module Sequel
             ds.send(:post_load, objects)
           else
             loader = placeholder_eager_loader
-            loader = loader.with_dataset{|ds| ds.eager(cascade)} if cascade
+            loader = loader.with_dataset{|dataset| dataset.eager(cascade)} if cascade
             objects = loader.all(eo[:id_map].keys)
           end
 

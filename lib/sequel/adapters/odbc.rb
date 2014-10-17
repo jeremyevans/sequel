@@ -100,7 +100,7 @@ module Sequel
           if rows = s.fetch_all
             rows.each do |row|
               hash = {}
-              cols.each{|n,i| hash[n] = convert_odbc_value(row[i])}
+              cols.each{|n,j| hash[n] = convert_odbc_value(row[j])}
               yield hash
             end
           end

@@ -781,8 +781,8 @@ module Sequel
 
         while result.next
           row = {}
-          cols.each do |n, i, pr|
-            row[n] = pr.call(result, i)
+          cols.each do |n, j, pr|
+            row[n] = pr.call(result, j)
           end
           yield row
         end

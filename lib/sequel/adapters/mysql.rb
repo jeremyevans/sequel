@@ -133,12 +133,12 @@ module Sequel
       # depending on the value given.
       def convert_invalid_date_time=(v)
         m0 = ::Sequel.method(:string_to_time)
-        @conversion_procs[11] = (v != false) ?  lambda{|v| convert_date_time(v, &m0)} : m0
+        @conversion_procs[11] = (v != false) ?  lambda{|val| convert_date_time(val, &m0)} : m0
         m1 = ::Sequel.method(:string_to_date) 
-        m = (v != false) ? lambda{|v| convert_date_time(v, &m1)} : m1
+        m = (v != false) ? lambda{|val| convert_date_time(val, &m1)} : m1
         [10, 14].each{|i| @conversion_procs[i] = m}
         m2 = method(:to_application_timestamp)
-        m = (v != false) ? lambda{|v| convert_date_time(v, &m2)} : m2
+        m = (v != false) ? lambda{|val| convert_date_time(val, &m2)} : m2
         [7, 12].each{|i| @conversion_procs[i] = m}
         @convert_invalid_date_time = v
       end

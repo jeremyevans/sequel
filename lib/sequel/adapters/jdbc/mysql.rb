@@ -54,8 +54,8 @@ module Sequel
               rs.close
             end
           else
-            statement(conn) do |stmt|
-              rs = stmt.executeQuery(LAST_INSERT_ID)
+            statement(conn) do |st|
+              rs = st.executeQuery(LAST_INSERT_ID)
               rs.next
               rs.getInt(1)
             end
