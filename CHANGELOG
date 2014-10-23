@@ -1,6 +1,6 @@
 === HEAD
 
-* Dataset#distinct now accepts virtual row blocks (chanks)
+* Dataset#distinct now accepts virtual row blocks (chanks) (#901)
 
 * Recognize disconnect errors in the postgres adapter when SSL is used (jeremyevans) (#900)
 
