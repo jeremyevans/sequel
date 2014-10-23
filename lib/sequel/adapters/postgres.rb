@@ -108,7 +108,14 @@ module Sequel
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
-      DISCONNECT_ERROR_RE = /\A(?:could not receive data from server|no connection to the server|connection not open|terminating connection due to administrator command)/
+      disconnect_errors = [
+        'could not receive data from server',
+        'no connection to the server',
+        'connection not open',
+        'terminating connection due to administrator command',
+        'PQconsumeInput() SSL SYSCALL error'
+       ]
+      DISCONNECT_ERROR_RE = /\A#{Regexp.union(disconnect_errors)}/
       
       self.translate_results = false if respond_to?(:translate_results=)
       
