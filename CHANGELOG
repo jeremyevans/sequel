@@ -1,5 +1,7 @@
 === HEAD
 
+* Dataset#distinct now accepts virtual row blocks (chanks)
+
 * Recognize disconnect errors in the postgres adapter when SSL is used (jeremyevans) (#900)
 
 * Stop converting '' default values to nil default values on MySQL (jeremyevans)

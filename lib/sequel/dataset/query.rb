@@ -82,16 +82,18 @@ module Sequel
       c
     end
 
-    # Returns a copy of the dataset with the SQL DISTINCT clause.
-    # The DISTINCT clause is used to remove duplicate rows from the
-    # output.  If arguments are provided, uses a DISTINCT ON clause,
-    # in which case it will only be distinct on those columns, instead
-    # of all returned columns.  Raises an error if arguments
-    # are given and DISTINCT ON is not supported.
+    # Returns a copy of the dataset with the SQL DISTINCT clause. The DISTINCT
+    # clause is used to remove duplicate rows from the output.  If arguments
+    # are provided, uses a DISTINCT ON clause, in which case it will only be
+    # distinct on those columns, instead of all returned columns. If a block
+    # is given, it is treated as a virtual row block, similar to +where+.
+    # Raises an error if arguments are given and DISTINCT ON is not supported.
     #
     #  DB[:items].distinct # SQL: SELECT DISTINCT * FROM items
     #  DB[:items].order(:id).distinct(:id) # SQL: SELECT DISTINCT ON (id) * FROM items ORDER BY id
-    def distinct(*args)
+    #  DB[:items].order(:id).distinct{func(:id)} # SQL: SELECT DISTINCT ON (func(id)) * FROM items ORDER BY id
+    def distinct(*args, &block)
+      virtual_row_columns(args, block)
       raise(InvalidOperation, "DISTINCT ON not supported") if !args.empty? && !supports_distinct_on?
       clone(:distinct => args)
     end

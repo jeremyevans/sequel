@@ -1820,6 +1820,11 @@ describe "Dataset#distinct" do
     @dataset.distinct(Sequel.cast(:stamp, :integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
   end
 
+  specify "should use DISTINCT ON if columns are given in a virtual row block and DISTINCT ON is supported" do
+    meta_def(@dataset, :supports_distinct_on?){true}
+    @dataset.distinct{func(:id)}.sql.should == 'SELECT DISTINCT ON (func(id)) name FROM test'
+  end
+
   specify "should do a subselect for count" do
     @dataset.distinct.count
     @db.sqls.should == ['SELECT count(*) AS count FROM (SELECT DISTINCT name FROM test) AS t1 LIMIT 1']
