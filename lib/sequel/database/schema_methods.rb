@@ -142,7 +142,7 @@ module Sequel
     
     # Creates the join table unless it already exists.
     def create_join_table?(hash, options=OPTS)
-      if supports_create_table_if_not_exists?
+      if supports_create_table_if_not_exists? && options[:no_index]
         create_join_table(hash, options.merge(:if_not_exists=>true))
       elsif !table_exists?(join_table_name(hash, options))
         create_join_table(hash, options)
@@ -215,10 +215,12 @@ module Sequel
     #   # SELECT NULL FROM a LIMIT 1 -- check existence
     #   # CREATE TABLE a (a integer) -- if it doesn't already exist
     def create_table?(name, options=OPTS, &block)
-      if supports_create_table_if_not_exists?
-        create_table(name, options.merge(:if_not_exists=>true), &block)
+      options = options.dup
+      generator = options[:generator] ||= create_table_generator(&block)
+      if generator.indexes.empty? && supports_create_table_if_not_exists?
+        create_table(name, options.merge!(:if_not_exists=>true))
       elsif !table_exists?(name)
-        create_table(name, options, &block)
+        create_table(name, options)
       end
     end
 
