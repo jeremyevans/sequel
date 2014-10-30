@@ -191,7 +191,7 @@ specify an explicit :key option:
     many_to_one :artist, :key=>:artistid
   end
   class Artist
-    one_to_many :albumst, :key=>:artistid
+    one_to_many :albums, :key=>:artistid
   end
   
 For many_to_many associations, the :left_key and :right_key options can be
