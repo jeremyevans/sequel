@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-26 13:03:17 -0700</span>
+          <span class='datetime'>2014-10-30 14:30:51 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -168,7 +168,7 @@
             <p>Then the default :key option will not be correct.  To fix this, you need to
             specify an explicit :key option:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artistid</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albumst</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artistid</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artistid</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artistid</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>For many_to_many associations, the :left_key and :right_key options can be
             used to specify the column names in the join table, and the :join_table

@@ -1,4 +1,4 @@
-Wed, 01 Oct 2014 08:54:02 -0700
+Sat, 01 Nov 2014 10:16:39 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 26 Aug 2014 13:03:17 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Wed, 27 Aug 2014 16:49:13 -0700
 lib/sequel/extensions/blank.rb	Tue, 19 Jun 2012 10:06:46 -0700
@@ -20,7 +20,7 @@ lib/sequel/extensions/hash_aliases.rb	Tue, 26 Aug 2014 13:03:18 -0700
 lib/sequel/extensions/inflector.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/extensions/looser_typecasting.rb	Tue, 26 Aug 2014 13:03:18 -0700
 lib/sequel/extensions/meta_def.rb	Tue, 26 Aug 2014 13:03:18 -0700
-lib/sequel/extensions/migration.rb	Sun, 28 Sep 2014 19:46:23 -0700
+lib/sequel/extensions/migration.rb	Wed, 01 Oct 2014 12:04:17 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Tue, 26 Aug 2014 13:03:18 -0700
 lib/sequel/extensions/named_timezones.rb	Tue, 26 Aug 2014 13:03:18 -0700
 lib/sequel/extensions/null_dataset.rb	Tue, 26 Aug 2014 13:03:18 -0700
@@ -82,7 +82,7 @@ lib/sequel/plugins/insert_returning_select.rb	Fri, 18 Jul 2014 16:31:18 -0700
 lib/sequel/plugins/instance_filters.rb	Wed, 30 Jul 2014 16:21:14 -0700
 lib/sequel/plugins/instance_hooks.rb	Wed, 15 Jan 2014 10:40:54 -0800
 lib/sequel/plugins/json_serializer.rb	Wed, 27 Aug 2014 16:49:13 -0700
-lib/sequel/plugins/lazy_attributes.rb	Tue, 12 Aug 2014 16:07:46 -0700
+lib/sequel/plugins/lazy_attributes.rb	Thu, 09 Oct 2014 11:54:31 -0700
 lib/sequel/plugins/list.rb	Wed, 23 Jul 2014 09:34:53 -0700
 lib/sequel/plugins/many_through_many.rb	Thu, 25 Sep 2014 16:34:26 -0700
 lib/sequel/plugins/many_to_one_pk_lookup.rb	Mon, 03 Jun 2013 16:35:29 -0700
@@ -119,6 +119,6 @@ lib/sequel/plugins/unlimited_update.rb	Tue, 05 Feb 2013 09:50:24 -0800
 lib/sequel/plugins/update_or_create.rb	Thu, 30 Jan 2014 13:58:40 -0800
 lib/sequel/plugins/update_primary_key.rb	Thu, 19 Sep 2013 07:06:56 -0700
 lib/sequel/plugins/validation_class_methods.rb	Thu, 28 Aug 2014 09:57:27 -0700
-lib/sequel/plugins/validation_helpers.rb	Wed, 27 Aug 2014 16:49:13 -0700
+lib/sequel/plugins/validation_helpers.rb	Thu, 09 Oct 2014 11:54:31 -0700
 lib/sequel/plugins/xml_serializer.rb	Wed, 27 Aug 2014 16:49:13 -0700
 doc/core_extensions.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
