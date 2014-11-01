@@ -5,7 +5,7 @@
 
 * Dataset#distinct now accepts a virtual row block.
 
-* Database#drop_view with :foreign=>true option now drops foreign
+* Database#drop_table with :foreign=>true option now drops foreign
   tables on PostgreSQL.  Database#create_table with :foreign option
   is now reversible on PostgreSQL.
 
