@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix server used for deleting model instances when using sharding (jeremyevans)
+
 === 4.16.0 (2014-11-01)
 
 * Make Database#create_table? and #create_join_table? not use IF NOT EXISTS if indexes are being added (jeremyevans) (#904)

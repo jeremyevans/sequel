@@ -1752,7 +1752,8 @@ module Sequel
       def _delete_without_checking
         if sql = (m = model).fast_instance_delete_sql
           sql = sql.dup
-          (ds = m.dataset).literal_append(sql, pk)
+          ds = use_server(m.dataset)
+          ds.literal_append(sql, pk)
           ds.with_sql_delete(sql)
         else
           _delete_dataset.delete 

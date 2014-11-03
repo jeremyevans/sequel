@@ -346,6 +346,12 @@ describe "Model#set_server" do
     @db.sqls.should == ["DELETE FROM items WHERE (id = 13) -- s1"]
   end
 
+  it "should set the server to use when deleting when using optimized delete" do
+    @c.set_primary_key :id
+    @c.load(:id=>13).set_server(:s1).delete
+    @db.sqls.should == ["DELETE FROM items WHERE id = 13 -- s1"]
+  end
+
   it "should set the server to use for transactions when destroying" do
     o = @c.load(:id=>13).set_server(:s1)
     o.use_transactions = true
