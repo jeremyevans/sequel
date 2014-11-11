@@ -756,7 +756,7 @@ ActiveRecord Method :: Notes, Workarounds
 +silence+ :: No equivalent.  Because the logger is handled at the <tt>Sequel::Database</tt> level, there is no thread-safe way to turn it off for specific blocks.
 +scopes+ :: No equivalent
 +sti_name+ :: No equivalent.
-+update_counters+ :: <tt>Album.where(:id=>:id).update(:counter_name=>:counter_name + 1, :other_counter=>:other_counter - 1)</tt>
++update_counters+ :: <tt>Album.where(:id=>:id).update(:counter_name=>Sequel.+(:counter_name, 1), :other_counter=>Sequel.-(:other_counter, 1))</tt>
 +uncached+ :: No equivalent
 
 === Instance Methods with Significantly Different Behavior
