@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix server used by Dataset#insert_select on PostgreSQL (jeremyevans)
+
 * Fix server used for deleting model instances when using sharding (jeremyevans)
 
 === 4.16.0 (2014-11-01)
