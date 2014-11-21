@@ -292,7 +292,7 @@ in another place.  This is what is meant by a functional style API.
 Let's say we only want to select the id and name columns, and that
 we want to order by name:
 
-  ds3 = ds.order(:name).select(:id, :name)
+  ds3 = ds2.order(:name).select(:id, :name)
   # SELECT id, name FROM artists WHERE name LIKE 'A%' ESCAPE '\' ORDER BY name
   
 Note how you don't need to assign the returned value of order to a variable,
