@@ -1904,7 +1904,7 @@ module Sequel
       # default values of all columns.  Separated from _save so it
       # can be overridden to avoid the refresh.
       def _save_refresh
-        _save_set_values(_refresh_get(this.opts[:server] ? this : this.server(:default)) || raise(Error, "Record not found"))
+        _save_set_values(_refresh_get(this.server?(:default)) || raise(Error, "Record not found"))
         changed_columns.clear
       end
 

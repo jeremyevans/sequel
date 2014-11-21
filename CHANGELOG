@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Dataset#server? for conditionally setting a default server to use if no default is present (jeremyevans)
+
+* Add Database#sharded? for determining if database uses sharding (jeremyevans)
+
 * Fix server used by Dataset#insert_select on PostgreSQL (jeremyevans)
 
 * Fix server used for deleting model instances when using sharding (jeremyevans)

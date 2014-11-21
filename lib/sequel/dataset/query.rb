@@ -794,6 +794,17 @@ module Sequel
       clone(:server=>servr)
     end
 
+    # If the database uses sharding and the current dataset has not had a
+    # server set, return a cloned dataset that uses the given server.
+    # Otherwise, return the receiver directly instead of returning a clone.
+    def server?(server)
+      if db.sharded? && !opts[:server]
+        server(server)
+      else
+        self
+      end
+    end
+
     # Unbind bound variables from this dataset's filter and return an array of two
     # objects.  The first object is a modified dataset where the filter has been
     # replaced with one that uses bound variable placeholders.  The second object
@@ -1119,7 +1130,7 @@ module Sequel
     # Return self if the dataset already has a server, or a cloned dataset with the
     # default server otherwise.
     def default_server
-      @opts[:server] ? self : clone(:server=>:default)
+      server?(:default)
     end
 
     # Treat the +block+ as a virtual_row block if not +nil+ and

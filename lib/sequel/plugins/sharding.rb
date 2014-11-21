@@ -30,7 +30,7 @@ module Sequel
             eb = eo[:eager_block]
             set_server = proc do |ds|
               ds = eb.call(ds) if eb
-              ds = ds.server(server) unless ds.opts[:server]
+              ds = ds.server?(server)
               ds
             end
             eo = eo.merge(:eager_block=>set_server)
@@ -53,7 +53,7 @@ module Sequel
         def eager_graph_dataset(opts, eager_options)
           ds = super
           if s = eager_options[:self].opts[:server]
-            ds = ds.server(s) unless ds.opts[:server]
+            ds = ds.server?(s)
           end
           ds
         end

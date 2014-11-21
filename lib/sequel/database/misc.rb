@@ -117,6 +117,7 @@ module Sequel
       self.log_warn_duration = @opts[:log_warn_duration]
       block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
+      @sharded = !!@opts[:servers]
       @opts[:adapter_class] = self.class
       
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, Database.single_threaded))
@@ -274,6 +275,12 @@ module Sequel
     def set_prepared_statement(name, ps)
       ps.prepared_sql
       Sequel.synchronize{prepared_statements[name] = ps}
+    end
+
+    # Whether this database instance uses multiple servers, either for sharding
+    # or for master/slave.
+    def sharded?
+      @sharded
     end
 
     # The timezone to use for this database, defaulting to <tt>Sequel.database_timezone</tt>.

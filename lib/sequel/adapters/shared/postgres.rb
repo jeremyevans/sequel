@@ -1329,8 +1329,7 @@ module Sequel
       # inserting a query if disable_insert_returning is used.
       def insert_select(*values)
         return unless supports_insert_select?
-        ds = @opts[:server] ? self : server(:default)
-        ds.with_sql_first(insert_select_sql(*values))
+        server?(:default).with_sql_first(insert_select_sql(*values))
       end
 
       # The SQL to use for an insert_select, adds a RETURNING clause to the insert
