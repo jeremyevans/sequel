@@ -75,6 +75,11 @@ module Sequel
           super
           @type_convertor_map[Java::JavaSQL::Types::INTEGER] = @type_convertor_map[Java::JavaSQL::Types::BIGINT]
           @basic_type_convertor_map[Java::JavaSQL::Types::INTEGER] = @basic_type_convertor_map[Java::JavaSQL::Types::BIGINT]
+          @type_convertor_map[Java::JavaSQL::Types::DATE] = lambda do |r, i|
+            if v = r.getString(i)
+              Sequel.string_to_date(v)
+            end
+          end
         end
       end
     end
