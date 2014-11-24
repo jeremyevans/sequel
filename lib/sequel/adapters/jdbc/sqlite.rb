@@ -71,6 +71,7 @@ module Sequel
         end
 
         # Use getLong instead of getInt for converting integers on SQLite, since SQLite does not enforce a limit of 2**32.
+        # Work around regressions in jdbc-sqlite 3.8.7 for date and blob types.
         def setup_type_convertor_map
           super
           @type_convertor_map[Java::JavaSQL::Types::INTEGER] = @type_convertor_map[Java::JavaSQL::Types::BIGINT]
@@ -78,6 +79,13 @@ module Sequel
           @type_convertor_map[Java::JavaSQL::Types::DATE] = lambda do |r, i|
             if v = r.getString(i)
               Sequel.string_to_date(v)
+            end
+          end
+          @type_convertor_map[Java::JavaSQL::Types::BLOB] = lambda do |r, i|
+            if v = r.getBytes(i)
+              Sequel::SQL::Blob.new(String.from_java_bytes(v))
+            elsif !r.wasNull
+              Sequel::SQL::Blob.new('')
             end
           end
         end

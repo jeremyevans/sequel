@@ -1,5 +1,7 @@
 === HEAD
 
+* Work around regression in jdbc-sqlite3 3.8.7 where empty blobs are returned as nil (jeremyevans)
+
 * Work around regression in jdbc-sqlite3 3.8.7 when using JDBC getDate method for date parsing (jeremyevans)
 
 * Make Model#update_or_create return object if existing object exists but updates are not necessary (contentfree) (#916)
