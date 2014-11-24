@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Model#update_or_create return object if existing object exists but updates are not necessary (contentfree) (#916)
+
 * Add Dataset#server? for conditionally setting a default server to use if no default is present (jeremyevans)
 
 * Add Database#sharded? for determining if database uses sharding (jeremyevans)

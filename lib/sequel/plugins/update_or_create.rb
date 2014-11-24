@@ -41,7 +41,7 @@ module Sequel
         # create a new record with the columns specified by both +attrs+ and
         # +set_attrs+, with the ones in +set_attrs+ taking priority.  If
         # a block is given, the object is yielded to the block before the
-        # object is saved.
+        # object is saved.  Returns the new or updated object.
         def update_or_create(attrs, set_attrs=nil, &block)
           obj = find_or_new(attrs, set_attrs, &block)
           obj.save_changes
@@ -50,7 +50,7 @@ module Sequel
 
         # Operates the same as +update_or_create+, but returns the objects
         # without persisting changes (no UPDATE/INSERT queries).
-        def find_or_new(attrs, set_attrs=nil, &block)
+        def find_or_new(attrs, set_attrs=nil)
           obj = find(attrs) || new(attrs)
           obj.set(set_attrs) if set_attrs
           yield obj if block_given?

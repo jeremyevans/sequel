@@ -48,6 +48,12 @@ describe "Sequel::Plugins::UpdateOrCreate" do
     sqls.shift.should == "SELECT * FROM test WHERE (id = 1) LIMIT 1"
   end
 
+  it ".update_or_create should return an existing record even if no changes necessary" do
+    @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
+    @c.update_or_create(:a=>2){|t| t.b = 3}.should == @c.load(:id=>1, :a=>2, :b=>3)
+    @db.sqls.should == ["SELECT * FROM test WHERE (a = 2) LIMIT 1"]
+  end
+
   it ".find_or_new should return an existing record" do
     @db.fetch = [[{:id=>1, :a=>2, :b=>3}]]
     @c.find_or_new(:a=>2){|t| t.b = 4}.should == @c.load(:id=>1, :a=>2, :b=>4)
