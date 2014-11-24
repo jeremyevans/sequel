@@ -43,7 +43,9 @@ module Sequel
         # a block is given, the object is yielded to the block before the
         # object is saved.
         def update_or_create(attrs, set_attrs=nil, &block)
-          find_or_new(attrs, set_attrs, &block).save_changes
+          obj = find_or_new(attrs, set_attrs, &block)
+          obj.save_changes
+          obj
         end
 
         # Operates the same as +update_or_create+, but returns the objects
