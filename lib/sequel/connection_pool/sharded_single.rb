@@ -54,6 +54,11 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
     end
   end
   
+  # The ShardedSingleConnectionPool always has a maximum size of 1.
+  def max_size
+    1
+  end
+  
   # Remove servers from the connection pool. Primarily used in conjunction with master/slave
   # or shard configurations.  Similar to disconnecting from all given servers,
   # except that after it is used, future requests for the server will use the
@@ -92,6 +97,11 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   # If the server given is in the hash, return it, otherwise, return the default server.
   def pick_server(server)
     @servers[server]
+  end
+  
+  # Make sure there is a valid connection for each server.
+  def preconnect
+    servers.each{|s| hold(s){}}
   end
   
   CONNECTION_POOL_MAP[[true, true]] = self

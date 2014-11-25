@@ -235,6 +235,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     sync{@servers[server]}
   end
   
+  # Create the maximum number of connections to each server immediately.
+  def preconnect
+    servers.each{|s| (max_size - size(s)).times{checkin_connection(s, make_new(s))}}
+  end
+  
   # Releases the connection assigned to the supplied thread and server. If the
   # server or connection given is scheduled for disconnection, remove the
   # connection instead of releasing it back to the pool.

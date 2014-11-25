@@ -34,12 +34,6 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @sleep_time = Float(opts[:pool_sleep_time] || 0.001)
   end
   
-  # The total number of connections opened, either available or allocated.
-  # This may not be completely accurate as it isn't protected by the mutex.
-  def size
-    @allocated.length + @available_connections.length
-  end
-  
   # Yield all of the available connections, and the one currently allocated to
   # this thread.  This will not yield connections currently allocated to other
   # threads, as it is not safe to operate on them.  This holds the mutex while
@@ -117,6 +111,12 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     :threaded
   end
   
+  # The total number of connections opened, either available or allocated.
+  # This may not be completely accurate as it isn't protected by the mutex.
+  def size
+    @allocated.length + @available_connections.length
+  end
+  
   private
 
   # Assigns a connection to the supplied thread, if one
@@ -174,6 +174,11 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # if any. The calling code should NOT already have the mutex before calling this.
   def owned_connection(thread)
     sync{@allocated[thread]}
+  end
+  
+  # Create the maximum number of connections immediately.
+  def preconnect
+    (max_size - size).times{checkin_connection(make_new(nil))}
   end
   
   # Releases the connection assigned to the supplied thread back to the pool.

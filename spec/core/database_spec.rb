@@ -23,6 +23,17 @@ describe "A new Database" do
     Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.should == [4,3]
   end
 
+  specify "should support :preconnect option to preconnect to database" do
+    @db.pool.size.should == 0
+    c = Class.new(Sequel::Database) do
+      def connect(_)
+        :connect
+      end
+    end
+    db = c.new(1 => 2, :logger => 3, :preconnect=>true)
+    db.pool.size.should == db.pool.max_size
+  end
+  
   specify "should handle the default string column size" do
     @db.default_string_column_size.should == 255
     db = Sequel::Database.new(:default_string_column_size=>50)

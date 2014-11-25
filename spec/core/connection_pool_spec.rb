@@ -488,6 +488,13 @@ describe "A connection pool with multiple servers" do
     @pool = Sequel::ConnectionPool.get_pool(mock_db.call{|server| "#{server}#{ic[server] += 1}"}, CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}}))
   end
   
+  specify "should support preconnect method that immediately creates the maximum number of connections" do
+    @pool.send(:preconnect)
+    i = 0
+    @pool.all_connections{|c1| i+=1}
+    i.should == @pool.max_size * 2
+  end
+
   specify "#all_connections should return connections for all servers" do
     @pool.hold{}
     @pool.all_connections{|c1| c1.should == "default1"}
@@ -755,6 +762,13 @@ describe "A single threaded pool with multiple servers" do
     @pool = Sequel::ConnectionPool.get_pool(mock_db.call(proc{|c| msp.call}){|c| c}, ST_CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}}))
   end
   
+  specify "should support preconnect method that immediately creates the maximum number of connections" do
+    @pool.send(:preconnect)
+    i = 0
+    @pool.all_connections{|c1| i+=1}
+    i.should == 2
+  end
+
   specify "#all_connections should return connections for all servers" do
     @pool.hold{}
     @pool.all_connections{|c1| c1.should == :default}
@@ -877,6 +891,25 @@ shared_examples_for "All connection pools classes" do
   specify "should have all_connections yield current and available connections" do
     p = @class.new(mock_db.call{123}, {})
     p.hold{|c| p.all_connections{|c1| c.should == c1}}
+  end
+
+  specify "should have a size method that gives the current size of the pool" do
+    p = @class.new(mock_db.call{123}, {})
+    p.size.should == 0
+    p.hold{}
+    p.size.should == 1
+  end
+
+  specify "should have a max_size method that gives the maximum size of the pool" do
+    @class.new(mock_db.call{123}, {}).max_size.should >= 1
+  end
+
+  specify "should support preconnect method that immediately creates the maximum number of connections" do
+    p = @class.new(mock_db.call{123}, {})
+    p.send(:preconnect)
+    i = 0
+    p.all_connections{|c1| i+=1}
+    i.should == p.max_size
   end
 
   specify "should be able to modify after_connect proc after the pool is created" do

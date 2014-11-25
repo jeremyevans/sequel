@@ -1,5 +1,9 @@
 === HEAD
 
+* Add :preconnect Database option for immediately creating the maximum number of connections (jeremyevans)
+
+* Support DB.pool.max_size for the single connection pools (jeremyevans)
+
 * Work around regression in jdbc-sqlite3 3.8.7 where empty blobs are returned as nil (jeremyevans)
 
 * Work around regression in jdbc-sqlite3 3.8.7 when using JDBC getDate method for date parsing (jeremyevans)

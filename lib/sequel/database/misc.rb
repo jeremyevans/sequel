@@ -100,13 +100,14 @@ module Sequel
     #
     # Accepts the following options:
     # :default_string_column_size :: The default size of string columns, 255 by default.
-    # :identifier_input_method :: A string method symbol to call on identifiers going into the database
-    # :identifier_output_method :: A string method symbol to call on identifiers coming from the database
-    # :logger :: A specific logger to use
-    # :loggers :: An array of loggers to use
-    # :quote_identifiers :: Whether to quote identifiers
-    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol 
-    # :single_threaded :: Whether to use a single-threaded connection pool
+    # :identifier_input_method :: A string method symbol to call on identifiers going into the database.
+    # :identifier_output_method :: A string method symbol to call on identifiers coming from the database.
+    # :logger :: A specific logger to use.
+    # :loggers :: An array of loggers to use.
+    # :preconnect :: Whether to automatically connect to the maximum number of servers.
+    # :quote_identifiers :: Whether to quote identifiers.
+    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol .
+    # :single_threaded :: Whether to use a single-threaded connection pool.
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
     # All options given are also passed to the connection pool.
@@ -144,6 +145,7 @@ module Sequel
         Sequel.synchronize{::Sequel::DATABASES.push(self)}
       end
       Sequel::Database.run_after_initialize(self)
+      @pool.send(:preconnect) if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
     end
 
     # If a transaction is not currently in process, yield to the block immediately.
