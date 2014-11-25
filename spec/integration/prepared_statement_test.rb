@@ -327,6 +327,13 @@ describe "Bound Argument Types" do
     @ds.get(:file).should == @vs[:file]
   end
 
+  cspecify "should handle blob type with special characters", [:odbc], [:oracle] do
+    @ds.delete
+    blob = Sequel.blob("\"'[]`a0 ")
+    @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>blob)
+    @ds.get(:file).should == blob
+  end
+
   cspecify "should handle blob type with nil values", [:oracle], [:tinytds], [:jdbc, proc{|db| defined?(Sequel::JDBC::SQLServer::DatabaseMethods) && db.is_a?(Sequel::JDBC::SQLServer::DatabaseMethods)}] do
     @ds.delete
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>nil)

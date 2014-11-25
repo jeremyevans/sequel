@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix handling of Sequel::SQL::Blob instances in bound variables in the postgres adapter (jeremyevans) (#917)
+
 * Add :preconnect Database option for immediately creating the maximum number of connections (jeremyevans)
 
 * Support DB.pool.max_size for the single connection pools (jeremyevans)

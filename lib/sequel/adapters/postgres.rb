@@ -192,7 +192,7 @@ module Sequel
       def bound_variable_arg(arg, conn)
         case arg
         when Sequel::SQL::Blob
-          conn.escape_bytea(arg)
+          {:value=>arg, :type=>17, :format=>1}
         when Sequel::SQLTime
           literal(arg)
         when DateTime, Time
