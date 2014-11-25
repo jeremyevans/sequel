@@ -144,8 +144,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     conn
   end
 
-  # Alias the default make_new method, so subclasses can call it directly.
-  alias default_make_new make_new
+  unless method_defined?(:default_make_new)
+    # Alias the default make_new method, so subclasses can call it directly.
+    alias default_make_new make_new
+  end
   
   # Creates a new connection to the given server if the size of the pool for
   # the server is less than the maximum size of the pool. The calling code
