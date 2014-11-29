@@ -367,7 +367,7 @@ describe Sequel::Model, "rcte_tree with composite keys" do
   
   it "should eagerly load descendants to a given level" do
     @c.plugin :rcte_tree, :key=>[:parent_id, :parent_id2]
-    @ds._fetch = [[{:id=>2, :id2=>3, :parent_id=>1, :parent_id=>2, :name=>'AA'}, {:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'}, {:id=>7, :id2=>8, :parent_id=>1, :parent_id2=>2, :name=>'D'}],
+    @ds._fetch = [[{:id=>2, :id2=>3, :parent_id=>1, :parent_id2=>2, :name=>'AA'}, {:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'}, {:id=>7, :id2=>8, :parent_id=>1, :parent_id2=>2, :name=>'D'}],
       [{:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C', :x_root_x_0=>2, :x_root_x_1=>3, :x_level_x=>0}, {:id=>9, :id2=>10, :parent_id=>2, :parent_id2=>3, :name=>'E', :x_root_x_0=>2, :x_root_x_1=>3, :x_level_x=>0},
        {:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7, :x_root_x_0=>6, :x_root_x_1=>7, :x_level_x=>0}, {:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7, :x_root_x_0=>2, :x_root_x_1=>3, :x_level_x=>1},
        {:id=>4, :id2=>5, :name=>'?', :parent_id=>7, :parent_id2=>8, :x_root_x_0=>7, :x_root_x_1=>8, :x_level_x=>0}, {:id=>5, :id2=>6, :name=>'?', :parent_id=>4, :parent_id2=>5, :x_root_x_0=>7, :x_root_x_1=>8, :x_level_x=>1}]]
@@ -375,7 +375,7 @@ describe Sequel::Model, "rcte_tree with composite keys" do
     sqls = @db.sqls
     sqls.first.should == "SELECT * FROM nodes"
     sqls.last.should =~ /WITH t AS \(SELECT parent_id AS x_root_x_0, parent_id2 AS x_root_x_1, nodes\.\*, CAST\(0 AS integer\) AS x_level_x FROM nodes WHERE \(\(parent_id, parent_id2\) IN \(\([267], [378]\), \([267], [378]\), \([267], [378]\)\)\) UNION ALL SELECT t\.x_root_x_0, t\.x_root_x_1, nodes\.\*, \(t\.x_level_x \+ 1\) AS x_level_x FROM nodes INNER JOIN t ON \(\(t\.id = nodes\.parent_id\) AND \(t\.id2 = nodes\.parent_id2\)\) WHERE \(t\.x_level_x < 1\)\) SELECT \* FROM t AS nodes/
-    os.should == [@c.load(:id=>2, :id2=>3, :parent_id=>1, :parent_id=>2, :name=>'AA'), @c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>7, :id2=>8, :parent_id=>1, :parent_id2=>2, :name=>'D')]
+    os.should == [@c.load(:id=>2, :id2=>3, :parent_id=>1, :parent_id2=>2, :name=>'AA'), @c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>7, :id2=>8, :parent_id=>1, :parent_id2=>2, :name=>'D')]
     os.map{|o| o.descendants}.should == [[@c.load(:id=>6, :id2=>7, :parent_id=>2, :parent_id2=>3, :name=>'C'), @c.load(:id=>9, :id2=>10, :parent_id=>2, :parent_id2=>3, :name=>'E'), @c.load(:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7)],
       [@c.load(:id=>3, :id2=>4, :name=>'00', :parent_id=>6, :parent_id2=>7)],
       [@c.load(:id=>4, :id2=>5, :name=>'?', :parent_id=>7, :parent_id2=>8), @c.load(:id=>5, :id2=>6, :name=>'?', :parent_id=>4, :parent_id2=>5)]]

@@ -196,7 +196,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
   end
 
   it "should deal correctly with :order option for one_through_many associations" do
-    @Artist.one_through_many :otag, :clone=>:otag, :order=>:id, :order=>:tags__name
+    @Artist.one_through_many :otag, :clone=>:otag, :order=>:tags__name
     @Artist.otags.sql.should == 'SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE ((albums.artist_id IN (SELECT artists.id FROM artists)) AND ((albums.artist_id, tags.id) IN (SELECT DISTINCT ON (albums.artist_id) albums.artist_id, tags.id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) ORDER BY albums.artist_id, tags.name))))) ORDER BY tags.name'
   end
 
