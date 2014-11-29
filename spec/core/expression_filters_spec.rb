@@ -1117,7 +1117,7 @@ describe "Sequel.delay" do
   end
 
   specify "should call the block with the current dataset if it accepts one argument" do
-    ds = Sequel.mock[:b].where(Sequel.delay{|ds| ds.first_source})
+    ds = Sequel.mock[:b].where(Sequel.delay{|x| x.first_source})
     ds.sql.should == "SELECT * FROM b WHERE b"
     ds.from(:c).sql.should == "SELECT * FROM c WHERE c"
   end
@@ -1132,7 +1132,7 @@ describe "Sequel.delay" do
   end
 
   specify "should have the condition specifier handling call block with the current dataset if it accepts one argument" do
-    ds = Sequel.mock[:b].where(:a=>Sequel.delay{|ds| ds.first_source})
+    ds = Sequel.mock[:b].where(:a=>Sequel.delay{|x| x.first_source})
     ds.sql.should == "SELECT * FROM b WHERE (a = b)"
     ds.from(:c).sql.should == "SELECT * FROM c WHERE (a = c)"
   end

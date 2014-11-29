@@ -3723,7 +3723,7 @@ describe "Sequel::Dataset#qualify" do
   end
 
   specify "should handle SQL::DelayedEvaluations that take dataset arguments" do
-    ds = @ds.filter(Sequel.delay{|ds| ds.first_source}).qualify
+    ds = @ds.filter(Sequel.delay{|x| x.first_source}).qualify
     ds.sql.should == 'SELECT t.* FROM t WHERE t.t'
   end
 
