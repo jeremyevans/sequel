@@ -897,13 +897,14 @@ module Sequel
 
     # Set the server to use to :default unless it is already set in the passed opts
     def default_server_opts(opts)
-      {:server=>@opts[:server] || :default}.merge(opts)
+      @db.sharded? ? {:server=>@opts[:server] || :default}.merge(opts) : opts
     end
 
     # Execute the given select SQL on the database using execute. Use the
     # :read_only server unless a specific server is set.
     def execute(sql, opts=OPTS, &block)
-      @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)
+      db = @db
+      db.execute(sql, db.sharded? ? {:server=>@opts[:server] || :read_only}.merge(opts) : opts, &block)
     end
     
     # Execute the given SQL on the database using execute_ddl.
