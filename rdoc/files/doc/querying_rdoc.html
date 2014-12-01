@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2014-11-21 08:58:34 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -296,7 +296,7 @@
             <p>Let&#39;s say we only want to select the id and name columns, and that we
             want to order by name:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39; ORDER BY name</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds2</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT id, name FROM artists WHERE name LIKE &#39;A%&#39; ESCAPE &#39;\&#39; ORDER BY name</span></pre>
             
             <p>Note how you don&#39;t need to assign the returned value of order to a
             variable, and then call select on that.  Because order just returns a

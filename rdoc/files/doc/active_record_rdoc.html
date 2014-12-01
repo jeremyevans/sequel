@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2014-11-10 21:51:27 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -1025,7 +1025,7 @@
             </td></tr><tr><td class='label'><code>sti_name</code> </td><td>
             <p>No equivalent.</p>
             </td></tr><tr><td class='label'><code>update_counters</code> </td><td>
-            <p><code>Album.where(:id=&gt;:id).update(:counter_name=&gt;:counter_name + 1,&#x000A;:other_counter=&gt;:other_counter - 1)</code></p>
+            <p><code>Album.where(:id=&gt;:id).update(:counter_name=&gt;Sequel.+(:counter_name,&#x000A;1), :other_counter=&gt;Sequel.-(:other_counter, 1))</code></p>
             </td></tr><tr><td class='label'><code>uncached</code> </td><td>
             <p>No equivalent</p>
             </td></tr></tbody></table>

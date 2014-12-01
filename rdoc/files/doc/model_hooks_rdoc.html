@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2014-11-10 21:51:27 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -241,7 +241,7 @@
             database without saving a model object.  One example is by using plain
             datasets, or one of the model&#39;s dataset methods:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">copies_sold=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># UPDATE albums SET copies_sold = copies_sold + 1 WHERE name = &#39;RF&#39;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>).<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">copies_sold=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">copies_sold</span>, <span class="ruby-value">1</span>))&#x000A;<span class="ruby-comment"># UPDATE albums SET copies_sold = copies_sold + 1 WHERE name = &#39;RF&#39;</span></pre>
             
             <p>In this case, the <code>update</code> method is called on the dataset
             returned by <code>Album.where</code>.  Even if there is only a single

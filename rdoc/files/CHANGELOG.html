@@ -31,12 +31,44 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-10-31 15:49:57 -0700</span>
+          <span class='datetime'>2014-12-01 07:59:35 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.17.0+%282014-12-01%29">4.17.0 (2014-12-01)<span><a href="#label-4.17.0+%282014-12-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Fix handling of <a
+            href="../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a> instances in
+            bound variables in the postgres adapter (jeremyevans) (#917)</p>
+            </li><li>
+            <p>Add :preconnect Database option for immediately creating the maximum number
+            of connections (jeremyevans)</p>
+            </li><li>
+            <p>Support DB.pool.max_size for the single connection pools (jeremyevans)</p>
+            </li><li>
+            <p>Work around regression in jdbc-sqlite3 3.8.7 where empty blobs are returned
+            as nil (jeremyevans)</p>
+            </li><li>
+            <p>Work around regression in jdbc-sqlite3 3.8.7 when using JDBC getDate method
+            for date parsing (jeremyevans)</p>
+            </li><li>
+            <p>Make Model#update_or_create return object if existing object exists but
+            updates are not necessary (contentfree) (#916)</p>
+            </li><li>
+            <p>Add Dataset#server? for conditionally setting a default server to use if no
+            default is present (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#sharded? for determining if database uses sharding
+            (jeremyevans)</p>
+            </li><li>
+            <p>Fix server used by Dataset#insert_select on PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Fix server used for deleting model instances when using sharding
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.16.0+%282014-11-01%29">4.16.0 (2014-11-01)<span><a href="#label-4.16.0+%282014-11-01%29">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
             <ul><li>

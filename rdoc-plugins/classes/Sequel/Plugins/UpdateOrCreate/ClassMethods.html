@@ -55,7 +55,7 @@
                 <a name='method-i-find_or_new'></a>
                 <div class='synopsis'>
                   <span class='name'>find_or_new</span>
-                  <span class='arguments'>(attrs, set_attrs=nil, &block)</span>
+                  <span class='arguments'>(attrs, set_attrs=nil)</span>
                 </div>
                 <div class='description'>
                   
@@ -66,7 +66,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-find_or_new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-find_or_new-source'><span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">attrs</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">attrs</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">set_attrs</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">set_attrs</span>&#x000A;  <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-identifier">obj</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-find_or_new-source'><span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find</span>(<span class="ruby-identifier">attrs</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">attrs</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">set</span>(<span class="ruby-identifier">set_attrs</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">set_attrs</span>&#x000A;  <span class="ruby-keyword">yield</span> <span class="ruby-identifier">obj</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">block_given?</span>&#x000A;  <span class="ruby-identifier">obj</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-update_or_create'>
@@ -83,13 +83,13 @@
                   new record with the columns specified by both <code>attrs</code> and
                   <code>set_attrs</code>, with the ones in <code>set_attrs</code> taking
                   priority.  If a block is given, the object is yielded to the block before
-                  the object is saved.</p>
+                  the object is saved.  Returns the new or updated object.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-update_or_create-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-update_or_create-source'><span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_or_create</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-update_or_create-source'><span class="ruby-comment"># File lib/sequel/plugins/update_or_create.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">update_or_create</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">obj</span> = <span class="ruby-identifier">find_or_new</span>(<span class="ruby-identifier">attrs</span>, <span class="ruby-identifier">set_attrs</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">save_changes</span>&#x000A;  <span class="ruby-identifier">obj</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

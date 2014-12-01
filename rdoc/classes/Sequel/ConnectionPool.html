@@ -62,6 +62,9 @@
             </td></tr><tr><td class='label'>size </td><td>
             <p>an integer representing the total number of connections in the pool, or for
             the given shard/server if sharding is supported.</p>
+            </td></tr><tr><td class='label'>max_size </td><td>
+            <p>an integer representing the maximum size of the connection pool, or the
+            maximum size per shard/server if sharding is supported.</p>
             </td></tr></tbody></table>
             
             <p>For sharded connection pools, the sharded API adds the following methods:</p>
@@ -184,13 +187,17 @@
                   connection object (and server argument if the callable accepts 2
                   arguments), useful for customizations that you want to apply to all
                   connections.</p>
+                  </td></tr><tr><td class='label'>:preconnect </td><td>
+                  <p>Automatically create the maximum number of connections, so that they
+                  don&#39;t need to be created as needed.  This is useful when connecting
+                  takes a long time and you want to avoid possible latency during runtime.</p>
                   </td></tr></tbody></table>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 80</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@after_connect</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:after_connect</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -209,7 +216,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-created_count-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-created_count-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">created_count</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">size</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-created_count-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">created_count</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">size</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-servers'>
@@ -227,7 +234,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-servers-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">servers</span>&#x000A;  [<span class="ruby-constant">DEFAULT_SERVER</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-servers-source'><span class="ruby-comment"># File lib/sequel/connection_pool.rb, line 91</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">servers</span>&#x000A;  [<span class="ruby-constant">DEFAULT_SERVER</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
