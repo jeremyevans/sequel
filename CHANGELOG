@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.17.0 (2014-12-01)
 
 * Fix handling of Sequel::SQL::Blob instances in bound variables in the postgres adapter (jeremyevans) (#917)
 
