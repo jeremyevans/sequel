@@ -1,4 +1,4 @@
-= Dataset Filtering 
+= Dataset Filtering
 
 Sequel is very flexibile when it comes to filtering records. You can specify your conditions as a custom string, as a string with parameters, as a hash of values to compare against, or as ruby code that Sequel translates into SQL expressions.
 
@@ -76,29 +76,29 @@ If you need to select multiple items from a dataset, you can supply an array:
 You can pass a block to where, which is evaluated in a special context:
 
   items.where{price * 2 < 50}.sql
-  #=> "SELECT * FROM items WHERE ((price * 2) < 50) 
+  #=> "SELECT * FROM items WHERE ((price * 2) < 50)
 
 This works for the standard inequality and arithmetic operators:
 
   items.where{price + 100 < 200}.sql
-  #=> "SELECT * FROM items WHERE ((price + 100) < 200) 
+  #=> "SELECT * FROM items WHERE ((price + 100) < 200)
 
   items.where{price - 100 > 200}.sql
-  #=> "SELECT * FROM items WHERE ((price - 100) > 200) 
+  #=> "SELECT * FROM items WHERE ((price - 100) > 200)
 
   items.where{price * 100 <= 200}.sql
-  #=> "SELECT * FROM items WHERE ((price * 100) <= 200) 
+  #=> "SELECT * FROM items WHERE ((price * 100) <= 200)
 
   items.where{price / 100 >= 200}.sql
-  #=> "SELECT * FROM items WHERE ((price / 100) >= 200) 
+  #=> "SELECT * FROM items WHERE ((price / 100) >= 200)
 
 You use the overloaded bitwise and (&) and or (|) operators to combine expressions:
 
   items.where{(price + 100 < 200) & (price * 100 <= 200)}.sql
-  #=> "SELECT * FROM items WHERE (((price + 100) < 200) AND ((price * 100) <= 200)) 
+  #=> "SELECT * FROM items WHERE (((price + 100) < 200) AND ((price * 100) <= 200))
 
   items.where{(price - 100 > 200) | (price / 100 >= 200)}.sql
-  #=> "SELECT * FROM items WHERE (((price - 100) > 200) OR ((price / 100) >= 200)) 
+  #=> "SELECT * FROM items WHERE (((price - 100) > 200) OR ((price / 100) >= 200))
 
 To filter by equality, you use the standard hash, which can be combined with other expressions using Sequel.& and Sequel.|:
 
@@ -124,7 +124,7 @@ You can use the exclude method to exclude conditions:
   #=> "SELECT * FROM items WHERE NOT active"
 
   items.exclude{price / 100 >= 200}.sql
-  #=> "SELECT * FROM items WHERE ((price / 100) < 200) 
+  #=> "SELECT * FROM items WHERE ((price / 100) < 200)
 
 === Comparing against column references
 
@@ -163,15 +163,15 @@ Like can also take more than one argument:
 
 == String concatenation
 
-You can concatenate SQL strings using Sequel.join: 
+You can concatenate SQL strings using Sequel.join:
 
-  items.where(Sequel.join([:name, :comment]).like('%acme%')).sql
-  #=> "SELECT * FROM items WHERE ((name || comment) LIKE 'Acme%' ESCAPE '\')"
+  items.where(Sequel.join([:name, :comment]).like('Jo%nice%')).sql
+  #=> "SELECT * FROM items WHERE ((name || comment) LIKE 'Jo%nice%' ESCAPE '\')"
 
 Sequel.join also takes a join argument:
 
-  items.filter(Sequel.join([:name, :comment], ' ').like('%acme%')).sql
-  #=> "SELECT * FROM items WHERE ((name || ' ' || comment) LIKE 'Acme%' ESCAPE '\')"
+  items.filter(Sequel.join([:name, :comment], ':').like('John:%nice%')).sql
+  #=> "SELECT * FROM items WHERE ((name || ':' || comment) LIKE 'John:%nice%' ESCAPE '\')"
 
 == Filtering using sub-queries
 
