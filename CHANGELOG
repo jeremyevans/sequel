@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix handling of schema qualified tables in many_through_many associations (jeremyevans)
+
 === 4.17.0 (2014-12-01)
 
 * Fix handling of Sequel::SQL::Blob instances in bound variables in the postgres adapter (jeremyevans) (#917)

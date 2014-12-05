@@ -70,6 +70,19 @@ describe Sequel::Model, "many_through_many" do
     a.first.tags.should == [@c2.load(:id=>4)]
   end
   
+  it "should handle schema qualified tables" do
+    @c1.many_through_many :tags, :through=>[[:myschema__albums_artists, :artist_id, :album_id], [:myschema__albums, :id, :id], [:myschema__albums_tags, :album_id, :tag_id]]
+    @c1.load(:id=>1).tags_dataset.sql.should == "SELECT tags.* FROM tags INNER JOIN myschema.albums_tags ON (myschema.albums_tags.tag_id = tags.id) INNER JOIN myschema.albums ON (myschema.albums.id = myschema.albums_tags.album_id) INNER JOIN myschema.albums_artists ON (myschema.albums_artists.album_id = myschema.albums.id) WHERE (myschema.albums_artists.artist_id = 1)"
+
+    @c1.dataset._fetch = {:id=>1}
+    @c2.dataset._fetch = {:id=>4, :x_foreign_key_x=>1}
+    a = @c1.eager(:tags).all
+    a.should == [@c1.load(:id => 1)]
+    DB.sqls.should == ['SELECT * FROM artists', "SELECT tags.*, myschema.albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN myschema.albums_tags ON (myschema.albums_tags.tag_id = tags.id) INNER JOIN myschema.albums ON (myschema.albums.id = myschema.albums_tags.album_id) INNER JOIN myschema.albums_artists ON (myschema.albums_artists.album_id = myschema.albums.id) WHERE (myschema.albums_artists.artist_id IN (1))"]
+
+    @c1.eager_graph(:tags).sql.should == 'SELECT artists.id, tags.id AS tags_id, tags.h1, tags.h2 FROM artists LEFT OUTER JOIN myschema.albums_artists AS albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN myschema.albums AS albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN myschema.albums_tags AS albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)'
+  end
+  
   it "should default to associating to other models in the same scope" do
     begin
       class ::AssociationModuleTest

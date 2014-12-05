@@ -114,9 +114,14 @@ module Sequel
 
         def _associated_dataset
           ds = associated_class
-          reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias], :qualify=>:deep)}
-          ft = final_reverse_edge
-          ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])), :table_alias=>ft[:alias], :qualify=>:deep)
+          (reverse_edges + [final_reverse_edge]).each do |t|
+            h = {:qualify=>:deep}
+            if t[:alias] != t[:table]
+              h[:table_alias] = t[:alias]
+            end
+            ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), h)
+          end
+          ds
         end
 
         # Make sure to use unique table aliases when lazy loading or eager loading
