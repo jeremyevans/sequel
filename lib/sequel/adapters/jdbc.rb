@@ -604,7 +604,18 @@ module Sequel
         schemas = []
         metadata(:getColumns, nil, schema, table, nil) do |h|
           next if schema_parse_table_skip?(h, schema)
-          s = {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name]), :column_size=>h[:column_size], :scale=>h[:decimal_digits]}
+          s = {
+            :type=>schema_column_type(h[:type_name]),
+            :db_type=>h[:type_name],
+            :default=>(h[:column_def] == '' ? nil : h[:column_def]),
+            :allow_null=>(h[:nullable] != 0),
+            :primary_key=>pks.include?(h[:column_name]),
+            :column_size=>h[:column_size],
+            :scale=>h[:decimal_digits]
+          }
+          if s[:primary_key]
+            s[:auto_increment] = h[:is_autoincrement] == "YES"
+          end
           s[:max_length] = s[:column_size] if s[:type] == :string
           if s[:db_type] =~ DECIMAL_TYPE_RE && s[:scale] == 0
             s[:type] = :integer

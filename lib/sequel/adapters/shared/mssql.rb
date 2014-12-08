@@ -433,6 +433,10 @@ module Sequel
         inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel.expr(s)}
         sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel.expr(s)}
 
+        identity_cols = metadata_dataset.from(:sys__columns).
+          where(:object_id=>table_id, :is_identity=>true).
+          select_map(:name)
+
         pk_index_id = metadata_dataset.from(sys_qual.call(:sysindexes)).
           where(:id=>table_id, :indid=>1..254){{(status & 2048)=>2048}}.
           get(:indid)
@@ -440,16 +444,21 @@ module Sequel
           join(sys_qual.call(:syscolumns).as(:sc), :id=>:id, :colid=>:colid).
           where(:sik__id=>table_id, :sik__indid=>pk_index_id).
           select_order_map(:sc__name)
+
         ds = metadata_dataset.from(inf_sch_qual.call(:information_schema__tables).as(:t)).
          join(inf_sch_qual.call(:information_schema__columns).as(:c), :table_catalog=>:table_catalog,
               :table_schema => :table_schema, :table_name => :table_name).
          select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null, :numeric_precision___column_size, :numeric_scale___scale).
          filter(:c__table_name=>tn)
+
         if schema = opts[:schema]
           ds.filter!(:c__table_schema=>schema)
         end
+
         ds.map do |row|
-          row[:primary_key] = pk_cols.include?(row[:column])
+          if row[:primary_key] = pk_cols.include?(row[:column])
+            row[:auto_increment] = identity_cols.include?(row[:column])
+          end
           row[:allow_null] = row[:allow_null] == 'YES' ? true : false
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE && row[:scale] == 0

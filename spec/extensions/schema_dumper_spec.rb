@@ -68,7 +68,7 @@ describe "Sequel::Database dump methods" do
     @d.meta_def(:schema) do |t, *o|
       case t
       when :t1, 't__t1', Sequel.identifier(:t__t1)
-        [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>false}],
+        [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true, :allow_null=>false}],
          [:c2, {:db_type=>'varchar(20)', :allow_null=>true}]]
       when :t2
         [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>false}],
@@ -92,7 +92,7 @@ describe "Sequel::Database dump methods" do
   end
 
   it "should dump non-Integer primary key columns with explicit :type" do
-    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true, :auto_increment=>true}]]}
     @d.dump_table_schema(:t6).should == "create_table(:t6) do\n  primary_key :c1, :type=>Bignum\nend"
   end
 
@@ -104,7 +104,7 @@ describe "Sequel::Database dump methods" do
   end
 
   it "should handle primary keys that are also foreign keys" do
-    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true, :auto_increment=>true}]]}
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2]}]}
     s = @d.dump_table_schema(:t6)
@@ -126,7 +126,7 @@ describe "Sequel::Database dump methods" do
   end
 
   it "should handle foreign key options in the primary key" do
-    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true, :auto_increment=>true}]]}
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:restrict, :on_update=>:set_null, :deferrable=>true}]}
     s = @d.dump_table_schema(:t6)
@@ -151,7 +151,7 @@ describe "Sequel::Database dump methods" do
   end
 
   it "should omit foreign key options that are the same as defaults in the primary key" do
-    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>true, :auto_increment=>true}]]}
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>false}]}
     s = @d.dump_table_schema(:t6)
@@ -232,7 +232,7 @@ END_MIG
   it "should sort table names topologically when dumping a migration with foreign keys" do
     @d.meta_def(:tables){|o| [:t1, :t2]}
     @d.meta_def(:schema) do |t|
-      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true}]]
+      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true}]]
     end
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list) do |t|
@@ -284,7 +284,7 @@ END_MIG
   it "should sort topologically even if the database raises an error when trying to parse foreign keys for a non-existent table" do
     @d.meta_def(:tables){|o| [:t1, :t2]}
     @d.meta_def(:schema) do |t|
-      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true}]]
+      t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true}]]
     end
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list) do |t|
@@ -763,13 +763,13 @@ END_MIG
   end
 
   it "should use separate primary_key call with non autoincrementable types" do
-    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'varchar(8)', :primary_key=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'varchar(8)', :primary_key=>true, :auto_increment=>false}]]}
     @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  String :c1, :size=>8\n  \n  primary_key [:c1]\nend"
     @d.dump_table_schema(:t3, :same_db=>true).should == "create_table(:t3) do\n  column :c1, \"varchar(8)\"\n  \n  primary_key [:c1]\nend"
   end
 
   it "should use explicit type for non integer foreign_key types" do
-    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'date', :primary_key=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'date', :primary_key=>true, :auto_increment=>false}]]}
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
     ["create_table(:t4) do\n  foreign_key :c1, :t3, :type=>Date, :key=>[:c1]\n  \n  primary_key [:c1]\nend",
@@ -779,7 +779,7 @@ END_MIG
   end
 
   it "should correctly handing autoincrementing primary keys that are also foreign keys" do
-    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true}]]}
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true}]]}
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
     ["create_table(:t4) do\n  primary_key :c1, :table=>:t3, :key=>[:c1]\nend",

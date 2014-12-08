@@ -457,19 +457,16 @@ module Sequel
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
-          row[:primary_key] = row.delete(:pk).to_i > 0
           row[:default] = nil if blank_object?(row[:default]) || row[:default] == 'NULL'
           row[:db_type] = row.delete(:type)
+          if row[:primary_key] = row.delete(:pk).to_i > 0
+            row[:auto_increment] = row[:db_type].downcase == 'integer'
+          end
           row[:type] = schema_column_type(row[:db_type])
           row
         end
       end
       
-      # SQLite treats integer primary keys as autoincrementing (alias of rowid).
-      def schema_autoincrementing_primary_key?(schema)
-        super && schema[:db_type].downcase == 'integer'
-      end
-
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)

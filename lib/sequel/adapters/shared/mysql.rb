@@ -460,10 +460,11 @@ module Sequel
         table = SQL::Identifier.new(im.call(table_name))
         table = SQL::QualifiedIdentifier.new(im.call(opts[:schema]), table) if opts[:schema]
         metadata_dataset.with_sql("DESCRIBE ?", table).map do |row|
-          row[:auto_increment] = true if row.delete(:Extra).to_s =~ /auto_increment/io
+          if row[:primary_key] = row.delete(:Key) == 'PRI'
+            row[:auto_increment] = !!(row.delete(:Extra).to_s =~ /auto_increment/io)
+          end
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
-          row[:primary_key] = row.delete(:Key) == 'PRI'
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
           [m.call(row.delete(:Field)), row]

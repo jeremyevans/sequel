@@ -2104,9 +2104,9 @@ end
 describe "Database#schema_autoincrementing_primary_key?" do
   specify "should indicate whether the parsed schema row indicates a primary key" do
     m = Sequel::Database.new.method(:schema_autoincrementing_primary_key?)
-    m.call(:primary_key=>true, :db_type=>'integer').should == true
-    m.call(:primary_key=>true, :db_type=>'varchar(255)').should == false
-    m.call(:primary_key=>false, :db_type=>'integer').should == false
+    m.call(:primary_key=>true, :auto_increment=>true).should == true
+    m.call(:primary_key=>true, :auto_increment=>false).should == false
+    m.call(:primary_key=>false).should == false
   end
 end
 

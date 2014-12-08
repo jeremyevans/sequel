@@ -1035,12 +1035,6 @@ module Sequel
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
       end
 
-      # PostgreSQL's autoincrementing primary keys are of type integer or bigint
-      # using a nextval function call as a default.
-      def schema_autoincrementing_primary_key?(schema)
-        super && schema[:default] =~ /\Anextval/io
-      end
-
       # Recognize PostgreSQL interval type.
       def schema_column_type(db_type)
         case db_type
@@ -1086,6 +1080,9 @@ module Sequel
             row.delete(:db_base_type)
           end
           row[:type] = schema_column_type(row[:db_type])
+          if row[:primary_key]
+            row[:auto_increment] = !!(row[:default] =~ /\Anextval/io)
+          end
           [m.call(row.delete(:name)), row]
         end
       end
