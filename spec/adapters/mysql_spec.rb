@@ -71,11 +71,11 @@ describe "MySQL", '#create_table' do
 
   specify "should include an :auto_increment schema attribute if auto incrementing" do
     @db.create_table(:dolls) do
+      primary_key :n4
       Integer :n2
       String :n3
-      Integer :n4, :auto_increment=>true, :unique=>true
     end
-    @db.schema(:dolls).map{|k, v| v[:auto_increment]}.should == [nil, nil, true]
+    @db.schema(:dolls).map{|k, v| v[:auto_increment]}.should == [true, nil, nil]
   end
 
   specify "should support collate with various other column options" do
@@ -105,9 +105,9 @@ if [:mysql, :mysql2].include?(DB.adapter_scheme)
     end
 
     specify "should consider tinyint(1) datatypes as boolean if set, but not larger tinyints" do
-      @db.schema(:booltest, :reload=>true).should == [[:b, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(1)"}, ], [:i, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}, ]]
+      @db.schema(:booltest, :reload=>true).map{|_, s| s[:type]}.should == [:boolean, :integer]
       @db.convert_tinyint_to_bool = false
-      @db.schema(:booltest, :reload=>true).should == [[:b, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(1)"}, ], [:i, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}, ]]
+      @db.schema(:booltest, :reload=>true).map{|_, s| s[:type]}.should == [:integer, :integer]
     end
 
     specify "should return tinyint(1)s as bools and tinyint(4)s as integers when set" do

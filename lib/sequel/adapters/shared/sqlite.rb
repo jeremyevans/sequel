@@ -282,6 +282,11 @@ module Sequel
         end
       end
 
+      # SQLite does not need to specify AUTOINCREMENT, integer primary keys are automatically auto incrementing.
+      def auto_increment_sql
+        ''
+      end
+
       def begin_new_transaction(conn, opts)
         mode = opts[:mode] || @transaction_mode
         sql = TRANSACTION_MODE[mode] or raise Error, "transaction :mode must be one of: :deferred, :immediate, :exclusive, nil"

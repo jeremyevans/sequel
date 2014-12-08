@@ -252,9 +252,7 @@ describe "A PostgreSQL database" do
   end
 
   specify "should correctly parse the schema" do
-    @db.schema(:public__testfk, :reload=>true).should == [
-      [:id, {:type=>:integer, :ruby_default=>nil, :db_type=>"integer", :default=>"nextval('testfk_id_seq'::regclass)", :oid=>23, :primary_key=>true, :allow_null=>false}],
-      [:i, {:type=>:integer, :ruby_default=>nil, :db_type=>"integer", :default=>nil, :oid=>23, :primary_key=>false, :allow_null=>true}]]
+    @db.schema(:public__testfk, :reload=>true).map{|c,s| [c, s[:oid]]}.should == [[:id, 23], [:i, 23]]
   end
 
   specify "should parse foreign keys for tables in a schema" do
@@ -300,7 +298,7 @@ describe "A PostgreSQL database with domain types" do
   specify "should correctly parse the schema" do
     sch = @db.schema(:testfk, :reload=>true)
     sch.first.last.delete(:domain_oid).should be_a_kind_of(Integer)
-    sch.should == [[:id, {:type=>:decimal, :ruby_default=>nil, :db_type=>"numeric(10,2)", :default=>nil, :oid=>1700, :primary_key=>true, :allow_null=>false, :db_domain_type=>'positive_number'}]]
+    sch.first.last[:db_domain_type].should == 'positive_number'
   end
 end
 
