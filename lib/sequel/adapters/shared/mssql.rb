@@ -428,7 +428,7 @@ module Sequel
         m = output_identifier_meth(opts[:dataset])
         m2 = input_identifier_meth(opts[:dataset])
         tn = m2.call(table_name.to_s)
-        table_id = get{object_id(tn)}
+        table_id = get(Sequel.function(:object_id, tn))
         info_sch_sch = opts[:information_schema_schema]
         inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel.expr(s)}
         sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel.expr(s)}
