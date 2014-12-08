@@ -40,7 +40,10 @@ module Sequel
               column[:db_type] << "(#{column[:longlength]},#{column[:scale]})"
             end
             column[:allow_null]  = column.delete(:nulls) == 'Y'
-            column[:primary_key] = column.delete(:identity) == 'Y' || !column[:keyseq].nil?
+            identity = column.delete(:identity) == 'Y'
+            if column[:primary_key] = identity || !column[:keyseq].nil?
+              column[:auto_increment] = identity
+            end
             column[:type]        = schema_column_type(column[:db_type])
             column[:max_length]  = column[:longlength] if column[:type] == :string
             [ m.call(column.delete(:name)), column]
