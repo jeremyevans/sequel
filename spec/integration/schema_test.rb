@@ -88,7 +88,7 @@ describe "Database schema parser" do
     DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number1, :number2]
   end
 
-  cspecify "should parse autoincrementing primary keys from the schema properly", :sqlite, :oracle do
+  cspecify "should parse autoincrementing primary keys from the schema properly", :sqlite, :oracle, :fdbsql do
     DB.create_table!(:items){Integer :number}
     DB.schema(:items).collect{|k,v| k if v[:primary_key] && v[:auto_increment]}.compact.should == []
     DB.create_table!(:items){primary_key :number}
