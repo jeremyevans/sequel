@@ -157,11 +157,19 @@ module Sequel
 
       cols = schema_parse_table(table_name, opts)
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
+
+      primary_keys = 0
+      auto_increment_set = false
+      cols.all? do |_,c|
+        auto_increment_set = true if c.has_key?(:auto_increment)
+        primary_keys += 1 if c[:primary_key]
+      end
+
       cols.each do |_,c|
         c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])
-        if c[:primary_key] && !c.has_key?(:auto_increment)
+        if c[:primary_key] && !auto_increment_set
           # If adapter didn't set it, assume that integer primary keys are auto incrementing
-          c[:auto_increment] = !!(c[:db_type] =~ /int/io)
+          c[:auto_increment] = primary_keys == 1 && !!(c[:db_type] =~ /int/io)
         end
         if !c[:max_length] && c[:type] == :string && (max_length = column_schema_max_length(c[:db_type]))
           c[:max_length] = max_length

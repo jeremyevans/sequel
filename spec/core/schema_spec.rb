@@ -1544,6 +1544,27 @@ describe "Schema Parser" do
     @sqls.should == ['x', 'x']
   end
 
+  specify "should set :auto_increment to true by default if unset and a single integer primary key is used" do
+    meta_def(@db, :schema_parse_table){|*| [[:a, {:primary_key=>true, :db_type=>'integer'}]]}
+    @db.schema(:x).first.last[:auto_increment].should == true
+  end
+
+  specify "should not set :auto_increment if already set" do
+    meta_def(@db, :schema_parse_table){|*| [[:a, {:primary_key=>true, :db_type=>'integer', :auto_increment=>false}]]}
+    @db.schema(:x).first.last[:auto_increment].should == false
+  end
+
+  specify "should set :auto_increment to false by default if unset and a single nonintegery primary key is used" do
+    meta_def(@db, :schema_parse_table){|*| [[:a, {:primary_key=>true, :db_type=>'varchar'}]]}
+    @db.schema(:x).first.last[:auto_increment].should == false
+  end
+
+  specify "should set :auto_increment to false by default if unset and a composite primary key" do
+    meta_def(@db, :schema_parse_table){|*| [[:a, {:primary_key=>true, :db_type=>'integer'}], [:b, {:primary_key=>true, :db_type=>'integer'}]]}
+    @db.schema(:x).first.last[:auto_increment].should == false
+    @db.schema(:x).last.last[:auto_increment].should == false
+  end
+
   specify "should convert various types of table name arguments" do
     meta_def(@db, :schema_parse_table) do |t, opts|
       [[t, opts]]
