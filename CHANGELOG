@@ -1,5 +1,7 @@
 === HEAD
 
+* Treat all PG::ConnectionBad exceptions as disconnect errors in the postgres adapter (jeremyevans)
+
 * Add :auto_increment key to schema information for primary key columns (jeremyevans) (#919)
 
 * Fix handling of schema qualified tables in many_through_many associations (jeremyevans)

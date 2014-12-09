@@ -108,13 +108,24 @@ module Sequel
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
+      # The underlying exception classes to reraise as disconnect errors
+      # instead of regular database errors.
+      DISCONNECT_ERROR_CLASSES = [IOError, Errno::EPIPE, Errno::ECONNRESET]
+      if defined?(::PG::ConnectionBad)
+        DISCONNECT_ERROR_CLASSES << ::PG::ConnectionBad
+      end
+      
       disconnect_errors = [
         'could not receive data from server',
         'no connection to the server',
         'connection not open',
         'terminating connection due to administrator command',
-        'PQconsumeInput() SSL SYSCALL error'
+        'PQconsumeInput() '
        ]
+
+      # Since exception class based disconnect checking may not work,
+      # also trying parsing the exception message to look for disconnect
+      # errors.
       DISCONNECT_ERROR_RE = /\A#{Regexp.union(disconnect_errors)}/
       
       self.translate_results = false if respond_to?(:translate_results=)
@@ -124,11 +135,15 @@ module Sequel
       # are SQL strings.
       attr_reader(:prepared_statements) if SEQUEL_POSTGRES_USES_PG
       
-      # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and
-      # the connection status cannot be determined or it is not OK.
+      # Raise a Sequel::DatabaseDisconnectError if a one of the disconnect
+      # error classes is raised, or a PGError is raised and the connection
+      # status cannot be determined or it is not OK.
       def check_disconnect_errors
         begin
           yield
+        rescue *DISCONNECT_ERROR_CLASSES => e
+          disconnect = true
+          raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
         rescue PGError => e
           disconnect = false
           begin
@@ -140,9 +155,6 @@ module Sequel
           disconnect ||= !status_ok
           disconnect ||= e.message =~ DISCONNECT_ERROR_RE
           disconnect ? raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)) : raise
-        rescue IOError, Errno::EPIPE, Errno::ECONNRESET => e
-          disconnect = true
-          raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
         ensure
           block if status_ok && !disconnect
         end
