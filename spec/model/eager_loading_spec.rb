@@ -538,6 +538,21 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
+  it "should respect :eager with cascaded hash when lazily loading an association" do
+    EagerBand.one_to_many :albums, :eager=>{:tracks=>:album}, :clone=>:albums
+    a = EagerBand.all
+    a.should == [EagerBand.load(:id=>2)]
+    DB.sqls.should == ['SELECT * FROM bands']
+    a = a.first.albums
+    DB.sqls.should == ['SELECT * FROM albums WHERE (albums.band_id = 2)',
+      'SELECT * FROM tracks WHERE (tracks.album_id IN (1))',
+      'SELECT * FROM albums WHERE (albums.id IN (1))']
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    a.first.tracks.should == [EagerTrack.load(:id => 3, :album_id => 1)]
+    a.first.tracks.first.album.should == a.first
+    DB.sqls.should == []
+  end
+  
   it "should cascade eagerly loading when the :eager_graph association option is used" do
     EagerAlbum.dataset._fetch = {:id=>1, :band_id=>2, :tracks_id=>3, :album_id=>1}
     a = EagerBand.eager(:graph_albums).all

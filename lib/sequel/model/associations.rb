@@ -75,7 +75,7 @@ module Sequel
           ds = ds.order(*self[:order]) if self[:order]
           ds = ds.limit(*self[:limit]) if self[:limit]
           ds = ds.limit(1) if limit_to_single_row?
-          ds = ds.eager(*self[:eager]) if self[:eager]
+          ds = ds.eager(self[:eager]) if self[:eager]
           ds = ds.distinct if self[:distinct]
           ds
         end
