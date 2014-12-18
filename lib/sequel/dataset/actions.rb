@@ -146,7 +146,8 @@ module Sequel
     #   DB[:table].empty? # SELECT 1 AS one FROM table LIMIT 1
     #   # => false
     def empty?
-      get(Sequel::SQL::AliasedExpression.new(1, :one)).nil?
+      ds = @opts[:order] ? unordered : self
+      ds.get(Sequel::SQL::AliasedExpression.new(1, :one)).nil?
     end
 
     # If a integer argument is given, it is interpreted as a limit, and then returns all 

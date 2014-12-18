@@ -1952,6 +1952,15 @@ describe "Dataset#empty?" do
     db.from(:test).filter(false).should be_empty
     db.sqls.should == ["SELECT 1 AS one FROM test WHERE 'f' LIMIT 1"]
   end
+
+  specify "should ignore order" do
+    db = Sequel.mock(:fetch=>proc{|sql| {1=>1}})
+    db.from(:test).should_not be_empty
+    without_order = db.sqls
+    db.from(:test).order(:the_order_column).should_not be_empty
+    with_order = db.sqls
+    without_order.should == with_order
+  end
 end
 
 describe "Dataset#first_source_alias" do
