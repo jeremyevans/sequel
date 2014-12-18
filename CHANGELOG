@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#empty? work when the dataset is ordered by a non-column expression (pete) (#923)
+
 * Fix passing a hash value to :eager association option (jeremyevans)
 
 * Treat all PG::ConnectionBad exceptions as disconnect errors in the postgres adapter (jeremyevans)
