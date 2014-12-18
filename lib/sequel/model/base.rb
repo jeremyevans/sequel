@@ -1144,12 +1144,10 @@ module Sequel
       alias to_hash values
 
       # Creates new instance and passes the given values to set.
-      # If a block is given, yield the instance to the block unless
-      # from_db is true.
+      # If a block is given, yield the instance to the block.
       #
       # Arguments:
       # values :: should be a hash to pass to set. 
-      # from_db :: only for backwards compatibility, forget it exists.
       #
       #   Artist.new(:name=>'Bob')
       #
