@@ -323,7 +323,7 @@ module Sequel
       #
       #   add_constraint(:valid_name, Sequel.like(:name, 'A%'))
       #   # ADD CONSTRAINT valid_name CHECK (name LIKE 'A%' ESCAPE '\')
-      #   add_constraint({:name=>:valid_name, :deferrable=>true}, :num=>1..5)
+      #   add_constraint({:name=>:valid_name, :deferrable=>true}, Sequel.like(:name, 'A%'))
       #   # ADD CONSTRAINT valid_name CHECK (name LIKE 'A%' ESCAPE '\') DEFERRABLE INITIALLY DEFERRED
       def add_constraint(name, *args, &block)
         opts = name.is_a?(Hash) ? name : {:name=>name}
