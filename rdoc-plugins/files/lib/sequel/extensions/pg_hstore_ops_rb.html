@@ -55,14 +55,16 @@
             
             <pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">hstore_column</span>)</pre>
             
-            <p>Also, on most Sequel expression objects, you can call the hstore  method:</p>
+            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
+            expression objects, you can call the hstore  method:</p>
             
             <pre class="ruby"><span class="ruby-identifier">h</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">hstore_column</span>).<span class="ruby-identifier">hstore</span></pre>
             
             <p>If you have loaded the <a
             href="../../../doc/core_extensions_rdoc.html">core_extensions
             extension</a>, or you have loaded the core_refinements extension and have
-            activated refinements for the file, you can also use Symbol#hstore:</p>
+            activated refinements for the file, you can also use <a
+            href="../../../../classes/Sequel/Postgres/HStoreOpMethods.html#method-i-hstore">Sequel::Postgres::HStoreOpMethods#hstore</a>:</p>
             
             <pre class="ruby"><span class="ruby-identifier">h</span> = :<span class="ruby-identifier">hstore_column</span>.<span class="ruby-identifier">hstore</span></pre>
             

@@ -38,12 +38,12 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Migrations">Migrations<span><a href="#label-Migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Migrations">Migrations<span><a href="#label-Migrations">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>This guide is based on <a
             href="http://guides.rubyonrails.org/migrations.html">guides.rubyonrails.org/migrations.html</a></p>
             
-            <h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Overview">Overview<span><a href="#label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Migrations make it easy to alter your database&#39;s schema in a systematic
             manner. They make it easier to coordinate with other developers and make
@@ -72,7 +72,7 @@
             href="schema_modification_rdoc.html">schema modification guide</a> for
             details on the schema modification methods you can use.</p>
             
-            <h2 id="label-A+Basic+Migration">A Basic Migration<span><a href="#label-A+Basic+Migration">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-A+Basic+Migration">A Basic Migration<span><a href="#label-A+Basic+Migration">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Here is a fairly basic <a href="../../classes/Sequel.html">Sequel</a>
             migration:</p>
@@ -175,7 +175,7 @@
             often not caught until much later, such as when a new developer joins the
             team and wants to run all migrations to create their development database.</p>
             
-            <h2 id="label-The+migration+extension">The <code>migration</code> extension<span><a href="#label-The+migration+extension">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-The+migration+extension">The <code>migration</code> extension<span><a href="#label-The+migration+extension">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The migration code is not technically part of the core of <a
             href="../../classes/Sequel.html">Sequel</a>.  It&#39;s not loaded by
@@ -189,7 +189,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">migration</span></pre>
             
-            <h2 id="label-Schema+methods">Schema methods<span><a href="#label-Schema+methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Schema+methods">Schema methods<span><a href="#label-Schema+methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Migrations themselves do not contain any schema modification methods, but
             they make it easy to call any of the <code>Sequel::Database</code>
@@ -235,7 +235,7 @@
             called on the <code>Database</code> object, which just executes the code on
             the underlying database.</p>
             
-            <h2 id="label-Errors+when+running+migrations">Errors when running migrations<span><a href="#label-Errors+when+running+migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Errors+when+running+migrations">Errors when running migrations<span><a href="#label-Errors+when+running+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> attempts to run migrations
             inside of a transaction if the database supports transactional DDL
@@ -247,7 +247,7 @@
             <p>It&#39;s recommended to always run migrations on a test database and ensure
             they work before running them on any production database.</p>
             
-            <h2 id="label-Transactions">Transactions<span><a href="#label-Transactions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Transactions">Transactions<span><a href="#label-Transactions">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>You can manually specify to use transactions on a per migration basis.  For
             example, if you want to force transaction use for a particular migration,
@@ -271,7 +271,7 @@
             
             <pre class="ruby"><span class="ruby-comment"># Force transaction use</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;/path/to/migrations/dir&#39;</span>, :<span class="ruby-identifier">use_transactions=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;&#x000A;<span class="ruby-comment"># Disable use of transactions</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;/path/to/migrations/dir&#39;</span>, :<span class="ruby-identifier">use_transactions=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>)</pre>
             
-            <h2 id="label-Migration+files">Migration files<span><a href="#label-Migration+files">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Migration+files">Migration files<span><a href="#label-Migration+files">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>While you can create migration objects yourself and apply them manually,
             most of the benefit to using migrations come from using Sequel&#39;s
@@ -287,13 +287,13 @@
             directory, and run unapplied migrations on the PostgreSQL database
             sequel_test running on localhost.</p>
             
-            <h2 id="label-Two+separate+migrators">Two separate migrators<span><a href="#label-Two+separate+migrators">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Two+separate+migrators">Two separate migrators<span><a href="#label-Two+separate+migrators">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> actually ships with two
             separate migrators.  One is the <code>IntegerMigrator</code>, the other is
             the <code>TimestampMigrator</code>.  They both have plusses and minuses:</p>
             
-            <h3 id="label-IntegerMigrator"><code>IntegerMigrator</code><span><a href="#label-IntegerMigrator">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-IntegerMigrator"><code>IntegerMigrator</code><span><a href="#label-IntegerMigrator">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
             <p>Simpler, uses migration versions starting with 1</p>
             </li><li>
@@ -310,7 +310,7 @@
             <p>Requires manual merging of simultaneous migrations</p>
             </li></ul>
             
-            <h3 id="label-TimeStampMigrator"><code>TimeStampMigrator</code><span><a href="#label-TimeStampMigrator">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-TimeStampMigrator"><code>TimeStampMigrator</code><span><a href="#label-TimeStampMigrator">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
             <p>More complex, use migration versions where the version should represent a
             timestamp</p>
@@ -330,7 +330,7 @@
             <p>Does not require manual merging of simultaneous migrations</p>
             </li></ul>
             
-            <h3 id="label-Filenames">Filenames<span><a href="#label-Filenames">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Filenames">Filenames<span><a href="#label-Filenames">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>In order for migration files to work with the <a
             href="../../classes/Sequel.html">Sequel</a>, they must be specified as
@@ -343,7 +343,7 @@
             migration class should contain 1 and only 1 call to
             <code>Sequel.migration</code>.</p>
             
-            <h3 id="label-IntegerMigrator+Filenames"><code>IntegerMigrator</code> Filenames<span><a href="#label-IntegerMigrator+Filenames">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-IntegerMigrator+Filenames"><code>IntegerMigrator</code> Filenames<span><a href="#label-IntegerMigrator+Filenames">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>These are valid migration names for the <code>IntegerMigrator</code>:</p>
             
@@ -367,7 +367,7 @@
             
             <pre>sequel -m db/migrations -M 0 postgres://localhost/sequel_test</pre>
             
-            <h3 id="label-TimestampMigrator+Filenames"><code>TimestampMigrator</code> Filenames<span><a href="#label-TimestampMigrator+Filenames">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-TimestampMigrator+Filenames"><code>TimestampMigrator</code> Filenames<span><a href="#label-TimestampMigrator+Filenames">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>With the <code>TimestampMigrator</code>, the version integer should
             represent a timestamp, though this isn&#39;t strictly required.</p>
@@ -389,7 +389,7 @@
             <p>You can force the use of the <code>TimestampMigrator</code> in the API by
             calling TimestampMigrator.apply instead of Migrator.apply.</p>
             
-            <h3 id="label-How+to+choose">How to choose<span><a href="#label-How+to+choose">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-How+to+choose">How to choose<span><a href="#label-How+to+choose">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Basically, unless you need the features provided by the
             <code>TimestampMigrator</code>, stick with the
@@ -432,7 +432,7 @@
             related schema changes by separate developers are unlikely, but you should
             give it some thought before using it.</p>
             
-            <h2 id="label-Ignoring+missing+migrations">Ignoring missing migrations<span><a href="#label-Ignoring+missing+migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Ignoring+missing+migrations">Ignoring missing migrations<span><a href="#label-Ignoring+missing+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>In some cases, you may want to allow a migration in the database that does
             not exist in the filesystem (deploying to an older version of code without
@@ -440,7 +440,7 @@
             required, you can pass <code>:allow_missing_migration_files =&gt;&#x000A;true</code> as an option. This will stop errors from being raised if there
             are migrations in the database that do not exist in the filesystem.</p>
             
-            <h2 id="label-Modifying+existing+migrations">Modifying existing migrations<span><a href="#label-Modifying+existing+migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Modifying+existing+migrations">Modifying existing migrations<span><a href="#label-Modifying+existing+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Just don&#39;t do it.</p>
             
@@ -456,7 +456,7 @@
             modified.  If you are a single developer, that may be an option, but
             certainly if you have multiple developers, it&#39;s a lot more work.</p>
             
-            <h2 id="label-Creating+a+migration">Creating a migration<span><a href="#label-Creating+a+migration">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Creating+a+migration">Creating a migration<span><a href="#label-Creating+a+migration">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> doesn&#39;t come with
             generators that create migrations for you.  However, creating a migration
@@ -477,7 +477,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span>{}&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h2 id="label-What+to+put+in+your+migration%27s+down+block">What to put in your migration&#39;s <code>down</code> block<span><a href="#label-What+to+put+in+your+migration%27s+down+block">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-What+to+put+in+your+migration-27s+down+block">What to put in your migration&#39;s <code>down</code> block<span><a href="#label-What+to+put+in+your+migration-27s+down+block">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>It&#39;s usually easy to determine what you should put in your
             migration&#39;s <code>up</code> block, as it&#39;s whatever change you want
@@ -498,7 +498,7 @@
             your <code>down</code> block raise a <code>Sequel::Error</code> exception
             saying why the migration cannot be reverted.</p>
             
-            <h2 id="label-Running+migrations">Running migrations<span><a href="#label-Running+migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Running+migrations">Running migrations<span><a href="#label-Running+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>You can run migrations using the <code>sequel</code> command line program
             that comes with <a href="../../classes/Sequel.html">Sequel</a>.  If you use
@@ -523,7 +523,7 @@
             be migrated down, while unapplied migrations less than or equal to that
             version will be migrated up.</p>
             
-            <h2 id="label-Running+migrations+from+a+Rake+task">Running migrations from a Rake task<span><a href="#label-Running+migrations+from+a+Rake+task">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Running+migrations+from+a+Rake+task">Running migrations from a Rake task<span><a href="#label-Running+migrations+from+a+Rake+task">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>You can also incorporate migrations into a Rakefile. Here&#39;s an example
             using integer migration versions.</p>
@@ -539,7 +539,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">rake</span> <span class="ruby-identifier">db</span>:<span class="ruby-identifier">migrate</span>[<span class="ruby-value">42</span>]</pre>
             
-            <h2 id="label-Verbose+migrations">Verbose migrations<span><a href="#label-Verbose+migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Verbose+migrations">Verbose migrations<span><a href="#label-Verbose+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>By default, <code>sequel -m</code> operates as a well behaved command line
             utility should, printing out nothing if there is no error.  If you want to
@@ -549,7 +549,7 @@
             <code>STDOUT</code>.  You can also log that same output to a file using the
             <code>-l</code> option with a log file name.</p>
             
-            <h2 id="label-Using+models+in+your+migrations">Using models in your migrations<span><a href="#label-Using+models+in+your+migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Using+models+in+your+migrations">Using models in your migrations<span><a href="#label-Using+models+in+your+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Just don&#39;t do it.</p>
             
@@ -565,7 +565,7 @@
             method into a migration itself, it&#39;s better than having your migration
             use models and call model methods.</p>
             
-            <h2 id="label-Dumping+the+current+schema+as+a+migration">Dumping the current schema as a migration<span><a href="#label-Dumping+the+current+schema+as+a+migration">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Dumping+the+current+schema+as+a+migration">Dumping the current schema as a migration<span><a href="#label-Dumping+the+current+schema+as+a+migration">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> comes with a
             <code>schema_dumper</code> extension that dumps the current schema of the
@@ -600,7 +600,7 @@
             
             <pre>sequel -m db/migrations postgres://host/database</pre>
             
-            <h2 id="label-Checking+for+Current+Migrations">Checking for Current Migrations<span><a href="#label-Checking+for+Current+Migrations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Checking+for+Current+Migrations">Checking for Current Migrations<span><a href="#label-Checking+for+Current+Migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>In your application code, you may want to check that you are up to date in
             regards to migrations (i.e. you don&#39;t have any unapplied migrations). 
@@ -621,7 +621,7 @@
             <p>This will cause your application to raise an error when you start it if you
             have any outstanding migrations.</p>
             
-            <h2 id="label-Old-style+migration+classes">Old-style migration classes<span><a href="#label-Old-style+migration+classes">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Old-style+migration+classes">Old-style migration classes<span><a href="#label-Old-style+migration+classes">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Before the <code>Sequel.migration</code> DSL was introduced, <a
             href="../../classes/Sequel.html">Sequel</a> used classes for Migrations:</p>

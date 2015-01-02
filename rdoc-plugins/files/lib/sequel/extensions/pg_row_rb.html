@@ -38,8 +38,9 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The pg_row extension adds support for Sequel to handle PostgreSQL&#39;s
-            row-valued/composite types.</p>
+            <p>The pg_row extension adds support for <a
+            href="../../../../classes/Sequel.html">Sequel</a> to handle
+            PostgreSQL&#39;s row-valued/composite types.</p>
             
             <p>This extension integrates with Sequel&#39;s native postgres and
             jdbc/postgresql adapters, so that when composite fields are retrieved, they
@@ -51,14 +52,15 @@
             hash or array, but not completely (is_a?(Hash) and is_a?(Array) are false).
             If you want the actual hash for a HashRow, call HashRow#to_hash, and if you
             want the actual array for an ArrayRow, call ArrayRow#to_a.  This is done so
-            that Sequel does not treat a values like an <a
-            href="../../../../classes/Array.html">Array</a> or <a
+            that <a href="../../../../classes/Sequel.html">Sequel</a> does not treat a
+            values like an <a href="../../../../classes/Array.html">Array</a> or <a
             href="../../../../classes/Hash.html">Hash</a> by default, which would cause
             issues.</p>
             
             <p>In addition to the parsers, this extension comes with literalizers for
-            HashRow and ArrayRow using the standard Sequel literalization callbacks, so
-            they work with on all adapters.</p>
+            HashRow and ArrayRow using the standard <a
+            href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
+            so they work with on all adapters.</p>
             
             <p>The first thing you are going to want to do is to load the extension into
             your Database object.  Make sure you load the :pg_array extension first if
@@ -85,12 +87,14 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_row_type</span>(:<span class="ruby-identifier">foo</span>)</pre>
             
-            <p>When you register the row type, Sequel will query the PostgreSQL system
-            tables to find the related metadata, and will setup a custom HashRow
+            <p>When you register the row type, <a
+            href="../../../../classes/Sequel.html">Sequel</a> will query the PostgreSQL
+            system tables to find the related metadata, and will setup a custom HashRow
             subclass for that type.  This includes looking up conversion procs for each
             column in the type, so that when the composite type is returned from the
             database, the members of the type have the correct type.  Additionally, if
-            the composite type also has an array form, Sequel registers an array type
+            the composite type also has an array form, <a
+            href="../../../../classes/Sequel.html">Sequel</a> registers an array type
             for the composite type, so that array columns of the composite type are
             converted correctly.</p>
             

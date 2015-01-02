@@ -41,10 +41,100 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p><a href="Dataset.html">Dataset</a> class for <a
+            href="../AS400.html">AS400</a> datasets accessed via <a
+            href="../../JDBC.html">JDBC</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-select_limit_sql">select_limit_sql</a></li>
+              <li><a target="docwin" href="#method-i-supports_window_functions-3F">supports_window_functions?</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../../EmulateOffsetWithRowNumber.html">EmulateOffsetWithRowNumber</a></li>
+              </ol>
+            </div>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FETCH_FIRST</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" FETCH FIRST ".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FETCH_FIRST_ROW_ONLY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" FETCH FIRST ROW ONLY".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ROWS_ONLY</td>
+                    <td>=</td>
+                    <td class='context-item-value'>" ROWS ONLY".freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>WILDCARD</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Sequel::LiteralString.new('*').freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-select_limit_sql'>
+                <a name='method-i-select_limit_sql'></a>
+                <div class='synopsis'>
+                  <span class='name'>select_limit_sql</span>
+                  <span class='arguments'>(sql)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Modify the sql to limit the number of rows returned</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-select_limit_sql-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-select_limit_sql-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">select_limit_sql</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">l</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>]&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">l</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">FETCH_FIRST_ROW_ONLY</span>&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">l</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">FETCH_FIRST</span>&#x000A;      <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">l</span>)&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">ROWS_ONLY</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
+                <a name='method-i-supports_window_functions-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>supports_window_functions?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_window_functions-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-supports_window_functions-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_window_functions?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

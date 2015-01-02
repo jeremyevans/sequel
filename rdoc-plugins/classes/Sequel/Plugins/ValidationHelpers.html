@@ -62,15 +62,18 @@
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">blank</span></pre>
             </td></tr><tr><td class='label'>:allow_missing </td><td>
             <p>Whether to skip the validation if the attribute isn&#39;t a key in the
-            values hash.  This is different from allow_nil, because Sequel only sends
-            the attributes in the values when doing an insert or update.  If the
-            attribute is not present, Sequel doesn&#39;t specify it, so the database
+            values hash.  This is different from allow_nil, because <a
+            href="../../Sequel.html">Sequel</a> only sends the attributes in the values
+            when doing an insert or update.  If the attribute is not present, <a
+            href="../../Sequel.html">Sequel</a> doesn&#39;t specify it, so the database
             will use the table&#39;s default value.  This is different from having an
-            attribute in values with a value of nil, which Sequel will send as NULL. If
-            your database table has a non NULL default, this may be a good option to
-            use.  You don&#39;t want to use allow_nil, because if the attribute is in
-            values but has a value nil, Sequel will attempt to insert a NULL value into
-            the database, instead of using the database&#39;s default.</p>
+            attribute in values with a value of nil, which <a
+            href="../../Sequel.html">Sequel</a> will send as NULL. If your database
+            table has a non NULL default, this may be a good option to use.  You
+            don&#39;t want to use allow_nil, because if the attribute is in values but
+            has a value nil, <a href="../../Sequel.html">Sequel</a> will attempt to
+            insert a NULL value into the database, instead of using the database&#39;s
+            default.</p>
             </td></tr><tr><td class='label'>:allow_nil </td><td>
             <p>Whether to skip the validation if the value is nil.</p>
             </td></tr><tr><td class='label'>:message </td><td>
@@ -134,10 +137,10 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>Default validation options used by Sequel.  Can be modified to change the
-                      error messages for all models (e.g. for internationalization), or to set
-                      certain default options for validations (e.g. :allow_nil=&gt;true for all
-                      validates_format).</p>
+                      <p>Default validation options used by <a href="../../Sequel.html">Sequel</a>. 
+                      Can be modified to change the error messages for all models (e.g. for
+                      internationalization), or to set certain default options for validations
+                      (e.g. :allow_nil=&gt;true for all validates_format).</p>
                     </td>
                   </tr>
                 </table>

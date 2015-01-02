@@ -41,10 +41,143 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>The migrator used if any migration file version appears to be a timestamp.
+            Stores filenames of migration files, and can figure out which migrations
+            have not been applied and apply them, even if earlier migrations are added
+            after later migrations.  If you plan to do that, the responsibility is on
+            you to make sure the migrations don&#39;t conflict. Part of the
+            <code>migration</code> extension.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-applied_migrations">applied_migrations</a></li>
+              <li><a target="docwin" href="#method-i-is_current-3F">is_current?</a></li>
+              <li><a target="docwin" href="#attribute-i-migration_tuples">migration_tuples</a></li>
+              <li><a target="docwin" href="#method-i-run">run</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_SCHEMA_COLUMN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>:filename</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_SCHEMA_TABLE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>:schema_migrations</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>Error</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Migrator::Error</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-applied_migrations'>applied_migrations</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="../Array.html">Array</a> of strings of applied migration filenames</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-migration_tuples'>migration_tuples</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Get tuples of migrations, filenames, and actions for each migration</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(db, directory, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Set up all state for the migrator instance</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 631</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@target</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:target</span>]&#x000A;  <span class="ruby-ivar">@applied_migrations</span> = <span class="ruby-identifier">get_applied_migrations</span>&#x000A;  <span class="ruby-ivar">@migration_tuples</span> = <span class="ruby-identifier">get_migration_tuples</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-is_current-3F'>
+                <a name='method-i-is_current-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>is_current?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The timestamp migrator is current if there are no migrations to apply in
+                  either direction.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-is_current-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-is_current-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 640</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">is_current?</span>&#x000A;  <span class="ruby-identifier">migration_tuples</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-run'>
+                <a name='method-i-run'></a>
+                <div class='synopsis'>
+                  <span class='name'>run</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Apply all migration tuples on the database</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-run-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-run-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 645</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">run</span>&#x000A;  <span class="ruby-identifier">migration_tuples</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span>, <span class="ruby-identifier">f</span>, <span class="ruby-identifier">direction</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">t</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Begin applying migration #{f}, direction: #{direction}&quot;</span>)&#x000A;    <span class="ruby-identifier">checked_transaction</span>(<span class="ruby-identifier">m</span>) <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">m</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)&#x000A;      <span class="ruby-identifier">fi</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">downcase</span>&#x000A;      <span class="ruby-identifier">direction</span> <span class="ruby-operator">==</span> <span class="ruby-value">:up</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">fi</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">fi</span>).<span class="ruby-identifier">delete</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">log_info</span>(<span class="ruby-node">&quot;Finished applying migration #{f}, direction: #{direction}, took #{sprintf(&#39;%0.6f&#39;, Time.now - t)} seconds&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

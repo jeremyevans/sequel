@@ -38,8 +38,9 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The pg_array extension adds support for Sequel to handle PostgreSQL&#39;s
-            array types.</p>
+            <p>The pg_array extension adds support for <a
+            href="../../../../classes/Sequel.html">Sequel</a> to handle
+            PostgreSQL&#39;s array types.</p>
             
             <p>This extension integrates with Sequel&#39;s native postgres adapter and the
             jdbc/postgresql adapter, so that when array fields are retrieved, they are
@@ -48,13 +49,15 @@
             PGArray is a DelegateClass of <a
             href="../../../../classes/Array.html">Array</a>, so it mostly acts like an
             array, but not completely (is_a?(Array) is false).  If you want the actual
-            array, you can call PGArray#to_a.  This is done so that Sequel does not
-            treat a PGArray like an <a href="../../../../classes/Array.html">Array</a>
-            by default, which would cause issues.</p>
+            array, you can call PGArray#to_a.  This is done so that <a
+            href="../../../../classes/Sequel.html">Sequel</a> does not treat a PGArray
+            like an <a href="../../../../classes/Array.html">Array</a> by default,
+            which would cause issues.</p>
             
             <p>In addition to the parsers, this extension comes with literalizers for
-            PGArray using the standard Sequel literalization callbacks, so they work
-            with on all adapters.</p>
+            PGArray using the standard <a
+            href="../../../../classes/Sequel.html">Sequel</a> literalization callbacks,
+            so they work with on all adapters.</p>
             
             <p>To turn an existing <a href="../../../../classes/Array.html">Array</a> into
             a PGArray:</p>
@@ -77,7 +80,9 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]))</pre>
             
-            <p>To use this extension, first load it into your Sequel::Database instance:</p>
+            <p>To use this extension, first load it into your <a
+            href="../../../../classes/Sequel/Database.html">Sequel::Database</a>
+            instance:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span></pre>
             

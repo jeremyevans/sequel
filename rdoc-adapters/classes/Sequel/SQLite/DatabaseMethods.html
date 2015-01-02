@@ -39,10 +39,10 @@
         <div id='text'>
           <div id='description'>
             
-            <p>No matter how you connect to SQLite, the following <a
-            href="Database.html">Database</a> options can be used to set PRAGMAs on
-            connections in a thread-safe manner: :auto_vacuum, :foreign_keys,
-            :synchronous, and :temp_store.</p>
+            <p>No matter how you connect to <a href="../SQLite.html">SQLite</a>, the
+            following <a href="Database.html">Database</a> options can be used to set
+            PRAGMAs on connections in a thread-safe manner: :auto_vacuum,
+            :foreign_keys, :synchronous, and :temp_store.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -169,8 +169,9 @@
                     <td class='context-item-value'>[RW]</td>
                     <td class='context-item-desc'>
                       
-                      <p>Whether to use integers for booleans in the database.  SQLite recommends
-                      booleans be stored as integers, but historically Sequel has used
+                      <p>Whether to use integers for booleans in the database.  <a
+                      href="../SQLite.html">SQLite</a> recommends booleans be stored as integers,
+                      but historically <a href="../../Sequel.html">Sequel</a> has used
                       &#39;t&#39;/&#39;f&#39;.</p>
                     </td>
                   </tr>
@@ -252,8 +253,8 @@
                 <div class='description'>
                   
                   <p>Set the case_sensitive_like PRAGMA using the given boolean value, if using
-                  SQLite 3.2.3+.  If not using 3.2.3+, no error is raised. See pragma_set.
-                  Consider using the :case_sensitive_like <a
+                  <a href="../SQLite.html">SQLite</a> 3.2.3+.  If not using 3.2.3+, no error
+                  is raised. See pragma_set. Consider using the :case_sensitive_like <a
                   href="Database.html">Database</a> option instead.</p>
                 </div>
                 <div class='source'>
@@ -271,7 +272,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p>SQLite uses the :sqlite database type.</p>
+                  <p><a href="../SQLite.html">SQLite</a> uses the :sqlite database type.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_type-source'); return false">
@@ -309,7 +310,7 @@
                   
                   <p>Boolean signifying the value of the <a
                   href="DatabaseMethods.html#method-i-foreign_keys">#foreign_keys</a> PRAGMA,
-                  or nil if not using SQLite 3.6.19+.</p>
+                  or nil if not using <a href="../SQLite.html">SQLite</a> 3.6.19+.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_keys-source'); return false">
@@ -328,9 +329,10 @@
                   
                   <p>Set the <a
                   href="DatabaseMethods.html#method-i-foreign_keys">#foreign_keys</a> PRAGMA
-                  using the given boolean value, if using SQLite 3.6.19+.  If not using
-                  3.6.19+, no error is raised. See pragma_set. Consider using the
-                  :foreign_keys <a href="Database.html">Database</a> option instead.</p>
+                  using the given boolean value, if using <a href="../SQLite.html">SQLite</a>
+                  3.6.19+.  If not using 3.6.19+, no error is raised. See pragma_set.
+                  Consider using the :foreign_keys <a href="Database.html">Database</a>
+                  option instead.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_keys-3D-source'); return false">
@@ -442,7 +444,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>SQLite supports CREATE TABLE IF NOT EXISTS syntax since 3.3.0.</p>
+                  <p><a href="../SQLite.html">SQLite</a> supports CREATE TABLE IF NOT EXISTS
+                  syntax since 3.3.0.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_create_table_if_not_exists-3F-source'); return false">
@@ -459,7 +462,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>SQLite 3.6.19+ supports deferrable foreign key constraints.</p>
+                  <p><a href="../SQLite.html">SQLite</a> 3.6.19+ supports deferrable foreign key
+                  constraints.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_deferrable_foreign_key_constraints-3F-source'); return false">
@@ -476,7 +480,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p>SQLite 3.8.0+ supports partial indexes.</p>
+                  <p><a href="../SQLite.html">SQLite</a> 3.8.0+ supports partial indexes.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_partial_indexes-3F-source'); return false">
@@ -493,7 +497,7 @@
                 </div>
                 <div class='description'>
                   
-                  <p>SQLite 3.6.8+ supports savepoints.</p>
+                  <p><a href="../SQLite.html">SQLite</a> 3.6.8+ supports savepoints.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_savepoints-3F-source'); return false">
@@ -623,8 +627,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>SQLite supports timezones in timestamps, since it just stores them as
-                  strings, but it breaks the usage of SQLite&#39;s datetime functions.</p>
+                  <p><a href="../SQLite.html">SQLite</a> supports timezones in timestamps, since
+                  it just stores them as strings, but it breaks the usage of SQLite&#39;s
+                  datetime functions.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-use_timestamp_timezones-3F-source'); return false">

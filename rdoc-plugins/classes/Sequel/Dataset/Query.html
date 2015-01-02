@@ -41,10 +41,79 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>Proxy object used by Dataset#query.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-dataset">dataset</a></li>
+              <li><a target="docwin" href="#method-i-method_missing">method_missing</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-dataset'>dataset</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The current dataset in the query.  This changes on each method call.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(dataset)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/query.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">dataset</span>)&#x000A;  <span class="ruby-ivar">@dataset</span> = <span class="ruby-identifier">dataset</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-method_missing'>
+                <a name='method-i-method_missing'></a>
+                <div class='synopsis'>
+                  <span class='name'>method_missing</span>
+                  <span class='arguments'>(method, *args, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Replace the query&#39;s dataset with dataset returned by the method call.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-method_missing-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/extensions/query.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@dataset</span> = <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;method #{method.inspect} did not return a dataset&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@dataset</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Dataset</span>)&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

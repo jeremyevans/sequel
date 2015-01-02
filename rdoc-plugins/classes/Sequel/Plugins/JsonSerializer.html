@@ -90,7 +90,7 @@
             fields, you can use the :fields option, which will call set_fields with the
             given fields:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>, :<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%wid name&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>, :<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%w&#39;id name&#39;</span>)</pre>
             
             <p>If you want to update an existing instance, you can use the from_json
             instance method:</p>
@@ -104,7 +104,7 @@
             
             <p>You can even provide options when setting up the associated objects:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">json</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%wid name&#39;</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>}})</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_json</span>(<span class="ruby-identifier">json</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%w&#39;id name&#39;</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>}})</pre>
             
             <p>Note that active_support/json makes incompatible changes to the to_json
             API, and breaks some aspects of the json_serializer plugin.  You can undo

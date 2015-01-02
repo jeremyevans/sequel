@@ -243,15 +243,15 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Registers an array type that the extension should handle.  Makes a Database
-                  instance that has been extended with <a
-                  href="PGArray/DatabaseMethods.html">DatabaseMethods</a> recognize the array
-                  type given and set up the appropriate typecasting.  Also sets up automatic
-                  typecasting for the native postgres adapter, so that on retrieval, the
-                  values are automatically converted to <a href="PGArray.html">PGArray</a>
-                  instances. The db_type argument should be the exact database type used (as
-                  returned by the PostgreSQL format_type database function).  Accepts the
-                  following options:</p>
+                  <p>Registers an array type that the extension should handle.  Makes a <a
+                  href="../Database.html">Database</a> instance that has been extended with
+                  <a href="PGArray/DatabaseMethods.html">DatabaseMethods</a> recognize the
+                  array type given and set up the appropriate typecasting.  Also sets up
+                  automatic typecasting for the native postgres adapter, so that on
+                  retrieval, the values are automatically converted to <a
+                  href="PGArray.html">PGArray</a> instances. The db_type argument should be
+                  the exact database type used (as returned by the PostgreSQL format_type
+                  database function).  Accepts the following options:</p>
                   <table class="rdoc-list note-list"><tbody><tr><td class='label'>:array_type </td><td>
                   <p>The type to automatically cast the array to when literalizing the array.
                   Usually the same as db_type.</p>
@@ -260,8 +260,9 @@
                   array (usually a string), and should return the appropriate typecasted
                   object.</p>
                   </td></tr><tr><td class='label'>:oid </td><td>
-                  <p>The PostgreSQL OID for the array type.  This is used by the Sequel postgres
-                  adapter to set up automatic type conversion on retrieval from the database.</p>
+                  <p>The PostgreSQL OID for the array type.  This is used by the <a
+                  href="../../Sequel.html">Sequel</a> postgres adapter to set up automatic
+                  type conversion on retrieval from the database.</p>
                   </td></tr><tr><td class='label'>:parser </td><td>
                   <p>Can be set to :json to use the faster JSON-based parser.  Note that the
                   JSON-based parser can only correctly handle integers values correctly.  It
@@ -283,8 +284,9 @@
                   Sequel::Postgres::PG_TYPES.</p>
                   </td></tr><tr><td class='label'>:type_symbol </td><td>
                   <p>The base of the schema type symbol for this type.  For example, if you
-                  provide :integer, Sequel will recognize this type as :integer_array during
-                  schema parsing. Defaults to the db_type argument.</p>
+                  provide :integer, <a href="../../Sequel.html">Sequel</a> will recognize
+                  this type as :integer_array during schema parsing. Defaults to the db_type
+                  argument.</p>
                   </td></tr><tr><td class='label'>:typecast_method_map </td><td>
                   <p>The map in which to place the database type string to type symbol mapping.
                   Defaults to <a href="PGArray.html#ARRAY_TYPES">ARRAY_TYPES</a>.</p>
@@ -330,8 +332,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Append the array SQL to the given sql string.  If the receiver has a type,
-                  add a cast to the database array type.</p>
+                  <p>Append the array <a href="../SQL.html">SQL</a> to the given sql string.  If
+                  the receiver has a type, add a cast to the database array type.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal_append-source'); return false">

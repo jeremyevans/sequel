@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+PostgreSQL+Extensions">New PostgreSQL Extensions<span><a href="#label-New+PostgreSQL+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-New+PostgreSQL+Extensions">New PostgreSQL Extensions<span><a href="#label-New+PostgreSQL+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>A pg_array extension has been added, supporting PostgreSQL&#39;s numeric
             and string array types.  Both single dimensional and multi-dimensional
@@ -120,7 +120,7 @@
             statements API manually.</p>
             </li></ul>
             
-            <h1 id="label-Other+New+Extensions">Other New Extensions<span><a href="#label-Other+New+Extensions">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Other+New+Extensions">Other New Extensions<span><a href="#label-Other+New+Extensions">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>A query_literals extension has been added that makes the select, group, and
             order methods operate similar to the filter methods in that if they are
@@ -172,7 +172,7 @@
             never return a row.</p>
             </li></ul>
             
-            <h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-New+Plugins">New Plugins<span><a href="#label-New+Plugins">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>A static_cache plugin has been added, allowing you to cache a model
             statically.  This plugin is useful for models whose tables do not change
@@ -200,7 +200,7 @@
             (either caching or static_cache).</p>
             </li></ul>
             
-            <h1 id="label-Core+Extension+Replacements">Core Extension Replacements<span><a href="#label-Core+Extension+Replacements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Core+Extension+Replacements">Core Extension Replacements<span><a href="#label-Core+Extension+Replacements">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Most of Sequel&#39;s core extensions now have equivalent methods defined on
             the <a href="../../../classes/Sequel.html">Sequel</a> module:</p>
@@ -232,7 +232,7 @@
             <p>Additionally, there is now direct support for creating literal strings in
             instance_evaled virtual row blocks using `:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">%xsome crazy SQL`</span>} <span class="ruby-comment"># WHERE (a &gt; some crazy SQL)</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">%x`some crazy SQL`</span>} <span class="ruby-comment"># WHERE (a &gt; some crazy SQL)</span></pre>
             
             <p>This doesn&#39;t override Kernel.`, since virtual rows use a BasicObject
             subclass.  Previously, using ` would result in calling the SQL function
@@ -257,7 +257,7 @@
             href="../../../classes/Sequel.html#method-c-core_extensions-3F">Sequel.core_extensions?</a>.</p>
             </li></ul>
             
-            <h1 id="label-Foreign+Keys+in+the+Schema+Dumper">Foreign Keys in the Schema Dumper<span><a href="#label-Foreign+Keys+in+the+Schema+Dumper">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Foreign+Keys+in+the+Schema+Dumper">Foreign Keys in the Schema Dumper<span><a href="#label-Foreign+Keys+in+the+Schema+Dumper">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Database#foreign_key_list has been added that gives an array of foreign key
             constraints on the table.  It is currently implemented on MySQL,
@@ -303,7 +303,7 @@
             copied if the source database supports Database#foreign_key_list.</p>
             </li></ul>
             
-            <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Other+New+Features">Other New Features<span><a href="#label-Other+New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset#to_hash_groups and select_hash_groups have been added. These
             methods are similar to to_hash and select_hash in that they return a hash,
@@ -426,7 +426,7 @@
             extensions to support PostgreSQL row-valued types.</p>
             </li></ul>
             
-            <h1 id="label-Performance+Improvements">Performance Improvements<span><a href="#label-Performance+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Performance+Improvements">Performance Improvements<span><a href="#label-Performance+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Model.[] when called with a primary key has been made about 110% faster for
             most models by avoiding cloning datasets.</p>
@@ -449,7 +449,7 @@
             on MRI.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Database#uri and url now return the connection string given to <a
             href="../../../classes/Sequel.html#method-c-connect">Sequel.connect</a>. 
@@ -570,7 +570,7 @@
             SEQUEL_NO_ASSOCIATIONS setting works correctly.</p>
             </li></ul>
             
-            <h1 id="label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">Deprecated Features to be Removed in <a href="../../../classes/Sequel.html">Sequel</a> 3.35.0<span><a href="#label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">Deprecated Features to be Removed in <a href="../../../classes/Sequel.html">Sequel</a> 3.35.0<span><a href="#label-Deprecated+Features+to+be+Removed+in+Sequel+3.35.0">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Ruby &lt;1.8.7 support is now deprecated.</p>
             </li><li>
@@ -588,7 +588,7 @@
             deprecated as well.</p>
             </li></ul>
             
-            <h1 id="label-Other+Backwards+Compatibility+Issues">Other Backwards Compatibility Issues<span><a href="#label-Other+Backwards+Compatibility+Issues">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Other+Backwards+Compatibility+Issues">Other Backwards Compatibility Issues<span><a href="#label-Other+Backwards+Compatibility+Issues">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>The generic Bignum type now uses bigint on SQLite, similar to other
             databases.  The integer type was previously used.  The only exception is

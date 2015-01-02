@@ -43,8 +43,9 @@
         <div id='text'>
           <div id='description'>
             
-            <p><a href="Database.html">Database</a> class for MySQL databases used with
-            Sequel.</p>
+            <p><a href="Database.html">Database</a> class for <a
+            href="../MySQL.html">MySQL</a> databases used with <a
+            href="../../Sequel.html">Sequel</a>.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -118,10 +119,10 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      <p>By default, Sequel raises an exception if in invalid date or time is used.
-                      However, if this is set to nil or :nil, the adapter treats dates like
-                      0000-00-00 and times like 838:00:00 as nil values.  If set to :string, it
-                      returns the strings as is.</p>
+                      <p>By default, <a href="../../Sequel.html">Sequel</a> raises an exception if
+                      in invalid date or time is used. However, if this is set to nil or :nil,
+                      the adapter treats dates like 0000-00-00 and times like 838:00:00 as nil
+                      values.  If set to :string, it returns the strings as is.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -150,14 +151,16 @@
                   <p>Connect to the database.  In addition to the usual database options, the
                   following options have effect:</p>
                   <table class="rdoc-list note-list"><tbody><tr><td class='label'>:auto_is_null </td><td>
-                  <p>Set to true to use MySQL default behavior of having a filter for an
-                  autoincrement column equals NULL to return the last inserted row.</p>
+                  <p>Set to true to use <a href="../MySQL.html">MySQL</a> default behavior of
+                  having a filter for an autoincrement column equals NULL to return the last
+                  inserted row.</p>
                   </td></tr><tr><td class='label'>:charset </td><td>
                   <p>Same as :encoding (:encoding takes precendence)</p>
                   </td></tr><tr><td class='label'>:compress </td><td>
                   <p>Set to false to not compress results from the server</p>
                   </td></tr><tr><td class='label'>:config_default_group </td><td>
-                  <p>The default group to read from the in the MySQL config file.</p>
+                  <p>The default group to read from the in the <a href="../MySQL.html">MySQL</a>
+                  config file.</p>
                   </td></tr><tr><td class='label'>:config_local_infile </td><td>
                   <p>If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with
                   the given value.</p>
@@ -277,7 +280,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Return the version of the MySQL server two which we are connecting.</p>
+                  <p>Return the version of the <a href="../MySQL.html">MySQL</a> server two
+                  which we are connecting.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-server_version-source'); return false">

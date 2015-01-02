@@ -85,7 +85,7 @@
             allowed fields, you can use the :fields option, which will call set_fields
             with the given fields:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>, :<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%wid name&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_xml</span>, :<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%w&#39;id name&#39;</span>)</pre>
             
             <p>If you want to update an existing instance, you can use the from_xml
             instance method:</p>
@@ -99,7 +99,7 @@
             
             <p>You can even provide options when setting up the associated objects:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%wid name&#39;</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>}})</pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">from_xml</span>(<span class="ruby-identifier">xml</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">artist=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">fields=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">%w&#39;id name&#39;</span>, :<span class="ruby-identifier">associations=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>}})</pre>
             
             <p>Usage:</p>
             

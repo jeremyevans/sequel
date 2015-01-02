@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Read-Only+Slaves%2FWritable+Master+and+Database+Sharding">Read-Only Slaves/Writable Master and Database Sharding<span><a href="#label-Read-Only+Slaves%2FWritable+Master+and+Database+Sharding">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Read-Only+Slaves-2FWritable+Master+and+Database+Sharding">Read-Only Slaves/Writable Master and Database Sharding<span><a href="#label-Read-Only+Slaves-2FWritable+Master+and+Database+Sharding">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> has support for read only
             slave databases with a writable master database, as well as database
@@ -46,7 +46,7 @@
             for both features is database independent, and should work for all database
             adapters that ship with <a href="../../classes/Sequel.html">Sequel</a>.</p>
             
-            <h2 id="label-The+%3Aservers+Database+option">The :servers Database option<span><a href="#label-The+%3Aservers+Database+option">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-The+-3Aservers+Database+option">The :servers Database option<span><a href="#label-The+-3Aservers+Database+option">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Sharding and read_only support are both enabled via the :servers database
             option.  Using the :servers database option makes <a
@@ -70,9 +70,9 @@
             <p>Note that all servers should have the same schema for all tables you are
             accessing, unless you really know what you are doing.</p>
             
-            <h2 id="label-Master+and+Slave+Database+Configurations">Master and Slave Database Configurations<span><a href="#label-Master+and+Slave+Database+Configurations">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Master+and+Slave+Database+Configurations">Master and Slave Database Configurations<span><a href="#label-Master+and+Slave+Database+Configurations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <h3 id="label-Single+Read-Only+Slave%2C+Single+Master">Single Read-Only Slave, Single Master<span><a href="#label-Single+Read-Only+Slave%2C+Single+Master">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Single+Read-Only+Slave-2C+Single+Master">Single Read-Only Slave, Single Master<span><a href="#label-Single+Read-Only+Slave-2C+Single+Master">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>To use a single, read-only slave that handles SELECT queries, the following
             is the simplest configuration:</p>
@@ -82,7 +82,7 @@
             <p>This will use the slave_server for SELECT queries and master_server for
             other queries.</p>
             
-            <h3 id="label-Multiple+Read-Only+Slaves%2C+Single+Master">Multiple Read-Only Slaves, Single Master<span><a href="#label-Multiple+Read-Only+Slaves%2C+Single+Master">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Multiple+Read-Only+Slaves-2C+Single+Master">Multiple Read-Only Slaves, Single Master<span><a href="#label-Multiple+Read-Only+Slaves-2C+Single+Master">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Let&#39;s say you have 4 slave database servers with names slave_server0,
             slave_server1, slave_server2, and slave_server3.</p>
@@ -94,7 +94,7 @@
             host instead of using the round robin approach presented above, but that
             can result in less optimal resource usage.</p>
             
-            <h3 id="label-Multiple+Read-Only+Slaves%2C+Multiple+Masters">Multiple Read-Only Slaves, Multiple Masters<span><a href="#label-Multiple+Read-Only+Slaves%2C+Multiple+Masters">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Multiple+Read-Only+Slaves-2C+Multiple+Masters">Multiple Read-Only Slaves, Multiple Masters<span><a href="#label-Multiple+Read-Only+Slaves-2C+Multiple+Masters">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>This involves the same basic idea as the multiple slaves, single master,
             but it shows that the master database is named :default.  So for 4 masters
@@ -102,7 +102,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://master_server/database&#39;</span>,    :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">read_only=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">get_slave_host</span>}},      :<span class="ruby-identifier">default=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">db</span>.<span class="ruby-identifier">get_master_host</span>}}})&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">get_slave_host</span>&#x000A;  <span class="ruby-ivar">@current_slave_host</span> <span class="ruby-operator">||=</span> <span class="ruby-value">-1</span>&#x000A;  <span class="ruby-node">&quot;slave_server#{(@current_slave_host+=1)%4}&quot;</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">DB</span>.<span class="ruby-identifier">get_master_host</span>&#x000A;  <span class="ruby-ivar">@current_master_host</span> <span class="ruby-operator">||=</span> <span class="ruby-value">-1</span>&#x000A;  <span class="ruby-node">&quot;master_server#{(@current_master_host+=1)%4}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h2 id="label-Sharding">Sharding<span><a href="#label-Sharding">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Sharding">Sharding<span><a href="#label-Sharding">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>There is specific support in <a href="../../classes/Sequel.html">Sequel</a>
             for handling master/slave database combinations, with the only necessary
@@ -164,7 +164,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">servers</span> = {:<span class="ruby-identifier">read_only</span> =<span class="ruby-operator">&gt;</span> {}}&#x000A;((<span class="ruby-string">&#39;0&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;9&#39;</span>).<span class="ruby-identifier">to_a</span> <span class="ruby-operator">+</span> (<span class="ruby-string">&#39;a&#39;</span><span class="ruby-operator">..</span><span class="ruby-string">&#39;f&#39;</span>).<span class="ruby-identifier">to_a</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">hex</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">servers</span>[<span class="ruby-identifier">hex</span>.<span class="ruby-identifier">to_sym</span>] = {:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">&quot;hash_host_#{hex}&quot;</span>}&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-constant">DB</span>=<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://hash_host/hashes&#39;</span>, :<span class="ruby-identifier">servers=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">servers</span>, &#x000A;  :<span class="ruby-identifier">servers_hash=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-constant">Exception</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&quot;Invalid Server&quot;</span>)})</pre>
             
-            <h3 id="label-Sharding+Plugin">Sharding Plugin<span><a href="#label-Sharding+Plugin">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sharding+Plugin">Sharding Plugin<span><a href="#label-Sharding+Plugin">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> comes with a sharding plugin
             that makes it easy to use sharding with model objects. It makes sure that
@@ -180,7 +180,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">sharding</span></pre>
             
-            <h3 id="label-server_block+Extension">server_block Extension<span><a href="#label-server_block+Extension">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-server_block+Extension">server_block Extension<span><a href="#label-server_block+Extension">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>By default, you must specify the server/shard you want to use for every
             dataset/action, or <a href="../../classes/Sequel.html">Sequel</a> will use
@@ -202,7 +202,7 @@
             If you need to do that, call the server method explicitly on the dataset
             used to retrieve the model objects.</p>
             
-            <h3 id="label-arbitrary_servers+Extension">arbitrary_servers Extension<span><a href="#label-arbitrary_servers+Extension">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-arbitrary_servers+Extension">arbitrary_servers Extension<span><a href="#label-arbitrary_servers+Extension">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>By default, Sequel&#39;s sharding support is designed to work with
             predefined shards.  It ships with Database#add_servers and

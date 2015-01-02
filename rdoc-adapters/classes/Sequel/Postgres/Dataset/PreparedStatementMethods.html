@@ -37,10 +37,48 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>Allow use of server side prepared statements for PostgreSQL using the pg
+            driver.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-call">call</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="BindArgumentMethods.html">BindArgumentMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-call'>
+                <a name='method-i-call'></a>
+                <div class='synopsis'>
+                  <span class='name'>call</span>
+                  <span class='arguments'>(*)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Raise a more obvious error if you attempt to call a unnamed prepared
+                  statement.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 759</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot call prepared statement without a name&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">prepared_statement_name</span>.<span class="ruby-identifier">nil?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -38,15 +38,16 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The pg_enum extension adds support for Sequel to handle PostgreSQL&#39;s
-            enum types.  To use this extension, first load it into your Database
-            instance:</p>
+            <p>The pg_enum extension adds support for <a
+            href="../../../../classes/Sequel.html">Sequel</a> to handle
+            PostgreSQL&#39;s enum types.  To use this extension, first load it into
+            your Database instance:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_enum</span></pre>
             
             <p>It allows creation of enum types using create_enum:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_enum</span>(:<span class="ruby-identifier">type_name</span>, <span class="ruby-node">%wvalue1 value2 value3&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_enum</span>(:<span class="ruby-identifier">type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)</pre>
             
             <p>You can also add values to existing enums via add_enum_value:</p>
             

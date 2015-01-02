@@ -241,7 +241,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Create an empty PGRange with the given database type.</p>
+                  <p>Create an empty <a href="PGRange.html">PGRange</a> with the given database
+                  type.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-empty-source'); return false">
@@ -258,8 +259,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Create a new PGRange instance using the beginning and ending of the ruby <a
-                  href="../../Range.html">Range</a>, with the given db_type.</p>
+                  <p>Create a new <a href="PGRange.html">PGRange</a> instance using the
+                  beginning and ending of the ruby <a href="../../Range.html">Range</a>, with
+                  the given db_type.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-from_range-source'); return false">
@@ -276,7 +278,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Initialize a new PGRange instance.  Accepts the following options:</p>
+                  <p>Initialize a new <a href="PGRange.html">PGRange</a> instance.  Accepts the
+                  following options:</p>
                   <table class="rdoc-list note-list"><tbody><tr><td class='label'>:db_type </td><td>
                   <p>The PostgreSQL database type for the range.</p>
                   </td></tr><tr><td class='label'>:empty </td><td>
@@ -302,12 +305,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Registers a range type that the extension should handle.  Makes a Database
-                  instance that has been extended with <a
-                  href="PGRange/DatabaseMethods.html">DatabaseMethods</a> recognize the range
-                  type given and set up the appropriate typecasting.  Also sets up automatic
-                  typecasting for the native postgres adapter, so that on retrieval, the
-                  values are automatically converted to PGRange instances. The <a
+                  <p>Registers a range type that the extension should handle.  Makes a <a
+                  href="../Database.html">Database</a> instance that has been extended with
+                  <a href="PGRange/DatabaseMethods.html">DatabaseMethods</a> recognize the
+                  range type given and set up the appropriate typecasting.  Also sets up
+                  automatic typecasting for the native postgres adapter, so that on
+                  retrieval, the values are automatically converted to <a
+                  href="PGRange.html">PGRange</a> instances. The <a
                   href="PGRange.html#attribute-i-db_type">#db_type</a> argument should be the
                   name of the range type. Accepts the following options:</p>
                   <table class="rdoc-list note-list"><tbody><tr><td class='label'>:converter </td><td>
@@ -315,8 +319,9 @@
                   range (usually a string), and should return the appropriate typecasted
                   object.</p>
                   </td></tr><tr><td class='label'>:oid </td><td>
-                  <p>The PostgreSQL OID for the range type.  This is used by the Sequel postgres
-                  adapter to set up automatic type conversion on retrieval from the database.</p>
+                  <p>The PostgreSQL OID for the range type.  This is used by the <a
+                  href="../../Sequel.html">Sequel</a> postgres adapter to set up automatic
+                  type conversion on retrieval from the database.</p>
                   </td></tr><tr><td class='label'>:subtype_oid </td><td>
                   <p>Should be the PostgreSQL OID for the range&#39;s subtype. If given,</p>
                   </td></tr></tbody></table>
@@ -341,8 +346,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Allow PGRange values in case statements, where they return true if they are
-                  equal to each other using eql?, or if this PGRange can be converted to a <a
+                  <p>Allow <a href="PGRange.html">PGRange</a> values in case statements, where
+                  they return true if they are equal to each other using eql?, or if this <a
+                  href="PGRange.html">PGRange</a> can be converted to a <a
                   href="../../Range.html">Range</a>, delegating to that range.</p>
                 </div>
                 <div class='source'>
@@ -379,11 +385,11 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Consider the receiver equal to other PGRange instances with the same
-                  beginning, ending, exclusions, and database type.  Also consider it equal
-                  to <a href="../../Range.html">Range</a> instances if this PGRange can be
-                  converted to a a <a href="../../Range.html">Range</a> and those ranges are
-                  equal.</p>
+                  <p>Consider the receiver equal to other <a href="PGRange.html">PGRange</a>
+                  instances with the same beginning, ending, exclusions, and database type. 
+                  Also consider it equal to <a href="../../Range.html">Range</a> instances if
+                  this <a href="PGRange.html">PGRange</a> can be converted to a a <a
+                  href="../../Range.html">Range</a> and those ranges are equal.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eql-3F-source'); return false">
@@ -434,9 +440,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Wrap the PGRange instance in an <a href="RangeOp.html">RangeOp</a>,
-                  allowing you to easily use the PostgreSQL range functions and operators
-                  with literal ranges.</p>
+                  <p>Wrap the <a href="PGRange.html">PGRange</a> instance in an <a
+                  href="RangeOp.html">RangeOp</a>, allowing you to easily use the PostgreSQL
+                  range functions and operators with literal ranges.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-op-source'); return false">
@@ -540,9 +546,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Whether or not this PGRange is a valid ruby range.  In order to be a valid
-                  ruby range, it must have a beginning and an ending (no unbounded ranges),
-                  and it cannot exclude the beginning element.</p>
+                  <p>Whether or not this <a href="PGRange.html">PGRange</a> is a valid ruby
+                  range.  In order to be a valid ruby range, it must have a beginning and an
+                  ending (no unbounded ranges), and it cannot exclude the beginning element.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-valid_ruby_range-3F-source'); return false">

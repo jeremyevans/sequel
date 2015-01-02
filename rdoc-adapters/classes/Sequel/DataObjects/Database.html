@@ -43,12 +43,14 @@
         <div id='text'>
           <div id='description'>
             
-            <p>DataObjects uses it&#39;s own internal connection pooling in addition to
-            the pooling that Sequel uses.  You should make sure that you don&#39;t set
-            the connection pool size to more than 8 for a <a
-            href="Database.html">Sequel::DataObjects::Database</a> object, or hack
-            DataObjects (or Extlib) to use a pool size at least as large as the pool
-            size being used by Sequel.</p>
+            <p><a href="../DataObjects.html">DataObjects</a> uses it&#39;s own internal
+            connection pooling in addition to the pooling that <a
+            href="../../Sequel.html">Sequel</a> uses.  You should make sure that you
+            don&#39;t set the connection pool size to more than 8 for a <a
+            href="Database.html">Sequel::DataObjects::Database</a> object, or hack <a
+            href="../DataObjects.html">DataObjects</a> (or Extlib) to use a pool size
+            at least as large as the pool size being used by <a
+            href="../../Sequel.html">Sequel</a>.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -130,11 +132,12 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Execute the given SQL.  If a block is given, the DataObjects::Reader
-                  created is yielded to it. A block should not be provided unless a a SELECT
-                  statement is being used (or something else that returns rows). Otherwise,
-                  the return value is the insert id if <a href=":type">opts</a> is :insert,
-                  or the number of affected rows, otherwise.</p>
+                  <p>Execute the given <a href="../SQL.html">SQL</a>.  If a block is given, the
+                  DataObjects::Reader created is yielded to it. A block should not be
+                  provided unless a a SELECT statement is being used (or something else that
+                  returns rows). Otherwise, the return value is the insert id if <a
+                  href=":type">opts</a> is :insert, or the number of affected rows,
+                  otherwise.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
@@ -151,8 +154,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Execute the SQL on the this database, returning the number of affected
-                  rows.</p>
+                  <p>Execute the <a href="../SQL.html">SQL</a> on the this database, returning
+                  the number of affected rows.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
@@ -169,8 +172,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Execute the SQL on this database, returning the primary key of the table
-                  being inserted to.</p>
+                  <p>Execute the <a href="../SQL.html">SQL</a> on this database, returning the
+                  primary key of the table being inserted to.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
@@ -205,7 +208,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Return the DataObjects URI for the Sequel URI, removing the do: prefix.</p>
+                  <p>Return the <a href="../DataObjects.html">DataObjects</a> URI for the <a
+                  href="../../Sequel.html">Sequel</a> URI, removing the do: prefix.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-uri-source'); return false">

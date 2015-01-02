@@ -41,10 +41,78 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p><a href="Dataset.html">Dataset</a> class for <a
+            href="../MySQL.html">MySQL</a> datasets accessed via <a
+            href="../../DataObjects.html">DataObjects</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-provides_accurate_rows_matched-3F">provides_accurate_rows_matched?</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../../MySQL/DatasetMethods.html">Sequel::MySQL::DatasetMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>APOS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::APOS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>APOS_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::APOS_RE</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DOUBLE_APOS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::DOUBLE_APOS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-provides_accurate_rows_matched-3F'>
+                <a name='method-i-provides_accurate_rows_matched-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>provides_accurate_rows_matched?</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The <a href="../../DataObjects.html">DataObjects</a> <a
+                  href="../MySQL.html">MySQL</a> driver uses the number of rows actually
+                  modified in the update, instead of the number of matched by the filter.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-provides_accurate_rows_matched-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-provides_accurate_rows_matched-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/do/mysql.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">provides_accurate_rows_matched?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

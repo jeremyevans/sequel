@@ -61,13 +61,14 @@
           <div id='description'>
             
             <p>Top level module for holding all PostgreSQL-related modules and classes for
-            Sequel.  There are a few module level accessors that are added via
-            metaprogramming.  These are:</p>
+            <a href="../Sequel.html">Sequel</a>.  There are a few module level
+            accessors that are added via metaprogramming.  These are:</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="Postgres.html#attribute-c-client_min_messages">::client_min_messages</a> </td><td>
             <p>Change the minimum level of messages that PostgreSQL will send to the the
-            client.  The PostgreSQL default is NOTICE, the Sequel default is WARNING. 
-            Set to nil to not change the server default. Overridable on a per instance
-            basis via the :client_min_messages option.</p>
+            client.  The PostgreSQL default is NOTICE, the <a
+            href="../Sequel.html">Sequel</a> default is WARNING.  Set to nil to not
+            change the server default. Overridable on a per instance basis via the
+            :client_min_messages option.</p>
             </td></tr><tr><td class='label'><a href="Postgres.html#attribute-c-force_standard_strings">::force_standard_strings</a> </td><td>
             <p>Set to false to not force the use of standard strings.  Overridable on a
             per instance basis via the :force_standard_strings option.</p>
@@ -90,6 +91,11 @@
             <ol>
               <li><a target="docwin" href="#attribute-c-client_min_messages">client_min_messages</a></li>
               <li><a target="docwin" href="#attribute-c-force_standard_strings">force_standard_strings</a></li>
+              <li><a target="docwin" href="#attribute-c-use_iso_date_format">use_iso_date_format</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-bytea">bytea</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -119,8 +125,9 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>Array of exceptions that need to be converted.  JDBC uses NativeExceptions,
-                      the native adapter uses PGError.</p>
+                      <p>Array of exceptions that need to be converted.  <a
+                      href="JDBC.html">JDBC</a> uses NativeExceptions, the native adapter uses
+                      PGError.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -264,10 +271,10 @@
                     <td class='context-item-value'>[RW]</td>
                     <td class='context-item-desc'>
                       
-                      <p>By default, Sequel sets the minimum level of log messages sent to the
-                      client to WARNING, where PostgreSQL uses a default of NOTICE.  This is to
-                      avoid a lot of mostly useless messages when running migrations, such as a
-                      couple of lines for every serial primary key field.</p>
+                      <p>By default, <a href="../Sequel.html">Sequel</a> sets the minimum level of
+                      log messages sent to the client to WARNING, where PostgreSQL uses a default
+                      of NOTICE.  This is to avoid a lot of mostly useless messages when running
+                      migrations, such as a couple of lines for every serial primary key field.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -277,14 +284,48 @@
                     <td class='context-item-value'>[RW]</td>
                     <td class='context-item-desc'>
                       
-                      <p>By default, Sequel forces the use of standard strings, so that &#39;\&#39;
-                      is interpreted as \ and not .  While PostgreSQL &lt;9.1 defaults to
-                      interpreting plain strings, newer versions use standard strings by default.
-                      Sequel assumes that SQL standard strings will be used.  Setting this to
-                      false means Sequel will use the database&#39;s default.</p>
+                      <p>By default, <a href="../Sequel.html">Sequel</a> forces the use of standard
+                      strings, so that &#39;\&#39; is interpreted as \ and not .  While
+                      PostgreSQL &lt;9.1 defaults to interpreting plain strings, newer versions
+                      use standard strings by default.  <a href="../Sequel.html">Sequel</a>
+                      assumes that <a href="SQL.html">SQL</a> standard strings will be used. 
+                      Setting this to false means <a href="../Sequel.html">Sequel</a> will use
+                      the database&#39;s default.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-c-use_iso_date_format'>use_iso_date_format</a>
+                    </td>
+                    <td class='context-item-value'>[RW]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>As an optimization, <a href="../Sequel.html">Sequel</a> sets the date style
+                      to ISO, so that PostgreSQL provides the date in a known format that <a
+                      href="../Sequel.html">Sequel</a> can parse faster.  This can be turned off
+                      if you require a date style other than ISO.</p>
                     </td>
                   </tr>
                 </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-bytea'>
+                <a name='method-i-bytea'></a>
+                <div class='synopsis'>
+                  <span class='name'>bytea</span>
+                  <span class='arguments'>(s)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-bytea-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bytea</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">s</span>)) <span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

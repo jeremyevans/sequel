@@ -37,10 +37,63 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>Methods to add to <a href="../Database.html">Database</a> instances that
+            access <a href="../Fdbsql.html">Fdbsql</a> via <a
+            href="../../JDBC.html">JDBC</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-extended">extended</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../../Fdbsql/DatabaseMethods.html">Sequel::Fdbsql::DatabaseMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DISCONNECT_ERROR_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/\A(?:This connection has been closed|An I\/O error occurred while sending to the backend)/</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-extended'>
+                <a name='method-c-extended'></a>
+                <div class='synopsis'>
+                  <span class='name'>extended</span>
+                  <span class='arguments'>(db)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add the primary_keys and primary_key_sequences instance variables, so we
+                  can get the correct return values for inserted rows.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-extended-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/fdbsql.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:adapter_initialize</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

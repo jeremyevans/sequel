@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Performance+Enhancements">Performance Enhancements<span><a href="#label-Performance+Enhancements">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset::PlaceholderLiteralizer has been added as an optimization
             framework.  This allows you to record changes to a given dataset using
@@ -54,7 +54,7 @@
             <p>There are two APIs for this optimization framework.  There is a lower level
             dataset API:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.&#x000A; <span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1 </span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], <span class="ruby-node">%wfoo bar&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id IN (1, 2)) AND</span>&#x000A;<span class="ruby-comment">#   (name NOT IN (&#39;foo&#39;, &#39;bar&#39;))) LIMIT 1</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">loader</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralizer</span>.&#x000A; <span class="ruby-identifier">loader</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">pl</span>, <span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">pl</span>.<span class="ruby-identifier">arg</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>(<span class="ruby-value">1</span>, <span class="ruby-string">&quot;foo&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id = 1) AND (name != &#39;foo&#39;)) LIMIT 1 </span>&#x000A;&#x000A;<span class="ruby-identifier">loader</span>.<span class="ruby-identifier">first</span>([<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], <span class="ruby-node">%w&quot;foo bar&quot;</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM items WHERE ((id IN (1, 2)) AND</span>&#x000A;<span class="ruby-comment">#   (name NOT IN (&#39;foo&#39;, &#39;bar&#39;))) LIMIT 1</span></pre>
             
             <p>There is also a higher level model API (Model.finder):</p>
             
@@ -108,7 +108,7 @@
             don&#39;t require cloning the dataset.</p>
             </li></ul>
             
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Database#create_join_table! and create_join_table? have been added, for
             consistency with create_table! and create_table?.</p>
@@ -138,7 +138,7 @@
             class loading issues.</p>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Multiple corner cases in Dataset#eager_graph have been fixed.</p>
             </li><li>
@@ -179,7 +179,7 @@
             href="../../../classes/Sequel.html">Sequel</a>.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>In some cases <a href="../../../classes/Sequel.html">Sequel</a> no longer
             adds superfluous parentheses when constructing SQL strings.  If you are

@@ -38,9 +38,37 @@
       <div id='content'>
         <div id='text'>
           <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-subselect_sql_append">subselect_sql_append</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-subselect_sql_append'>
+                <a name='method-i-subselect_sql_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>subselect_sql_append</span>
+                  <span class='arguments'>(sql, ds)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Extend given dataset with this module so subselects inside subselects in
+                  prepared statements work.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-subselect_sql_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-subselect_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 387</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subselect_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-value">:select</span>).<span class="ruby-identifier">clone</span>(<span class="ruby-value">:append_sql=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">CallableStatementMethods</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">bind</span>(<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:bind_vars</span>]&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_args</span> = <span class="ruby-identifier">prepared_args</span>&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_sql</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

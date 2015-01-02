@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Virtual+Row+Blocks">Virtual Row Blocks<span><a href="#label-Virtual+Row+Blocks">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Virtual+Row+Blocks">Virtual Row Blocks<span><a href="#label-Virtual+Row+Blocks">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>Dataset methods where, order, and select all take blocks that are referred
             to as virtual row blocks.  Many other dataset methods pass the blocks they
@@ -46,7 +46,7 @@
             href="../../classes/Sequel/Dataset.html">Sequel::Dataset</a> methods that
             take virtual row blocks.</p>
             
-            <h2 id="label-Why+Virtual+Rows">Why Virtual Rows<span><a href="#label-Why+Virtual+Rows">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Why+Virtual+Rows">Why Virtual Rows<span><a href="#label-Why+Virtual+Rows">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Virtual Rows were created to work around the issue that some parts of
             Sequel&#39;s standard DSL could not be used on ruby 1.9.  For example, the
@@ -71,7 +71,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>(<span class="ruby-identifier">c</span>)}</pre>
             
-            <h2 id="label-Regular+Procs+vs+Instance+Evaled+Procs">Regular Procs vs Instance Evaled Procs<span><a href="#label-Regular+Procs+vs+Instance+Evaled+Procs">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Regular+Procs+vs+Instance+Evaled+Procs">Regular Procs vs Instance Evaled Procs<span><a href="#label-Regular+Procs+vs+Instance+Evaled+Procs">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Virtual row blocks behave differently depending on whether the block
             accepts an argument.  If the block accepts an argument, it is called with
@@ -113,7 +113,7 @@
             That being said, I usually use instance evaled procs unless I need to call
             methods on the receiver of the surrounding scope inside the proc.</p>
             
-            <h2 id="label-Local+Variables+vs+Method+Calls">Local Variables vs Method Calls<span><a href="#label-Local+Variables+vs+Method+Calls">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Local+Variables+vs+Method+Calls">Local Variables vs Method Calls<span><a href="#label-Local+Variables+vs+Method+Calls">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>If you have a method that accepts 0 arguments and has the same name as a
             local variable, you can call it with () to differentiate the method call
@@ -122,12 +122,12 @@
             
             <pre class="ruby"><span class="ruby-identifier">b</span> = <span class="ruby-value">32</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">b</span>() <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">b</span>}&#x000A;<span class="ruby-comment"># WHERE b &gt; 32</span></pre>
             
-            <h2 id="label-VirtualRow+Methods">VirtualRow Methods<span><a href="#label-VirtualRow+Methods">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-VirtualRow+Methods">VirtualRow Methods<span><a href="#label-VirtualRow+Methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>VirtualRow is a class that returns SQL::Identifiers,
             SQL::QualifiedIdentifiers, or SQL::Functions depending on how it is called.</p>
             
-            <h2 id="label-SQL%3A%3AIdentifiers+-+Regular+columns">SQL::Identifiers - Regular columns<span><a href="#label-SQL%3A%3AIdentifiers+-+Regular+columns">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-SQL-3A-3AIdentifiers+-+Regular+columns">SQL::Identifiers - Regular columns<span><a href="#label-SQL-3A-3AIdentifiers+-+Regular+columns">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>SQL::Identifiers can be thought of as regular column references in SQL, not
             qualified by any table. You get an SQL::Identifier if the method is called
@@ -136,7 +136,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE column &gt; 1</span></pre>
             
-            <h2 id="label-SQL%3A%3AQualifiedIdentifiers+-+Qualified+columns">SQL::QualifiedIdentifiers - Qualified columns<span><a href="#label-SQL%3A%3AQualifiedIdentifiers+-+Qualified+columns">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-SQL-3A-3AQualifiedIdentifiers+-+Qualified+columns">SQL::QualifiedIdentifiers - Qualified columns<span><a href="#label-SQL-3A-3AQualifiedIdentifiers+-+Qualified+columns">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>SQL::QualifiedIdentifiers can be thought of as column references in SQL
             that are qualified to a specific table.  You get an
@@ -149,7 +149,7 @@
             usage very similar to using symbols, which also translate the double
             underscore into a qualified column.</p>
             
-            <h2 id="label-SQL%3A%3AFunctions+-+SQL+function+calls">SQL::Functions - SQL function calls<span><a href="#label-SQL%3A%3AFunctions+-+SQL+function+calls">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-SQL-3A-3AFunctions+-+SQL+function+calls">SQL::Functions - SQL function calls<span><a href="#label-SQL-3A-3AFunctions+-+SQL+function+calls">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>SQL::Functions can be thought of as function calls in SQL.  You get a
             simple function call if you call a method with arguments and without a
@@ -177,7 +177,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1)</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>(<span class="ruby-identifier">col1</span>, <span class="ruby-identifier">col2</span>).<span class="ruby-identifier">distinct</span>}&#x000A;<span class="ruby-comment"># SELECT count(DISTINCT col1, col2)</span></pre>
             
-            <h2 id="label-SQL%3A%3AFunctions+with+windows+-+SQL+window+function+calls">SQL::Functions with windows - SQL window function calls<span><a href="#label-SQL%3A%3AFunctions+with+windows+-+SQL+window+function+calls">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-SQL-3A-3AFunctions+with+windows+-+SQL+window+function+calls">SQL::Functions with windows - SQL window function calls<span><a href="#label-SQL-3A-3AFunctions+with+windows+-+SQL+window+function+calls">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Not all databases support window functions, but they are very helpful for
             certain types of queries.  To use them, you should just call the over
@@ -185,19 +185,19 @@
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">rank</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT rank() OVER ()</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-operator">*</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-operator">*</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT count(*) OVER ()</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">o</span>.<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">o</span>.<span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">o</span>.<span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-comment"># SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)</span></pre>
             
-            <h2 id="label-Operators">Operators<span><a href="#label-Operators">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Operators">Operators<span><a href="#label-Operators">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>VirtualRows use method_missing to handle almost all method calls.  However,
             they have special handling of some operator methods to make certain things
             easier. The operators all use a prefix form.</p>
             
-            <h3 id="label-Math+Operators">Math Operators<span><a href="#label-Math+Operators">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Math+Operators">Math Operators<span><a href="#label-Math+Operators">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>The standard +, -, *, and / mathematical operators are defined:</p>
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">o</span>.<span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">b</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-keyword">self</span>.<span class="ruby-operator">-</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">a</span>).<span class="ruby-identifier">as</span>(<span class="ruby-identifier">b</span>)}&#x000A;<span class="ruby-comment"># SELECT (1 - a) AS b</span></pre>
             
-            <h3 id="label-Boolean+Operators">Boolean Operators<span><a href="#label-Boolean+Operators">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Boolean+Operators">Boolean Operators<span><a href="#label-Boolean+Operators">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>The &amp; and | methods are defined to use AND and OR:</p>
             
@@ -207,25 +207,25 @@
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">~</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>})}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-operator">~</span>({:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>})}&#x000A;<span class="ruby-comment"># WHERE ((a != 1) OR (b != 2))</span></pre>
             
-            <h3 id="label-Inequality+Operators">Inequality Operators<span><a href="#label-Inequality+Operators">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Inequality+Operators">Inequality Operators<span><a href="#label-Inequality+Operators">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>The standard &gt;, &lt;, &gt;=, and &lt;= inequality operators are defined:</p>
             
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&gt;</span>(<span class="ruby-value">1</span>, :<span class="ruby-identifier">c</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-keyword">self</span>.<span class="ruby-operator">&gt;</span>(<span class="ruby-value">1</span>, :<span class="ruby-identifier">c</span>)}&#x000A;<span class="ruby-comment"># WHERE (1 &gt; c)</span></pre>
             
-            <h2 id="label-Literal+Strings">Literal Strings<span><a href="#label-Literal+Strings">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Literal+Strings">Literal Strings<span><a href="#label-Literal+Strings">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The backtick operator can be used inside an instance-evaled virtual row
             block to create a literal string:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">%xsome SQL`</span>}&#x000A;<span class="ruby-comment"># WHERE (a &gt; some SQL)</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">a</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">%x`some SQL`</span>}&#x000A;<span class="ruby-comment"># WHERE (a &gt; some SQL)</span></pre>
             
             <p>You can use this on a regular virtual row block too, but it doesn&#39;t
             look as nice:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&gt;</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-identifier">o</span>.<span class="ruby-value">%x(&#39;some SQL&#39;))}&#x000A;</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-operator">&gt;</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-identifier">o</span>.<span class="ruby-value">%x`(&#39;some SQL&#39;))}&#x000A;</span></pre>
             
-            <h2 id="label-Returning+multiple+values">Returning multiple values<span><a href="#label-Returning+multiple+values">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Returning+multiple+values">Returning multiple values<span><a href="#label-Returning+multiple+values">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>It&#39;s common when using select and order virtual row blocks to want to
             return multiple values.  If you want to do that, you just need to return an
@@ -238,7 +238,7 @@
             
             <pre># Invalid ruby syntax&#x000A;ds.select{|o| o.column1, o.sum(o.column2).as(o.sum)}&#x000A;ds.select{column1, sum(column2).as(sum)}</pre>
             
-            <h2 id="label-Alternative+Description+of+the+VirtualRow+method+call+rules">Alternative Description of the VirtualRow method call rules<span><a href="#label-Alternative+Description+of+the+VirtualRow+method+call+rules">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Alternative+Description+of+the+VirtualRow+method+call+rules">Alternative Description of the VirtualRow method call rules<span><a href="#label-Alternative+Description+of+the+VirtualRow+method+call+rules">&para;</a> <a href="#top">&uarr;</a></span></h2>
             <ul><li>
             <p>If a block is given:</p>
             <ul><li>

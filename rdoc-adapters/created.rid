@@ -1,4 +1,4 @@
-Mon, 01 Dec 2014 08:02:39 -0800
+Fri, 02 Jan 2015 11:45:03 -0800
 lib/sequel/adapters/ado.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ado/access.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ado/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -14,7 +14,7 @@ lib/sequel/adapters/fdbsql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/firebird.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ibmdb.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/informix.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/jdbc.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/jdbc.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/adapters/jdbc/as400.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/cubrid.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/db2.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -26,7 +26,7 @@ lib/sequel/adapters/jdbc/hsqldb.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/informix-sqli.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/jdbcprogress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/jtds.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/jdbc/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/jdbc/mssql.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/adapters/jdbc/mysql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/oracle.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/postgresql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -42,22 +42,22 @@ lib/sequel/adapters/odbc/db2.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/progress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/openbase.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/oracle.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/postgres.rb	Tue, 25 Nov 2014 15:15:39 -0800
+lib/sequel/adapters/oracle.rb	Mon, 08 Dec 2014 15:26:11 -0800
+lib/sequel/adapters/postgres.rb	Tue, 09 Dec 2014 09:54:32 -0800
 lib/sequel/adapters/shared/access.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/cubrid.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/shared/db2.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/shared/db2.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/adapters/shared/fdbsql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/firebird.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/informix.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/shared/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/shared/mysql.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/shared/mssql.rb	Mon, 08 Dec 2014 15:26:11 -0800
+lib/sequel/adapters/shared/mysql.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/adapters/shared/mysql_prepared_statements.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/oracle.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/shared/postgres.rb	Fri, 21 Nov 2014 12:58:09 -0800
+lib/sequel/adapters/shared/postgres.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/adapters/shared/progress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/sqlanywhere.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/shared/sqlite.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/shared/sqlite.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/adapters/sqlanywhere.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/sqlite.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/swift.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -66,7 +66,7 @@ lib/sequel/adapters/swift/postgres.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/swift/sqlite.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/tinytds.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/utils/emulate_offset_with_reverse_and_count.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/utils/emulate_offset_with_row_number.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/utils/emulate_offset_with_row_number.rb	Fri, 02 Jan 2015 11:08:19 -0800
 lib/sequel/adapters/utils/pg_types.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/utils/replace.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/utils/split_alter_table.rb	Thu, 20 Nov 2014 12:20:00 -0800

@@ -53,9 +53,10 @@
             
             <p>To determine the columns to use for the type/not_null/max_length
             validations, the plugin looks at the database schema for the model&#39;s
-            table.  To determine the unique validations, Sequel looks at the indexes on
-            the table.  In order for this plugin to be fully functional, the underlying
-            database adapter needs to support both schema and index parsing.</p>
+            table.  To determine the unique validations, <a
+            href="../../Sequel.html">Sequel</a> looks at the indexes on the table.  In
+            order for this plugin to be fully functional, the underlying database
+            adapter needs to support both schema and index parsing.</p>
             
             <p>This plugin uses the validation_helpers plugin underneath to implement the
             validations.  It does not allow for any per-column validation message

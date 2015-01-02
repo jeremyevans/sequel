@@ -42,9 +42,54 @@
       <div id='content'>
         <div id='text'>
           <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-inspect">inspect</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>INSPECT_LOOKUPS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:CURRENT_DATE, :CURRENT_TIMESTAMP, :CURRENT_TIME, :SQLTRUE, :SQLFALSE, :NULL, :NOTNULL]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Constants to lookup in the <a href="../../Sequel.html">Sequel</a> module.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-inspect'>
+                <a name='method-i-inspect'></a>
+                <div class='synopsis'>
+                  <span class='name'>inspect</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Reference the constant in the <a href="../../Sequel.html">Sequel</a> module
+                  if there is one that matches.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-inspect-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/extensions/eval_inspect.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inspect</span>&#x000A;  <span class="ruby-constant">INSPECT_LOOKUPS</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-node">&quot;Sequel::#{c}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">c</span>) <span class="ruby-operator">==</span> <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

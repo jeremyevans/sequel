@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Connecting+to+a+database">Connecting to a database<span><a href="#label-Connecting+to+a+database">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Connecting+to+a+database">Connecting to a database<span><a href="#label-Connecting+to+a+database">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>All <a href="../../classes/Sequel.html">Sequel</a> activity begins with
             connecting to a database, which creates a <a
@@ -62,7 +62,7 @@
             but it is the convention that most <a
             href="../../classes/Sequel.html">Sequel</a> code uses.</p>
             
-            <h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The connect method usually takes a well-formed URI, which is parsed into
             connection options needed to open the database connection.  The
@@ -85,7 +85,7 @@
             
             <p>All of the above statements are equivalent.</p>
             
-            <h2 id="label-Using+the+specialized+adapter+method">Using the specialized adapter method<span><a href="#label-Using+the+specialized+adapter+method">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Using+the+specialized+adapter+method">Using the specialized adapter method<span><a href="#label-Using+the+specialized+adapter+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The specialized adapter method is similar to <a
             href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> with
@@ -106,7 +106,7 @@
             mentioned below, using <code>Sequel.connect</code> is recommended instead
             of <code>Sequel.jdbc</code>).</p>
             
-            <h2 id="label-Passing+a+block+to+either+method">Passing a block to either method<span><a href="#label-Passing+a+block+to+either+method">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Passing+a+block+to+either+method">Passing a block to either method<span><a href="#label-Passing+a+block+to+either+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Both the <a
             href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method
@@ -118,7 +118,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[:<span class="ruby-identifier">users</span>].<span class="ruby-identifier">count</span>}</pre>
             
-            <h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>These options are shared by all adapters unless otherwise noted.</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'>:adapter </td><td>
@@ -161,14 +161,14 @@
             raising an error (default: 5 seconds)</p>
             </td></tr></tbody></table>
             
-            <h2 id="label-Adapter+specific+connection+options">Adapter specific connection options<span><a href="#label-Adapter+specific+connection+options">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Adapter+specific+connection+options">Adapter specific connection options<span><a href="#label-Adapter+specific+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The following sections explain the options and behavior specific to each
             adapter. If the library the adapter requires is different from the name of
             the adapter scheme, it is listed specifically, otherwise you can assume
             that is requires the library with the same name.</p>
             
-            <h3 id="label-ado">ado<span><a href="#label-ado">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-ado">ado<span><a href="#label-ado">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: win32ole</p>
             
@@ -204,7 +204,7 @@
             
             <pre class="ruby"><span class="ruby-comment"># SQL Server</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado:///sequel_test?host=server%5cdb_instance&#39;</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;ado://user:password@server/database?host=server%5cdb_instance&amp;provider=SQLNCLI10&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2007</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(:<span class="ruby-identifier">conn_string=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Provider=Microsoft.ACE.OLEDB.12.0;Data Source=drive:\path\filename.accdb&#39;</span>)&#x000A;<span class="ruby-comment"># Access 2000</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(:<span class="ruby-identifier">conn_string=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.mdb&#39;</span>)&#x000A;<span class="ruby-comment"># Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ado</span>(:<span class="ruby-identifier">conn_string=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\path\filename.xls;Extended Properties=Excel 8.0;&#39;</span>)</pre>
             
-            <h3 id="label-amalgalite+">amalgalite <span><a href="#label-amalgalite+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-amalgalite+">amalgalite <span><a href="#label-amalgalite+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Amalgalite is an ruby extension that provides self contained access to
             SQLite, so you don&#39;t need to install SQLite separately.  As amalgalite
@@ -223,20 +223,20 @@
             <p>Handles paths in the connection string similar to the SQLite adapter, so
             see the sqlite section below for details.</p>
             
-            <h3 id="label-cubrid">cubrid<span><a href="#label-cubrid">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-cubrid">cubrid<span><a href="#label-cubrid">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>cubrid is a ruby extension for accessing a CUBRID database.  Currently, the
             ruby cubrid gem is in fairly rough state, with broken transaction support
             and some other issues, but most things work.</p>
             
-            <h3 id="label-db2+">db2 <span><a href="#label-db2+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-db2+">db2 <span><a href="#label-db2+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: db2/db2cli</p>
             
             <p>This is the older DB2 adapter.  It&#39;s recommended you try the ibmdb
             adapter instead for new DB2 work, as it is better supported.</p>
             
-            <h3 id="label-dbi+">dbi <span><a href="#label-dbi+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-dbi+">dbi <span><a href="#label-dbi+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Allows access to a multitude of databases via ruby-dbi.  Additional
             options:</p>
@@ -253,7 +253,7 @@
             <p>While the DBI adapter does work, it is recommended that you use another
             adapter if your database supports it.</p>
             
-            <h3 id="label-do+">do <span><a href="#label-do+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-do+">do <span><a href="#label-do+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: data_objects</p>
             
@@ -272,7 +272,7 @@
             
             <pre>do:sqlite3::memory:&#x000A;do:postgres://user:password@host/database&#x000A;do:mysql://user:password@host/database</pre>
             
-            <h3 id="label-fdbsql">fdbsql<span><a href="#label-fdbsql">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-fdbsql">fdbsql<span><a href="#label-fdbsql">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: pg</p>
             
@@ -288,21 +288,21 @@
             &#39;require&#39; to choose how to treat SSL.</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-firebird+">firebird <span><a href="#label-firebird+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-firebird+">firebird <span><a href="#label-firebird+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: fb (using code at <a
             href="http://github.com/wishdev/fb">github.com/wishdev/fb</a>)</p>
             
             <p>Does not support the :port option.</p>
             
-            <h3 id="label-ibmdb">ibmdb<span><a href="#label-ibmdb">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-ibmdb">ibmdb<span><a href="#label-ibmdb">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>requires &#39;ibm_db&#39;</p>
             
             <p>This connects to DB2 using IBM_DB.  This is the recommended adapter if you
             are using a C-based ruby to connect to DB2.</p>
             
-            <h3 id="label-informix+">informix <span><a href="#label-informix+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-informix+">informix <span><a href="#label-informix+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Does not support the :host or :port options.  Depending on the
             configuration of your server it may be necessary to either set</p>
@@ -320,7 +320,7 @@
             <p>Disable transactions for the database.</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-jdbc+">jdbc <span><a href="#label-jdbc+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-jdbc+">jdbc <span><a href="#label-jdbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: java</p>
             
@@ -376,7 +376,7 @@
             <p>Set the login timeout on the JDBC connection (in seconds).</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: mysqlplus (or mysql if mysqlplus is not available)</p>
             
@@ -418,7 +418,7 @@
             <p>Set the timeout in seconds before a connection attempt is abandoned.</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>This is a newer MySQL adapter that does typecasting in C, so it is often
             faster than the mysql adapter.  Supports the same additional options as the
@@ -431,7 +431,7 @@
             ::Mysql2::Client::MULTI_STATEMENTS)</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>The ODBC adapter allows you to connect to any database with the appropriate
             ODBC drivers installed.</p>
@@ -452,11 +452,11 @@
             <code>Sequel.odbc(:drvconnect=&gt;&#39;driver={...};...&#39;)</code></p>
             </td></tr></tbody></table>
             
-            <h3 id="label-openbase+">openbase <span><a href="#label-openbase+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-openbase+">openbase <span><a href="#label-openbase+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>The :port option is ignored.</p>
             
-            <h3 id="label-oracle+">oracle <span><a href="#label-oracle+">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-oracle+">oracle <span><a href="#label-oracle+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: oci8</p>
             
@@ -472,7 +472,7 @@
             <p>The Oracle privilege level.</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-postgres">postgres<span><a href="#label-postgres">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: pg (or postgres if pg is not available)</p>
             
@@ -521,7 +521,7 @@
             for an optimization.</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-sqlanywhere">sqlanywhere<span><a href="#label-sqlanywhere">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-sqlanywhere">sqlanywhere<span><a href="#label-sqlanywhere">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>The sqlanywhere driver works off connection strings, so a connection string
             is built based on the url/options hash provided.  The following additional
@@ -536,7 +536,7 @@
             <p>specify the CharSet connection string option</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-sqlite">sqlite<span><a href="#label-sqlite">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-sqlite">sqlite<span><a href="#label-sqlite">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: sqlite3</p>
             
@@ -554,7 +554,7 @@
             <p>the busy timeout to use in milliseconds (default: 5000).</p>
             </td></tr></tbody></table>
             
-            <h3 id="label-swift">swift<span><a href="#label-swift">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-swift">swift<span><a href="#label-swift">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>swift is a ruby 1.9+ library, so you&#39;ll need to be running ruby 1.9+. 
             It can connect to SQLite, MySQL, and PostgreSQL, and you must specify which
@@ -573,7 +573,7 @@
             
             <pre>swift:///?database=:memory:&amp;db_type=sqlite&#x000A;swift://root:root@localhost/test?db_type=mysql&#x000A;swift://root:root@localhost/test?db_type=postgres</pre>
             
-            <h3 id="label-tinytds">tinytds<span><a href="#label-tinytds">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-tinytds">tinytds<span><a href="#label-tinytds">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: tiny_tds</p>
             

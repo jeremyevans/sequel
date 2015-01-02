@@ -61,10 +61,14 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a target="docwin" href="#method-i-DB2Clob">DB2Clob</a></li>
+              <li><a target="docwin" href="#method-i-OracleDecimal">OracleDecimal</a></li>
               <li><a target="docwin" href="#method-i-RubyBigDecimal">RubyBigDecimal</a></li>
               <li><a target="docwin" href="#method-i-RubyBlob">RubyBlob</a></li>
               <li><a target="docwin" href="#method-i-RubyClob">RubyClob</a></li>
               <li><a target="docwin" href="#method-i-RubyDate">RubyDate</a></li>
+              <li><a target="docwin" href="#method-i-RubyPGArray">RubyPGArray</a></li>
+              <li><a target="docwin" href="#method-i-RubyPGHstore">RubyPGHstore</a></li>
               <li><a target="docwin" href="#method-i-RubyTime">RubyTime</a></li>
               <li><a target="docwin" href="#method-i-RubyTimestamp">RubyTimestamp</a></li>
               <li><a target="docwin" href="#method-i-SqlAnywhereBoolean">SqlAnywhereBoolean</a></li>
@@ -98,6 +102,13 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>JAVA_BIG_DECIMAL_CONSTRUCTOR</td>
+                    <td>=</td>
+                    <td class='context-item-value'>java.math.BigDecimal.java_class.constructor(Java::long).method(:new_instance)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MAP</td>
                     <td>=</td>
                     <td class='context-item-value'>Hash.new(o.method(:Object))</td>
@@ -109,6 +120,38 @@
             </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-DB2Clob'>
+                <a name='method-i-DB2Clob'></a>
+                <div class='synopsis'>
+                  <span class='name'>DB2Clob</span>
+                  <span class='arguments'>(r, i)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-DB2Clob-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-DB2Clob-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/db2.rb, line 16</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">DB2Clob</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getClob</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getSubString</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">length</span>)&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DB2</span><span class="ruby-operator">::</span><span class="ruby-identifier">use_clob_as_blob</span>&#x000A;    <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-OracleDecimal'>
+                <a name='method-i-OracleDecimal'></a>
+                <div class='synopsis'>
+                  <span class='name'>OracleDecimal</span>
+                  <span class='arguments'>(r, i)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-OracleDecimal-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-OracleDecimal-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/oracle.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">OracleDecimal</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getBigDecimal</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-identifier">i</span> = <span class="ruby-identifier">v</span>.<span class="ruby-identifier">long_value</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">==</span> <span class="ruby-constant">JAVA_BIG_DECIMAL_CONSTRUCTOR</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;      <span class="ruby-identifier">i</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_string</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-RubyBigDecimal'>
                 <a name='method-i-RubyBigDecimal'></a>
                 <div class='synopsis'>
@@ -171,6 +214,44 @@
                     [show source]
                   </a>
                   <pre id='method-i-RubyDate-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyDate</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getDate</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-constant">Date</span>.<span class="ruby-identifier">civil</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">getYear</span> <span class="ruby-operator">+</span> <span class="ruby-value">1900</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getMonth</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">v</span>.<span class="ruby-identifier">getDate</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-RubyPGArray'>
+                <a name='method-i-RubyPGArray'></a>
+                <div class='synopsis'>
+                  <span class='name'>RubyPGArray</span>
+                  <span class='arguments'>(r, i)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return PostgreSQL array types as ruby Arrays instead of <a
+                  href="../JDBC.html">JDBC</a> PostgreSQL driver-specific array type. Only
+                  used if the database does not have a conversion proc for the type.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyPGArray-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-RubyPGArray-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/postgresql.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyPGArray</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getArray</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">array</span>.<span class="ruby-identifier">to_ary</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-RubyPGHstore'>
+                <a name='method-i-RubyPGHstore'></a>
+                <div class='synopsis'>
+                  <span class='name'>RubyPGHstore</span>
+                  <span class='arguments'>(r, i)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return PostgreSQL hstore types as ruby Hashes instead of <a
+                  href="TypeConvertor/Java.html">Java</a> HashMaps.  Only used if the
+                  database does not have a conversion proc for the type.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-RubyPGHstore-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-RubyPGHstore-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/postgresql.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-constant">RubyPGHstore</span>(<span class="ruby-identifier">r</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">r</span>.<span class="ruby-identifier">getObject</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">to_hash</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-RubyTime'>

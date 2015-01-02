@@ -1,4 +1,4 @@
-Mon, 01 Dec 2014 08:02:55 -0800
+Fri, 02 Jan 2015 11:45:20 -0800
 lib/sequel/extensions/_pretty_table.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -84,7 +84,7 @@ lib/sequel/plugins/instance_hooks.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/json_serializer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/lazy_attributes.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/list.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/many_through_many.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/plugins/many_through_many.rb	Fri, 05 Dec 2014 14:52:17 -0800
 lib/sequel/plugins/many_to_one_pk_lookup.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/modification_detection.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Thu, 20 Nov 2014 12:20:00 -0800

@@ -64,7 +64,8 @@
         <div id='text'>
           <div id='description'>
             
-            <p>Sequel extends <code>Symbol</code> to add methods to implement the SQL DSL.</p>
+            <p><a href="Sequel.html">Sequel</a> extends <code>Symbol</code> to add methods
+            to implement the SQL DSL.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -149,8 +150,8 @@
                   <p>Returns a <code>Sequel::SQL::Function</code> with this as the function
                   name, and the given arguments. This is aliased as <code>Symbol#[]</code> if
                   the RUBY_VERSION is less than 1.9.0. Ruby 1.9 defines
-                  <code>Symbol#[]</code>, and Sequel doesn&#39;t override methods defined by
-                  ruby itself.</p>
+                  <code>Symbol#[]</code>, and <a href="Sequel.html">Sequel</a> doesn&#39;t
+                  override methods defined by ruby itself.</p>
                   
                   <pre class="ruby">:<span class="ruby-identifier">now</span>.<span class="ruby-identifier">sql_function</span> <span class="ruby-comment"># SQL: now()</span>&#x000A;:<span class="ruby-identifier">sum</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># SQL: sum(a)</span>&#x000A;:<span class="ruby-identifier">concat</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>) <span class="ruby-comment"># SQL: concat(a, b)</span></pre>
                 </div>

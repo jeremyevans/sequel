@@ -46,7 +46,8 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-string">&#39;a, b, ?&#39;</span>, <span class="ruby-value">2</span>).<span class="ruby-identifier">group</span>(<span class="ruby-string">&#39;a, b&#39;</span>).<span class="ruby-identifier">order</span>(<span class="ruby-string">&#39;c&#39;</span>)</pre>
             
-            <p>The default Sequel behavior would literalize that as:</p>
+            <p>The default <a href="../../../../classes/Sequel.html">Sequel</a> behavior
+            would literalize that as:</p>
             
             <pre>SELECT &#39;a, b, ?&#39;, 2 FROM table GROUP BY &#39;a, b&#39; ORDER BY &#39;c&#39;</pre>
             

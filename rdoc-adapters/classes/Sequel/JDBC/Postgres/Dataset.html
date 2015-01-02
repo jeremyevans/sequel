@@ -41,10 +41,89 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p><a href="Dataset.html">Dataset</a> subclass used for datasets that connect
+            to PostgreSQL via <a href="../../JDBC.html">JDBC</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-prepare">prepare</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../../Postgres/DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>APOS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Dataset::APOS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ARRAY_TYPE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Java::JavaSQL::Types::ARRAY</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>HSTORE_TYPE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'hstore'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PG_SPECIFIC_TYPES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>STRING_TYPE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Java::JavaSQL::Types::VARCHAR</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-prepare'>
+                <a name='method-i-prepare'></a>
+                <div class='synopsis'>
+                  <span class='name'>prepare</span>
+                  <span class='arguments'>(type, name=nil, *values)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Add the shared PostgreSQL prepared statement methods</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/postgresql.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">JDBC</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span><span class="ruby-operator">::</span><span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">DatasetMethods</span><span class="ruby-operator">::</span><span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

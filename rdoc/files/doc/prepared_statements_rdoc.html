@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Prepared+Statements+and+Bound+Variables">Prepared Statements and Bound Variables<span><a href="#label-Prepared+Statements+and+Bound+Variables">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Prepared+Statements+and+Bound+Variables">Prepared Statements and Bound Variables<span><a href="#label-Prepared+Statements+and+Bound+Variables">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> has support for prepared
             statements and bound variables.  No matter which database you are using,
@@ -71,7 +71,7 @@
             as saving or deleting a model instance, or looking up a model based on a
             primary key.</p>
             
-            <h2 id="label-Placeholders">Placeholders<span><a href="#label-Placeholders">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Placeholders">Placeholders<span><a href="#label-Placeholders">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Generally, when using prepared statements (and certainly when using bound
             variables), you need to put placeholders in your SQL to indicate where you
@@ -89,7 +89,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM items WHERE name = ?&quot;</span>, :<span class="ruby-identifier">$n</span>]</pre>
             
-            <h2 id="label-Bound+Variables">Bound Variables<span><a href="#label-Bound+Variables">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Bound+Variables">Bound Variables<span><a href="#label-Bound+Variables">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Using bound variables for this query is simple:</p>
             
@@ -108,7 +108,7 @@
             
             <pre class="ruby"><span class="ruby-comment"># Insert record with &#39;Jim&#39;, note that the previous filter is ignored</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">insert</span>, {:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>}, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$n</span>)&#x000A;<span class="ruby-comment"># Change name to &#39;Bob&#39; for all records with name of &#39;Jim&#39;</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">update</span>, {:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>, :<span class="ruby-identifier">new_n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>}, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$new_n</span>)</pre>
             
-            <h2 id="label-Prepared+Statements">Prepared Statements<span><a href="#label-Prepared+Statements">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Prepared+Statements">Prepared Statements<span><a href="#label-Prepared+Statements">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Prepared statement support is similar to bound variable support, but you
             use <code>Dataset#prepare</code> with a name, and <code>Dataset#call</code>
@@ -123,33 +123,33 @@
             
             <pre class="ruby"><span class="ruby-identifier">ps1</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">prepare</span>(:<span class="ruby-identifier">insert</span>, :<span class="ruby-identifier">insert_with_name</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$n</span>)&#x000A;<span class="ruby-identifier">ps1</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">insert_with_name</span>, :<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>) <span class="ruby-comment"># same as above</span>&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">items</span>].<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$n</span>)&#x000A;<span class="ruby-identifier">ps2</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">prepare</span>(:<span class="ruby-identifier">update</span>, :<span class="ruby-identifier">update_name</span>, :<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">$new_n</span>)&#x000A;<span class="ruby-identifier">ps2</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>, :<span class="ruby-identifier">new_n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">call</span>(:<span class="ruby-identifier">update_name</span>, :<span class="ruby-identifier">n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Jim&#39;</span>, :<span class="ruby-identifier">new_n=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bob&#39;</span>) <span class="ruby-comment"># same as above</span></pre>
             
-            <h2 id="label-Implementation+Issues">Implementation Issues<span><a href="#label-Implementation+Issues">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Implementation+Issues">Implementation Issues<span><a href="#label-Implementation+Issues">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Currently, creating a prepared statement uses Object#extend, which can hurt
             performance.  For high performance applications, it&#39;s recommended to
             create all of your prepared statements upon application initialization, and
             not to create prepared statements dynamically at runtime.</p>
             
-            <h2 id="label-Database+support">Database support<span><a href="#label-Database+support">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Database+support">Database support<span><a href="#label-Database+support">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <h3 id="label-PostgreSQL">PostgreSQL<span><a href="#label-PostgreSQL">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-PostgreSQL">PostgreSQL<span><a href="#label-PostgreSQL">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>If you are using the ruby-postgres or postgres-pr driver, PostgreSQL uses
             the default emulated support.  If you are using ruby-pg, there is native
             support for both prepared statements and bound variables.  Prepared
             statements are always server side.</p>
             
-            <h3 id="label-SQLite">SQLite<span><a href="#label-SQLite">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-SQLite">SQLite<span><a href="#label-SQLite">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>SQLite supports both prepared statements and bound variables.</p>
             
-            <h3 id="label-MySQL%2FMysql2">MySQL/Mysql2<span><a href="#label-MySQL%2FMysql2">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-MySQL-2FMysql2">MySQL/Mysql2<span><a href="#label-MySQL-2FMysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>The MySQL/Mysql2 ruby drivers do not support bound variables, so the bound
             variable methods fall back to string interpolation.  It uses server side
             prepared statements.</p>
             
-            <h3 id="label-JDBC">JDBC<span><a href="#label-JDBC">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-JDBC">JDBC<span><a href="#label-JDBC">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>JDBC supports both prepared statements and bound variables.  Whether these
             are server side or client side depends on the JDBC driver.  For PostgreSQL
@@ -157,16 +157,16 @@
             string, which will use a server side prepared statement after N calls to
             the prepared statement.</p>
             
-            <h3 id="label-TinyTDS">TinyTDS<span><a href="#label-TinyTDS">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-TinyTDS">TinyTDS<span><a href="#label-TinyTDS">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Uses the sp_executesql stored procedure with bound variables, since
             Microsoft SQL Server doesn&#39;t support true prepared statements.</p>
             
-            <h3 id="label-IBM_DB">IBM_DB<span><a href="#label-IBM_DB">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-IBM_DB">IBM_DB<span><a href="#label-IBM_DB">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>DB2 supports both prepared statements and bound variables.</p>
             
-            <h3 id="label-Oracle">Oracle<span><a href="#label-Oracle">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Oracle">Oracle<span><a href="#label-Oracle">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Oracle supports both prepared statements and bound variables.  Prepared
             statements (OCI8::Cursor objects) are cached per connection.  If you ever
@@ -177,7 +177,7 @@
             :$name__string or :$num__integer.  Using blobs as bound variables is not
             currently supported.</p>
             
-            <h3 id="label-All+Others">All Others<span><a href="#label-All+Others">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-All+Others">All Others<span><a href="#label-All+Others">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Support is emulated using interpolation.</p>
           </div>

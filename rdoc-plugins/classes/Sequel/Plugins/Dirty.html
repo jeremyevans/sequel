@@ -39,9 +39,9 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The dirty plugin makes Sequel save the initial value of a column when
-            setting a new value for the column.  This makes it easier to see what
-            changes were made to the object:</p>
+            <p>The dirty plugin makes <a href="../../Sequel.html">Sequel</a> save the
+            initial value of a column when setting a new value for the column.  This
+            makes it easier to see what changes were made to the object:</p>
             
             <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span> = <span class="ruby-string">&#39;Bar&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">initial_value</span>(:<span class="ruby-identifier">name</span>)   <span class="ruby-comment"># &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_change</span>(:<span class="ruby-identifier">name</span>)   <span class="ruby-comment"># [&#39;Foo&#39;, &#39;Bar&#39;]</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>         <span class="ruby-comment"># {:name =&gt; [&#39;Foo&#39;, &#39;Bar&#39;]}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">reset_column</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">name</span>                   <span class="ruby-comment"># =&gt; &#39;Foo&#39;</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changed?</span>(:<span class="ruby-identifier">name</span>) <span class="ruby-comment"># false</span></pre>
             

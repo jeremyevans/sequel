@@ -38,7 +38,8 @@
         <div id='text'>
           <div id='description'>
             
-            <p>The schema_caching extension adds a few methods to Sequel::Database that
+            <p>The schema_caching extension adds a few methods to <a
+            href="../../../../classes/Sequel/Database.html">Sequel::Database</a> that
             make it easy to dump the parsed schema information to a file, and load it
             from that file.  Loading the schema information from a dumped file is
             faster than parsing it from the database, so this can save bootup time for
@@ -64,9 +65,10 @@
             the tables that your models use.</p>
             
             <p>Note that it is up to the application to ensure that the dumped cached
-            schema reflects the current state of the database.  Sequel does no checking
-            to ensure this, as checking would take time and the purpose of this code is
-            to take a shortcut.</p>
+            schema reflects the current state of the database.  <a
+            href="../../../../classes/Sequel.html">Sequel</a> does no checking to
+            ensure this, as checking would take time and the purpose of this code is to
+            take a shortcut.</p>
             
             <p>The cached schema is dumped in Marshal format, since it is the fastest and
             it handles all ruby objects used in the schema hash.  Because of this, you

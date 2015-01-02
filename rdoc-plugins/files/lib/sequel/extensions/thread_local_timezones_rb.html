@@ -57,11 +57,12 @@
             <p>This extension is designed to work with the named_timezones extension.</p>
             
             <p>This extension adds the thread_application_timezone=,
-            thread_database_timezone=, and thread_typecast_timezone= methods to the
-            Sequel module.  It overrides the application_timezone, database_timezone,
-            and typecast_timezone methods to check the related thread local timezone
-            first, and use it if present. If the related thread local timezone is not
-            present, it falls back to the default global timezone.</p>
+            thread_database_timezone=, and thread_typecast_timezone= methods to the <a
+            href="../../../../classes/Sequel.html">Sequel</a> module.  It overrides the
+            application_timezone, database_timezone, and typecast_timezone methods to
+            check the related thread local timezone first, and use it if present. If
+            the related thread local timezone is not present, it falls back to the
+            default global timezone.</p>
             
             <p>There is one special case of note.  If you have a default global timezone
             and you want to have a nil thread local timezone, you have to set the

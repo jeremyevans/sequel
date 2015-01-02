@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-The+Sequel+Object+Model">The <a href="../../classes/Sequel.html">Sequel</a> Object Model<span><a href="#label-The+Sequel+Object+Model">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-The+Sequel+Object+Model">The <a href="../../classes/Sequel.html">Sequel</a> Object Model<span><a href="#label-The+Sequel+Object+Model">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>Sequel&#39;s dataset layer is mostly structured as an DSL, so it often
             obscures what actual objects are being used.  For example, you don&#39;t
@@ -65,7 +65,7 @@
             (and subclasses)</p>
             </li></ul>
             
-            <h2 id="label-Sequel%3A%3ADatabase"><a href="../../classes/Sequel/Database.html">Sequel::Database</a><span><a href="#label-Sequel%3A%3ADatabase">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Sequel-3A-3ADatabase"><a href="../../classes/Sequel/Database.html">Sequel::Database</a><span><a href="#label-Sequel-3A-3ADatabase">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel/Database.html">Sequel::Database</a> is the
             main <a href="../../classes/Sequel.html">Sequel</a> object that you deal
@@ -99,7 +99,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]) <span class="ruby-comment"># (SELECT * FROM &quot;table&quot;)</span></pre>
             
-            <h2 id="label-Sequel%3A%3ADataset"><a href="../../classes/Sequel/Dataset.html">Sequel::Dataset</a><span><a href="#label-Sequel%3A%3ADataset">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Sequel-3A-3ADataset"><a href="../../classes/Sequel/Dataset.html">Sequel::Dataset</a><span><a href="#label-Sequel-3A-3ADataset">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel/Dataset.html">Sequel::Dataset</a> objects
             represent SQL queries, or more generally, they represent abstract
@@ -136,7 +136,7 @@
             
             <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">db</span> <span class="ruby-comment"># =&gt; DB</span></pre>
             
-            <h2 id="label-Sequel%3A%3AModel"><a href="../../classes/Sequel/Model.html">Sequel::Model</a><span><a href="#label-Sequel%3A%3AModel">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Sequel-3A-3AModel"><a href="../../classes/Sequel/Model.html">Sequel::Model</a><span><a href="#label-Sequel-3A-3AModel">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel/Model.html">Sequel::Model</a> objects are
             wrappers around a particular <a
@@ -164,7 +164,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">db</span> <span class="ruby-comment"># =&gt; DB</span></pre>
             
-            <h2 id="label-Standard+Ruby+Types">Standard Ruby Types<span><a href="#label-Standard+Ruby+Types">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Standard+Ruby+Types">Standard Ruby Types<span><a href="#label-Standard+Ruby+Types">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Where possible, <a href="../../classes/Sequel.html">Sequel</a> uses
             ruby&#39;s standard types to represent SQL concepts. In the examples here,
@@ -172,7 +172,7 @@
             side to <a
             href="../../classes/Sequel/Database.html#method-i-literal">Sequel::Database#literal</a>.</p>
             
-            <h3 id="label-Symbol">Symbol<span><a href="#label-Symbol">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Symbol">Symbol<span><a href="#label-Symbol">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>For example, ruby symbols represent SQL identifiers (tables, columns,
             schemas):</p>
@@ -194,14 +194,14 @@
             
             <pre class="ruby">:<span class="ruby-identifier">table__column___alias</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span></pre>
             
-            <h3 id="label-Integer%2C+Float%2C+BigDecimal%2C+String%2C+Date%2C+Time%2C+DateTime">Integer, Float, BigDecimal, String, Date, Time, DateTime<span><a href="#label-Integer%2C+Float%2C+BigDecimal%2C+String%2C+Date%2C+Time%2C+DateTime">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Integer-2C+Float-2C+BigDecimal-2C+String-2C+Date-2C+Time-2C+DateTime">Integer, Float, BigDecimal, String, Date, Time, DateTime<span><a href="#label-Integer-2C+Float-2C+BigDecimal-2C+String-2C+Date-2C+Time-2C+DateTime">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Ruby&#39;s Integer, Float, BigDecimal, String, Date, Time, and DateTime
             classes represent similar types in SQL:</p>
             
             <pre class="ruby"><span class="ruby-value">1</span>                     <span class="ruby-comment"># 1</span>&#x000A;<span class="ruby-value">1.0</span>                   <span class="ruby-comment"># 1.0</span>&#x000A;<span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;1.0&#39;</span>) <span class="ruby-comment"># 1.0</span>&#x000A;<span class="ruby-string">&quot;string&quot;</span>              <span class="ruby-comment"># &#39;string&#39;</span>&#x000A;<span class="ruby-constant">Date</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">2012</span>, <span class="ruby-value">5</span>, <span class="ruby-value">6</span>)  <span class="ruby-comment"># &#39;2012-05-06&#39;</span>&#x000A;<span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>              <span class="ruby-comment"># &#39;2012-05-06 10:20:30&#39;</span>&#x000A;<span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">now</span>          <span class="ruby-comment"># &#39;2012-05-06 10:20:30&#39;</span></pre>
             
-            <h3 id="label-Hash">Hash<span><a href="#label-Hash">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Hash">Hash<span><a href="#label-Hash">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> generally uses hash objects
             to represent equality:</p>
@@ -234,7 +234,7 @@
             
             <pre class="ruby">{:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-regexp">/a.*b/</span>} <span class="ruby-comment"># (&quot;column&quot; ~ &#39;a.*b&#39;)</span></pre>
             
-            <h3 id="label-Array">Array<span><a href="#label-Array">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Array">Array<span><a href="#label-Array">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> generally treats arrays as
             an SQL value list:</p>
@@ -249,7 +249,7 @@
             <p>The advantage of using an array over a hash for such a case is that a hash
             cannot include multiple objects with the same key, while the array can.</p>
             
-            <h2 id="label-Sequel%3A%3ASQL%3A%3AExpression+%28and+subclasses%29"><a href="../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a> (and subclasses)<span><a href="#label-Sequel%3A%3ASQL%3A%3AExpression+%28and+subclasses%29">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Sequel-3A-3ASQL-3A-3AExpression+-28and+subclasses-29"><a href="../../classes/Sequel/SQL/Expression.html">Sequel::SQL::Expression</a> (and subclasses)<span><a href="#label-Sequel-3A-3ASQL-3A-3AExpression+-28and+subclasses-29">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>If <a href="../../classes/Sequel.html">Sequel</a> needs to represent an SQL
             concept that does not map directly to an existing ruby class, it will
@@ -260,7 +260,7 @@
             <p>Some of the examples below show examples that require the <a
             href="core_extensions_rdoc.html">core_extensions extension</a>.</p>
             
-            <h3 id="label-Sequel%3A%3ALiteralString"><a href="../../classes/Sequel/LiteralString.html">Sequel::LiteralString</a><span><a href="#label-Sequel%3A%3ALiteralString">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ALiteralString"><a href="../../classes/Sequel/LiteralString.html">Sequel::LiteralString</a><span><a href="#label-Sequel-3A-3ALiteralString">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/LiteralString.html">Sequel::LiteralString</a>
             is not actually a <a
@@ -277,7 +277,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&quot;co&#39;de&quot;</span>)&#x000A;<span class="ruby-string">&quot;co&#39;de&quot;</span>.<span class="ruby-identifier">lit</span> <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3ABlob"><a href="../../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a><span><a href="#label-Sequel%3A%3ASQL%3A%3ABlob">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3ABlob"><a href="../../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a><span><a href="#label-Sequel-3A-3ASQL-3A-3ABlob">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQL/Blob.html">Sequel::SQL::Blob</a> is also
             a String subclass, but it is treated as an SQL blob instead of an SQL
@@ -291,7 +291,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">blob</span>(<span class="ruby-string">&quot;blob&quot;</span>)&#x000A;<span class="ruby-string">&quot;blob&quot;</span>.<span class="ruby-identifier">to_sequel_blob</span>  <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQLTime"><a href="../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a><span><a href="#label-Sequel%3A%3ASQLTime">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQLTime"><a href="../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a><span><a href="#label-Sequel-3A-3ASQLTime">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQLTime.html">Sequel::SQLTime</a> is a Time
             subclass.  However, it is treated specially by <a
@@ -301,7 +301,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-value">10</span>, <span class="ruby-value">20</span>, <span class="ruby-value">30</span>) <span class="ruby-comment"># &quot;10:20:30&quot;</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AValueList"><a href="../../classes/Sequel/SQL/ValueList.html">Sequel::SQL::ValueList</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AValueList">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AValueList"><a href="../../classes/Sequel/SQL/ValueList.html">Sequel::SQL::ValueList</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AValueList">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/ValueList.html">Sequel::SQL::ValueList</a>
@@ -327,7 +327,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">value_list</span>([[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]])&#x000A;[[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>], [<span class="ruby-value">3</span>, <span class="ruby-value">4</span>]].<span class="ruby-identifier">sql_value_list</span> <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AIdentifier"><a href="../../classes/Sequel/SQL/Identifier.html">Sequel::SQL::Identifier</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AIdentifier">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AIdentifier"><a href="../../classes/Sequel/SQL/Identifier.html">Sequel::SQL::Identifier</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AIdentifier">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/Identifier.html">Sequel::SQL::Identifier</a>
@@ -343,7 +343,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(:<span class="ruby-identifier">col__umn</span>)&#x000A;:<span class="ruby-identifier">col__umn</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AQualifiedIdentifier"><a href="../../classes/Sequel/SQL/QualifiedIdentifier.html">Sequel::SQL::QualifiedIdentifier</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AQualifiedIdentifier">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AQualifiedIdentifier"><a href="../../classes/Sequel/SQL/QualifiedIdentifier.html">Sequel::SQL::QualifiedIdentifier</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AQualifiedIdentifier">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/QualifiedIdentifier.html">Sequel::SQL::QualifiedIdentifier</a>
@@ -357,7 +357,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">table__column</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AAliasedExpression"><a href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AAliasedExpression">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AAliasedExpression"><a href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AAliasedExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a>
@@ -373,7 +373,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column___alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>, [:<span class="ruby-identifier">column_alias1</span>, :<span class="ruby-identifier">column_alias2</span>])&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AComplexExpression"><a href="../../classes/Sequel/SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AComplexExpression">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AComplexExpression"><a href="../../classes/Sequel/SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AComplexExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a>
@@ -391,7 +391,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(:<span class="ruby-identifier">col1</span>, :<span class="ruby-identifier">col2</span>)&#x000A;:<span class="ruby-identifier">col1</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">col2</span> <span class="ruby-comment"># core_extensions extension</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">2</span>)&#x000A;:<span class="ruby-identifier">column</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span> <span class="ruby-comment"># core_extensions extension</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([:<span class="ruby-identifier">column</span>, <span class="ruby-string">&#39;b&#39;</span>])&#x000A;:<span class="ruby-identifier">column</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39;b&#39;</span> <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3ACaseExpression"><a href="../../classes/Sequel/SQL/CaseExpression.html">Sequel::SQL::CaseExpression</a><span><a href="#label-Sequel%3A%3ASQL%3A%3ACaseExpression">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3ACaseExpression"><a href="../../classes/Sequel/SQL/CaseExpression.html">Sequel::SQL::CaseExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3ACaseExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/CaseExpression.html">Sequel::SQL::CaseExpression</a>
@@ -417,7 +417,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({<span class="ruby-value">2</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-value">0</span>, :<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">case</span>({{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, <span class="ruby-value">0</span>)&#x000A;&#x000A;{<span class="ruby-value">2</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>, :<span class="ruby-identifier">a</span>) <span class="ruby-comment"># core_extensions extension</span>&#x000A;{{:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}.<span class="ruby-identifier">case</span>(<span class="ruby-value">0</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3ACast"><a href="../../classes/Sequel/SQL/Cast.html">Sequel::SQL::Cast</a><span><a href="#label-Sequel%3A%3ASQL%3A%3ACast">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3ACast"><a href="../../classes/Sequel/SQL/Cast.html">Sequel::SQL::Cast</a><span><a href="#label-Sequel-3A-3ASQL-3A-3ACast">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQL/Cast.html">Sequel::SQL::Cast</a> objects
             represent CAST expressions in SQL, which does explicit typecasting in the
@@ -436,7 +436,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-constant">String</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">int4</span>)&#x000A;&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">String</span>) <span class="ruby-comment"># core_extensions extension</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">int4</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AColumnAll"><a href="../../classes/Sequel/SQL/ColumnAll.html">Sequel::SQL::ColumnAll</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AColumnAll">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AColumnAll"><a href="../../classes/Sequel/SQL/ColumnAll.html">Sequel::SQL::ColumnAll</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AColumnAll">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/ColumnAll.html">Sequel::SQL::ColumnAll</a>
@@ -453,7 +453,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-operator">*</span>&#x000A;:<span class="ruby-identifier">table</span>.<span class="ruby-operator">*</span> <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AConstant"><a href="../../classes/Sequel/SQL/Constant.html">Sequel::SQL::Constant</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AConstant">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AConstant"><a href="../../classes/Sequel/SQL/Constant.html">Sequel::SQL::Constant</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AConstant">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQL/Constant.html">Sequel::SQL::Constant</a>
             objects represent constants or psuedo-constants in SQL, such as TRUE, NULL,
@@ -467,7 +467,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">time=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_TIMESTAMP</span>)</pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3ADelayedEvaluation"><a href="../../classes/Sequel/SQL/DelayedEvaluation.html">Sequel::SQL::DelayedEvaluation</a><span><a href="#label-Sequel%3A%3ASQL%3A%3ADelayedEvaluation">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3ADelayedEvaluation"><a href="../../classes/Sequel/SQL/DelayedEvaluation.html">Sequel::SQL::DelayedEvaluation</a><span><a href="#label-Sequel-3A-3ASQL-3A-3ADelayedEvaluation">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/DelayedEvaluation.html">Sequel::SQL::DelayedEvaluation</a>
@@ -500,7 +500,7 @@
             <p>This will evaluate “some_model.updated_at” every time you literalize the
             dataset (usually every time it is executed).</p>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AFunction"><a href="../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AFunction">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AFunction"><a href="../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AFunction">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQL/Function.html">Sequel::SQL::Function</a>
             objects represents database function calls, which take a function name and
@@ -514,14 +514,14 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>, :<span class="ruby-identifier">a</span>, <span class="ruby-value">2</span>)&#x000A;:<span class="ruby-identifier">func</span>.<span class="ruby-identifier">sql_function</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AJoinClause"><a href="../../classes/Sequel/SQL/JoinClause.html">Sequel::SQL::JoinClause</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AJoinClause">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AJoinClause"><a href="../../classes/Sequel/SQL/JoinClause.html">Sequel::SQL::JoinClause</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AJoinClause">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/JoinClause.html">Sequel::SQL::JoinClause</a>
             objects represent SQL JOIN clauses.  They are usually not created manually,
             as the Dataset join methods create them automatically.</p>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3APlaceholderLiteralString"><a href="../../classes/Sequel/SQL/PlaceholderLiteralString.html">Sequel::SQL::PlaceholderLiteralString</a><span><a href="#label-Sequel%3A%3ASQL%3A%3APlaceholderLiteralString">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3APlaceholderLiteralString"><a href="../../classes/Sequel/SQL/PlaceholderLiteralString.html">Sequel::SQL::PlaceholderLiteralString</a><span><a href="#label-Sequel-3A-3ASQL-3A-3APlaceholderLiteralString">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/PlaceholderLiteralString.html">Sequel::SQL::PlaceholderLiteralString</a>
@@ -552,7 +552,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;? = ?&#39;</span>, :<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;:b = :v&#39;</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">v=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>([<span class="ruby-string">&#39;&#39;</span>, <span class="ruby-string">&#39; = &#39;</span>], :<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>)&#x000A;&#x000A;<span class="ruby-string">&#39;? = ?&#39;</span>.<span class="ruby-identifier">lit</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># core_extensions extension</span>&#x000A;<span class="ruby-string">&#39;:b = :v&#39;</span>.<span class="ruby-identifier">lit</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">v=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AOrderedExpression"><a href="../../classes/Sequel/SQL/OrderedExpression.html">Sequel::SQL::OrderedExpression</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AOrderedExpression">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AOrderedExpression"><a href="../../classes/Sequel/SQL/OrderedExpression.html">Sequel::SQL::OrderedExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AOrderedExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/OrderedExpression.html">Sequel::SQL::OrderedExpression</a>
@@ -573,7 +573,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">a</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">first</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">last</span>)&#x000A;&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">asc</span> <span class="ruby-comment"># core_extensions extension</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">desc</span> <span class="ruby-comment"># core_extensions extension</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">first</span>) <span class="ruby-comment"># core_extensions extension</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">last</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3ASubscript"><a href="../../classes/Sequel/SQL/Subscript.html">Sequel::SQL::Subscript</a><span><a href="#label-Sequel%3A%3ASQL%3A%3ASubscript">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3ASubscript"><a href="../../classes/Sequel/SQL/Subscript.html">Sequel::SQL::Subscript</a><span><a href="#label-Sequel-3A-3ASQL-3A-3ASubscript">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/Subscript.html">Sequel::SQL::Subscript</a>
@@ -588,7 +588,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span>, <span class="ruby-value">2</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">subscript</span>(:<span class="ruby-identifier">a</span>, <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>)&#x000A;&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># core_extensions extension</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span>, <span class="ruby-value">2</span>) <span class="ruby-comment"># core_extensions extension</span>&#x000A;:<span class="ruby-identifier">a</span>.<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">2</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AVirtualRow"><a href="../../classes/Sequel/SQL/VirtualRow.html">Sequel::SQL::VirtualRow</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AVirtualRow">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AVirtualRow"><a href="../../classes/Sequel/SQL/VirtualRow.html">Sequel::SQL::VirtualRow</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AVirtualRow">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a
             href="../../classes/Sequel/SQL/VirtualRow.html">Sequel::SQL::VirtualRow</a>
@@ -603,7 +603,7 @@
             <p>These objects are usually not instantiated manually.  See the <a
             href="virtual_rows_rdoc.html">Virtual Row Guide</a> for details.</p>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AWindow"><a href="../../classes/Sequel/SQL/Window.html">Sequel::SQL::Window</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AWindow">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AWindow"><a href="../../classes/Sequel/SQL/Window.html">Sequel::SQL::Window</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AWindow">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQL/Window.html">Sequel::SQL::Window</a>
             objects represent the windows used by <a
@@ -613,7 +613,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (ORDER BY &quot;a&quot;)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">parition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (PARTITION BY &quot;a&quot;)</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">parition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">frame=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">all</span>)&#x000A;<span class="ruby-comment"># (PARTITION BY &quot;a&quot; ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)</span></pre>
             
-            <h3 id="label-Sequel%3A%3ASQL%3A%3AWrapper"><a href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a><span><a href="#label-Sequel%3A%3ASQL%3A%3AWrapper">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Sequel-3A-3ASQL-3A-3AWrapper"><a href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AWrapper">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a>
             objects wrap arbitrary objects so that they can be used in <a

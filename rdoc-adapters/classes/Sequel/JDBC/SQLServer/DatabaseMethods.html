@@ -37,8 +37,26 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p><a href="../Database.html">Database</a> instance methods for <a
+            href="../SQLServer.html">SQLServer</a> databases accessed via <a
+            href="../../JDBC.html">JDBC</a>.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-metadata_dataset">metadata_dataset</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../MSSQL/DatabaseMethods.html">Sequel::JDBC::MSSQL::DatabaseMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
@@ -47,6 +65,25 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-metadata_dataset'>
+                <a name='method-i-metadata_dataset'></a>
+                <div class='synopsis'>
+                  <span class='name'>metadata_dataset</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-metadata_dataset-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-metadata_dataset-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">metadata_dataset</span>&#x000A;  <span class="ruby-keyword">super</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">MetadataDatasetMethods</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

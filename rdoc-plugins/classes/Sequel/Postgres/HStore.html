@@ -60,6 +60,7 @@
               <li><a target="docwin" href="#method-i-_dump">_dump</a></li>
               <li><a target="docwin" href="#method-i-fetch">fetch</a></li>
               <li><a target="docwin" href="#method-i-merge">merge</a></li>
+              <li><a target="docwin" href="#method-i-op">op</a></li>
               <li><a target="docwin" href="#method-i-sql_literal_append">sql_literal_append</a></li>
               <li><a target="docwin" href="#method-i-unquoted_literal">unquoted_literal</a></li>
             </ol>
@@ -98,9 +99,9 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
-                      <p>Default proc used for all underlying HStore hashes, so that even if you
-                      grab the underlying hash, it will still convert non-string keys to strings
-                      during lookup.</p>
+                      <p>Default proc used for all underlying <a href="HStore.html">HStore</a>
+                      hashes, so that even if you grab the underlying hash, it will still convert
+                      non-string keys to strings during lookup.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -175,8 +176,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Parse the given string into an HStore, assuming the str is in PostgreSQL
-                  hstore output format.</p>
+                  <p>Parse the given string into an <a href="HStore.html">HStore</a>, assuming
+                  the str is in PostgreSQL hstore output format.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-parse-source'); return false">
@@ -229,13 +230,31 @@
                 <div class='description'>
                   
                   <p>Convert the input hash to string keys and values before merging, and return
-                  a new HStore instance with the merged hash.</p>
+                  a new <a href="HStore.html">HStore</a> instance with the merged hash.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-merge-source'); return false">
                     [show source]
                   </a>
                   <pre id='method-i-merge-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 251</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>(<span class="ruby-identifier">convert_hash</span>(<span class="ruby-identifier">hash</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-op'>
+                <a name='method-i-op'></a>
+                <div class='synopsis'>
+                  <span class='name'>op</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Wrap the receiver in an <a href="HStoreOp.html">HStoreOp</a> so you can
+                  easily use the PostgreSQL hstore functions and operators with it.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-op-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 307</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_literal_append'>

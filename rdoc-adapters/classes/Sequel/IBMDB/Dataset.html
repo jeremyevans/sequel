@@ -42,7 +42,24 @@
       <div id='content'>
         <div id='text'>
           <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-call">call</a></li>
+              <li><a target="docwin" href="#method-i-convert_smallint_to_bool">convert_smallint_to_bool</a></li>
+              <li><a target="docwin" href="#attribute-i-convert_smallint_to_bool">convert_smallint_to_bool</a></li>
+              <li><a target="docwin" href="#method-i-fetch_rows">fetch_rows</a></li>
+              <li><a target="docwin" href="#method-i-prepare">prepare</a></li>
+            </ol>
+          </div>
           <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../DB2/DatasetMethods.html">Sequel::DB2::DatasetMethods</a></li>
+              </ol>
+            </div>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
@@ -52,6 +69,98 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-convert_smallint_to_bool'>convert_smallint_to_bool</a>
+                    </td>
+                    <td class='context-item-value'>[W]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Override the default <a
+                      href="../IBMDB.html#attribute-c-convert_smallint_to_bool">Sequel::IBMDB.convert_smallint_to_bool</a>
+                      setting for this dataset.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-call'>
+                <a name='method-i-call'></a>
+                <div class='synopsis'>
+                  <span class='name'>call</span>
+                  <span class='arguments'>(type, bind_arguments={}, *values, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Emulate support of bind arguments in called statements.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 419</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">bind_arguments</span>={}, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">CallableStatementMethods</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bind_arguments</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-convert_smallint_to_bool'>
+                <a name='method-i-convert_smallint_to_bool'></a>
+                <div class='synopsis'>
+                  <span class='name'>convert_smallint_to_bool</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Whether to convert smallint to boolean arguments for this dataset. Defaults
+                  to the <a href="../IBMDB.html">IBMDB</a> module setting.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-convert_smallint_to_bool-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-convert_smallint_to_bool-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 427</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">convert_smallint_to_bool</span>&#x000A;  <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@convert_smallint_to_bool</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@convert_smallint_to_bool</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@convert_smallint_to_bool</span> = <span class="ruby-constant">IBMDB</span>.<span class="ruby-identifier">convert_smallint_to_bool</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-fetch_rows'>
+                <a name='method-i-fetch_rows'></a>
+                <div class='synopsis'>
+                  <span class='name'>fetch_rows</span>
+                  <span class='arguments'>(sql)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Fetch the rows from the database and yield plain hashes.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 435</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">stmt</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">columns</span> = []&#x000A;    <span class="ruby-identifier">convert</span> = <span class="ruby-identifier">convert_smallint_to_bool</span>&#x000A;    <span class="ruby-identifier">cps</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">conversion_procs</span>&#x000A;    <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">num_fields</span>.<span class="ruby-identifier">times</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">k</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">field_name</span> <span class="ruby-identifier">i</span>&#x000A;      <span class="ruby-identifier">key</span> = <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">k</span>)&#x000A;      <span class="ruby-identifier">type</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">field_type</span>(<span class="ruby-identifier">i</span>).<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>&#x000A;      <span class="ruby-comment"># decide if it is a smallint from precision</span>&#x000A;      <span class="ruby-identifier">type</span> = <span class="ruby-value">:boolean</span>  <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:int</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">convert</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">field_precision</span>(<span class="ruby-identifier">i</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">8</span>&#x000A;      <span class="ruby-identifier">type</span> = <span class="ruby-value">:blob</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:clob</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DB2</span>.<span class="ruby-identifier">use_clob_as_blob</span>&#x000A;      <span class="ruby-identifier">columns</span> <span class="ruby-operator">&lt;&lt;</span> [<span class="ruby-identifier">key</span>, <span class="ruby-identifier">cps</span>[<span class="ruby-identifier">type</span>]]&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>)}&#x000A;    <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">cols</span>&#x000A;&#x000A;    <span class="ruby-keyword">while</span> <span class="ruby-identifier">res</span> = <span class="ruby-identifier">stmt</span>.<span class="ruby-identifier">fetch_array</span>&#x000A;      <span class="ruby-identifier">row</span> = {}&#x000A;      <span class="ruby-identifier">res</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">columns</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span>, (<span class="ruby-identifier">k</span>, <span class="ruby-identifier">pr</span>)<span class="ruby-operator">|</span>&#x000A;        <span class="ruby-identifier">row</span>[<span class="ruby-identifier">k</span>] = ((<span class="ruby-identifier">pr</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">v</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">yield</span> <span class="ruby-identifier">row</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-prepare'>
+                <a name='method-i-prepare'></a>
+                <div class='synopsis'>
+                  <span class='name'>prepare</span>
+                  <span class='arguments'>(type, name=nil, *values)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Store the given type of prepared statement in the associated database with
+                  the given name.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/ibmdb.rb, line 465</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

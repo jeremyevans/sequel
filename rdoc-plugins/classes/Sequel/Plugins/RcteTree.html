@@ -39,7 +39,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="module-Sequel::Plugins::RcteTree-label-Overview">Overview<span><a href="#module-Sequel::Plugins::RcteTree-label-Overview">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="module-Sequel::Plugins::RcteTree-label-Overview">Overview<span><a href="#module-Sequel::Plugins::RcteTree-label-Overview">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>The rcte_tree plugin deals with tree structured data stored in the database
             using the adjacency list model (where child rows have a foreign key
@@ -48,14 +48,14 @@
             and all descendants to a given level (where level 1 is children, level 2 is
             children and grandchildren etc.) in a single query.</p>
             
-            <h1 id="module-Sequel::Plugins::RcteTree-label-Background">Background<span><a href="#module-Sequel::Plugins::RcteTree-label-Background">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="module-Sequel::Plugins::RcteTree-label-Background">Background<span><a href="#module-Sequel::Plugins::RcteTree-label-Background">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>There are two types of common models for storing tree structured data in an
-            SQL database, the adjacency list model and the nested set model. Before
-            recursive common table expressions (or similar capabilities such as CONNECT
-            BY for Oracle), the nested set model was the only easy way to retrieve all
-            ancestors and descendants in a single query.  However, it has significant
-            performance corner cases.</p>
+            <a href="../SQL.html">SQL</a> database, the adjacency list model and the
+            nested set model. Before recursive common table expressions (or similar
+            capabilities such as CONNECT BY for Oracle), the nested set model was the
+            only easy way to retrieve all ancestors and descendants in a single query. 
+            However, it has significant performance corner cases.</p>
             
             <p>On PostgreSQL 8.4, with a significant number of rows, the nested set model
             is almost 500 times slower than using a recursive common table expression
@@ -69,7 +69,7 @@
             href="http://explainextended.com/2009/09/24/adjacency-list-vs-nested-sets-postgresql">explainextended.com/2009/09/24/adjacency-list-vs-nested-sets-postgresql</a>/
             for detailed analysis.</p>
             
-            <h1 id="module-Sequel::Plugins::RcteTree-label-Usage">Usage<span><a href="#module-Sequel::Plugins::RcteTree-label-Usage">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="module-Sequel::Plugins::RcteTree-label-Usage">Usage<span><a href="#module-Sequel::Plugins::RcteTree-label-Usage">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>The rcte_tree plugin adds four associations to the model: parent, children,
             ancestors, and descendants.  Both the parent and children are fairly
@@ -84,7 +84,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">rcte_tree</span>&#x000A;&#x000A;<span class="ruby-comment"># Lazy loading</span>&#x000A;<span class="ruby-identifier">model</span> = <span class="ruby-constant">Model</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">parent</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">children</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">ancestors</span> <span class="ruby-comment"># Populates :parent association for all ancestors</span>&#x000A;<span class="ruby-identifier">model</span>.<span class="ruby-identifier">descendants</span> <span class="ruby-comment"># Populates :children association for all descendants</span>&#x000A;&#x000A;<span class="ruby-comment"># Eager loading - also populates the :parent and children associations</span>&#x000A;<span class="ruby-comment"># for all ancestors and descendants</span>&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">ancestors</span>, :<span class="ruby-identifier">descendants</span>).<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Eager loading children and grand children</span>&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">descendants=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># Eager loading children, grand children, and great grand children</span>&#x000A;<span class="ruby-constant">Model</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">descendants=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>).<span class="ruby-identifier">all</span></pre>
             
-            <h1 id="module-Sequel::Plugins::RcteTree-label-Options">Options<span><a href="#module-Sequel::Plugins::RcteTree-label-Options">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="module-Sequel::Plugins::RcteTree-label-Options">Options<span><a href="#module-Sequel::Plugins::RcteTree-label-Options">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>You can override the options for any specific association by making sure
             the plugin options contain one of the following keys:</p>

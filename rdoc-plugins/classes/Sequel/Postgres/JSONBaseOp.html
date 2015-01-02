@@ -44,8 +44,9 @@
           <div id='description'>
             
             <p>The <a href="JSONBaseOp.html">JSONBaseOp</a> class is a simple container
-            for a single object that defines methods that yield Sequel expression
-            objects representing PostgreSQL json operators and functions.</p>
+            for a single object that defines methods that yield <a
+            href="../../Sequel.html">Sequel</a> expression objects representing
+            PostgreSQL json operators and functions.</p>
             
             <p>In the method documentation examples, assume that:</p>
             
@@ -135,7 +136,7 @@
                   <p>Get JSON array element or object field as json.  If an array is given, gets
                   the object at the specified path.</p>
                   
-                  <pre class="ruby"><span class="ruby-identifier">json_op</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># (json -&gt; 1)</span>&#x000A;<span class="ruby-identifier">json_op</span>[<span class="ruby-string">&#39;a&#39;</span>] <span class="ruby-comment"># (json -&gt; &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>[<span class="ruby-node">%wa b&#39;</span>] <span class="ruby-comment"># (json #&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span></pre>
+                  <pre class="ruby"><span class="ruby-identifier">json_op</span>[<span class="ruby-value">1</span>] <span class="ruby-comment"># (json -&gt; 1)</span>&#x000A;<span class="ruby-identifier">json_op</span>[<span class="ruby-string">&#39;a&#39;</span>] <span class="ruby-comment"># (json -&gt; &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>[<span class="ruby-node">%w&#39;a b&#39;</span>] <span class="ruby-comment"># (json #&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
@@ -290,7 +291,7 @@
                   <p>Get JSON array element or object field as text.  If an array is given, gets
                   the object at the specified path.</p>
                   
-                  <pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># (json -&gt;&gt; 1)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (json -&gt;&gt; &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-node">%wa b&#39;</span>) <span class="ruby-comment"># (json #&gt;&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span></pre>
+                  <pre class="ruby"><span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># (json -&gt;&gt; 1)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># (json -&gt;&gt; &#39;a&#39;)</span>&#x000A;<span class="ruby-identifier">json_op</span>.<span class="ruby-identifier">get_text</span>(<span class="ruby-node">%w&#39;a b&#39;</span>) <span class="ruby-comment"># (json #&gt;&gt; ARRAY[&#39;a&#39;, &#39;b&#39;])</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-get_text-source'); return false">

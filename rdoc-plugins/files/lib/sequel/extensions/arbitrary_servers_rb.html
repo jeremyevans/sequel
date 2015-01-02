@@ -49,9 +49,10 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>).<span class="ruby-identifier">all</span></pre>
             
-            <p>Because Sequel can never be sure that the connection will be reused,
-            arbitrary connections are disconnected as soon as the outermost block that
-            uses them exits.  So this example uses the same connection:</p>
+            <p>Because <a href="../../../../classes/Sequel.html">Sequel</a> can never be
+            sure that the connection will be reused, arbitrary connections are
+            disconnected as soon as the outermost block that uses them exits.  So this
+            example uses the same connection:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">server=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">server=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">host=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>, :<span class="ruby-identifier">database=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;...&#39;</span>}) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">c2</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-comment"># c == c2</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             

@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>The add_* association methods now accept a primary key, and associates the
             receiver to the associated model object with that primary key:</p>
@@ -51,7 +51,7 @@
             <pre>Album.plugin :validation_class_methods&#x000A;Album.validates_acceptance_of(:a)&#x000A;Album.validation_reflections&#x000A;# =&gt; {:a=&gt;[[:acceptance, {:tag=&gt;:acceptance, :allow_nil=&gt;true,&#x000A;            :message=&gt;&quot;is not accepted&quot;, :accept=&gt;&quot;1&quot;}]]}</pre>
             </li></ul>
             
-            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>In the postgres, mysql, and sqlite adapters, typecasting now uses methods
             instead of procs.  Since methods aren&#39;t closures (while procs are),
@@ -85,7 +85,7 @@
             easier to determine at a glance which license is used.</p>
             </li></ul>
             
-            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Because <a href="../../../classes/Sequel.html">Sequel</a> switched the
             generic File type from image to varbinary(max) on Microsoft SQL Server, any

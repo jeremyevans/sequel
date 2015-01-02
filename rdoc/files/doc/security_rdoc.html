@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Security+Considerations+with+Sequel">Security Considerations with <a href="../../classes/Sequel.html">Sequel</a><span><a href="#label-Security+Considerations+with+Sequel">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Security+Considerations+with+Sequel">Security Considerations with <a href="../../classes/Sequel.html">Sequel</a><span><a href="#label-Security+Considerations+with+Sequel">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p>When using <a href="../../classes/Sequel.html">Sequel</a>, there are some
             security areas you should be aware of:</p>
@@ -54,7 +54,7 @@
             <p>General Parameter Handling</p>
             </li></ul>
             
-            <h2 id="label-Code+Execution">Code Execution<span><a href="#label-Code+Execution">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Code+Execution">Code Execution<span><a href="#label-Code+Execution">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The most serious security vulnerability you can have in any library is a
             code execution vulnerability.  <a
@@ -85,7 +85,7 @@
             <p>As long as you don&#39;t call those with user input, you should not be
             vulnerable to code execution.</p>
             
-            <h2 id="label-SQL+Injection">SQL Injection<span><a href="#label-SQL+Injection">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-SQL+Injection">SQL Injection<span><a href="#label-SQL+Injection">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The primary security concern in SQL database libraries is SQL injection.
             Because <a href="../../classes/Sequel.html">Sequel</a> promotes using ruby
@@ -101,9 +101,9 @@
             <p>SQL identifier injections</p>
             </li></ul>
             
-            <h3 id="label-SQL+Code+Injections">SQL Code Injections<span><a href="#label-SQL+Code+Injections">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-SQL+Code+Injections">SQL Code Injections<span><a href="#label-SQL+Code+Injections">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <h4 id="label-Full+SQL+Strings">Full SQL Strings<span><a href="#label-Full+SQL+Strings">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-Full+SQL+Strings">Full SQL Strings<span><a href="#label-Full+SQL+Strings">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>Some <a href="../../classes/Sequel.html">Sequel</a> methods are designed to
             execute raw SQL, including:</p>
@@ -155,7 +155,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;SELECT * FROM foo WHERE bar = ?&#39;</span>, <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">user</span>].<span class="ruby-identifier">to_s</span>]</pre>
             
-            <h4 id="label-Manually+Created+Literal+Strings">Manually Created Literal Strings<span><a href="#label-Manually+Created+Literal+Strings">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-Manually+Created+Literal+Strings">Manually Created Literal Strings<span><a href="#label-Manually+Created+Literal+Strings">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> generally treats ruby
             strings as SQL strings (escaping them correctly), and not as raw SQL. 
@@ -190,7 +190,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Date</span>.<span class="ruby-identifier">today</span>) <span class="ruby-comment"># &quot;&#39;2013-03-22&#39;&quot;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># &quot;&#39;a&#39;&quot;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)) <span class="ruby-comment"># &quot;a&quot;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">a</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># &quot;(\&quot;a\&quot; = &#39;a&#39;)&quot;</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">a</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">lit</span>(<span class="ruby-string">&#39;a&#39;</span>)) <span class="ruby-comment"># &quot;(\&quot;a\&quot; = a)&quot;</span></pre>
             
-            <h4 id="label-SQL+Filter+Fragments">SQL Filter Fragments<span><a href="#label-SQL+Filter+Fragments">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-SQL+Filter+Fragments">SQL Filter Fragments<span><a href="#label-SQL+Filter+Fragments">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>The most common way to use raw SQL with <a
             href="../../classes/Sequel.html">Sequel</a> is in filters:</p>
@@ -262,7 +262,7 @@
             href="../../classes/Sequel/Model/ClassMethods.html#method-i-find_or_create">Model.find_or_create</a>
             class methods also call down to the filter methods.</p>
             
-            <h4 id="label-SQL+Fragment+passed+to+Dataset%23update">SQL Fragment passed to Dataset#update<span><a href="#label-SQL+Fragment+passed+to+Dataset%23update">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-SQL+Fragment+passed+to+Dataset-23update">SQL Fragment passed to Dataset#update<span><a href="#label-SQL+Fragment+passed+to+Dataset-23update">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>Similar to the filter methods, <a
             href="../../classes/Sequel/Dataset.html#method-i-update">Sequel::Dataset#update</a>
@@ -278,14 +278,14 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[:<span class="ruby-identifier">value</span>].<span class="ruby-identifier">to_s</span>) <span class="ruby-comment"># Safe</span></pre>
             
-            <h4 id="label-SQL+Fragment+passed+to+Dataset%23lock_style">SQL Fragment passed to Dataset#lock_style<span><a href="#label-SQL+Fragment+passed+to+Dataset%23lock_style">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-SQL+Fragment+passed+to+Dataset-23lock_style">SQL Fragment passed to Dataset#lock_style<span><a href="#label-SQL+Fragment+passed+to+Dataset-23lock_style">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>The <a
             href="../../classes/Sequel/Dataset.html#method-i-lock_style">Sequel::Dataset#lock_style</a>
             method also treats an input string  as SQL code. This method should not be
             called with user input.</p>
             
-            <h4 id="label-SQL+Type+Names">SQL Type Names<span><a href="#label-SQL+Type+Names">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-SQL+Type+Names">SQL Type Names<span><a href="#label-SQL+Type+Names">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>In general, most places where <a
             href="../../classes/Sequel.html">Sequel</a> needs to use an SQL type that
@@ -293,13 +293,13 @@
             that string is used verbatim as the SQL type.  You should not use user
             input for type strings.</p>
             
-            <h4 id="label-SQL+Function+Names">SQL Function Names<span><a href="#label-SQL+Function+Names">&para;</a> <a href="#documentation">&uarr;</a></span></h4>
+            <h4 id="label-SQL+Function+Names">SQL Function Names<span><a href="#label-SQL+Function+Names">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>In most cases, <a href="../../classes/Sequel.html">Sequel</a> does not
             quote SQL function names.  You should not use user input for function
             names.</p>
             
-            <h3 id="label-SQL+Identifier+Injections">SQL Identifier Injections<span><a href="#label-SQL+Identifier+Injections">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-SQL+Identifier+Injections">SQL Identifier Injections<span><a href="#label-SQL+Identifier+Injections">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Usually, <a href="../../classes/Sequel.html">Sequel</a> treats ruby symbols
             as SQL identifiers, and ruby strings as SQL strings.  However, there are
@@ -357,7 +357,7 @@
             However, if you are creating symbols from user input, you at least have a
             denial of service vulnerability, and possibly a more serious vulnerability.</p>
             
-            <h2 id="label-Denial+of+Service">Denial of Service<span><a href="#label-Denial+of+Service">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Denial+of+Service">Denial of Service<span><a href="#label-Denial+of+Service">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> converts some strings to
             symbols.  Because symbols in ruby are not garbage collected, if the strings
@@ -371,7 +371,7 @@
             href="../../classes/Sequel.html">Sequel</a> creates symbols, so they do not
             introduce a vulnerability into their application.</p>
             
-            <h3 id="label-Column+Names%2FAliases">Column Names/Aliases<span><a href="#label-Column+Names%2FAliases">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Column+Names-2FAliases">Column Names/Aliases<span><a href="#label-Column+Names-2FAliases">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> returns SQL result sets as
             an array of hashes with symbol keys.  The keys are derived from the name
@@ -396,7 +396,7 @@
             returned hash(es) by name, and if an alias was used and you didn&#39;t
             expect it, your application wouldn&#39;t work.</p>
             
-            <h3 id="label-Database+Connection+Options">Database Connection Options<span><a href="#label-Database+Connection+Options">&para;</a> <a href="#documentation">&uarr;</a></span></h3>
+            <h3 id="label-Database+Connection+Options">Database Connection Options<span><a href="#label-Database+Connection+Options">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>All database connection options are converted to symbols.  For a connection
             URL, the keys are generally fixed, but the scheme is turned into a symbol
@@ -414,7 +414,7 @@
             <p>This is not generally a risk unless you are allowing the user to control
             the connection URLs or are connecting to arbitrary databases at runtime.</p>
             
-            <h2 id="label-Mass+Assignment">Mass Assignment<span><a href="#label-Mass+Assignment">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Mass+Assignment">Mass Assignment<span><a href="#label-Mass+Assignment">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Mass assignment is the practice of passing a hash of columns and values to
             a single method, and having multiple column values for a given object set
@@ -469,7 +469,7 @@
             <p>For more details on the mass assignment methods, see the <a
             href="mass_assignment_rdoc.html">Mass Assignment Guide</a>.</p>
             
-            <h2 id="label-General+Parameter+Handling">General Parameter Handling<span><a href="#label-General+Parameter+Handling">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-General+Parameter+Handling">General Parameter Handling<span><a href="#label-General+Parameter+Handling">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>This issue isn&#39;t necessarily specific to <a
             href="../../classes/Sequel.html">Sequel</a>, but it is a good general

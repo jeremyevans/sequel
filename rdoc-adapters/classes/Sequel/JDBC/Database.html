@@ -36,9 +36,6 @@
           <li class='other'>
             <a target="docwin" href="../../../files/lib/sequel/adapters/jdbc/db2_rb.html">lib/sequel/adapters/jdbc/db2.rb</a>
           </li>
-          <li class='other'>
-            <a target="docwin" href="../../../files/lib/sequel/adapters/jdbc/mssql_rb.html">lib/sequel/adapters/jdbc/mssql.rb</a>
-          </li>
           <li>
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
           </li>
@@ -52,8 +49,8 @@
         <div id='text'>
           <div id='description'>
             
-            <p>JDBC Databases offer a fairly uniform interface that does not change much
-            based on the sub adapter.</p>
+            <p><a href="../JDBC.html">JDBC</a> Databases offer a fairly uniform interface
+            that does not change much based on the sub adapter.</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -106,13 +103,29 @@
                     <td class='context-item-value'><a target="docwin" href="#method-i-execute">execute</a></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>jdbc_indexes</td>
+                    <td>-&gt;</td>
+                    <td class='context-item-value'><a target="docwin" href="#method-i-indexes">indexes</a></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>jdbc_schema_parse_table</td>
                     <td>-&gt;</td>
                     <td class='context-item-value'><a target="docwin" href="#method-i-schema_parse_table">schema_parse_table</a></td>
                     <td class='context-item-desc'>
                       
-                      <p>Alias the generic JDBC version so it can be called directly later</p>
+                      <p>Alias the generic <a href="../JDBC.html">JDBC</a> versions so they can be
+                      called directly later</p>
                     </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>jdbc_tables</td>
+                    <td>-&gt;</td>
+                    <td class='context-item-value'><a target="docwin" href="#method-i-tables">tables</a></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>jdbc_views</td>
+                    <td>-&gt;</td>
+                    <td class='context-item-value'><a target="docwin" href="#method-i-views">views</a></td>
                   </tr>
                 </table>
               </div>
@@ -128,8 +141,8 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      <p>Map of JDBC type ids to callable objects that return appropriate ruby or
-                      java values.</p>
+                      <p>Map of <a href="../JDBC.html">JDBC</a> type ids to callable objects that
+                      return appropriate ruby or java values.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -139,9 +152,9 @@
                     <td class='context-item-value'>[RW]</td>
                     <td class='context-item-desc'>
                       
-                      <p>Whether to convert some Java types to ruby types when retrieving rows. True
-                      by default, can be set to false to roughly double performance when fetching
-                      rows.</p>
+                      <p>Whether to convert some <a href="Java.html">Java</a> types to ruby types
+                      when retrieving rows. True by default, can be set to false to roughly
+                      double performance when fetching rows.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -161,7 +174,8 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      <p>The Java database driver we are using (should be a Java class)</p>
+                      <p>The <a href="Java.html">Java</a> database driver we are using (should be a
+                      <a href="Java.html">Java</a> class)</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -171,8 +185,9 @@
                     <td class='context-item-value'>[RW]</td>
                     <td class='context-item-desc'>
                       
-                      <p>The fetch size to use for JDBC Statement objects created by this database.
-                      By default, this is nil so a fetch size is not set explicitly.</p>
+                      <p>The fetch size to use for <a href="../JDBC.html">JDBC</a> Statement objects
+                      created by this database. By default, this is nil so a fetch size is not
+                      set explicitly.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -182,8 +197,8 @@
                     <td class='context-item-value'>[R]</td>
                     <td class='context-item-desc'>
                       
-                      <p>Map of JDBC type ids to callable objects that return appropriate ruby
-                      values.</p>
+                      <p>Map of <a href="../JDBC.html">JDBC</a> type ids to callable objects that
+                      return appropriate ruby values.</p>
                     </td>
                   </tr>
                 </table>
@@ -252,8 +267,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Execute the given SQL.  If a block is given, if should be a SELECT
-                  statement or something else that returns rows.</p>
+                  <p>Execute the given <a href="../SQL.html">SQL</a>.  If a block is given, if
+                  should be a SELECT statement or something else that returns rows.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
@@ -270,7 +285,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Execute the given DDL SQL, which should not return any values or rows.</p>
+                  <p>Execute the given DDL <a href="../SQL.html">SQL</a>, which should not
+                  return any values or rows.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_ddl-source'); return false">
@@ -287,7 +303,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Execute the given INSERT SQL, returning the last inserted row id.</p>
+                  <p>Execute the given INSERT <a href="../SQL.html">SQL</a>, returning the last
+                  inserted row id.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
@@ -304,7 +321,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Use the JDBC metadata to get a list of foreign keys for the table.</p>
+                  <p>Use the <a href="../JDBC.html">JDBC</a> metadata to get a list of foreign
+                  keys for the table.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-foreign_key_list-source'); return false">
@@ -321,7 +339,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Use the JDBC metadata to get the index information for the table.</p>
+                  <p>Use the <a href="../JDBC.html">JDBC</a> metadata to get the index
+                  information for the table.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-indexes-source'); return false">
@@ -374,7 +393,8 @@
                   
                   <p>The uri for this connection.  You can specify the uri using the :uri, :url,
                   or :database options.  You don&#39;t need to worry about this if you use
-                  Sequel.connect with the JDBC connectrion strings.</p>
+                  Sequel.connect with the <a href="../JDBC.html">JDBC</a> connectrion
+                  strings.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-uri-source'); return false">

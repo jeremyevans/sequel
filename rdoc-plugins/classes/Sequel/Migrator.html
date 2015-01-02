@@ -41,7 +41,90 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>The <code>Migrator</code> class performs migrations based on migration
+            files in a  specified directory. The migration files should be named using
+            the following pattern:</p>
+            
+            <pre>&lt;version&gt;_&lt;title&gt;.rb</pre>
+            
+            <p>For example, the following files are considered migration files:</p>
+            
+            <pre>001_create_sessions.rb&#x000A;002_add_data_column.rb</pre>
+            
+            <p>You can also use timestamps as version numbers:</p>
+            
+            <pre>1273253850_create_sessions.rb&#x000A;1273257248_add_data_column.rb</pre>
+            
+            <p>If any migration filenames use timestamps as version numbers, <a
+            href="../Sequel.html">Sequel</a> uses the <code>TimestampMigrator</code> to
+            migrate, otherwise it uses the <code>IntegerMigrator</code>. The
+            <code>TimestampMigrator</code> can handle migrations that are run out of
+            order as well as migrations with the same timestamp, while the
+            <code>IntegerMigrator</code> is more strict and raises exceptions for
+            missing or duplicate migration files.</p>
+            
+            <p>The migration files should contain either one <code>Migration</code>
+            subclass or one <code>Sequel.migration</code> call.</p>
+            
+            <p>Migrations are generally run via the sequel command line tool, using the -m
+            and -M switches.  The -m switch specifies the migration directory, and the
+            -M switch specifies the version to which to migrate.</p>
+            
+            <p>You can apply migrations using the <a href="Migrator.html">Migrator</a>
+            API, as well (this is necessary if you want to specify the version from
+            which to migrate in addition to the version to which to migrate). To apply
+            a migrator, the <code>apply</code> method must be invoked with the database
+            instance, the directory of migration files and the target version. If no
+            current version is supplied, it is read from the database. The migrator
+            automatically creates a table (schema_info for integer migrations and
+            schema_migrations for timestamped migrations). in the database to keep
+            track of the current migration version. If no migration version is stored
+            in the database, the version is considered to be 0. If no target version is
+            specified, the database is migrated to the latest version available in the
+            migration directory.</p>
+            
+            <p>For example, to migrate the database to the latest version:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>)</pre>
+            
+            <p>For example, to migrate the database all the way down:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-value">0</span>)</pre>
+            
+            <p>For example, to migrate the database to version 4:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-value">4</span>)</pre>
+            
+            <p>To migrate the database from version 1 to version 5:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&#39;.&#39;</span>, <span class="ruby-value">5</span>, <span class="ruby-value">1</span>)</pre>
+            
+            <p>Part of the <code>migration</code> extension.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+              <li><a target="docwin" href="#method-c-check_current">check_current</a></li>
+              <li><a target="docwin" href="#method-c-is_current-3F">is_current?</a></li>
+              <li><a target="docwin" href="#method-c-migrator_class">migrator_class</a></li>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+              <li><a target="docwin" href="#method-c-run">run</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#attribute-i-column">column</a></li>
+              <li><a target="docwin" href="#attribute-i-db">db</a></li>
+              <li><a target="docwin" href="#attribute-i-directory">directory</a></li>
+              <li><a target="docwin" href="#attribute-i-ds">ds</a></li>
+              <li><a target="docwin" href="#attribute-i-files">files</a></li>
+              <li><a target="docwin" href="#attribute-i-table">table</a></li>
+              <li><a target="docwin" href="#attribute-i-target">target</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
           <div id='class-list'>
@@ -52,6 +135,246 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MIGRATION_FILE_PATTERN</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/\A(\d+)_.+\.rb\z/i.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MIGRATION_SPLITTER</td>
+                    <td>=</td>
+                    <td class='context-item-value'>'_'.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MINIMUM_TIMESTAMP</td>
+                    <td>=</td>
+                    <td class='context-item-value'>20000101</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-column'>column</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The column to use to hold the migration version number for integer
+                      migrations or filename for timestamp migrations (defaults to :version for
+                      integer migrations and :filename for timestamp migrations)</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-db'>db</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The database related to this migrator</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-directory'>directory</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The directory for this migrator&#39;s files</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-ds'>ds</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The dataset for this migrator, representing the <code>schema_info</code>
+                      table for integer migrations and the <code>schema_migrations</code> table
+                      for timestamp migrations</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-files'>files</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>All migration files in this migrator&#39;s directory</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-table'>table</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The table to use to hold the applied migration data (defaults to
+                      :schema_info for integer migrations and :schema_migrations for timestamp
+                      migrations)</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-target'>target</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The target version for this migrator</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(db, directory, target = nil, current = nil)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Wrapper for <code>run</code>, maintaining backwards API compatibility</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 361</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">target</span> = <span class="ruby-keyword">nil</span>, <span class="ruby-identifier">current</span> = <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-value">:target</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">target</span>, <span class="ruby-value">:current</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">current</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-check_current'>
+                <a name='method-c-check_current'></a>
+                <div class='synopsis'>
+                  <span class='name'>check_current</span>
+                  <span class='arguments'>(*args)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Raise a <a href="Migrator/NotCurrentError.html">NotCurrentError</a> unless
+                  the migrator is current, takes the same arguments as run.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-check_current-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-check_current-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 367</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">check_current</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">NotCurrentError</span>, <span class="ruby-string">&#39;migrator is not current&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">is_current?</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-is_current-3F'>
+                <a name='method-c-is_current-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>is_current?</span>
+                  <span class='arguments'>(db, directory, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return whether the migrator is current (i.e. it does not need to make any
+                  changes).  Takes the same arguments as run.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-is_current-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-is_current-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 373</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">is_current?</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">migrator_class</span>(<span class="ruby-identifier">directory</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">is_current?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-migrator_class'>
+                <a name='method-c-migrator_class'></a>
+                <div class='synopsis'>
+                  <span class='name'>migrator_class</span>
+                  <span class='arguments'>(directory)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Choose the <a href="Migrator.html">Migrator</a> subclass to use.  Uses the
+                  <a href="TimestampMigrator.html">TimestampMigrator</a> if the version
+                  number appears to be a unix time integer for a year after 2005, otherwise
+                  uses the <a href="IntegerMigrator.html">IntegerMigrator</a>.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-migrator_class-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-migrator_class-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 397</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">migrator_class</span>(<span class="ruby-identifier">directory</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">equal?</span>(<span class="ruby-constant">Migrator</span>)&#x000A;    <span class="ruby-constant">Dir</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">directory</span>).<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">file</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-keyword">next</span> <span class="ruby-keyword">unless</span> <span class="ruby-constant">MIGRATION_FILE_PATTERN</span>.<span class="ruby-identifier">match</span>(<span class="ruby-identifier">file</span>)&#x000A;      <span class="ruby-keyword">return</span> <span class="ruby-constant">TimestampMigrator</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">file</span>.<span class="ruby-identifier">split</span>(<span class="ruby-constant">MIGRATION_SPLITTER</span>, <span class="ruby-value">2</span>).<span class="ruby-identifier">first</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">MINIMUM_TIMESTAMP</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-constant">IntegerMigrator</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(db, directory, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Setup the state for the migrator</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 435</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must supply a valid migration path&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-constant">File</span>.<span class="ruby-identifier">directory?</span>(<span class="ruby-identifier">directory</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@directory</span> = <span class="ruby-identifier">directory</span>&#x000A;  <span class="ruby-ivar">@allow_missing_migration_files</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_missing_migration_files</span>]&#x000A;  <span class="ruby-ivar">@files</span> = <span class="ruby-identifier">get_migration_files</span>&#x000A;  <span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span> = <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:schema_and_table</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table</span>]  <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-value">:DEFAULT_SCHEMA_TABLE</span>))&#x000A;  <span class="ruby-ivar">@table</span> = <span class="ruby-identifier">schema</span> <span class="ruby-operator">?</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">schema</span>, <span class="ruby-identifier">table</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">table</span>&#x000A;  <span class="ruby-ivar">@column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:column</span>] <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-value">:DEFAULT_SCHEMA_COLUMN</span>)&#x000A;  <span class="ruby-ivar">@ds</span> = <span class="ruby-identifier">schema_dataset</span>&#x000A;  <span class="ruby-ivar">@use_transactions</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:use_transactions</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-run'>
+                <a name='method-c-run'></a>
+                <div class='synopsis'>
+                  <span class='name'>run</span>
+                  <span class='arguments'>(db, directory, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Migrates the supplied database using the migration files in the specified
+                  directory. Options:</p>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_missing_migration_files </td><td>
+                  <p>Don&#39;t raise an error if there are missing migration files.</p>
+                  </td></tr><tr><td class='label'>:column </td><td>
+                  <p>The column in the :table argument storing the migration version (default:
+                  :version).</p>
+                  </td></tr><tr><td class='label'>:current </td><td>
+                  <p>The current version of the database.  If not given, it is retrieved from
+                  the database using the :table and :column options.</p>
+                  </td></tr><tr><td class='label'>:table </td><td>
+                  <p>The table containing the schema version (default: :schema_info).</p>
+                  </td></tr><tr><td class='label'>:target </td><td>
+                  <p>The target version to which to migrate.  If not given, migrates to the
+                  maximum version.</p>
+                  </td></tr></tbody></table>
+                  
+                  <p>Examples:</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&quot;migrations&quot;</span>)&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&quot;migrations&quot;</span>, :<span class="ruby-identifier">target=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">15</span>, :<span class="ruby-identifier">current=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10</span>)&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&quot;app1/migrations&quot;</span>, :<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">app2_version</span>)&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Migrator</span>.<span class="ruby-identifier">run</span>(<span class="ruby-constant">DB</span>, <span class="ruby-string">&quot;app2/migrations&quot;</span>, :<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">app2_version</span>, :<span class="ruby-identifier">table=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">schema_info2</span>)</pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-run-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-run-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 390</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">run</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">migrator_class</span>(<span class="ruby-identifier">directory</span>).<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">directory</span>, <span class="ruby-identifier">opts</span>).<span class="ruby-identifier">run</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

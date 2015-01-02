@@ -47,7 +47,7 @@
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">date_arithmetic</span></pre>
             
             <p>Then you can use the Sequel.date_add and Sequel.date_sub methods to return
-            Sequel expressions:</p>
+            <a href="../../../../classes/Sequel.html">Sequel</a> expressions:</p>
             
             <pre class="ruby"><span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(:<span class="ruby-identifier">date_column</span>, :<span class="ruby-identifier">years=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">months=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">days=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-identifier">sub</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_sub</span>(:<span class="ruby-identifier">date_column</span>, :<span class="ruby-identifier">hours=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">minutes=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>, :<span class="ruby-identifier">seconds=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)</pre>
             
@@ -56,8 +56,8 @@
             
             <pre class="ruby"><span class="ruby-identifier">require</span> <span class="ruby-string">&#39;active_support/all&#39;</span>&#x000A;<span class="ruby-identifier">add</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_add</span>(:<span class="ruby-identifier">date_column</span>, <span class="ruby-value">1</span>.<span class="ruby-identifier">years</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>.<span class="ruby-identifier">months</span> <span class="ruby-operator">+</span> <span class="ruby-value">3</span>.<span class="ruby-identifier">days</span>)&#x000A;<span class="ruby-identifier">sub</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">date_sub</span>(:<span class="ruby-identifier">date_column</span>, <span class="ruby-value">1</span>.<span class="ruby-identifier">hours</span> <span class="ruby-operator">+</span> <span class="ruby-value">2</span>.<span class="ruby-identifier">minutes</span> <span class="ruby-operator">+</span> <span class="ruby-value">3</span>.<span class="ruby-identifier">seconds</span>)</pre>
             
-            <p>These expressions can be used in your datasets, or anywhere else that
-            Sequel expressions are allowed:</p>
+            <p>These expressions can be used in your datasets, or anywhere else that <a
+            href="../../../../classes/Sequel.html">Sequel</a> expressions are allowed:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">select</span>(<span class="ruby-identifier">add</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">d</span>)).<span class="ruby-identifier">where</span>(<span class="ruby-identifier">sub</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CURRENT_TIMESTAMP</span>)</pre>
           </div>

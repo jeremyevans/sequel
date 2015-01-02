@@ -43,8 +43,9 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">test</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (1 = 0)</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">test</span>].<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (1 = 1)</span></pre>
             
-            <p>The default Sequel behavior is to respect NULLs, so that when name is NULL,
-            the expression returns NULL.</p>
+            <p>The default <a href="../../../../classes/Sequel.html">Sequel</a> behavior
+            is to respect NULLs, so that when name is NULL, the expression returns
+            NULL.</p>
             
             <p>You can load this extension into specific datasets:</p>
             

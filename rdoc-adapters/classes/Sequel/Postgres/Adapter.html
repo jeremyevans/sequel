@@ -41,10 +41,118 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p><a href="../../PGconn.html">PGconn</a> subclass for connection specific
+            methods used with the pg, postgres, or postgres-pr driver.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-check_disconnect_errors">check_disconnect_errors</a></li>
+              <li><a target="docwin" href="#method-i-execute">execute</a></li>
+              <li><a target="docwin" href="#attribute-i-prepared_statements">prepared_statements</a></li>
+            </ol>
+          </div>
           <div id='context'>
           </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="Adapter/PG.html">Sequel::Postgres::Adapter::PG</a></li>
+            </ol>
+          </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DISCONNECT_ERROR_CLASSES</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[IOError, Errno::EPIPE, Errno::ECONNRESET]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The underlying exception classes to reraise as disconnect errors instead of
+                      regular database errors.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DISCONNECT_ERROR_RE</td>
+                    <td>=</td>
+                    <td class='context-item-value'>/\A#{Regexp.union(disconnect_errors)}/</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Since exception class based disconnect checking may not work, also trying
+                      parsing the exception message to look for disconnect errors.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-prepared_statements'>prepared_statements</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Hash of prepared statements for this connection.  Keys are string names of
+                      the server side prepared statement, and values are <a
+                      href="../SQL.html">SQL</a> strings.</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-check_disconnect_errors'>
+                <a name='method-i-check_disconnect_errors'></a>
+                <div class='synopsis'>
+                  <span class='name'>check_disconnect_errors</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Raise a Sequel::DatabaseDisconnectError if a one of the disconnect error
+                  classes is raised, or a PGError is raised and the connection status cannot
+                  be determined or it is not OK.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-check_disconnect_errors-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-check_disconnect_errors-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_disconnect_errors</span>&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-keyword">yield</span>&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-operator">*</span><span class="ruby-constant">DISCONNECT_ERROR_CLASSES</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>))&#x000A;  <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;    <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">s</span> = <span class="ruby-identifier">status</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">PGError</span>&#x000A;      <span class="ruby-identifier">disconnect</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">status_ok</span> = (<span class="ruby-identifier">s</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Adapter</span><span class="ruby-operator">::</span><span class="ruby-constant">CONNECTION_OK</span>)&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">||=</span> <span class="ruby-operator">!</span><span class="ruby-identifier">status_ok</span>&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">e</span>.<span class="ruby-identifier">message</span> <span class="ruby-operator">=~</span> <span class="ruby-constant">DISCONNECT_ERROR_RE</span>&#x000A;    <span class="ruby-identifier">disconnect</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">convert_exception_class</span>(<span class="ruby-identifier">e</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">DatabaseDisconnectError</span>)) <span class="ruby-operator">:</span> <span class="ruby-identifier">raise</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">block</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_ok</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">disconnect</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-execute'>
+                <a name='method-i-execute'></a>
+                <div class='synopsis'>
+                  <span class='name'>execute</span>
+                  <span class='arguments'>(sql, args=nil)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Execute the given <a href="../SQL.html">SQL</a> with this connection.  If a
+                  block is given, yield the results, otherwise, return the number of changed
+                  rows.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 165</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">v</span>, <span class="ruby-keyword">self</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">q</span> = <span class="ruby-identifier">check_disconnect_errors</span>{<span class="ruby-identifier">execute_query</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>)}&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">block_given?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">yield</span>(<span class="ruby-identifier">q</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">cmd_tuples</span>&#x000A;  <span class="ruby-keyword">ensure</span>&#x000A;    <span class="ruby-identifier">q</span>.<span class="ruby-identifier">clear</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">q</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">q</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:clear</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

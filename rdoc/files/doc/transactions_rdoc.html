@@ -38,7 +38,7 @@
         <div id='text'>
           <div id='description'>
             
-            <h1 id="label-Database+Transactions+">Database Transactions <span><a href="#label-Database+Transactions+">&para;</a> <a href="#documentation">&uarr;</a></span></h1>
+            <h1 id="label-Database+Transactions+">Database Transactions <span><a href="#label-Database+Transactions+">&para;</a> <a href="#top">&uarr;</a></span></h1>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> uses autocommit mode by
             default for all of its database adapters, so in general in <a
@@ -60,7 +60,7 @@
             <p>Everywhere else, it is up to you to use a database transaction if you want
             to.</p>
             
-            <h2 id="label-Basic+Transaction+Usage">Basic Transaction Usage<span><a href="#label-Basic+Transaction+Usage">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Basic+Transaction+Usage">Basic Transaction Usage<span><a href="#label-Basic+Transaction+Usage">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>In <a href="../../classes/Sequel.html">Sequel</a>, the
             <code>Database#transaction</code> method should be called if you want to
@@ -97,14 +97,14 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">in_transaction?</span> <span class="ruby-comment"># false</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">in_transaction?</span> <span class="ruby-comment"># true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <h2 id="label-Transaction+Hooks">Transaction Hooks<span><a href="#label-Transaction+Hooks">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Transaction+Hooks">Transaction Hooks<span><a href="#label-Transaction+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>You can add hooks to an in progress transaction that are called after the
             transaction commits or rolls back:</p>
             
             <pre class="ruby"><span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;  <span class="ruby-identifier">x</span> <span class="ruby-comment"># nil</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 1</span>&#x000A;&#x000A;<span class="ruby-identifier">x</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_commit</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">1</span>}&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-identifier">x</span> = <span class="ruby-value">2</span>}&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">x</span> <span class="ruby-comment"># 2</span></pre>
             
-            <h2 id="label-Nested+Transaction+Calls+%2F+Savepoints">Nested Transaction Calls / Savepoints<span><a href="#label-Nested+Transaction+Calls+%2F+Savepoints">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Nested+Transaction+Calls+-2F+Savepoints">Nested Transaction Calls / Savepoints<span><a href="#label-Nested+Transaction+Calls+-2F+Savepoints">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>You can nest calls to transaction, which by default just reuses the
             existing transaction:</p>
@@ -134,7 +134,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># ArgumentError raised</span></pre>
             
-            <h2 id="label-Prepared+Transactions+%2F+Two-Phase+Commit">Prepared Transactions / Two-Phase Commit<span><a href="#label-Prepared+Transactions+%2F+Two-Phase+Commit">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Prepared+Transactions+-2F+Two-Phase+Commit">Prepared Transactions / Two-Phase Commit<span><a href="#label-Prepared+Transactions+-2F+Two-Phase+Commit">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports database prepared
             transactions on PostgreSQL, MySQL, and H2.  With prepared transactions, at
@@ -159,7 +159,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_prepared_transaction</span>(<span class="ruby-string">&#39;foo&#39;</span>)</pre>
             
-            <h2 id="label-Transaction+Isolation+Levels">Transaction Isolation Levels<span><a href="#label-Transaction+Isolation+Levels">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Transaction+Isolation+Levels">Transaction Isolation Levels<span><a href="#label-Transaction+Isolation+Levels">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>The SQL standard supports 4 isolation levels: READ UNCOMMITTED, READ
             COMMITTED, REPEATABLE READ, and SERIALIZABLE.  Not all databases implement
@@ -174,7 +174,7 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">isolation</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">serializable</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-comment"># SET TRANSACTION ISOLATION LEVEL SERIALIZABLE</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
             
-            <h2 id="label-Automatically+Restarting+Transactions">Automatically Restarting Transactions<span><a href="#label-Automatically+Restarting+Transactions">&para;</a> <a href="#documentation">&uarr;</a></span></h2>
+            <h2 id="label-Automatically+Restarting+Transactions">Automatically Restarting Transactions<span><a href="#label-Automatically+Restarting+Transactions">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> offers the ability to
             automatically restart transactions if specific types of errors are

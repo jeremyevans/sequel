@@ -95,7 +95,8 @@
                     <td class='context-item-desc'>
                       
                       <p>Hash of prepared statements for this connection.  Keys are string names of
-                      the server side prepared statement, and values are SQL strings.</p>
+                      the server side prepared statement, and values are <a
+                      href="../SQL.html">SQL</a> strings.</p>
                     </td>
                   </tr>
                 </table>
@@ -111,7 +112,8 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Create a new connection to the FoundationDB SQL Layer. See <a
+                  <p>Create a new connection to the FoundationDB <a href="../SQL.html">SQL</a>
+                  Layer. See <a
                   href="Database.html#method-i-connect">Sequel::Fdbsql::Database#connect</a>.</p>
                 </div>
                 <div class='source'>
@@ -147,8 +149,9 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Execute the given SQL with this connection.  If a block is given, yield the
-                  results, otherwise, return the number of changed rows.</p>
+                  <p>Execute the given <a href="../SQL.html">SQL</a> with this connection.  If a
+                  block is given, yield the results, otherwise, return the number of changed
+                  rows.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
