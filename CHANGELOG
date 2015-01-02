@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.18.0 (2015-01-02)
 
 * Make Dataset#empty? work when the dataset is ordered by a non-column expression (pete) (#923)
 
