@@ -1,5 +1,13 @@
 module Sequel
   module EmulateOffsetWithRowNumber
+    # If the offset must be emulated with ROW_NUMBER, don't remove any ordering,
+    # because it can cause invalid queries to be issued if an offset is required
+    # when ordering.
+    def empty?
+      return super unless emulate_offset_with_row_number?
+      get(Sequel::SQL::AliasedExpression.new(1, :one)).nil?
+    end
+
     # Emulate OFFSET support with the ROW_NUMBER window function
     # 
     # The implementation is ugly, cloning the current dataset and modifying
