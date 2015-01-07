@@ -103,9 +103,9 @@ module Sequel
           validations.each do |att, procs|
             v = case att
             when Array
-              att.collect{|a| o.send(a)}
+              att.collect{|a| o.get_column_value(a)}
             else
-              o.send(att)
+              o.get_column_value(att)
             end
             procs.each {|tag, p| p.call(o, att, v)}
           end
@@ -150,7 +150,7 @@ module Sequel
           reflect_validation(:confirmation, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors.add(a, opts[:message]) unless v == o.send(:"#{a}_confirmation")
+            o.errors.add(a, opts[:message]) unless v == o.get_column_value(:"#{a}_confirmation")
           end
         end
     
@@ -418,7 +418,7 @@ module Sequel
         def validation_if_proc(o, i)
           case i
           when Symbol
-            o.send(i)
+            o.get_column_value(i)
           when Proc
             o.instance_eval(&i)
           else

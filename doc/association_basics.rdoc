@@ -1501,6 +1501,12 @@ if you want to name the association the same name as an existing column, or
 if the column has the same name as an already defined method such as
 <tt>object_id</tt>.
 
+Starting in Sequel 4.19.0, you can override how Sequel gets column values
+by overriding <tt>Sequel::Model#get_column_value</tt>.  By overriding it
+to not call +send+ for column names that conflict that existing method names,
+you can avoid these issues.  The rest of the section documents the previous
+way to work around this issue, which will probably be removed in Sequel 5.
+
 Sequel has added the following options that allow you to work around the
 issue by either specifying the column name symbol or the method name symbol
 to use.  In most cases, these methods are designed to be used with column

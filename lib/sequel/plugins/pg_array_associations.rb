@@ -94,7 +94,7 @@ module Sequel
         # many_to_pg_array associations can have associated objects as long as they have
         # a primary key.
         def can_have_associated_objects?(obj)
-          obj.send(self[:primary_key])
+          obj.get_column_value(self[:primary_key])
         end
 
         # Assume that the key in the associated table uses a version of the current
@@ -195,7 +195,7 @@ module Sequel
         # pg_array_to_many associations can only have associated objects if
         # the array field is not nil or empty.
         def can_have_associated_objects?(obj)
-          v = obj.send(self[:key])
+          v = obj.get_column_value(self[:key])
           v && !v.empty?
         end
 
@@ -307,13 +307,13 @@ module Sequel
           key_column = opts[:key_column] ||= opts[:key]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:dataset] ||= lambda do
-            opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains(Sequel.pg_array([send(pk)], opts.array_type)))
+            opts.associated_dataset.where(Sequel.pg_array_op(opts.predicate_key).contains(Sequel.pg_array([get_column_value(pk)], opts.array_type)))
           end
           opts[:eager_loader] ||= proc do |eo|
             id_map = eo[:id_map]
 
             eager_load_results(opts, eo.merge(:loader=>false)) do |assoc_record|
-              if pks ||= assoc_record.send(key)
+              if pks ||= assoc_record.get_column_value(key)
                 pks.each do |pkv|
                   next unless objects = id_map[pkv]
                   objects.each do |object| 
@@ -358,23 +358,23 @@ module Sequel
           save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
 
           opts[:adder] ||= proc do |o|
-            if array = o.send(key)
-              array << send(pk)
+            if array = o.get_column_value(key)
+              array << get_column_value(pk)
             else
-              o.send("#{key}=", Sequel.pg_array([send(pk)], opts.array_type))
+              o.set_column_value("#{key}=", Sequel.pg_array([get_column_value(pk)], opts.array_type))
             end
             o.save(save_opts)
           end
   
           opts[:remover] ||= proc do |o|
-            if (array = o.send(key)) && !array.empty?
-              array.delete(send(pk))
+            if (array = o.get_column_value(key)) && !array.empty?
+              array.delete(get_column_value(pk))
               o.save(save_opts)
             end
           end
 
           opts[:clearer] ||= proc do
-            opts.associated_dataset.where(Sequel.pg_array_op(key).contains([send(pk)])).update(key=>Sequel.function(:array_remove, key, send(pk)))
+            opts.associated_dataset.where(Sequel.pg_array_op(key).contains([get_column_value(pk)])).update(key=>Sequel.function(:array_remove, key, get_column_value(pk)))
           end
         end
 
@@ -387,7 +387,7 @@ module Sequel
           opts[:eager_loader_key] = nil
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:dataset] ||= lambda do
-            opts.associated_dataset.where(opts.predicate_key=>send(key).to_a)
+            opts.associated_dataset.where(opts.predicate_key=>get_column_value(key).to_a)
           end
           opts[:eager_loader] ||= proc do |eo|
             rows = eo[:rows]
@@ -395,7 +395,7 @@ module Sequel
             pkm = opts.primary_key_method
 
             rows.each do |object|
-              if associated_pks = object.send(key)
+              if associated_pks = object.get_column_value(key)
                 associated_pks.each do |apk|
                   (id_map[apk] ||= []) << object
                 end
@@ -403,7 +403,7 @@ module Sequel
             end
 
             eager_load_results(opts, eo.merge(:id_map=>id_map)) do |assoc_record|
-              if objects = id_map[assoc_record.send(pkm)]
+              if objects = id_map[assoc_record.get_column_value(pkm)]
                 objects.each do |object| 
                   object.associations[name].push(assoc_record)
                 end
@@ -451,26 +451,26 @@ module Sequel
           end
 
           opts[:adder] ||= proc do |o|
-            opk = o.send(opts.primary_key) 
-            if array = send(key)
+            opk = o.get_column_value(opts.primary_key) 
+            if array = get_column_value(key)
               modified!(key)
               array << opk
             else
-              send("#{key}=", Sequel.pg_array([opk], opts.array_type))
+              set_column_value("#{key}=", Sequel.pg_array([opk], opts.array_type))
             end
             save_after_modify.call(self) if save_after_modify
           end
   
           opts[:remover] ||= proc do |o|
-            if (array = send(key)) && !array.empty?
+            if (array = get_column_value(key)) && !array.empty?
               modified!(key)
-              array.delete(o.send(opts.primary_key))
+              array.delete(o.get_column_value(opts.primary_key))
               save_after_modify.call(self) if save_after_modify
             end
           end
 
           opts[:clearer] ||= proc do
-            if (array = send(key)) && !array.empty?
+            if (array = get_column_value(key)) && !array.empty?
               modified!(key)
               array.clear
               save_after_modify.call(self) if save_after_modify
@@ -488,11 +488,11 @@ module Sequel
           key = ref[:key]
           expr = case obj
           when Sequel::Model
-            if (assoc_pks = obj.send(key)) && !assoc_pks.empty?
+            if (assoc_pks = obj.get_column_value(key)) && !assoc_pks.empty?
               Sequel.expr(pk=>assoc_pks.to_a)
             end
           when Array
-            if (assoc_pks = obj.map{|o| o.send(key)}.flatten.compact.uniq) && !assoc_pks.empty?
+            if (assoc_pks = obj.map{|o| o.get_column_value(key)}.flatten.compact.uniq) && !assoc_pks.empty?
               Sequel.expr(pk=>assoc_pks)
             end
           when Sequel::Dataset
@@ -508,11 +508,11 @@ module Sequel
           key = ref.qualify(model.table_name, ref[:key_column])
           expr = case obj
           when Sequel::Model
-            if pkv = obj.send(ref.primary_key_method)
+            if pkv = obj.get_column_value(ref.primary_key_method)
               Sequel.pg_array_op(key).contains(Sequel.pg_array([pkv], ref.array_type))
             end
           when Array
-            if (pkvs = obj.map{|o| o.send(ref.primary_key_method)}.compact) && !pkvs.empty?
+            if (pkvs = obj.map{|o| o.get_column_value(ref.primary_key_method)}.compact) && !pkvs.empty?
               Sequel.pg_array(key).overlaps(Sequel.pg_array(pkvs, ref.array_type))
             end
           when Sequel::Dataset

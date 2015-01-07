@@ -16,6 +16,21 @@ describe "Model#values" do
   end
 end
 
+describe "Model#get_column_value and set_column_value" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+    @c.columns :x
+    @o = @c.load(:x=>1)
+  end
+
+  it "should get and set column values" do
+    @o.get_column_value(:x).should == 1
+    @o.set_column_value(:x=, 2)
+    @o.get_column_value(:x).should == 2
+    @o.x.should == 2
+  end
+end
+
 describe "Model#save server use" do
   before do
     @db = Sequel.mock(:autoid=>proc{|sql| 10}, :fetch=>{:x=>1, :id=>10}, :servers=>{:blah=>{}, :read_only=>{}})
@@ -1170,6 +1185,21 @@ describe Sequel::Model, "#set_fields" do
     o = Class.new(@c).new
     o.set_fields({:x => 3}, [:x, :y])
     o.values.should == {:x => 3}
+  end
+
+  it "should respect set_column_value" do
+    @c.class_eval do
+      def set_column_value(c, v)
+        if c.to_s == 'model='
+          self[:model] = v
+        else
+          send(c, v)
+        end
+      end
+    end
+    @o1.set_fields({:model=>2, :x=>3}, [:model, :x])
+    @o1[:model].should == 2
+    @o1.x.should == 3
   end
 end
 

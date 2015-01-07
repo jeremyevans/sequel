@@ -270,7 +270,7 @@ module Sequel
 
           h = {}
 
-          cols.each{|c| h[c.to_s] = send(c)}
+          cols.each{|c| h[c.to_s] = get_column_value(c)}
           if inc = opts[:include]
             if inc.is_a?(Hash)
               inc.each do |k, v|

@@ -28,7 +28,7 @@ module Sequel
         # Return a bound variable hash that maps the keys in +ks+ (qualified by the +table+)
         # to the values of the results of sending the methods in +vs+.
         def association_bound_variable_hash(table, ks, vs)
-          Hash[*ks.zip(vs).map{|k, v| [:"#{table}.#{k}", send(v)]}.flatten]
+          Hash[*ks.zip(vs).map{|k, v| [:"#{table}.#{k}", get_column_value(v)]}.flatten]
         end
 
         # Given an association reflection, return a bound variable hash for the given

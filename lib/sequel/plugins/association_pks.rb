@@ -61,12 +61,12 @@ module Sequel
           if clpk
             def_association_pks_getter(opts) do
               h = {}
-              lk.zip(lpk).each{|k, pk| h[k] = send(pk)}
+              lk.zip(lpk).each{|k, pk| h[k] = get_column_value(pk)}
               _join_table_dataset(opts).filter(h).select_map(rk)
             end
           else
             def_association_pks_getter(opts) do
-              _join_table_dataset(opts).filter(lk=>send(lpk)).select_map(rk)
+              _join_table_dataset(opts).filter(lk=>get_column_value(lpk)).select_map(rk)
             end
           end
 
@@ -74,10 +74,10 @@ module Sequel
             pks = send(crk ? :convert_cpk_array : :convert_pk_array, opts, pks)
             checked_transaction do
               if clpk
-                lpkv = lpk.map{|k| send(k)}
+                lpkv = lpk.map{|k| get_column_value(k)}
                 cond = lk.zip(lpkv)
               else
-                lpkv = send(lpk)
+                lpkv = get_column_value(lpk)
                 cond = {lk=>lpkv}
               end
               ds = _join_table_dataset(opts).filter(cond)

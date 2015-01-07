@@ -1143,6 +1143,20 @@ module Sequel
       attr_reader :values
       alias to_hash values
 
+      # Get the value of the column.  Takes a single symbol or string argument.
+      # By default it calls send with the argument to get the value.  This can
+      # be overridden if you have columns that conflict with existing
+      # method names.
+      alias get_column_value send
+
+      # Set the value of the column.  Takes two argument.  The first is a
+      # symbol or string argument for the column name, suffixed with =.  The
+      # second is the value to set for the column.  By default it calls send
+      # with the argument to set the value.  This can be overridden if you have
+      # columns that conflict with existing method names (unlikely for setter
+      # methods, but possible).
+      alias set_column_value send
+
       # Creates new instance and passes the given values to set.
       # If a block is given, yield the instance to the block.
       #
@@ -1597,23 +1611,23 @@ module Sequel
         when :skip
           fields.each do |f|
             if hash.has_key?(f) 
-              send("#{f}=", hash[f])
+              set_column_value("#{f}=", hash[f])
             elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
-              send("#{sf}=", hash[sf])
+              set_column_value("#{sf}=", hash[sf])
             end
           end
         when :raise
           fields.each do |f|
             if hash.has_key?(f)
-              send("#{f}=", hash[f])
+              set_column_value("#{f}=", hash[f])
             elsif f.is_a?(Symbol) && hash.has_key?(sf = f.to_s)
-              send("#{sf}=", hash[sf])
+              set_column_value("#{sf}=", hash[sf])
             else
               raise(Sequel::Error, "missing field in hash: #{f.inspect} not in #{hash.inspect}")
             end
           end
         else
-          fields.each{|f| send("#{f}=", hash[f])}
+          fields.each{|f| set_column_value("#{f}=", hash[f])}
         end
         self
       end
@@ -2093,7 +2107,7 @@ module Sequel
         hash.each do |k,v|
           m = "#{k}="
           if meths.include?(m)
-            send(m, v)
+            set_column_value(m, v)
           elsif strict
             # Avoid using respond_to? or creating symbols from user input
             if public_methods.map{|s| s.to_s}.include?(m)

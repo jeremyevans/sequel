@@ -255,7 +255,7 @@ module Sequel
         # Set the cti_key column to the name of the model.
         def _before_validation
           if new? && model.cti_key && !model.cti_model_map
-            send("#{model.cti_key}=", model.name.to_s)
+            set_column_value("#{model.cti_key}=", model.name.to_s)
           end
           super
         end

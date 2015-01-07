@@ -236,7 +236,7 @@ module Sequel
             ds = if where
               where.call(ds, self, arr)
             else
-              vals = arr.map{|x| send(x)}
+              vals = arr.map{|x| get_column_value(x)}
               next if vals.any?{|v| v.nil?}
               ds.where(arr.zip(vals))
             end
@@ -267,7 +267,7 @@ module Sequel
           am, an, ab, m = opts.values_at(:allow_missing, :allow_nil, :allow_blank, :message)
           Array(atts).each do |a|
             next if am && !values.has_key?(a)
-            v = send(a)
+            v = get_column_value(a)
             next if an && v.nil?
             next if ab && v.respond_to?(:blank?) && v.blank?
             if message = yield(a, v, m)

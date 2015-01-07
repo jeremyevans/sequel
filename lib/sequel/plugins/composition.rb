@@ -100,7 +100,7 @@ module Sequel
               klass = opts[:class]
               class_proc = proc{klass || constantize(opts[:class_name])}
               opts[:composer] = proc do
-                if values = keys.map{|k| send(k)} and values.any?{|v| !v.nil?}
+                if values = keys.map{|k| get_column_value(k)} and values.any?{|v| !v.nil?}
                   class_proc.call.new(*values)
                 else
                   nil
@@ -113,9 +113,9 @@ module Sequel
               setters = setter_meths.zip(cov_methods)
               opts[:decomposer] = proc do
                 if (o = compositions[name]).nil?
-                  setter_meths.each{|sm| send(sm, nil)}
+                  setter_meths.each{|sm| get_column_value(sm, nil)}
                 else
-                  setters.each{|sm, cm| send(sm, o.send(cm))}
+                  setters.each{|sm, cm| get_column_value(sm, o.send(cm))}
                 end
               end
             end

@@ -163,7 +163,7 @@ module Sequel
                 end
               end
               define_method("#{column}=") do |v| 
-                if !changed_columns.include?(column) && (new? || send(column) != v)
+                if !changed_columns.include?(column) && (new? || get_column_value(column) != v)
                   changed_columns << column
                 end
 

@@ -355,7 +355,7 @@ module Sequel
 
         # The values that predicate_keys should match for objects to be associated.
         def predicate_key_values(object)
-          predicate_key_methods.map{|k| object.send(k)}
+          predicate_key_methods.map{|k| object.get_column_value(k)}
         end
 
         # Qualify +col+ with the given table name.  If +col+ is an array of columns,
@@ -732,7 +732,7 @@ module Sequel
         # many_to_one associations can only have associated objects if none of
         # the :keys options have a nil value.
         def can_have_associated_objects?(obj)
-          !self[:keys].any?{|k| obj.send(k).nil?}
+          !self[:keys].any?{|k| obj.get_column_value(k).nil?}
         end
         
         # Whether the dataset needs a primary key to function, false for many_to_one associations.
@@ -897,7 +897,7 @@ module Sequel
         # one_to_many associations can only have associated objects if none of
         # the :keys options have a nil value.
         def can_have_associated_objects?(obj)
-          !self[:primary_keys].any?{|k| obj.send(k).nil?}
+          !self[:primary_keys].any?{|k| obj.get_column_value(k).nil?}
         end
 
         # one_to_many and one_to_one associations can be clones
@@ -1120,7 +1120,7 @@ module Sequel
         # many_to_many associations can only have associated objects if none of
         # the :left_primary_keys options have a nil value.
         def can_have_associated_objects?(obj)
-          !self[:left_primary_keys].any?{|k| obj.send(k).nil?}
+          !self[:left_primary_keys].any?{|k| obj.get_column_value(k).nil?}
         end
 
         # one_through_one and many_to_many associations can be clones
@@ -1851,17 +1851,17 @@ module Sequel
       
           opts[:adder] ||= proc do |o|
             h = {}
-            lcks.zip(lcpks).each{|k, pk| h[k] = send(pk)}
-            rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.send(pk)}
+            lcks.zip(lcpks).each{|k, pk| h[k] = get_column_value(pk)}
+            rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.get_column_value(pk)}
             _join_table_dataset(opts).insert(h)
           end
 
           opts[:remover] ||= proc do |o|
-            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.send(k)})).delete
+            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.get_column_value(k)})).delete
           end
 
           opts[:clearer] ||= proc do
-            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| send(k)})).delete
+            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)})).delete
           end
         end
 
@@ -1898,7 +1898,7 @@ module Sequel
             pk_meths = opts.primary_key_methods
 
             eager_load_results(opts, eo) do |assoc_record|
-              hash_key = uses_cks ? pk_meths.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key_method)
+              hash_key = uses_cks ? pk_meths.map{|k| assoc_record.get_column_value(k)} : assoc_record.get_column_value(opts.primary_key_method)
               if objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
               end
@@ -1919,7 +1919,7 @@ module Sequel
       
           return if opts[:read_only]
       
-          opts[:setter] ||= proc{|o| cks.zip(opts.primary_key_methods).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
+          opts[:setter] ||= proc{|o| cks.zip(opts.primary_key_methods).each{|k, pk| set_column_value(:"#{k}=", (o.get_column_value(pk) if o))}}
           opts[:_setter] = proc{|o| set_associated_object(opts, o)}
         end
         
@@ -1947,7 +1947,7 @@ module Sequel
 
             eager_load_results(opts, eo) do |assoc_record|
               assoc_record.values.delete(delete_rn) if delete_rn
-              hash_key = uses_cks ? km.map{|k| assoc_record.send(k)} : assoc_record.send(km)
+              hash_key = uses_cks ? km.map{|k| assoc_record.get_column_value(k)} : assoc_record.get_column_value(km)
               next unless objects = h[hash_key]
               if assign_singular
                 objects.each do |object| 
@@ -1988,10 +1988,10 @@ module Sequel
 
           if one_to_one
             opts[:setter] ||= proc do |o|
-              up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)})))
+              up_ds = _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| get_column_value(k)})))
               if o
                 up_ds = up_ds.exclude(o.pk_hash) unless o.new?
-                cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
+                cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
               end
               checked_transaction do
                 up_ds.update(ck_nil_hash)
@@ -2003,17 +2003,17 @@ module Sequel
             save_opts[:raise_on_failure] = opts[:raise_on_save_failure] != false
 
             opts[:adder] ||= proc do |o|
-              cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
+              cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
               o.save(save_opts)
             end
     
             opts[:remover] ||= proc do |o|
-              cks.each{|k| o.send(:"#{k}=", nil)}
+              cks.each{|k| o.set_column_value(:"#{k}=", nil)}
               o.save(save_opts)
             end
 
             opts[:clearer] ||= proc do
-              _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
+              _apply_association_options(opts, opts.associated_dataset.where(cks.zip(cpks.map{|k| get_column_value(k)}))).update(ck_nil_hash)
             end
           end
         end
@@ -2115,7 +2115,7 @@ module Sequel
 
         # Return the associated single object using a primary key lookup on the associated class.
         def _load_associated_object_via_primary_key(opts)
-          opts.associated_class.send(:primary_key_lookup, ((fk = opts[:key]).is_a?(Array) ? fk.map{|c| send(c)} : send(fk)))
+          opts.associated_class.send(:primary_key_lookup, ((fk = opts[:key]).is_a?(Array) ? fk.map{|c| get_column_value(c)} : get_column_value(fk)))
         end
 
         # Load the associated objects for the given association reflection and dynamic options
@@ -2729,17 +2729,17 @@ END
           vals = if obj.is_a?(Sequel::Dataset)
             {(keys.length == 1 ? keys.first : keys)=>obj.select(*meths).exclude(Sequel::SQL::BooleanExpression.from_value_pairs(meths.zip([]), :OR))}
           else
-            vals = Array(obj).reject{|o| !meths.all?{|m| o.send(m)}}
+            vals = Array(obj).reject{|o| !meths.all?{|m| o.get_column_value(m)}}
             return SQL::Constants::FALSE if vals.empty?
             if obj.is_a?(Array)
               if keys.length == 1
                 meth = meths.first
-                {keys.first=>vals.map{|o| o.send(meth)}}
+                {keys.first=>vals.map{|o| o.get_column_value(meth)}}
               else
-                {keys=>vals.map{|o| meths.map{|m| o.send(m)}}}
+                {keys=>vals.map{|o| meths.map{|m| o.get_column_value(m)}}}
               end  
             else
-              keys.zip(meths.map{|k| obj.send(k)})
+              keys.zip(meths.map{|k| obj.get_column_value(k)})
             end
           end
           SQL::BooleanExpression.from_value_pairs(vals)
@@ -2786,11 +2786,11 @@ END
                 a.each do |rec|
                   case key
                   when Array
-                    if (k = key.map{|k2| rec.send(k2)}) && k.all?
+                    if (k = key.map{|k2| rec.get_column_value(k2)}) && k.all?
                       id_map[k] << rec
                     end
                   when Symbol
-                    if k = rec.send(key)
+                    if k = rec.get_column_value(key)
                       id_map[k] << rec
                     end
                   else

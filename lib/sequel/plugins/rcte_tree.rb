@@ -148,7 +148,7 @@ module Sequel
         a[:read_only] = true unless a.has_key?(:read_only)
         a[:eager_loader_key] = key
         a[:dataset] ||= proc do
-          base_ds = model.filter(prkey_array.zip(key_array.map{|k| send(k)}))
+          base_ds = model.filter(prkey_array.zip(key_array.map{|k| get_column_value(k)}))
           recursive_ds = model.join(t, key_array.zip(prkey_array))
           if c = a[:conditions]
             (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
@@ -243,7 +243,7 @@ module Sequel
         d[:read_only] = true unless d.has_key?(:read_only)
         la = d[:level_alias] ||= :x_level_x
         d[:dataset] ||= proc do
-          base_ds = model.filter(key_array.zip(prkey_array.map{|k| send(k)}))
+          base_ds = model.filter(key_array.zip(prkey_array.map{|k| get_column_value(k)}))
           recursive_ds = model.join(t, prkey_array.zip(key_array))
           if c = d[:conditions]
             (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|

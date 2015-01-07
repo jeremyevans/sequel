@@ -57,7 +57,7 @@ module Sequel
         # Add the lock column instance filter to the object.
         def lock_column_instance_filter
           lc = model.lock_column
-          instance_filter(lc=>Sequel.blob(send(lc)))
+          instance_filter(lc=>Sequel.blob(get_column_value(lc)))
         end
 
         # Clear the instance filters when refreshing, so that attempting to

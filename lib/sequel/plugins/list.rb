@@ -63,7 +63,7 @@ module Sequel
           proc{|obj| obj.model.filter(scope=>obj.send(scope))}
         when Array
           model.dataset = model.dataset.order_prepend(*scope)
-          proc{|obj| obj.model.filter(scope.map{|s| [s, obj.send(s)]})}
+          proc{|obj| obj.model.filter(scope.map{|s| [s, obj.get_column_value(s)]})}
         else
           scope
         end
@@ -90,8 +90,8 @@ module Sequel
         # Set the value of the position_field to the maximum value plus 1 unless the
         # position field already has a value.
         def before_create
-          unless send(position_field)
-            send("#{position_field}=", list_dataset.max(position_field).to_i+1)
+          unless get_column_value(position_field)
+            set_column_value("#{position_field}=", list_dataset.max(position_field).to_i+1)
           end
           super
         end
@@ -168,7 +168,7 @@ module Sequel
 
         # The value of the model's position field for this instance.
         def position_value
-          send(position_field)
+          get_column_value(position_field)
         end
 
         # The model instance the given number of places below this model instance

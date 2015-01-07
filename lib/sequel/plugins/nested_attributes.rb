@@ -152,9 +152,9 @@ module Sequel
         # not use an ensure block, so callers should be careful.
         def nested_attributes_check_key_modifications(meta, obj)
           reflection = meta[:reflection]
-          keys = reflection.associated_object_keys.map{|x| obj.send(x)}
+          keys = reflection.associated_object_keys.map{|x| obj.get_column_value(x)}
           yield
-          unless keys == reflection.associated_object_keys.map{|x| obj.send(x)}
+          unless keys == reflection.associated_object_keys.map{|x| obj.get_column_value(x)}
             raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed")
           end
         end

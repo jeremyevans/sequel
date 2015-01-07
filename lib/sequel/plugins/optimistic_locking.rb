@@ -57,7 +57,7 @@ module Sequel
         # Add the lock column instance filter to the object.
         def lock_column_instance_filter
           lc = model.lock_column
-          instance_filter(lc=>send(lc))
+          instance_filter(lc=>get_column_value(lc))
         end
 
         # Clear the instance filters when refreshing, so that attempting to
@@ -72,10 +72,10 @@ module Sequel
         # lock version.
         def _update_columns(columns)
           lc = model.lock_column
-          lcv = send(lc)
+          lcv = get_column_value(lc)
           columns[lc] = lcv + 1
           super
-          send("#{lc}=", lcv + 1)
+          set_column_value("#{lc}=", lcv + 1)
         end
       end
     end

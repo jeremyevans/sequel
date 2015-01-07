@@ -60,7 +60,7 @@ module Sequel
         #
         #   column_change(:name) # => ['Initial', 'Current']
         def column_change(column)
-          [initial_value(column), send(column)] if column_changed?(column)
+          [initial_value(column), get_column_value(column)] if column_changed?(column)
         end
 
         # A hash with column symbol keys and pairs of initial and
@@ -70,7 +70,7 @@ module Sequel
         def column_changes
           h = {}
           initial_values.each do |column, value|
-            h[column] = [value, send(column)]
+            h[column] = [value, get_column_value(column)]
           end
           h
         end
@@ -99,7 +99,7 @@ module Sequel
         #
         #   initial_value(:name) # => 'Initial'
         def initial_value(column)
-          initial_values.fetch(column){send(column)}
+          initial_values.fetch(column){get_column_value(column)}
         end
 
         # A hash with column symbol keys and initial values.
@@ -116,7 +116,7 @@ module Sequel
         #   name # => 'Initial'
         def reset_column(column)
           if initial_values.has_key?(column)
-            send(:"#{column}=", initial_values[column])
+            set_column_value(:"#{column}=", initial_values[column])
           end
           if missing_initial_values.include?(column)
             values.delete(column)
@@ -136,7 +136,7 @@ module Sequel
           value = if initial_values.has_key?(column)
             initial_values[column]
           else
-            send(column)
+            get_column_value(column)
           end
 
           initial_values[column] = if value && value != true && value.respond_to?(:clone)
@@ -184,7 +184,7 @@ module Sequel
             end
           else
             check_missing_initial_value(column)
-            iv[column] = send(column)
+            iv[column] = get_column_value(column)
             super
           end
         end

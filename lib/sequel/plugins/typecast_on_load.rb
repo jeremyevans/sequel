@@ -51,7 +51,7 @@ module Sequel
         def load_typecast
           model.typecast_on_load_columns.each do |c|
             if v = values[c]
-              send("#{c}=", v)
+              set_column_value("#{c}=", v)
             end
           end
           changed_columns.clear
