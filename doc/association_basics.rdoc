@@ -304,6 +304,11 @@ Examples:
 
 one_through_one associations do not have any modification methods added.
 
+Note that the remove_all_* method does not call remove hooks defined on
+the association, it just issues a single query to the database.  If you
+want to remove all associated objects and call remove hooks, iterate
+over the array of associated objects and call remove_* for each.
+
 == Caching
 
 Associations are cached after being retrieved:
@@ -1165,16 +1170,18 @@ Called after adding an object to the association:
 
 ==== :before_remove [+one_to_many+, +many_to_many+]
 
-Called before removing an object from the association:
+Called before removing an object from the association using <tt>remove_<i>association</i></tt>:
 
   class Artist
     # Don't allow removing a self-titled album
     one_to_many :albums, :before_remove=>proc{|ar, al| false if al.name == ar.name}
   end
 
+This is not called when using <tt>remove_all_<i>association</i></tt>.
+
 ==== :after_remove [+one_to_many+, +many_to_many+]
 
-Called after removing an object from the association:
+Called after removing an object from the association using <tt>remove_<i>association</i></tt>:
 
   class Artist
     # Log all disassociations of albums to an audit logging table
@@ -1186,6 +1193,8 @@ Called after removing an object from the association:
       DB[:audit_logs].insert(:log=>"Album #{album.inspect} disassociated from #{inspect}")
     end
   end
+
+This is not called when using <tt>remove_all_<i>association</i></tt>.
 
 ==== :before_set [+many_to_one+, +one_to_one+]
 
