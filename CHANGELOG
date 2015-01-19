@@ -1,6 +1,8 @@
 === HEAD
 
-* Add column_conflicts plugin to automatically handle columns that conflict with method names (#929)
+* Make Dataset#union, #intersect, and #except automatically handle datasets with raw SQL (jeremyevans) (#934)
+
+* Add column_conflicts plugin to automatically handle columns that conflict with method names (jeremyevans) (#929)
 
 * Add Model#get_column_value and #set_column_value to get/set column values (jeremyevans) (#929)
 

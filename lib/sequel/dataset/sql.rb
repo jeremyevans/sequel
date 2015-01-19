@@ -827,7 +827,7 @@ module Sequel
     # Return a from_self dataset if an order or limit is specified, so it works as expected
     # with UNION, EXCEPT, and INTERSECT clauses.
     def compound_from_self
-      (@opts[:limit] || @opts[:order]) ? from_self : self
+      (@opts[:sql] || @opts[:limit] || @opts[:order]) ? from_self : self
     end
     
     private

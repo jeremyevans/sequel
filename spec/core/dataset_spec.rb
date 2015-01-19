@@ -2619,6 +2619,13 @@ describe "Dataset compound operations" do
       "SELECT * FROM (SELECT * FROM (SELECT * FROM test ORDER BY a LIMIT 2) AS t1 UNION SELECT * FROM (SELECT * FROM test ORDER BY b LIMIT 3) AS t1) AS t1 ORDER BY c LIMIT 4"
   end
 
+  specify "should handle raw SQL datasets properly when using UNION, INTERSECT, or EXCEPT" do
+    @dataset = Sequel.mock['SELECT 1']
+    @dataset.union(@dataset).sql.should == "SELECT * FROM (SELECT * FROM (SELECT 1) AS t1 UNION SELECT * FROM (SELECT 1) AS t1) AS t1"
+    @dataset.intersect(@dataset).sql.should == "SELECT * FROM (SELECT * FROM (SELECT 1) AS t1 INTERSECT SELECT * FROM (SELECT 1) AS t1) AS t1"
+    @dataset.except(@dataset).sql.should == "SELECT * FROM (SELECT * FROM (SELECT 1) AS t1 EXCEPT SELECT * FROM (SELECT 1) AS t1) AS t1"
+  end
+
   specify "should hoist WITH clauses in given dataset if dataset doesn't support WITH in subselect" do
     ds = Sequel.mock.dataset
     meta_def(ds, :supports_cte?){true}
