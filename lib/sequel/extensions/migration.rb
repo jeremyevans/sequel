@@ -523,13 +523,12 @@ module Sequel
     def run
       migrations.zip(version_numbers).each do |m, v|
         t = Time.now
-        lv = up? ? v : v + 1
-        db.log_info("Begin applying migration version #{lv}, direction: #{direction}")
+        db.log_info("Begin applying migration version #{v}, direction: #{direction}")
         checked_transaction(m) do
           m.apply(db, direction)
-          set_migration_version(v)
+          set_migration_version(up? ? v : v-1)
         end
-        db.log_info("Finished applying migration version #{lv}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
+        db.log_info("Finished applying migration version #{v}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
       end
       
       target
@@ -565,11 +564,10 @@ module Sequel
       remove_migration_classes
 
       # load migration files
-      files[up? ? (current + 1)..target : (target + 1)..current].compact.each{|f| load(f)}
+      version_numbers.each{|n| load(files[n])}
       
       # get migration classes
-      classes = Migration.descendants
-      up? ? classes : classes.reverse
+      Migration.descendants
     end
     
     # Returns the latest version available in the specified directory.
@@ -606,7 +604,9 @@ module Sequel
     # so that each number in the array is the migration version
     # that will be in affect after the migration is run.
     def version_numbers
-      up? ? ((current+1)..target).to_a : (target..(current - 1)).to_a.reverse
+      versions = files.compact.map{ |f| migration_version_from_file(File.basename(f)) }.sort!
+      versions.select!{ |v| up? ? (v > current && v <= target) : (v <= current && v > target) }
+      up? ? versions : versions.reverse
     end
   end
 
