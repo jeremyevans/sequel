@@ -278,7 +278,10 @@ describe "Sequel::IntegerMigrator" do
   end
   
   specify "should not raise and error if there is a missing integer migration version and allow_missing_migration_files is true" do
-    proc{Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true)}.should_not raise_error
+    Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true)
+    @db.sqls.last.should == "UPDATE schema_info SET version = 3"
+    Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true, :target=>0)
+    @db.sqls.last.should == "UPDATE schema_info SET version = 0"
   end
 
   specify "should raise and error if there is a duplicate integer migration version" do

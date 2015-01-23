@@ -1,5 +1,7 @@
 === HEAD
 
+* Use correct migration version when using IntegerMigrator with :allow_missing_migration_files (blerins) (#938)
+
 * Make Dataset#union, #intersect, and #except automatically handle datasets with raw SQL (jeremyevans) (#934)
 
 * Add column_conflicts plugin to automatically handle columns that conflict with method names (jeremyevans) (#929)
