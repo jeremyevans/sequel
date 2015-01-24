@@ -353,6 +353,10 @@ The <tt>:allow_blank</tt> is similar to the <tt>:allow_nil</tt> option, but inst
   a.website = ''
   a.valid? # true
 
+If you are going to use <tt>:allow_blank</tt> you should make sure that all objects respond to the blank? method. Sequel ships with an extension that will do this for you:
+
+  Sequel.extension :blank
+
 === <tt>:allow_missing</tt>
 
 The <tt>:allow_missing</tt> option is different from the <tt>:allow_nil</tt> option, in that instead of checking if the attribute value is nil, it checks if the attribute is present in the model instance's values hash.   <tt>:allow_nil</tt> will skip the validation when the attribute is in the values hash and has a nil value and when the attribute is not in the values hash.  <tt>:allow_missing</tt> will only skip the validation when the attribute is not in the values hash.  If the attribute is in the values hash but has a nil value, <tt>:allow_missing</tt> will not skip it.
