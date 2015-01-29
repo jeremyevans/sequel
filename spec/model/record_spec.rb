@@ -273,6 +273,17 @@ describe "Model#save" do
     DB.sqls.should == ["BEGIN", "ROLLBACK"]
   end
 
+  it "should rollback if before_save calls cancel_action and raise_on_save_failure = true" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    o.raise_on_save_failure = true
+    def o.before_save
+      cancel_action
+    end
+    proc { o.save(:columns=>:y) }.should raise_error(Sequel::HookFailed)
+    DB.sqls.should == ["BEGIN", "ROLLBACK"]
+  end
+
   it "should rollback if before_save returns false and :raise_on_failure option is true" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true

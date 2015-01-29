@@ -188,8 +188,21 @@ describe "Model#before_create && Model#after_create" do
     DB.sqls.should == []
   end
 
+  specify ".create should cancel the save and raise an error if before_create calls cancel_action and raise_on_save_failure is true" do
+    @c.before_create{cancel_action}
+    proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed)
+    DB.sqls.should == []
+  end
+
   specify ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
     @c.before_create{false}
+    @c.raise_on_save_failure = false
+    @c.create(:x => 2).should == nil
+    DB.sqls.should == []
+  end
+
+  specify ".create should cancel the save and return nil if before_create calls cancel_action and raise_on_save_failure is false" do
+    @c.before_create{cancel_action}
     @c.raise_on_save_failure = false
     @c.create(:x => 2).should == nil
     DB.sqls.should == []

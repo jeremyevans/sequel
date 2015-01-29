@@ -1233,6 +1233,14 @@ module Sequel
       def autoincrementing_primary_key
         primary_key
       end
+
+      # Cancel the current action.  Should be called in before hooks to halt
+      # the processing of the action.  If a +msg+ argument is given and
+      # the model instance is configured to raise exceptions on failure,
+      # sets the message to use for the raised HookFailed exception.
+      def cancel_action(msg=nil)
+        raise_hook_failure(msg)
+      end
   
       # The columns that have been updated.  This isn't completely accurate,
       # as it could contain columns whose values have not changed.
@@ -2087,8 +2095,17 @@ module Sequel
 
       # Raise an error appropriate to the hook type. May be swallowed by
       # checked_save_failure depending on the raise_on_failure? setting.
-      def raise_hook_failure(type)
-        raise HookFailed.new("the #{type} hook failed", self)
+      def raise_hook_failure(type=nil)
+        msg = case type
+        when String
+          type
+        when Symbol
+          "the #{type} hook failed"
+        else
+          "a hook failed"
+        end
+
+        raise HookFailed.new(msg, self)
       end
   
       # Get the ruby class or classes related to the given column's type.

@@ -127,20 +127,22 @@ If you want to insert a row into the model's table without running the creation 
 
   Album.insert(:name=>'RF') # does not run hooks
 
-== Halting Hook Processing
+== Canceling Actions in Hooks
 
-Sequel uses a convention that if any <tt>before_*</tt> hook method returns false (but not nil), that the action will be canceled and a <tt>Sequel::HookFailed</tt> raised (or +nil+ to be returned by +save+ if +raise_on_save_failure+ is +false+).  You can use this to implement validation-like behavior, that will run even if validations are skipped.  For example:
+Sometimes want to cancel an action in a before hook, so the action is not performed.  For example, you may want to not allow destroying or saving a record in certain cases.  In those cases, you can call +cancel_action+ inside the <tt>before_*</tt> hook, which will stop processing the hook and will either raise a <tt>Sequel::HookFailed</tt> exception (the default), or return +nil+ if +raise_on_save_failure+ is +false+).  You can use this to implement validation-like behavior, that will run even if validations are skipped:
 
   class Album < Sequel::Model
     def before_save
-      return false if name == ''
+      cancel_action if name == ''
       super
     end
   end
 
-While returning false is not really recommended, you should be aware of this behavior so that you do not inadvertently return false.  For around hooks, neglecting to call +super+ halts hook processing in the same way as returning +false+ in a before hook.  You can't halt hook processing in after hooks, since by then the main processing has already taken place.
+For backwards compatibility, Sequel also treats the <tt>before_*</tt> hook methods returning +false+ as an indication that the action should be canceled.  This usage is discouraged in new code, but you should be aware of this behavior so that you do not inadvertently return false.
 
-By default, Sequel runs hooks other than validation hooks inside a transaction, so if you abort the hook by returning false in a before hook or by raising an exception in any hook, Sequel will rollback the transaction.  However, note that the implicit use of transactions when saving and destroying model objects is conditional (it depends on the model instance's +use_transactions+ setting and the <tt>:transaction</tt> option passed to save).
+For around hooks, neglecting to call +super+ halts hook processing in the same way as calling +cancel_action+ in a before hook.  It's probably a bad idea to use +cancel_action+ hook processing in after hooks, or after yielding in around hooks, since by then the main processing has already taken place.
+
+By default, Sequel runs hooks other than validation hooks inside a transaction, so if you cancel the action by calling +cancel_action+ in any hook, Sequel will rollback the transaction.  However, note that the implicit use of transactions when saving and destroying model objects is conditional (it depends on the model instance's +use_transactions+ setting and the <tt>:transaction</tt> option passed to save).
 
 == Conditional Hooks
 

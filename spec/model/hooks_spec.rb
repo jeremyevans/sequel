@@ -27,8 +27,22 @@ describe "Model#before_create && Model#after_create" do
     proc{@c.load(:id => 2233).save}.should_not raise_error
   end
 
+  specify ".create should cancel the save and raise an error if before_create calls cancel_action and raise_on_save_failure is true" do
+    @c.send(:define_method, :before_create){cancel_action 'not good'}
+    proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed, 'not good')
+    DB.sqls.should == []
+    proc{@c.load(:id => 2233).save}.should_not raise_error
+  end
+
   specify ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_create){false}
+    @c.raise_on_save_failure = false
+    @c.create(:x => 2).should == nil
+    DB.sqls.should == []
+  end
+
+  specify ".create should cancel the save and return nil if before_create calls cancel_action and raise_on_save_failure is false" do
+    @c.send(:define_method, :before_create){cancel_action}
     @c.raise_on_save_failure = false
     @c.create(:x => 2).should == nil
     DB.sqls.should == []
@@ -59,6 +73,12 @@ describe "Model#before_update && Model#after_update" do
     DB.sqls.should == []
   end
 
+  specify "#save should cancel the save and raise an error if before_update calls cancel_action and raise_on_save_failure is true" do
+    @c.send(:define_method, :before_update){cancel_action}
+    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::HookFailed)
+    DB.sqls.should == []
+  end
+
   specify "#save should cancel the save and raise an error if before_update returns false and raise_on_failure option is true" do
     @c.send(:define_method, :before_update){false}
     @c.raise_on_save_failure = false
@@ -68,6 +88,13 @@ describe "Model#before_update && Model#after_update" do
 
   specify "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_update){false}
+    @c.raise_on_save_failure = false
+    @c.load(:id => 2233).save.should == nil
+    DB.sqls.should == []
+  end
+
+  specify "#save should cancel the save and return nil if before_update calls cancel_action and raise_on_save_failure is false" do
+    @c.send(:define_method, :before_update){cancel_action}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
     DB.sqls.should == []
@@ -113,8 +140,22 @@ describe "Model#before_save && Model#after_save" do
     DB.sqls.should == []
   end
 
+  specify "#save should cancel the save and raise an error if before_save calls cancel_action and raise_on_failure option is true" do
+    @c.send(:define_method, :before_save){cancel_action}
+    @c.raise_on_save_failure = false
+    proc{@c.load(:id => 2233).save(:raise_on_failure => true)}.should raise_error(Sequel::HookFailed)
+    DB.sqls.should == []
+  end
+
   specify "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_save){false}
+    @c.raise_on_save_failure = false
+    @c.load(:id => 2233).save.should == nil
+    DB.sqls.should == []
+  end
+
+  specify "#save should cancel the save and return nil if before_save calls cancel_action and raise_on_save_failure is false" do
+    @c.send(:define_method, :before_save){cancel_action}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
     DB.sqls.should == []
@@ -150,6 +191,12 @@ describe "Model#before_destroy && Model#after_destroy" do
     DB.sqls.should == []
   end
 
+  specify "#destroy should cancel the destroy and raise an error if before_destroy calls cancel_action and raise_on_save_failure is true" do
+    @c.send(:define_method, :before_destroy){cancel_action; true}
+    proc{@c.load(:id => 2233).destroy}.should raise_error(Sequel::HookFailed)
+    DB.sqls.should == []
+  end
+
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_failure option is true" do
     @c.send(:define_method, :before_destroy){false}
     @c.raise_on_save_failure = false
@@ -159,6 +206,13 @@ describe "Model#before_destroy && Model#after_destroy" do
 
   specify "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_destroy){false}
+    @c.raise_on_save_failure = false
+    @c.load(:id => 2233).destroy.should == nil
+    DB.sqls.should == []
+  end
+
+  specify "#destroy should cancel the destroy and return nil if before_destroy calls cancel_action and raise_on_save_failure is false" do
+    @c.send(:define_method, :before_destroy){cancel_action; true}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).destroy.should == nil
     DB.sqls.should == []
@@ -215,8 +269,21 @@ describe "Model#before_validation && Model#after_validation" do
     DB.sqls.should == []
   end
   
+  specify "#save should cancel the save and raise an error if before_validation calls cancel_action and raise_on_save_failure is true" do
+    @c.send(:define_method, :before_validation){cancel_action}
+    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::HookFailed)
+    DB.sqls.should == []
+  end
+
   specify "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
     @c.send(:define_method, :before_validation){false}
+    @c.raise_on_save_failure = false
+    @c.load(:id => 2233).save.should == nil
+    DB.sqls.should == []
+  end
+
+  specify "#save should cancel the save and return nil if before_validation calls cancel_action and raise_on_save_failure is false" do
+    @c.send(:define_method, :before_validation){cancel_action}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
     DB.sqls.should == []
