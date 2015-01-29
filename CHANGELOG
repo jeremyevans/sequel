@@ -1,5 +1,7 @@
 === HEAD
 
+* Add accessed_columns plugin, recording which columns have been accessed for a model instance (jeremyevans)
+
 * Use correct migration version when using IntegerMigrator with :allow_missing_migration_files (blerins) (#938)
 
 * Make Dataset#union, #intersect, and #except automatically handle datasets with raw SQL (jeremyevans) (#934)
