@@ -2315,7 +2315,7 @@ module Sequel
               raise Error, "callbacks should either be Procs or Symbols"
             end
             if res == false and stop_on_false
-              raise(BeforeHookFailed, "Unable to modify association for #{inspect}: one of the #{callback_type} hooks returned false") if raise_error
+              raise(HookFailed, "Unable to modify association for #{inspect}: one of the #{callback_type} hooks returned false") if raise_error
               return false
             end
           end

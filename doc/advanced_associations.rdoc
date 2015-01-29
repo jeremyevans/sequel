@@ -457,7 +457,7 @@ array of symbols and procs.  For <tt>:after_load</tt> with a *_to_many associati
 the associated object argument is an array of associated objects.
 
 If any of the before callbacks return +false+, the adding/removing
-does not happen and it either raises a <tt>Sequel::BeforeHookFailed</tt> (the default), or
+does not happen and it either raises a <tt>Sequel::HookFailed</tt> (the default), or
 returns false (if +raise_on_save_failure+ is false).
 
 === Association extensions

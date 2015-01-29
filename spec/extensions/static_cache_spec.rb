@@ -261,17 +261,17 @@ describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
     end
 
     it "should not allow the saving of new objects" do
-      proc{@c.create}.should raise_error(Sequel::BeforeHookFailed)
+      proc{@c.create}.should raise_error(Sequel::HookFailed)
     end
 
     it "should not allow the saving of existing objects" do
       @db.fetch = {:id=>1}
-      proc{@c.first(:id=>1).save}.should raise_error(Sequel::BeforeHookFailed)
+      proc{@c.first(:id=>1).save}.should raise_error(Sequel::HookFailed)
     end
 
     it "should not allow the destroying of existing objects" do
       @db.fetch = {:id=>1}
-      proc{@c.first(:id=>1).destroy}.should raise_error(Sequel::BeforeHookFailed)
+      proc{@c.first(:id=>1).destroy}.should raise_error(Sequel::HookFailed)
     end
   end
 

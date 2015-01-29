@@ -269,7 +269,7 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    proc { o.save(:columns=>:y) }.should raise_error(Sequel::BeforeHookFailed)
+    proc { o.save(:columns=>:y) }.should raise_error(Sequel::HookFailed)
     DB.sqls.should == ["BEGIN", "ROLLBACK"]
   end
 
@@ -280,7 +280,7 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    proc { o.save(:columns=>:y, :raise_on_failure => true) }.should raise_error(Sequel::BeforeHookFailed)
+    proc { o.save(:columns=>:y, :raise_on_failure => true) }.should raise_error(Sequel::HookFailed)
     DB.sqls.should == ["BEGIN", "ROLLBACK"]
   end
 
