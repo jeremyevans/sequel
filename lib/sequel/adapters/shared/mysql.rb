@@ -274,9 +274,11 @@ module Sequel
       def mysql_connection_setting_sqls
         sqls = []
         
-        # Increase timeout so mysql server doesn't disconnect us
-        # Value used by default is maximum allowed value on Windows.
-        sqls << "SET @@wait_timeout = #{opts[:timeout] || 2147483}"
+        if wait_timeout = opts.fetch(:timeout, 2147483)
+          # Increase timeout so mysql server doesn't disconnect us
+          # Value used by default is maximum allowed value on Windows.
+          sqls << "SET @@wait_timeout = #{wait_timeout}"
+        end
 
         # By default, MySQL 'where id is null' selects the last inserted id
         sqls <<  "SET SQL_AUTO_IS_NULL=0" unless opts[:auto_is_null]

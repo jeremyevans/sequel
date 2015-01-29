@@ -1,5 +1,7 @@
 === HEAD
 
+* Support not setting @@wait_timeout on MySQL via :timeout=>nil Database option (jeremyevans)
+
 * Add accessed_columns plugin, recording which columns have been accessed for a model instance (jeremyevans)
 
 * Use correct migration version when using IntegerMigrator with :allow_missing_migration_files (blerins) (#938)
