@@ -1499,80 +1499,84 @@ by the foreign/primary keys.  This option causes the
 you want to replace the default foreign/primary key conditions that Sequel
 would use when eagerly graphing.
 
-=== Column Naming Conflict Options
+=== Associations Based on SQL Expressions Options
 
-Sequel's association support historically called methods on model objects
-to get primary key or foreign key values instead of accessing the column
-values directly, in order to allow advanced features such as associations
-based on virtual column keys.  Unfortunately, that causes issues if columns
-are used with names that clash with existing method names, which can happen
-if you want to name the association the same name as an existing column, or
-if the column has the same name as an already defined method such as
-<tt>object_id</tt>.
+Sequel's associations can work not just with columns, but also with
+arbitrary SQL expressions.  For example, on PostgreSQL, you can store
+foreign keys to other tables in hstore, json, or jsonb columns, and Sequel
+can automatically work with such constructs, including full support for
+eager loading.
 
-Starting in Sequel 4.19.0, you can override how Sequel gets column values
-by overriding <tt>Sequel::Model#get_column_value</tt>.  By overriding it
-to not call +send+ for column names that conflict that existing method names,
-you can avoid these issues.
+There's actually two parts to supporting associations based on SQL
+expressions.  First is you must have an instance method in the model
+that returns the value that the SQL expression would return. Second
+is you must have an SQL expression object.  If Sequel has access to
+a model instance and needs to get the value of the expression, it
+calls the method to get the value.  If Sequel does not have access
+to a model instance, but needs to use the SQL expression in a query,
+it will use the SQL expression object.
 
-The rest of the section documents the previous way to work around this issue,
-which also can be used to base associations on arbitrary SQL expressions.
-
-Sequel has added the following options that allow you to work around the
-issue by either specifying the column name symbol or the method name symbol
-to use.  In most cases, these methods are designed to be used with column
-aliases defined with <tt>Model.def_column_alias</tt>:
+Below is an example storing foreign keys to other tables in a
+PostgreSQL hstore column, using the +pg_hstore+ and +pg_hstore_ops+
+extensions.
 
   # Example schema:
-  #  albums           artists
-  #   :id        /-->  :id
-  #   :artist --/      :name
+  #  albums          artists
+  #   :id       /---> :id
+  #   :meta ---/      :name
   #   :name
   class Album < Sequel::Model
-    def_column_alias(:artist_id, :artist)
-    many_to_one :artist, :key=>:artist_id, :key_column=>:artist
+    many_to_one :artist, :key_column=>Sequel.cast(Sequel.hstore(:meta)['artist_id'], Integer)
+
+    def artist_id
+      meta['artist_id'].to_i
+    end
+  end
+  class Artist < Sequel::Model
+    one_to_many :albums, :key=>Sequel.cast(Sequel.hstore(:meta)['artist_id'], Integer), :key_method=>:artist_id
   end
   
   # Example schema:
-  #  things              objs
-  #   :id           /-->  :id
-  #   :object_id --/      :name
-  #   :name
-  class Thing < Sequel::Model
-    def_column_alias(:obj_id, :object_id)
+  #  albums   albums_artists   artists
+  #   :id  <----- :meta -------> :id
+  #   :name                      :name
+  class Album < Sequel::Model
+    many_to_many :artists, :left_key=>Sequel.cast(Sequel.hstore(:meta)['album_id'], Integer),
+      :right_key=>Sequel.cast(Sequel.hstore(:meta)['artist_id'], Integer)
   end
-  class Obj < Sequel::Model
-    one_to_many :things, :key=>:object_id, :key_method=>:obj_id
+  class Artist < Sequel::Model
+    many_to_many :albums, :left_key=>Sequel.cast(Sequel.hstore(:meta)['artist_id'], Integer),
+      :right_key=>Sequel.cast(Sequel.hstore(:meta)['album_id'], Integer)
   end
 
 ==== :key_column [+many_to_one+]
 
 Like the :key option, but :key references the method name, while
-:key_column references the underlying column.
+:key_column references the underlying column/expression.
 
 ==== :primary_key_method [+many_to_one+]
 
-Like the :primary_key option, but :primary_key references the column
+Like the :primary_key option, but :primary_key references the column/expression
 name, while :primary_key_method references the method name.
 
 ==== :primary_key_column [+one_to_many+, +one_to_one+]
 
 Like the :primary_key option, but :primary_key references the method name, while
-:primary_key_column references the underlying column.
+:primary_key_column references the underlying column/expression.
 
 ==== :key_method [+one_to_many+, +one_to_one+]
 
-Like the :key option, but :key references the column
+Like the :key option, but :key references the column/expression
 name, while :key_method references the method name.
 
 ==== :left_primary_key_column [+many_to_many+, +one_through_one+]
 
 Like the :left_primary_key option, but :left_primary_key references the method name, while
-:left_primary_key_column references the underlying column.
+:left_primary_key_column references the underlying column/expression.
 
 ==== :right_primary_key_method [+many_to_many+, +one_through_one+]
 
-Like the :right_primary_key option, but :right_primary_key references the column
+Like the :right_primary_key option, but :right_primary_key references the column/expression
 name, while :right_primary_key_method references the method name.
 
 === Private Method Overriding Options
