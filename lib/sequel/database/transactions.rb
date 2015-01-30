@@ -45,6 +45,9 @@ module Sequel
     # :num_retries :: The number of times to retry if the :retry_on option is used.
     #                 The default is 5 times.  Can be set to nil to retry indefinitely,
     #                 but that is not recommended.
+    # :retry_sleep :: The number of seconds to sleep in between retries. Helpful on
+    #                 serialization errors for long-running queries, where retrying
+    #                 immediately is likely to conflict with the same still-running query.
     # :prepare :: A string to use as the transaction identifier for a
     #             prepared transaction (two-phase commit), if the database/adapter
     #             supports prepared transactions.
@@ -79,7 +82,10 @@ module Sequel
         rescue *retry_on
           if num_retries
             num_retries -= 1
-            retry if num_retries >= 0
+            if num_retries >= 0
+              sleep opts[:retry_sleep].to_i if opts[:retry_sleep]
+              retry
+            end
           else
             retry
           end
