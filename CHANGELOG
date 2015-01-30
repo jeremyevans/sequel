@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.19.0 (2015-02-01)
 
 * Make jdbc/sqlanywhere correctly set :auto_increment entry in schema hashes (jeremyevans)
 
