@@ -1,5 +1,7 @@
 === HEAD
 
+* Make jdbc/sqlanywhere correctly set :auto_increment entry in schema hashes (jeremyevans)
+
 * Add Model#cancel_action for canceling actions in before hooks, instead of having the hooks return false (jeremyevans)
 
 * Support not setting @@wait_timeout on MySQL via :timeout=>nil Database option (jeremyevans)

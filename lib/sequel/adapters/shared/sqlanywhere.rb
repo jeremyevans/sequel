@@ -56,8 +56,9 @@ module Sequel
          from{sa_describe_query("select * from #{im.call(table)}").as(:a)}.
          join(:syscolumn___b, :table_id=>:base_table_id, :column_id=>:base_column_id).
          order(:a__column_number).
-          map do |row|
-          row[:auto_increment] = row.delete(:is_autoincrement) == 1
+         map do |row|
+          auto_increment = row.delete(:is_autoincrement)
+          row[:auto_increment] = auto_increment == 1 || auto_increment == true
           row[:primary_key] = row.delete(:pkey) == 'Y'
           row[:allow_null] = row[:nulls_allowed].is_a?(Fixnum) ? row.delete(:nulls_allowed) == 1 : row.delete(:nulls_allowed)
           row[:db_type] = row.delete(:domain_name)
