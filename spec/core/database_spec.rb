@@ -682,16 +682,17 @@ shared_examples_for "Database#transaction" do
     a.should == [1] * 100
   end
   
-  specify "should support :retry_sleep option for waiting between retries" do
-    a = []
-    def @db.sleep(n); (@naps ||= []) << n; end
-    def @db.naps; @naps; end
-    @db.transaction(:retry_on=>Sequel::DatabaseDisconnectError, :retry_sleep => 3) do
-      a << 1; raise Sequel::DatabaseDisconnectError if a.length < 2
+  specify "should support :before_retry option for invoking callback before retrying" do
+    a, errs, calls = [], [], []
+    retryer = ->(n, err) { calls << n; errs << err }
+    @db.transaction(:retry_on=>Sequel::DatabaseDisconnectError, :before_retry => retryer) do
+      a << 1; raise Sequel::DatabaseDisconnectError if a.length < 3
     end
-    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
-    a.should == [1, 1]
-    @db.naps.should == [3]
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
+    a.should == [1, 1, 1]
+    errs.count.should == 2
+    errs.each { |e| e.class.should == Sequel::DatabaseDisconnectError }
+    calls.should == [1, 2]
   end
   
   specify "should raise an error if attempting to use :retry_on inside another transaction" do
