@@ -806,7 +806,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-predicate_key_values-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-predicate_key_values-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 357</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key_values</span>(<span class="ruby-identifier">object</span>)&#x000A;  <span class="ruby-identifier">predicate_key_methods</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">k</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-predicate_key_values-source'><span class="ruby-comment"># File lib/sequel/model/associations.rb, line 357</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key_values</span>(<span class="ruby-identifier">object</span>)&#x000A;  <span class="ruby-identifier">predicate_key_methods</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">k</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-predicate_keys'>

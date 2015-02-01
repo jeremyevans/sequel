@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-10-30 14:30:51 -0700</span>
+          <span class='datetime'>2015-01-30 10:33:25 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -228,6 +228,11 @@
             <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_all_albums</span></pre>
             
             <p>one_through_one associations do not have any modification methods added.</p>
+            
+            <p>Note that the remove_all_* method does not call remove hooks defined on the
+            association, it just issues a single query to the database.  If you want to
+            remove all associated objects and call remove hooks, iterate over the array
+            of associated objects and call remove_* for each.</p>
             
             <h2 id="label-Caching">Caching<span><a href="#label-Caching">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -908,15 +913,21 @@
             
             <h4 id="label-3Abefore_remove+-5Bone_to_many-2C+many_to_many-5D">:before_remove [<code>one_to_many</code>, <code>many_to_many</code>]<span><a href="#label-3Abefore_remove+-5Bone_to_many-2C+many_to_many-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <p>Called before removing an object from the association:</p>
+            <p>Called before removing an object from the association using
+            <code>remove_<em>association</em></code>:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Don&#39;t allow removing a self-titled album</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">before_remove=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ar</span>, <span class="ruby-identifier">al</span><span class="ruby-operator">|</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">al</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">ar</span>.<span class="ruby-identifier">name</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
             
+            <p>This is not called when using <code>remove_all_<em>association</em></code>.</p>
+            
             <h4 id="label-3Aafter_remove+-5Bone_to_many-2C+many_to_many-5D">:after_remove [<code>one_to_many</code>, <code>many_to_many</code>]<span><a href="#label-3Aafter_remove+-5Bone_to_many-2C+many_to_many-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <p>Called after removing an object from the association:</p>
+            <p>Called after removing an object from the association using
+            <code>remove_<em>association</em></code>:</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span>&#x000A;  <span class="ruby-comment"># Log all disassociations of albums to an audit logging table</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">after_remove=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">log_remove_album</span>&#x000A;&#x000A;  <span class="ruby-identifier">private</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">log_remove_album</span>(<span class="ruby-identifier">album</span>)&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">audit_logs</span>].<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">log=</span><span class="ruby-operator">&gt;</span><span class="ruby-node">&quot;Album #{album.inspect} disassociated from #{inspect}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>This is not called when using <code>remove_all_<em>association</em></code>.</p>
             
             <h4 id="label-3Abefore_set+-5Bmany_to_one-2C+one_to_one-5D">:before_set [<code>many_to_one</code>, <code>one_to_one</code>]<span><a href="#label-3Abefore_set+-5Bmany_to_one-2C+one_to_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -1181,55 +1192,62 @@
             href="../../classes/Sequel.html">Sequel</a> would use when eagerly
             graphing.</p>
             
-            <h3 id="label-Column+Naming+Conflict+Options">Column Naming Conflict Options<span><a href="#label-Column+Naming+Conflict+Options">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <h3 id="label-Associations+Based+on+SQL+Expressions+Options">Associations Based on SQL Expressions Options<span><a href="#label-Associations+Based+on+SQL+Expressions+Options">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>Sequel&#39;s association support historically called methods on model
-            objects to get primary key or foreign key values instead of accessing the
-            column values directly, in order to allow advanced features such as
-            associations based on virtual column keys.  Unfortunately, that causes
-            issues if columns are used with names that clash with existing method
-            names, which can happen if you want to name the association the same name
-            as an existing column, or if the column has the same name as an already
-            defined method such as <code>object_id</code>.</p>
+            <p>Sequel&#39;s associations can work not just with columns, but also with
+            arbitrary SQL expressions.  For example, on PostgreSQL, you can store
+            foreign keys to other tables in hstore, json, or jsonb columns, and <a
+            href="../../classes/Sequel.html">Sequel</a> can automatically work with
+            such constructs, including full support for eager loading.</p>
             
-            <p><a href="../../classes/Sequel.html">Sequel</a> has added the following
-            options that allow you to work around the issue by either specifying the
-            column name symbol or the method name symbol to use.  In most cases, these
-            methods are designed to be used with column aliases defined with
-            <code>Model.def_column_alias</code>:</p>
+            <p>There&#39;s actually two parts to supporting associations based on SQL
+            expressions.  First is you must have an instance method in the model that
+            returns the value that the SQL expression would return. Second is you must
+            have an SQL expression object.  If <a
+            href="../../classes/Sequel.html">Sequel</a> has access to a model instance
+            and needs to get the value of the expression, it calls the method to get
+            the value.  If <a href="../../classes/Sequel.html">Sequel</a> does not have
+            access to a model instance, but needs to use the SQL expression in a query,
+            it will use the SQL expression object.</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Example schema:</span>&#x000A;<span class="ruby-comment">#  albums           artists</span>&#x000A;<span class="ruby-comment">#   :id        /--&gt;  :id</span>&#x000A;<span class="ruby-comment">#   :artist --/      :name</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">def_column_alias</span>(:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artist</span>)&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">key_column=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Example schema:</span>&#x000A;<span class="ruby-comment">#  things              objs</span>&#x000A;<span class="ruby-comment">#   :id           /--&gt;  :id</span>&#x000A;<span class="ruby-comment">#   :object_id --/      :name</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Thing</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">def_column_alias</span>(:<span class="ruby-identifier">obj_id</span>, :<span class="ruby-identifier">object_id</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Obj</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">things</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">object_id</span>, :<span class="ruby-identifier">key_method=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">obj_id</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <p>Below is an example storing foreign keys to other tables in a PostgreSQL
+            hstore column, using the <code>pg_hstore</code> and
+            <code>pg_hstore_ops</code> extensions.</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Example schema:</span>&#x000A;<span class="ruby-comment">#  albums          artists</span>&#x000A;<span class="ruby-comment">#   :id       /---&gt; :id</span>&#x000A;<span class="ruby-comment">#   :meta ---/      :name</span>&#x000A;<span class="ruby-comment">#   :name</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">key_column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">meta</span>)[<span class="ruby-string">&#39;artist_id&#39;</span>], <span class="ruby-constant">Integer</span>)&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">artist_id</span>&#x000A;    <span class="ruby-identifier">meta</span>[<span class="ruby-string">&#39;artist_id&#39;</span>].<span class="ruby-identifier">to_i</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">key=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">meta</span>)[<span class="ruby-string">&#39;artist_id&#39;</span>], <span class="ruby-constant">Integer</span>), :<span class="ruby-identifier">key_method=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Example schema:</span>&#x000A;<span class="ruby-comment">#  albums   albums_artists   artists</span>&#x000A;<span class="ruby-comment">#   :id  &lt;----- :meta -------&gt; :id</span>&#x000A;<span class="ruby-comment">#   :name                      :name</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">left_key=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">meta</span>)[<span class="ruby-string">&#39;album_id&#39;</span>], <span class="ruby-constant">Integer</span>),&#x000A;    :<span class="ruby-identifier">right_key=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">meta</span>)[<span class="ruby-string">&#39;artist_id&#39;</span>], <span class="ruby-constant">Integer</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Artist</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">left_key=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">meta</span>)[<span class="ruby-string">&#39;artist_id&#39;</span>], <span class="ruby-constant">Integer</span>),&#x000A;    :<span class="ruby-identifier">right_key=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">hstore</span>(:<span class="ruby-identifier">meta</span>)[<span class="ruby-string">&#39;album_id&#39;</span>], <span class="ruby-constant">Integer</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h4 id="label-3Akey_column+-5Bmany_to_one-5D">:key_column [<code>many_to_one</code>]<span><a href="#label-3Akey_column+-5Bmany_to_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>Like the :key option, but :key references the method name, while
-            :key_column references the underlying column.</p>
+            :key_column references the underlying column/expression.</p>
             
             <h4 id="label-3Aprimary_key_method+-5Bmany_to_one-5D">:primary_key_method [<code>many_to_one</code>]<span><a href="#label-3Aprimary_key_method+-5Bmany_to_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <p>Like the :primary_key option, but :primary_key references the column name,
-            while :primary_key_method references the method name.</p>
+            <p>Like the :primary_key option, but :primary_key references the
+            column/expression name, while :primary_key_method references the method
+            name.</p>
             
             <h4 id="label-3Aprimary_key_column+-5Bone_to_many-2C+one_to_one-5D">:primary_key_column [<code>one_to_many</code>, <code>one_to_one</code>]<span><a href="#label-3Aprimary_key_column+-5Bone_to_many-2C+one_to_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>Like the :primary_key option, but :primary_key references the method name,
-            while :primary_key_column references the underlying column.</p>
+            while :primary_key_column references the underlying column/expression.</p>
             
             <h4 id="label-3Akey_method+-5Bone_to_many-2C+one_to_one-5D">:key_method [<code>one_to_many</code>, <code>one_to_one</code>]<span><a href="#label-3Akey_method+-5Bone_to_many-2C+one_to_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
-            <p>Like the :key option, but :key references the column name, while
+            <p>Like the :key option, but :key references the column/expression name, while
             :key_method references the method name.</p>
             
             <h4 id="label-3Aleft_primary_key_column+-5Bmany_to_many-2C+one_through_one-5D">:left_primary_key_column [<code>many_to_many</code>, <code>one_through_one</code>]<span><a href="#label-3Aleft_primary_key_column+-5Bmany_to_many-2C+one_through_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>Like the :left_primary_key option, but :left_primary_key references the
             method name, while :left_primary_key_column references the underlying
-            column.</p>
+            column/expression.</p>
             
             <h4 id="label-3Aright_primary_key_method+-5Bmany_to_many-2C+one_through_one-5D">:right_primary_key_method [<code>many_to_many</code>, <code>one_through_one</code>]<span><a href="#label-3Aright_primary_key_method+-5Bmany_to_many-2C+one_through_one-5D">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
             <p>Like the :right_primary_key option, but :right_primary_key references the
-            column name, while :right_primary_key_method references the method name.</p>
+            column/expression name, while :right_primary_key_method references the
+            method name.</p>
             
             <h3 id="label-Private+Method+Overriding+Options">Private Method Overriding Options<span><a href="#label-Private+Method+Overriding+Options">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

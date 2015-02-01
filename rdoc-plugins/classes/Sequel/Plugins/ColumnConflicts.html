@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::ColumnConflicts</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::ColumnConflicts
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/column_conflicts_rb.html">lib/sequel/plugins/column_conflicts.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The column_conflicts plugin overrides Model#get_column_value and
+            set_column_value to automatically handle column names that conflict with
+            Ruby/Sequel method names.</p>
+            
+            <p>By default, Model#get_column_value and set_column_value just call send,
+            this plugin overrides the methods and gets/sets the value directly in the
+            values hash if the column name conflicts with an existing <a
+            href="../Model.html">Sequel::Model</a> instance method name.</p>
+            
+            <p>Checking for column conflicts causes a performance hit, which is why <a
+            href="../../Sequel.html">Sequel</a> does not enable such checks by default.</p>
+            
+            <p>When using this plugin, you can manually update the columns used.  This may
+            be useful if the columns conflict with one of your custom methods, instead
+            of a method defined in Sequel::Model:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">column_conflicts</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">get_column_conflict!</span>(:<span class="ruby-identifier">column</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">set_column_conflict!</span>(:<span class="ruby-identifier">other_column</span>)</pre>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Make all model&#39;s handle column conflicts automatically (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">column_conflicts</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class handle column conflicts automatically</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">column_conflicts</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="ColumnConflicts/ClassMethods.html">Sequel::Plugins::ColumnConflicts::ClassMethods</a></li>
+              <li><a target="docwin" href="ColumnConflicts/InstanceMethods.html">Sequel::Plugins::ColumnConflicts::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Check for column conflicts on the current model if the model has a dataset.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/column_conflicts.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@get_column_conflicts</span> = {}&#x000A;    <span class="ruby-ivar">@set_column_conflicts</span> = {}&#x000A;    <span class="ruby-identifier">check_column_conflicts</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

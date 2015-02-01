@@ -1,7 +1,7 @@
-Fri, 02 Jan 2015 11:43:50 -0800
+Sun, 01 Feb 2015 09:28:29 -0800
 README.rdoc	Tue, 11 Nov 2014 11:08:34 -0800
-CHANGELOG	Fri, 02 Jan 2015 11:08:19 -0800
-MIT-LICENSE	Thu, 24 Apr 2014 08:56:47 -0700
+CHANGELOG	Fri, 30 Jan 2015 10:36:37 -0800
+MIT-LICENSE	Wed, 14 Jan 2015 18:47:41 -0800
 lib/sequel.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/ast_transformer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/connection_pool.rb	Tue, 25 Nov 2014 10:11:48 -0800
@@ -14,7 +14,7 @@ lib/sequel/model.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/no_core_ext.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/sql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/timezones.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/version.rb	Fri, 02 Jan 2015 11:08:19 -0800
+lib/sequel/version.rb	Fri, 30 Jan 2015 10:36:37 -0800
 lib/sequel/connection_pool/sharded_single.rb	Tue, 25 Nov 2014 10:11:48 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Tue, 25 Nov 2014 10:32:49 -0800
 lib/sequel/connection_pool/single.rb	Tue, 25 Nov 2014 10:11:48 -0800
@@ -37,9 +37,9 @@ lib/sequel/dataset/mutation.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/prepared_statements.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/query.rb	Fri, 21 Nov 2014 12:58:09 -0800
-lib/sequel/dataset/sql.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/model/associations.rb	Fri, 12 Dec 2014 10:16:16 -0800
-lib/sequel/model/base.rb	Thu, 18 Dec 2014 09:39:11 -0800
+lib/sequel/dataset/sql.rb	Mon, 19 Jan 2015 08:45:05 -0800
+lib/sequel/model/associations.rb	Thu, 29 Jan 2015 16:13:26 -0800
+lib/sequel/model/base.rb	Thu, 29 Jan 2015 16:13:26 -0800
 lib/sequel/model/dataset_module.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/default_inflections.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/errors.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -47,8 +47,8 @@ lib/sequel/model/exceptions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/inflections.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/plugins.rb	Thu, 20 Nov 2014 12:20:00 -0800
 doc/active_record.rdoc	Mon, 10 Nov 2014 21:51:27 -0800
-doc/advanced_associations.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
-doc/association_basics.rdoc	Thu, 30 Oct 2014 14:30:51 -0700
+doc/advanced_associations.rdoc	Thu, 29 Jan 2015 16:13:26 -0800
+doc/association_basics.rdoc	Fri, 30 Jan 2015 10:33:25 -0800
 doc/bin_sequel.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
 doc/cheat_sheet.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/code_order.rdoc	Thu, 06 Jun 2013 17:24:35 -0700
@@ -58,7 +58,7 @@ doc/dataset_filtering.rdoc	Tue, 02 Dec 2014 17:30:08 -0800
 doc/extensions.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/mass_assignment.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
 doc/migration.rdoc	Tue, 28 Oct 2014 15:46:00 -0700
-doc/model_hooks.rdoc	Mon, 10 Nov 2014 21:51:27 -0800
+doc/model_hooks.rdoc	Thu, 29 Jan 2015 16:13:26 -0800
 doc/model_plugins.rdoc	Fri, 06 Sep 2013 13:38:06 -0700
 doc/mssql_stored_procedures.rdoc	Thu, 02 Jan 2014 10:46:37 -0800
 doc/object_model.rdoc	Fri, 23 May 2014 13:28:32 -0700
@@ -74,7 +74,7 @@ doc/sql.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/testing.rdoc	Wed, 17 Sep 2014 09:20:16 -0700
 doc/thread_safety.rdoc	Sat, 26 Oct 2013 06:54:00 -0700
 doc/transactions.rdoc	Wed, 09 Apr 2014 15:04:48 -0700
-doc/validations.rdoc	Tue, 18 Mar 2014 14:41:16 -0700
+doc/validations.rdoc	Sat, 24 Jan 2015 16:17:58 -0800
 doc/virtual_rows.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/release_notes/1.0.txt	Sat, 16 Jul 2011 11:31:03 -0700
 doc/release_notes/1.1.txt	Sat, 16 Jul 2011 11:31:03 -0700
@@ -154,6 +154,7 @@ doc/release_notes/4.15.0.txt	Wed, 01 Oct 2014 08:46:53 -0700
 doc/release_notes/4.16.0.txt	Sat, 01 Nov 2014 10:20:55 -0700
 doc/release_notes/4.17.0.txt	Mon, 01 Dec 2014 07:59:35 -0800
 doc/release_notes/4.18.0.txt	Fri, 02 Jan 2015 11:08:19 -0800
+doc/release_notes/4.19.0.txt	Fri, 30 Jan 2015 10:36:37 -0800
 doc/release_notes/4.2.0.txt	Fri, 30 Aug 2013 12:10:20 -0700
 doc/release_notes/4.3.0.txt	Wed, 02 Oct 2013 14:34:47 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
@@ -162,4 +163,4 @@ doc/release_notes/4.6.0.txt	Thu, 02 Jan 2014 12:13:25 -0800
 doc/release_notes/4.7.0.txt	Fri, 31 Jan 2014 11:26:01 -0800
 doc/release_notes/4.8.0.txt	Fri, 28 Feb 2014 09:33:59 -0800
 doc/release_notes/4.9.0.txt	Tue, 01 Apr 2014 10:01:57 -0700
-lib/sequel/extensions/migration.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/migration.rb	Fri, 23 Jan 2015 08:15:01 -0800

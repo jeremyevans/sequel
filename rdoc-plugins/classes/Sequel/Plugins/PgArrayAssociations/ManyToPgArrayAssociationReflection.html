@@ -116,7 +116,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-can_have_associated_objects-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-can_have_associated_objects-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_have_associated_objects?</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">send</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_key</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-can_have_associated_objects-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_have_associated_objects?</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_key</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-default_key'>

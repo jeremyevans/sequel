@@ -31,12 +31,39 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-01-02 11:08:19 -0800</span>
+          <span class='datetime'>2015-01-30 10:36:37 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.19.0+-282015-02-01-29">4.19.0 (2015-02-01)<span><a href="#label-4.19.0+-282015-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make jdbc/sqlanywhere correctly set :auto_increment entry in schema hashes
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Model#cancel_action for canceling actions in before hooks, instead of
+            having the hooks return false (jeremyevans)</p>
+            </li><li>
+            <p>Support not setting @@wait_timeout on MySQL via :timeout=&gt;nil Database
+            option (jeremyevans)</p>
+            </li><li>
+            <p>Add accessed_columns plugin, recording which columns have been accessed for
+            a model instance (jeremyevans)</p>
+            </li><li>
+            <p>Use correct migration version when using IntegerMigrator with
+            :allow_missing_migration_files (blerins) (#938)</p>
+            </li><li>
+            <p>Make Dataset#union, intersect, and except automatically handle datasets
+            with raw SQL (jeremyevans) (#934)</p>
+            </li><li>
+            <p>Add column_conflicts plugin to automatically handle columns that conflict
+            with method names (jeremyevans) (#929)</p>
+            </li><li>
+            <p>Add Model#get_column_value and set_column_value to get/set column values
+            (jeremyevans) (#929)</p>
+            </li></ul>
             
             <h3 id="label-4.18.0+-282015-01-02-29">4.18.0 (2015-01-02)<span><a href="#label-4.18.0+-282015-01-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-11-10 21:51:27 -0800</span>
+          <span class='datetime'>2015-01-29 16:13:26 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -283,28 +283,36 @@
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>) <span class="ruby-comment"># does not run hooks</span></pre>
             
-            <h2 id="label-Halting+Hook+Processing">Halting Hook Processing<span><a href="#label-Halting+Hook+Processing">&para;</a> <a href="#top">&uarr;</a></span></h2>
+            <h2 id="label-Canceling+Actions+in+Hooks">Canceling Actions in Hooks<span><a href="#label-Canceling+Actions+in+Hooks">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <p><a href="../../classes/Sequel.html">Sequel</a> uses a convention that if
-            any <code>before_*</code> hook method returns false (but not nil), that the
-            action will be canceled and a <code>Sequel::HookFailed</code> raised (or
-            <code>nil</code> to be returned by <code>save</code> if
-            <code>raise_on_save_failure</code> is <code>false</code>).  You can use
-            this to implement validation-like behavior, that will run even if
-            validations are skipped.  For example:</p>
+            <p>Sometimes want to cancel an action in a before hook, so the action is not
+            performed.  For example, you may want to not allow destroying or saving a
+            record in certain cases.  In those cases, you can call
+            <code>cancel_action</code> inside the <code>before_*</code> hook, which
+            will stop processing the hook and will either raise a
+            <code>Sequel::HookFailed</code> exception (the default), or return
+            <code>nil</code> if <code>raise_on_save_failure</code> is
+            <code>false</code>).  You can use this to implement validation-like
+            behavior, that will run even if validations are skipped:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&#39;</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">before_save</span>&#x000A;    <span class="ruby-identifier">cancel_action</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&#39;</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>While returning false is not really recommended, you should be aware of
-            this behavior so that you do not inadvertently return false.  For around
-            hooks, neglecting to call <code>super</code> halts hook processing in the
-            same way as returning <code>false</code> in a before hook.  You can&#39;t
-            halt hook processing in after hooks, since by then the main processing has
-            already taken place.</p>
+            <p>For backwards compatibility, <a href="../../classes/Sequel.html">Sequel</a>
+            also treats the <code>before_*</code> hook methods returning
+            <code>false</code> as an indication that the action should be canceled. 
+            This usage is discouraged in new code, but you should be aware of this
+            behavior so that you do not inadvertently return false.</p>
+            
+            <p>For around hooks, neglecting to call <code>super</code> halts hook
+            processing in the same way as calling <code>cancel_action</code> in a
+            before hook.  It&#39;s probably a bad idea to use
+            <code>cancel_action</code> hook processing in after hooks, or after
+            yielding in around hooks, since by then the main processing has already
+            taken place.</p>
             
             <p>By default, <a href="../../classes/Sequel.html">Sequel</a> runs hooks other
-            than validation hooks inside a transaction, so if you abort the hook by
-            returning false in a before hook or by raising an exception in any hook, <a
+            than validation hooks inside a transaction, so if you cancel the action by
+            calling <code>cancel_action</code> in any hook, <a
             href="../../classes/Sequel.html">Sequel</a> will rollback the transaction. 
             However, note that the implicit use of transactions when saving and
             destroying model objects is conditional (it depends on the model

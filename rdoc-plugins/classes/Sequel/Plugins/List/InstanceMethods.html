@@ -113,7 +113,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_create-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-before_create-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_create</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">position_field</span>)&#x000A;    <span class="ruby-identifier">send</span>(<span class="ruby-node">&quot;#{position_field}=&quot;</span>, <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-before_create-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_create</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)&#x000A;    <span class="ruby-identifier">set_column_value</span>(<span class="ruby-node">&quot;#{position_field}=&quot;</span>, <span class="ruby-identifier">list_dataset</span>.<span class="ruby-identifier">max</span>(<span class="ruby-identifier">position_field</span>).<span class="ruby-identifier">to_i</span><span class="ruby-operator">+</span><span class="ruby-value">1</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-last_position'>
@@ -270,7 +270,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-position_value-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-position_value-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">position_value</span>&#x000A;  <span class="ruby-identifier">send</span>(<span class="ruby-identifier">position_field</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-position_value-source'><span class="ruby-comment"># File lib/sequel/plugins/list.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">position_value</span>&#x000A;  <span class="ruby-identifier">get_column_value</span>(<span class="ruby-identifier">position_field</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prev'>

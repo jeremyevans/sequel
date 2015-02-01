@@ -5844,7 +5844,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-compound_from_self-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-compound_from_self-source'><span class="ruby-comment"># File lib/sequel/dataset/sql.rb, line 829</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">compound_from_self</span>&#x000A;  (<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]) <span class="ruby-operator">?</span> <span class="ruby-identifier">from_self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-compound_from_self-source'><span class="ruby-comment"># File lib/sequel/dataset/sql.rb, line 829</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">compound_from_self</span>&#x000A;  (<span class="ruby-ivar">@opts</span>[<span class="ruby-value">:sql</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:limit</span>] <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:order</span>]) <span class="ruby-operator">?</span> <span class="ruby-identifier">from_self</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::AccessedColumns::InstanceMethods</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::AccessedColumns::InstanceMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/accessed_columns_rb.html">lib/sequel/plugins/accessed_columns.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-5B-5D">[]</a></li>
+              <li><a target="docwin" href="#method-i-accessed_columns">accessed_columns</a></li>
+              <li><a target="docwin" href="#method-i-after_save">after_save</a></li>
+              <li><a target="docwin" href="#method-i-initialize_copy">initialize_copy</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-5B-5D'>
+                <a name='method-i-5B-5D'></a>
+                <div class='synopsis'>
+                  <span class='name'>[]</span>
+                  <span class='arguments'>(c)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Record the column access before retrieving the value.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">c</span>)&#x000A;  (<span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">c</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frozen?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-accessed_columns'>
+                <a name='method-i-accessed_columns'></a>
+                <div class='synopsis'>
+                  <span class='name'>accessed_columns</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The columns that have been accessed.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-accessed_columns-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-accessed_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">accessed_columns</span>&#x000A;  <span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@accessed_columns</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">:</span> []&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-after_save'>
+                <a name='method-i-after_save'></a>
+                <div class='synopsis'>
+                  <span class='name'>after_save</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Clear the accessed columns when saving.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_save-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@accessed_columns</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-initialize_copy'>
+                <a name='method-i-initialize_copy'></a>
+                <div class='synopsis'>
+                  <span class='name'>initialize_copy</span>
+                  <span class='arguments'>(other)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Copy the accessed columns when duping and cloning.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-initialize_copy-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-initialize_copy-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize_copy</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@accessed_columns</span>, <span class="ruby-ivar">@accessed_columns</span>.<span class="ruby-identifier">dup</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@accessed_columns</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>
