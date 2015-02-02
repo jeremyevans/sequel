@@ -154,10 +154,8 @@ module Sequel
         case s
         when String
           super
-        when Integer
+        when Integer, Float
           super(Time.at(s).to_s)
-        when Float
-          super(DateTime.jd(s).to_s)
         else
           raise Sequel::Error, "unhandled type when converting to : #{s.inspect} (#{s.class.inspect})"
         end
