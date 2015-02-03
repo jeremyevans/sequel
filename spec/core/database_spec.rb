@@ -684,7 +684,7 @@ shared_examples_for "Database#transaction" do
   
   specify "should support :before_retry option for invoking callback before retrying" do
     a, errs, calls = [], [], []
-    retryer = ->(n, err) { calls << n; errs << err }
+    retryer = proc{|n, err| calls << n; errs << err }
     @db.transaction(:retry_on=>Sequel::DatabaseDisconnectError, :before_retry => retryer) do
       a << 1; raise Sequel::DatabaseDisconnectError if a.length < 3
     end
