@@ -682,6 +682,19 @@ shared_examples_for "Database#transaction" do
     a.should == [1] * 100
   end
   
+  specify "should support :before_retry option for invoking callback before retrying" do
+    a, errs, calls = [], [], []
+    retryer = ->(n, err) { calls << n; errs << err }
+    @db.transaction(:retry_on=>Sequel::DatabaseDisconnectError, :before_retry => retryer) do
+      a << 1; raise Sequel::DatabaseDisconnectError if a.length < 3
+    end
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'ROLLBACK', 'BEGIN', 'COMMIT']
+    a.should == [1, 1, 1]
+    errs.count.should == 2
+    errs.each { |e| e.class.should == Sequel::DatabaseDisconnectError }
+    calls.should == [1, 2]
+  end
+  
   specify "should raise an error if attempting to use :retry_on inside another transaction" do
     proc{@db.transaction{@db.transaction(:retry_on=>Sequel::ConstraintViolation){}}}.should raise_error(Sequel::Error)
     @db.sqls.should == ['BEGIN', 'ROLLBACK']

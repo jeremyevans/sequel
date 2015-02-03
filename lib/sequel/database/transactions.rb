@@ -45,6 +45,9 @@ module Sequel
     # :num_retries :: The number of times to retry if the :retry_on option is used.
     #                 The default is 5 times.  Can be set to nil to retry indefinitely,
     #                 but that is not recommended.
+    # :before_retry :: Proc to execute before rertrying if the :retry_on option is used.
+    #                  Called with two arguments: the number of retry attempts (counting
+    #                  the current one) and the error the last attempt failed with.
     # :prepare :: A string to use as the transaction identifier for a
     #             prepared transaction (two-phase commit), if the database/adapter
     #             supports prepared transactions.
@@ -73,13 +76,17 @@ module Sequel
     #                 and :remote_write (9.2+).
     def transaction(opts=OPTS, &block)
       if retry_on = opts[:retry_on]
-        num_retries = opts.fetch(:num_retries, 5)
+        tot_retries = opts.fetch(:num_retries, 5)
+        num_retries = 0 unless tot_retries.nil?
         begin
           transaction(opts.merge(:retry_on=>nil, :retrying=>true), &block)
-        rescue *retry_on
+        rescue *retry_on => e
           if num_retries
-            num_retries -= 1
-            retry if num_retries >= 0
+            num_retries += 1
+            if num_retries <= tot_retries
+              opts[:before_retry].call(num_retries, e) if opts[:before_retry]
+              retry
+            end
           else
             retry
           end
