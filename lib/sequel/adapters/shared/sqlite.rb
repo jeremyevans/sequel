@@ -160,10 +160,8 @@ module Sequel
       end
 
       # Override the default setting for whether to use timezones in timestamps.
-      # For backwards compatibility, it is set to +true+ by default.
-      # Anyone wanting to use SQLite's datetime functions should set it to +false+
-      # using this method.  It's possible that the default will change in a future version,
-      # so anyone relying on timezones in timestamps should set this to +true+.
+      # It is set to +false+ by default, as SQLite's date/time methods do not
+      # support timezones in timestamps.
       attr_writer :use_timestamp_timezones
 
       # SQLite supports timezones in timestamps, since it just stores them as strings,
