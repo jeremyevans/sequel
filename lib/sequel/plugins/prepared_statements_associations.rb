@@ -50,6 +50,7 @@ module Sequel
         # that, given appropriate bound variables, the prepared statement will work correctly for any
         # instance.  Return false if such a prepared statement cannot be created.
         def association_prepared_statement(opts, assoc_bv)
+          return unless model.cache_associations
           opts.send(:cached_fetch, :prepared_statement) do
             unless opts[:instance_specific]
               ds, bv = _associated_dataset(opts, {}).unbind

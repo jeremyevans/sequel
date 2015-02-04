@@ -1,5 +1,7 @@
 === HEAD
 
+* Only use prepared statements for associations if caching association metadata (jeremyevans)
+
 * Set parent association when loading descendants in the rcte_tree plugin (jeremyevans)
 
 * Add Database#transaction :before_retry option, specifying a proc to call before retrying (uhoh-itsmaciek) (#941)

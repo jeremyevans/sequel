@@ -90,6 +90,14 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @db.sqls.should == []
   end
 
+  specify "should run a regular query if not caching association metadata" do
+    @Artist.cache_associations = false
+    @Artist.load(:id=>1).albums
+    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @Artist.load(:id=>1).album
+    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
+  end
+
   specify "should run a regular query if there is a callback" do
     @Artist.load(:id=>1).albums(proc{|ds| ds})
     @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
