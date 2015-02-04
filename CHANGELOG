@@ -1,5 +1,7 @@
 === HEAD
 
+* Set parent association when loading descendants in the rcte_tree plugin (jeremyevans)
+
 * Add Database#transaction :before_retry option, specifying a proc to call before retrying (uhoh-itsmaciek) (#941)
 
 === 4.19.0 (2015-02-01)

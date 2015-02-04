@@ -272,7 +272,11 @@ module Sequel
               end
             end
             children_map.each do |parent_id, objs|
-              parent_map[parent_id].associations[childrena] = objs
+              parent_obj = parent_map[parent_id]
+              parent_obj.associations[childrena] = objs
+              objs.each do |obj|
+                obj.associations[parent] = parent_obj
+              end
             end
           end
         end
@@ -333,7 +337,12 @@ module Sequel
             (children_map[key_conv[obj]] ||= []) << obj
           end
           children_map.each do |parent_id, objs|
-            parent_map[parent_id].associations[childrena] = objs.uniq
+            objs = objs.uniq
+            parent_obj = parent_map[parent_id]
+            parent_obj.associations[childrena] = objs
+            objs.each do |obj|
+              obj.associations[parent] = parent_obj
+            end
           end
         end
         model.one_to_many descendants, d

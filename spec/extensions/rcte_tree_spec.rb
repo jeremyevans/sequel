@@ -91,14 +91,17 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:p].associations[:p].associations[:p].associations.fetch(:p, 1).should == nil
   end
   
-  it "should add all children associations when lazily loading descendants" do
+  it "should add all parent and children associations when lazily loading descendants" do
     @c.plugin :rcte_tree
     @ds._fetch = [[{:id=>3, :name=>'??', :parent_id=>1}, {:id=>1, :name=>'A', :parent_id=>2}, {:id=>4, :name=>'B', :parent_id=>2}, {:id=>5, :name=>'?', :parent_id=>3}]]
     @o.descendants.should == [@c.load(:id=>3, :name=>'??', :parent_id=>1), @c.load(:id=>1, :name=>'A', :parent_id=>2), @c.load(:id=>4, :name=>'B', :parent_id=>2), @c.load(:id=>5, :name=>'?', :parent_id=>3)]
     @o.associations[:children].should == [@c.load(:id=>1, :name=>'A', :parent_id=>2), @c.load(:id=>4, :name=>'B', :parent_id=>2)]
     @o.associations[:children].map{|c1| c1.associations[:children]}.should == [[@c.load(:id=>3, :name=>'??', :parent_id=>1)], []]
+    @o.associations[:children].map{|c1| c1.associations[:parent]}.should == [@o, @o]
     @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@c.load(:id=>5, :name=>'?', :parent_id=>3)]], []]
+    @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:parent]}}.should == [[@o.children.first], []]
     @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[]]], []]
+    @o.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:parent]}}}.should == [[[@o.children.first.children.first]], []]
   end
   
   it "should add all children associations when lazily loading descendants and giving options" do
@@ -182,7 +185,9 @@ describe Sequel::Model, "rcte_tree" do
       [@c.load(:id=>4, :name=>'?', :parent_id=>7), @c.load(:id=>5, :name=>'?', :parent_id=>4)]]
     os.map{|o| o.children}.should == [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E')], [@c.load(:id=>3, :name=>'00', :parent_id=>6)], [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
     os.map{|o1| o1.children.map{|o2| o2.children}}.should == [[[@c.load(:id=>3, :name=>'00', :parent_id=>6)], []], [[]], [[@c.load(:id=>5, :name=>'?', :parent_id=>4)]]]
+    os.map{|o1| o1.children.map{|o2| o2.parent}}.should == [[os[0], os[0]], [os[1]], [os[2]]]
     os.map{|o1| o1.children.map{|o2| o2.children.map{|o3| o3.children}}}.should == [[[[]], []], [[]], [[[]]]]
+    os.map{|o1| o1.children.map{|o2| o2.children.map{|o3| o3.parent}}}.should == [[[os[0].children[0]], []], [[]], [[os[2].children[0]]]]
     @db.sqls.should == []
   end
   
