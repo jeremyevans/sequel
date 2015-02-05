@@ -60,7 +60,8 @@ module Sequel
     # :rollback :: Can the set to :reraise to reraise any Sequel::Rollback exceptions
     #              raised, or :always to always rollback even if no exceptions occur
     #              (useful for testing).
-    # :server :: The server to use for the transaction.
+    # :server :: The server to use for the transaction. Set to :default, :read_only, or
+    #            whatever symbol you used in the connect string when naming your servers.
     # :savepoint :: Whether to create a new savepoint for this transaction,
     #               only respected if the database/adapter supports savepoints.  By
     #               default Sequel will reuse an existing transaction, so if you want to
