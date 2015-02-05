@@ -41,6 +41,16 @@ is the simplest configuration:
 This will use the slave_server for SELECT queries and master_server for
 other queries.
 
+If you want to ensure your queries are going to a specific database, you
+can force this for a given query by using the .server method and passing 
+the symbol name defined in the connect options. For example:
+
+  # Force the SELECT to run on the master
+  DB[:users].server(:default).all
+
+  # Force the SELECT to run on the read-only slave
+  DB[:users].server(:read_only).all
+
 === Multiple Read-Only Slaves, Single Master
 
 Let's say you have 4 slave database servers with names slave_server0,
