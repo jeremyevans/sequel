@@ -1,5 +1,7 @@
 === HEAD
 
+* Make freeze not validate objects if their errors are already frozen (jeremyevans)
+
 * Only use prepared statements for associations if caching association metadata (jeremyevans)
 
 * Set parent association when loading descendants in the rcte_tree plugin (jeremyevans)

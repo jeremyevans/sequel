@@ -446,6 +446,15 @@ describe "Model#freeze" do
     o.valid?.should == false
   end
 
+  it "should not call validate if errors is already frozen" do
+    @o.valid?.should == true
+    o = Album.new
+    o.errors.freeze
+    def o.validate() errors.add(:foo, '') end
+    proc{o.freeze}.should_not raise_error
+    o.valid?.should == true
+  end
+
   it "should raise an Error if trying to save/destroy/delete/refresh" do
     proc{@o.save}.should raise_error(Sequel::Error)
     proc{@o.destroy}.should raise_error(Sequel::Error)

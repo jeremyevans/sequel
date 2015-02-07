@@ -1329,9 +1329,10 @@ module Sequel
       def freeze
         values.freeze
         changed_columns.freeze
-        errors
-        validate
-        errors.freeze
+        unless errors.frozen?
+          validate
+          errors.freeze
+        end
         this.freeze if !new? && model.primary_key
         super
       end
