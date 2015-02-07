@@ -12,7 +12,10 @@ module Sequel
     # instances.  This is slower as it requires creating new objects, but it allows
     # you to make changes to the object and save them.  If you set the option to false,
     # you are responsible for updating the cache manually (the pg_static_cache_updater
-    # extension can handle this automatically).
+    # extension can handle this automatically).  Note that it is not safe to use the
+    # :frozen=>false option if you are mutating column values directly.  If you are
+    # mutating column values, you should also override Model.call to dup each mutable
+    # column value to ensure it is not shared by other instances.
     #
     # The caches this plugin creates are used for the following things:
     #
