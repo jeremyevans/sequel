@@ -1,12 +1,18 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "Sequel::Plugins::StaticCache with :frozen=>false option" do
+describe "Sequel::Plugins::StaticCache" do
   before do
     @db = Sequel.mock
     @db.fetch = [{:id=>1}, {:id=>2}]
     @db.numrows = 1
     @c = Class.new(Sequel::Model(@db[:t]))
     @c.columns :id, :name
+  end
+
+  it "should not attempt to validate objects" do
+    @c.send(:define_method, :validate){errors.add(:name, 'bad')}
+    proc{@c.plugin(:static_cache)}.should_not raise_error
+    @c.map{|o| o.valid?}.should == [true, true]
   end
 
   shared_examples_for "Sequel::Plugins::StaticCache" do  

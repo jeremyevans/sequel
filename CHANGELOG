@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't have the static cache plugin attempt to validate objects (jeremyevans)
+
 * Make freeze not validate objects if their errors are already frozen (jeremyevans)
 
 * Only use prepared statements for associations if caching association metadata (jeremyevans)

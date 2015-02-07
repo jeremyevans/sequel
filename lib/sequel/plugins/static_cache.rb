@@ -180,7 +180,10 @@ module Sequel
         def load_cache
           a = dataset.all
           h = {}
-          a.each{|o| h[o.pk.freeze] = o.freeze}
+          a.each do |o|
+            o.errors.freeze
+            h[o.pk.freeze] = o.freeze
+          end
           @all = a.freeze
           @cache = h.freeze
         end
