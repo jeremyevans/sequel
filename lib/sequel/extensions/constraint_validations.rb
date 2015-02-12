@@ -264,7 +264,7 @@ module Sequel
 
     private
 
-    # Modify the default create_table generator to include
+    # Modify the default alter_table generator to include
     # the constraint validation methods.
     def alter_table_generator(&block)
       super do
