@@ -32,6 +32,7 @@ module Sequel
         opts[:username] ||= opts.delete(:user)
         opts[:flags] ||= 0
         opts[:flags] |= ::Mysql2::Client::FOUND_ROWS if ::Mysql2::Client.const_defined?(:FOUND_ROWS)
+        opts[:encoding] ||= opts[:charset]
         conn = ::Mysql2::Client.new(opts)
         conn.query_options.merge!(:symbolize_keys=>true, :cache_rows=>false)
 
@@ -41,7 +42,7 @@ module Sequel
         # in case the READ_DEFAULT_GROUP overrode the provided encoding.
         # Doesn't work across implicit reconnects, but Sequel doesn't turn on
         # that feature.
-        if encoding = opts[:encoding] || opts[:charset]
+        if encoding = opts[:encoding]
           sqls.unshift("SET NAMES #{conn.escape(encoding.to_s)}")
         end
 
