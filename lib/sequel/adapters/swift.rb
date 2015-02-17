@@ -135,10 +135,18 @@ module Sequel
           @columns = res.fields.map do |c|
             col_map[c] = output_identifier(c)
           end
+          tz = db.timezone if Sequel.application_timezone
           res.each do |r|
             h = {}
             r.each do |k, v|
-              h[col_map[k]] = v.is_a?(StringIO) ? SQL::Blob.new(v.read) : v
+              h[col_map[k]] = case v
+              when StringIO
+                SQL::Blob.new(v.read)
+              when DateTime
+                tz ? Sequel.database_to_application_timestamp(Sequel.send(:convert_input_datetime_no_offset, v, tz)) : v
+              else
+                v
+              end
             end
             yield h
           end

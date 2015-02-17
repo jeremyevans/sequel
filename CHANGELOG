@@ -1,5 +1,7 @@
 === HEAD
 
+* Have swift adapter respect database and application timezone settings (asppsa, jeremyevans) (#946)
+
 * Don't have the static cache plugin attempt to validate objects (jeremyevans)
 
 * Make freeze not validate objects if their errors are already frozen (jeremyevans)
