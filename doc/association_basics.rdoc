@@ -268,9 +268,9 @@ an example of a directed graph:
   #   :name       \----- :predecessor_id
 
   class Node
-    many_to_many :direct_successors, :left_key=>:successor_id,
+    many_to_many :direct_predecessors, :left_key=>:successor_id,
       :right_key=>:predecessor_id, :join_table=>:edges, :class=>self
-    many_to_many :direct_predecessors, :right_key=>:successor_id,
+    many_to_many :direct_successors, :right_key=>:successor_id,
       :left_key=>:predecessor_id, :join_table=>:edges, :class=>self
   end
 
