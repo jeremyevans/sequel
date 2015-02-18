@@ -326,7 +326,7 @@ module Sequel
       #   add_constraint({:name=>:valid_name, :deferrable=>true}, Sequel.like(:name, 'A%'))
       #   # ADD CONSTRAINT valid_name CHECK (name LIKE 'A%' ESCAPE '\') DEFERRABLE INITIALLY DEFERRED
       def add_constraint(name, *args, &block)
-        opts = name.is_a?(Hash) ? name : {:name=>name}
+        opts = name.is_a?(Hash) ? name : (args.last.is_a?(Hash) ? args.pop : {}).merge(:name=>name)
         @operations << opts.merge(:op=>:add_constraint, :type=>:check, :check=>block || args)
       end
 
