@@ -207,6 +207,11 @@ describe "Sequel::Plugins::JsonSerializer" do
     @album.to_json(:root=>true, :only => :name).to_s.should == '{"album":{"name":"RF"}}'
   end
   
+  it "should handle the :root option with a string to qualify single records using the string as the key" do
+    @album.to_json(:root=>"foo", :except => [:name, :artist_id]).to_s.should == '{"foo":{"id":1}}'
+    @album.to_json(:root=>"bar", :only => :name).to_s.should == '{"bar":{"name":"RF"}}'
+  end
+  
   it "should handle the :root=>:both option to qualify a dataset of records" do
     Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
     Album.dataset.to_json(:root=>:both, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
@@ -221,6 +226,12 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should handle the :root=>:instance option to qualify just the instances" do
     Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
     Album.dataset.to_json(:root=>:instance, :only => :id).to_s.should == '[{"album":{"id":1}},{"album":{"id":1}}]'
+  end
+
+  it "should handle the :root=>string option to qualify just the collection using the string as the key" do
+    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
+    Album.dataset.to_json(:root=>"foos", :only => :id).to_s.should == '{"foos":[{"id":1},{"id":1}]}'
+    Album.dataset.to_json(:root=>"bars", :only => :id).to_s.should == '{"bars":[{"id":1},{"id":1}]}'
   end
 
   it "should store the default options in json_serializer_opts" do

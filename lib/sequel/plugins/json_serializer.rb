@@ -253,7 +253,9 @@ module Sequel
         # :only :: Symbol or Array of Symbols of columns to only
         #          include in the JSON output, ignoring all other
         #          columns.
-        # :root :: Qualify the JSON with the name of the object.
+        # :root :: Qualify the JSON with the name of the object.  If a
+        #          string is given, use the string as the key, otherwise
+        #          use an underscored version of the model's name.
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
             opts = model.json_serializer_opts.merge(a.first)
@@ -286,7 +288,12 @@ module Sequel
               Array(inc).each{|c| h[c.to_s] = send(c)}
             end
           end
-          h = {model.send(:underscore, model.to_s) => h} if opts[:root]
+
+          if root = opts[:root]
+            root = model.send(:underscore, model.to_s) unless root.is_a?(String)
+            h = {root => h}
+          end
+
           Sequel.object_to_json(h, *a)
         end
       end
@@ -299,16 +306,13 @@ module Sequel
         #
         # :array :: An array of instances.  If this is not provided,
         #           calls #all on the receiver to get the array.
-        # :root :: If set to :collection, only wraps the collection
-        #          in a root object.  If set to :instance, only wraps
+        # :root :: If set to :collection, wraps the collection
+        #          in a root object using the pluralized, underscored model
+        #          name as the key.  If set to :instance, only wraps
         #          the instances in a root object.  If set to :both,
         #          wraps both the collection and instances in a root
-        #          object.  Unfortunately, for backwards compatibility,
-        #          if this option is true and doesn't match one of those
-        #          symbols, it defaults to both.  That may change in a
-        #          future version, so for forwards compatibility, you
-        #          should pick a specific symbol for your desired
-        #          behavior.
+        #          object.  If set to a string, wraps the collection in
+        #          a root object using the string as the key.  
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
             opts = model.json_serializer_opts.merge(a.first)
@@ -317,15 +321,17 @@ module Sequel
             opts = model.json_serializer_opts
           end
 
-          collection_root = case opts[:root]
+          case collection_root = opts[:root]
           when nil, false, :instance
-            false
-          when :both
-            true
+            collection_root = false
           else
             opts = opts.dup
-            opts.delete(:root)
-            true
+            unless collection_root == :both
+              opts.delete(:root)
+            end
+            unless collection_root.is_a?(String)
+              collection_root = model.send(:pluralize, model.send(:underscore, model.to_s))
+            end
           end
 
           res = if row_proc 
@@ -341,7 +347,7 @@ module Sequel
           end
 
           if collection_root
-            Sequel.object_to_json({model.send(:pluralize, model.send(:underscore, model.to_s)) => res}, *a)
+            Sequel.object_to_json({collection_root => res}, *a)
           else
             Sequel.object_to_json(res, *a)
           end
