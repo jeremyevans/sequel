@@ -37,6 +37,15 @@
 #   DB[:table_name].get(:column_name)
 #   # ['value1', 'value2']
 #
+# If the migration extension is loaded before this one (the order is important),
+# you can use create_enum in a reversible migration:
+#
+#   Sequel.migration do
+#     change do
+#       create_enum(:type_name, %w'value1 value2 value3')
+#     end
+#   end
+#
 # Finally, typecasting for enums is setup to cast to strings, which
 # allows you to use symbols in your model code.  Similar, you can provide
 # the enum values as symbols when creating enums using create_enum or
@@ -128,6 +137,16 @@ module Sequel
       # Typecast the given value to a string.
       def typecast_value_enum(value)
         value.to_s
+      end
+    end
+  end
+
+  # support reversible create_enum statements if the migration extension is loaded
+  if defined?(MigrationReverser)
+    class MigrationReverser
+      private
+      def create_enum(name, _)
+        @actions << [:drop_enum, name]
       end
     end
   end
