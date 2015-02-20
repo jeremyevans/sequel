@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "pg_inet extension" do
+describe "pg_enum extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     @db.extend(Module.new do
