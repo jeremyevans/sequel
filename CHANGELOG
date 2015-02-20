@@ -1,5 +1,7 @@
 === HEAD
 
+* Dataset#paged_each now returns an enumerator if not passed a block (jeremyevans)
+
 * Use to_json :root option with string value as the JSON object key in the json_serializer plugin (jeremyevans)
 
 * Allow create_enum in the pg_enum extension be reversible in migrations (celsworth) (#951)

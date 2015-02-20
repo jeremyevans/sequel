@@ -449,7 +449,7 @@ module Sequel
     #              for using an approach with a limit and offset for every page.  This can
     #              be set to :filter, which uses a limit and a filter that excludes
     #              rows from previous pages.  In order for this strategy to work, you must be
-    #              selecting the columns you are ordering by, and non of the columns can contain
+    #              selecting the columns you are ordering by, and none of the columns can contain
     #              NULLs.  Note that some Sequel adapters have optimized implementations that will
     #              use cursors or streaming regardless of the :strategy option used.
     # :filter_values :: If the :strategy=>:filter option is used, this option should be a proc
@@ -485,6 +485,9 @@ module Sequel
     def paged_each(opts=OPTS)
       unless @opts[:order]
         raise Sequel::Error, "Dataset#paged_each requires the dataset be ordered"
+      end
+      unless block_given?
+        return enum_for(:paged_each, opts)
       end
 
       total_limit = @opts[:limit]

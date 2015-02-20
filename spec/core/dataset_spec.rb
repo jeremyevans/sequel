@@ -4641,6 +4641,11 @@ describe "Dataset#paged_each" do
     @rows.should == @db
   end
 
+  it "should return enumerator when called without block" do
+    @ds.paged_each.each(&@proc)
+    @rows.should == @db
+  end
+
   it "should respect the row_proc" do
     @ds.row_proc = lambda{|row| {:x=>row[:x]*2}}
     @ds.paged_each(&@proc)
