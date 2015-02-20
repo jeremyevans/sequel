@@ -1,5 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
+Sequel.extension :migration
+
 describe "pg_enum extension" do
   before do
     @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
@@ -60,5 +62,31 @@ describe "pg_enum extension" do
   it "should support :if_not_exists option for #add_enum_value method for not adding the value if it exists" do
     @db.add_enum_value(:foo, :a, :if_not_exists=>true)
     @db.sqls.first.should == "ALTER TYPE foo ADD VALUE IF NOT EXISTS 'a'"
+  end
+
+  it "should reverse a create_enum directive in a migration" do
+    c = Class.new do
+      attr_reader :actions
+      def initialize(&block)
+        @actions = []
+      end
+      def method_missing(*args)
+        @actions << args
+      end
+    end
+
+    db = c.new
+
+    p = Proc.new do
+      create_enum(:type_name, %w'value1 value2 value3')
+    end
+
+    Sequel.migration{change(&p)}.apply(db, :up)
+    Sequel.migration{change(&p)}.apply(db, :down)
+
+    db.actions.should == [
+      [:create_enum, :type_name, ["value1", "value2", "value3"] ],
+      [:drop_enum, :type_name]
+    ]
   end
 end
