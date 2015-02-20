@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow create_enum in the pg_enum extension be reversible in migrations (celsworth) (#951)
+
 * Have swift adapter respect database and application timezone settings (asppsa, jeremyevans) (#946)
 
 * Don't have the static cache plugin attempt to validate objects (jeremyevans)
