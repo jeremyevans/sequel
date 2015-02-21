@@ -1,5 +1,7 @@
 === HEAD
 
+* Skip eager loading queries if there are no matching keys (jeremyevans) (#952)
+
 * Dataset#paged_each now returns an enumerator if not passed a block (jeremyevans)
 
 * Use to_json :root option with string value as the JSON object key in the json_serializer plugin (jeremyevans)

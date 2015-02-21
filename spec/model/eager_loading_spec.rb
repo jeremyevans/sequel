@@ -131,6 +131,16 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
   
+  it "should skip eager loading for a many_to_one association with no matching keys" do
+    EagerAlbum.dataset._fetch = [{:id=>1, :band_id=>nil}]
+    a = EagerAlbum.eager(:band).all
+    DB.sqls.should == ['SELECT * FROM albums']
+    a.should == [EagerAlbum.load(:id => 1, :band_id => nil)]
+    a.first.associations.fetch(:band).should == nil
+    a.first.band.should == nil
+    DB.sqls.should == []
+  end
+  
   it "should eagerly load a single many_to_one association with the same name as the column" do
     EagerAlbum.def_column_alias(:band_id_id, :band_id)
     EagerAlbum.many_to_one :band_id, :key_column=>:band_id, :class=>EagerBand

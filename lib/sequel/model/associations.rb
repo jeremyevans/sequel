@@ -241,6 +241,10 @@ module Sequel
         def eager_load_results(eo, &block)
           rows = eo[:rows]
           initialize_association_cache(rows) unless eo[:initialize_rows] == false
+          if eo[:id_map]
+            ids = eo[:id_map].keys
+            return ids if ids.empty?
+          end
           strategy = eager_limit_strategy
           cascade = eo[:associations]
 
@@ -252,7 +256,7 @@ module Sequel
             ds = associated_dataset
             loader = union_eager_loader
             joiner = " UNION ALL "
-            eo[:id_map].keys.each_slice(subqueries_per_union).each do |slice|
+            ids.each_slice(subqueries_per_union).each do |slice|
               objects.concat(ds.with_sql(slice.map{|k| loader.sql(*k)}.join(joiner)).to_a)
             end
             ds = ds.eager(cascade) if cascade
@@ -260,7 +264,7 @@ module Sequel
           else
             loader = placeholder_eager_loader
             loader = loader.with_dataset{|dataset| dataset.eager(cascade)} if cascade
-            objects = loader.all(eo[:id_map].keys)
+            objects = loader.all(ids)
           end
 
           objects.each(&block)
