@@ -142,7 +142,7 @@ as it's third argument.  A simple example is:
 
 +foreign_key+ accepts the same options as +column+.  For example, to have a unique foreign key with varchar(16) type:
 
-  foreign_key :column_name, :unique=>true, :type=>'varchar(16)'
+  foreign_key :column_name, :table, :unique=>true, :type=>'varchar(16)'
 
 +foreign_key+ also accepts some specific options:
 
