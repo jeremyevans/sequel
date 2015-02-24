@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize MSSQL bit type as boolean in the schema_dumper (jeremyevans)
+
 * Skip eager loading queries if there are no matching keys (jeremyevans) (#952)
 
 * Dataset#paged_each now returns an enumerator if not passed a block (jeremyevans)
