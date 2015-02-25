@@ -1735,6 +1735,15 @@ This is usually used if the association dataset depends on specific values in
 model instance that would not be valid when eager loading for multiple
 instances.
 
+==== :instance_specific
+
+This allows you to override the setting of whether the dataset contains instance
+specific code.  For example, if you are passing a block to the association,
+Sequel sets this to true by default, which disables some optimizations that
+would be invalid if the association is instance specific.  If you know that the
+block does not contain instance specific code, you can set this to false to
+reenable the optimizations.
+
 ==== :cartesian_product_number 
 
 The number of joins completed by this association that could cause more

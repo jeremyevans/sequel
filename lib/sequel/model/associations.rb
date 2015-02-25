@@ -1655,7 +1655,7 @@ module Sequel
 
           opts = orig_opts.merge(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
           opts[:block] = block if block
-          if block || orig_opts[:block] || orig_opts[:dataset]
+          if !opts.has_key?(:instance_specific) && (block || orig_opts[:block] || orig_opts[:dataset])
             # It's possible the association is instance specific, in that it depends on
             # values other than the foreign key value.  This needs to be checked for
             # in certain places to disable optimizations.

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for overridding the :instance_specific association option (jeremyevans)
+
 * Recognize MSSQL bit type as boolean in the schema_dumper (jeremyevans)
 
 * Skip eager loading queries if there are no matching keys (jeremyevans) (#952)

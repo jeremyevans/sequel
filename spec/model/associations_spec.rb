@@ -136,6 +136,14 @@ describe Sequel::Model, "associate" do
     proc{c.one_to_many :cs, :clone=>:c}.should raise_error(Sequel::Error)
   end
 
+  it "should allow overriding the :instance_specific option" do
+    c = Class.new(Sequel::Model(:c))
+    c.many_to_one :c, :instance_specific=>true
+    c.association_reflection(:c)[:instance_specific].should == true
+    c.many_to_one :c, :instance_specific=>false do |ds| ds end
+    c.association_reflection(:c)[:instance_specific].should == false
+  end
+
   it "should allow cloning of one_to_many to one_to_one associations and vice-versa" do
     c = Class.new(Sequel::Model(:c))
     c.one_to_one :c
