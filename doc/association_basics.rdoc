@@ -886,6 +886,22 @@ that returns all albums of an artist that went gold (sold at least
     ds.where{copies_sold > 500000}
   end
 
+The result of the block is cached as an optimization.  One of the side
+effects of that is that if your block depends on external state, it won't
+work correctly unless you setup a delayed evaluation.  For example:
+
+  Artist.one_to_many :gold_albums, :class=>:Album do |ds|
+    ds.where{copies_sold > $gold_limit}
+  end
+
+In this case if you change <tt>$gold_limit</tt> later, the changes won't
+effect the association.  If you want to pick up changes to <tt>$gold_limit</tt>,
+you need to setup a delayed evaluation:
+
+  Artist.one_to_many :gold_albums, :class=>:Album do |ds|
+    ds.where{copies_sold > Sequel.delay{$gold_limit}}
+  end
+
 ==== :class
 
 This is the class of the associated objects that will be used.  It's
