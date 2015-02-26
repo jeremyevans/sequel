@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for set_column_type :auto_increment=>true to add AUTO_INCREMENT to existing column on MySQL (jeremyevans) (#959)
+
 * Add support for overridding the :instance_specific association option (jeremyevans)
 
 * Recognize MSSQL bit type as boolean in the schema_dumper (jeremyevans)

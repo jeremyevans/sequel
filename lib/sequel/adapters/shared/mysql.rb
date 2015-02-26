@@ -215,7 +215,9 @@ module Sequel
             raise Error, "cannot determine database type to use for CHANGE COLUMN operation"
           end
           opts = op.merge(opts)
-          opts.delete(:auto_increment) if op[:auto_increment] == false
+          if op.has_key?(:auto_increment)
+            opts[:auto_increment] = op[:auto_increment]
+          end
           "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(opts)}"
         when :drop_constraint
           case op[:type]

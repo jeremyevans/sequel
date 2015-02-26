@@ -90,6 +90,15 @@ describe "MySQL", '#create_table' do
     @db.create_table!(:dolls){column :t, "enum('a', 'b', 'c', 'd')", :default=>'b'}
     @db.schema(:dolls).first.last[:ruby_default].should == 'b'
   end
+
+  specify "should allow setting auto_increment for existing column" do
+    log do
+    @db.create_table(:dolls){Integer :a, :primary_key=>true}
+    @db.schema(:dolls).first.last[:auto_increment].should == false
+    @db.set_column_type :dolls, :a, Integer, :auto_increment=>true
+    @db.schema(:dolls).first.last[:auto_increment].should == true
+    end
+  end
 end
 
 if [:mysql, :mysql2].include?(DB.adapter_scheme)
