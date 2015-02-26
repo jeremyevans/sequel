@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix eager loading when using the :window_function limit strategy with an eager block and cascaded associations (jeremyevans)
+
 * Add support for set_column_type :auto_increment=>true to add AUTO_INCREMENT to existing column on MySQL (jeremyevans) (#959)
 
 * Add support for overridding the :instance_specific association option (jeremyevans)

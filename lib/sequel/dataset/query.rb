@@ -16,7 +16,7 @@ module Sequel
 
     # Which options don't affect the SQL generation.  Used by simple_select_all?
     # to determine if this is a simple SELECT * FROM table.
-    NON_SQL_OPTIONS = [:server, :defaults, :overrides, :graph, :eager_graph, :graph_aliases]
+    NON_SQL_OPTIONS = [:server, :defaults, :overrides, :graph, :eager, :eager_graph, :graph_aliases]
     
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
