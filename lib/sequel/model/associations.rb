@@ -144,15 +144,13 @@ module Sequel
         # If the ruby eager limit strategy is being used, slice the array using the slice
         # range to return the object(s) at the correct offset/limit.
         def apply_ruby_eager_limit_strategy(rows)
-          if eager_limit_strategy == :ruby
-            name = self[:name]
-            if returns_array?
-              range = slice_range
-              rows.each{|o| o.associations[name] = o.associations[name][range] || []}
-            elsif slice_range
-              offset = slice_range.begin
-              rows.each{|o| o.associations[name] = o.associations[name][offset]}
-            end
+          name = self[:name]
+          if returns_array?
+            range = slice_range
+            rows.each{|o| o.associations[name] = o.associations[name][range] || []}
+          elsif slice_range
+            offset = slice_range.begin
+            rows.each{|o| o.associations[name] = o.associations[name][offset]}
           end
         end
 
@@ -250,6 +248,8 @@ module Sequel
 
           if eo[:eager_block] || eo[:loader] == false
             strategy = true_eager_graph_limit_strategy if strategy == :union
+            # Correlated subqueries are not supported for regular eager loading
+            strategy = :ruby if strategy == :correlated_subquery
             objects = apply_eager_limit_strategy(eager_loading_dataset(eo), strategy).all
           elsif strategy == :union
             objects = []
@@ -268,7 +268,9 @@ module Sequel
           end
 
           objects.each(&block)
-          apply_ruby_eager_limit_strategy(rows)
+          if strategy == :ruby
+            apply_ruby_eager_limit_strategy(rows)
+          end
         end
 
         # The key to use for the key hash when eager loading

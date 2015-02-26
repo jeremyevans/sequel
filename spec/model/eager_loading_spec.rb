@@ -1065,6 +1065,35 @@ describe Sequel::Model, "#eager" do
     DB.sqls.should == []
   end
 
+  it "should allow cascading of eager loading with custom callback with symbol value when association has a limit" do
+    EagerAlbum.dataset._fetch = (1..11).map{|i| {:band_id=>2, :id=>i}}
+    EagerTrack.dataset._fetch = [{:id=>3, :album_id=>1}]
+    a = EagerBand.eager(:top_10_albums=>{proc{|ds| ds.select(:id, :name)}=>:tracks}).all
+    a.should == [EagerBand.load(:id => 2)]
+    sqls = DB.sqls
+    sqls.pop.should =~ /SELECT \* FROM tracks WHERE \(tracks.album_id IN \((\d+, ){10}\d+\)\)/
+    sqls.should == ['SELECT * FROM bands', 'SELECT id, name FROM albums WHERE (albums.band_id IN (2))']
+    a = a.first
+    a.top_10_albums.should == (1..10).map{|i| EagerAlbum.load(:band_id=>2, :id=>i)}
+    a.top_10_albums.map{|x| x.tracks}.should == [[EagerTrack.load(:id => 3, :album_id=>1)]] + ([[]] * 9)
+    DB.sqls.should == []
+  end
+
+  it "should allow cascading of eager loading with custom callback with symbol value when association has a limit when using window function eager limit strategy" do
+    def (EagerAlbum.dataset).supports_window_functions?() true end
+    EagerAlbum.dataset._fetch = {:band_id=>2, :id=>1}
+    EagerTrack.dataset._fetch = [{:id=>3, :album_id=>1}]
+    a = EagerBand.eager(:top_10_albums=>{proc{|ds| ds.select(:id, :name)}=>:tracks}).all
+    a.should == [EagerBand.load(:id => 2)]
+    DB.sqls.should == ['SELECT * FROM bands',
+      'SELECT * FROM (SELECT id, name, row_number() OVER (PARTITION BY albums.band_id) AS x_sequel_row_number_x FROM albums WHERE (albums.band_id IN (2))) AS t1 WHERE (x_sequel_row_number_x <= 10)',
+      'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a = a.first
+    a.top_10_albums.should == [EagerAlbum.load(:band_id=>2, :id=>1)]
+    a.top_10_albums.first.tracks.should == [EagerTrack.load(:id => 3, :album_id=>1)]
+    DB.sqls.should == []
+  end
+
   it "should allow cascading of eager loading with custom callback with array value" do
     a = EagerTrack.eager(:album=>{proc{|ds| ds.select(:id, :band_id)}=>[:band, :band_name]}).all
     a.should == [EagerTrack.load(:id => 3, :album_id => 1)]
