@@ -1,5 +1,7 @@
 === HEAD
 
+* Duplicate the associations hash when duplicating a model object (jeremyevans)
+
 * Correctly apply association limit when eager loadnig with an eager block using default limit strategy on some databases (jeremyevans)
 
 * Fix eager loading when using the :window_function limit strategy with an eager block and cascaded associations (jeremyevans)

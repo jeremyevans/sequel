@@ -4215,12 +4215,21 @@ describe "Model#freeze" do
     Album::B.dataset._fetch = {:album_id=>1, :id=>2}
     @o.b.should == Album::B.load(:id=>2, :album_id=>1)
     @o.associations[:b].should be_nil
+
+    @o = @o.dup
+    @o.b.should == Album::B.load(:id=>2, :album_id=>1)
+    @o.associations[:b].should == Album::B.load(:id=>2, :album_id=>1)
   end
 
   it "should not break reciprocal associations" do
     b = Album::B.load(:id=>2, :album_id=>nil)
     b.album = @o
     @o.associations[:b].should be_nil
+
+    @o = @o.dup
+    b = Album::B.load(:id=>2, :album_id=>nil)
+    b.album = @o
+    @o.associations[:b].should == Album::B.load(:id=>2, :album_id=>1)
   end
 end
 

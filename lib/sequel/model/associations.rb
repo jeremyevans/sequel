@@ -2216,6 +2216,13 @@ module Sequel
           end
         end
 
+        # Duplicate the associations hash when duplicating the object.
+        def initialize_copy(other)
+          super
+          @associations = @associations.dup if @associations
+          self
+        end
+
         # Load the associated objects using the dataset, handling callbacks, reciprocals, and caching.
         def load_associated_objects(opts, dynamic_opts=nil)
           if dynamic_opts == true or dynamic_opts == false or dynamic_opts == nil
