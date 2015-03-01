@@ -92,12 +92,10 @@ describe "MySQL", '#create_table' do
   end
 
   specify "should allow setting auto_increment for existing column" do
-    log do
     @db.create_table(:dolls){Integer :a, :primary_key=>true}
     @db.schema(:dolls).first.last[:auto_increment].should == false
     @db.set_column_type :dolls, :a, Integer, :auto_increment=>true
     @db.schema(:dolls).first.last[:auto_increment].should == true
-    end
   end
 end
 
