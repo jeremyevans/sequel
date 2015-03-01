@@ -84,7 +84,8 @@ module Sequel
         :numeric=>{:message=>lambda{"is not a number"}},
         :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
         :presence=>{:message=>lambda{"is not present"}},
-        :unique=>{:message=>lambda{'is already taken'}}
+        :unique=>{:message=>lambda{'is already taken'}},
+        :confirmation=>{:message=>lambda{|attribute| "doesn't match #{attribute}"}}
       }
 
       module InstanceMethods 
@@ -175,6 +176,15 @@ module Sequel
         # Check attribute value(s) is not considered blank by the database, but allow false values.
         def validates_presence(atts, opts=OPTS)
           validatable_attributes_for_type(:presence, atts, opts){|a,v,m| validation_error_message(m) if model.db.send(:blank_object?, v) && v != false}
+        end
+
+        # Checks if attributes match their confirmations.
+        def validates_confirmation(atts, opts=OPTS)
+          atts = Array(atts).map { |a| :"#{a}_confirmation" }
+          validatable_attributes_for_type(:confirmation, atts, opts) do |a,v,m|
+            original = a.to_s.chomp("_confirmation")
+            validation_error_message(m, original) if v != get_column_value(original)
+          end
         end
         
         # Checks that there are no duplicate values in the database for the given
