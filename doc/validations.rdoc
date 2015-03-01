@@ -230,6 +230,18 @@ These methods check that the specified attributes can be valid integers or valid
     end
   end
 
+=== +validates_confirmation+
+
++validates_confirmation+ checks that the specified attributes match their confirmations. It assumes that the confirmation is in +<attribute>_confirmation+, so you will need to define the accessor if you haven't already.
+
+  class User < Sequel::Model
+    attr_accessor :password_confirmation
+
+    def validate
+      validates_confirmation :password
+    end
+  end
+
 === +validates_type+
 
 +validates_type+ checks that the specified attributes are instances of the class specified in the first argument.  The class can be specified as the class itself, or as a string or symbol with the class name, or as a an array of classes.

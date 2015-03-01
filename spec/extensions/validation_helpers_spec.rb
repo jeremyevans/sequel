@@ -531,4 +531,16 @@ describe "Sequel::Plugins::ValidationHelpers" do
     m.should_not be_valid
     DB.sqls.should == []
   end
+
+  it "should support validates_confirmation" do
+    @c.set_validations{validates_confirmation :value}
+    @c.send(:attr_accessor, :value_confirmation)
+    @m.value = "foo"
+    @m.value_confirmation = "foo"
+    @m.should be_valid
+
+    @m.value_confirmation = "bar"
+    @m.should_not be_valid
+    @m.errors.should == {:value_confirmation => ["doesn't match value"]}
+  end
 end 
