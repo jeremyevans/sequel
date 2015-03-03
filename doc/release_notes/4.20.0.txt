@@ -50,6 +50,11 @@
   auto_validations plugin is used and there is a unique constraint or
   index on the related table.
 
+* AUTOINCREMENT is now used again on SQLite by default for primary
+  keys.  It was removed when :auto_increment was added to the schema
+  hashes, but the removal changed SQLite's behavior.  This restores
+  the previous behavior.
+
 * Microsoft SQL Server's bit type is now recognized as a boolean type
   by the schema dumper.
 

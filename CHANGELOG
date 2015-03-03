@@ -1,5 +1,7 @@
 === 4.20.0 (2015-03-03)
 
+* Restore the use of AUTOINCREMENT on SQLite (jeremyevans) (#965)
+
 * Duplicate the associations hash when duplicating a model object (jeremyevans)
 
 * Correctly apply association limit when eager loading with an eager block using default limit strategy on some databases (jeremyevans)
