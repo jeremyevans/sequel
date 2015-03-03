@@ -192,12 +192,9 @@
                     <td class='context-item-value'>[W]</td>
                     <td class='context-item-desc'>
                       
-                      <p>Override the default setting for whether to use timezones in timestamps.
-                      For backwards compatibility, it is set to <code>true</code> by default.
-                      Anyone wanting to use SQLite&#39;s datetime functions should set it to
-                      <code>false</code> using this method.  It&#39;s possible that the default
-                      will change in a future version, so anyone relying on timezones in
-                      timestamps should set this to <code>true</code>.</p>
+                      <p>Override the default setting for whether to use timezones in timestamps. It
+                      is set to <code>false</code> by default, as SQLite&#39;s date/time methods
+                      do not support timezones in timestamps.</p>
                     </td>
                   </tr>
                 </table>
@@ -520,7 +517,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-synchronous-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-synchronous-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 176</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">synchronous</span>&#x000A;  <span class="ruby-constant">SYNCHRONOUS</span>[<span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:synchronous</span>).<span class="ruby-identifier">to_i</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-synchronous-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 174</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">synchronous</span>&#x000A;  <span class="ruby-constant">SYNCHRONOUS</span>[<span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:synchronous</span>).<span class="ruby-identifier">to_i</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-synchronous-3D'>
@@ -539,7 +536,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-synchronous-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-synchronous-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 182</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">synchronous=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span> = <span class="ruby-constant">SYNCHRONOUS</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">value</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for synchronous option. Please specify one of :off, :normal, :full.&quot;</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:synchronous</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-synchronous-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 180</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">synchronous=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span> = <span class="ruby-constant">SYNCHRONOUS</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">value</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for synchronous option. Please specify one of :off, :normal, :full.&quot;</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:synchronous</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-tables'>
@@ -561,7 +558,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-tables-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 191</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">TABLES_FILTER</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-tables-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 189</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">tables</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">TABLES_FILTER</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-temp_store'>
@@ -579,7 +576,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-temp_store-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-temp_store-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 196</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">temp_store</span>&#x000A;  <span class="ruby-constant">TEMP_STORE</span>[<span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:temp_store</span>).<span class="ruby-identifier">to_i</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-temp_store-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 194</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">temp_store</span>&#x000A;  <span class="ruby-constant">TEMP_STORE</span>[<span class="ruby-identifier">pragma_get</span>(<span class="ruby-value">:temp_store</span>).<span class="ruby-identifier">to_i</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-temp_store-3D'>
@@ -599,7 +596,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-temp_store-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-temp_store-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 202</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">temp_store=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span> = <span class="ruby-constant">TEMP_STORE</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">value</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for temp_store option. Please specify one of :default, :file, :memory.&quot;</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:temp_store</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-temp_store-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 200</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">temp_store=</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span> = <span class="ruby-constant">TEMP_STORE</span>.<span class="ruby-identifier">index</span>(<span class="ruby-identifier">value</span>) <span class="ruby-operator">||</span> (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Invalid value for temp_store option. Please specify one of :default, :file, :memory.&quot;</span>)&#x000A;  <span class="ruby-identifier">pragma_set</span>(<span class="ruby-value">:temp_store</span>, <span class="ruby-identifier">value</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-transaction_mode-3D'>
@@ -635,7 +632,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-use_timestamp_timezones-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-use_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 171</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@use_timestamp_timezones</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@use_timestamp_timezones</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@use_timestamp_timezones</span> = <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-use_timestamp_timezones-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 169</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_timestamp_timezones?</span>&#x000A;  <span class="ruby-keyword">defined?</span>(<span class="ruby-ivar">@use_timestamp_timezones</span>) <span class="ruby-operator">?</span> <span class="ruby-ivar">@use_timestamp_timezones</span> <span class="ruby-operator">:</span> (<span class="ruby-ivar">@use_timestamp_timezones</span> = <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-views'>
@@ -657,7 +654,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-views-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 211</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">VIEWS_FILTER</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-views-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/sqlite.rb, line 209</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">views</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">tables_and_views</span>(<span class="ruby-constant">VIEWS_FILTER</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

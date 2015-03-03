@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.20.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.20.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.20.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2015-03-03 08:32:28 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>A :before_retry option has been added to Database#transaction, which
+            specifies a proc to call when retrying if the :retry_on option is used. 
+            This can be used to implement additional logging, sleeping between retries,
+            or other things.</p>
+            </li><li>
+            <p>The to_json method :root option in the json_serializer plugin can now be a
+            string value to specify the name for the object key, instead of using the
+            underscored model name.</p>
+            </li><li>
+            <p>Dataset#paged_each now returns an enumerator if not passed a block.</p>
+            </li><li>
+            <p>You can now set the :instance_specific association option to false.
+            Previously, it was automatically set to true in some cases.  If you know
+            the association does not depend on anything instance-specific other than
+            the foreign/primary key, setting this option can allow <a
+            href="../../../classes/Sequel.html">Sequel</a> to perform some additional
+            optimizations.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Eager loading queries are now skipped if there are no matching keys. There
+            was code to check this previously, but it was accidently removed in an
+            earlier refactoring.</p>
+            </li><li>
+            <p>Eager loading an association with a limit and an eager block and cascaded
+            associations now works correctly when the window_function limit strategy is
+            used (the default on databases that support window functions).</p>
+            </li><li>
+            <p>Eager loading an association with a limit with an eager block now works
+            correctly on databases do not support window functions but do support
+            correlated subqueries.</p>
+            </li><li>
+            <p>The parent association is now set on associated objects when loading
+            descendants in the rcte_tree plugin.  This allows the parent method on any
+            of the descendants to work without issuing a database query.</p>
+            </li><li>
+            <p>The prepared_statements_associations plugin now only uses prepared
+            statements if association metadata is being cached.  Previously, it would
+            use prepared statements even if association metadata was not cached, which
+            could leak the prepared statements.</p>
+            </li><li>
+            <p>Model#dup now duplicates the associations hash for the object.</p>
+            </li><li>
+            <p>Model#freeze no longer validates an object if the the errors for the object
+            are already frozen.  The static_cache plugin now freezes the errors before
+            freezing the object, so that it doesn&#39;t validate the object.  This can
+            skip many database queries when the auto_validations plugin is used and
+            there is a unique constraint or index on the related table.</p>
+            </li><li>
+            <p>AUTOINCREMENT is now used again on SQLite by default for primary keys.  It
+            was removed when :auto_increment was added to the schema hashes, but the
+            removal changed SQLite&#39;s behavior.  This restores the previous
+            behavior.</p>
+            </li><li>
+            <p>Microsoft SQL Server&#39;s bit type is now recognized as a boolean type by
+            the schema dumper.</p>
+            </li><li>
+            <p>The pg_enum extension&#39;s create_enum method can now be used in
+            reversible migrations.</p>
+            </li><li>
+            <p>set_column_type with the :auto_increment=&gt;true option once again works
+            on MySQL.  It had been broken since <a
+            href="../../../classes/Sequel.html">Sequel</a> started adding
+            :auto_increment to the schema hashes.</p>
+            </li><li>
+            <p>The mysql2 adapter now recognizes the :charset option as a synonym for
+            :encoding.</p>
+            </li><li>
+            <p>The swift adapter now respects database and application timezone settings.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>AssociationReflection#apply_ruby_eager_limit_strategy no longer checks that
+            the strategy is :ruby, callers are now expected to check the value
+            themselves.  This should only matter if you are using custom association
+            types.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

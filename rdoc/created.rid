@@ -1,6 +1,6 @@
-Sun, 01 Feb 2015 09:28:29 -0800
+Tue, 03 Mar 2015 08:47:58 -0800
 README.rdoc	Tue, 11 Nov 2014 11:08:34 -0800
-CHANGELOG	Fri, 30 Jan 2015 10:36:37 -0800
+CHANGELOG	Tue, 03 Mar 2015 08:32:28 -0800
 MIT-LICENSE	Wed, 14 Jan 2015 18:47:41 -0800
 lib/sequel.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/ast_transformer.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -14,7 +14,7 @@ lib/sequel/model.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/no_core_ext.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/sql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/timezones.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/version.rb	Fri, 30 Jan 2015 10:36:37 -0800
+lib/sequel/version.rb	Mon, 02 Mar 2015 19:29:41 -0800
 lib/sequel/connection_pool/sharded_single.rb	Tue, 25 Nov 2014 10:11:48 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Tue, 25 Nov 2014 10:32:49 -0800
 lib/sequel/connection_pool/single.rb	Tue, 25 Nov 2014 10:11:48 -0800
@@ -28,18 +28,18 @@ lib/sequel/database/misc.rb	Tue, 25 Nov 2014 10:11:48 -0800
 lib/sequel/database/query.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/database/schema_generator.rb	Thu, 18 Dec 2014 09:57:14 -0800
 lib/sequel/database/schema_methods.rb	Mon, 08 Dec 2014 15:26:11 -0800
-lib/sequel/database/transactions.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/dataset/actions.rb	Thu, 18 Dec 2014 08:15:05 -0800
+lib/sequel/database/transactions.rb	Thu, 05 Feb 2015 12:29:54 -0800
+lib/sequel/dataset/actions.rb	Fri, 20 Feb 2015 12:34:34 -0800
 lib/sequel/dataset/features.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/graph.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/misc.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/mutation.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/prepared_statements.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/dataset/query.rb	Fri, 21 Nov 2014 12:58:09 -0800
+lib/sequel/dataset/query.rb	Thu, 26 Feb 2015 13:52:20 -0800
 lib/sequel/dataset/sql.rb	Mon, 19 Jan 2015 08:45:05 -0800
-lib/sequel/model/associations.rb	Thu, 29 Jan 2015 16:13:26 -0800
-lib/sequel/model/base.rb	Thu, 29 Jan 2015 16:13:26 -0800
+lib/sequel/model/associations.rb	Thu, 26 Feb 2015 13:52:20 -0800
+lib/sequel/model/base.rb	Fri, 06 Feb 2015 16:24:12 -0800
 lib/sequel/model/dataset_module.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/default_inflections.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/errors.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -48,7 +48,7 @@ lib/sequel/model/inflections.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/plugins.rb	Thu, 20 Nov 2014 12:20:00 -0800
 doc/active_record.rdoc	Mon, 10 Nov 2014 21:51:27 -0800
 doc/advanced_associations.rdoc	Thu, 29 Jan 2015 16:13:26 -0800
-doc/association_basics.rdoc	Fri, 30 Jan 2015 10:33:25 -0800
+doc/association_basics.rdoc	Wed, 25 Feb 2015 08:50:11 -0800
 doc/bin_sequel.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
 doc/cheat_sheet.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/code_order.rdoc	Thu, 06 Jun 2013 17:24:35 -0700
@@ -67,9 +67,9 @@ doc/postgresql.rdoc	Mon, 11 Aug 2014 08:23:34 -0700
 doc/prepared_statements.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/querying.rdoc	Fri, 21 Nov 2014 08:58:34 -0800
 doc/reflection.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
-doc/schema_modification.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
+doc/schema_modification.rdoc	Tue, 24 Feb 2015 08:28:23 -0800
 doc/security.rdoc	Tue, 22 Apr 2014 10:09:17 -0700
-doc/sharding.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
+doc/sharding.rdoc	Thu, 05 Feb 2015 12:29:54 -0800
 doc/sql.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/testing.rdoc	Wed, 17 Sep 2014 09:20:16 -0700
 doc/thread_safety.rdoc	Sat, 26 Oct 2013 06:54:00 -0700
@@ -156,6 +156,7 @@ doc/release_notes/4.17.0.txt	Mon, 01 Dec 2014 07:59:35 -0800
 doc/release_notes/4.18.0.txt	Fri, 02 Jan 2015 11:08:19 -0800
 doc/release_notes/4.19.0.txt	Fri, 30 Jan 2015 10:36:37 -0800
 doc/release_notes/4.2.0.txt	Fri, 30 Aug 2013 12:10:20 -0700
+doc/release_notes/4.20.0.txt	Tue, 03 Mar 2015 08:32:28 -0800
 doc/release_notes/4.3.0.txt	Wed, 02 Oct 2013 14:34:47 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
 doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800

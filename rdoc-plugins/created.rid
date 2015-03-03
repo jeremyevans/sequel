@@ -1,10 +1,10 @@
-Sun, 01 Feb 2015 09:29:59 -0800
+Tue, 03 Mar 2015 08:49:26 -0800
 lib/sequel/extensions/_pretty_table.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/columns_introspection.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/connection_validator.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/constraint_validations.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/constraint_validations.rb	Thu, 12 Feb 2015 17:30:51 -0800
 lib/sequel/extensions/core_extensions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/core_refinements.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/current_datetime_timestamp.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -27,7 +27,7 @@ lib/sequel/extensions/null_dataset.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pagination.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_array.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_array_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/pg_enum.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/pg_enum.rb	Fri, 20 Feb 2015 08:17:56 -0800
 lib/sequel/extensions/pg_hstore.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_hstore_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_inet.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -46,7 +46,7 @@ lib/sequel/extensions/query_literals.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/round_timestamps.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/ruby18_symbol_extensions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/schema_caching.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/schema_dumper.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/schema_dumper.rb	Tue, 24 Feb 2015 08:28:23 -0800
 lib/sequel/extensions/select_remove.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/sequel_3_dataset_methods.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/server_block.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -83,7 +83,7 @@ lib/sequel/plugins/input_transformer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/insert_returning_select.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_filters.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_hooks.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/json_serializer.rb	Wed, 07 Jan 2015 13:10:26 -0800
+lib/sequel/plugins/json_serializer.rb	Fri, 20 Feb 2015 12:34:34 -0800
 lib/sequel/plugins/lazy_attributes.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/list.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/many_through_many.rb	Fri, 05 Dec 2014 14:52:17 -0800
@@ -96,10 +96,10 @@ lib/sequel/plugins/pg_array_associations.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/pg_row.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/pg_typecast_on_load.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/prepared_statements.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/prepared_statements_associations.rb	Wed, 07 Jan 2015 13:10:26 -0800
+lib/sequel/plugins/prepared_statements_associations.rb	Thu, 05 Feb 2015 12:29:54 -0800
 lib/sequel/plugins/prepared_statements_safe.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/prepared_statements_with_pk.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/rcte_tree.rb	Wed, 07 Jan 2015 13:10:26 -0800
+lib/sequel/plugins/rcte_tree.rb	Thu, 05 Feb 2015 12:29:54 -0800
 lib/sequel/plugins/schema.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/scissors.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/serialization.rb	Wed, 07 Jan 2015 13:10:26 -0800
@@ -108,7 +108,7 @@ lib/sequel/plugins/sharding.rb	Fri, 21 Nov 2014 12:58:09 -0800
 lib/sequel/plugins/single_table_inheritance.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/skip_create_refresh.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/split_values.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/static_cache.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/plugins/static_cache.rb	Fri, 06 Feb 2015 16:24:12 -0800
 lib/sequel/plugins/string_stripper.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/subclasses.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/table_select.rb	Thu, 20 Nov 2014 12:20:00 -0800

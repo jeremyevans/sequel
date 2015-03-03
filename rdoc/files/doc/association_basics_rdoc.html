@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-01-30 10:33:25 -0800</span>
+          <span class='datetime'>2015-02-25 08:50:11 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -197,7 +197,7 @@
             <p>For many_to_many self_referential associations, it&#39;s fairly similar. 
             Here&#39;s an example of a directed graph:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  nodes              edges</span>&#x000A;<span class="ruby-comment">#   :id   &lt;----------- :successor_id</span>&#x000A;<span class="ruby-comment">#   :name       \----- :predecessor_id</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">direct_successors</span>, :<span class="ruby-identifier">left_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">successor_id</span>,&#x000A;    :<span class="ruby-identifier">right_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">predecessor_id</span>, :<span class="ruby-identifier">join_table=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">edges</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">direct_predecessors</span>, :<span class="ruby-identifier">right_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">successor_id</span>,&#x000A;    :<span class="ruby-identifier">left_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">predecessor_id</span>, :<span class="ruby-identifier">join_table=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">edges</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># Database schema:</span>&#x000A;<span class="ruby-comment">#  nodes              edges</span>&#x000A;<span class="ruby-comment">#   :id   &lt;----------- :successor_id</span>&#x000A;<span class="ruby-comment">#   :name       \----- :predecessor_id</span>&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Node</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">direct_predecessors</span>, :<span class="ruby-identifier">left_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">successor_id</span>,&#x000A;    :<span class="ruby-identifier">right_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">predecessor_id</span>, :<span class="ruby-identifier">join_table=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">edges</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">direct_successors</span>, :<span class="ruby-identifier">right_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">successor_id</span>,&#x000A;    :<span class="ruby-identifier">left_key=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">predecessor_id</span>, :<span class="ruby-identifier">join_table=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">edges</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h2 id="label-Methods+Added">Methods Added<span><a href="#label-Methods+Added">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -664,6 +664,19 @@
             albums of an artist that went gold (sold at least 500,000 copies):</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">gold_albums</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Album</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">500000</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>The result of the block is cached as an optimization.  One of the side
+            effects of that is that if your block depends on external state, it
+            won&#39;t work correctly unless you setup a delayed evaluation.  For
+            example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">gold_albums</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Album</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">$gold_limit</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>In this case if you change <code>$gold_limit</code> later, the changes
+            won&#39;t effect the association.  If you want to pick up changes to
+            <code>$gold_limit</code>, you need to setup a delayed evaluation:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">gold_albums</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Album</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">copies_sold</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">delay</span>{<span class="ruby-identifier">$gold_limit</span>}}&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h4 id="label-3Aclass">:class<span><a href="#label-3Aclass">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -1357,6 +1370,16 @@
             <p>This is usually used if the association dataset depends on specific values
             in model instance that would not be valid when eager loading for multiple
             instances.</p>
+            
+            <h4 id="label-3Ainstance_specific">:instance_specific<span><a href="#label-3Ainstance_specific">&para;</a> <a href="#top">&uarr;</a></span></h4>
+            
+            <p>This allows you to override the setting of whether the dataset contains
+            instance specific code.  For example, if you are passing a block to the
+            association, <a href="../../classes/Sequel.html">Sequel</a> sets this to
+            true by default, which disables some optimizations that would be invalid if
+            the association is instance specific.  If you know that the block does not
+            contain instance specific code, you can set this to false to reenable the
+            optimizations.</p>
             
             <h4 id="label-3Acartesian_product_number+">:cartesian_product_number <span><a href="#label-3Acartesian_product_number+">&para;</a> <a href="#top">&uarr;</a></span></h4>
             

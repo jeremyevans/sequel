@@ -31,12 +31,64 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-01-30 10:36:37 -0800</span>
+          <span class='datetime'>2015-03-03 08:32:28 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.20.0+-282015-03-03-29">4.20.0 (2015-03-03)<span><a href="#label-4.20.0+-282015-03-03-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Restore the use of AUTOINCREMENT on SQLite (jeremyevans) (#965)</p>
+            </li><li>
+            <p>Duplicate the associations hash when duplicating a model object
+            (jeremyevans)</p>
+            </li><li>
+            <p>Correctly apply association limit when eager loading with an eager block
+            using default limit strategy on some databases (jeremyevans)</p>
+            </li><li>
+            <p>Fix eager loading when using the :window_function limit strategy with an
+            eager block and cascaded associations (jeremyevans)</p>
+            </li><li>
+            <p>Add support for set_column_type :auto_increment=&gt;true to add
+            AUTO_INCREMENT to existing column on MySQL (jeremyevans) (#959)</p>
+            </li><li>
+            <p>Add support for overridding the :instance_specific association option
+            (jeremyevans)</p>
+            </li><li>
+            <p>Recognize MSSQL bit type as boolean in the schema_dumper (jeremyevans)</p>
+            </li><li>
+            <p>Skip eager loading queries if there are no matching keys (jeremyevans)
+            (#952)</p>
+            </li><li>
+            <p>Dataset#paged_each now returns an enumerator if not passed a block
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use to_json :root option with string value as the JSON object key in the
+            json_serializer plugin (jeremyevans)</p>
+            </li><li>
+            <p>Allow create_enum in the pg_enum extension be reversible in migrations
+            (celsworth) (#951)</p>
+            </li><li>
+            <p>Have swift adapter respect database and application timezone settings
+            (asppsa, jeremyevans) (#946)</p>
+            </li><li>
+            <p>Don&#39;t have the static cache plugin attempt to validate objects
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make freeze not validate objects if their errors are already frozen
+            (jeremyevans)</p>
+            </li><li>
+            <p>Only use prepared statements for associations if caching association
+            metadata (jeremyevans)</p>
+            </li><li>
+            <p>Set parent association when loading descendants in the rcte_tree plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#transaction :before_retry option, specifying a proc to call
+            before retrying (uhoh-itsmaciek) (#941)</p>
+            </li></ul>
             
             <h3 id="label-4.19.0+-282015-02-01-29">4.19.0 (2015-02-01)<span><a href="#label-4.19.0+-282015-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

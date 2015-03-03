@@ -1,4 +1,4 @@
-Sun, 01 Feb 2015 09:29:42 -0800
+Tue, 03 Mar 2015 08:49:10 -0800
 lib/sequel/adapters/ado.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ado/access.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ado/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -36,7 +36,7 @@ lib/sequel/adapters/jdbc/sqlserver.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/transactions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/mock.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/mysql.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/mysql2.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/mysql2.rb	Sat, 14 Feb 2015 08:11:29 -0800
 lib/sequel/adapters/odbc.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/db2.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -51,16 +51,16 @@ lib/sequel/adapters/shared/fdbsql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/firebird.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/informix.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/mssql.rb	Mon, 08 Dec 2014 15:26:11 -0800
-lib/sequel/adapters/shared/mysql.rb	Thu, 29 Jan 2015 16:13:26 -0800
+lib/sequel/adapters/shared/mysql.rb	Thu, 26 Feb 2015 09:18:33 -0800
 lib/sequel/adapters/shared/mysql_prepared_statements.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/oracle.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/postgres.rb	Mon, 08 Dec 2014 15:26:11 -0800
 lib/sequel/adapters/shared/progress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/sqlanywhere.rb	Fri, 30 Jan 2015 10:33:25 -0800
-lib/sequel/adapters/shared/sqlite.rb	Mon, 08 Dec 2014 15:26:11 -0800
+lib/sequel/adapters/shared/sqlite.rb	Tue, 03 Mar 2015 08:32:28 -0800
 lib/sequel/adapters/sqlanywhere.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/sqlite.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/adapters/swift.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/swift.rb	Tue, 17 Feb 2015 14:54:23 -0800
 lib/sequel/adapters/swift/mysql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/swift/postgres.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/swift/sqlite.rb	Thu, 20 Nov 2014 12:20:00 -0800

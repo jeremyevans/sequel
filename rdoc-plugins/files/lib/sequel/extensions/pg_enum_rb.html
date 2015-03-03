@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-11-20 12:20:00 -0800</span>
+          <span class='datetime'>2015-02-20 08:17:56 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -71,6 +71,11 @@
             PGArray:</p>
             
             <pre>DB.create_table(:table_name)&#x000A;  column :column_name, &#39;enum_type_name[]&#39;&#x000A;end&#x000A;DB[:table_name].get(:column_name)&#x000A;# [&#39;value1&#39;, &#39;value2&#39;]</pre>
+            
+            <p>If the migration extension is loaded before this one (the order is
+            important), you can use create_enum in a reversible migration:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_enum</span>(:<span class="ruby-identifier">type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Finally, typecasting for enums is setup to cast to strings, which allows
             you to use symbols in your model code.  Similar, you can provide the enum

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2015-02-05 12:29:54 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -81,6 +81,12 @@
             
             <p>This will use the slave_server for SELECT queries and master_server for
             other queries.</p>
+            
+            <p>If you want to ensure your queries are going to a specific database, you
+            can force this for a given query by using the .server method and passing 
+            the symbol name defined in the connect options. For example:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Force the SELECT to run on the master</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">users</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">default</span>).<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Force the SELECT to run on the read-only slave</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">users</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">read_only</span>).<span class="ruby-identifier">all</span></pre>
             
             <h3 id="label-Multiple+Read-Only+Slaves-2C+Single+Master">Multiple Read-Only Slaves, Single Master<span><a href="#label-Multiple+Read-Only+Slaves-2C+Single+Master">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
