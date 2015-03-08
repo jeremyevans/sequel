@@ -187,20 +187,6 @@ module Sequel
       end
     end    
 
-    # Call all stored after_commit blocks for the given transaction
-    def after_transaction_commit(conn)
-      if ary = _trans(conn)[:after_commit]
-        ary.each{|b| b.call}
-      end
-    end
-
-    # Call all stored after_rollback blocks for the given transaction
-    def after_transaction_rollback(conn)
-      if ary = _trans(conn)[:after_rollback]
-        ary.each{|b| b.call}
-      end
-    end
-
     # Whether the current thread/connection is already inside a transaction
     def already_in_transaction?(conn, opts)
       _trans(conn) && (!supports_savepoints? || !opts[:savepoint])
@@ -288,14 +274,10 @@ module Sequel
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
       if transaction_finished?(conn)
-        begin
-          if committed
-            after_transaction_commit(conn)
-          else
-            after_transaction_rollback(conn)
-          end
-        ensure
-          Sequel.synchronize{@transactions.delete(conn)}
+        callbacks = _trans(conn)[committed ? :after_commit : :after_rollback]
+        Sequel.synchronize{@transactions.delete(conn)}
+        if callbacks
+          callbacks.each{|b| b.call}
         end
       end
     end

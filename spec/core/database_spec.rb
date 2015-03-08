@@ -899,6 +899,16 @@ shared_examples_for "Database#transaction" do
     @db.sqls.should == ['BEGIN', 'COMMIT']
   end
 
+  specify "should have transaction inside after_commit work correctly" do
+    @db.transaction{@db.after_commit{@db.transaction{@db.execute('foo')}}}
+    @db.sqls.should == ['BEGIN', 'COMMIT', 'BEGIN', 'foo', 'COMMIT']
+  end
+
+  specify "should have transaction inside after_rollback work correctly" do
+    @db.transaction(:rollback=>:always){@db.after_rollback{@db.transaction{@db.execute('foo')}}}
+    @db.sqls.should == ['BEGIN', 'ROLLBACK', 'BEGIN', 'foo', 'COMMIT']
+  end
+
   specify "should not call after_commit if the transaction rolls back" do
     @db.transaction{@db.after_commit{@db.execute('foo')}; raise Sequel::Rollback}
     @db.sqls.should == ['BEGIN', 'ROLLBACK']
