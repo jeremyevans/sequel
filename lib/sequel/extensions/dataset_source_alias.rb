@@ -41,7 +41,7 @@ module Sequel
   class Dataset
     module DatasetSourceAlias
       # Preprocess the list of sources and attempt to alias any
-      # datasets in the sources to the first source of the resepctive
+      # datasets in the sources to the first source of the respective
       # dataset.
       def from(*source, &block)
         virtual_row_columns(source, block)
