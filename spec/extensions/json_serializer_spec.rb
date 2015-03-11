@@ -206,6 +206,19 @@ describe "Sequel::Plugins::JsonSerializer" do
     @album.to_json(:root=>true, :except => [:name, :artist_id]).to_s.should == '{"album":{"id":1}}'
     @album.to_json(:root=>true, :only => :name).to_s.should == '{"album":{"name":"RF"}}'
   end
+
+  it "should handle the :root option to qualify single records of namespaced models" do
+    module ::Namespace
+      class Album < Sequel::Model
+        plugin :json_serializer, :naked=>true
+      end
+    end
+    Namespace::Album.new({}).to_json(:root=>true).to_s.should == '{"album":{}}'
+    Namespace::Album.dataset._fetch = [{}]
+    Namespace::Album.dataset.to_json(:root=>:collection).to_s.should == '{"albums":[{}]}'
+    Namespace::Album.dataset.to_json(:root=>:both).to_s.should == '{"albums":[{"album":{}}]}'
+    Object.send(:remove_const, :Namespace)
+  end
   
   it "should handle the :root option with a string to qualify single records using the string as the key" do
     @album.to_json(:root=>"foo", :except => [:name, :artist_id]).to_s.should == '{"foo":{"id":1}}'

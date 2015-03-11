@@ -290,7 +290,9 @@ module Sequel
           end
 
           if root = opts[:root]
-            root = model.send(:underscore, model.to_s) unless root.is_a?(String)
+            unless root.is_a?(String)
+              root = model.send(:underscore, model.send(:demodulize, model.to_s))
+            end
             h = {root => h}
           end
 
@@ -330,7 +332,7 @@ module Sequel
               opts.delete(:root)
             end
             unless collection_root.is_a?(String)
-              collection_root = model.send(:pluralize, model.send(:underscore, model.to_s))
+              collection_root = model.send(:pluralize, model.send(:underscore, model.send(:demodulize, model.to_s)))
             end
           end
 
