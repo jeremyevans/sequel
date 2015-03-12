@@ -52,7 +52,20 @@
 #   h.to_matrix      # hstore_to_matrix(hstore_column)
 #   h.values         # avals(hstore_column)
 #
-# See the PostgreSQL hstore function and operator documentation for more
+# Add a key, or update an existing key with a new value:
+# 
+#   DB[:tab].update(:h=>Sequel.hstore_op(:h).concat('c'=>3))
+# 
+# Delete a key:
+# 
+#   DB[:tab].update(:h=>Sequel.hstore_op(:h).delete('k1'))
+#  
+# You can also use Sequel.lit with raw SQL for part of query :
+#  
+#   DB[:tab].update(:h=>Sequel.lit("h || ('c1' => '3')"))
+#   DB[:tab].update(:h=>Sequel.lit("delete(h, 'k1')"))
+#
+# See the {PostgreSQL hstore function and operator documentation}[http://www.postgresql.org/docs/9.4/static/hstore.html] for more
 # details on what these functions and operators do.
 #
 # If you are also using the pg_hstore extension, you should load it before
