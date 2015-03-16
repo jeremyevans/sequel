@@ -226,6 +226,7 @@ These methods check that the specified attributes can be valid integers or valid
 
   class Album < Sequel::Model
     def validate
+      super
       validates_includes [1, 2, 3, 4, 5], :rating
     end
   end
