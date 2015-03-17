@@ -3,7 +3,7 @@ module Sequel
     # PlaceholderLiteralizer allows you to record the application of arbitrary changes
     # to a dataset with placeholder arguments, recording where those placeholder arguments
     # are used in the query.  When running the query, the literalization process is much
-    # faster as Sequel can skip most of the work it normal has to do when literalizing a
+    # faster as Sequel can skip most of the work it normally has to do when literalizing a
     # dataset.
     #
     # Basically, this enables optimizations that allow Sequel to cache the SQL produced
@@ -27,7 +27,7 @@ module Sequel
     #   loader = Sequel::Dataset::PlaceholderLiteralizer.loader(DB[:items]) do |pl, ds|
     #     ds.join(pl.arg, :item_id=>:id)
     #   end
-    #   loader(:cart_items)
+    #   loader.all(:cart_items)
     #  
     # Will not qualify the item_id column with cart_items.  In this type of situation it's
     # best to add a table alias when joining:
@@ -35,7 +35,7 @@ module Sequel
     #   loader = Sequel::Dataset::PlaceholderLiteralizer.loader(DB[:items]) do |pl, ds|
     #     ds.join(Sequel.as(pl.arg, :t), :item_id=>:id)
     #   end
-    #   loader(:cart_items)
+    #   loader.all(:cart_items)
     #
     # There are other similar cases that are not handled, mainly when Sequel changes the
     # SQL produced depending on the types of the arguments.
