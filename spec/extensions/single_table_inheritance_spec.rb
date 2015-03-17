@@ -272,5 +272,27 @@ describe Sequel::Model, "single table inheritance plugin" do
       StiTest3.create.kind.should == 'stitest3'
       StiTest4.create.kind.should == 'stitest4'
     end
+
+    it "becomes another sub type" do
+      StiTest2.plugin :single_table_inheritance, :kind
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest3.create.becomes(StiTest4).should be_a_instance_of(StiTest4)
+    end
+
+    it "doesn't reset the inheritance type column" do
+      StiTest2.plugin :single_table_inheritance, :kind
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest3.create.becomes(StiTest4).kind.should == "StiTest3"
+    end
+
+    it "resets the inheritance type column after saving" do
+      StiTest2.plugin :single_table_inheritance, :kind
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest3.create.becomes(StiTest4).save.kind.should == "StiTest4"
+    end
+
   end
 end
