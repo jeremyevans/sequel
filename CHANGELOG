@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Sequel.pg_jsonb return JSONBOp instances instead of JSONOp instances when passed other than Array or Hash (jeremyevans) (#977)
+
 * Demodulize default root name in json_serializer plugin (janko-m) (#968)
 
 * Make Database#transaction work in after_commit/after_rollback blocks (jeremyevans)

@@ -282,7 +282,7 @@ module Sequel
       end
     end
 
-    # Wrap the array or hash in a Postgres::JSONArray or Postgres::JSONHash.
+    # Wrap the array or hash in a Postgres::JSONBArray or Postgres::JSONBHash.
     def pg_jsonb(v)
       case v
       when Postgres::JSONBArray, Postgres::JSONBHash
@@ -296,7 +296,7 @@ module Sequel
       when Postgres::JSONHash
         Postgres::JSONBHash.new(v.to_hash)
       else
-        Sequel.pg_json_op(v)
+        Sequel.pg_jsonb_op(v)
       end
     end
   end

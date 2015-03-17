@@ -206,6 +206,7 @@ describe "Sequel::Postgres::JSONOp" do
   it "should be able to turn symbols into json ops using Sequel.pg_json" do
     @db.literal(Sequel.pg_json(:a)[1]).should == "(a -> 1)"
     @db.literal(Sequel.pg_jsonb(:a)[1]).should == "(a -> 1)"
+    @db.literal(Sequel.pg_jsonb(:a).contains('a'=>1)).should == "(a @> '{\"a\":1}'::jsonb)"
   end
 
   it "should allow transforming JSONArray instances into ArrayOp instances" do
