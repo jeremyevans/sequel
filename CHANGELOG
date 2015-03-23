@@ -1,5 +1,9 @@
 === HEAD
 
+* Add GenericExpression#!~ for inverting =~ on ruby 1.9 (similar to inverting a hash) (jeremyevans) (#979)
+
+* Add GenericExpression#=~ for equality, inclusion, and pattern matching (similar to using a hash) (jeremyevans) (#979)
+
 * Add Database#add_named_conversion_proc on PostgreSQL to make it easier to add conversion procs for types by name (jeremyevans)
 
 * Make Sequel.pg_jsonb return JSONBOp instances instead of JSONOp instances when passed other than Array or Hash (jeremyevans) (#977)

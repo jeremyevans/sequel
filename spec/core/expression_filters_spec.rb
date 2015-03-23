@@ -59,6 +59,34 @@ describe "Blockless Ruby Filters" do
     @d.l(~Sequel.expr(:x => nil)).should == '(x IS NOT NULL)'
   end
   
+  it "should support = and similar operations via =~ method" do
+    @d.l{x =~ 100}.should == '(x = 100)'
+    @d.l{x =~ 'a'}.should == '(x = \'a\')'
+    @d.l{x =~ true}.should == '(x IS TRUE)'
+    @d.l{x =~ false}.should == '(x IS FALSE)'
+    @d.l{x =~ nil}.should == '(x IS NULL)'
+    @d.l{x =~ (1...5)}.should == '((x >= 1) AND (x < 5))'
+    @d.l{x =~ [1,2,3]}.should == '(x IN (1, 2, 3))'
+
+    def @d.supports_regexp?; true end
+    @d.l{x =~ /blah/}.should == '(x ~ \'blah\')'
+  end
+
+  if RUBY_VERSION >= '1.9'
+    it "should support != and similar inversions via !~ method" do
+      @d.l{x !~ 100}.should == '(x != 100)'
+      @d.l{x !~ 'a'}.should == '(x != \'a\')'
+      @d.l{x !~ true}.should == '(x IS NOT TRUE)'
+      @d.l{x !~ false}.should == '(x IS NOT FALSE)'
+      @d.l{x !~ nil}.should == '(x IS NOT NULL)'
+      @d.l{x !~ (1...5)}.should == '((x < 1) OR (x >= 5))'
+      @d.l{x !~ [1,2,3]}.should == '(x NOT IN (1, 2, 3))'
+
+      def @d.supports_regexp?; true end
+      @d.l{x !~ /blah/}.should == '(x !~ \'blah\')'
+    end
+  end
+  
   it "should support ~ via Hash and Regexp (if supported by database)" do
     def @d.supports_regexp?; true end
     @d.l(:x => /blah/).should == '(x ~ \'blah\')'

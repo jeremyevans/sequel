@@ -791,6 +791,38 @@ module Sequel
       end
     end
 
+    # This module includes methods for overriding the =~ method for SQL equality,
+    # inclusion, and pattern matching.  It returns the same result that Sequel would
+    # return when using a hash with a single entry, where the receiver was the key
+    # and the argument was the value. Example:
+    #
+    #   Sequel.expr(:a) =~ 1 # (a = 1)
+    #   Sequel.expr(:a) =~ [1, 2] # (a IN [1, 2])
+    #   Sequel.expr(:a) =~ nil # (a IS NULL)
+    #
+    # On Ruby 1.9+, this also adds the !~ method, for easily setting up not equals,
+    # exclusion, and inverse pattern matching.  This is the same as as inverting the
+    # result of the =~ method
+    #
+    #   Sequel.expr(:a) !~ 1 # (a != 1)
+    #   Sequel.expr(:a) !~ [1, 2] # (a NOT IN [1, 2])
+    #   Sequel.expr(:a) !~ nil # (a IS NOT NULL)
+    module PatternMatchMethods
+      # Set up an equality, inclusion, or pattern match operation, based on the type
+      # of the argument.
+      def =~(other)
+        BooleanExpression.send(:from_value_pair, self, other)
+      end
+
+      if RUBY_VERSION >= '1.9'
+        module_eval(<<-END, __FILE__, __LINE__+1)
+          def !~(other)
+            ~(self =~ other)
+          end
+        END
+      end
+    end
+
     # These methods are designed as replacements for the core extension operator
     # methods, so that Sequel is still easy to use if the core extensions are not
     # enabled.
@@ -1358,6 +1390,7 @@ module Sequel
       include InequalityMethods
       include NumericMethods
       include OrderMethods
+      include PatternMatchMethods
       include StringMethods
       include SubscriptMethods
     end

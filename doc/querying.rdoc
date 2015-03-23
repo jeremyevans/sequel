@@ -388,6 +388,12 @@ will be ANDed together:
   Artist.where(:name=>'A'...'M'){id > 5}
   # SELECT * FROM artists WHERE name >= 'A' AND name < 'M' AND id > 5
 
+Using virtual row blocks, what you can do with single entry hash or an array with
+a single two element array can also be done using the =~ method:
+
+  Artist.where{id =~ 5}
+  # SELECT * FROM artists WHERE id = 5
+
 === Symbols
 
 If you have a boolean column in the database, and you want only true
@@ -494,7 +500,22 @@ Or to use the NOT LIKE operator:
 
   Artist.exclude(Sequel.like(:name, '%J%'))
   # SELECT * FROM artists WHERE name NOT LIKE '%J%' ESCAPE '\'
+
+You can use Sequel.~ to negate expressions:
+
+  Artist.where(Sequel.~(:id=>5))
+  # SELECT * FROM artists WHERE id != 5
+
+On Sequel expression objects, you can use ~ to negate them:
  
+  Artist.where(~Sequel.like(:name, '%J%'))
+  # SELECT * FROM artists WHERE name NOT LIKE '%J%' ESCAPE '\'
+
+On Ruby 1.9+, you can use !~ on Sequel expressions to create negated expressions:
+
+  Artist.where{ id !~ 5}
+  # SELECT * FROM artists WHERE id != 5
+
 === Removing
 
 To remove all existing filters, use +unfiltered+:

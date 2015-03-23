@@ -223,6 +223,8 @@ Sequel also accepts expressions:
   
   my_posts = posts.where{stamp > Date.today << 1}
   # WHERE stamp > '2010-06-14'
+  my_posts = posts.where{stamp =~ Date.today}
+  # WHERE stamp = '2010-07-14'
   
 Some adapters will also let you specify Regexps:
 

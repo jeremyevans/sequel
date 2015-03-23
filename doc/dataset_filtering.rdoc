@@ -105,17 +105,22 @@ To filter by equality, you use the standard hash, which can be combined with oth
   items.where{Sequel.&({:category => 'ruby'}, (price + 100 < 200))}.sql
   #=> "SELECT * FROM items WHERE ((category = 'ruby') AND ((price + 100) < 200))"
 
+You can also use the =~ operator:
+
+  items.where{(category =~ 'ruby') & (price + 100 < 200)}.sql
+  #=> "SELECT * FROM items WHERE ((category = 'ruby') AND ((price + 100) < 200))"
+
 This works with other hash values, such as arrays and ranges:
 
-  items.where{Sequel.|({:category => ['ruby', 'other']}, (:price - 100 > 200))}.sql
+  items.where{Sequel.|({:category => ['ruby', 'other']}, (price - 100 > 200))}.sql
   #=> "SELECT * FROM items WHERE ((category IN ('ruby', 'other')) OR ((price - 100) <= 200))"
 
-  items.where{Sequel.&({:price => (100..200)}, :active)}.sql
+  items.where{(price =~ (100..200)) & :active}.sql
   #=> "SELECT * FROM items WHERE ((price >= 100 AND price <= 200) AND active)"
 
 === Negating conditions
 
-You can use the exclude method to exclude conditions:
+You can use the exclude method to exclude whole conditions:
 
   items.exclude(:category => 'ruby').sql
   #=> "SELECT * FROM items WHERE (category != 'ruby')"
@@ -125,6 +130,19 @@ You can use the exclude method to exclude conditions:
 
   items.exclude{price / 100 >= 200}.sql
   #=> "SELECT * FROM items WHERE ((price / 100) < 200)
+
+To exclude only parts of conditions, you can use when in combination with Sequel.~ or the ~ method on Sequel expressions:
+
+  items.where{Sequel.&(Sequel.~(:category => 'ruby'), (price + 100 < 200))}.sql
+  #=> "SELECT * FROM items WHERE ((category != 'ruby') AND ((price + 100) < 200))"
+
+  items.where{~(category =~ 'ruby') & (price + 100 < 200)}.sql
+  #=> "SELECT * FROM items WHERE ((category != 'ruby') AND ((price + 100) < 200))"
+
+On Ruby 1.9+, you can also use the !~ method:
+
+  items.where{(category !~ 'ruby') & (price + 100 < 200)}.sql
+  #=> "SELECT * FROM items WHERE ((category != 'ruby') AND ((price + 100) < 200))"
 
 === Comparing against column references
 

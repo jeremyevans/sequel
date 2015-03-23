@@ -247,6 +247,10 @@ You can also specify this as an array of two element arrays:
 
   [[:column, 1]] # ("column" = 1)
 
+For expression objects, you can also use the =~ method:
+
+  where{column =~ 1} # ("column" = 1)
+
 === Not Equal Operator (!=)
 
 You can specify a not equals condition by inverting the hash or array of two element arrays using <tt>Sequel.negate</tt> or <tt>Sequel.~</tt>:
@@ -256,10 +260,18 @@ You can specify a not equals condition by inverting the hash or array of two ele
   Sequel.~(:column => 1)        # ("column" != 1)
   Sequel.~([[:column, 1]])      # ("column" != 1)
 
-The difference between the two is that negate only works on hashes and arrays of element arrays, and it negates all entries in the, while ~ does a general inversion.  This is best shown by an example with multiple entries:
+The difference between the two is that negate only works on hashes and arrays of element arrays, and it negates all entries in the hash or array, while ~ does a general inversion.  This is best shown by an example with multiple entries:
 
   Sequel.negate(:column => 1, :foo => 2)   # (("column" != 1) AND (foo != 2))
   Sequel.~(:column => 1, :foo => 2)        # (("column" != 1) OR (foo != 2))
+
+You can also use the ~ method on an equality expression:
+
+  where{~(column =~ 1)} # ("column" != 1)
+
+On Ruby 1.9+, you can use the !~ method:
+
+  where{column !~ 1} # ("column" != 1)
 
 The most common need for not equals is in filters, in which case you can use the +exclude+ method:
 
@@ -279,6 +291,14 @@ As you may have guessed, Sequel switches from an = to an IN when the hash value 
   {:column=>DB[:albums].select(:id)} # ("column" IN (SELECT "id" FROM "albums"))
   Sequel.~(:column=>DB[:albums].select(:id)) # ("column" NOT IN (SELECT "id" FROM "albums"))
 
+Similar to =, you can also use =~ with expressions for inclusion:
+
+  where{column =~ [1, 2, 3]} # ("column" IN (1, 2, 3))
+
+and on Ruby 1.9, !~ for exclusion:
+
+  where{column !~ [1, 2, 3]} # ("column" NOT IN (1, 2, 3))
+
 Sequel also supports the SQL EXISTS operator using <tt>Dataset#exists</tt>:
 
   DB[:albums].exists # EXISTS (SELECT * FROM albums)
@@ -296,6 +316,11 @@ Negation works the same way as it does for equality and inclusion:
   Sequel.~(:column=>nil) # ("column" IS NOT NULL)
   Sequel.~(:column=>true) # ("column" IS NOT TRUE)
   Sequel.~(:column=>false) # ("column" IS NOT FALSE)
+
+Likewise, =~ works for identity (and Ruby 1.9, !~ for negative identity):
+
+  where{column =~ nil} # ("column" IS NULL)
+  where{column !~ nil} # ("column" IS NOT NULL)
 
 === Inversion Operator (NOT)
 
