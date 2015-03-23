@@ -64,7 +64,7 @@ module Sequel
           rescue TinyTds::Error => e
             raise_error(e, :disconnect=>!c.active?)
           ensure
-           r.cancel if r && c.sqlsent?
+            r.cancel if r && c.sqlsent? && c.active?
           end
         end
       end

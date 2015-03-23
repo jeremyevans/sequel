@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix TinyTds::Error being raised when trying to cancel a query on a closed connection in the tinytds adapter (jeremyevans)
+
 * Add GenericExpression#!~ for inverting =~ on ruby 1.9 (similar to inverting a hash) (jeremyevans) (#979)
 
 * Add GenericExpression#=~ for equality, inclusion, and pattern matching (similar to using a hash) (jeremyevans) (#979)
