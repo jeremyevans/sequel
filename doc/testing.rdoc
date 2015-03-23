@@ -166,6 +166,7 @@ The SEQUEL_INTEGRATION_URL environment variable specifies the Database connectio
 
 === Other
 
+RSPEC1 :: Use RSpec 1 to run the tests even if a newer version is installed
 SEQUEL_COLUMNS_INTROSPECTION :: Use the columns_introspection extension when running the specs
 SEQUEL_CONNECTION_VALIDATOR :: Use the connection validator extension when running the specs
 SEQUEL_ERROR_SQL :: Use the error_sql extension when running the specs
