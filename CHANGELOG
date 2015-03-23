@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#add_named_conversion_proc on PostgreSQL to make it easier to add conversion procs for types by name (jeremyevans)
+
 * Make Sequel.pg_jsonb return JSONBOp instances instead of JSONOp instances when passed other than Array or Hash (jeremyevans) (#977)
 
 * Demodulize default root name in json_serializer plugin (janko-m) (#968)

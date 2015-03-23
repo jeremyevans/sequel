@@ -141,7 +141,7 @@ module Sequel
       module DatabaseMethods
         def self.extended(db)
           db.instance_eval do
-            add_named_conversion_procs(conversion_procs, :hstore=>PG_NAMED_TYPES[:hstore])
+            add_named_conversion_proc(:hstore)
             @schema_type_classes[:hstore] = HStore
           end
         end

@@ -154,6 +154,15 @@ module Sequel
       # having callable values for the conversion proc for that type.
       attr_reader :conversion_procs
 
+      # Add a conversion proc for a named type.  This should be used 
+      # for types without fixed OIDs, which includes all types that
+      # are not included in a default PostgreSQL installation.  If 
+      # a block is given, it is used as the conversion proc, otherwise
+      # the conversion proc is looked up in the PG_NAMED_TYPES hash.
+      def add_named_conversion_proc(name, &block)
+        add_named_conversion_procs(conversion_procs, name=>(block || PG_NAMED_TYPES[name]))
+      end
+
       # Commit an existing prepared transaction with the given transaction
       # identifier string.
       def commit_prepared_transaction(transaction_id, opts=OPTS)
