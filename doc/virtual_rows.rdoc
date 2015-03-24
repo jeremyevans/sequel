@@ -185,9 +185,21 @@ object returned, with the options for the window:
 
 == Operators
 
-VirtualRows use method_missing to handle almost all method calls.  However, they
-have special handling of some operator methods to make certain things easier. The
-operators all use a prefix form.
+VirtualRows use method_missing to handle almost all method calls.  Since the
+objects given by method_missing are SQL::Identifiers, SQL::QualifiedIdentifiers
+or SQL::Functions, you can use all operators that they provide (see
+DatasetFiltering[http://sequel.jeremyevans.net/rdoc/files/doc/dataset_filtering_rdoc.html#label-Filtering+using+expressions]):
+
+  ds.select{|o| o.price - 100}
+  ds.select{o.price - 100}
+  # SELECT (price - 100)
+
+  ds.where{|o| (o.price < 200) & (o.tax * 100 >= 23)}
+  ds.where{(price < 200) & (tax * 100 >= 0.23)}
+  # WHERE ((price < 200) AND ((tax * 100) >= 0.23))
+
+However, VirtualRows have special handling of some operator methods to make
+certain things easier.  The operators all use a prefix form.
 
 === Math Operators
 
