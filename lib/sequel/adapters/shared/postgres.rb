@@ -1293,22 +1293,33 @@ module Sequel
       # :phrase :: Similar to :plain, but also adding an ILIKE filter to ensure that
       #            returned rows also include the exact phrase used.
       # :rank :: Set to true to order by the rank, so that closer matches are returned first.
+      # :tsquery :: Specifies the terms argument is already a valid SQL expression returning a
+      #            tsquery, and can be used directly in the query.
+      # :tsvector :: Specifies the cols argument is already a valid SQL expression returning a
+      #            tsvector, and can be used directly in the query.
       def full_text_search(cols, terms, opts = OPTS)
         lang = Sequel.cast(opts[:language] || 'simple', :regconfig)
-        terms = terms.join(' | ') if terms.is_a?(Array)
-        columns = full_text_string_join(cols)
-        query_func = (opts[:phrase] || opts[:plain]) ? :plainto_tsquery : :to_tsquery
-        vector = Sequel.function(:to_tsvector, lang, columns)
-        query = Sequel.function(query_func, lang, terms)
 
-        ds = where(Sequel.lit(["(", " @@ ", ")"], vector, query))
+        unless opts[:tsvector]
+          phrase_cols = full_text_string_join(cols)
+          cols = Sequel.function(:to_tsvector, lang, phrase_cols)
+        end
+
+        unless opts[:tsquery]
+          phrase_terms = terms.is_a?(Array) ? terms.join(' | ') : terms
+          query_func = (opts[:phrase] || opts[:plain]) ? :plainto_tsquery : :to_tsquery
+          terms = Sequel.function(query_func, lang, phrase_terms)
+        end
+
+        ds = where(Sequel.lit(["(", " @@ ", ")"], cols, terms))
 
         if opts[:phrase]
-          ds = ds.grep(cols, "%#{escape_like(terms)}%", :case_insensitive=>true)
+          raise Error, "can't use :phrase with either :tsvector or :tsquery arguments to full_text_search together" if opts[:tsvector] || opts[:tsquery]
+          ds = ds.grep(phrase_cols, "%#{escape_like(phrase_terms)}%", :case_insensitive=>true)
         end
 
         if opts[:rank]
-          ds = ds.order{ts_rank_cd(vector, query)}
+          ds = ds.order{ts_rank_cd(cols, terms)}
         end
 
         ds

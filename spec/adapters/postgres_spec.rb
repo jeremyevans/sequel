@@ -924,6 +924,11 @@ describe "A PostgreSQL database" do
     @db[:posts].full_text_search(:title, 'rubinius ruby', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
     @db[:posts].full_text_search(:title, 'jruby maglev', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
 
+    @db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rails', :tsvector=>true).all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search(:title, Sequel.function(:to_tsquery, 'simple', 'rails'), :tsquery=>true).all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
+    proc{@db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rubinius ruby', :tsvector=>true, :phrase=>true)}.should raise_error(Sequel::Error)
+    proc{@db[:posts].full_text_search(:title, Sequel.function(:to_tsquery, 'simple', 'rails'), :tsquery=>true, :phrase=>true)}.should raise_error(Sequel::Error)
+
     @db[:posts].delete
     t1 = "bork " * 1000 + "ruby sequel"
     t2 = "ruby sequel " * 1000

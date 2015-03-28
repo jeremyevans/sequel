@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :tsquery and :tsvector options in Dataset#full_text_search on PostgreSQL, for using existing tsquery/tsvector expressions (jeremyevans)
+
 * Fix TinyTds::Error being raised when trying to cancel a query on a closed connection in the tinytds adapter (jeremyevans)
 
 * Add GenericExpression#!~ for inverting =~ on ruby 1.9 (similar to inverting a hash) (jeremyevans) (#979)
