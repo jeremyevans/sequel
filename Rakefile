@@ -89,11 +89,13 @@ begin
     require "rspec/core/rake_task"
     spec_class = RSpec::Core::RakeTask
     spec_files_meth = :pattern=
+    spec_opts_meth = :rspec_opts=
   rescue LoadError
     # RSpec 1
     require "spec/rake/spectask"
     spec_class = Spec::Rake::SpecTask
     spec_files_meth = :spec_files=
+    spec_opts_meth = :spec_opts=
   end
 
   spec = lambda do |name, files, d|
