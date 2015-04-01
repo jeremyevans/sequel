@@ -31,12 +31,38 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-03-03 08:32:28 -0800</span>
+          <span class='datetime'>2015-04-01 08:28:35 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.21.0+-282015-04-01-29">4.21.0 (2015-04-01)<span><a href="#label-4.21.0+-282015-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Support :tsquery and :tsvector options in Dataset#full_text_search on
+            PostgreSQL, for using existing tsquery/tsvector expressions (jeremyevans)</p>
+            </li><li>
+            <p>Fix TinyTds::Error being raised when trying to cancel a query on a closed
+            connection in the tinytds adapter (jeremyevans)</p>
+            </li><li>
+            <p>Add GenericExpression#!~ for inverting =~ on ruby 1.9 (similar to inverting
+            a hash) (jeremyevans) (#979)</p>
+            </li><li>
+            <p>Add GenericExpression#=~ for equality, inclusion, and pattern matching
+            (similar to using a hash) (jeremyevans) (#979)</p>
+            </li><li>
+            <p>Add Database#add_named_conversion_proc on PostgreSQL to make it easier to
+            add conversion procs for types by name (jeremyevans)</p>
+            </li><li>
+            <p>Make Sequel.pg_jsonb return JSONBOp instances instead of JSONOp instances
+            when passed other than Array or Hash (jeremyevans) (#977)</p>
+            </li><li>
+            <p>Demodulize default root name in json_serializer plugin (janko-m) (#968)</p>
+            </li><li>
+            <p>Make Database#transaction work in after_commit/after_rollback blocks
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.20.0+-282015-03-03-29">4.20.0 (2015-03-03)<span><a href="#label-4.20.0+-282015-03-03-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

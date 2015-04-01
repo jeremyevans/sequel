@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2015-03-24 08:02:02 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -187,9 +187,16 @@
             
             <h2 id="label-Operators">Operators<span><a href="#label-Operators">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <p>VirtualRows use method_missing to handle almost all method calls.  However,
-            they have special handling of some operator methods to make certain things
-            easier. The operators all use a prefix form.</p>
+            <p>VirtualRows use method_missing to handle almost all method calls.  Since
+            the objects given by method_missing are SQL::Identifiers,
+            SQL::QualifiedIdentifiers or SQL::Functions, you can use all operators that
+            they provide (see <a
+            href="http://sequel.jeremyevans.net/rdoc/files/doc/dataset_filtering_rdoc.html#label-Filtering+using+expressions">DatasetFiltering</a>):</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>{<span class="ruby-identifier">o</span>.<span class="ruby-identifier">price</span> <span class="ruby-operator">-</span> <span class="ruby-value">100</span>}&#x000A;<span class="ruby-comment"># SELECT (price - 100)</span>&#x000A;&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">o</span>.<span class="ruby-identifier">tax</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">23</span>)}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{(<span class="ruby-identifier">price</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">200</span>) <span class="ruby-operator">&amp;</span> (<span class="ruby-identifier">tax</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">0.23</span>)}&#x000A;<span class="ruby-comment"># WHERE ((price &lt; 200) AND ((tax * 100) &gt;= 0.23))</span></pre>
+            
+            <p>However, VirtualRows have special handling of some operator methods to make
+            certain things easier.  The operators all use a prefix form.</p>
             
             <h3 id="label-Math+Operators">Math Operators<span><a href="#label-Math+Operators">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

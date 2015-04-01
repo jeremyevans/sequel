@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-01-24 16:17:58 -0800</span>
+          <span class='datetime'>2015-03-16 15:06:33 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -258,7 +258,7 @@
             included in the first argument to the method, which is usually an array,
             but can be any object that responds to <code>include?</code>.</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-identifier">validates_includes</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>], :<span class="ruby-identifier">rating</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_includes</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>], :<span class="ruby-identifier">rating</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-validates_type"><code>validates_type</code><span><a href="#label-validates_type">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

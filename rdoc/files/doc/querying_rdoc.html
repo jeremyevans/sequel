@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-11-21 08:58:34 -0800</span>
+          <span class='datetime'>2015-03-23 10:16:45 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -385,6 +385,11 @@
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;A&#39;</span><span class="ruby-operator">...</span><span class="ruby-string">&#39;M&#39;</span>){<span class="ruby-identifier">id</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name &gt;= &#39;A&#39; AND name &lt; &#39;M&#39; AND id &gt; 5</span></pre>
             
+            <p>Using virtual row blocks, what you can do with single entry hash or an
+            array with a single two element array can also be done using the =~ method:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">=~</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id = 5</span></pre>
+            
             <h3 id="label-Symbols">Symbols<span><a href="#label-Symbols">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>If you have a boolean column in the database, and you want only true
@@ -481,6 +486,22 @@
             <p>Or to use the NOT LIKE operator:</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;%J%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</span></pre>
+            
+            <p>You can use <a href="../../classes/Sequel.html">Sequel</a>.~ to negate
+            expressions:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">5</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span></pre>
+            
+            <p>On <a href="../../classes/Sequel.html">Sequel</a> expression objects, you
+            can use ~ to negate them:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(<span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;%J%&#39;</span>))&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE name NOT LIKE &#39;%J%&#39; ESCAPE &#39;\&#39;</span></pre>
+            
+            <p>On Ruby 1.9+, you can use !~ on <a
+            href="../../classes/Sequel.html">Sequel</a> expressions to create negated
+            expressions:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>{ <span class="ruby-identifier">id</span> <span class="ruby-operator">!~</span> <span class="ruby-value">5</span>}&#x000A;<span class="ruby-comment"># SELECT * FROM artists WHERE id != 5</span></pre>
             
             <h3 id="label-Removing">Removing<span><a href="#label-Removing">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2015-03-23 10:16:45 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -319,6 +319,10 @@
             
             <pre class="ruby">[[:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>]] <span class="ruby-comment"># (&quot;column&quot; = 1)</span></pre>
             
+            <p>For expression objects, you can also use the =~ method:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">=~</span> <span class="ruby-value">1</span>} <span class="ruby-comment"># (&quot;column&quot; = 1)</span></pre>
+            
             <h3 id="label-Not+Equal+Operator+-28-21-3D-29">Not Equal Operator (!=)<span><a href="#label-Not+Equal+Operator+-28-21-3D-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>You can specify a not equals condition by inverting the hash or array of
@@ -328,10 +332,19 @@
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>)   <span class="ruby-comment"># (&quot;column&quot; != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>([[:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>]]) <span class="ruby-comment"># (&quot;column&quot; != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>)        <span class="ruby-comment"># (&quot;column&quot; != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>([[:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>]])      <span class="ruby-comment"># (&quot;column&quot; != 1)</span></pre>
             
             <p>The difference between the two is that negate only works on hashes and
-            arrays of element arrays, and it negates all entries in the, while ~ does a
-            general inversion.  This is best shown by an example with multiple entries:</p>
+            arrays of element arrays, and it negates all entries in the hash or array,
+            while ~ does a general inversion.  This is best shown by an example with
+            multiple entries:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">foo</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)   <span class="ruby-comment"># ((&quot;column&quot; != 1) AND (foo != 2))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">foo</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)        <span class="ruby-comment"># ((&quot;column&quot; != 1) OR (foo != 2))</span></pre>
+            
+            <p>You can also use the ~ method on an equality expression:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-operator">~</span>(<span class="ruby-identifier">column</span> <span class="ruby-operator">=~</span> <span class="ruby-value">1</span>)} <span class="ruby-comment"># (&quot;column&quot; != 1)</span></pre>
+            
+            <p>On Ruby 1.9+, you can use the !~ method:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">!~</span> <span class="ruby-value">1</span>} <span class="ruby-comment"># (&quot;column&quot; != 1)</span></pre>
             
             <p>The most common need for not equals is in filters, in which case you can
             use the <code>exclude</code> method:</p>
@@ -355,6 +368,14 @@
             
             <pre class="ruby">{:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>)} <span class="ruby-comment"># (&quot;column&quot; IN (SELECT &quot;id&quot; FROM &quot;albums&quot;))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>)) <span class="ruby-comment"># (&quot;column&quot; NOT IN (SELECT &quot;id&quot; FROM &quot;albums&quot;))</span></pre>
             
+            <p>Similar to =, you can also use =~ with expressions for inclusion:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]} <span class="ruby-comment"># (&quot;column&quot; IN (1, 2, 3))</span></pre>
+            
+            <p>and on Ruby 1.9, !~ for exclusion:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]} <span class="ruby-comment"># (&quot;column&quot; NOT IN (1, 2, 3))</span></pre>
+            
             <p><a href="../../classes/Sequel.html">Sequel</a> also supports the SQL EXISTS
             operator using <code>Dataset#exists</code>:</p>
             
@@ -370,6 +391,10 @@
             <p>Negation works the same way as it does for equality and inclusion:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>) <span class="ruby-comment"># (&quot;column&quot; IS NOT NULL)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># (&quot;column&quot; IS NOT TRUE)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>) <span class="ruby-comment"># (&quot;column&quot; IS NOT FALSE)</span></pre>
+            
+            <p>Likewise, =~ works for identity (and Ruby 1.9, !~ for negative identity):</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span>} <span class="ruby-comment"># (&quot;column&quot; IS NULL)</span>&#x000A;<span class="ruby-identifier">where</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span>} <span class="ruby-comment"># (&quot;column&quot; IS NOT NULL)</span></pre>
             
             <h3 id="label-Inversion+Operator+-28NOT-29">Inversion Operator (NOT)<span><a href="#label-Inversion+Operator+-28NOT-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

@@ -1,4 +1,4 @@
-Tue, 03 Mar 2015 08:49:26 -0800
+Wed, 01 Apr 2015 08:55:40 -0700
 lib/sequel/extensions/_pretty_table.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -8,7 +8,7 @@ lib/sequel/extensions/constraint_validations.rb	Thu, 12 Feb 2015 17:30:51 -0800
 lib/sequel/extensions/core_extensions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/core_refinements.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/current_datetime_timestamp.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/dataset_source_alias.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/dataset_source_alias.rb	Mon, 09 Mar 2015 19:27:17 -0700
 lib/sequel/extensions/date_arithmetic.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/empty_array_ignore_nulls.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/error_sql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -28,11 +28,11 @@ lib/sequel/extensions/pagination.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_array.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_array_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_enum.rb	Fri, 20 Feb 2015 08:17:56 -0800
-lib/sequel/extensions/pg_hstore.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/pg_hstore_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/pg_hstore.rb	Sun, 22 Mar 2015 20:21:32 -0700
+lib/sequel/extensions/pg_hstore_ops.rb	Thu, 12 Mar 2015 11:48:25 -0700
 lib/sequel/extensions/pg_inet.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_interval.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/pg_json.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/pg_json.rb	Tue, 17 Mar 2015 08:10:34 -0700
 lib/sequel/extensions/pg_json_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_loose_count.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_range.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -83,7 +83,7 @@ lib/sequel/plugins/input_transformer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/insert_returning_select.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_filters.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_hooks.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/json_serializer.rb	Fri, 20 Feb 2015 12:34:34 -0800
+lib/sequel/plugins/json_serializer.rb	Thu, 12 Mar 2015 08:21:51 -0700
 lib/sequel/plugins/lazy_attributes.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/list.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/many_through_many.rb	Fri, 05 Dec 2014 14:52:17 -0800
