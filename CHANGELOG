@@ -1,3 +1,7 @@
+=== HEAD
+
+* Use Symbol#to_proc instead of explicit blocks (jeremyevans)
+
 === 4.21.0 (2015-04-01)
 
 * Support :tsquery and :tsvector options in Dataset#full_text_search on PostgreSQL, for using existing tsquery/tsvector expressions (jeremyevans)

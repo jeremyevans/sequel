@@ -23,7 +23,7 @@ module Sequel
 
     # Return the string that #print will print via puts.
     def self.string(records, columns = nil) # records is an array of hashes
-      columns ||= records.first.keys.sort_by{|x|x.to_s}
+      columns ||= records.first.keys.sort_by(&:to_s)
       sizes = column_sizes(records, columns)
       sep_line = separator_line(columns, sizes)
 

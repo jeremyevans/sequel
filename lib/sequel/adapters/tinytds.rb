@@ -238,7 +238,7 @@ module Sequel
             result.each(*args) do |r|
               unless cols
                 cols = result.fields.map{|c| [c, output_identifier(c)]}
-                @columns = columns = cols.map{|c| c.last}
+                @columns = columns = cols.map(&:last)
               end
               h = {}
               cols.each do |s, sym|

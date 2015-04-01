@@ -147,7 +147,7 @@ module Sequel
             arg = arg.split(',')
             type = :includes
           when :includes_int_array
-            arg = arg.split(',').map{|x| x.to_i}
+            arg = arg.split(',').map(&:to_i)
             type = :includes
           when :includes_int_range
             arg = constraint_validation_int_range(arg)
@@ -155,7 +155,7 @@ module Sequel
           end
 
           column = if type == :unique
-            column.split(',').map{|c| c.to_sym}
+            column.split(',').map(&:to_sym)
           else
             column.to_sym
           end

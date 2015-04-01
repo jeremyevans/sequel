@@ -36,8 +36,8 @@ module Sequel
     #   # Register custom serializer/deserializer pair, if desired
     #   require 'sequel/plugins/serialization'
     #   Sequel::Plugins::Serialization.register_format(:reverse,
-    #     lambda{|v| v.reverse},
-    #     lambda{|v| v.reverse})
+    #     lambda(&:reverse),
+    #     lambda(&:reverse))
     #
     #   class User < Sequel::Model
     #     # Built-in format support when loading the plugin
@@ -51,7 +51,7 @@ module Sequel
     #     serialize_attributes :reverse, :password
     #
     #     # Use a custom serializer/deserializer pair without registering
-    #     serialize_attributes [lambda{|v| v.reverse}, lambda{|v| v.reverse}], :password
+    #     serialize_attributes [lambda(&:reverse), lambda(&:reverse)], :password
     #   end
     #   user = User.create
     #   user.permissions = { :global => 'read-only' }
@@ -106,7 +106,7 @@ module Sequel
             end
           end
         end)
-      register_format(:yaml, lambda{|v| v.to_yaml}, lambda{|v| YAML.load(v)})
+      register_format(:yaml, lambda(&:to_yaml), lambda{|v| YAML.load(v)})
       register_format(:json, lambda{|v| Sequel.object_to_json(v)}, lambda{|v| Sequel.parse_json(v)})
 
       module ClassMethods
@@ -129,7 +129,7 @@ module Sequel
         def serialize_attributes(format, *columns)
           if format.is_a?(Symbol)
             unless format = REGISTERED_FORMATS[format]
-              raise(Error, "Unsupported serialization format: #{format} (valid formats: #{REGISTERED_FORMATS.keys.map{|k| k.inspect}.join})")
+              raise(Error, "Unsupported serialization format: #{format} (valid formats: #{REGISTERED_FORMATS.keys.map(&:inspect).join})")
             end
           end
           serializer, deserializer = format

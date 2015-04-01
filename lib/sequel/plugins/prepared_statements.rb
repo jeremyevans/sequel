@@ -72,7 +72,7 @@ module Sequel
 
         # Return a sorted array of columns for use as a hash key.
         def prepared_columns(cols)
-          RUBY_VERSION >= '1.9' ? cols.sort : cols.sort_by{|c| c.to_s}
+          RUBY_VERSION >= '1.9' ? cols.sort : cols.sort_by(&:to_s)
         end
 
         # Return a prepared statement that can be used to delete a row from this model's dataset.

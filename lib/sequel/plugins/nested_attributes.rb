@@ -195,7 +195,7 @@ module Sequel
         # If there is a limit on the nested attributes for this association,
         # make sure the length of the attributes_list is not greater than the limit.
         def nested_attributes_list_setter(meta, attributes_list)
-          attributes_list = attributes_list.sort_by{|x| x.to_s}.map{|k,v| v} if attributes_list.is_a?(Hash)
+          attributes_list = attributes_list.sort_by(&:to_s).map{|k,v| v} if attributes_list.is_a?(Hash)
           if (limit = meta[:limit]) && attributes_list.length > limit
             raise(Error, "number of nested attributes (#{attributes_list.length}) exceeds the limit (#{limit})")
           end
@@ -254,10 +254,10 @@ module Sequel
           reflection = meta[:reflection]
           klass = reflection.associated_class
           sym_keys = Array(klass.primary_key)
-          str_keys = sym_keys.map{|k| k.to_s}
+          str_keys = sym_keys.map(&:to_s)
           if (pk = attributes.values_at(*sym_keys)).all? || (pk = attributes.values_at(*str_keys)).all?
-            pk = pk.map{|k| k.to_s}
-            obj = Array(send(reflection[:name])).find{|x| Array(x.pk).map{|k| k.to_s} == pk}
+            pk = pk.map(&:to_s)
+            obj = Array(send(reflection[:name])).find{|x| Array(x.pk).map(&:to_s) == pk}
           end
           if obj
             attributes = attributes.dup.delete_if{|k,v| str_keys.include? k.to_s}

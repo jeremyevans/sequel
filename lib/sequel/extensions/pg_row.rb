@@ -445,7 +445,7 @@ module Sequel
           end
           # Manually cast to integer using to_i, because adapter may not cast oid type
           # correctly (e.g. swift)
-          parser_opts[:oid], rel_oid, array_oid = row.values_at(:oid, :typrelid, :typarray).map{|i| i.to_i}
+          parser_opts[:oid], rel_oid, array_oid = row.values_at(:oid, :typrelid, :typarray).map(&:to_i)
 
           # Get column names and oids for each of the members of the composite type.
           res = from(:pg_attribute).

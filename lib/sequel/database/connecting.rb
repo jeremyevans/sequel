@@ -6,7 +6,7 @@ module Sequel
     # ---------------------
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado amalgalite cubrid db2 dbi do fdbsql firebird ibmdb informix jdbc mock mysql mysql2 odbc openbase oracle postgres sqlanywhere sqlite swift tinytds'.collect{|x| x.to_sym}
+    ADAPTERS = %w'ado amalgalite cubrid db2 dbi do fdbsql firebird ibmdb informix jdbc mock mysql mysql2 odbc openbase oracle postgres sqlanywhere sqlite swift tinytds'.collect(&:to_sym)
 
     @single_threaded = false
 

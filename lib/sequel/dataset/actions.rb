@@ -8,7 +8,7 @@ module Sequel
     # ---------------------
     
     # Action methods defined by Sequel that execute code on the database.
-    ACTION_METHODS = (<<-METHS).split.map{|x| x.to_sym}
+    ACTION_METHODS = (<<-METHS).split.map(&:to_sym)
       << [] all avg count columns columns! delete each
       empty? fetch_rows first first! get import insert interval last
       map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
@@ -982,7 +982,7 @@ module Sequel
         [v, descending]
       end
 
-      row_values = yield(row, order_exprs.map{|e| e.first})
+      row_values = yield(row, order_exprs.map(&:first))
 
       last_expr = []
       cond = order_exprs.zip(row_values).map do |(v, descending), value|

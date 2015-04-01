@@ -6,7 +6,7 @@ module Sequel
      CUBRID_TYPE_PROCS = {
        ::Cubrid::DATE => lambda{|t| Date.new(t.year, t.month, t.day)},
        ::Cubrid::TIME => lambda{|t| SQLTime.create(t.hour, t.min, t.sec)},
-       21 => lambda{|s| s.to_i}
+       21 => lambda(&:to_i)
      }
 
     class Database < Sequel::Database
@@ -31,7 +31,7 @@ module Sequel
       end
 
       def server_version
-        @server_version ||= synchronize{|c| c.server_version}
+        @server_version ||= synchronize(&:server_version)
       end
       
       def execute(sql, opts=OPTS)
@@ -125,7 +125,7 @@ module Sequel
         execute(sql) do |stmt|
           begin
             cols = stmt.column_info.map{|c| [output_identifier(c[COLUMN_INFO_NAME]), CUBRID_TYPE_PROCS[c[COLUMN_INFO_TYPE]]]}
-            @columns = cols.map{|c| c.first}
+            @columns = cols.map(&:first)
             stmt.each do |r|
               row = {}
               cols.zip(r).each{|(k, p), v| row[k] = (v && p) ? p.call(v) : v}

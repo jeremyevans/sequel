@@ -416,7 +416,7 @@ module Sequel
            "DROP TABLE #{bt}"
         ]
         indexes(table).each do |name, h|
-          if (h[:columns].map{|x| x.to_s} - new_columns).empty?
+          if (h[:columns].map(&:to_s) - new_columns).empty?
             a << alter_table_sql(table, h.merge(:op=>:add_index, :name=>name))
           end
         end

@@ -32,7 +32,7 @@ module Sequel
     JOIN_METHODS = (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).map{|x| "#{x}_join".to_sym} + [:join, :join_table]
     
     # Methods that return modified datasets
-    QUERY_METHODS = (<<-METHS).split.map{|x| x.to_sym} + JOIN_METHODS
+    QUERY_METHODS = (<<-METHS).split.map(&:to_sym) + JOIN_METHODS
       add_graph_aliases and distinct except exclude exclude_having exclude_where
       filter for_update from from_self graph grep group group_and_count group_by having intersect invert
       limit lock_style naked offset or order order_append order_by order_more order_prepend qualify
@@ -584,7 +584,7 @@ module Sequel
     # Returns a cloned dataset without a row_proc.
     #
     #   ds = DB[:items]
-    #   ds.row_proc = proc{|r| r.invert}
+    #   ds.row_proc = proc(&:invert)
     #   ds.all # => [{2=>:id}]
     #   ds.naked.all # => [{:id=>2}]
     def naked
@@ -1001,7 +1001,7 @@ module Sequel
         s, ds = hoist_cte(dataset)
         return s.compound_clone(type, ds, opts)
       end
-      ds = compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, opts[:all]]])
+      ds = compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map(&:dup) + [[type, dataset.compound_from_self, opts[:all]]])
       opts[:from_self] == false ? ds : ds.from_self(opts)
     end
 

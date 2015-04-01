@@ -604,7 +604,7 @@ module Sequel
           key = qualify(associated_class.table_name, associated_class.primary_key)
           case obj
           when Array
-            {key=>obj.map{|o| o.pk}}
+            {key=>obj.map(&:pk)}
           when Sequel::Dataset
             {key=>obj.select(*Array(qualify(associated_class.table_name, associated_class.primary_key)))}
           else
@@ -1001,7 +1001,7 @@ module Sequel
         end
 
         def filter_by_associations_limit_aliases
-          filter_by_associations_limit_alias_key.map{|v| v.column}
+          filter_by_associations_limit_alias_key.map(&:column)
         end
 
         def filter_by_associations_limit_key
@@ -1289,7 +1289,7 @@ module Sequel
         end
 
         def filter_by_associations_limit_aliases
-          filter_by_associations_limit_alias_key.map{|v| v.alias}
+          filter_by_associations_limit_alias_key.map(&:alias)
         end
 
         def filter_by_associations_limit_key
@@ -1846,7 +1846,7 @@ module Sequel
                 select_all(egds.first_source).
                 select_append(*associated_key_array)
               egds = opts.apply_eager_graph_limit_strategy(egls, egds)
-              ds.graph(egds, associated_key_array.map{|v| v.alias}.zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :join_only=>eo[:join_only], :select=>select||orig_egds.columns, &graph_block)
+              ds.graph(egds, associated_key_array.map(&:alias).zip(lpkcs) + conditions, :qualify=>:deep, :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier], :join_type=>eo[:join_type]||join_type, :from_self_alias=>eo[:from_self_alias], :join_only=>eo[:join_only], :select=>select||orig_egds.columns, &graph_block)
             else
               ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lpkcs) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table, [eo[:table_alias]]), :join_type=>eo[:join_type]||jt_join_type, :join_only=>eo[:join_only], :implicit_qualifier=>eo[:implicit_qualifier], :qualify=>:deep, :from_self_alias=>eo[:from_self_alias], &jt_graph_block)
               ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :qualify=>:deep, :join_type=>eo[:join_type]||join_type, :join_only=>eo[:join_only], &graph_block)

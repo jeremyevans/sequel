@@ -489,7 +489,7 @@ module Sequel
       #   end
       def inherited(subclass)
         super
-        ivs = subclass.instance_variables.collect{|x| x.to_s}
+        ivs = subclass.instance_variables.collect(&:to_s)
         inherited_instance_variables.each do |iv, dup|
           next if ivs.include?(iv.to_s)
           if (sup_class_value = instance_variable_get(iv)) && dup
@@ -851,7 +851,7 @@ module Sequel
         clear_setter_methods_cache
         columns, bad_columns = columns.partition{|x| NORMAL_METHOD_NAME_REGEXP.match(x.to_s)}
         bad_columns.each{|x| def_bad_column_accessor(x)}
-        im = instance_methods.collect{|x| x.to_s}
+        im = instance_methods.collect(&:to_s)
         columns.each do |column|
           meth = "#{column}="
           overridable_methods_module.module_eval("def #{column}; self[:#{column}] end", __FILE__, __LINE__) unless im.include?(column.to_s)
@@ -948,7 +948,7 @@ module Sequel
         if allowed_columns
           allowed_columns.map{|x| "#{x}="}
         else
-          meths = instance_methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
+          meths = instance_methods.collect(&:to_s).grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
           meths
         end
@@ -2128,8 +2128,8 @@ module Sequel
             set_column_value(m, v)
           elsif strict
             # Avoid using respond_to? or creating symbols from user input
-            if public_methods.map{|s| s.to_s}.include?(m)
-              if Array(model.primary_key).map{|s| s.to_s}.member?(k.to_s) && model.restrict_primary_key?
+            if public_methods.map(&:to_s).include?(m)
+              if Array(model.primary_key).map(&:to_s).member?(k.to_s) && model.restrict_primary_key?
                 raise Error, "#{k} is a restricted primary key"
               else
                 raise Error, "#{k} is a restricted column"
@@ -2158,7 +2158,7 @@ module Sequel
         if type.is_a?(Array)
           type.map{|x| "#{x}="}
         else
-          meths = methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
+          meths = methods.collect(&:to_s).grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
           meths -= Array(primary_key).map{|x| "#{x}="} if type != :all && primary_key && model.restrict_primary_key?
           meths
         end
@@ -2239,7 +2239,7 @@ module Sequel
       #   # DELETE FROM artists WHERE (id = 2)
       #   # ...
       def destroy
-        pr = proc{all{|r| r.destroy}.length}
+        pr = proc{all(&:destroy).length}
         model.use_transactions ? @db.transaction(:server=>opts[:server], &pr) : pr.call
       end
 

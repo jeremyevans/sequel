@@ -364,7 +364,7 @@ module Sequel
           cps = db.conversion_procs
           type_procs = result.types.map{|t| cps[base_type_name(t)]}
           cols = result.columns.map{|c| i+=1; [output_identifier(c), i, type_procs[i]]}
-          @columns = cols.map{|c| c.first}
+          @columns = cols.map(&:first)
           result.each do |values|
             row = {}
             cols.each do |name,id,type_proc|

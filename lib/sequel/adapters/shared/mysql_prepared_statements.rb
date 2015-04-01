@@ -6,7 +6,7 @@ module Sequel
     # prepared statements and stored procedures.
     module PreparedStatements
       module DatabaseMethods
-        disconnect_errors = <<-END.split("\n").map{|l| l.strip}
+        disconnect_errors = <<-END.split("\n").map(&:strip)
         Commands out of sync; you can't run this command now
         Can't connect to local MySQL server through socket
         MySQL server has gone away

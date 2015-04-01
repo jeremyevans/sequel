@@ -59,7 +59,7 @@ module Sequel
     #   # and :key_map taking a class object and returning the column
     #   # value to use
     #   Employee.plugin :single_table_inheritance, :type,
-    #     :model_map=>proc{|v| v.reverse},
+    #     :model_map=>proc(&:reverse),
     #     :key_map=>proc{|klass| klass.name.reverse}
     #
     #   # You can use the same class for multiple values.

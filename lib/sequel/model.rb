@@ -170,6 +170,6 @@ module Sequel
 
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via +set+/+update+/+new+/etc..
-    RESTRICTED_SETTER_METHODS = instance_methods.map{|x| x.to_s}.grep(SETTER_METHOD_REGEXP)
+    RESTRICTED_SETTER_METHODS = instance_methods.map(&:to_s).grep(SETTER_METHOD_REGEXP)
   end
 end

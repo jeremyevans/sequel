@@ -390,11 +390,11 @@ module Sequel
       nil
     end
     
-    NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
-    FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23506 23504'.freeze.each{|s| s.freeze}
-    UNIQUE_CONSTRAINT_SQLSTATES = %w'23505'.freeze.each{|s| s.freeze}
-    CHECK_CONSTRAINT_SQLSTATES = %w'23513 23514'.freeze.each{|s| s.freeze}
-    SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each{|s| s.freeze}
+    NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each(&:freeze)
+    FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23506 23504'.freeze.each(&:freeze)
+    UNIQUE_CONSTRAINT_SQLSTATES = %w'23505'.freeze.each(&:freeze)
+    CHECK_CONSTRAINT_SQLSTATES = %w'23513 23514'.freeze.each(&:freeze)
+    SERIALIZATION_CONSTRAINT_SQLSTATES = %w'40001'.freeze.each(&:freeze)
     # Given the SQLState, return the appropriate DatabaseError subclass.
     def database_specific_error_class_from_sqlstate(sqlstate)
       case sqlstate

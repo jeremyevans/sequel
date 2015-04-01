@@ -24,7 +24,7 @@ module Sequel
           s.to_f 
         end
       end
-      def date(s) ::Date.new(*s.split(DASH_STR).map{|x| x.to_i}) end
+      def date(s) ::Date.new(*s.split(DASH_STR).map(&:to_i)) end
       def bytea(str)
         str = if str =~ /\A\\x/
           # PostgreSQL 9.0+ bytea hex format

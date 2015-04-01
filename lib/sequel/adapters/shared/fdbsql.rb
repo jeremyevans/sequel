@@ -265,9 +265,9 @@ module Sequel
       end
 
       STALE_STATEMENT_SQLSTATE = '0A50A'.freeze
-      NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each{|s| s.freeze}
-      FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each{|s| s.freeze}
-      UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each{|s| s.freeze}
+      NOT_NULL_CONSTRAINT_SQLSTATES = %w'23502'.freeze.each(&:freeze)
+      FOREIGN_KEY_CONSTRAINT_SQLSTATES = %w'23503 23504'.freeze.each(&:freeze)
+      UNIQUE_CONSTRAINT_SQLSTATES = %w'23501'.freeze.each(&:freeze)
 
       # Given the SQLState, return the appropriate DatabaseError subclass.
       def database_specific_error_class_from_sqlstate(sqlstate)

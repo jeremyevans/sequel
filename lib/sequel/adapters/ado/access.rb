@@ -294,7 +294,7 @@ module Sequel
         
         def fetch_ado_schema(type, criteria=[])
           execute_open_ado_schema(type, criteria) do |s|
-            cols = s.Fields.extend(Enumerable).map {|c| c.Name}
+            cols = s.Fields.extend(Enumerable).map(&:Name)
             s.getRows.transpose.each do |r|
               row = {}
               cols.each{|c| row[c] = r.shift}

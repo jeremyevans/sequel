@@ -303,7 +303,7 @@ module Sequel
             type_proc = f.type == 1 && cast_tinyint_integer?(f) ? cps[2] : cps[f.type]
             [output_identifier(f.name), type_proc, i+=1]
           end
-          @columns = cols.map{|c| c.first}
+          @columns = cols.map(&:first)
           if opts[:split_multiple_result_sets]
             s = []
             yield_rows(r, cols){|h| s << h}

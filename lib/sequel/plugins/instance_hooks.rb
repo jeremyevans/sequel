@@ -82,7 +82,7 @@ module Sequel
         
         # Run all hook blocks of the given hook type.
         def run_after_instance_hooks(hook)
-          instance_hooks(hook).each{|b| b.call}
+          instance_hooks(hook).each(&:call)
         end
 
         # Run all hook blocks of the given hook type.  If a hook block returns false,

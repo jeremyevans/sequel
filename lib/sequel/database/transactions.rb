@@ -277,7 +277,7 @@ module Sequel
         callbacks = _trans(conn)[committed ? :after_commit : :after_rollback]
         Sequel.synchronize{@transactions.delete(conn)}
         if callbacks
-          callbacks.each{|b| b.call}
+          callbacks.each(&:call)
         end
       end
     end

@@ -73,7 +73,7 @@ module Sequel
       <<END_MIG
 Sequel.migration do
   change do
-#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_foreign_keys(t)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by(&:to_s).map{|t| dump_table_foreign_keys(t)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
 end
 END_MIG
@@ -91,7 +91,7 @@ END_MIG
       <<END_MIG
 Sequel.migration do
   change do
-#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by(&:to_s).map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
 end
 END_MIG
@@ -207,7 +207,7 @@ END_MIG
     def dump_add_fk_constraints(table, fks)
       sfks = "alter_table(#{table.inspect}) do\n"
       sfks << create_table_generator do
-        fks.sort_by{|fk| fk[:columns].map{|c| c.to_s}}.each do |fk|
+        fks.sort_by{|fk| fk[:columns].map(&:to_s)}.each do |fk|
           foreign_key fk[:columns], fk
         end
       end.dump_constraints.gsub(/^foreign_key /, '  add_foreign_key ')
@@ -218,7 +218,7 @@ END_MIG
     # string that would add the foreign keys if run in a migration.
     def dump_table_foreign_keys(table, options=OPTS)
       if supports_foreign_key_parsing?
-        fks = foreign_key_list(table, options).sort_by{|fk| fk[:columns].map{|c| c.to_s}}
+        fks = foreign_key_list(table, options).sort_by{|fk| fk[:columns].map(&:to_s)}
       end
 
       if fks.nil? || fks.empty?
@@ -234,7 +234,7 @@ END_MIG
       table = table.value.to_s if table.is_a?(SQL::Identifier)
       raise(Error, "must provide table as a Symbol, String, or Sequel::SQL::Identifier") unless [String, Symbol].any?{|c| table.is_a?(c)}
       s = schema(table).dup
-      pks = s.find_all{|x| x.last[:primary_key] == true}.map{|x| x.first}
+      pks = s.find_all{|x| x.last[:primary_key] == true}.map(&:first)
       options = options.merge(:single_pk=>true) if pks.length == 1
       m = method(:recreate_column)
       im = method(:index_to_generator_opts)
@@ -319,7 +319,7 @@ END_MIG
         options[:skipped_foreign_keys] = skipped_foreign_keys
         tables
       else
-        tables.sort_by{|t| t.to_s}
+        tables.sort_by(&:to_s)
       end
     end
 
@@ -351,7 +351,7 @@ END_MIG
         end
 
         # Add sorted tables from this loop to the final list
-        sorted_tables.concat(this_loop.sort_by{|t| t.to_s})
+        sorted_tables.concat(this_loop.sort_by(&:to_s))
 
         # Remove tables that were handled this loop
         this_loop.each{|t| table_fks.delete(t)}
@@ -417,7 +417,7 @@ END_MIG
             if !name and c[:check].length == 1 and c[:check].first.is_a?(Hash)
               "check #{c[:check].first.inspect[1...-1]}"
             else
-              "#{name ? "constraint #{name.inspect}," : 'check'} #{c[:check].map{|x| x.inspect}.join(', ')}"
+              "#{name ? "constraint #{name.inspect}," : 'check'} #{c[:check].map(&:inspect).join(', ')}"
             end
           when :foreign_key
             c.delete(:on_delete) if c[:on_delete] == :no_action

@@ -667,7 +667,7 @@ module Sequel
         if search_path = @opts[:search_path]
           case search_path
           when String
-            search_path = search_path.split(",").map{|s| s.strip}
+            search_path = search_path.split(",").map(&:strip)
           when Array
             # nil
           else
@@ -706,7 +706,7 @@ module Sequel
       # Convert the hash of named conversion procs into a hash a oid conversion procs. 
       def convert_named_procs_to_procs(named_procs)
         h = {}
-        from(:pg_type).where(:typtype=>'b', :typname=>named_procs.keys.map{|t| t.to_s}).select_map([:oid, :typname]).each do |oid, name|
+        from(:pg_type).where(:typtype=>'b', :typname=>named_procs.keys.map(&:to_s)).select_map([:oid, :typname]).each do |oid, name|
           h[oid.to_i] = named_procs[name.untaint.to_sym]
         end
         h
@@ -1197,7 +1197,7 @@ module Sequel
       WINDOW = " WINDOW ".freeze
       SELECT_VALUES = "VALUES ".freeze
       EMPTY_STRING = ''.freeze
-      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each{|s| s.freeze}
+      LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
       Dataset.def_sql_method(self, :insert, [['if server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
