@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.21.0 (2015-04-01)
 
 * Support :tsquery and :tsvector options in Dataset#full_text_search on PostgreSQL, for using existing tsquery/tsvector expressions (jeremyevans)
 
