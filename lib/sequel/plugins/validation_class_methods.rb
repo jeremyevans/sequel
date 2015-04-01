@@ -182,8 +182,8 @@ module Sequel
           blk = if (i = opts[:if]) || (am = opts[:allow_missing]) || (an = opts[:allow_nil]) || (ab = opts[:allow_blank])
             proc do |o,a,v|
               next if i && !validation_if_proc(o, i)
-              next if an && Array(v).all?{|x| x.nil?}
-              next if ab && Array(v).all?{|x| x.blank?}
+              next if an && Array(v).all?(&:nil?)
+              next if ab && Array(v).all?(&:blank?)
               next if am && Array(a).all?{|x| !o.values.has_key?(x)}
               block.call(o,a,v)
             end

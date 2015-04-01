@@ -53,7 +53,7 @@ module Sequel
           name = opts[:name]
           if !associations.include?(name) && retrieved_by && !frozen?
             begin
-              retrieved_by.send(:eager_load, retrieved_with.reject{|o| o.frozen?}, name=>{})
+              retrieved_by.send(:eager_load, retrieved_with.reject(&:frozen?), name=>{})
             rescue Sequel::UndefinedAssociation
               # This can happen if class table inheritance is used and the association
               # is only defined in a subclass.  This particular instance can use the

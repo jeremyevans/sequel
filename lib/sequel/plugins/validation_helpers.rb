@@ -237,7 +237,7 @@ module Sequel
               where.call(ds, self, arr)
             else
               vals = arr.map{|x| get_column_value(x)}
-              next if vals.any?{|v| v.nil?}
+              next if vals.any?(&:nil?)
               ds.where(arr.zip(vals))
             end
             ds = yield(ds) if block_given?

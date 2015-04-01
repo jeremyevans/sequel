@@ -63,7 +63,7 @@ module Sequel
         #
         #  class MyModel
         #   add_hook_type :before_move_to
-        #   before_move_to(:check_move_allowed){|o| o.allow_move?}
+        #   before_move_to(:check_move_allowed, &:allow_move?)
         #   def move_to(there)
         #     return if before_move_to == false
         #     # move MyModel object to there
