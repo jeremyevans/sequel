@@ -1,5 +1,7 @@
 === HEAD
 
+* Use a conditional variable instead of busy waiting in the threaded connection pools on ruby 1.9+ (jeremyevans)
+
 * Use Symbol#to_proc instead of explicit blocks (jeremyevans)
 
 === 4.21.0 (2015-04-01)

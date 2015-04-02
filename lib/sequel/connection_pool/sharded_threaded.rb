@@ -18,6 +18,12 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     @available_connections = {}
     @connections_to_remove = []
     @servers = opts.fetch(:servers_hash, Hash.new(:default))
+
+    if USE_WAITER
+      @waiter = nil
+      @waiters = {}
+    end
+
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
   end
@@ -32,6 +38,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
           @servers[server] = server
           @available_connections[server] = []
           @allocated[server] = {}
+          @waiters[server] = ConditionVariable.new if USE_WAITER
         end
       end
     end
@@ -115,16 +122,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       return yield(conn)
     end
     begin
-      unless conn = acquire(t, server)
-        time = Time.now
-        timeout = time + @timeout
-        sleep_time = @sleep_time
-        sleep sleep_time
-        until conn = acquire(t, server)
-          raise(::Sequel::PoolTimeout) if Time.now > timeout
-          sleep sleep_time
-        end
-      end
+      conn = acquire(t, server)
       yield conn
     rescue Sequel::DatabaseDisconnectError
       sync{@connections_to_remove << conn} if conn
@@ -144,6 +142,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       servers.each do |server|
         if @servers.include?(server)
           disconnect_server(server)
+          @waiters.delete(server) if USE_WAITER
           @available_connections.delete(server)
           @allocated.delete(server)
           @servers.delete(server)
@@ -164,16 +163,60 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   private
 
   # Assigns a connection to the supplied thread for the given server, if one
-  # is available. The calling code should NOT already have the mutex when
+  # is available. The calling code should already have the mutex when
   # calling this.
-  def acquire(thread, server)
-    sync do
-      if conn = available(server)
-        allocated(server)[thread] = conn
-      end
+  def _acquire(thread, server)
+    if conn = available(server)
+      allocated(server)[thread] = conn
     end
   end
   
+  if USE_WAITER
+    # Assigns a connection to the supplied thread, if one
+    # is available. The calling code should NOT already have the mutex when
+    # calling this.
+    #
+    # This should return a connection is one is available within the timeout,
+    # or nil if a connection could not be acquired within the timeout.
+    def acquire(thread, server)
+      sync do
+        if conn = _acquire(thread, server)
+          return conn
+        end
+
+        time = Time.now
+        @waiters[server].wait(@mutex, @timeout)
+        Thread.pass
+
+        until conn = _acquire(thread, server)
+          deadline ||= time + @timeout
+          current_time = Time.now
+          raise(::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{current_time - time}") if current_time > deadline
+          @waiters[server].wait(@mutex, deadline - current_time)
+          Thread.pass
+        end
+
+        conn
+      end
+    end
+  else
+    # :nocov:
+    def acquire(thread, server)
+      unless conn = sync{_acquire(thread, server)}
+        time = Time.now
+        timeout = time + @timeout
+        sleep_time = @sleep_time
+        sleep sleep_time
+        until conn = sync{_acquire(thread, server)}
+          raise(::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{Time.now - time}") if Time.now > timeout
+          sleep sleep_time
+        end
+      end
+      conn
+    end
+    # :nocov:
+  end
+
   # Returns an available connection to the given server. If no connection is
   # available, tries to create a new connection. The calling code should already
   # have the mutex before calling this.
@@ -186,6 +229,10 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # before calling this.
   def checkin_connection(server, conn)
     available_connections(server) << conn
+    if USE_WAITER
+      @waiters[server].signal
+      Thread.pass
+    end
     conn
   end
 

@@ -33,7 +33,7 @@ describe "ConnectionPool options" do
     cpool = Sequel::ConnectionPool.get_pool(mock_db.call, {:max_connections=>'5', :pool_timeout=>'3', :pool_sleep_time=>'0.01'})
     cpool.max_size.should == 5
     cpool.instance_variable_get(:@timeout).should == 3
-    cpool.instance_variable_get(:@sleep_time).should == 0.01
+    cpool.instance_variable_get(:@sleep_time).should == 0.01 unless cpool.class::USE_WAITER
   end
 
   specify "should raise an error unless size is positive" do
