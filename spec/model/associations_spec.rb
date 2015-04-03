@@ -680,12 +680,12 @@ describe Sequel::Model, "many_to_one" do
     @c2.many_to_one :parent, :class => @c2, :before_set=>:bs
     def p.bs(x) false end
     p.should_not_receive(:_parent=)
-    proc{p.parent = c}.should raise_error(Sequel::Error)
+    proc{p.parent = c}.should raise_error(Sequel::HookFailed)
     
     p.parent.should == nil
     p.associations[:parent] = c
     p.parent.should == c
-    proc{p.parent = nil}.should raise_error(Sequel::Error)
+    proc{p.parent = nil}.should raise_error(Sequel::HookFailed)
   end
 
   it "should raise an error if a callback is not a proc or symbol" do
@@ -1097,18 +1097,18 @@ describe Sequel::Model, "one_to_one" do
   it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
     # The reason for this is that assignment in ruby always returns the argument instead of the result
     # of the method, so we can't return nil to signal that the association callback prevented the modification
-    p = @c2.new
+    p = @c2.load(:id=>321)
     c = @c2.load(:id=>123)
     p.raise_on_save_failure = false
     @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
     def p.bs(x) false end
     p.should_not_receive(:_parent=)
-    proc{p.parent = c}.should raise_error(Sequel::Error)
+    proc{p.parent = c}.should raise_error(Sequel::HookFailed)
     
-    p.parent.should == nil
+    p.associations[:parent].should == nil
     p.associations[:parent] = c
     p.parent.should == c
-    proc{p.parent = nil}.should raise_error(Sequel::Error)
+    proc{p.parent = nil}.should raise_error(Sequel::HookFailed)
   end
 
   it "should not validate the associated object in setter if the :validate=>false option is used" do
@@ -1837,11 +1837,11 @@ describe Sequel::Model, "one_to_many" do
     p.should_not_receive(:_add_attribute)
     p.should_not_receive(:_remove_attribute)
     p.associations[:attributes] = []
-    proc{p.add_attribute(c)}.should raise_error(Sequel::Error)
+    proc{p.add_attribute(c)}.should raise_error(Sequel::HookFailed)
     p.attributes.should == []
     p.associations[:attributes] = [c]
     p.should_receive(:br).once.with(c).and_return(false)
-    proc{p.remove_attribute(c)}.should raise_error(Sequel::Error)
+    proc{p.remove_attribute(c)}.should raise_error(Sequel::HookFailed)
     p.attributes.should == [c]
   end
 
@@ -2642,11 +2642,11 @@ describe Sequel::Model, "many_to_many" do
     p.should_not_receive(:_remove_attribute)
     p.associations[:attributes] = []
     p.raise_on_save_failure = true
-    proc{p.add_attribute(c)}.should raise_error(Sequel::Error)
+    proc{p.add_attribute(c)}.should raise_error(Sequel::HookFailed)
     p.attributes.should == []
     p.associations[:attributes] = [c]
     p.should_receive(:br).once.with(c).and_return(false)
-    proc{p.remove_attribute(c)}.should raise_error(Sequel::Error)
+    proc{p.remove_attribute(c)}.should raise_error(Sequel::HookFailed)
     p.attributes.should == [c]
   end
 
