@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle Model#cancel_action in association before hooks (jeremyevans)
+
 * Use a conditional variable instead of busy waiting in the threaded connection pools on ruby 1.9+ (jeremyevans)
 
 * Use Symbol#to_proc instead of explicit blocks (jeremyevans)

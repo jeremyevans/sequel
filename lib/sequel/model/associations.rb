@@ -2316,6 +2316,10 @@ module Sequel
 
         # Run the callback for the association with the object.
         def run_association_callbacks(reflection, callback_type, object)
+          # The reason we automatically set raise_error for singular associations is that
+          # assignment in ruby always returns the argument instead of the result of the
+          # method, so we can't return nil to signal that the association callback prevented
+          # the modification
           raise_error = raise_on_save_failure || !reflection.returns_array?
           stop_on_false = [:before_add, :before_remove, :before_set].include?(callback_type)
           reflection[callback_type].each do |cb|
@@ -2327,11 +2331,14 @@ module Sequel
             else
               raise Error, "callbacks should either be Procs or Symbols"
             end
+
             if res == false and stop_on_false
-              raise(HookFailed, "Unable to modify association for #{inspect}: one of the #{callback_type} hooks returned false") if raise_error
-              return false
+              raise(HookFailed, "Unable to modify association for #{inspect}: one of the #{callback_type} hooks returned false")
             end
           end
+        rescue HookFailed
+          return false unless raise_error
+          raise
         end
 
         # Set the given object as the associated object for the given *_to_one association reflection

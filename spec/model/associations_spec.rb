@@ -672,13 +672,26 @@ describe Sequel::Model, "many_to_one" do
   end
 
   it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
-    # The reason for this is that assignment in ruby always returns the argument instead of the result
-    # of the method, so we can't return nil to signal that the association callback prevented the modification
     p = @c2.new
     c = @c2.load(:id=>123)
     p.raise_on_save_failure = false
     @c2.many_to_one :parent, :class => @c2, :before_set=>:bs
     def p.bs(x) false end
+    p.should_not_receive(:_parent=)
+    proc{p.parent = c}.should raise_error(Sequel::HookFailed)
+    
+    p.parent.should == nil
+    p.associations[:parent] = c
+    p.parent.should == c
+    proc{p.parent = nil}.should raise_error(Sequel::HookFailed)
+  end
+
+  it "should raise error and not call internal add or remove method if before callback calls cancel_action, even if raise_on_save_failure is false" do
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.many_to_one :parent, :class => @c2, :before_set=>:bs
+    def p.bs(x) cancel_action end
     p.should_not_receive(:_parent=)
     proc{p.parent = c}.should raise_error(Sequel::HookFailed)
     
@@ -1095,13 +1108,26 @@ describe Sequel::Model, "one_to_one" do
   end
 
   it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
-    # The reason for this is that assignment in ruby always returns the argument instead of the result
-    # of the method, so we can't return nil to signal that the association callback prevented the modification
     p = @c2.load(:id=>321)
     c = @c2.load(:id=>123)
     p.raise_on_save_failure = false
     @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
     def p.bs(x) false end
+    p.should_not_receive(:_parent=)
+    proc{p.parent = c}.should raise_error(Sequel::HookFailed)
+    
+    p.associations[:parent].should == nil
+    p.associations[:parent] = c
+    p.parent.should == c
+    proc{p.parent = nil}.should raise_error(Sequel::HookFailed)
+  end
+
+  it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
+    p = @c2.load(:id=>321)
+    c = @c2.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
+    def p.bs(x) cancel_action end
     p.should_not_receive(:_parent=)
     proc{p.parent = c}.should raise_error(Sequel::HookFailed)
     
@@ -1858,6 +1884,39 @@ describe Sequel::Model, "one_to_many" do
     p.attributes.should == []
     p.associations[:attributes] = [c]
     p.should_receive(:br).once.with(c).and_return(false)
+    p.remove_attribute(c).should == nil
+    p.attributes.should == [c]
+  end
+
+  it "should raise error and not call internal add or remove method if before callback calls cancel_action if raise_on_save_failure is true" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    @c2.one_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    def p.ba(o); cancel_action; end
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    proc{p.add_attribute(c)}.should raise_error(Sequel::HookFailed)
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    def p.br(o); cancel_action; end
+    proc{p.remove_attribute(c)}.should raise_error(Sequel::HookFailed)
+    p.attributes.should == [c]
+  end
+
+  it "should return nil and not call internal add or remove method if before callback calls cancel_action if raise_on_save_failure is false" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.one_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    def p.ba(o); cancel_action; end
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    p.add_attribute(c).should == nil
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    def p.br(o); cancel_action; end
     p.remove_attribute(c).should == nil
     p.attributes.should == [c]
   end
@@ -2663,6 +2722,41 @@ describe Sequel::Model, "many_to_many" do
     p.attributes.should == []
     p.associations[:attributes] = [c]
     p.should_receive(:br).once.with(c).and_return(false)
+    p.remove_attribute(c).should == nil
+    p.attributes.should == [c]
+  end
+
+  it "should raise error and not call internal add or remove method if before callback calls cancel_action if raise_on_save_failure is true" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    @c2.many_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    def p.ba(o) cancel_action end
+    p.should_receive(:ba).once.with(c).and_return(false)
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    p.raise_on_save_failure = true
+    proc{p.add_attribute(c)}.should raise_error(Sequel::HookFailed)
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    def p.br(o) cancel_action end
+    proc{p.remove_attribute(c)}.should raise_error(Sequel::HookFailed)
+    p.attributes.should == [c]
+  end
+
+  it "should return nil and not call internal add or remove method if before callback calls cancel_action if raise_on_save_failure is false" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.many_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    def p.ba(o) cancel_action end
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    p.add_attribute(c).should == nil
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    def p.br(o) cancel_action end
     p.remove_attribute(c).should == nil
     p.attributes.should == [c]
   end
