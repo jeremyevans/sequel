@@ -732,19 +732,19 @@ module Sequel
         return naked.to_hash_groups(key_column, value_column) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
-            each{|r| (h[r.values_at(*key_column)] ||= []) << r.values_at(*value_column)}
+            each{|r| (h[r.values.values_at(*key_column)] ||= []) << r.values.values_at(*value_column)}
           else
-            each{|r| (h[r[key_column]] ||= []) << r.values_at(*value_column)}
+            each{|r| (h[r[key_column]] ||= []) << r.values.values_at(*value_column)}
           end
         else
           if key_column.is_a?(Array)
-            each{|r| (h[r.values_at(*key_column)] ||= []) << r[value_column]}
+            each{|r| (h[r.values.values_at(*key_column)] ||= []) << r[value_column]}
           else
             each{|r| (h[r[key_column]] ||= []) << r[value_column]}
           end
         end
       elsif key_column.is_a?(Array)
-        each{|r| (h[r.values_at(*key_column)] ||= []) << r}
+        each{|r| (h[r.values.values_at(*key_column)] ||= []) << r}
       else
         each{|r| (h[r[key_column]] ||= []) << r}
       end
