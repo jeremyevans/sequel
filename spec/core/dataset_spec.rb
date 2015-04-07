@@ -1758,6 +1758,17 @@ describe "Dataset#to_hash" do
     @d.to_hash(:b).should == {4 => {:a => 2, :b => 4}, 8 => {:a => 6, :b => 8}, 12 => {:a => 10, :b => 12}}
     @d.to_hash([:a, :b]).should == {[2, 4] => {:a => 2, :b => 4}, [6, 8] => {:a => 6, :b => 8}, [10, 12] => {:a => 10, :b => 12}}
   end
+
+  specify "should handle a single composite key when using a row_proc" do
+    c = @d.row_proc = Class.new do
+      def self.call(h); new(h); end
+      def initialize(h); @h = h; end
+      def [](k) @h[k]; end
+      def h; @h; end
+      def ==(o) @h == o.h; end
+    end
+    @d.to_hash([:a, :b]).should == {[1, 2] => c.call(:a => 1, :b => 2), [3, 4] => c.call(:a => 3, :b => 4), [5, 6] => c.call(:a => 5, :b => 6)}
+  end
 end
 
 describe "Dataset#to_hash_groups" do
@@ -1796,6 +1807,17 @@ describe "Dataset#to_hash_groups" do
     @d.to_hash_groups(:a).should == {2 => [{:a => 2, :b => 4}, {:a => 2, :b => 12}], 6 => [{:a => 6, :b => 8}], 14 => [{:a => 14, :b => 8}]}
     @d.to_hash_groups(:b).should == {4 => [{:a => 2, :b => 4}], 8 => [{:a => 6, :b => 8}, {:a => 14, :b => 8}], 12 => [{:a => 2, :b => 12}]}
     @d.to_hash_groups([:a, :b]).should == {[2, 4] => [{:a => 2, :b => 4}], [6, 8] => [{:a => 6, :b => 8}], [2, 12] => [{:a => 2, :b => 12}], [14, 8] => [{:a => 14, :b => 8}]}
+  end
+
+  specify "should handle a single composite key when using a row_proc" do
+    c = @d.row_proc = Class.new do
+      def self.call(h); new(h); end
+      def initialize(h); @h = h; end
+      def [](k) @h[k]; end
+      def h; @h; end
+      def ==(o) @h == o.h; end
+    end
+    @d.to_hash_groups([:a, :b]).should == {[1, 2] => [c.call(:a => 1, :b => 2)], [3, 4] => [c.call(:a => 3, :b => 4)], [1, 6] => [c.call(:a => 1, :b => 6)], [7, 4] => [c.call(:a => 7, :b => 4)]}
   end
 end
 

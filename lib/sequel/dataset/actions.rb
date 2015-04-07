@@ -701,7 +701,7 @@ module Sequel
           end
         end
       elsif key_column.is_a?(Array)
-        each{|r| h[r.values_at(*key_column)] = r}
+        each{|r| h[key_column.map{|k| r[k]}] = r}
       else
         each{|r| h[r[key_column]] = r}
       end
@@ -744,7 +744,7 @@ module Sequel
           end
         end
       elsif key_column.is_a?(Array)
-        each{|r| (h[r.values_at(*key_column)] ||= []) << r}
+        each{|r| (h[key_column.map{|k| r[k]}] ||= []) << r}
       else
         each{|r| (h[r[key_column]] ||= []) << r}
       end

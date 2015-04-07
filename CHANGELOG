@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#to_hash and #to_hash_groups handle single array argument for model datasets (jeremyevans)
+
 * Handle Model#cancel_action in association before hooks (jeremyevans)
 
 * Use a conditional variable instead of busy waiting in the threaded connection pools on ruby 1.9+ (jeremyevans)
