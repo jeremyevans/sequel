@@ -3,7 +3,7 @@ Sequel.require 'adapters/shared/firebird'
 
 module Sequel
   # The Sequel Firebird adapter requires the ruby fb driver located at
-  # http://github.com/wishdev/fb.
+  # https://github.com/rowland/fb.
   module Firebird
     class Database < Sequel::Database
       include Sequel::Firebird::DatabaseMethods
