@@ -11,7 +11,9 @@ describe "Sequel::Plugins::AutoValidations" do
        [:name, {:primary_key=>false, :type=>:string, :allow_null=>false, :max_length=>50}],
        [:num, {:primary_key=>false, :type=>:integer, :allow_null=>true}],
        [:d, {:primary_key=>false, :type=>:date, :allow_null=>false}],
-       [:nnd, {:primary_key=>false, :type=>:string, :allow_null=>false, :ruby_default=>'nnd'}]]
+       [:nnrd, {:primary_key=>false, :type=>:string, :allow_null=>false, :ruby_default=>'nnrd'}],
+       [:nnd, {:primary_key=>false, :type=>:string, :allow_null=>false, :default=>'nnd'}],
+      ]
     end
     def db.supports_index_parsing?() true end
     def db.indexes(t, *)
@@ -20,7 +22,7 @@ describe "Sequel::Plugins::AutoValidations" do
       {:a=>{:columns=>[:name, :num], :unique=>true}, :b=>{:columns=>[:num], :unique=>false}}
     end
     @c = Class.new(Sequel::Model(db[:test]))
-    @c.send(:def_column_accessor, :id, :name, :num, :d, :nnd)
+    @c.send(:def_column_accessor, :id, :name, :num, :d, :nnd, :nnrd)
     @c.raise_on_typecast_failure = false
     @c.plugin :auto_validations
     @m = @c.new
@@ -68,10 +70,12 @@ describe "Sequel::Plugins::AutoValidations" do
   end
 
   it "should automatically validate explicit nil values for columns with not nil defaults" do
-    @m.set(:d=>Date.today, :name=>1, :nnd=>nil)
+    @m.set(:d=>Date.today, :name=>1, :nnd=>nil, :nnrd=>nil)
     @m.id = nil
     @m.valid?.should == false
-    @m.errors.should == {:id=>["is not present"], :nnd=>["is not present"]}
+    @m.errors.should == {
+      :id=>["is not present"], :nnd=>["is not present"], :nnrd=>["is not present"]
+    }
   end
 
   it "should allow skipping validations by type" do

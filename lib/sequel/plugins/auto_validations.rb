@@ -109,7 +109,10 @@ module Sequel
 
         # Parse the database schema and indexes and record the columns to automatically validate.
         def setup_auto_validations
-          not_null_cols, explicit_not_null_cols = db_schema.select{|col, sch| sch[:allow_null] == false}.partition{|col, sch| sch[:ruby_default].nil?}.map{|cs| cs.map{|col, sch| col}}
+          not_null_cols, explicit_not_null_cols =
+                 db_schema.select{|col, sch| sch[:allow_null] == false}
+                   .partition{|col, sch| sch[:default].nil? && sch[:ruby_default].nil?}
+                   .map{|cs| cs.map{|col, sch| col}}
           @auto_validate_not_null_columns = not_null_cols - Array(primary_key)
           explicit_not_null_cols += Array(primary_key)
           @auto_validate_explicit_not_null_columns = explicit_not_null_cols.uniq
