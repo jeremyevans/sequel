@@ -387,4 +387,24 @@ describe "pg_array extension" do
     @db.schema_type_class(:banana_array).should == Sequel::Postgres::PGArray
     @db.schema_type_class(:integer).should == Integer
   end
+
+  it "should set a ruby_default for array types" do
+    @db.send(:column_schema_to_ruby_default,
+             "'{foo,bar}'::character varying", :varchar_array
+            ).should == @m::PGArray.new(['foo', 'bar'], :varchar)
+
+    @db.send(:column_schema_to_ruby_default,
+             "'{1,2,3}'::integer", :integer_array
+            ).should == @m::PGArray.new([1,2,3], :integer)
+  end
+
+  it "should reject garbage array defaults" do
+    @db.send(:column_schema_to_ruby_default,
+             "'{1,2,3'::integer", :integer_array
+            ).should == nil
+
+    @db.send(:column_schema_to_ruby_default,
+             "'{foo,bar'::character varying", :varchar_array
+            ).should == nil
+  end
 end
