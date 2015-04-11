@@ -397,4 +397,14 @@ describe "pg_array extension" do
              "'{1,2,3}'::integer", :integer_array
             ).should == @m::PGArray.new([1,2,3], :integer)
   end
+
+  it "should reject garbage array defaults" do
+    @db.send(:column_schema_to_ruby_default,
+             "'{1,2,3'::integer", :integer_array
+            ).should == nil
+
+    @db.send(:column_schema_to_ruby_default,
+             "'{foo,bar'::character varying", :varchar_array
+            ).should == nil
+  end
 end

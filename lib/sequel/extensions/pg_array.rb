@@ -168,6 +168,7 @@ module Sequel
         typecast_method_map[db_type] = :"#{type}_array"
 
         define_array_typecast_method(mod, type, creator, opts.fetch(:scalar_typecast, type))
+        define_array_create_method(mod, type, creator)
 
         if oid = opts[:oid]
           type_procs[oid] = creator
@@ -176,6 +177,15 @@ module Sequel
         nil
       end
 
+      def self.define_array_create_method(mod, type, creator)
+        mod.class_eval do
+          meth = :"create_#{type}_array_from_default"
+          define_method(meth){|v| creator.call(v) }
+          private meth
+        end
+      end
+      private_class_method :define_array_create_method
+      
       # Define a private array typecasting method in the given module for the given type that uses
       # the creator argument to do the type conversion.
       def self.define_array_typecast_method(mod, type, creator, scalar_typecast)
@@ -307,7 +317,8 @@ module Sequel
         def column_schema_default_to_ruby_value(default, type)
           case type
           when *ARRAY_TYPES.values
-            Creator.new(type).call(default)
+            meth = "create_#{type}_from_default"
+            send(meth, default)
           else
             super
           end
