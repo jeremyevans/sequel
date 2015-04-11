@@ -300,6 +300,19 @@ module Sequel
           end
         end
 
+        def column_schema_default_string_type?(type)
+          ARRAY_TYPES.values.include?(type) || super
+        end
+
+        def column_schema_default_to_ruby_value(default, type)
+          case type
+          when *ARRAY_TYPES.values
+            Creator.new(type).call(default)
+          else
+            super
+          end
+        end
+
         # Given a value to typecast and the type of PGArray subclass:
         # * If given a PGArray with a matching array_type, use it directly.
         # * If given a PGArray with a different array_type, return a PGArray
