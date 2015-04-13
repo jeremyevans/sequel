@@ -94,13 +94,13 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |s|
           i = -1
-          cols = s.columns(true).map{|c| [output_identifier(c.name), i+=1]}
+          cols = s.columns(true).map{|c| [output_identifier(c.name), c.type, i+=1]}
           columns = cols.map{|c| c.at(0)}
           @columns = columns
           if rows = s.fetch_all
             rows.each do |row|
               hash = {}
-              cols.each{|n,j| hash[n] = convert_odbc_value(row[j])}
+              cols.each{|n,t,j| hash[n] = convert_odbc_value(row[j], t)}
               yield hash
             end
           end
@@ -110,22 +110,22 @@ module Sequel
       
       private
 
-      def convert_odbc_value(v)
+      def convert_odbc_value(v, t)
         # When fetching a result set, the Ruby ODBC driver converts all ODBC 
         # SQL types to an equivalent Ruby type; with the exception of
         # SQL_TYPE_DATE, SQL_TYPE_TIME and SQL_TYPE_TIMESTAMP.
         #
         # The conversions below are consistent with the mappings in
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
-        case v
-        when ::ODBC::TimeStamp
+        case
+        when v.class == ::ODBC::TimeStamp
           db.to_application_timestamp([v.year, v.month, v.day, v.hour, v.minute, v.second, v.fraction])
-        when ::ODBC::Time
+        when v.class == ::ODBC::Time
           Sequel::SQLTime.create(v.hour, v.minute, v.second)
-        when ::ODBC::Date
+        when v.class == ::ODBC::Date
           Date.new(v.year, v.month, v.day)
         else
-          v
+          t === ::ODBC::SQL_BIT ? v === 1 : v
         end
       end
       
