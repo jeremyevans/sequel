@@ -15,6 +15,10 @@ if RUBY_VERSION < '1.9.3'
   gem "i18n", '<0.7.0'
 end
 
+if RUBY_VERSION < '1.9.0'
+  gem "fastercsv"
+end
+
 # MRI/Rubinius Adapter Dependencies
 platforms :ruby do
   gem "sqlite3"
