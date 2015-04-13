@@ -1,9 +1,5 @@
 if RUBY_VERSION < "1.9"
-  begin
-    require 'fastercsv'
-  rescue LoadError
-    warn("plugin csv_serializer requires either ruby>=1.9 or fastercsv")
-  end
+  require 'fastercsv'
 else
   require 'csv'
 end
@@ -12,8 +8,8 @@ module Sequel
   module Plugins
     # csv_serializer handles serializing entire Sequel::Model objects to CSV,
     # as well as support for deserializing CSV directly into Sequel::Model
-    # objects.  It requires either the csv standard library from ruby >= 1.9,
-    # or the fastercsv gem.
+    # objects.  It requires either the csv standard library when usnig ruby 1.9+,
+    # or the fastercsv gem when using ruby 1.8.
     #
     # Basic Example:
     #
@@ -82,73 +78,32 @@ module Sequel
         end
       end
 
-      # Convert the options hash to one that can be passed to CSV.new
-      def self.process_opts(model, opts = {}, columns = model.columns)
-        opts = (model.csv_serializer_opts || {}).merge(opts)
-        headers = if opts[:only].is_a?(Array)
-                    opts.delete(:only)
-                  elsif opts[:only].is_a?(Symbol)
-                    [opts.delete(:only)]
-                  elsif opts[:headers].is_a?(Array)
-                    opts[:headers]
-                  else
-                    columns
-                  end
-        headers += Array(opts.delete(:include))
-        headers -= Array(opts.delete(:except))
-        opts = opts.merge(:headers=>headers)
-        Array(opts.delete(:except)).each { |header| headers.delete(header) }
-        opts
-      end
-
       module ClassMethods
         # The default opts to use when serializing model objects to CSV
         attr_reader :csv_serializer_opts
 
-        # Attempt to parse a single instance from the given CSV string
-        def from_csv(csv, opts = {})
-          values_hash = hash_from_csv(csv, opts)
-          instance = new
-          instance.set(values_hash)
-          instance
-        end
-
-        # Attempt to parse a single line of CSV into a hash which can be
-        # converted to a Sequel::Model instance
-        def hash_from_csv(csv, opts = {})
-          opts = CsvSerializer.process_opts(self, opts)
-
-          types = {}
-          db_schema.each_pair { |k, v| types[k] = v[:type] }
-
-          values_hash = {}
-          CSV.parse_line(csv, opts).to_hash.each_pair do |k, v|
-            next if v.nil? || k.nil?
-
-            value = if types[k]
-                      db.send(:column_schema_default_to_ruby_value, v, types[k])
-                    else
-                      v
-                    end
-
-            values_hash[k] = value
-          end
-          values_hash
-        end
-
         # Attempt to parse an array of instances from the given CSV string
         def array_from_csv(csv, opts = {})
-          opts = CsvSerializer.process_opts(self, opts)
-
-          instances = []
-          CSV.parse(csv, opts) do |row|
-            instance = new
-            row.to_hash.each_pair do |k, v|
-              instance.send(:"#{k}=", v)
-            end
-            instances << instance
+          CSV.parse(csv, process_csv_serializer_opts(opts)).map do |row|
+            row = row.to_hash
+            row.delete(nil)
+            new(row)
           end
-          instances
+        end
+
+        # Attempt to parse a single instance from the given CSV string
+        def from_csv(csv, opts = {})
+          new.from_csv(csv, opts)
+        end
+
+        # Convert the options hash to one that can be passed to CSV.
+        def process_csv_serializer_opts(opts)
+          opts = (csv_serializer_opts || {}).merge(opts)
+          opts_cols = opts.delete(:columns)
+          opts_include = opts.delete(:include)
+          opts_except = opts.delete(:except)
+          opts[:headers] ||= Array(opts.delete(:only) || opts_cols || columns) + Array(opts_include) - Array(opts_except)
+          opts
         end
 
         Plugins.inherited_instance_variables(
@@ -161,13 +116,17 @@ module Sequel
           end)
 
         Plugins.def_dataset_methods(self, :to_csv)
-      end # module ClassMethods
+      end
 
       module InstanceMethods
-        # Parse the provided CSV
+        # Update the object using the data provided in the first line in CSV. Options:
+        #
+        # :headers :: The headers to use for the CSV line. Use nil for a header
+        #             to specify the column should be ignored.
         def from_csv(csv, opts = {})
-          values_hash = self.class.hash_from_csv(csv, opts)
-          set(values_hash)
+          row = CSV.parse_line(csv, model.process_csv_serializer_opts(opts)).to_hash
+          row.delete(nil)
+          set(row)
         end
 
         # Return a string in CSV format.  Accepts the same options as CSV.new,
@@ -180,13 +139,13 @@ module Sequel
         # :include :: Symbol or Array of Symbols specifying non-column
         #             attributes to include in the CSV output.
         def to_csv(opts = {})
-          opts = CsvSerializer.process_opts(model, opts)
+          opts = model.process_csv_serializer_opts(opts)
 
           CSV.generate(opts) do |csv|
-            csv << opts[:headers].map { |k| send(k) }
+            csv << opts[:headers].map{|k| send(k)}
           end
         end
-      end # module InstanceMethods
+      end
 
       module DatasetMethods
         # Return a CSV string representing an array of all objects in this
@@ -197,16 +156,16 @@ module Sequel
         # :array :: An array of instances.  If this is not provided, calls #all
         #           on the receiver to get the array.
         def to_csv(opts = {})
-          opts = CsvSerializer.process_opts(model, opts, columns)
+          opts = model.process_csv_serializer_opts({:columns=>columns}.merge(opts))
           items = opts.delete(:array) || self
 
           CSV.generate(opts) do |csv|
             items.each do |object|
-              csv << opts[:headers].map { |header| object[header] }
+              csv << opts[:headers].map{|header| object[header]}
             end
           end
         end
-      end # module DatasetMethods
-    end # module CsvSerializer
-  end # module Plugins
-end # module Sequel
+      end
+    end
+  end
+end
