@@ -166,7 +166,7 @@ module Sequel
       end
 
       cols.each do |_,c|
-        c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])
+        c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type]) unless c.has_key?(:ruby_default)
         if c[:primary_key] && !auto_increment_set
           # If adapter didn't set it, assume that integer primary keys are auto incrementing
           c[:auto_increment] = primary_keys == 1 && !!(c[:db_type] =~ /int/io)
