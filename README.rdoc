@@ -466,7 +466,7 @@ to select from a qualified table:
 
 === Identifier aliases
 
-You can also alias identifiers by using the triple undersecore special notation <tt>:column___alias</tt> or <tt>:table__column___alias</tt>:
+You can also alias identifiers by using the triple underscore special notation <tt>:column___alias</tt> or <tt>:table__column___alias</tt>:
 
   items.literal(:price___p)
   # price AS p
@@ -807,7 +807,7 @@ Sequel models also provide a +subset+ class method that creates a dataset method
 
 You can define a +validate+ method for your model, which +save+
 will check before attempting to save the model in the database.
-If an attribute of the model isn't valid, you should add a error
+If an attribute of the model isn't valid, you should add an error
 message for that attribute to the model object's +errors+. If an
 object has any errors added by the validate method, +save+ will
 raise an error or return false depending on how it is configured
