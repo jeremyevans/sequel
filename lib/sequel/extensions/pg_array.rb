@@ -300,6 +300,15 @@ module Sequel
           end
         end
 
+        # Convert ruby arrays to PostgreSQL arrays when used as default values.
+        def column_definition_default_sql(sql, column)
+          if (d = column[:default]) && d.is_a?(Array) && !Sequel.condition_specifier?(d)
+            sql << " DEFAULT (#{literal(Sequel.pg_array(d))}::#{type_literal(column)})"
+          else
+            super
+          end
+        end
+
         # Given a value to typecast and the type of PGArray subclass:
         # * If given a PGArray with a matching array_type, use it directly.
         # * If given a PGArray with a different array_type, return a PGArray

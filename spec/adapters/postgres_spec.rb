@@ -2162,6 +2162,23 @@ describe 'PostgreSQL array handling' do
     end
   end
 
+  specify 'convert ruby array :default values' do
+    @db.create_table!(:items) do
+      column :n, 'integer[]', :default=>[]
+    end
+    @ds.insert
+    @ds.count.should == 1
+    if @native
+      rs = @ds.all
+      rs.should == [{:n=>[]}]
+      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
+      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      @ds.delete
+      @ds.insert(rs.first)
+      @ds.all.should == rs
+    end
+  end
+
   specify 'insert and retrieve custom array types' do
     int2vector = Class.new do
       attr_reader :array

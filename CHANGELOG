@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow :default value for PostgreSQL array columns to be a ruby array when using the pg_array extension (jeremyevans) (#989)
+
 * Add csv_serializer plugin for serializing model objects to and from csv (bjmllr, jeremyevans) (#988)
 
 * Make Dataset#to_hash and #to_hash_groups handle single array argument for model datasets (jeremyevans)

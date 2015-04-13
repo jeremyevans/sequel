@@ -387,4 +387,9 @@ describe "pg_array extension" do
     @db.schema_type_class(:banana_array).should == Sequel::Postgres::PGArray
     @db.schema_type_class(:integer).should == Integer
   end
+
+  it "should convert ruby arrays to pg arrays as :default option values" do
+    @db.create_table('a'){column :b, 'c[]', :default=>[]; Integer :d}
+    @db.sqls.should == ['CREATE TABLE a (b c[] DEFAULT (ARRAY[]::c[]), d integer)']
+  end
 end
