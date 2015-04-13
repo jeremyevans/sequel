@@ -91,7 +91,8 @@ module Sequel
     #
     # :allow_null :: Whether NULL is an allowed value for the column.
     # :db_type :: The database type for the column, as a database specific string.
-    # :default :: The database default for the column, as a database specific string.
+    # :default :: The database default for the column, as a database specific string, or nil if there is
+    #             no default value.
     # :primary_key :: Whether the columns is a primary key column.  If this column is not present,
     #                 it means that primary key information is unavailable, not that the column
     #                 is not a primary key.
