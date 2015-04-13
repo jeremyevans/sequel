@@ -113,6 +113,13 @@ describe "Database schema parser" do
     DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
+  specify "should make :default nil for a NULL default" do
+    DB.create_table!(:items){Integer :number}
+    DB.schema(:items).first.last[:default].should == nil
+    DB.create_table!(:items){Integer :number, :default=>0}
+    DB.schema(:items).first.last[:default].should_not == nil
+  end
+
   specify "should parse current timestamp defaults from the schema properly" do
     DB.create_table!(:items){Time :a, :default=>Sequel::CURRENT_TIMESTAMP}
     DB.schema(:items).first.last[:ruby_default].should == Sequel::CURRENT_TIMESTAMP

@@ -1,5 +1,7 @@
 === HEAD
 
+* Set :default schema option to nil when adapter can determine that the value is nil (jeremyevans) (#990)
+
 * Do not add a schema :max_length entry for a varchar(max) column on MSSQL (jeremyevans)
 
 * Allow :default value for PostgreSQL array columns to be a ruby array when using the pg_array extension (jeremyevans) (#989)
