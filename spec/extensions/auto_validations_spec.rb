@@ -11,7 +11,7 @@ describe "Sequel::Plugins::AutoValidations" do
        [:name, {:primary_key=>false, :type=>:string, :allow_null=>false, :max_length=>50}],
        [:num, {:primary_key=>false, :type=>:integer, :allow_null=>true}],
        [:d, {:primary_key=>false, :type=>:date, :allow_null=>false}],
-       [:nnd, {:primary_key=>false, :type=>:string, :allow_null=>false, :ruby_default=>'nnd'}]]
+       [:nnd, {:primary_key=>false, :type=>:string, :allow_null=>false, :default=>'nnd'}]]
     end
     def db.supports_index_parsing?() true end
     def db.indexes(t, *)

@@ -1,6 +1,8 @@
 === HEAD
 
-* Set :default schema option to nil when adapter can determine that the value is nil (jeremyevans) (#990)
+* Make :auto_validations plugin check :default entry instead of :ruby_default entry for checking existence of default value (jeremyevans) (#990)
+
+* Adapters should now set :default schema option to nil when adapter can determine that the value is nil (jeremyevans)
 
 * Do not add a schema :max_length entry for a varchar(max) column on MSSQL (jeremyevans)
 
