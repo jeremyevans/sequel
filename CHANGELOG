@@ -1,5 +1,7 @@
 === HEAD
 
+* Do not add a schema :max_length entry for a varchar(max) column on MSSQL (jeremyevans)
+
 * Allow :default value for PostgreSQL array columns to be a ruby array when using the pg_array extension (jeremyevans) (#989)
 
 * Add csv_serializer plugin for serializing model objects to and from csv (bjmllr, jeremyevans) (#988)

@@ -466,7 +466,7 @@ module Sequel
           else
             schema_column_type(row[:db_type])
           end
-          row[:max_length] = row[:max_chars] if row[:type] == :string
+          row[:max_length] = row[:max_chars] if row[:type] == :string && row[:max_chars] >= 0
           [m.call(row.delete(:column)), row]
         end
       end
