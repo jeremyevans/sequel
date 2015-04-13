@@ -355,7 +355,7 @@ describe "Bound Argument Types" do
     @ds.filter(:s=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:s])[:s].should == @vs[:s]
   end
 
-  cspecify "should handle boolean type", [:do, :sqlite], [:odbc, :mssql], [:jdbc, :sqlite], [:jdbc, :db2], :oracle do
+  cspecify "should handle boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:jdbc, :db2], :oracle do
     @ds.filter(:b=>:$x).prepare(:first, :ps_string).call(:x=>@vs[:b])[:b].should == @vs[:b]
   end
 end
