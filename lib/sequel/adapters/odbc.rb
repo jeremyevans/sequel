@@ -117,15 +117,19 @@ module Sequel
         #
         # The conversions below are consistent with the mappings in
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
-        case
-        when v.class == ::ODBC::TimeStamp
+        case v
+        when ::ODBC::TimeStamp
           db.to_application_timestamp([v.year, v.month, v.day, v.hour, v.minute, v.second, v.fraction])
-        when v.class == ::ODBC::Time
+        when ::ODBC::Time
           Sequel::SQLTime.create(v.hour, v.minute, v.second)
-        when v.class == ::ODBC::Date
+        when ::ODBC::Date
           Date.new(v.year, v.month, v.day)
         else
-          t === ::ODBC::SQL_BIT ? v === 1 : v
+          if t == ::ODBC::SQL_BIT
+            v == 1
+          else
+            v
+          end
         end
       end
       
