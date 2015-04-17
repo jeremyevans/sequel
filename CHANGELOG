@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::MassAssignmentRestriction exception, raised for mass assignment errors in strict mode (jeremyevans) (#994)
+
 * Handle ODBC::SQL_BIT type as boolean in the odbc adapter, fixing boolean handling on odbc/mssql (jrgns) (#993)
 
 * Make :auto_validations plugin check :default entry instead of :ruby_default entry for checking existence of default value (jeremyevans) (#990)

@@ -2130,12 +2130,12 @@ module Sequel
             # Avoid using respond_to? or creating symbols from user input
             if public_methods.map(&:to_s).include?(m)
               if Array(model.primary_key).map(&:to_s).member?(k.to_s) && model.restrict_primary_key?
-                raise Error, "#{k} is a restricted primary key"
+                raise MassAssignmentRestriction, "#{k} is a restricted primary key"
               else
-                raise Error, "#{k} is a restricted column"
+                raise MassAssignmentRestriction, "#{k} is a restricted column"
               end
             else
-              raise Error, "method #{m} doesn't exist"
+              raise MassAssignmentRestriction, "method #{m} doesn't exist"
             end
           end
         end

@@ -20,6 +20,10 @@ module Sequel
   
   # Raised when an undefined association is used when eager loading.
   UndefinedAssociation = Class.new(Error)
+
+  # Raised when a mass assignment method is called in strict mode with either a restricted column
+  # or a column without a setter method.
+  MassAssignmentRestriction = Class.new(Error)
   
   # Exception class raised when +raise_on_save_failure+ is set and validation fails
   class ValidationFailed < Error

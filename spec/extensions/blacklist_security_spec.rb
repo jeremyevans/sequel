@@ -16,8 +16,8 @@ describe Sequel::Model, "#(set|update)_except" do
 
   it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
     @c.strict_param_setting = true
-    proc{@c.new.set_except({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::Error)
-    proc{@c.new.set_except({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::Error)
+    proc{@c.new.set_except({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@c.new.set_except({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
     (o = @c.new).set_except({:z => 3}, :x, :y)
     o.values.should == {:z=>3}
   end

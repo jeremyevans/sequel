@@ -157,7 +157,7 @@ describe "Sequel::Plugins::JsonSerializer" do
 
   it "should raise an exception for json keys that aren't associations, columns, or setter methods" do
     Album.send(:undef_method, :blah=)
-    proc{Album.from_json(@album.to_json(:include=>:blah))}.should raise_error(Sequel::Error)
+    proc{Album.from_json(@album.to_json(:include=>:blah))}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should support a to_json class and dataset method" do
@@ -269,7 +269,7 @@ describe "Sequel::Plugins::JsonSerializer" do
 
   it "should raise an error if attempting to set a restricted column and :all_columns is not used" do
     Artist.restrict_primary_key
-    proc{Artist.from_json(@artist.to_json)}.should raise_error(Sequel::Error)
+    proc{Artist.from_json(@artist.to_json)}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should raise an error if an unsupported association is passed in the :associations option" do

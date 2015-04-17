@@ -1020,24 +1020,24 @@ describe Sequel::Model, "#set" do
 
   it "should raise error if strict_param_setting is true and method does not exist" do
     @o1.strict_param_setting = true
-    proc{@o1.set('foo' => 1)}.should raise_error(Sequel::Error)
+    proc{@o1.set('foo' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should raise error if strict_param_setting is true and column is a primary key" do
     @o1.strict_param_setting = true
-    proc{@o1.set('id' => 1)}.should raise_error(Sequel::Error)
+    proc{@o1.set('id' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should raise error if strict_param_setting is true and column is restricted" do
     @o1.strict_param_setting = true
     @c.set_allowed_columns
-    proc{@o1.set('x' => 1)}.should raise_error(Sequel::Error)
+    proc{@o1.set('x' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should not create a symbol if strict_param_setting is true and string is given" do
     @o1.strict_param_setting = true
     l = Symbol.all_symbols.length
-    proc{@o1.set('sadojafdso' => 1)}.should raise_error(Sequel::Error)
+    proc{@o1.set('sadojafdso' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
     Symbol.all_symbols.length.should == l
   end
 
@@ -1283,12 +1283,12 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
     @c.strict_param_setting = true
 
-    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_after_commit_rollback => false)}.should raise_error(Sequel::Error)
+    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_after_commit_rollback => false)}.should raise_error(Sequel::MassAssignmentRestriction)
     (o = @c.new).set_all(:x => 1, :y => 2, :z=>3)
     o.values.should == {:x => 1, :y => 2, :z=>3}
 
-    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::Error)
-    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::Error)
+    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
     (o = @c.new).set_only({:x => 1, :y => 2}, :x, :y)
     o.values.should == {:x => 1, :y => 2}
   end

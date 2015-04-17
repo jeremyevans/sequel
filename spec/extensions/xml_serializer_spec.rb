@@ -149,7 +149,7 @@ describe "Sequel::Plugins::XmlSerializer" do
 
   it "should raise an exception for xml tags that aren't associations, columns, or setter methods" do
     Album.send(:undef_method, :blah=)
-    proc{Album.from_xml(@album.to_xml(:include=>:blah))}.should raise_error(Sequel::Error)
+    proc{Album.from_xml(@album.to_xml(:include=>:blah))}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should support a to_xml class and dataset method" do
@@ -184,7 +184,7 @@ describe "Sequel::Plugins::XmlSerializer" do
 
   it "should raise an error if attempting to set a restricted column and :all_columns is not used" do
     Artist.restrict_primary_key
-    proc{Artist.from_xml(@artist.to_xml)}.should raise_error(Sequel::Error)
+    proc{Artist.from_xml(@artist.to_xml)}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should raise an error if an unsupported association is passed in the :associations option" do
@@ -193,7 +193,7 @@ describe "Sequel::Plugins::XmlSerializer" do
   end
 
   it "should raise an error if using from_xml and XML represents an array" do
-    proc{Artist.from_xml(Artist.to_xml(:array=>[@artist]))}.should raise_error(Sequel::Error)
+    proc{Artist.from_xml(Artist.to_xml(:array=>[@artist]))}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should raise an error if using array_from_xml and XML does not represent an array" do

@@ -530,15 +530,15 @@ describe Sequel::Model, ".strict_param_setting" do
   end
 
   it "should raise an error if a missing/restricted column/method is accessed" do
-    proc{@c.new(:z=>1)}.should raise_error(Sequel::Error)
-    proc{@c.create(:z=>1)}.should raise_error(Sequel::Error)
+    proc{@c.new(:z=>1)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@c.create(:z=>1)}.should raise_error(Sequel::MassAssignmentRestriction)
     c = @c.new
-    proc{c.set(:z=>1)}.should raise_error(Sequel::Error)
-    proc{c.set_all(:use_after_commit_rollback => false)}.should raise_error(Sequel::Error)
-    proc{c.set_only({:x=>1}, :y)}.should raise_error(Sequel::Error)
-    proc{c.update(:z=>1)}.should raise_error(Sequel::Error)
-    proc{c.update_all(:use_after_commit_rollback=>false)}.should raise_error(Sequel::Error)
-    proc{c.update_only({:x=>1}, :y)}.should raise_error(Sequel::Error)
+    proc{c.set(:z=>1)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{c.set_all(:use_after_commit_rollback => false)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{c.set_only({:x=>1}, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{c.update(:z=>1)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{c.update_all(:use_after_commit_rollback=>false)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{c.update_only({:x=>1}, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should be disabled by strict_param_setting = false" do

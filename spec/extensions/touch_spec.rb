@@ -171,7 +171,7 @@ describe "Touch plugin" do
 
   specify "should raise an error if given a column argument in touch that doesn't exist" do
     @Artist.plugin :touch
-    proc{@a.touch(:x)}.should raise_error(Sequel::Error)
+    proc{@a.touch(:x)}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   specify "should raise an Error when a nonexistent association is given" do

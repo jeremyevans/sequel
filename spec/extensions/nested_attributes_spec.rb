@@ -433,7 +433,7 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     a.associations[:artist] = ar
     @Album.nested_attributes :artist
-    proc{a.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})}.should raise_error(Sequel::Error)
+    proc{a.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})}.should raise_error(Sequel::MassAssignmentRestriction)
     @Album.nested_attributes :artist, :destroy=>true
     proc{a.set(:artist_attributes=>{:id=>'20', :_delete=>'1'})}.should_not raise_error
   end
@@ -443,7 +443,7 @@ describe "NestedAttributes plugin" do
     ar = @Artist.load(:id=>20, :name=>'Ar')
     a.associations[:artist] = ar
     @Album.nested_attributes :artist
-    proc{a.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})}.should raise_error(Sequel::Error)
+    proc{a.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})}.should raise_error(Sequel::MassAssignmentRestriction)
     @Album.nested_attributes :artist, :remove=>true
     proc{a.set(:artist_attributes=>{:id=>'20', :_remove=>'1'})}.should_not raise_error
   end
@@ -545,7 +545,7 @@ describe "NestedAttributes plugin" do
   
   it "should not accept nested attributes unless explicitly specified" do
     @Artist.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
-    proc{@Artist.create({:name=>'Ar', :tags_attributes=>[{:name=>'T'}]})}.should raise_error(Sequel::Error)
+    proc{@Artist.create({:name=>'Ar', :tags_attributes=>[{:name=>'T'}]})}.should raise_error(Sequel::MassAssignmentRestriction)
     @db.sqls.should == []
   end
   
@@ -646,8 +646,8 @@ describe "NestedAttributes plugin" do
       "UPDATE tags SET name = 'T2' WHERE (id = 30)",
       "INSERT INTO tags (name) VALUES ('T3')",
       ["INSERT INTO at (album_id, tag_id) VALUES (10, 1)", "INSERT INTO at (tag_id, album_id) VALUES (1, 10)"])
-    proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
-    proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
+    proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should accept a proc for the :fields option that accepts the associated object and returns an array of fields" do
@@ -664,8 +664,8 @@ describe "NestedAttributes plugin" do
       "UPDATE tags SET name = 'T2' WHERE (id = 30)",
       "INSERT INTO tags (name) VALUES ('T3')",
       ["INSERT INTO at (album_id, tag_id) VALUES (10, 1)", "INSERT INTO at (tag_id, album_id) VALUES (1, 10)"])
-    proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
-    proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
+    proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should allow per-call options via the set_nested_attributes method" do
@@ -682,8 +682,8 @@ describe "NestedAttributes plugin" do
       "UPDATE tags SET name = 'T2' WHERE (id = 30)",
       "INSERT INTO tags (name) VALUES ('T3')",
       ["INSERT INTO at (album_id, tag_id) VALUES (10, 1)", "INSERT INTO at (tag_id, album_id) VALUES (1, 10)"])
-    proc{al.set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::Error)
-    proc{al.set_nested_attributes(:tags, [{:name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::Error)
+    proc{al.set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{al.set_nested_attributes(:tags, [{:name=>'T2', :number=>3}], :fields=>[:name])}.should raise_error(Sequel::MassAssignmentRestriction)
   end
 
   it "should have set_nested_attributes method raise error if called with a bad association" do
