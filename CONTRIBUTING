@@ -11,6 +11,11 @@ Issue Guidelines
    the problem, the full backtrace of any exception, and for issues
    involving database queries, an SQL log.
 
+3) Issues are generally closed as soon as the problem is considered
+   fixed.  However, discussion can still happen after the issue is
+   closed, and the issue will be reopened if additional evidence is
+   providing showing the issue still exists.
+
 Pull Request Guidelines
 -----------------------
 
@@ -37,3 +42,20 @@ Pull Request Guidelines
    supported by ruby 1.8.7, or specs that use features not supported
    by RSpec 1.3.  Please test on ruby 1.8.7 before submitting pull
    requests.
+
+7) Please do not submit pull requests for code that is not ready to
+   be merged.  Pull requests should not be used to "start a
+   convervation" about a possible code change.  If the pull
+   request requires a conversation, that conversation should take
+   place on the sequel-talk Google Group or IRC.
+
+8) Pull requests are generally closed as soon as it appears that the
+   branch will not be merged.  However, discussion about the code can
+   still happen after the pull request is closed, and the pull request
+   can be reopened if additional commits to the branch or other
+   changes make it likely that it will be merged.
+
+Code of Conduct
+---------------
+
+MINASWAN (Matz is nice and so we are nice)
