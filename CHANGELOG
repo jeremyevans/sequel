@@ -1,5 +1,7 @@
 === HEAD
 
+* Make tree plugin set reciprocal association for children association correctly (lpil, jeremyevans) (#995)
+
 * Add Sequel::MassAssignmentRestriction exception, raised for mass assignment errors in strict mode (jeremyevans) (#994)
 
 * Handle ODBC::SQL_BIT type as boolean in the odbc adapter, fixing boolean handling on odbc/mssql (jrgns) (#993)

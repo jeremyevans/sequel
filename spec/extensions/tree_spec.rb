@@ -23,6 +23,10 @@ describe Sequel::Model, "tree plugin" do
     @c.associations.sort_by{|x| x.to_s}.should == [:children, :parent]
   end
   
+  it "should define the correct reciprocals" do
+    @c.associations.sort_by{|x| x.to_s}.map{|x| @c.association_reflection(x).reciprocal}.should == [:parent, :children]
+  end
+  
   it "should define the correct associations when giving options" do
     klass(:children=>{:name=>:cs}, :parent=>{:name=>:p}).associations.sort_by{|x| x.to_s}.should == [:cs, :p]
   end
