@@ -43,7 +43,7 @@ module Sequel
         children = chi.fetch(:name, :children)
 
         par[:reciprocal] = children
-        chi[:recripocal] = parent
+        chi[:reciprocal] = parent
 
         model.many_to_one parent, par
         model.one_to_many children, chi
