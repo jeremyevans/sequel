@@ -159,7 +159,7 @@ module Sequel
           key = Array(skm[subclass]).dup
           sti_subclass_added(key)
           rp = dataset.row_proc
-          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(table_name, sk)=>key), :inherited=>true)
+          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(sd.first_source_alias, sk)=>key), :inherited=>true)
           subclass.instance_eval do
             dataset.row_proc = rp
             @sti_key = sk
