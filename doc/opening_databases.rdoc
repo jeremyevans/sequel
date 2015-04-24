@@ -445,6 +445,14 @@ The following additional options are supported:
 :readonly :: open database in read-only mode
 :timeout :: the busy timeout to use in milliseconds (default: 5000).
 
+Note that SQLite memory databases are restricted to a single connection by
+default.  This is because SQLite does not allow multiple connections to
+a single memory database.  For this reason, Sequel sets the maximum number
+of connections in the connection pool to 1 by default when an SQLite memory
+database is used.  Attempts to force the use of more than 1 connection
+can result in weird behavior, since the connections will be to separate
+memory databases.
+
 === swift
 
 swift is a ruby 1.9+ library, so you'll need to be running ruby 1.9+.  It
