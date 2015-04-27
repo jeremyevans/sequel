@@ -207,6 +207,7 @@ describe Sequel::Model, "single table inheritance plugin" do
       StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest2)
       StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
       StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+      StiTest3.sti_model_map.should == StiTest2.sti_model_map
 
       StiTest2.create.kind.should == 4
       StiTest3.create.kind.should == 5
