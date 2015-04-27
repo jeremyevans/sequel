@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't silently ignore :jdbc_properties Database option in jdbc adapter (jeremyevans)
+
 * Make tree plugin set reciprocal association for children association correctly (lpil, jeremyevans) (#995)
 
 * Add Sequel::MassAssignmentRestriction exception, raised for mass assignment errors in strict mode (jeremyevans) (#994)

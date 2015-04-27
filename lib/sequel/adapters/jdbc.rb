@@ -204,6 +204,7 @@ module Sequel
           args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
           begin
             JavaSQL::DriverManager.setLoginTimeout(opts[:login_timeout]) if opts[:login_timeout]
+            raise StandardError, "skipping regular connection" if opts[:jdbc_properties]
             JavaSQL::DriverManager.getConnection(*args)
           rescue JavaSQL::SQLException, NativeException, StandardError => e
             raise e unless driver
