@@ -393,28 +393,8 @@ module Sequel
         end
       end
       
-      # Methods for DB2 prepared statements using the native driver.
-      module PreparedStatementMethods
-        include Sequel::Dataset::UnnumberedArgumentMapper
-        
-        private
-        # Execute the prepared statement with arguments instead of the given SQL.
-        def execute(sql, opts=OPTS, &block)
-          super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
-        
-        # Execute the prepared statment with arguments instead of the given SQL.
-        def execute_dui(sql, opts=OPTS, &block)
-          super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
+      PreparedStatementMethods = prepared_statements_module(:prepare_bind, Sequel::Dataset::UnnumberedArgumentMapper)
 
-        # Execute the prepared statement with arguments instead of the given SQL.
-        def execute_insert(sql, opts=OPTS, &block)
-          super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
-
-      end
-      
       # Emulate support of bind arguments in called statements.
       def call(type, bind_arguments={}, *values, &block)
         ps = to_prepared_statement(type, values)

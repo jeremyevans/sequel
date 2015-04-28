@@ -33,7 +33,9 @@ module Sequel
               ds = ds.server?(server)
               ds
             end
-            eo = eo.merge(:eager_block=>set_server)
+            eo = Hash[eo]
+            eo[:eager_block] = set_server
+            eo
           end
 
           super

@@ -57,7 +57,7 @@ module Sequel
         # of free columns.
         def before_create
           if v = model.prepared_statements_column_defaults
-            @values = v.merge(values)
+            @values = Hash[v].merge!(values)
           end
           super
         end

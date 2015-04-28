@@ -80,7 +80,7 @@ module Sequel
         tot_retries = opts.fetch(:num_retries, 5)
         num_retries = 0 unless tot_retries.nil?
         begin
-          transaction(opts.merge(:retry_on=>nil, :retrying=>true), &block)
+          transaction(Hash[opts].merge!(:retry_on=>nil, :retrying=>true), &block)
         rescue *retry_on => e
           if num_retries
             num_retries += 1
@@ -100,7 +100,7 @@ module Sequel
               raise Sequel::Error, "cannot set :retry_on options if you are already inside a transaction"
             end
             if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last
-              _transaction(conn, opts.merge(:savepoint=>true), &block)
+              _transaction(conn, Hash[opts].merge!(:savepoint=>true), &block)
             else
               return yield(conn)
             end

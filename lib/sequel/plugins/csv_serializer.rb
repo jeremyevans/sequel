@@ -156,7 +156,7 @@ module Sequel
         # :array :: An array of instances.  If this is not provided, calls #all
         #           on the receiver to get the array.
         def to_csv(opts = {})
-          opts = model.process_csv_serializer_opts({:columns=>columns}.merge(opts))
+          opts = model.process_csv_serializer_opts({:columns=>columns}.merge!(opts))
           items = opts.delete(:array) || self
 
           CSV.generate(opts) do |csv|

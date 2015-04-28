@@ -146,7 +146,7 @@ module Sequel
       %w'presence unique'.each do |v|
         class_eval(<<-END, __FILE__, __LINE__+1)
           def #{v}(columns, opts=OPTS)
-            @generator.validation({:type=>:#{v}, :columns=>Array(columns)}.merge(opts))
+            @generator.validation({:type=>:#{v}, :columns=>Array(columns)}.merge!(opts))
           end
         END
       end
@@ -155,7 +155,7 @@ module Sequel
       %w'exact_length min_length max_length length_range format like ilike includes'.each do |v|
         class_eval(<<-END, __FILE__, __LINE__+1)
           def #{v}(arg, columns, opts=OPTS)
-            @generator.validation({:type=>:#{v}, :columns=>Array(columns), :arg=>arg}.merge(opts))
+            @generator.validation({:type=>:#{v}, :columns=>Array(columns), :arg=>arg}.merge!(opts))
           end
         END
       end

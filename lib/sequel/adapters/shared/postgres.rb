@@ -64,7 +64,7 @@ module Sequel
       # :where :: Create a partial exclusion constraint, which only affects
       #           a subset of table rows, value should be a filter expression.
       def exclude(elements, opts=OPTS)
-        constraints << {:type => :exclude, :elements => elements}.merge(opts)
+        constraints << {:type => :exclude, :elements => elements}.merge!(opts)
       end
     end
 
@@ -72,7 +72,7 @@ module Sequel
       # Adds an exclusion constraint to an existing table, see
       # CreateTableGenerator#exclude.
       def add_exclusion_constraint(elements, opts=OPTS)
-        @operations << {:op => :add_constraint, :type => :exclude, :elements => elements}.merge(opts)
+        @operations << {:op => :add_constraint, :type => :exclude, :elements => elements}.merge!(opts)
       end
 
       # Validate the constraint with the given name, which should have
@@ -1468,7 +1468,7 @@ module Sequel
       def _import(columns, values, opts=OPTS)
         if @opts[:returning]
           statements = multi_insert_sql(columns, values)
-          @db.transaction(opts.merge(:server=>@opts[:server])) do
+          @db.transaction(Hash[opts].merge!(:server=>@opts[:server])) do
             statements.map{|st| returning_fetch_rows(st)}
           end.first.map{|v| v.length == 1 ? v.values.first : v}
         elsif opts[:return] == :primary_key

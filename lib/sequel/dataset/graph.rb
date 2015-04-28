@@ -18,7 +18,7 @@ module Sequel
         raise Error, "cannot call add_graph_aliases on a dataset that has not been called with graph or set_graph_aliases"
       end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      select_more(*columns).clone(:graph_aliases => ga.merge(graph_aliases))
+      select_more(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases))
     end
 
     # Similar to Dataset#join_table, but uses unambiguous aliases for selected
@@ -72,7 +72,7 @@ module Sequel
       when SQL::QualifiedIdentifier
         table_alias ||= split_qualifiers(table).last
       when SQL::AliasedExpression
-        return graph(table.expression, join_conditions, {:table_alias=>table.alias}.merge(options), &block)
+        return graph(table.expression, join_conditions, {:table_alias=>table.alias}.merge!(options), &block)
       else
         raise Error, "The dataset argument should be a symbol or dataset"
       end

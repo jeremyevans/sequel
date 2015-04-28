@@ -227,7 +227,7 @@ module Sequel
         # affect global state, unlike PGArray.register.  See PGArray.register for
         # possible options.
         def register_array_type(db_type, opts=OPTS, &block)
-          opts = {:type_procs=>conversion_procs, :typecast_method_map=>@pg_array_schema_types, :typecast_methods_module=>(class << self; self; end)}.merge(opts)
+          opts = {:type_procs=>conversion_procs, :typecast_method_map=>@pg_array_schema_types, :typecast_methods_module=>(class << self; self; end)}.merge!(opts)
           unless (opts.has_key?(:scalar_oid) || block) && opts.has_key?(:oid)
             array_oid, scalar_oid = from(:pg_type).where(:typname=>db_type.to_s).get([:typarray, :oid])
             opts[:scalar_oid] = scalar_oid unless opts.has_key?(:scalar_oid) || block

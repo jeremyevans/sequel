@@ -7,6 +7,33 @@ module Sequel
     # ---------------------
     
     PREPARED_ARG_PLACEHOLDER = LiteralString.new('?').freeze
+
+    DEFAULT_PREPARED_STATEMENT_MODULE_METHODS = %w'execute execute_dui execute_insert'.freeze.each(&:freeze)
+    PREPARED_STATEMENT_MODULE_CODE = {
+      :bind => "opts = Hash[opts]; opts[:arguments] = bind_arguments".freeze,
+      :prepare => "sql = prepared_statement_name".freeze,
+      :prepare_bind => "sql = prepared_statement_name; opts = Hash[opts]; opts[:arguments] = bind_arguments".freeze
+    }.freeze
+
+    def self.prepared_statements_module(code, mods, meths=DEFAULT_PREPARED_STATEMENT_MODULE_METHODS, &block)
+      code = PREPARED_STATEMENT_MODULE_CODE[code] || code
+
+      Module.new do
+        Array(mods).each do |mod|
+          include mod
+        end
+
+        if block
+          module_eval(&block)
+        end
+
+        meths.each do |meth|
+          module_eval("def #{meth}(sql, opts=Sequel::OPTS) #{code}; super end", __FILE__, __LINE__)
+        end
+        private *meths
+      end
+    end
+    private_class_method :prepared_statements_module
     
     # Default implementation of the argument mapper to allow
     # native database support for bind variables and prepared
@@ -221,7 +248,7 @@ module Sequel
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
     def bind(bind_vars={})
-      clone(:bind_vars=>@opts[:bind_vars] ? @opts[:bind_vars].merge(bind_vars) : bind_vars)
+      clone(:bind_vars=>@opts[:bind_vars] ? Hash[@opts[:bind_vars]].merge!(bind_vars) : bind_vars)
     end
     
     # For the given type (:select, :first, :insert, :insert_select, :update, or :delete),

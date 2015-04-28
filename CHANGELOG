@@ -1,5 +1,7 @@
 === HEAD
 
+* Avoid hash allocations and rehashes (jeremyevans)
+
 * Don't silently ignore :jdbc_properties Database option in jdbc adapter (jeremyevans)
 
 * Make tree plugin set reciprocal association for children association correctly (lpil, jeremyevans) (#995)

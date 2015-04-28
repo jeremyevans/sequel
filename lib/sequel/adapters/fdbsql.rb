@@ -109,12 +109,12 @@ module Sequel
 
         # Execute the given SQL with the stored bind arguments.
         def execute(sql, opts=OPTS, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+          super(sql, {:arguments=>bind_arguments}.merge!(opts), &block)
         end
 
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts=OPTS, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+          super(sql, {:arguments=>bind_arguments}.merge!(opts), &block)
         end
       end
 

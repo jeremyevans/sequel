@@ -178,7 +178,7 @@ module Sequel
         # Duplicate compositions hash when duplicating model instance.
         def initialize_copy(other)
           super
-          @compositions = other.compositions.dup
+          @compositions = Hash[other.compositions]
           self
         end
       end

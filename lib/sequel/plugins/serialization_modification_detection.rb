@@ -58,7 +58,7 @@ module Sequel
         def initialize_copy(other)
           super
           if o = other.instance_variable_get(:@original_deserialized_values)
-            @original_deserialized_values = o.dup
+            @original_deserialized_values = Hash[o]
           end
           self
         end

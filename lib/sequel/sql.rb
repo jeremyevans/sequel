@@ -1378,7 +1378,7 @@ module Sequel
 
       # Return a new function call with the given opts merged into the current opts.
       def with_opts(opts)
-        self.class.new!(name, args, @opts.merge(opts))
+        self.class.new!(name, args, Hash[@opts].merge!(opts))
       end
     end
 

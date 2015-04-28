@@ -180,7 +180,7 @@ module Sequel
         else
           h = Hash.new(0)
           interval.parts.each{|unit, value| h[unit] += value}
-          {}.merge(h)
+          Hash[h]
         end
       end
 

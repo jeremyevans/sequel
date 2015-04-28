@@ -304,52 +304,9 @@ module Sequel
         end
       end
       
-      # SQLite prepared statement uses a new prepared statement each time
-      # it is called, but it does use the bind arguments.
-      module BindArgumentMethods
-        include ArgumentMapper
-        
-        private
-        
-        # Run execute_select on the database with the given SQL and the stored
-        # bind arguments.
-        def execute(sql, opts=OPTS, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
-        
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts=OPTS, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
-        
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts=OPTS, &block)
-          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
-      end
+      BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)
+      PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods)
 
-      module PreparedStatementMethods
-        include BindArgumentMethods
-          
-        private
-          
-        # Execute the stored prepared statement name and the stored bind
-        # arguments instead of the SQL given.
-        def execute(sql, opts=OPTS, &block)
-          super(prepared_statement_name, opts, &block)
-        end
-         
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts=OPTS, &block)
-          super(prepared_statement_name, opts, &block)
-        end
-          
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts=OPTS, &block)
-          super(prepared_statement_name, opts, &block)
-        end
-      end
-        
       # Execute the given type of statement with the hash of values.
       def call(type, bind_vars={}, *values, &block)
         ps = to_prepared_statement(type, values)

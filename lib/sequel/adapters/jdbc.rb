@@ -255,7 +255,7 @@ module Sequel
                 log_yield(sql){stmt.execute(sql)}
               when :insert
                 log_yield(sql){execute_statement_insert(stmt, sql)}
-                last_insert_id(conn, opts.merge(:stmt=>stmt))
+                last_insert_id(conn, Hash[opts].merge!(:stmt=>stmt))
               else
                 log_yield(sql){stmt.executeUpdate(sql)}
               end
@@ -268,13 +268,17 @@ module Sequel
       # Execute the given DDL SQL, which should not return any
       # values or rows.
       def execute_ddl(sql, opts=OPTS)
-        execute(sql, {:type=>:ddl}.merge(opts))
+        opts = Hash[opts]
+        opts[:type] = :ddl
+        execute(sql, opts)
       end
       
       # Execute the given INSERT SQL, returning the last inserted
       # row id.
       def execute_insert(sql, opts=OPTS)
-        execute(sql, {:type=>:insert}.merge(opts))
+        opts = Hash[opts]
+        opts[:type] = :insert
+        execute(sql, opts)
       end
 
       # Use the JDBC metadata to get a list of foreign keys for the table.
@@ -435,7 +439,7 @@ module Sequel
                 log_yield(msg, args){cps.execute}
               when :insert
                 log_yield(msg, args){execute_prepared_statement_insert(cps)}
-                last_insert_id(conn, opts.merge(:prepared=>true, :stmt=>cps))
+                last_insert_id(conn, Hash[opts].merge!(:prepared=>true, :stmt=>cps))
               else
                 log_yield(msg, args){cps.executeUpdate}
               end
@@ -667,53 +671,36 @@ module Sequel
 
       Database::DatasetClass = self
       
-      # Use JDBC PreparedStatements instead of emulated ones.  Statements
-      # created using #prepare are cached at the connection level to allow
-      # reuse.  This also supports bind variables by using unnamed
-      # prepared statements created using #call.
-      module PreparedStatementMethods
-        include Sequel::Dataset::UnnumberedArgumentMapper
-        
-        private
-        
-        # Execute the prepared SQL using the stored type and
-        # arguments derived from the hash passed to call.
-        def execute(sql, opts=OPTS, &block)
-          super(self, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
-        
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts=OPTS, &block)
-          super(self, {:arguments=>bind_arguments}.merge(opts), &block)
-        end
-        
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts=OPTS, &block)
-          super(self, {:arguments=>bind_arguments, :type=>:insert}.merge(opts), &block)
-        end
+      PreparedStatementMethods = prepared_statements_module(
+        "sql = self; opts = Hash[opts]; opts[:arguments] = bind_arguments",
+        Sequel::Dataset::UnnumberedArgumentMapper,
+        %w"execute execute_dui") do
+          private
+
+          # Same as execute, explicit due to intricacies of alias and super.
+          def execute_insert(sql, opts=OPTS)
+            sql = self
+            opts = Hash[opts]
+            opts[:arguments] = bind_arguments
+            opts[:type] = :insert
+            super
+          end
       end
       
-      # Use JDBC CallableStatements to execute stored procedures.  Only supported
-      # if the underlying database has stored procedure support.
-      module StoredProcedureMethods
-        include Sequel::Dataset::StoredProcedureMethods
-        
-        private
-        
-        # Execute the database stored procedure with the stored arguments.
-        def execute(sql, opts=OPTS, &block)
-          super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
-        end
-        
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_dui(sql, opts=OPTS, &block)
-          super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
-        end
-        
-        # Same as execute, explicit due to intricacies of alias and super.
-        def execute_insert(sql, opts=OPTS, &block)
-          super(@sproc_name, {:args=>@sproc_args, :sproc=>true, :type=>:insert}.merge(opts), &block)
-        end
+      StoredProcedureMethods = prepared_statements_module(
+        "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
+        Sequel::Dataset::StoredProcedureMethods,
+        %w"execute execute_dui") do
+          private
+
+          # Same as execute, explicit due to intricacies of alias and super.
+          def execute_insert(sql, opts=OPTS)
+            sql = @sproc_name
+            opts = Hash[opts]
+            opts[:args] = @sproc_args
+            opts[:type] = :insert
+            super
+          end
       end
       
       # Whether to convert some Java types to ruby types when retrieving rows.

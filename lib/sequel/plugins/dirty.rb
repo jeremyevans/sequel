@@ -201,9 +201,9 @@ module Sequel
         # Duplicate internal data structures
         def initialize_copy(other)
           super
-          @initial_values = other.initial_values.dup
+          @initial_values = Hash[other.initial_values]
           @missing_initial_values = other.send(:missing_initial_values).dup
-          @previous_changes = other.previous_changes.dup if other.previous_changes
+          @previous_changes = Hash[other.previous_changes] if other.previous_changes
           self
         end
 

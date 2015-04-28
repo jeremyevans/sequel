@@ -1559,7 +1559,7 @@ module Sequel
       #   a.save_changes # UPDATE artists SET name = 'Bob' WHERE (id = 1)
       #   # => #<Artist {:id=>1, :name=>'Jim', ...}
       def save_changes(opts=OPTS)
-        save(opts.merge(:changed=>true)) || false if modified? 
+        save(Hash[opts].merge!(:changed=>true)) || false if modified? 
       end
   
       # Updates the instance with the supplied values with support for virtual
@@ -1611,7 +1611,7 @@ module Sequel
       #   # Sequel::Error raised
       def set_fields(hash, fields, opts=nil)
         opts = if opts
-          model.default_set_fields_options.merge(opts)
+          Hash[model.default_set_fields_options].merge!(opts)
         else
           model.default_set_fields_options
         end
@@ -1942,7 +1942,7 @@ module Sequel
       # databases don't like you setting primary key values even
       # to their existing values.
       def _save_update_all_columns_hash
-        v = @values.dup
+        v = Hash[@values]
         Array(primary_key).each{|x| v.delete(x) unless changed_columns.include?(x)}
         v
       end
@@ -2029,7 +2029,7 @@ module Sequel
       
       # If transactions should be used, wrap the yield in a transaction block.
       def checked_transaction(opts=OPTS)
-        use_transaction?(opts) ? db.transaction({:server=>this_server}.merge(opts)){yield} : yield
+        use_transaction?(opts) ? db.transaction({:server=>this_server}.merge!(opts)){yield} : yield
       end
 
       # Change the value of the column to given value, recording the change.
@@ -2067,7 +2067,7 @@ module Sequel
       # Copy constructor -- Duplicate internal data structures.
       def initialize_copy(other)
         super
-        @values = @values.dup
+        @values = Hash[@values]
         @changed_columns = @changed_columns.dup if @changed_columns
         @errors = @errors.dup if @errors
         @this = @this.dup if @this

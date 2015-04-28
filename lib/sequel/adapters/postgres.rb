@@ -681,7 +681,7 @@ module Sequel
       # This is untested with the prepared statement/bound variable support,
       # and unlikely to work with either.
       def use_cursor(opts=OPTS)
-        clone(:cursor=>{:rows_per_fetch=>1000}.merge(opts))
+        clone(:cursor=>{:rows_per_fetch=>1000}.merge!(opts))
       end
 
       # Replace the WHERE clause with one that uses CURRENT OF with the given
@@ -732,46 +732,13 @@ module Sequel
           end
         end
 
-        # Allow use of bind arguments for PostgreSQL using the pg driver.
-        module BindArgumentMethods
-          include ArgumentMapper
-          include ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods
-          
-          private
-          
-          # Execute the given SQL with the stored bind arguments.
-          def execute(sql, opts=OPTS, &block)
-            super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
-          end
-          
-          # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts=OPTS, &block)
-            super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
-          end
-        end
-        
-        # Allow use of server side prepared statements for PostgreSQL using the
-        # pg driver.
-        module PreparedStatementMethods
-          include BindArgumentMethods
+        BindArgumentMethods = prepared_statements_module(:bind, [ArgumentMapper, ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods], %w'execute execute_dui')
 
+        PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods, %w'execute execute_dui') do
           # Raise a more obvious error if you attempt to call a unnamed prepared statement.
           def call(*)
             raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
             super
-          end
-          
-          private
-          
-          # Execute the stored prepared statement name and the stored bind
-          # arguments instead of the SQL given.
-          def execute(sql, opts=OPTS, &block)
-            super(prepared_statement_name, opts, &block)
-          end
-          
-          # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts=OPTS, &block)
-            super(prepared_statement_name, opts, &block)
           end
         end
         

@@ -44,7 +44,7 @@ module Sequel
 
         # Copy the accessed columns when duping and cloning.
         def initialize_copy(other)
-          other.instance_variable_set(:@accessed_columns, @accessed_columns.dup) if @accessed_columns
+          other.instance_variable_set(:@accessed_columns, Hash[@accessed_columns]) if @accessed_columns
           super
         end
 

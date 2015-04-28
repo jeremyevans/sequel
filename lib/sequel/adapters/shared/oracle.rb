@@ -474,8 +474,12 @@ module Sequel
       # If this dataset is associated with a sequence, return the most recently
       # inserted sequence value.
       def execute_insert(sql, opts=OPTS)
-        f = @opts[:from]
-        super(sql, {:table=>(f.first if f), :sequence=>@opts[:sequence]}.merge(opts))
+        opts = Hash[opts]
+        if f = @opts[:from]
+          opts[:table] = f.first
+        end
+        opts[:sequence] = @opts[:sequence]
+        super
       end
 
       # Use a colon for the timestamp offset, since Oracle appears to require it.

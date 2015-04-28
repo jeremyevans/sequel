@@ -38,7 +38,7 @@ module Sequel
         if match = /\A(jdbc|do):/o.match(conn_string)
           c = adapter_class(match[1].to_sym)
           opts = opts.merge(:orig_opts=>opts.dup)
-          opts = {:uri=>conn_string}.merge(opts)
+          opts = {:uri=>conn_string}.merge!(opts)
         else
           uri = URI.parse(conn_string)
           scheme = uri.scheme

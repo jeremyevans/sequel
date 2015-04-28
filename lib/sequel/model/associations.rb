@@ -1920,7 +1920,7 @@ module Sequel
           graph_cks = opts[:graph_keys]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(graph_cks) + conditions, Hash[eo].merge!(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
           end
       
           return if opts[:read_only]
@@ -1980,7 +1980,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(opts.apply_eager_graph_limit_strategy(eo[:limit_strategy], eager_graph_dataset(opts, eo)), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, eo.merge(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
+            ds = ds.graph(opts.apply_eager_graph_limit_strategy(eo[:limit_strategy], eager_graph_dataset(opts, eo)), use_only_conditions ? only_conditions : cks.zip(pkcs) + conditions, Hash[eo].merge!(:select=>select, :join_type=>eo[:join_type]||join_type, :qualify=>:deep, :from_self_alias=>eo[:from_self_alias]), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds
@@ -2219,7 +2219,7 @@ module Sequel
         # Duplicate the associations hash when duplicating the object.
         def initialize_copy(other)
           super
-          @associations = @associations.dup if @associations
+          @associations = Hash[@associations] if @associations
           self
         end
 
@@ -2231,7 +2231,7 @@ module Sequel
             dynamic_opts = {:callback=>dynamic_opts}
           end
           if block_given?
-            dynamic_opts = dynamic_opts.merge(:callback=>Proc.new)
+            dynamic_opts = Hash[dynamic_opts].merge!(:callback=>Proc.new)
           end
           name = opts[:name]
           if associations.include?(name) and !dynamic_opts[:callback] and !dynamic_opts[:reload]
@@ -2521,7 +2521,7 @@ END
         def eager(*associations)
           opts = @opts[:eager]
           association_opts = eager_options_for_associations(associations)
-          opts = opts ? opts.merge(association_opts) : association_opts
+          opts = opts ? Hash[opts].merge!(association_opts) : association_opts
           clone(:eager=>opts)
         end
 

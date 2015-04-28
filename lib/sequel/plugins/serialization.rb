@@ -212,7 +212,7 @@ module Sequel
         # Dup the deserialized values when duping model instance.
         def initialize_copy(other)
           super
-          @deserialized_values = other.deserialized_values.dup
+          @deserialized_values = Hash[other.deserialized_values]
           self
         end
 

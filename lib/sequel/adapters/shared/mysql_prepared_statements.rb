@@ -100,51 +100,19 @@ module Sequel
           end
         end
         
-        # Methods for MySQL prepared statements using the native driver.
-        module PreparedStatementMethods
-          include Sequel::Dataset::UnnumberedArgumentMapper
-          
-          # Raise a more obvious error if you attempt to call a unnamed prepared statement.
-          def call(*)
-            raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
-            super
-          end
-          
-          private
-          
-          # Execute the prepared statement with the bind arguments instead of
-          # the given SQL.
-          def execute(sql, opts=OPTS, &block)
-            super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
-          end
-          
-          # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts=OPTS, &block)
-            super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
-          end
-          
-          # Same as execute, explicit due to intricacies of alias and super.
-          def execute_insert(sql, opts=OPTS, &block)
-            super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
-          end
+        PreparedStatementMethods = Sequel::Dataset.send(:prepared_statements_module,
+          :prepare_bind,
+          Sequel::Dataset::UnnumberedArgumentMapper) do
+            # Raise a more obvious error if you attempt to call a unnamed prepared statement.
+            def call(*)
+              raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
+              super
+            end
         end
         
-        # Methods for MySQL stored procedures using the native driver.
-        module StoredProcedureMethods
-          include Sequel::Dataset::StoredProcedureMethods
-          
-          private
-          
-          # Execute the database stored procedure with the stored arguments.
-          def execute(sql, opts=OPTS, &block)
-            super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
-          end
-          
-          # Same as execute, explicit due to intricacies of alias and super.
-          def execute_dui(sql, opts=OPTS, &block)
-            super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
-          end
-        end
+        StoredProcedureMethods = Sequel::Dataset.send(:prepared_statements_module,
+          "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
+          Sequel::Dataset::StoredProcedureMethods, %w'execute execute_dui')
         
         # MySQL is different in that it supports prepared statements but not bound
         # variables outside of prepared statements.  The default implementation

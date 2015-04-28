@@ -74,10 +74,10 @@ module Sequel
     def clone(opts = nil)
       c = super()
       if opts
-        c.instance_variable_set(:@opts, @opts.merge(opts))
+        c.instance_variable_set(:@opts, Hash[@opts].merge!(opts))
         c.instance_variable_set(:@columns, nil) if @columns && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
       else
-        c.instance_variable_set(:@opts, @opts.dup)
+        c.instance_variable_set(:@opts, Hash[@opts])
       end
       c
     end
@@ -939,7 +939,7 @@ module Sequel
         s, ds = hoist_cte(dataset)
         s.with(name, ds, opts)
       else
-        clone(:with=>(@opts[:with]||[]) + [opts.merge(:name=>name, :dataset=>dataset)])
+        clone(:with=>(@opts[:with]||[]) + [Hash[opts].merge!(:name=>name, :dataset=>dataset)])
       end
     end
 
@@ -968,7 +968,7 @@ module Sequel
         s, ds = hoist_cte(recursive)
         s.with_recursive(name, nonrecursive, ds, opts)
       else
-        clone(:with=>(@opts[:with]||[]) + [opts.merge(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
+        clone(:with=>(@opts[:with]||[]) + [Hash[opts].merge!(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
       end
     end
     

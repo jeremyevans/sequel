@@ -328,7 +328,7 @@ module Sequel
   def self.transaction(dbs, opts=OPTS, &block)
     unless opts[:rollback]
       rescue_rollback = true
-      opts = opts.merge(:rollback=>:reraise)
+      opts = Hash[opts].merge!(:rollback=>:reraise)
     end
     pr = dbs.reverse.inject(block){|bl, db| proc{db.transaction(opts, &bl)}}
     if rescue_rollback

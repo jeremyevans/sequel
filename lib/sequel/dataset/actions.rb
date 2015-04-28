@@ -493,7 +493,8 @@ module Sequel
       total_limit = @opts[:limit]
       offset = @opts[:offset]
       if server = @opts[:server]
-        opts = opts.merge(:server=>server)
+        opts = Hash[opts]
+        opts[:server] = server
       end
 
       rows_per_fetch = opts[:rows_per_fetch] || 1000
@@ -833,7 +834,7 @@ module Sequel
     # separate insert commands for each row.  Otherwise, call #multi_insert_sql
     # and execute each statement it gives separately.
     def _import(columns, values, opts)
-      trans_opts = opts.merge(:server=>@opts[:server])
+      trans_opts = Hash[opts].merge!(:server=>@opts[:server])
       if opts[:return] == :primary_key
         @db.transaction(trans_opts){values.map{|v| insert(columns, v)}}
       else
@@ -901,14 +902,23 @@ module Sequel
 
     # Set the server to use to :default unless it is already set in the passed opts
     def default_server_opts(opts)
-      @db.sharded? ? {:server=>@opts[:server] || :default}.merge(opts) : opts
+      if @db.sharded?
+        opts = Hash[opts]
+        opts[:server] = @opts[:server] || :default
+      end
+      opts
     end
 
     # Execute the given select SQL on the database using execute. Use the
     # :read_only server unless a specific server is set.
     def execute(sql, opts=OPTS, &block)
       db = @db
-      db.execute(sql, db.sharded? ? {:server=>@opts[:server] || :read_only}.merge(opts) : opts, &block)
+      if db.sharded?
+        opts = Hash[opts]
+        opts[:server] = @opts[:server] || :read_only
+        opts
+      end
+      db.execute(sql, opts, &block)
     end
     
     # Execute the given SQL on the database using execute_ddl.

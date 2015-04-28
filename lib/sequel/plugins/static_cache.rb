@@ -111,7 +111,7 @@ module Sequel
         def to_hash(key_column = nil, value_column = nil)
         if key_column.nil? && value_column.nil?
           if @static_cache_frozen
-            return cache.dup
+            return Hash[cache]
           else
             key_column = primary_key
           end
@@ -198,7 +198,7 @@ module Sequel
           if @static_cache_frozen
             o
           elsif o
-            call(o.values.dup)
+            call(Hash[o.values])
           end
         end
       end

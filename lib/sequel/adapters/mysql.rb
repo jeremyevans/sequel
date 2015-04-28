@@ -347,8 +347,10 @@ module Sequel
       end
       
       # Set the :type option to :select if it hasn't been set.
-      def execute(sql, opts=OPTS, &block)
-        super(sql, {:type=>:select}.merge(opts), &block)
+      def execute(sql, opts=OPTS)
+        opts = Hash[opts]
+        opts[:type] = :select
+        super
       end
       
       # Handle correct quoting of strings using ::MySQL.quote.

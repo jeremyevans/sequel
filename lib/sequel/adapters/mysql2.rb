@@ -188,8 +188,11 @@ module Sequel
       end
 
       # Set the :type option to :select if it hasn't been set.
-      def execute(sql, opts=OPTS, &block)
-        super(sql, {:type=>:select, :stream=>@opts[:stream]}.merge(opts), &block)
+      def execute(sql, opts=OPTS)
+        opts = Hash[opts]
+        opts[:type] = :select
+        opts[:stream] = @opts[:stream]
+        super
       end
 
       # Handle correct quoting of strings using ::Mysql2::Client#escape.
