@@ -147,27 +147,19 @@ module Sequel
         # This defaults to a lookup in the key map.
         attr_reader :sti_key_chooser
 
+        Plugins.inherited_instance_variables(self, :@sti_dataset=>nil, :@sti_key=>nil, :@sti_key_map=>nil, :@sti_model_map=>nil, :@sti_key_chooser=>nil)
+
         # Copy the necessary attributes to the subclasses, and filter the
         # subclass's dataset based on the sti_kep_map entry for the class.
         def inherited(subclass)
           super
-          sk = sti_key
-          sd = sti_dataset
-          skm = sti_key_map
-          smm = sti_model_map
-          skc = sti_key_chooser
-          key = Array(skm[subclass]).dup
+          key = Array(sti_key_map[subclass]).dup
           sti_subclass_added(key)
           rp = dataset.row_proc
-          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(sd.first_source_alias, sk)=>key), :inherited=>true)
+          subclass.set_dataset(sti_dataset.filter(SQL::QualifiedIdentifier.new(sti_dataset.first_source_alias, sti_key)=>key), :inherited=>true)
           subclass.instance_eval do
             dataset.row_proc = rp
-            @sti_key = sk
             @sti_key_array = key
-            @sti_dataset = sd
-            @sti_key_map = skm
-            @sti_model_map = smm
-            @sti_key_chooser = skc
             self.simple_table = nil
           end
         end

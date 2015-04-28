@@ -153,17 +153,17 @@ module Sequel
         # Specified with the :table_map option to the plugin, and used if
         # the implicit naming is incorrect.
         attr_reader :cti_table_map
-        
+
+        Plugins.inherited_instance_variables(self, :@cti_key=>nil, :@cti_model_map=>nil, :@cti_table_map=>nil)
+
         # Add the appropriate data structures to the subclass.  Does not
         # allow anonymous subclasses to be created, since they would not
         # be mappable to a table.
         def inherited(subclass)
           cc = cti_columns
-          ck = cti_key
           ct = cti_tables.dup
-          ctm = cti_table_map.dup
+          ctm = cti_table_map
           cbm = cti_base_model
-          cmm = cti_model_map
           pk = primary_key
           ds = dataset
           table = nil
@@ -172,12 +172,9 @@ module Sequel
             raise(Error, "cannot create anonymous subclass for model class using class_table_inheritance") if !(n = name) || n.empty?
             table = ctm[n.to_sym] || implicit_table_name
             columns = db.from(table).columns
-            @cti_key = ck 
             @cti_tables = ct + [table]
             @cti_columns = cc.merge(table=>columns)
-            @cti_table_map = ctm
             @cti_base_model = cbm
-            @cti_model_map = cmm
             # Need to set dataset and columns before calling super so that
             # the main column accessor module is included in the class before any
             # plugin accessor modules (such as the lazy attributes accessor module).
