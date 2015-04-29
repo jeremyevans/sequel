@@ -1,4 +1,5 @@
 require 'dbi'
+Sequel::Deprecation.deprecate 'The dbi adapter is deprecated and will be removed in a future version of Sequel.  Please switch to another adapter.'
 
 module Sequel
   module DBI

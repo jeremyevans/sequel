@@ -1,4 +1,5 @@
 require 'openbase'
+Sequel::Deprecation.deprecate 'The openbase adapter is deprecated and will be removed in a future version of Sequel.'
 
 module Sequel
   module OpenBase

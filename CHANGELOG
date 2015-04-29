@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate the db2, dbi, fdbsql, firebird, jdbc/fdbsql, informix, and openbase adapters (jeremyevans)
+
 * Avoid hash allocations and rehashes (jeremyevans)
 
 * Don't silently ignore :jdbc_properties Database option in jdbc adapter (jeremyevans)

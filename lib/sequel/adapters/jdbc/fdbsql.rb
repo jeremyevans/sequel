@@ -1,5 +1,6 @@
 Sequel::JDBC.load_driver('com.foundationdb.sql.jdbc.Driver')
 Sequel.require 'adapters/shared/fdbsql'
+Sequel::Deprecation.deprecate 'The jdbc/fdbsql adapter is deprecated and will be removed in a future version of Sequel.'
 
 module Sequel
   Fdbsql::CONVERTED_EXCEPTIONS << NativeException

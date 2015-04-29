@@ -2,6 +2,7 @@ require 'pg'
 
 Sequel.require 'adapters/utils/pg_types'
 Sequel.require 'adapters/shared/fdbsql'
+Sequel::Deprecation.deprecate 'The fdbsql adapter is deprecated and will be removed in a future version of Sequel.'
 
 module Sequel
   module Fdbsql

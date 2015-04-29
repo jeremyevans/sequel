@@ -1,5 +1,6 @@
 require 'db2/db2cli'
 Sequel.require %w'shared/db2', 'adapters'
+Sequel::Deprecation.deprecate 'The db2 adapter is deprecated and will be removed in a future version of Sequel.  Please switch to the ibmdb adapter.'
 
 module Sequel
   module DB2

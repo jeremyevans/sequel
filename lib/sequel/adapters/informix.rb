@@ -1,5 +1,6 @@
 require 'informix'
 Sequel.require 'adapters/shared/informix'
+Sequel::Deprecation.deprecate 'The informix adapter is deprecated and will be removed in a future version of Sequel.  Please switch to the ibmdb adapter.'
 
 module Sequel
   module Informix

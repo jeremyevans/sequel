@@ -1,5 +1,6 @@
 require 'fb'
 Sequel.require 'adapters/shared/firebird'
+Sequel::Deprecation.deprecate 'The firebird adapter is deprecated and will be removed in a future version of Sequel.'
 
 module Sequel
   # The Sequel Firebird adapter requires the ruby fb driver located at

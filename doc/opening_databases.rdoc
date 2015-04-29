@@ -154,39 +154,6 @@ cubrid is a ruby extension for accessing a CUBRID database.  Currently,
 the ruby cubrid gem is in fairly rough state, with broken transaction
 support and some other issues, but most things work.
 
-=== db2 
-
-Requires: db2/db2cli
-
-This is the older DB2 adapter.  It's recommended you try the ibmdb adapter
-instead for new DB2 work, as it is better supported.
-
-=== dbi 
-
-Allows access to a multitude of databases via ruby-dbi.  Additional options:
-
-:db_type :: Specifying 'mssql' allows Microsoft SQL Server specific syntax to
-            be used.  Otherwise has no effect.
-
-DBI connection strings are a preprocessed a bit, and are specified with a dbi-
-in front of the protocol.  Examples:
-
-  dbi-ado://...
-  dbi-db2://...
-  dbi-frontbase://...
-  dbi-interbase://...
-  dbi-msql://...
-  dbi-mysql://...
-  dbi-odbc://...
-  dbi-oracle://...
-  dbi-pg://...
-  dbi-proxy://...
-  dbi-sqlite://...
-  dbi-sqlrelay://...
-
-While the DBI adapter does work, it is recommended that you use another adapter
-if your database supports it.
-
 === do 
 
 Requires: data_objects
@@ -206,24 +173,6 @@ Connection string examples:
   do:postgres://user:password@host/database
   do:mysql://user:password@host/database
 
-=== fdbsql
-
-Requires: pg
-
-The following additional options are supported:
-
-:connect_timeout :: Set the number of seconds to wait for a connection (default 20).
-:notice_receiver :: A proc that be called with the PGresult objects that have notice or warning messages.
-                    The default notice receiver just prints the messages to stderr, but this can be used
-                    to handle notice/warning messages differently.
-:sslmode :: Set to 'disable', 'allow', 'prefer', 'require' to choose how to treat SSL.
-
-=== firebird 
-
-Requires: fb (using code at http://github.com/wishdev/fb)
-
-Does not support the :port option.
-
 === ibmdb
 
 requires 'ibm_db'
@@ -231,31 +180,14 @@ requires 'ibm_db'
 This connects to DB2 using IBM_DB.  This is the recommended adapter if you are
 using a C-based ruby to connect to DB2.
 
-=== informix 
-
-Does not support the :host or :port options.  Depending on the configuration of your server
-it may be necessary to either set
-   
-   DB.quote_identifier = false
-
-or set
-
-   export DELIMIDENT=y
-
-in the scripts environment.
-
-The following additional options are supported:
-
-:nolog :: Disable transactions for the database.
- 
 === jdbc 
 
 Requires: java
 
 Houses Sequel's JDBC support when running on JRuby.
-Support for individual database types is done using sub adapters.
+Support for individual database types is done using subadapters.
 There are currently subadapters for PostgreSQL, MySQL, SQLite, H2, HSQLDB, Derby,
-Oracle, MSSQL, JTDS, AS400, Progress, Fdbsql, Firebird, Informix, and DB2.
+Oracle, MSSQL, JTDS, AS400, Progress, Firebird, Informix, and DB2.
 For PostgreSQL, MySQL, SQLite, H2, HSQLDB, Derby, and JTDS,
 this can use the jdbc-* gem, for the others you need to have the .jar in your CLASSPATH
 or load the Java class manually before calling Sequel.connect.
@@ -291,7 +223,6 @@ Example connection strings:
   jdbc:jdbcprogress:T:hostname:port:database
   jdbc:cubrid:hostname:port:database:::
   jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password
-  jdbc:fdbsql://localhost:15432/user?user=user&password=password
 
 You can also use JNDI connection strings:
 
@@ -357,10 +288,6 @@ The :host and :port options are not respected. The following additional options 
 :db_type :: Can be specified as 'mssql', 'progress', or 'db2' to use SQL syntax specific to those databases.
 :drvconnect :: Can be given an ODBC connection string, and will use ODBC::Database#drvconnect to
                do the connection.  Typical usage would be: <tt>Sequel.odbc(:drvconnect=>'driver={...};...')</tt>
-
-=== openbase 
-
-The :port option is ignored.
 
 === oracle 
 
