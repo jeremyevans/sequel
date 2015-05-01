@@ -94,14 +94,11 @@
             until after a successful save.</p>
             </li><li>
             <p>Composite unique key constraint violations are now recognized and raised as
-            <a
-            href="../../../classes/Sequel/UniqueConstraintViolation.html">Sequel::UniqueConstraintViolation</a>
-            on SQLite.</p>
+            Sequel::UniqueConstraintViolation on SQLite.</p>
             </li><li>
             <p>Primary key unique constraint violations are now recognized and and raised
-            as <a
-            href="../../../classes/Sequel/UniqueConstraintViolation.html">Sequel::UniqueConstraintViolation</a>
-            on Microsoft SQL Server and SQLAnywhere.</p>
+            as Sequel::UniqueConstraintViolation on Microsoft SQL Server and
+            SQLAnywhere.</p>
             </li><li>
             <p>If an exception occurs when using a cursor in the postgres adapter, and an
             exception also occurs when closing the cursor when cleaning up, the initial

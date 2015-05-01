@@ -118,7 +118,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-initialize_copy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-initialize_copy-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize_copy</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@accessed_columns</span>, <span class="ruby-ivar">@accessed_columns</span>.<span class="ruby-identifier">dup</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@accessed_columns</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-initialize_copy-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize_copy</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@accessed_columns</span>, <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@accessed_columns</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@accessed_columns</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

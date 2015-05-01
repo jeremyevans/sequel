@@ -1,0 +1,87 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::CsvSerializer::DatasetMethods</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::CsvSerializer::DatasetMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/csv_serializer_rb.html">lib/sequel/plugins/csv_serializer.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-to_csv">to_csv</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-to_csv'>
+                <a name='method-i-to_csv'></a>
+                <div class='synopsis'>
+                  <span class='name'>to_csv</span>
+                  <span class='arguments'>(opts = {})</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a CSV string representing an array of all objects in this dataset. 
+                  Takes the same options as the instance method, and passes them to every
+                  instance.  Accepts the same options as CSV.new, as well as the following
+                  options:</p>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:array </td><td>
+                  <p>An array of instances.  If this is not provided, calls all on the receiver
+                  to get the array.</p>
+                  </td></tr></tbody></table>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_csv-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-to_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 158</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_csv</span>(<span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>({<span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">columns</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;  <span class="ruby-identifier">items</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:array</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>&#x000A;&#x000A;  <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">csv</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">items</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">object</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>].<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">header</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>[<span class="ruby-identifier">header</span>]}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

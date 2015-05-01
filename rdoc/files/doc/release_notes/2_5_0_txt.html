@@ -97,10 +97,8 @@
             <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[<span class="ruby-string">&#39;INSERT INTO t (time) VALUES (CURRENT_TIMESTAMP)&#39;</span>]&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert</span></pre>
             </li><li>
             <p>The database adapters (at least MySQL, PostgreSQL, SQLite, and JDBC)
-            generally raise <a
-            href="../../../classes/Sequel/DatabaseError.html">Sequel::DatabaseError</a>
-            for database problems, making it easier to tell what is a true database
-            error versus an error raised by <a
+            generally raise Sequel::DatabaseError for database problems, making it
+            easier to tell what is a true database error versus an error raised by <a
             href="../../../classes/Sequel.html">Sequel</a> itself.</p>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> uses the async features
@@ -129,10 +127,9 @@
             <p>Backwards Compatibility</p>
             <hr>
             <ul><li>
-            <p>The SQLite adapter now raises <a
-            href="../../../classes/Sequel/DatabaseError.html">Sequel::DatabaseError</a>
-            instead of Sequel::Error::InvalidStatement whenever an SQLite3::Exception
-            is raised by the SQLite3 driver.</p>
+            <p>The SQLite adapter now raises Sequel::DatabaseError instead of
+            Sequel::Error::InvalidStatement whenever an SQLite3::Exception is raised by
+            the SQLite3 driver.</p>
             </li><li>
             <p>Date and DateTime conversions now convert 2 digit years.  To revert to the
             previous behavior:</p>

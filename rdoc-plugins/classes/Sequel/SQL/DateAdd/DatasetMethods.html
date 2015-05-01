@@ -61,7 +61,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ACCESS_DURATION_UNITS</td>
                     <td>=</td>
-                    <td class='context-item-value'>DURATION_UNITS.zip(%w'yyyy m d h n s'.map{|s| s.freeze}).freeze</td>
+                    <td class='context-item-value'>DURATION_UNITS.zip(%w'yyyy m d h n s'.map(&:freeze)).freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>

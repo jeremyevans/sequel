@@ -31,12 +31,57 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-04-01 08:28:35 -0700</span>
+          <span class='datetime'>2015-05-01 08:43:44 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.22.0+-282015-05-01-29">4.22.0 (2015-05-01)<span><a href="#label-4.22.0+-282015-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Deprecate the db2, dbi, fdbsql, firebird, jdbc/fdbsql, informix, and
+            openbase adapters (jeremyevans)</p>
+            </li><li>
+            <p>Avoid hash allocations and rehashes (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t silently ignore :jdbc_properties Database option in jdbc adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make tree plugin set reciprocal association for children association
+            correctly (lpil, jeremyevans) (#995)</p>
+            </li><li>
+            <p>Add Sequel::MassAssignmentRestriction exception, raised for mass assignment
+            errors in strict mode (jeremyevans) (#994)</p>
+            </li><li>
+            <p>Handle ODBC::SQL_BIT type as boolean in the odbc adapter, fixing boolean
+            handling on odbc/mssql (jrgns) (#993)</p>
+            </li><li>
+            <p>Make :auto_validations plugin check :default entry instead of :ruby_default
+            entry for checking existence of default value (jeremyevans) (#990)</p>
+            </li><li>
+            <p>Adapters should now set :default schema option to nil when adapter can
+            determine that the value is nil (jeremyevans)</p>
+            </li><li>
+            <p>Do not add a schema :max_length entry for a varchar(max) column on MSSQL
+            (jeremyevans)</p>
+            </li><li>
+            <p>Allow :default value for PostgreSQL array columns to be a ruby array when
+            using the pg_array extension (jeremyevans) (#989)</p>
+            </li><li>
+            <p>Add csv_serializer plugin for serializing model objects to and from csv
+            (bjmllr, jeremyevans) (#988)</p>
+            </li><li>
+            <p>Make Dataset#to_hash and to_hash_groups handle single array argument for
+            model datasets (jeremyevans)</p>
+            </li><li>
+            <p>Handle Model#cancel_action in association before hooks (jeremyevans)</p>
+            </li><li>
+            <p>Use a condition variable instead of busy waiting in the threaded connection
+            pools on ruby 1.9+ (jeremyevans)</p>
+            </li><li>
+            <p>Use Symbol#to_proc instead of explicit blocks (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.21.0+-282015-04-01-29">4.21.0 (2015-04-01)<span><a href="#label-4.21.0+-282015-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
@@ -1663,8 +1708,7 @@
             <p>Add Dataset#with_pk! for model datasets, like with_pk, but raising instead
             of returning nil (jeremyevans)</p>
             </li><li>
-            <p>Add Dataset#first!, like first, but raising a <a
-            href="../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
+            <p>Add Dataset#first!, like first, but raising a Sequel::NoMatchingRow
             exception instead of returning nil (jeremyevans)</p>
             </li><li>
             <p>Dataset select_map, select_order_map, and get no longer support a plain
@@ -1750,8 +1794,7 @@
             <p>Add the :retry_on and :num_retries transaction options for automatically
             retrying transactions (jeremyevans)</p>
             </li><li>
-            <p>Raise serialization failures/deadlocks as <a
-            href="../classes/Sequel/SerializationFailure.html">Sequel::SerializationFailure</a>
+            <p>Raise serialization failures/deadlocks as Sequel::SerializationFailure
             exceptions (jeremyevans)</p>
             </li><li>
             <p>Support transaction isolation levels on Oracle and DB2 (jeremyevans)</p>
@@ -1788,9 +1831,8 @@
             <p>Add Dataset#paged_each, for processing entire datasets without keeping all
             rows in memory (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/Sequel/ConstraintViolation.html">Sequel::ConstraintViolation</a>
-            exception class and subclasses for easier exception handling (jeremyevans)</p>
+            <p>Add Sequel::ConstraintViolation exception class and subclasses for easier
+            exception handling (jeremyevans)</p>
             </li><li>
             <p>Fix use of identity_map plugin with many_to_many associations with right
             composite keys (chanks) (#603)</p>
@@ -3032,8 +3074,7 @@
             rollback the transaction (jeremyevans)</p>
             </li><li>
             <p>Support :rollback =&gt; :reraise option in Database#transaction to reraise
-            the <a href="../classes/Sequel/Rollback.html">Sequel::Rollback</a>
-            exception (jeremyevans)</p>
+            the Sequel::Rollback exception (jeremyevans)</p>
             </li><li>
             <p>Add support for connecting to Apache Derby databases using the jdbc adapter
             (jeremyevans)</p>
@@ -5111,9 +5152,7 @@
             &#39;sequel/extensions/migration&#39; if you want them (jeremyevans)</p>
             </li><li>
             <p>Denamespace <a href="../classes/Sequel/Error.html">Sequel::Error</a>
-            decendants (e.g. use <a
-            href="../classes/Sequel/Rollback.html">Sequel::Rollback</a> instead of <a
-            href="../classes/Sequel/Rollback.html">Sequel::Error::Rollback</a>)
+            decendants (e.g. use Sequel::Rollback instead of Sequel::Error::Rollback)
             (jeremyevans)</p>
             </li><li>
             <p>Deprecate Error::InvalidTransform, Error::NoExistingFilter, and
@@ -5382,10 +5421,9 @@
             <p>Add per-database type translation support for schema changes, translating
             ruby classes to database specific types (jeremyevans)</p>
             </li><li>
-            <p>Add <a
-            href="../classes/Sequel/DatabaseConnectionError.html">Sequel::DatabaseConnectionError</a>,
-            for indicating that <a href="../classes/Sequel.html">Sequel</a> wasn&#39;t
-            able to connect to the database (jeremyevans)</p>
+            <p>Add Sequel::DatabaseConnectionError, for indicating that <a
+            href="../classes/Sequel.html">Sequel</a> wasn&#39;t able to connect to the
+            database (jeremyevans)</p>
             </li><li>
             <p>Add validates_not_string validation, useful in conjunction with
             raise_on_typecast_failure = false (jeremyevans)</p>
@@ -5757,10 +5795,9 @@
             <p>Allow Models to use the RETURNING clause when inserting records on
             PostgreSQL (jeremyevans)</p>
             </li><li>
-            <p>Raise <a
-            href="../classes/Sequel/DatabaseError.html">Sequel::DatabaseError</a>
-            instead of generic <a href="../classes/Sequel/Error.html">Sequel::Error</a>
-            for database errors, don&#39;t swallow tracebacks (jeremyevans)</p>
+            <p>Raise Sequel::DatabaseError instead of generic <a
+            href="../classes/Sequel/Error.html">Sequel::Error</a> for database errors,
+            don&#39;t swallow tracebacks (jeremyevans)</p>
             </li><li>
             <p>Use INSERT … RETURNING … with PostgreSQL 8.2 and higher (jeremyevans)</p>
             </li><li>
@@ -6547,9 +6584,7 @@
             <p>Add simple callback mechanism to make model eager loading implementation
             easier (jeremyevans).</p>
             </li><li>
-            <p>Added <a
-            href="../classes/Sequel/InvalidOperation.html">Sequel::Error::InvalidOperation</a>
-            class for invalid operations (#198).</p>
+            <p>Added Sequel::Error::InvalidOperation class for invalid operations (#198).</p>
             </li><li>
             <p>Implemented MySQL::Database#server_version (#199).</p>
             </li><li>

@@ -113,13 +113,12 @@
             engine is set, you can specify :engine=&gt;nil to not use it (same goes for
             charset and collate).</p>
             </li><li>
-            <p>The <a
-            href="../../../classes/Sequel/DatabaseConnectionError.html">Sequel::DatabaseConnectionError</a>
-            exception class was added.  It is raised by the connection pool if there is
-            an error attempting to instantiate a database connection.  Also, if the
-            adapter returns nil instead of raising an error for faulty connection
-            parameters, DatabaseConnectionError will be raised immediately, instead of
-            the connection pool busy waiting until if gives up with a PoolTimeoutError.</p>
+            <p>The Sequel::DatabaseConnectionError exception class was added.  It is
+            raised by the connection pool if there is an error attempting to
+            instantiate a database connection.  Also, if the adapter returns nil
+            instead of raising an error for faulty connection parameters,
+            DatabaseConnectionError will be raised immediately, instead of the
+            connection pool busy waiting until if gives up with a PoolTimeoutError.</p>
             </li><li>
             <p>Database#tables is now supported on the JDBC adapter, returning an Array of
             table name symbols.</p>

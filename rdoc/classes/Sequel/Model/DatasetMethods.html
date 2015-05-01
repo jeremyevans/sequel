@@ -123,7 +123,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-destroy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-destroy-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2241</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">destroy</span>&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">all</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">r</span>.<span class="ruby-identifier">destroy</span>}.<span class="ruby-identifier">length</span>}&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">use_transactions</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:server=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-destroy-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2241</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">destroy</span>&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">all</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:destroy</span>).<span class="ruby-identifier">length</span>}&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">use_transactions</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-value">:server=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>], <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-graph'>
@@ -277,8 +277,7 @@
                 <div class='description'>
                   
                   <p>Same as <a href="DatasetMethods.html#method-i-with_pk">#with_pk</a>, but
-                  raises <a href="../NoMatchingRow.html">NoMatchingRow</a> instead of
-                  returning nil if no row matches.</p>
+                  raises NoMatchingRow instead of returning nil if no row matches.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_pk-21-source'); return false">

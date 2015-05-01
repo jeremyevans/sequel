@@ -248,7 +248,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>RESTRICTED_SETTER_METHODS</td>
                     <td>=</td>
-                    <td class='context-item-value'>instance_methods.map{|x| x.to_s}.grep(SETTER_METHOD_REGEXP)</td>
+                    <td class='context-item-value'>instance_methods.map(&:to_s).grep(SETTER_METHOD_REGEXP)</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       

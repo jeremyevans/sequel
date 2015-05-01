@@ -89,9 +89,7 @@
             after_commit/after_rollback hook to execute code after commit or rollback.</p>
             </li><li>
             <p>Database#transaction now supports a :rollback =&gt; :reraise option to
-            reraise any <a
-            href="../../../classes/Sequel/Rollback.html">Sequel::Rollback</a>
-            exceptions raised by the block.</p>
+            reraise any Sequel::Rollback exceptions raised by the block.</p>
             </li><li>
             <p>Database#transaction now supports a :rollback =&gt; :always option to
             always rollback the transaction, which is mostly useful when using

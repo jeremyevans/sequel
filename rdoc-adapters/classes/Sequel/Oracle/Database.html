@@ -90,7 +90,7 @@
                     <td class='context-item-value'>
                       {
                       :blob=>lambda{|b| Sequel::SQL::Blob.new(b.read)},
-                      :clob=>lambda{|b| b.read}
+                      :clob=>lambda(&:read)
                       }
                     </td>
                     <td>&nbsp;</td>

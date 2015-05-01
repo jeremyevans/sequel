@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-09-23 08:06:53 -0700</span>
+          <span class='datetime'>2015-04-29 09:26:32 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -229,30 +229,6 @@
             ruby cubrid gem is in fairly rough state, with broken transaction support
             and some other issues, but most things work.</p>
             
-            <h3 id="label-db2+">db2 <span><a href="#label-db2+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: db2/db2cli</p>
-            
-            <p>This is the older DB2 adapter.  It&#39;s recommended you try the ibmdb
-            adapter instead for new DB2 work, as it is better supported.</p>
-            
-            <h3 id="label-dbi+">dbi <span><a href="#label-dbi+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Allows access to a multitude of databases via ruby-dbi.  Additional
-            options:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:db_type </td><td>
-            <p>Specifying &#39;mssql&#39; allows Microsoft SQL Server specific syntax to
-            be used.  Otherwise has no effect.</p>
-            </td></tr></tbody></table>
-            
-            <p>DBI connection strings are a preprocessed a bit, and are specified with a
-            dbi- in front of the protocol.  Examples:</p>
-            
-            <pre>dbi-ado://...&#x000A;dbi-db2://...&#x000A;dbi-frontbase://...&#x000A;dbi-interbase://...&#x000A;dbi-msql://...&#x000A;dbi-mysql://...&#x000A;dbi-odbc://...&#x000A;dbi-oracle://...&#x000A;dbi-pg://...&#x000A;dbi-proxy://...&#x000A;dbi-sqlite://...&#x000A;dbi-sqlrelay://...</pre>
-            
-            <p>While the DBI adapter does work, it is recommended that you use another
-            adapter if your database supports it.</p>
-            
             <h3 id="label-do+">do <span><a href="#label-do+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: data_objects</p>
@@ -272,29 +248,6 @@
             
             <pre>do:sqlite3::memory:&#x000A;do:postgres://user:password@host/database&#x000A;do:mysql://user:password@host/database</pre>
             
-            <h3 id="label-fdbsql">fdbsql<span><a href="#label-fdbsql">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: pg</p>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:connect_timeout </td><td>
-            <p>Set the number of seconds to wait for a connection (default 20).</p>
-            </td></tr><tr><td class='label'>:notice_receiver </td><td>
-            <p>A proc that be called with the PGresult objects that have notice or warning
-            messages. The default notice receiver just prints the messages to stderr,
-            but this can be used to handle notice/warning messages differently.</p>
-            </td></tr><tr><td class='label'>:sslmode </td><td>
-            <p>Set to &#39;disable&#39;, &#39;allow&#39;, &#39;prefer&#39;,
-            &#39;require&#39; to choose how to treat SSL.</p>
-            </td></tr></tbody></table>
-            
-            <h3 id="label-firebird+">firebird <span><a href="#label-firebird+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: fb (using code at <a
-            href="http://github.com/wishdev/fb">github.com/wishdev/fb</a>)</p>
-            
-            <p>Does not support the :port option.</p>
-            
             <h3 id="label-ibmdb">ibmdb<span><a href="#label-ibmdb">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>requires &#39;ibm_db&#39;</p>
@@ -302,35 +255,17 @@
             <p>This connects to DB2 using IBM_DB.  This is the recommended adapter if you
             are using a C-based ruby to connect to DB2.</p>
             
-            <h3 id="label-informix+">informix <span><a href="#label-informix+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Does not support the :host or :port options.  Depending on the
-            configuration of your server it may be necessary to either set</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">quote_identifier</span> = <span class="ruby-keyword">false</span></pre>
-            
-            <p>or set</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">export</span> <span class="ruby-constant">DELIMIDENT</span>=<span class="ruby-identifier">y</span></pre>
-            
-            <p>in the scripts environment.</p>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:nolog </td><td>
-            <p>Disable transactions for the database.</p>
-            </td></tr></tbody></table>
-            
             <h3 id="label-jdbc+">jdbc <span><a href="#label-jdbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: java</p>
             
             <p>Houses Sequel&#39;s JDBC support when running on JRuby. Support for
-            individual database types is done using sub adapters. There are currently
+            individual database types is done using subadapters. There are currently
             subadapters for PostgreSQL, MySQL, SQLite, H2, HSQLDB, Derby, Oracle,
-            MSSQL, JTDS, AS400, Progress, Fdbsql, Firebird, Informix, and DB2. For
-            PostgreSQL, MySQL, SQLite, H2, HSQLDB, Derby, and JTDS, this can use the
-            jdbc-* gem, for the others you need to have the .jar in your CLASSPATH or
-            load the Java class manually before calling <a
+            MSSQL, JTDS, AS400, Progress, Firebird, Informix, and DB2. For PostgreSQL,
+            MySQL, SQLite, H2, HSQLDB, Derby, and JTDS, this can use the jdbc-* gem,
+            for the others you need to have the .jar in your CLASSPATH or load the Java
+            class manually before calling <a
             href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>.</p>
             
             <p>You just use the JDBC connection string directly, which can be specified
@@ -353,7 +288,7 @@
             
             <p>Example connection strings:</p>
             
-            <pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:firebirdsql:localhost/3050:/path/to/database.fdb&#x000A;jdbc:jdbcprogress:T:hostname:port:database&#x000A;jdbc:cubrid:hostname:port:database:::&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password&#x000A;jdbc:fdbsql://localhost:15432/user?user=user&amp;password=password</pre>
+            <pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:firebirdsql:localhost/3050:/path/to/database.fdb&#x000A;jdbc:jdbcprogress:T:hostname:port:database&#x000A;jdbc:cubrid:hostname:port:database:::&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
             
             <p>You can also use JNDI connection strings:</p>
             
@@ -452,10 +387,6 @@
             <code>Sequel.odbc(:drvconnect=&gt;&#39;driver={...};...&#39;)</code></p>
             </td></tr></tbody></table>
             
-            <h3 id="label-openbase+">openbase <span><a href="#label-openbase+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>The :port option is ignored.</p>
-            
             <h3 id="label-oracle+">oracle <span><a href="#label-oracle+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Requires: oci8</p>
@@ -553,6 +484,15 @@
             </td></tr><tr><td class='label'>:timeout </td><td>
             <p>the busy timeout to use in milliseconds (default: 5000).</p>
             </td></tr></tbody></table>
+            
+            <p>Note that SQLite memory databases are restricted to a single connection by
+            default.  This is because SQLite does not allow multiple connections to a
+            single memory database.  For this reason, <a
+            href="../../classes/Sequel.html">Sequel</a> sets the maximum number of
+            connections in the connection pool to 1 by default when an SQLite memory
+            database is used.  Attempts to force the use of more than 1 connection can
+            result in weird behavior, since the connections will be to separate memory
+            databases.</p>
             
             <h3 id="label-swift">swift<span><a href="#label-swift">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

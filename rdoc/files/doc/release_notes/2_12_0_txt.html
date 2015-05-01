@@ -409,10 +409,8 @@
             href="../../../classes/Sequel/Error.html">Sequel::Error</a> are now located
             directly under <a href="../../../classes/Sequel.html">Sequel</a>.  The old
             names are not deprecated (unless mentioned above), but their use is now
-            discouraged.  The exceptions have the same name except that <a
-            href="../../../classes/Sequel/PoolTimeout.html">Sequel::Error::PoolTimeoutError</a>
-            changed to <a
-            href="../../../classes/Sequel/PoolTimeout.html">Sequel::PoolTimeout</a>.</p>
+            discouraged.  The exceptions have the same name except that
+            Sequel::Error::PoolTimeoutError changed to Sequel::PoolTimeout.</p>
             </li><li>
             <p>Dataset#where now always affects the WHERE clause.  Before, it was just an
             alias of filter, so it modified the HAVING clause if the dataset already

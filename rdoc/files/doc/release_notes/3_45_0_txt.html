@@ -58,10 +58,9 @@
             is designed for the case where part of the LIKE pattern is based on user
             input that should not treat the metacharacters specially.</p>
             </li><li>
-            <p>Serialization failures/deadlocks are now raised as <a
-            href="../../../classes/Sequel/SerializationFailure.html">Sequel::SerializationFailure</a>
-            exception instances.  This exception class is a good candidate for the
-            transaction :retry_on option.</p>
+            <p>Serialization failures/deadlocks are now raised as
+            Sequel::SerializationFailure exception instances.  This exception class is
+            a good candidate for the transaction :retry_on option.</p>
             </li><li>
             <p>On PostgreSQL, you can now provide the :force_standard_strings and
             :client_min_messages Database options to override the defaults on a

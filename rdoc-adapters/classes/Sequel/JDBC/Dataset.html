@@ -60,14 +60,60 @@
               </ol>
             </div>
           </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a target="docwin" href="Dataset/PreparedStatementMethods.html">Sequel::JDBC::Dataset::PreparedStatementMethods</a></li>
-              <li><a target="docwin" href="Dataset/StoredProcedureMethods.html">Sequel::JDBC::Dataset::StoredProcedureMethods</a></li>
-            </ol>
-          </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PreparedStatementMethods</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      prepared_statements_module(
+                      "sql = self; opts = Hash[opts]; opts[:arguments] = bind_arguments",
+                      Sequel::Dataset::UnnumberedArgumentMapper,
+                      %w"execute execute_dui") do
+                      private
+                      
+                      # Same as execute, explicit due to intricacies of alias and super.
+                      def execute_insert(sql, opts=OPTS)
+                      sql = self
+                      opts = Hash[opts]
+                      opts[:arguments] = bind_arguments
+                      opts[:type] = :insert
+                      super
+                      end
+                      end
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>StoredProcedureMethods</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      prepared_statements_module(
+                      "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
+                      Sequel::Dataset::StoredProcedureMethods,
+                      %w"execute execute_dui") do
+                      private
+                      
+                      # Same as execute, explicit due to intricacies of alias and super.
+                      def execute_insert(sql, opts=OPTS)
+                      sql = @sproc_name
+                      opts = Hash[opts]
+                      opts[:args] = @sproc_args
+                      opts[:type] = :insert
+                      super
+                      end
+                      end
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
@@ -103,7 +149,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 724</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span> <span class="ruby-identifier">process_result_set</span>(<span class="ruby-identifier">result</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 712</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">result</span><span class="ruby-operator">|</span> <span class="ruby-identifier">process_result_set</span>(<span class="ruby-identifier">result</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prepare'>
@@ -121,7 +167,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 731</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 719</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_fetch_size'>
@@ -139,7 +185,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_fetch_size-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_fetch_size-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 742</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_fetch_size</span>(<span class="ruby-identifier">size</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch_size=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">size</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_fetch_size-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc.rb, line 730</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_fetch_size</span>(<span class="ruby-identifier">size</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch_size=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">size</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

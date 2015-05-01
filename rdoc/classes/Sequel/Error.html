@@ -41,7 +41,12 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'></div>
+          <div id='description'>
+            
+            <p>The default exception class for exceptions raised by <a
+            href="../Sequel.html">Sequel</a>. All exception classes defined by <a
+            href="../Sequel.html">Sequel</a> are descendants of this class.</p>
+          </div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
@@ -51,16 +56,6 @@
           </div>
           <div id='context'>
           </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a target="docwin" href="AdapterNotFound.html">Sequel::Error::AdapterNotFound</a></li>
-              <li><a target="docwin" href="InvalidOperation.html">Sequel::Error::InvalidOperation</a></li>
-              <li><a target="docwin" href="InvalidValue.html">Sequel::Error::InvalidValue</a></li>
-              <li><a target="docwin" href="PoolTimeout.html">Sequel::Error::PoolTimeoutError</a></li>
-              <li><a target="docwin" href="Rollback.html">Sequel::Error::Rollback</a></li>
-            </ol>
-          </div>
           <div id='section'>
             <div id='constants-list'>
               <h2>Constants</h2>
@@ -69,59 +64,37 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>AdapterNotFound</td>
                     <td>=</td>
-                    <td class='context-item-value'>Sequel::AdapterNotFound</td>
+                    <td class='context-item-value'>AdapterNotFound</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="Error.html">Error</a> raised when the adapter requested
-                      doesn&#39;t exist or can&#39;t be loaded.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>InvalidOperation</td>
                     <td>=</td>
-                    <td class='context-item-value'>Sequel::InvalidOperation</td>
+                    <td class='context-item-value'>InvalidOperation</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="Error.html">Error</a> raised on an invalid operation, such as
-                      trying to update or delete a joined or grouped dataset.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>InvalidValue</td>
                     <td>=</td>
-                    <td class='context-item-value'>Sequel::InvalidValue</td>
+                    <td class='context-item-value'>InvalidValue</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="Error.html">Error</a> raised when attempting an invalid type
-                      conversion.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>PoolTimeoutError</td>
                     <td>=</td>
-                    <td class='context-item-value'>Sequel::PoolTimeout</td>
+                    <td class='context-item-value'>PoolTimeout</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="Error.html">Error</a> raised when the connection pool cannot
-                      acquire a database connection before the timeout.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>Rollback</td>
                     <td>=</td>
-                    <td class='context-item-value'>Sequel::Rollback</td>
+                    <td class='context-item-value'>Rollback</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="Error.html">Error</a> that you should raise to signal a rollback
-                      of the current transaction. The transaction block will catch this
-                      exception, rollback the current transaction, and won&#39;t reraise it
-                      (unless a reraise is requested).</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                 </table>
               </div>

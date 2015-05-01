@@ -62,13 +62,11 @@
             adapters may support them in a future version.</p>
             </li><li>
             <p>The connection pool code can now remove connections if the adapter raises a
-            <a
-            href="../../../classes/Sequel/DatabaseDisconnectError.html">Sequel::DatabaseDisconnectError</a>
-            indicating that the connection has been lost.  When a query is attempted
-            and the adapter raises this error, the connection pool removes the
-            connection from the pool, and reraises the error.  The Oracle and
-            PostgreSQL adapters currently support this, and other adapters may support
-            it in a future version.</p>
+            Sequel::DatabaseDisconnectError indicating that the connection has been
+            lost.  When a query is attempted and the adapter raises this error, the
+            connection pool removes the connection from the pool, and reraises the
+            error.  The Oracle and PostgreSQL adapters currently support this, and
+            other adapters may support it in a future version.</p>
             </li><li>
             <p>Whether to upcase or quote identifiers can now be set separately.
             Previously, upcasing was done when quoting except when using SQLite,

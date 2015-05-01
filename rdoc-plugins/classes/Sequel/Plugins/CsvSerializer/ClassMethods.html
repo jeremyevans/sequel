@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::CsvSerializer::ClassMethods</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::CsvSerializer::ClassMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/csv_serializer_rb.html">lib/sequel/plugins/csv_serializer.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'></div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-array_from_csv">array_from_csv</a></li>
+              <li><a target="docwin" href="#attribute-i-csv_serializer_opts">csv_serializer_opts</a></li>
+              <li><a target="docwin" href="#method-i-from_csv">from_csv</a></li>
+              <li><a target="docwin" href="#method-i-process_csv_serializer_opts">process_csv_serializer_opts</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='attribute-list'>
+              <h2 class='section-bar'>Attributes</h2>
+              <div class='name-list'>
+                <table>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>
+                      <a name='attribute-i-csv_serializer_opts'>csv_serializer_opts</a>
+                    </td>
+                    <td class='context-item-value'>[R]</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The default opts to use when serializing model objects to CSV</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-array_from_csv'>
+                <a name='method-i-array_from_csv'></a>
+                <div class='synopsis'>
+                  <span class='name'>array_from_csv</span>
+                  <span class='arguments'>(csv, opts = {})</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Attempt to parse an array of instances from the given CSV string</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-array_from_csv-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-array_from_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 86</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">array_from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)).<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">row</span> = <span class="ruby-identifier">row</span>.<span class="ruby-identifier">to_hash</span>&#x000A;    <span class="ruby-identifier">row</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-keyword">nil</span>)&#x000A;    <span class="ruby-identifier">new</span>(<span class="ruby-identifier">row</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-from_csv'>
+                <a name='method-i-from_csv'></a>
+                <div class='synopsis'>
+                  <span class='name'>from_csv</span>
+                  <span class='arguments'>(csv, opts = {})</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Attempt to parse a single instance from the given CSV string</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_csv-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-from_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 95</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-identifier">new</span>.<span class="ruby-identifier">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-process_csv_serializer_opts'>
+                <a name='method-i-process_csv_serializer_opts'></a>
+                <div class='synopsis'>
+                  <span class='name'>process_csv_serializer_opts</span>
+                  <span class='arguments'>(opts)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Convert the options hash to one that can be passed to CSV.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-process_csv_serializer_opts-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-process_csv_serializer_opts-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">opts</span> = (<span class="ruby-identifier">csv_serializer_opts</span> <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">opts_cols</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)&#x000A;  <span class="ruby-identifier">opts_include</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:include</span>)&#x000A;  <span class="ruby-identifier">opts_except</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:except</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:only</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">opts_cols</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">columns</span>) <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts_include</span>) <span class="ruby-operator">-</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts_except</span>)&#x000A;  <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -41,16 +41,14 @@
             <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
             <p>Dataset#first! has been added.  This is identical to first, except where
-            first would return nil due to no row matching, first! raises a <a
-            href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
-            exception.  The main benefit here is that a standard exception class is now
-            used, so external libraries can deal with these exceptions appropriately
-            (such as web applications returning a 404 error).</p>
+            first would return nil due to no row matching, first! raises a
+            Sequel::NoMatchingRow exception.  The main benefit here is that a standard
+            exception class is now used, so external libraries can deal with these
+            exceptions appropriately (such as web applications returning a 404 error).</p>
             </li><li>
             <p>Dataset#with_pk! has been added to model datasets.  Similar to first!, this
-            raises a <a
-            href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
-            exception instead of returning nil if there is no matching row.</p>
+            raises a Sequel::NoMatchingRow exception instead of returning nil if there
+            is no matching row.</p>
             </li><li>
             <p>A drop_foreign_key method has been added to the alter_table generator:</p>
             

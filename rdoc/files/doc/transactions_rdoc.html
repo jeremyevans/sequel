@@ -69,10 +69,8 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
             
-            <p>If the block raises a <a
-            href="../../classes/Sequel/Rollback.html">Sequel::Rollback</a> exception,
-            the transaction is rolled back, but no exception is raised outside the
-            block:</p>
+            <p>If the block raises a Sequel::Rollback exception, the transaction is rolled
+            back, but no exception is raised outside the block:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># no exception raised</span></pre>
             
@@ -81,9 +79,8 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">ArgumentError</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># ArgumentError raised</span></pre>
             
-            <p>If you want <a
-            href="../../classes/Sequel/Rollback.html">Sequel::Rollback</a> exceptions
-            to be reraised, use the <code>:rollback =&gt; :reraise</code> option:</p>
+            <p>If you want Sequel::Rollback exceptions to be reraised, use the
+            <code>:rollback =&gt; :reraise</code> option:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">reraise</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK</span>&#x000A;<span class="ruby-comment"># Sequel::Rollback raised</span></pre>
             
@@ -122,9 +119,8 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">auto_savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">foo</span>].<span class="ruby-identifier">insert</span>(<span class="ruby-value">1</span>) <span class="ruby-comment"># INSERT</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># RELEASE SAVEPOINT</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
             
-            <p>If a <a href="../../classes/Sequel/Rollback.html">Sequel::Rollback</a>
-            exception is raised inside the savepoint block, it will only rollback to
-            the savepoint:</p>
+            <p>If a Sequel::Rollback exception is raised inside the savepoint block, it
+            will only rollback to the savepoint:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span> <span class="ruby-comment"># BEGIN</span>&#x000A;  <span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">savepoint</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>) <span class="ruby-keyword">do</span> <span class="ruby-comment"># SAVEPOINT</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;  <span class="ruby-keyword">end</span> <span class="ruby-comment"># ROLLBACK TO SAVEPOINT</span>&#x000A;  <span class="ruby-comment"># no exception raised</span>&#x000A;<span class="ruby-keyword">end</span> <span class="ruby-comment"># COMMIT</span></pre>
             
@@ -184,11 +180,9 @@
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">isolation</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">serializable</span>, :<span class="ruby-identifier">retry_on=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SerializationFailure</span>]) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">ModelClass</span>.<span class="ruby-identifier">find_or_create</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>At the serializable transaction isolation level, find_or_create may raises
-            a <a
-            href="../../classes/Sequel/SerializationFailure.html">Sequel::SerializationFailure</a>
-            exception if multiple threads simultaneously run that code.  With the
-            :retry_on option set, the transaction will be automatically retried until
-            it succeeds.</p>
+            a Sequel::SerializationFailure exception if multiple threads simultaneously
+            run that code.  With the :retry_on option set, the transaction will be
+            automatically retried until it succeeds.</p>
             
             <p>Note that automatic retrying should not be used unless the entire
             transaction block is idempotent, as otherwise it can cause non-idempotent

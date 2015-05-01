@@ -238,23 +238,14 @@
               <li><a target="docwin" href="Sequel/Schema.html">Sequel::Schema</a></li>
               <li><a target="docwin" href="Sequel/Timezones.html">Sequel::Timezones</a></li>
               <li><a target="docwin" href="Sequel/ASTTransformer.html">Sequel::ASTTransformer</a></li>
-              <li><a target="docwin" href="Sequel/AdapterNotFound.html">Sequel::AdapterNotFound</a></li>
               <li><a target="docwin" href="Sequel/BasicObject.html">Sequel::BasicObject</a></li>
               <li><a target="docwin" href="Sequel/HookFailed.html">Sequel::BeforeHookFailed</a></li>
-              <li><a target="docwin" href="Sequel/CheckConstraintViolation.html">Sequel::CheckConstraintViolation</a></li>
               <li><a target="docwin" href="Sequel/ConnectionPool.html">Sequel::ConnectionPool</a></li>
-              <li><a target="docwin" href="Sequel/ConstraintViolation.html">Sequel::ConstraintViolation</a></li>
               <li><a target="docwin" href="Sequel/Database.html">Sequel::Database</a></li>
-              <li><a target="docwin" href="Sequel/DatabaseConnectionError.html">Sequel::DatabaseConnectionError</a></li>
-              <li><a target="docwin" href="Sequel/DatabaseDisconnectError.html">Sequel::DatabaseDisconnectError</a></li>
-              <li><a target="docwin" href="Sequel/DatabaseError.html">Sequel::DatabaseError</a></li>
               <li><a target="docwin" href="Sequel/Dataset.html">Sequel::Dataset</a></li>
               <li><a target="docwin" href="Sequel/Error.html">Sequel::Error</a></li>
-              <li><a target="docwin" href="Sequel/ForeignKeyConstraintViolation.html">Sequel::ForeignKeyConstraintViolation</a></li>
               <li><a target="docwin" href="Sequel/HookFailed.html">Sequel::HookFailed</a></li>
               <li><a target="docwin" href="Sequel/IntegerMigrator.html">Sequel::IntegerMigrator</a></li>
-              <li><a target="docwin" href="Sequel/InvalidOperation.html">Sequel::InvalidOperation</a></li>
-              <li><a target="docwin" href="Sequel/InvalidValue.html">Sequel::InvalidValue</a></li>
               <li><a target="docwin" href="Sequel/LiteralString.html">Sequel::LiteralString</a></li>
               <li><a target="docwin" href="Sequel/Migration.html">Sequel::Migration</a></li>
               <li><a target="docwin" href="Sequel/MigrationAlterTableReverser.html">Sequel::MigrationAlterTableReverser</a></li>
@@ -262,24 +253,15 @@
               <li><a target="docwin" href="Sequel/MigrationReverser.html">Sequel::MigrationReverser</a></li>
               <li><a target="docwin" href="Sequel/Migrator.html">Sequel::Migrator</a></li>
               <li><a target="docwin" href="Sequel/Model.html">Sequel::Model</a></li>
-              <li><a target="docwin" href="Sequel/NoExistingObject.html">Sequel::NoExistingObject</a></li>
-              <li><a target="docwin" href="Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a></li>
-              <li><a target="docwin" href="Sequel/NotNullConstraintViolation.html">Sequel::NotNullConstraintViolation</a></li>
-              <li><a target="docwin" href="Sequel/PoolTimeout.html">Sequel::PoolTimeout</a></li>
               <li><a target="docwin" href="Sequel/Qualifier.html">Sequel::Qualifier</a></li>
-              <li><a target="docwin" href="Sequel/Rollback.html">Sequel::Rollback</a></li>
               <li><a target="docwin" href="Sequel/SQLTime.html">Sequel::SQLTime</a></li>
-              <li><a target="docwin" href="Sequel/SerializationFailure.html">Sequel::SerializationFailure</a></li>
               <li><a target="docwin" href="Sequel/ShardedSingleConnectionPool.html">Sequel::ShardedSingleConnectionPool</a></li>
               <li><a target="docwin" href="Sequel/ShardedThreadedConnectionPool.html">Sequel::ShardedThreadedConnectionPool</a></li>
               <li><a target="docwin" href="Sequel/SimpleMigration.html">Sequel::SimpleMigration</a></li>
               <li><a target="docwin" href="Sequel/SingleConnectionPool.html">Sequel::SingleConnectionPool</a></li>
               <li><a target="docwin" href="Sequel/ThreadedConnectionPool.html">Sequel::ThreadedConnectionPool</a></li>
               <li><a target="docwin" href="Sequel/TimestampMigrator.html">Sequel::TimestampMigrator</a></li>
-              <li><a target="docwin" href="Sequel/UnbindDuplicate.html">Sequel::UnbindDuplicate</a></li>
               <li><a target="docwin" href="Sequel/Unbinder.html">Sequel::Unbinder</a></li>
-              <li><a target="docwin" href="Sequel/UndefinedAssociation.html">Sequel::UndefinedAssociation</a></li>
-              <li><a target="docwin" href="Sequel/UniqueConstraintViolation.html">Sequel::UniqueConstraintViolation</a></li>
               <li><a target="docwin" href="Sequel/ValidationFailed.html">Sequel::ValidationFailed</a></li>
             </ol>
           </div>
@@ -297,6 +279,17 @@
                       
                       <p>Hash of adapters that have been used. The key is the adapter scheme symbol,
                       and the value is the <a href="Sequel/Database.html">Database</a> subclass.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>AdapterNotFound</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when the adapter requested
+                      doesn&#39;t exist or can&#39;t be loaded.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -331,6 +324,29 @@
                     <td class='context-item-value'>/\A((?:(?!__).)+)__(.+)\z/.freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CheckConstraintViolation</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(ConstraintViolation)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when <a
+                      href="Sequel.html">Sequel</a> determines a database check constraint has
+                      been violated.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ConstraintViolation</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(DatabaseError)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Generic error raised when <a href="Sequel.html">Sequel</a> determines a
+                      database constraint has been violated.</p>
+                    </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DATABASES</td>
@@ -399,6 +415,77 @@
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatabaseConnectionError</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(DatabaseError)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when the <a
+                      href="Sequel.html">Sequel</a> is unable to connect to the database with the
+                      connection parameters it was given.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatabaseDisconnectError</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(DatabaseError)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised by adapters when they
+                      determine that the connection to the database has been lost.  Instructs the
+                      connection pool code to  remove that connection from the pool so that other
+                      connections can be acquired automatically.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DatabaseError</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Generic error raised by the database adapters, indicating a problem
+                      originating from the database server.  Usually raised because incorrect <a
+                      href="Sequel/SQL.html">SQL</a> syntax is used.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ForeignKeyConstraintViolation</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(ConstraintViolation)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when <a
+                      href="Sequel.html">Sequel</a> determines a database foreign key constraint
+                      has been violated.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>InvalidOperation</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised on an invalid operation, such
+                      as trying to update or delete a joined or grouped dataset.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>InvalidValue</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when attempting an invalid
+                      type conversion.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MAJOR</td>
                     <td>=</td>
                     <td class='context-item-value'>4</td>
@@ -412,12 +499,59 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MINOR</td>
                     <td>=</td>
-                    <td class='context-item-value'>21</td>
+                    <td class='context-item-value'>22</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
                       <p>The minor version of <a href="Sequel.html">Sequel</a>.  Bumped for every
                       non-patch level release, generally around once a month.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MassAssignmentRestriction</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Raised when a mass assignment method is called in strict mode with either a
+                      restricted column or a column without a setter method.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NoExistingObject</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Exception class raised when <code>require_modification</code> is set and an
+                      UPDATE or DELETE statement to modify the dataset doesn&#39;t modify a
+                      single row.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NoMatchingRow</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when the user requests a
+                      record via the first! or similar method, and the dataset does not yield any
+                      rows.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NotNullConstraintViolation</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(ConstraintViolation)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when <a
+                      href="Sequel.html">Sequel</a> determines a database NOT NULL constraint has
+                      been violated.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -431,11 +565,47 @@
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>PoolTimeout</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when the connection pool
+                      cannot acquire a database connection before the timeout.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>Rollback</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> that you should raise to signal a
+                      rollback of the current transaction. The transaction block will catch this
+                      exception, rollback the current transaction, and won&#39;t reraise it
+                      (unless a reraise is requested).</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>SPLIT_SYMBOL_CACHE</td>
                     <td>=</td>
                     <td class='context-item-value'>{}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SerializationFailure</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(DatabaseError)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when <a
+                      href="Sequel.html">Sequel</a> determines a serialization failure/deadlock
+                      in the database.</p>
+                    </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>TINY</td>
@@ -446,6 +616,39 @@
                       
                       <p>The tiny version of <a href="Sequel.html">Sequel</a>.  Usually 0, only
                       bumped for bugfix releases that fix regressions from previous versions.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UnbindDuplicate</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when unbinding a dataset that
+                      has multiple different values for a given variable.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UndefinedAssociation</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(Error)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Raised when an undefined association is used when eager loading.</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UniqueConstraintViolation</td>
+                    <td>=</td>
+                    <td class='context-item-value'>Class.new(ConstraintViolation)</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p><a href="Sequel/Error.html">Error</a> raised when <a
+                      href="Sequel.html">Sequel</a> determines a database unique constraint has
+                      been violated.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
@@ -1041,9 +1244,8 @@
                   
                   <pre>DB1.transaction do&#x000A;  DB2.transaction do&#x000A;    DB3.transaction do&#x000A;      ...&#x000A;    end&#x000A;  end&#x000A;end</pre>
                   
-                  <p>except that if <a href="Sequel/Rollback.html">Sequel::Rollback</a> is
-                  raised by the block, the transaction is rolled back on all databases
-                  instead of just the last one.</p>
+                  <p>except that if Sequel::Rollback is raised by the block, the transaction is
+                  rolled back on all databases instead of just the last one.</p>
                   
                   <p>Note that this method cannot guarantee that all databases will commit or
                   rollback.  For example, if DB3 commits but attempting to commit on DB2
@@ -1056,7 +1258,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-transaction-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-transaction-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 328</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">dbs</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rollback</span>]&#x000A;    <span class="ruby-identifier">rescue_rollback</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:rollback=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:reraise</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">dbs</span>.<span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-identifier">block</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">bl</span>, <span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">bl</span>)}}&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">rescue_rollback</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;      <span class="ruby-keyword">nil</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-transaction-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 328</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">dbs</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:rollback</span>]&#x000A;    <span class="ruby-identifier">rescue_rollback</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-identifier">opts</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">opts</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-value">:rollback=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:reraise</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">dbs</span>.<span class="ruby-identifier">reverse</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-identifier">block</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">bl</span>, <span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">proc</span>{<span class="ruby-identifier">db</span>.<span class="ruby-identifier">transaction</span>(<span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">bl</span>)}}&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">rescue_rollback</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;    <span class="ruby-keyword">rescue</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Rollback</span>&#x000A;      <span class="ruby-keyword">nil</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">pr</span>.<span class="ruby-identifier">call</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-version'>

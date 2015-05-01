@@ -107,7 +107,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 432</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@type</span> = <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 441</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">converter</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@type</span> = <span class="ruby-identifier">type</span>&#x000A;  <span class="ruby-ivar">@converter</span> = <span class="ruby-identifier">converter</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -125,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 440</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">parse_pg_array</span>(<span class="ruby-identifier">string</span>, <span class="ruby-ivar">@converter</span>), <span class="ruby-ivar">@type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_array.rb, line 449</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">string</span>)&#x000A;  <span class="ruby-constant">PGArray</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">parse_pg_array</span>(<span class="ruby-identifier">string</span>, <span class="ruby-ivar">@converter</span>), <span class="ruby-ivar">@type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

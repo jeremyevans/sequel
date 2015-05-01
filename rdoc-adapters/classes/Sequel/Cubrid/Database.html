@@ -186,7 +186,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-server_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/cubrid.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">synchronize</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">server_version</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/cubrid.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> <span class="ruby-identifier">synchronize</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:server_version</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

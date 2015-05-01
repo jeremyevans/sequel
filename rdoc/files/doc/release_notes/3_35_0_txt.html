@@ -115,10 +115,8 @@
             </li><li>
             <p>Errors that occur when rolling back database transactions are now handled
             correctly.  Previously, the underlying exception was raised, it wasn&#39;t
-            correctly wrapped in a <a
-            href="../../../classes/Sequel/DatabaseError.html">Sequel::DatabaseError</a>,
-            and if it was due to a database disconnection, the connection wasn&#39;t
-            removed from the pool.</p>
+            correctly wrapped in a Sequel::DatabaseError, and if it was due to a
+            database disconnection, the connection wasn&#39;t removed from the pool.</p>
             </li><li>
             <p><a href="../../../classes/Sequel.html">Sequel</a> no longer sets ruby
             instance variables on java objects, fixing warnings on JRuby 1.7 and

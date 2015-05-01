@@ -70,7 +70,7 @@
                       {
                       ::Cubrid::DATE => lambda{|t| Date.new(t.year, t.month, t.day)},
                       ::Cubrid::TIME => lambda{|t| SQLTime.create(t.hour, t.min, t.sec)},
-                      21 => lambda{|s| s.to_i}
+                      21 => lambda(&:to_i)
                       }
                     </td>
                     <td>&nbsp;</td>

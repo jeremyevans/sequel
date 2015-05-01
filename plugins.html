@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.21.0</h2>
+    <h2>Sequel::Model Plugins for v4.22.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -112,6 +112,7 @@
 </ul></li>
 <li>Serialization:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Composition.html">composition</a>: Supports defining getters/setters for objects with data backed by the model's columns.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/CsvSerializer.html">csv_serializer</a>: Allows you to serialize/deserialize model objects to/from CSV.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/JsonSerializer.html">json_serializer</a>: Allows you to serialize/deserialize model objects to/from JSON.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization</a>: Supports serializing column values and storing them as either marshal, yaml, or json in the database.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SerializationModificationDetection.html">serialization_modification_detection</a>: Allows you to detect changes to serialized columns.</li>
@@ -144,7 +145,7 @@
 <li><a href='http://github.com/sdepold/sequel-bit_fields'>sequel-bit_fields</a>: Allows treating an integer column as a bitfield of many boolean settings.</li>
 <li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
 <li><a href='http://github.com/mig-hub/sequel-crushyform'>sequel_crushyform</a>: Builds forms for you</li>
-<li><a href='http://github.com/gucki/sequel_mappable'>sequel_mappable</a>: Provides geocoding functionality to model & dataset.</li>
+<li><a href='http://github.com/gucki/sequel_mappable'>sequel_mappable</a>: Provides geocoding functionality to model and dataset.</li>
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
 <li><a href='http://github.com/gucki/sequel_paperclip'>sequel_paperclip</a>: Provides attachment functionality for models, including post processing (thumbnail generation, etc).</li>
@@ -154,6 +155,7 @@
 <li><a href='http://github.com/gucki/sequel_sexy_validations'>sequel_sexy_validations</a>: Provides sexy validations (like those in rails 3) for models.</li>
 <li><a href='http://github.com/tadman/sequel_simple_callbacks'>sequel_simple_callbacks</a>: Enables ActiveRecord-compatible class-level before and after filter declarations for models with support for conditional execution.</li>
 <li><a href='http://github.com/pk/sequel_sluggable'>sequel_sluggable</a>: Easy slug behaviour for any model.</li>
+<li><a href='https://github.com/QuinnHarris/sequel-table_inheritance'>sequel-table_inheritance</a>: Combines the functionality of the single table inheritance and class table inheritance plugins.</li>
 <li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
 <li><a href='http://github.com/jeremyevans/sequel_validation_helpers_block'>sequel_validation_helpers_block</a>: Allows easy determination of which validation rules apply to a given column, at the expense of increased verbosity.</li>
 </ul>
@@ -233,7 +235,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_json_ops_rb.html">pg_json_ops</a>: Adds DSL support for calling PostgreSQL json operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_range_ops_rb.html">pg_range_ops</a>: Adds DSL support for calling PostgreSQL range operators and functions.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pg_row_ops_rb.html">pg_row_ops</a>: Adds DSL support for dealing with PostgreSQL row-valued/composite types.</li>
-<li><a href="rdoc-plugins/files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">ruby18_symbol_extensions</a>: Contains implementations of Symbol#{<,<=,>,>=,[]} that are only usable on ruby 1.8.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/ruby18_symbol_extensions_rb.html">ruby18_symbol_extensions</a>: Contains implementations of Symbol#{&lt;,&lt;=,&gt;,&gt;=,[]} that are only usable on ruby 1.8.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_expr_rb.html">sql_expr</a>: Adds sql_expr method to all objects, allowing easy use of Sequel's DSL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/string_date_time_rb.html">string_date_time</a>: Adds instance methods to String for converting the string into a Date/Time/DateTime.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/thread_local_timezones_rb.html">thread_local_timezones</a>: Allows for per-thread overrides of the global timezone settings.</li>
@@ -260,9 +262,22 @@
 <li><a href='https://github.com/refile/refile-sequel'>refile-sequel</a>: Provides an extension for using Refile with Sequel.</li>
 </ul>
 
-<h3>Submitting Your Plugin/Extension</h3>
+<h3>External Adapters</h3>
 
-<p>If you have created a Sequel plugin/extension and would like to list it here, please submit a request to code AT jeremyevans DOT net, or send a pull request via github.</p>
+<p>Adapters allow Sequel to communicate with databases.  Sequel ships with many adapters, but here are links to external adapters:</p>
+
+<ul>
+<li><a href='https://github.com/djanowski/sequel-fusiontables'>fusiontables</a>: Fusion Tables adapter using <a href="https://github.com/djanowski/ft">ft</a> driver</li>
+<li><a href='https://github.com/hrp/sequel-hive-adapter'>hive</a>: Hadoop Hive adapter using <a href="https://github.com/forward3d/rbhive">rbhive</a> driver</li>
+<li><a href='https://github.com/ahto/sequel-jdbc-crate'>jdbc-crate</a>: JDBC subadapter for Crate database</li>
+<li><a href='https://github.com/colincasey/sequel-jdbc-hxtt-adapter'>jdbc-hxtt</a>: JDBC subadapter for MS Access databases</li>
+<li><a href='https://github.com/gimoh/sequel-openedge-adapter'>openedge</a>: ODBC and JDBC subadapters for OpenEdge database</li>
+<li><a href='https://github.com/camilo/sequel-vertica'>vertica</a>: Vertica adapter using <a href="https://github.com/wvanbergen/vertica">vertica</a> driver</li>
+</ul>
+
+<h3>Submitting Your Plugin/Extension/Adapter</h3>
+
+<p>If you have created a Sequel plugin/extension/adapter and would like to list it here, please submit a request to code AT jeremyevans DOT net, or send a pull request via github.</p>
 
     <br style="clear: both;" />
   </div>
