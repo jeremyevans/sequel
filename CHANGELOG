@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.22.0 (2015-05-01)
 
 * Deprecate the db2, dbi, fdbsql, firebird, jdbc/fdbsql, informix, and openbase adapters (jeremyevans)
 
