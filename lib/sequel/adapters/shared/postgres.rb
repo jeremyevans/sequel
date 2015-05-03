@@ -706,7 +706,7 @@ module Sequel
       # Convert the hash of named conversion procs into a hash a oid conversion procs. 
       def convert_named_procs_to_procs(named_procs)
         h = {}
-        from(:pg_type).where(:typtype=>'b', :typname=>named_procs.keys.map(&:to_s)).select_map([:oid, :typname]).each do |oid, name|
+        from(:pg_type).where(:typtype=>['b', 'e'], :typname=>named_procs.keys.map(&:to_s)).select_map([:oid, :typname]).each do |oid, name|
           h[oid.to_i] = named_procs[name.untaint.to_sym]
         end
         h
