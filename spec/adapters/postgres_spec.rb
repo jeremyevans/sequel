@@ -1662,6 +1662,18 @@ if DB.adapter_scheme == :postgres
       @db[:foo].insert(Sequel.pg_array(['21 days'], :interval))
       @db[:foo].get(:bar).should == ['syad 12']
     end
+
+    specify "should work with conversion procs on enums" do
+      @db.create_enum(:foo_enum, %w(foo bar))
+      @db.add_named_conversion_proc(:foo_enum){|string| string.reverse}
+      @db.create_table!(:foo){foo_enum :bar}
+      @db[:foo].insert(:bar => 'test string')
+      @db[:foo].get(:bar).should == 'test string'.reverse
+
+      # need to drop teh table here so we can drop the enum as well.
+      @db.drop_table?(:foo)
+      @db.drop_enum(:foo_enum)
+    end
   end
 end
 
