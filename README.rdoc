@@ -430,6 +430,12 @@ You can then do anything you like with the dataset:
   # ON order_items.item_id = items.id
   # WHERE order_items.order_id = 1234
   
+Note that the default selection in Sequel is <tt>*</tt>, which includes all columns
+in all joined tables.  Because Sequel returns results as a hash keyed by column name
+symbols, if any tables have columns with the same name, this will clobber the columns
+in the returned hash.  So when joining you are usually going to want to change the
+selection using +select+, +select_all+, and/or +select_append+.
+
 == Column references in Sequel
 
 Sequel expects column names to be specified using symbols. In addition, returned hashes always use symbols as their keys. This allows you to freely mix literal values and column references in many cases. For example, the two following lines produce equivalent SQL:
