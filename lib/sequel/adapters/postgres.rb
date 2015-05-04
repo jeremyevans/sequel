@@ -190,6 +190,7 @@ module Sequel
       INFINITE_DATETIME_VALUES = ([PLUS_INFINITY, MINUS_INFINITY] + INFINITE_TIMESTAMP_STRINGS).freeze
       
       set_adapter_scheme :postgres
+      set_adapter_scheme :postgresql
 
       # Whether infinite timestamps/dates should be converted on retrieval.  By default, no
       # conversion is done, so an error is raised if you attempt to retrieve an infinite
