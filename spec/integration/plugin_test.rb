@@ -1480,8 +1480,10 @@ describe "List plugin without a scope" do
     @c[:name => "abc"].move_to(3)
     @c.map(:name).should == %w[ def hig abc ]
 
-    proc { @c[:name => "abc"].move_to(-1) }.should raise_error(Sequel::Error)
-    proc { @c[:name => "abc"].move_to(10) }.should raise_error(Sequel::Error)
+    @c[:name => "abc"].move_to(-1)
+    @c.map(:name).should == %w[ abc def hig ]
+    @c[:name => "abc"].move_to(10)
+    @c.map(:name).should == %w[ def hig abc ]
   end
 
   it "should define move_to_top and move_to_bottom" do
@@ -1505,8 +1507,10 @@ describe "List plugin without a scope" do
     @c[:name => "abc"].move_down(2)
     @c.map(:name).should == %w[ def hig abc ]
 
-    proc { @c[:name => "def"].move_up(10) }.should raise_error(Sequel::Error)
-    proc { @c[:name => "def"].move_down(10) }.should raise_error(Sequel::Error)
+    @c[:name => "abc"].move_up(10)
+    @c.map(:name).should == %w[ abc def hig ]
+    @c[:name => "abc"].move_down(10)
+    @c.map(:name).should == %w[ def hig abc ]
   end
 
   it "should update positions on destroy" do
@@ -1569,8 +1573,10 @@ describe "List plugin with a scope" do
     @c[:name => "P2"].move_to(3)
     @c.map(:name).should == %w[ Hm Ps Au P1 P3 P2 ]
 
-    proc { @c[:name => "P2"].move_to(-1) }.should raise_error(Sequel::Error)
-    proc { @c[:name => "P2"].move_to(10) }.should raise_error(Sequel::Error)
+    @c[:name => "P2"].move_to(-1)
+    @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
+    @c[:name => "P2"].move_to(10)
+    @c.map(:name).should == %w[ Hm Ps Au P1 P3 P2 ]
   end
 
   specify "should define move_to_top and move_to_bottom" do
@@ -1588,8 +1594,10 @@ describe "List plugin with a scope" do
     @c[:name => "P1"].move_down
     @c.map(:name).should == %w[ Hm Ps Au P2 P3 P1 ]
 
-    proc { @c[:name => "P1"].move_up(10) }.should raise_error(Sequel::Error)
-    proc { @c[:name => "P1"].move_down(10) }.should raise_error(Sequel::Error)
+    @c[:name => "P1"].move_up(10)
+    @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
+    @c[:name => "P1"].move_down(10)
+    @c.map(:name).should == %w[ Hm Ps Au P2 P3 P1 ]
   end
 
   it "should update positions on destroy" do

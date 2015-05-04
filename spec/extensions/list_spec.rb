@@ -153,10 +153,12 @@ describe "List plugin" do
       "UPDATE items SET position = 2 WHERE (id = 7)"]
   end
 
-  it "should have move_to raise an error if an invalid target is used" do
-    proc{@o.move_to(0)}.should raise_error(Sequel::Error)
+  it "should have move_to handle out of range targets" do
+    @o.move_to(0)
+    @o.position.should == 1
     @c.dataset._fetch = {:max=>10}
-    proc{@o.move_to(11)}.should raise_error(Sequel::Error)
+    @o.move_to(11)
+    @o.position.should == 10
   end
 
   it "should have move_to use a transaction if the instance is configured to use transactions" do

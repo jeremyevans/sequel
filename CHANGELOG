@@ -1,3 +1,9 @@
+=== HEAD
+
+* Make Model#move_to in the list plugin handle out-of-range targets without raising an exception (jeremyevans) (#1003)
+
+* Make Database#add_named_conversion_proc on PostgreSQL handle conversion procs for enum types (celsworth) (#1002)
+
 === 4.22.0 (2015-05-01)
 
 * Deprecate the db2, dbi, fdbsql, firebird, jdbc/fdbsql, informix, and openbase adapters (jeremyevans)

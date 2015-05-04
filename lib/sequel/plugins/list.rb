@@ -129,11 +129,11 @@ module Sequel
             checked_transaction do
               ds = list_dataset
               op, ds = if target < current
-                raise(Sequel::Error, "Moving too far up (target = #{target})") if target < 1
+                target = 1 if target < 1
                 [:+, ds.filter(position_field=>target...current)]
               else
                 lp ||= last_position
-                raise(Sequel::Error, "Moving too far down (target = #{target}, last_position = #{lp})") if target > lp
+                target = lp if target > lp
                 [:-, ds.filter(position_field=>(current + 1)..target)]
               end
               ds.update(position_field => Sequel::SQL::NumericExpression.new(op, position_field, 1))
