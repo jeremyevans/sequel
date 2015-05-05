@@ -5,81 +5,79 @@ describe Sequel::Model::Errors do
     @errors = Sequel::Model::Errors.new
   end
   
-  specify "should be clearable using #clear" do
+  it "should be clearable using #clear" do
     @errors.add(:a, 'b')
-    @errors.should == {:a=>['b']}
+    @errors.must_equal(:a=>['b'])
     @errors.clear
-    @errors.should == {}
+    @errors.must_equal({})
   end
   
-  specify "should be empty if there are no errors" do
-    @errors.should be_empty
+  it "should be empty if there are no errors" do
+    @errors.must_be :empty?
   end
   
-  specify "should not be empty if there are errors" do
+  it "should not be empty if there are errors" do
     @errors.add(:blah, "blah")
-    @errors.should_not be_empty
+    @errors.wont_be :empty?
   end
   
-  specify "should return an array of errors for a specific attribute using #on if there are errors" do
+  it "should return an array of errors for a specific attribute using #on if there are errors" do
     @errors.add(:blah, 'blah')
-    @errors.on(:blah).should == ['blah']
+    @errors.on(:blah).must_equal ['blah']
   end
   
-  specify "should return nil using #on if there are no errors for that attribute" do
-    @errors.on(:blah).should == nil
+  it "should return nil using #on if there are no errors for that attribute" do
+    @errors.on(:blah).must_equal nil
   end
   
-  specify "should accept errors using #add" do
+  it "should accept errors using #add" do
     @errors.add :blah, 'zzzz'
-    @errors[:blah].should == ['zzzz']
+    @errors[:blah].must_equal ['zzzz']
   end
   
-  specify "should return full messages using #full_messages" do
-    @errors.full_messages.should == []
+  it "should return full messages using #full_messages" do
+    @errors.full_messages.must_equal []
     
     @errors.add(:blow, 'blieuh')
     @errors.add(:blow, 'blich')
     @errors.add(:blay, 'bliu')
     msgs = @errors.full_messages
-    msgs.size.should == 3
-    msgs.should include('blow blieuh', 'blow blich', 'blay bliu')
+    msgs.sort.must_equal ['blay bliu', 'blow blich', 'blow blieuh']
   end
 
-  specify "should not add column names for LiteralStrings" do
-    @errors.full_messages.should == []
+  it "should not add column names for LiteralStrings" do
+    @errors.full_messages.must_equal []
     
     @errors.add(:blow, 'blieuh')
     @errors.add(:blow, Sequel.lit('blich'))
     @errors.add(:blay, 'bliu')
     msgs = @errors.full_messages
-    msgs.size.should == 3
-    msgs.should include('blow blieuh', 'blich', 'blay bliu')
+    msgs.sort.must_equal ['blay bliu', 'blich', 'blow blieuh']
   end
 
-  specify "should return the number of error messages using #count" do
-    @errors.count.should == 0
+  it "should return the number of error messages using #count" do
+    @errors.count.must_equal 0
     @errors.add(:a, 'b')
-    @errors.count.should == 1
+    @errors.count.must_equal 1
     @errors.add(:a, 'c')
-    @errors.count.should == 2
+    @errors.count.must_equal 2
     @errors.add(:b, 'c')
-    @errors.count.should == 3
+    @errors.count.must_equal 3
   end
 
-  specify "should return the array of error messages for a given attribute using #on" do
+  it "should return the array of error messages for a given attribute using #on" do
     @errors.add(:a, 'b')
-    @errors.on(:a).should == ['b']
+    @errors.on(:a).must_equal ['b']
     @errors.add(:a, 'c')
-    @errors.on(:a).should == ['b', 'c']
+    @errors.on(:a).must_equal ['b', 'c']
     @errors.add(:b, 'c')
-    @errors.on(:a).should == ['b', 'c']
+    @errors.on(:a).must_equal ['b', 'c']
   end
 
-  specify "should return nil if there are no error messages for a given attribute using #on" do
-    @errors.on(:a).should == nil
+  it "should return nil if there are no error messages for a given attribute using #on" do
+    @errors.on(:a).must_equal nil
     @errors.add(:b, 'b')
-    @errors.on(:a).should == nil
+    @errors.on(:a).must_equal nil
   end
 end
 
@@ -95,48 +93,48 @@ describe Sequel::Model do
     @o = @c.new
   end
   
-  specify "should supply a #valid? method that returns true if validations pass" do
+  it "should supply a #valid? method that returns true if validations pass" do
     @o.score = 50
-    @o.should_not be_valid
+    @o.wont_be :valid?
     @o.score = 100
-    @o.should be_valid
+    @o.must_be :valid?
   end
   
-  specify "should provide an errors object" do
+  it "should provide an errors object" do
     @o.score = 100
-    @o.should be_valid
-    @o.errors.should be_empty
+    @o.must_be :valid?
+    @o.errors.must_be :empty?
     
     @o.score = 86
-    @o.should_not be_valid
-    @o.errors[:score].should == ['too low']
-    @o.errors.on(:blah).should be_nil
+    @o.wont_be :valid?
+    @o.errors[:score].must_equal ['too low']
+    @o.errors.on(:blah).must_equal nil
   end
   
-  specify "should allow raising of ValidationFailed with a Model instance with errors" do
+  it "should allow raising of ValidationFailed with a Model instance with errors" do
     @o.errors.add(:score, 'is too low')
     begin
       raise Sequel::ValidationFailed, @o
     rescue Sequel::ValidationFailed => e
     end
-    e.model.should equal(@o)
-    e.errors.should equal(@o.errors)
-    e.message.should == 'score is too low'
+    e.model.must_be_same_as(@o)
+    e.errors.must_be_same_as(@o.errors)
+    e.message.must_equal 'score is too low'
   end
   
-  specify "should allow raising of ValidationFailed with an Errors instance" do
+  it "should allow raising of ValidationFailed with an Errors instance" do
     @o.errors.add(:score, 'is too low')
     begin
       raise Sequel::ValidationFailed, @o.errors
     rescue Sequel::ValidationFailed => e
     end
-    e.model.should be_nil
-    e.errors.should equal(@o.errors)
-    e.message.should == 'score is too low'
+    e.model.must_equal nil
+    e.errors.must_be_same_as(@o.errors)
+    e.message.must_equal 'score is too low'
   end
 
-  specify "should allow raising of ValidationFailed with a string" do
-    proc{raise Sequel::ValidationFailed, "no reason"}.should raise_error(Sequel::ValidationFailed, "no reason")
+  it "should allow raising of ValidationFailed with a string" do
+    proc{raise Sequel::ValidationFailed, "no reason"}.must_raise(Sequel::ValidationFailed, "no reason")
   end
 end
 
@@ -153,39 +151,43 @@ describe "Model#save" do
     DB.reset
   end
 
-  specify "should save only if validations pass" do
+  it "should save only if validations pass" do
     @m.raise_on_save_failure = false
-    @m.should_not be_valid
+    @m.wont_be :valid?
     @m.save
-    DB.sqls.should be_empty
+    DB.sqls.must_be :empty?
     
     @m.x = 7
-    @m.should be_valid
-    @m.save.should_not == false
-    DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
+    @m.must_be :valid?
+    @m.save.wont_equal false
+    DB.sqls.must_equal ['UPDATE people SET x = 7 WHERE (id = 4)']
   end
   
-  specify "should skip validations if the :validate=>false option is used" do
+  it "should skip validations if the :validate=>false option is used" do
     @m.raise_on_save_failure = false
-    @m.should_not be_valid
+    @m.wont_be :valid?
     @m.save(:validate=>false)
-    DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 4)']
+    DB.sqls.must_equal ['UPDATE people SET x = 6 WHERE (id = 4)']
   end
 
-  specify "should raise error if validations fail and raise_on_save_failure is true" do
-    proc{@m.save}.should(raise_error(Sequel::ValidationFailed) do |e|
-      e.model.should equal(@m)
-      e.errors.should equal(@m.errors)
-    end)
+  it "should raise error if validations fail and raise_on_save_failure is true" do
+    begin
+      @m.save
+    rescue Sequel::ValidationFailed => e
+      e.model.must_be_same_as(@m)
+      e.errors.must_be_same_as(@m.errors)
+    else
+      raise
+    end
   end
 
-  specify "should raise error if validations fail and :raise_on_failure option is true" do
+  it "should raise error if validations fail and :raise_on_failure option is true" do
     @m.raise_on_save_failure = false
-    proc{@m.save(:raise_on_failure => true)}.should raise_error(Sequel::ValidationFailed)
+    proc{@m.save(:raise_on_failure => true)}.must_raise(Sequel::ValidationFailed)
   end
 
-  specify "should return nil if validations fail and raise_on_save_faiure is false" do
+  it "should return nil if validations fail and raise_on_save_faiure is false" do
     @m.raise_on_save_failure = false
-    @m.save.should == nil
+    @m.save.must_equal nil
   end
 end

@@ -12,15 +12,15 @@ describe Sequel::Inflections do
 
   it "should be possible to clear the list of singulars, plurals, and uncountables" do
     Sequel.inflections.clear(:plurals)
-    Sequel.inflections.plurals.should == []
+    Sequel.inflections.plurals.must_equal []
     Sequel.inflections.plural('blah', 'blahs')
     Sequel.inflections.clear
-    Sequel.inflections.plurals.should == []
-    Sequel.inflections.singulars.should == []
-    Sequel.inflections.uncountables.should == []
+    Sequel.inflections.plurals.must_equal []
+    Sequel.inflections.singulars.must_equal []
+    Sequel.inflections.uncountables.must_equal []
   end
 
   it "should be yielded and returned by Sequel.inflections" do
-    Sequel.inflections{|i| i.should == Sequel::Inflections}.should == Sequel::Inflections
+    Sequel.inflections{|i| i.must_equal Sequel::Inflections}.must_equal Sequel::Inflections
   end
 end

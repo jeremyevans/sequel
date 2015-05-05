@@ -25,42 +25,9 @@ class Sequel::Database
   end
 end
 
-require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
+require './spec/guards_helper'
 
-RSPEC_EXAMPLE_GROUP.class_eval do
-  def log 
-    begin
-      DB.loggers << Logger.new(STDOUT)
-      yield
-    ensure
-     DB.loggers.pop
-    end 
-  end 
-
-  def self.cspecify(message, *checked, &block)
-    return specify(message, &block) if ENV['SEQUEL_NO_PENDING']
-    pending = false
-    checked.each do |c|
-      case c
-      when DB.adapter_scheme
-        pending = c
-      when Proc
-        pending = c if c.first.call(DB)
-      when Array
-        pending = c if c.first == DB.adapter_scheme && c.last == DB.call(DB)
-      end
-    end
-    if pending
-      specify(message) do
-        method = RSPEC_SKIP_PENDING && !ENV['SEQUEL_NO_SKIP_PENDING'] ? :skip : :pending
-        send(method, "Not yet working on #{Array(pending).join(', ')}")
-        instance_eval(&block)
-      end
-    else
-      specify(message, &block)
-    end
-  end
-
+class Minitest::HooksSpec
   def check_sqls
     yield unless ENV['SEQUEL_NO_CHECK_SQLS']
   end

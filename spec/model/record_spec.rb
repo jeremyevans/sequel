@@ -7,12 +7,12 @@ describe "Model#values" do
 
   it "should return the hash of model values" do
     hash = {:x=>1}
-    @c.load(hash).values.should equal(hash)
+    @c.load(hash).values.must_be_same_as(hash)
   end
 
   it "should be aliased as to_hash" do
     hash = {:x=>1}
-    @c.load(hash).to_hash.should equal(hash)
+    @c.load(hash).to_hash.must_be_same_as(hash)
   end
 end
 
@@ -24,10 +24,10 @@ describe "Model#get_column_value and set_column_value" do
   end
 
   it "should get and set column values" do
-    @o.get_column_value(:x).should == 1
+    @o.get_column_value(:x).must_equal 1
     @o.set_column_value(:x=, 2)
-    @o.get_column_value(:x).should == 2
-    @o.x.should == 2
+    @o.get_column_value(:x).must_equal 2
+    @o.x.must_equal 2
   end
 end
 
@@ -41,14 +41,14 @@ describe "Model#save server use" do
   end
 
   it "should use the :default server if the model doesn't have one already specified" do
-    @c.new(:x=>1).save.should == @c.load(:x=>1, :id=>10)
-    @db.sqls.should == ["INSERT INTO items (x) VALUES (1)", 'SELECT * FROM items WHERE (id = 10) LIMIT 1']
+    @c.new(:x=>1).save.must_equal @c.load(:x=>1, :id=>10)
+    @db.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", 'SELECT * FROM items WHERE (id = 10) LIMIT 1']
   end
 
   it "should use the model's server if the model has one already specified" do
     @c.dataset = @c.dataset.server(:blah)
-    @c.new(:x=>1).save.should == @c.load(:x=>1, :id=>10)
-    @db.sqls.should == ["INSERT INTO items (x) VALUES (1) -- blah", 'SELECT * FROM items WHERE (id = 10) LIMIT 1 -- blah']
+    @c.new(:x=>1).save.must_equal @c.load(:x=>1, :id=>10)
+    @db.sqls.must_equal ["INSERT INTO items (x) VALUES (1) -- blah", 'SELECT * FROM items WHERE (id = 10) LIMIT 1 -- blah']
   end
 end
 
@@ -64,7 +64,7 @@ describe "Model#save" do
   it "should insert a record for a new model instance" do
     o = @c.new(:x => 1)
     o.save
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
   end
 
   it "should use dataset's insert_select method if present" do
@@ -77,13 +77,13 @@ describe "Model#save" do
     o = @c.new(:x => 1)
     o.save
     
-    o.values.should == {:y=>2}
-    DB.sqls.should == ["INSERT INTO items (y) VALUES (2) RETURNING *"]
+    o.values.must_equal(:y=>2)
+    DB.sqls.must_equal ["INSERT INTO items (y) VALUES (2) RETURNING *"]
   end
 
   it "should not use dataset's insert_select method if specific columns are selected" do
     ds = @c.dataset = @c.dataset.select(:y)
-    ds.should_not_receive(:insert_select)
+    def ds.insert_select(*) raise; end
     @c.new(:x => 1).save
   end
 
@@ -100,28 +100,28 @@ describe "Model#save" do
     o = @c.new(:x => 1)
     o.save
     
-    o.values.should == {:y=>2}
-    DB.sqls.should == ["INSERT INTO items (y) VALUES (2) RETURNING y"]
+    o.values.must_equal(:y=>2)
+    DB.sqls.must_equal ["INSERT INTO items (y) VALUES (2) RETURNING y"]
   end
 
   it "should use value returned by insert as the primary key and refresh the object" do
     o = @c.new(:x => 11)
     o.save
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (11)",
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)",
       "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
   end
 
   it "should allow you to skip refreshing by overridding _save_refresh" do
     @c.send(:define_method, :_save_refresh){}
     @c.create(:x => 11)
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (11)"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)"]
   end
 
   it "should work correctly for inserting a record without a primary key" do
     @c.no_primary_key
     o = @c.new(:x => 11)
     o.save
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (11)"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)"]
   end
 
   it "should set the autoincrementing_primary_key value to the value returned by insert" do
@@ -131,65 +131,65 @@ describe "Model#save" do
     def o.autoincrementing_primary_key() :y end
     o.save
     sqls = DB.sqls
-    sqls.length.should == 2
-    sqls.first.should == "INSERT INTO items (x) VALUES (11)"
-    sqls.last.should =~ %r{SELECT \* FROM items WHERE \(\([xy] = 1[13]\) AND \([xy] = 1[13]\)\) LIMIT 1}
+    sqls.length.must_equal 2
+    sqls.first.must_equal "INSERT INTO items (x) VALUES (11)"
+    sqls.last.must_match %r{SELECT \* FROM items WHERE \(\([xy] = 1[13]\) AND \([xy] = 1[13]\)\) LIMIT 1}
   end
 
   it "should update a record for an existing model instance" do
     o = @c.load(:id => 3, :x => 1)
     o.save
-    DB.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET x = 1 WHERE (id = 3)"]
   end
   
   it "should raise a NoExistingObject exception if the dataset update call doesn't return 1, unless require_modification is false" do
     o = @c.load(:id => 3, :x => 1)
     t = o.this
     t.numrows = 0
-    proc{o.save}.should raise_error(Sequel::NoExistingObject)
+    proc{o.save}.must_raise(Sequel::NoExistingObject)
     t.numrows = 2
-    proc{o.save}.should raise_error(Sequel::NoExistingObject)
+    proc{o.save}.must_raise(Sequel::NoExistingObject)
     t.numrows = 1
-    proc{o.save}.should_not raise_error
+    o.save
     
     o.require_modification = false
     t.numrows = 0
-    proc{o.save}.should_not raise_error
+    o.save
     t.numrows = 2
-    proc{o.save}.should_not raise_error
+    o.save
   end
   
   it "should respect the :columns option to specify the columns to save" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save(:columns=>:y)
-    DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
+    DB.sqls.first.must_equal "UPDATE items SET y = NULL WHERE (id = 3)"
   end
   
   it "should mark saved columns as not changed" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o[:y] = 4
-    o.changed_columns.should == [:y]
+    o.changed_columns.must_equal [:y]
     o.save(:columns=>:x)
-    o.changed_columns.should == [:y]
+    o.changed_columns.must_equal [:y]
     o.save(:columns=>:y)
-    o.changed_columns.should == []
+    o.changed_columns.must_equal []
   end
   
   it "should mark all columns as not changed if this is a new record" do
     o = @c.new(:x => 1, :y => nil)
     o.x = 4
-    o.changed_columns.should == [:x]
+    o.changed_columns.must_equal [:x]
     o.save
-    o.changed_columns.should == []
+    o.changed_columns.must_equal []
   end
   
   it "should mark all columns as not changed if this is a new record and insert_select was used" do
     def (@c.dataset).insert_select(h) h.merge(:id=>1) end
     o = @c.new(:x => 1, :y => nil)
     o.x = 4
-    o.changed_columns.should == [:x]
+    o.changed_columns.must_equal [:x]
     o.save
-    o.changed_columns.should == []
+    o.changed_columns.must_equal []
   end
 
   it "should store previous value of @new in @was_new and as well as the hash used for updating in @columns_updated until after hooks finish running" do
@@ -198,44 +198,44 @@ describe "Model#save" do
     o = @c.new(:x => 1, :y => nil)
     o[:x] = 2
     o.save
-    res.should == [nil, true]
+    res.must_equal [nil, true]
     o.after_save
-    res.should == [nil, nil]
+    res.must_equal [nil, nil]
 
     res = nil
     o = @c.load(:id => 23,:x => 1, :y => nil)
     o[:x] = 2
     o.save
-    res.should == [{:x => 2, :y => nil}, nil]
+    res.must_equal [{:x => 2, :y => nil}, nil]
     o.after_save
-    res.should == [nil, nil]
+    res.must_equal [nil, nil]
 
     res = nil
     o = @c.load(:id => 23,:x => 2, :y => nil)
     o[:x] = 2
     o[:y] = 22
     o.save(:columns=>:x)
-    res.should == [{:x=>2},nil]
+    res.must_equal [{:x=>2},nil]
     o.after_save
-    res.should == [nil, nil]
+    res.must_equal [nil, nil]
   end
   
   it "should use Model's use_transactions setting by default" do
     @c.use_transactions = true
     @c.load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
-    DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
     @c.use_transactions = false
     @c.load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
-    DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET y = NULL WHERE (id = 3)"]
   end
 
   it "should inherit Model's use_transactions setting" do
     @c.use_transactions = true
     Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
-    DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
     @c.use_transactions = false
     Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:columns=>:y)
-    DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET y = NULL WHERE (id = 3)"]
   end
 
   it "should use object's use_transactions setting" do
@@ -243,23 +243,23 @@ describe "Model#save" do
     o.use_transactions = false
     @c.use_transactions = true
     o.save(:columns=>:y)
-    DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET y = NULL WHERE (id = 3)"]
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     @c.use_transactions = false 
     o.save(:columns=>:y)
-    DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
 
   it "should use :transaction option if given" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     o.save(:columns=>:y, :transaction=>false)
-    DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET y = NULL WHERE (id = 3)"]
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = false
     o.save(:columns=>:y, :transaction=>true)
-    DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
 
   it "should rollback if before_save returns false and raise_on_save_failure = true" do
@@ -269,8 +269,8 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    proc { o.save(:columns=>:y) }.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    proc { o.save(:columns=>:y) }.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
 
   it "should rollback if before_save calls cancel_action and raise_on_save_failure = true" do
@@ -280,8 +280,8 @@ describe "Model#save" do
     def o.before_save
       cancel_action
     end
-    proc { o.save(:columns=>:y) }.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    proc { o.save(:columns=>:y) }.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
 
   it "should rollback if before_save returns false and :raise_on_failure option is true" do
@@ -291,8 +291,8 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    proc { o.save(:columns=>:y, :raise_on_failure => true) }.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    proc { o.save(:columns=>:y, :raise_on_failure => true) }.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
 
   it "should not rollback outer transactions if before_save returns false and raise_on_save_failure = false" do
@@ -303,10 +303,10 @@ describe "Model#save" do
       false
     end
     DB.transaction do
-      o.save(:columns=>:y).should == nil
+      o.save(:columns=>:y).must_equal nil
       DB.run "BLAH"
     end
-    DB.sqls.should == ["BEGIN", "BLAH", "COMMIT"]
+    DB.sqls.must_equal ["BEGIN", "BLAH", "COMMIT"]
   end
 
   it "should rollback if before_save returns false and raise_on_save_failure = false" do
@@ -316,8 +316,8 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    o.save(:columns=>:y).should == nil
-    DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    o.save(:columns=>:y).must_equal nil
+    DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
 
   it "should not rollback if before_save throws Rollback and use_transactions = false" do
@@ -326,8 +326,8 @@ describe "Model#save" do
     def o.before_save
       raise Sequel::Rollback
     end
-    proc { o.save(:columns=>:y) }.should raise_error(Sequel::Rollback)
-    DB.sqls.should == []
+    proc { o.save(:columns=>:y) }.must_raise(Sequel::Rollback)
+    DB.sqls.must_equal []
   end
 
   it "should support a :server option to set the server/shard to use" do
@@ -337,9 +337,9 @@ describe "Model#save" do
     db.sqls
     o = c.new(:x => 1)
     o.save(:server=>:s1)
-    db.sqls.should == ["INSERT INTO items (x) VALUES (1) -- s1", "SELECT * FROM items WHERE (id = 13) LIMIT 1 -- s1"]
+    db.sqls.must_equal ["INSERT INTO items (x) VALUES (1) -- s1", "SELECT * FROM items WHERE (id = 13) LIMIT 1 -- s1"]
     o.save(:server=>:s1, :transaction=>true)
-    db.sqls.should == ["BEGIN -- s1", "UPDATE items SET x = 1 WHERE (id = 13) -- s1", 'COMMIT -- s1']
+    db.sqls.must_equal ["BEGIN -- s1", "UPDATE items SET x = 1 WHERE (id = 13) -- s1", 'COMMIT -- s1']
   end
 end
 
@@ -354,46 +354,46 @@ describe "Model#set_server" do
 
   it "should set the server to use when inserting" do
     @c.new(:x => 1).set_server(:s1).save
-    @db.sqls.should == ["INSERT INTO items (x) VALUES (1) -- s1", "SELECT * FROM items WHERE (id = 13) LIMIT 1 -- s1"]
+    @db.sqls.must_equal ["INSERT INTO items (x) VALUES (1) -- s1", "SELECT * FROM items WHERE (id = 13) LIMIT 1 -- s1"]
   end
 
   it "should set the server to use when updating" do
      @c.load(:id=>13, :x => 1).set_server(:s1).save
-    @db.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 13) -- s1"]
+    @db.sqls.must_equal ["UPDATE items SET x = 1 WHERE (id = 13) -- s1"]
   end
 
   it "should set the server to use for transactions when saving" do
     @c.load(:id=>13, :x => 1).set_server(:s1).save(:transaction=>true)
-    @db.sqls.should == ["BEGIN -- s1", "UPDATE items SET x = 1 WHERE (id = 13) -- s1", 'COMMIT -- s1']
+    @db.sqls.must_equal ["BEGIN -- s1", "UPDATE items SET x = 1 WHERE (id = 13) -- s1", 'COMMIT -- s1']
   end
 
   it "should set the server to use when deleting" do
     @c.load(:id=>13).set_server(:s1).delete
-    @db.sqls.should == ["DELETE FROM items WHERE (id = 13) -- s1"]
+    @db.sqls.must_equal ["DELETE FROM items WHERE (id = 13) -- s1"]
   end
 
   it "should set the server to use when deleting when using optimized delete" do
     @c.set_primary_key :id
     @c.load(:id=>13).set_server(:s1).delete
-    @db.sqls.should == ["DELETE FROM items WHERE id = 13 -- s1"]
+    @db.sqls.must_equal ["DELETE FROM items WHERE id = 13 -- s1"]
   end
 
   it "should set the server to use for transactions when destroying" do
     o = @c.load(:id=>13).set_server(:s1)
     o.use_transactions = true
     o.destroy
-    @db.sqls.should == ["BEGIN -- s1", "DELETE FROM items WHERE (id = 13) -- s1", 'COMMIT -- s1']
+    @db.sqls.must_equal ["BEGIN -- s1", "DELETE FROM items WHERE (id = 13) -- s1", 'COMMIT -- s1']
   end
 
   it "should set the server on this if this is already loaded" do
     o = @c.load(:id=>13, :x => 1)
     o.this
     o.set_server(:s1)
-    o.this.opts[:server].should == :s1
+    o.this.opts[:server].must_equal :s1
   end
 
   it "should set the server on this if this is not already loaded" do
-    @c.load(:id=>13, :x => 1).set_server(:s1).this.opts[:server].should == :s1
+    @c.load(:id=>13, :x => 1).set_server(:s1).this.opts[:server].must_equal :s1
   end
 end
 
@@ -413,20 +413,20 @@ describe "Model#freeze" do
   end
 
   it "should freeze the object" do
-    @o.frozen?.should == true
+    @o.frozen?.must_equal true
   end
 
   it "should freeze the object if the model doesn't have a primary key" do
     Album.no_primary_key
     @o = Album.load(:id=>1).freeze
-    @o.frozen?.should == true
+    @o.frozen?.must_equal true
   end
 
   it "should freeze the object's values, associations, changed_columns, errors, and this" do
-    @o.values.frozen?.should == true
-    @o.changed_columns.frozen?.should == true
-    @o.errors.frozen?.should == true
-    @o.this.frozen?.should == true
+    @o.values.frozen?.must_equal true
+    @o.changed_columns.frozen?.must_equal true
+    @o.errors.frozen?.must_equal true
+    @o.this.frozen?.must_equal true
   end
 
   it "should still have working class attr overriddable methods" do
@@ -434,33 +434,33 @@ describe "Model#freeze" do
   end
 
   it "should have working new? method" do
-    @o.new?.should == false
-    Album.new.freeze.new?.should == true
+    @o.new?.must_equal false
+    Album.new.freeze.new?.must_equal true
   end
 
   it "should have working valid? method" do
-    @o.valid?.should == true
+    @o.valid?.must_equal true
     o = Album.new
     def o.validate() errors.add(:foo, '') end
     o.freeze
-    o.valid?.should == false
+    o.valid?.must_equal false
   end
 
   it "should not call validate if errors is already frozen" do
-    @o.valid?.should == true
+    @o.valid?.must_equal true
     o = Album.new
     o.errors.freeze
     def o.validate() errors.add(:foo, '') end
-    proc{o.freeze}.should_not raise_error
-    o.valid?.should == true
+    o.freeze
+    o.valid?.must_equal true
   end
 
   it "should raise an Error if trying to save/destroy/delete/refresh" do
-    proc{@o.save}.should raise_error(Sequel::Error)
-    proc{@o.destroy}.should raise_error(Sequel::Error)
-    proc{@o.delete}.should raise_error(Sequel::Error)
-    proc{@o.refresh}.should raise_error(Sequel::Error)
-    @o.db.sqls.should == []
+    proc{@o.save}.must_raise(Sequel::Error)
+    proc{@o.destroy}.must_raise(Sequel::Error)
+    proc{@o.delete}.must_raise(Sequel::Error)
+    proc{@o.refresh}.must_raise(Sequel::Error)
+    @o.db.sqls.must_equal []
   end
 end
 
@@ -472,32 +472,32 @@ describe "Model#dup" do
   end
 
   it "should be equal to existing object" do
-    @o.dup.should == @o
-    @o.dup.values.should == @o.values
-    @o.dup.changed_columns.should == @o.changed_columns
-    @o.dup.errors.should == @o.errors
-    @o.dup.this.should == @o.this
+    @o.dup.must_equal @o
+    @o.dup.values.must_equal @o.values
+    @o.dup.changed_columns.must_equal @o.changed_columns
+    @o.dup.errors.must_equal @o.errors
+    @o.dup.this.must_equal @o.this
   end
 
   it "should not use identical structures" do
-    @o.dup.should_not equal(@o)
-    @o.dup.values.should_not equal(@o.values)
-    @o.dup.changed_columns.should_not equal(@o.changed_columns)
-    @o.dup.errors.should_not equal(@o.errors)
-    @o.dup.this.should_not equal(@o.this)
+    @o.dup.wont_be_same_as(@o)
+    @o.dup.values.wont_be_same_as(@o.values)
+    @o.dup.changed_columns.wont_be_same_as(@o.changed_columns)
+    @o.dup.errors.wont_be_same_as(@o.errors)
+    @o.dup.this.wont_be_same_as(@o.this)
   end
 
   it "should keep new status" do
-    @o.dup.new?.should == false
-    @Album.new.dup.new?.should == true
+    @o.dup.new?.must_equal false
+    @Album.new.dup.new?.must_equal true
   end
 
   it "should not copy frozen status" do
-    @o.freeze.dup.should_not be_frozen
-    @o.freeze.dup.values.should_not be_frozen
-    @o.freeze.dup.changed_columns.should_not be_frozen
-    @o.freeze.dup.errors.should_not be_frozen
-    @o.freeze.dup.this.should_not be_frozen
+    @o.freeze.dup.wont_be :frozen?
+    @o.freeze.dup.values.wont_be :frozen?
+    @o.freeze.dup.changed_columns.wont_be :frozen?
+    @o.freeze.dup.errors.wont_be :frozen?
+    @o.freeze.dup.this.wont_be :frozen?
   end
 end
 
@@ -509,32 +509,32 @@ describe "Model#clone" do
   end
 
   it "should be equal to existing object" do
-    @o.clone.should == @o
-    @o.clone.values.should == @o.values
-    @o.clone.changed_columns.should == @o.changed_columns
-    @o.clone.errors.should == @o.errors
-    @o.clone.this.should == @o.this
+    @o.clone.must_equal @o
+    @o.clone.values.must_equal @o.values
+    @o.clone.changed_columns.must_equal @o.changed_columns
+    @o.clone.errors.must_equal @o.errors
+    @o.clone.this.must_equal @o.this
   end
 
   it "should not use identical structures" do
-    @o.clone.should_not equal(@o)
-    @o.clone.values.should_not equal(@o.values)
-    @o.clone.changed_columns.should_not equal(@o.changed_columns)
-    @o.clone.errors.should_not equal(@o.errors)
-    @o.clone.this.should_not equal(@o.this)
+    @o.clone.wont_be_same_as(@o)
+    @o.clone.values.wont_be_same_as(@o.values)
+    @o.clone.changed_columns.wont_be_same_as(@o.changed_columns)
+    @o.clone.errors.wont_be_same_as(@o.errors)
+    @o.clone.this.wont_be_same_as(@o.this)
   end
 
   it "should keep new status" do
-    @o.clone.new?.should == false
-    @Album.new.clone.new?.should == true
+    @o.clone.new?.must_equal false
+    @Album.new.clone.new?.must_equal true
   end
 
   it "should copy frozen status" do
-    @o.freeze.clone.should be_frozen
-    @o.freeze.clone.values.should be_frozen
-    @o.freeze.clone.changed_columns.should be_frozen
-    @o.freeze.clone.errors.should be_frozen
-    @o.freeze.clone.this.should be_frozen
+    @o.freeze.clone.must_be :frozen?
+    @o.freeze.clone.values.must_be :frozen?
+    @o.freeze.clone.changed_columns.must_be :frozen?
+    @o.freeze.clone.errors.must_be :frozen?
+    @o.freeze.clone.this.must_be :frozen?
   end
 end
 
@@ -553,21 +553,21 @@ describe "Model#marshallable" do
     s = nil
     i2 = nil
     i.marshallable!
-    proc{s = Marshal.dump(i)}.should_not raise_error
-    proc{i2 = Marshal.load(s)}.should_not raise_error
-    i2.should == i
+    s = Marshal.dump(i)
+    i2 = Marshal.load(s)
+    i2.must_equal i
 
     i.save
     i.marshallable!
-    proc{s = Marshal.dump(i)}.should_not raise_error
-    proc{i2 = Marshal.load(s)}.should_not raise_error
-    i2.should == i
+    s = Marshal.dump(i)
+    i2 = Marshal.load(s)
+    i2.must_equal i
 
     i.save
     i.marshallable!
-    proc{s = Marshal.dump(i)}.should_not raise_error
-    proc{i2 = Marshal.load(s)}.should_not raise_error
-    i2.should == i
+    s = Marshal.dump(i)
+    i2 = Marshal.load(s)
+    i2.must_equal i
   end
 end
 
@@ -582,51 +582,51 @@ describe "Model#modified?" do
   end
   
   it "should be true if the object is new" do
-    @c.new.modified?.should == true
+    @c.new.modified?.must_equal true
   end
   
   it "should be false if the object has not been modified" do
-    @c.load(:id=>1).modified?.should == false
+    @c.load(:id=>1).modified?.must_equal false
   end
   
   it "should be true if the object has been modified" do
     o = @c.load(:id=>1, :x=>2)
     o.x = 3
-    o.modified?.should == true
+    o.modified?.must_equal true
   end
   
   it "should be true if the object is marked modified!" do
     o = @c.load(:id=>1, :x=>2)
     o.modified!
-    o.modified?.should == true
+    o.modified?.must_equal true
   end
   
   it "should be false if the object is marked modified! after saving until modified! again" do
     o = @c.load(:id=>1, :x=>2)
     o.modified!
     o.save
-    o.modified?.should == false
+    o.modified?.must_equal false
     o.modified!
-    o.modified?.should == true
+    o.modified?.must_equal true
   end
   
   it "should be false if a column value is set that is the same as the current value after typecasting" do
     o = @c.load(:id=>1, :x=>2)
     o.x = '2'
-    o.modified?.should == false
+    o.modified?.must_equal false
   end
   
   it "should be true if a column value is set that is the different as the current value after typecasting" do
     o = @c.load(:id=>1, :x=>'2')
     o.x = '2'
-    o.modified?.should == true
+    o.modified?.must_equal true
   end
 
   it "should be true if given a column argument and the column has been changed" do
     o = @c.new
-    o.modified?(:id).should == false
+    o.modified?(:id).must_equal false
     o.id = 1
-    o.modified?(:id).should == true
+    o.modified?(:id).must_equal true
   end
 end
 
@@ -645,20 +645,20 @@ describe "Model#modified!" do
       values[:x] = 3
     end
     o.update({})
-    o.x.should == 2
+    o.x.must_equal 2
 
     o.modified!
     o.update({})
-    o.x.should == 3
-    o.db.sqls.should == []
+    o.x.must_equal 3
+    o.db.sqls.must_equal []
   end
 
   it "should mark given column argument as modified" do
     o = @c.load(:id=>1, :x=>2)
     o.modified!(:x)
-    o.changed_columns.should == [:x]
+    o.changed_columns.must_equal [:x]
     o.save
-    o.db.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 1)"]
+    o.db.sqls.must_equal ["UPDATE items SET x = 2 WHERE (id = 1)"]
   end
 end
   
@@ -674,29 +674,29 @@ describe "Model#save_changes" do
   it "should always save if the object is new" do
     o = @c.new(:x => 1)
     o.save_changes
-    DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    DB.sqls.first.must_equal "INSERT INTO items (x) VALUES (1)"
   end
 
   it "should take options passed to save" do
     o = @c.new(:x => 1)
     def o.before_validation; false; end
-    proc{o.save_changes}.should raise_error(Sequel::Error)
-    DB.sqls.should == []
+    proc{o.save_changes}.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal []
     o.save_changes(:validate=>false)
-    DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    DB.sqls.first.must_equal "INSERT INTO items (x) VALUES (1)"
   end
 
   it "should do nothing if no changed columns" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
   end
   
   it "should do nothing if modified? is false" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     def o.modified?; false; end
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
   end
   
   it "should update only changed columns" do
@@ -704,17 +704,17 @@ describe "Model#save_changes" do
     o.x = 2
 
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET x = 2 WHERE (id = 3)"]
     o.save_changes
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
 
     o.y = 4
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET y = 4 WHERE (id = 3)"]
     o.save_changes
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
   end
   
   it "should not consider columns changed if the values did not change" do
@@ -722,55 +722,55 @@ describe "Model#save_changes" do
     o.x = 1
 
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
     o.x = 3
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET x = 3 WHERE (id = 3)"]
 
     o[:y] = nil
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
     o[:y] = 4
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET y = 4 WHERE (id = 3)"]
   end
   
   it "should clear changed_columns" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.x = 4
-    o.changed_columns.should == [:x]
+    o.changed_columns.must_equal [:x]
     o.save_changes
-    o.changed_columns.should == []
+    o.changed_columns.must_equal []
   end
 
   it "should update columns changed in a before_update hook" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     @c.send(:define_method, :before_update){self.x += 1}
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
     o.x = 2
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET x = 3 WHERE (id = 3)"]
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
     o.x = 4
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 5 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET x = 5 WHERE (id = 3)"]
   end
 
   it "should update columns changed in a before_save hook" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     @c.send(:define_method, :before_update){self.x += 1}
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
     o.x = 2
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET x = 3 WHERE (id = 3)"]
     o.save_changes
-    DB.sqls.should == []
+    DB.sqls.must_equal []
     o.x = 4
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 5 WHERE (id = 3)"]
+    DB.sqls.must_equal ["UPDATE items SET x = 5 WHERE (id = 3)"]
   end
 end
 
@@ -785,41 +785,41 @@ describe "Model#new?" do
   
   it "should be true for a new instance" do
     n = @c.new(:x => 1)
-    n.should be_new
+    n.must_be :new?
   end
   
   it "should be false after saving" do
     n = @c.new(:x => 1)
     n.save
-    n.should_not be_new
+    n.wont_be :new?
   end
 end
 
 describe Sequel::Model, "with a primary key" do
   it "should default to :id" do
     model_a = Class.new Sequel::Model
-    model_a.primary_key.should == :id
+    model_a.primary_key.must_equal :id
   end
 
   it "should be changed through 'set_primary_key'" do
     model_a = Class.new(Sequel::Model){ set_primary_key :a }
-    model_a.primary_key.should == :a
+    model_a.primary_key.must_equal :a
   end
 
   it "should accept single argument composite keys" do
     model_a = Class.new(Sequel::Model){ set_primary_key [:a, :b] }
-    model_a.primary_key.should == [:a, :b]
+    model_a.primary_key.must_equal [:a, :b]
   end
 end
 
 describe Sequel::Model, "without a primary key" do
   it "should return nil for primary key" do
-    Class.new(Sequel::Model){no_primary_key}.primary_key.should be_nil
+    Class.new(Sequel::Model){no_primary_key}.primary_key.must_equal nil
   end
 
   it "should raise a Sequel::Error on 'this'" do
     instance = Class.new(Sequel::Model){no_primary_key}.new
-    proc{instance.this}.should raise_error(Sequel::Error)
+    proc{instance.this}.must_raise(Sequel::Error)
   end
 end
 
@@ -831,26 +831,26 @@ describe Sequel::Model, "#this" do
 
   it "should return a dataset identifying the record" do
     instance = @example.load(:id => 3)
-    instance.this.sql.should == "SELECT * FROM examples WHERE (id = 3) LIMIT 1"
+    instance.this.sql.must_equal "SELECT * FROM examples WHERE (id = 3) LIMIT 1"
   end
 
   it "should support arbitary primary keys" do
     @example.set_primary_key :a
 
     instance = @example.load(:a => 3)
-    instance.this.sql.should == "SELECT * FROM examples WHERE (a = 3) LIMIT 1"
+    instance.this.sql.must_equal "SELECT * FROM examples WHERE (a = 3) LIMIT 1"
   end
 
   it "should use a qualified primary key if the dataset is joined" do
     @example.dataset = @example.dataset.cross_join(:a)
     instance = @example.load(:id => 3)
-    instance.this.sql.should == "SELECT * FROM examples CROSS JOIN a WHERE (examples.id = 3) LIMIT 1"
+    instance.this.sql.must_equal "SELECT * FROM examples CROSS JOIN a WHERE (examples.id = 3) LIMIT 1"
   end
 
   it "should support composite primary keys" do
     @example.set_primary_key [:x, :y]
     instance = @example.load(:x => 4, :y => 5)
-    instance.this.sql.should =~ /SELECT \* FROM examples WHERE \(\([xy] = [45]\) AND \([xy] = [45]\)\) LIMIT 1/
+    instance.this.sql.must_match /SELECT \* FROM examples WHERE \(\([xy] = [45]\) AND \([xy] = [45]\)\) LIMIT 1/
   end
 end
 
@@ -862,29 +862,29 @@ describe "Model#pk" do
   
   it "should by default return the value of the :id column" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk.should == 111
+    m.pk.must_equal 111
   end
 
   it "should return the primary key value for custom primary key" do
     @m.set_primary_key :x
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk.should == 2
+    m.pk.must_equal 2
   end
 
   it "should return the primary key value for composite primary key" do
     @m.set_primary_key [:y, :x]
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk.should == [3, 2]
+    m.pk.must_equal [3, 2]
   end
 
   it "should raise if no primary key" do
     @m.set_primary_key nil
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk}.should raise_error(Sequel::Error)
+    proc {m.pk}.must_raise(Sequel::Error)
 
     @m.no_primary_key
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk}.should raise_error(Sequel::Error)
+    proc {m.pk}.must_raise(Sequel::Error)
   end
 end
 
@@ -896,29 +896,29 @@ describe "Model#pk_hash" do
   
   it "should by default return a hash with the value of the :id column" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk_hash.should == {:id => 111}
+    m.pk_hash.must_equal(:id => 111)
   end
 
   it "should return a hash with the primary key value for custom primary key" do
     @m.set_primary_key :x
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk_hash.should == {:x => 2}
+    m.pk_hash.must_equal(:x => 2)
   end
 
   it "should return a hash with the primary key values for composite primary key" do
     @m.set_primary_key [:y, :x]
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.pk_hash.should == {:y => 3, :x => 2}
+    m.pk_hash.must_equal(:y => 3, :x => 2)
   end
 
   it "should raise if no primary key" do
     @m.set_primary_key nil
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc{m.pk_hash}.should raise_error(Sequel::Error)
+    proc{m.pk_hash}.must_raise(Sequel::Error)
 
     @m.no_primary_key
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc{m.pk_hash}.should raise_error(Sequel::Error)
+    proc{m.pk_hash}.must_raise(Sequel::Error)
   end
 end
 
@@ -930,34 +930,34 @@ describe "Model#qualified_pk_hash" do
   
   it "should by default return a hash with the value of the :id column" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.qualified_pk_hash.should == {Sequel.qualify(:items, :id) => 111}
+    m.qualified_pk_hash.must_equal(Sequel.qualify(:items, :id) => 111)
   end
 
   it "should accept a custom qualifier" do
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.qualified_pk_hash(:foo).should == {Sequel.qualify(:foo, :id) => 111}
+    m.qualified_pk_hash(:foo).must_equal(Sequel.qualify(:foo, :id) => 111)
   end
 
   it "should return a hash with the primary key value for custom primary key" do
     @m.set_primary_key :x
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.qualified_pk_hash.should == {Sequel.qualify(:items, :x) => 2}
+    m.qualified_pk_hash.must_equal(Sequel.qualify(:items, :x) => 2)
   end
 
   it "should return a hash with the primary key values for composite primary key" do
     @m.set_primary_key [:y, :x]
     m = @m.load(:id => 111, :x => 2, :y => 3)
-    m.qualified_pk_hash.should == {Sequel.qualify(:items, :y) => 3, Sequel.qualify(:items, :x) => 2}
+    m.qualified_pk_hash.must_equal(Sequel.qualify(:items, :y) => 3, Sequel.qualify(:items, :x) => 2)
   end
 
   it "should raise if no primary key" do
     @m.set_primary_key nil
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc{m.qualified_pk_hash}.should raise_error(Sequel::Error)
+    proc{m.qualified_pk_hash}.must_raise(Sequel::Error)
 
     @m.no_primary_key
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc{m.qualified_pk_hash}.should raise_error(Sequel::Error)
+    proc{m.qualified_pk_hash}.must_raise(Sequel::Error)
   end
 end
 
@@ -975,75 +975,75 @@ describe Sequel::Model, "#set" do
 
   it "should filter the given params using the model columns" do
     @o1.set(:x => 1, :z => 2)
-    @o1.values.should == {:x => 1}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 1)
+    DB.sqls.must_equal []
 
     @o2.set(:y => 1, :abc => 2)
-    @o2.values.should == {:y => 1, :id=> 5}
-    DB.sqls.should == []
+    @o2.values.must_equal(:y => 1, :id=> 5)
+    DB.sqls.must_equal []
   end
   
   it "should work with both strings and symbols" do
     @o1.set('x'=> 1, 'z'=> 2)
-    @o1.values.should == {:x => 1}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 1)
+    DB.sqls.must_equal []
 
     @o2.set('y'=> 1, 'abc'=> 2)
-    @o2.values.should == {:y => 1, :id=> 5}
-    DB.sqls.should == []
+    @o2.values.must_equal(:y => 1, :id=> 5)
+    DB.sqls.must_equal []
   end
   
   it "should support virtual attributes" do
     @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.set(:blah => 333)
-    @o1.values.should == {:x => 333}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 333)
+    DB.sqls.must_equal []
     @o1.set('blah'=> 334)
-    @o1.values.should == {:x => 334}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 334)
+    DB.sqls.must_equal []
   end
   
   it "should not modify the primary key" do
     @o1.set(:x => 1, :id => 2)
-    @o1.values.should == {:x => 1}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 1)
+    DB.sqls.must_equal []
     @o2.set('y'=> 1, 'id'=> 2)
-    @o2.values.should == {:y => 1, :id=> 5}
-    DB.sqls.should == []
+    @o2.values.must_equal(:y => 1, :id=> 5)
+    DB.sqls.must_equal []
   end
 
   it "should return self" do
     returned_value = @o1.set(:x => 1, :z => 2)
-    returned_value.should == @o1
-    DB.sqls.should == []
+    returned_value.must_equal @o1
+    DB.sqls.must_equal []
   end
 
   it "should raise error if strict_param_setting is true and method does not exist" do
     @o1.strict_param_setting = true
-    proc{@o1.set('foo' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@o1.set('foo' => 1)}.must_raise(Sequel::MassAssignmentRestriction)
   end
 
   it "should raise error if strict_param_setting is true and column is a primary key" do
     @o1.strict_param_setting = true
-    proc{@o1.set('id' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@o1.set('id' => 1)}.must_raise(Sequel::MassAssignmentRestriction)
   end
 
   it "should raise error if strict_param_setting is true and column is restricted" do
     @o1.strict_param_setting = true
     @c.set_allowed_columns
-    proc{@o1.set('x' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@o1.set('x' => 1)}.must_raise(Sequel::MassAssignmentRestriction)
   end
 
   it "should not create a symbol if strict_param_setting is true and string is given" do
     @o1.strict_param_setting = true
     l = Symbol.all_symbols.length
-    proc{@o1.set('sadojafdso' => 1)}.should raise_error(Sequel::MassAssignmentRestriction)
-    Symbol.all_symbols.length.should == l
+    proc{@o1.set('sadojafdso' => 1)}.must_raise(Sequel::MassAssignmentRestriction)
+    Symbol.all_symbols.length.must_equal l
   end
 
   it "#set should correctly handle cases where an instance method is added to the class" do
     @o1.set(:x => 1)
-    @o1.values.should == {:x => 1}
+    @o1.values.must_equal(:x => 1)
 
     @c.class_eval do
       def z=(v)
@@ -1051,23 +1051,23 @@ describe Sequel::Model, "#set" do
       end
     end
     @o1.set(:x => 2, :z => 3)
-    @o1.values.should == {:x => 2, :z=>3}
+    @o1.values.must_equal(:x => 2, :z=>3)
   end
 
   it "#set should correctly handle cases where a singleton method is added to the object" do
     @o1.set(:x => 1)
-    @o1.values.should == {:x => 1}
+    @o1.values.must_equal(:x => 1)
 
     def @o1.z=(v)
       self[:z] = v
     end
     @o1.set(:x => 2, :z => 3)
-    @o1.values.should == {:x => 2, :z=>3}
+    @o1.values.must_equal(:x => 2, :z=>3)
   end
 
   it "#set should correctly handle cases where a module with a setter method is included in the class" do
     @o1.set(:x => 1)
-    @o1.values.should == {:x => 1}
+    @o1.values.must_equal(:x => 1)
 
     @c.send(:include, Module.new do
       def z=(v)
@@ -1075,12 +1075,12 @@ describe Sequel::Model, "#set" do
       end
     end)
     @o1.set(:x => 2, :z => 3)
-    @o1.values.should == {:x => 2, :z=>3}
+    @o1.values.must_equal(:x => 2, :z=>3)
   end
 
   it "#set should correctly handle cases where the object extends a module with a setter method " do
     @o1.set(:x => 1)
-    @o1.values.should == {:x => 1}
+    @o1.values.must_equal(:x => 1)
 
     @o1.extend(Module.new do
       def z=(v)
@@ -1088,7 +1088,7 @@ describe Sequel::Model, "#set" do
       end
     end)
     @o1.set(:x => 2, :z => 3)
-    @o1.values.should == {:x => 2, :z=>3}
+    @o1.values.must_equal(:x => 2, :z=>3)
   end
 end
 
@@ -1106,26 +1106,26 @@ describe Sequel::Model, "#update" do
   
   it "should filter the given params using the model columns" do
     @o1.update(:x => 1, :z => 2)
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
 
     DB.reset
     @o2.update(:y => 1, :abc => 2)
-    DB.sqls.should == ["UPDATE items SET y = 1 WHERE (id = 5)"]
+    DB.sqls.must_equal ["UPDATE items SET y = 1 WHERE (id = 5)"]
   end
   
   it "should support virtual attributes" do
     @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.update(:blah => 333)
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
   
   it "should not modify the primary key" do
     @o1.update(:x => 1, :id => 2)
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     DB.reset
     @o2.update('y'=> 1, 'id'=> 2)
-    @o2.values.should == {:y => 1, :id=> 5}
-    DB.sqls.should == ["UPDATE items SET y = 1 WHERE (id = 5)"]
+    @o2.values.must_equal(:y => 1, :id=> 5)
+    DB.sqls.must_equal ["UPDATE items SET y = 1 WHERE (id = 5)"]
   end
 end
 
@@ -1141,70 +1141,70 @@ describe Sequel::Model, "#set_fields" do
 
   it "should set only the given fields" do
     @o1.set_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
-    @o1.values.should == {:x => 1, :y => 2}
+    @o1.values.must_equal(:x => 1, :y => 2)
     @o1.set_fields({:x => 9, :y => 8, :z=>6, :id=>7}, [:x, :y, :id])
-    @o1.values.should == {:x => 9, :y => 8, :id=>7}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 9, :y => 8, :id=>7)
+    DB.sqls.must_equal []
   end
 
   it "should lookup into the hash without checking if the entry exists" do
     @o1.set_fields({:x => 1}, [:x, :y])
-    @o1.values.should == {:x => 1, :y => nil}
+    @o1.values.must_equal(:x => 1, :y => nil)
     @o1.set_fields(Hash.new(2), [:x, :y])
-    @o1.values.should == {:x => 2, :y => 2}
+    @o1.values.must_equal(:x => 2, :y => 2)
   end
 
   it "should skip missing fields if :missing=>:skip option is used" do
     @o1.set_fields({:x => 3}, [:x, :y], :missing=>:skip)
-    @o1.values.should == {:x => 3}
+    @o1.values.must_equal(:x => 3)
     @o1.set_fields({"x" => 4}, [:x, :y], :missing=>:skip)
-    @o1.values.should == {:x => 4}
+    @o1.values.must_equal(:x => 4)
     @o1.set_fields(Hash.new(2).merge(:x=>2), [:x, :y], :missing=>:skip)
-    @o1.values.should == {:x => 2}
+    @o1.values.must_equal(:x => 2)
     @o1.set_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y], :missing=>:skip)
-    @o1.values.should == {:x => 1, :y => 2}
+    @o1.values.must_equal(:x => 1, :y => 2)
   end
 
   it "should raise for missing fields if :missing=>:raise option is used" do
-    proc{@o1.set_fields({:x => 1}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
-    proc{@o1.set_fields(Hash.new(2).merge(:x=>2), [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
-    proc{@o1.set_fields({"x" => 1}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+    proc{@o1.set_fields({:x => 1}, [:x, :y], :missing=>:raise)}.must_raise(Sequel::Error)
+    proc{@o1.set_fields(Hash.new(2).merge(:x=>2), [:x, :y], :missing=>:raise)}.must_raise(Sequel::Error)
+    proc{@o1.set_fields({"x" => 1}, [:x, :y], :missing=>:raise)}.must_raise(Sequel::Error)
     @o1.set_fields({:x => 5, "y"=>2}, [:x, :y], :missing=>:raise)
-    @o1.values.should == {:x => 5, :y => 2}
+    @o1.values.must_equal(:x => 5, :y => 2)
     @o1.set_fields({:x => 1, :y => 3, :z=>3, :id=>4}, [:x, :y], :missing=>:raise)
-    @o1.values.should == {:x => 1, :y => 3}
+    @o1.values.must_equal(:x => 1, :y => 3)
   end
 
   it "should use default behavior for an unrecognized :missing option" do
     @o1.set_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y], :missing=>:foo)
-    @o1.values.should == {:x => 1, :y => 2}
+    @o1.values.must_equal(:x => 1, :y => 2)
     @o1.set_fields({:x => 9, :y => 8, :z=>6, :id=>7}, [:x, :y, :id], :missing=>:foo)
-    @o1.values.should == {:x => 9, :y => 8, :id=>7}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 9, :y => 8, :id=>7)
+    DB.sqls.must_equal []
   end
 
   it "should respect model's default_set_fields_options" do
     @c.default_set_fields_options = {:missing=>:skip}
     @o1.set_fields({:x => 3}, [:x, :y])
-    @o1.values.should == {:x => 3}
+    @o1.values.must_equal(:x => 3)
     @o1.set_fields({:x => 4}, [:x, :y], {})
-    @o1.values.should == {:x => 4}
-    proc{@o1.set_fields({:x => 3}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+    @o1.values.must_equal(:x => 4)
+    proc{@o1.set_fields({:x => 3}, [:x, :y], :missing=>:raise)}.must_raise(Sequel::Error)
     @c.default_set_fields_options = {:missing=>:raise}
-    proc{@o1.set_fields({:x => 3}, [:x, :y])}.should raise_error(Sequel::Error)
-    proc{@o1.set_fields({:x => 3}, [:x, :y], {})}.should raise_error(Sequel::Error)
+    proc{@o1.set_fields({:x => 3}, [:x, :y])}.must_raise(Sequel::Error)
+    proc{@o1.set_fields({:x => 3}, [:x, :y], {})}.must_raise(Sequel::Error)
     @o1.set_fields({:x => 5}, [:x, :y], :missing=>:skip)
-    @o1.values.should == {:x => 5}
+    @o1.values.must_equal(:x => 5)
     @o1.set_fields({:x => 5}, [:x, :y], :missing=>nil)
-    @o1.values.should == {:x => 5, :y=>nil}
-    DB.sqls.should == []
+    @o1.values.must_equal(:x => 5, :y=>nil)
+    DB.sqls.must_equal []
   end
 
   it "should respect model's default_set_fields_options in a subclass" do
     @c.default_set_fields_options = {:missing=>:skip}
     o = Class.new(@c).new
     o.set_fields({:x => 3}, [:x, :y])
-    o.values.should == {:x => 3}
+    o.values.must_equal(:x => 3)
   end
 
   it "should respect set_column_value" do
@@ -1218,8 +1218,8 @@ describe Sequel::Model, "#set_fields" do
       end
     end
     @o1.set_fields({:model=>2, :x=>3}, [:model, :x])
-    @o1[:model].should == 2
-    @o1.x.should == 3
+    @o1[:model].must_equal 2
+    @o1.x.must_equal 3
   end
 end
 
@@ -1236,35 +1236,35 @@ describe Sequel::Model, "#update_fields" do
 
   it "should set only the given fields, and then save the changes to the record" do
     @o1.update_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
-    @o1.values.should == {:x => 1, :y => 2, :id=>1}
+    @o1.values.must_equal(:x => 1, :y => 2, :id=>1)
     sqls = DB.sqls
-    sqls.pop.should =~ /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
-    sqls.should == []
+    sqls.pop.must_match /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
+    sqls.must_equal []
 
     @o1.update_fields({:x => 1, :y => 5, :z=>6, :id=>7}, [:x, :y])
-    @o1.values.should == {:x => 1, :y => 5, :id=>1}
-    DB.sqls.should == ["UPDATE items SET y = 5 WHERE (id = 1)"]
+    @o1.values.must_equal(:x => 1, :y => 5, :id=>1)
+    DB.sqls.must_equal ["UPDATE items SET y = 5 WHERE (id = 1)"]
   end
 
   it "should support :missing=>:skip option" do
     @o1.update_fields({:x => 1, :z=>3, :id=>4}, [:x, :y], :missing=>:skip)
-    @o1.values.should == {:x => 1, :id=>1}
-    DB.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 1)"]
+    @o1.values.must_equal(:x => 1, :id=>1)
+    DB.sqls.must_equal ["UPDATE items SET x = 1 WHERE (id = 1)"]
   end
 
   it "should support :missing=>:raise option" do
-    proc{@o1.update_fields({:x => 1}, [:x, :y], :missing=>:raise)}.should raise_error(Sequel::Error)
+    proc{@o1.update_fields({:x => 1}, [:x, :y], :missing=>:raise)}.must_raise(Sequel::Error)
   end
 
   it "should respect model's default_set_fields_options" do
     @c.default_set_fields_options = {:missing=>:skip}
     @o1.update_fields({:x => 3}, [:x, :y])
-    @o1.values.should == {:x => 3, :id=>1}
-    DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 1)"]
+    @o1.values.must_equal(:x => 3, :id=>1)
+    DB.sqls.must_equal ["UPDATE items SET x = 3 WHERE (id = 1)"]
 
     @c.default_set_fields_options = {:missing=>:raise}
-    proc{@o1.update_fields({:x => 3}, [:x, :y])}.should raise_error(Sequel::Error)
-    DB.sqls.should == []
+    proc{@o1.update_fields({:x => 3}, [:x, :y])}.must_raise(Sequel::Error)
+    DB.sqls.must_equal []
   end
 end
 
@@ -1283,50 +1283,50 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
     @c.strict_param_setting = true
 
-    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_after_commit_rollback => false)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :use_after_commit_rollback => false)}.must_raise(Sequel::MassAssignmentRestriction)
     (o = @c.new).set_all(:x => 1, :y => 2, :z=>3)
-    o.values.should == {:x => 1, :y => 2, :z=>3}
+    o.values.must_equal(:x => 1, :y => 2, :z=>3)
 
-    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
-    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::MassAssignmentRestriction)
+    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3}, :x, :y)}.must_raise(Sequel::MassAssignmentRestriction)
     (o = @c.new).set_only({:x => 1, :y => 2}, :x, :y)
-    o.values.should == {:x => 1, :y => 2}
+    o.values.must_equal(:x => 1, :y => 2)
   end
 
   it "#set_all should set all attributes including the primary key" do
     @o1.set_all(:x => 1, :y => 2, :z=>3, :id=>4)
-    @o1.values.should == {:id =>4, :x => 1, :y => 2, :z=>3}
+    @o1.values.must_equal(:id =>4, :x => 1, :y => 2, :z=>3)
   end
 
   it "#set_all should set not set restricted fields" do
     @o1.set_all(:x => 1, :use_after_commit_rollback => false)
-    @o1.use_after_commit_rollback.should == true
-    @o1.values.should == {:x => 1}
+    @o1.use_after_commit_rollback.must_equal true
+    @o1.values.must_equal(:x => 1)
   end
 
   it "#set_only should only set given attributes" do
     @o1.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
-    @o1.values.should == {:x => 1, :y => 2}
+    @o1.values.must_equal(:x => 1, :y => 2)
     @o1.set_only({:x => 4, :y => 5, :z=>6, :id=>7}, :x, :y)
-    @o1.values.should == {:x => 4, :y => 5}
+    @o1.values.must_equal(:x => 4, :y => 5)
     @o1.set_only({:x => 9, :y => 8, :z=>6, :id=>7}, :x, :y, :id)
-    @o1.values.should == {:x => 9, :y => 8, :id=>7}
+    @o1.values.must_equal(:x => 9, :y => 8, :id=>7)
   end
 
   it "#update_all should update all attributes" do
     @c.new.update_all(:x => 1)
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_all(:y => 1)
-    DB.sqls.should == ["INSERT INTO items (y) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (y) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_all(:z => 1)
-    DB.sqls.should == ["INSERT INTO items (z) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (z) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "#update_only should only update given attributes" do
     @o1.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x])
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x)
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 end
 
@@ -1340,22 +1340,22 @@ describe Sequel::Model, "#destroy with filtered dataset" do
 
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
     def (@instance.this).execute_dui(*a) 0 end
-    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
     def (@instance.this).execute_dui(*a) 2 end
-    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
     def (@instance.this).execute_dui(*a) 1 end
-    proc{@instance.delete}.should_not raise_error
+    @instance.delete
     
     @instance.require_modification = false
     def (@instance.this).execute_dui(*a) 0 end
-    proc{@instance.delete}.should_not raise_error
+    @instance.delete
     def (@instance.this).execute_dui(*a) 2 end
-    proc{@instance.delete}.should_not raise_error
+    @instance.delete
   end
 
   it "should include WHERE clause when deleting" do
     @instance.destroy
-    DB.sqls.should == ["DELETE FROM items WHERE ((a = 1) AND (id = 1234))"]
+    DB.sqls.must_equal ["DELETE FROM items WHERE ((a = 1) AND (id = 1234))"]
   end
 end
 
@@ -1369,53 +1369,53 @@ describe Sequel::Model, "#destroy" do
 
   it "should return self" do
     @model.send(:define_method, :after_destroy){3}
-    @instance.destroy.should == @instance
+    @instance.destroy.must_equal @instance
   end
   
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
     def (@model.dataset).execute_dui(*a) 0 end
-    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
     def (@model.dataset).execute_dui(*a) 2 end
-    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
     def (@model.dataset).execute_dui(*a) 1 end
-    proc{@instance.delete}.should_not raise_error
+    @instance.delete
     
     @instance.require_modification = false
     def (@model.dataset).execute_dui(*a) 0 end
-    proc{@instance.delete}.should_not raise_error
+    @instance.delete
     def (@model.dataset).execute_dui(*a) 2 end
-    proc{@instance.delete}.should_not raise_error
+    @instance.delete
   end
 
   it "should run within a transaction if use_transactions is true" do
     @instance.use_transactions = true
     @instance.destroy
-    DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE id = 1234", "COMMIT"]
+    DB.sqls.must_equal ["BEGIN", "DELETE FROM items WHERE id = 1234", "COMMIT"]
   end
 
   it "should not run within a transaction if use_transactions is false" do
     @instance.use_transactions = false
     @instance.destroy
-    DB.sqls.should == ["DELETE FROM items WHERE id = 1234"]
+    DB.sqls.must_equal ["DELETE FROM items WHERE id = 1234"]
   end
 
   it "should run within a transaction if :transaction option is true" do
     @instance.use_transactions = false
     @instance.destroy(:transaction => true)
-    DB.sqls.should == ["BEGIN", "DELETE FROM items WHERE id = 1234", "COMMIT"]
+    DB.sqls.must_equal ["BEGIN", "DELETE FROM items WHERE id = 1234", "COMMIT"]
   end
 
   it "should not run within a transaction if :transaction option is false" do
     @instance.use_transactions = true
     @instance.destroy(:transaction => false)
-    DB.sqls.should == ["DELETE FROM items WHERE id = 1234"]
+    DB.sqls.must_equal ["DELETE FROM items WHERE id = 1234"]
   end
 
   it "should run before_destroy and after_destroy hooks" do
     @model.send(:define_method, :before_destroy){DB.execute('before blah')}
     @model.send(:define_method, :after_destroy){DB.execute('after blah')}
     @instance.destroy
-    DB.sqls.should == ["before blah", "DELETE FROM items WHERE id = 1234", "after blah"]
+    DB.sqls.must_equal ["before blah", "DELETE FROM items WHERE id = 1234", "after blah"]
   end
 end
 
@@ -1427,18 +1427,18 @@ describe Sequel::Model, "#exists?" do
   end
 
   it "should do a query to check if the record exists" do
-    @model.load(:id=>1).exists?.should == true
-    DB.sqls.should == ['SELECT 1 AS one FROM items WHERE (id = 1) LIMIT 1']
+    @model.load(:id=>1).exists?.must_equal true
+    DB.sqls.must_equal ['SELECT 1 AS one FROM items WHERE (id = 1) LIMIT 1']
   end
 
   it "should return false when #this.count == 0" do
-    @model.load(:id=>2).exists?.should == false
-    DB.sqls.should == ['SELECT 1 AS one FROM items WHERE (id = 2) LIMIT 1']
+    @model.load(:id=>2).exists?.must_equal false
+    DB.sqls.must_equal ['SELECT 1 AS one FROM items WHERE (id = 2) LIMIT 1']
   end
 
   it "should return false without issuing a query if the model object is new" do
-    @model.new.exists?.should == false
-    DB.sqls.should == []
+    @model.new.exists?.must_equal false
+    DB.sqls.must_equal []
   end
 end
 
@@ -1449,10 +1449,10 @@ describe Sequel::Model, "#each" do
     @m = @model.load(:a => 1, :b => 2, :id => 4444)
   end
   
-  specify "should iterate over the values" do
+  it "should iterate over the values" do
     h = {}
     @m.each{|k, v| h[k] = v}
-    h.should == {:a => 1, :b => 2, :id => 4444}
+    h.must_equal(:a => 1, :b => 2, :id => 4444)
   end
 end
 
@@ -1463,40 +1463,40 @@ describe Sequel::Model, "#keys" do
     @m = @model.load(:a => 1, :b => 2, :id => 4444)
   end
   
-  specify "should return the value keys" do
-    @m.keys.sort_by{|k| k.to_s}.should == [:a, :b, :id]
-    @model.new.keys.should == []
+  it "should return the value keys" do
+    @m.keys.sort_by{|k| k.to_s}.must_equal [:a, :b, :id]
+    @model.new.keys.must_equal []
   end
 end
 
 describe Sequel::Model, "#==" do
-  specify "should compare instances by values" do
+  it "should compare instances by values" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     a = z.load(:id => 1, :x => 3)
     b = z.load(:id => 1, :x => 4)
     c = z.load(:id => 1, :x => 3)
     
-    a.should_not == b
-    a.should == c
-    b.should_not == c
+    a.wont_equal b
+    a.must_equal c
+    b.wont_equal c
   end
 
-  specify "should be aliased to #eql?" do
+  it "should be aliased to #eql?" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     a = z.load(:id => 1, :x => 3)
     b = z.load(:id => 1, :x => 4)
     c = z.load(:id => 1, :x => 3)
     
-    a.eql?(b).should == false
-    a.eql?(c).should == true
-    b.eql?(c).should == false
+    a.eql?(b).must_equal false
+    a.eql?(c).must_equal true
+    b.eql?(c).must_equal false
   end
 end
 
 describe Sequel::Model, "#===" do
-  specify "should compare instances by class and pk if pk is not nil" do
+  it "should compare instances by class and pk if pk is not nil" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     y = Class.new(Sequel::Model)
@@ -1506,12 +1506,12 @@ describe Sequel::Model, "#===" do
     c = z.load(:id => 2, :x => 3)
     d = y.load(:id => 1, :x => 3)
     
-    a.should === b
-    a.should_not === c
-    a.should_not === d
+    a.must_be :===, b
+    a.wont_be :===, c
+    a.wont_be :===, d
   end
 
-  specify "should always be false if the primary key is nil" do
+  it "should always be false if the primary key is nil" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     y = Class.new(Sequel::Model)
@@ -1521,38 +1521,38 @@ describe Sequel::Model, "#===" do
     c = z.new(:x => 3)
     d = y.new(:x => 3)
     
-    a.should_not === b
-    a.should_not === c
-    a.should_not === d
+    a.wont_be :===, b
+    a.wont_be :===, c
+    a.wont_be :===, d
   end
 end
 
 describe Sequel::Model, "#hash" do
-  specify "should be the same only for objects with the same class and pk if the pk is not nil" do
+  it "should be the same only for objects with the same class and pk if the pk is not nil" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     y = Class.new(Sequel::Model)
     y.columns :id, :x
     a = z.load(:id => 1, :x => 3)
     
-    a.hash.should == z.load(:id => 1, :x => 4).hash
-    a.hash.should_not == z.load(:id => 2, :x => 3).hash
-    a.hash.should_not == y.load(:id => 1, :x => 3).hash
+    a.hash.must_equal z.load(:id => 1, :x => 4).hash
+    a.hash.wont_equal z.load(:id => 2, :x => 3).hash
+    a.hash.wont_equal y.load(:id => 1, :x => 3).hash
   end
 
-  specify "should be the same only for objects with the same class and values if the pk is nil" do
+  it "should be the same only for objects with the same class and values if the pk is nil" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     y = Class.new(Sequel::Model)
     y.columns :id, :x
     a = z.new(:x => 3)
     
-    a.hash.should_not == z.new(:x => 4).hash
-    a.hash.should == z.new(:x => 3).hash
-    a.hash.should_not == y.new(:x => 3).hash
+    a.hash.wont_equal z.new(:x => 4).hash
+    a.hash.must_equal z.new(:x => 3).hash
+    a.hash.wont_equal y.new(:x => 3).hash
   end
 
-  specify "should be the same only for objects with the same class and pk if pk is composite and all values are non-NULL" do
+  it "should be the same only for objects with the same class and pk if pk is composite and all values are non-NULL" do
     z = Class.new(Sequel::Model)
     z.columns :id, :id2, :x
     z.set_primary_key([:id, :id2])
@@ -1561,12 +1561,12 @@ describe Sequel::Model, "#hash" do
     y.set_primary_key([:id, :id2])
     a = z.load(:id => 1, :id2=>2, :x => 3)
     
-    a.hash.should == z.load(:id => 1, :id2=>2, :x => 4).hash
-    a.hash.should_not == z.load(:id => 2, :id2=>1, :x => 3).hash
-    a.hash.should_not == y.load(:id => 1, :id2=>1, :x => 3).hash
+    a.hash.must_equal z.load(:id => 1, :id2=>2, :x => 4).hash
+    a.hash.wont_equal z.load(:id => 2, :id2=>1, :x => 3).hash
+    a.hash.wont_equal y.load(:id => 1, :id2=>1, :x => 3).hash
   end
 
-  specify "should be the same only for objects with the same class and value if pk is composite and one values is NULL" do
+  it "should be the same only for objects with the same class and value if pk is composite and one values is NULL" do
     z = Class.new(Sequel::Model)
     z.columns :id, :id2, :x
     z.set_primary_key([:id, :id2])
@@ -1575,29 +1575,29 @@ describe Sequel::Model, "#hash" do
     y.set_primary_key([:id, :id2])
 
     a = z.load(:id => 1, :id2 => nil, :x => 3)
-    a.hash.should == z.load(:id => 1, :id2=>nil, :x => 3).hash
-    a.hash.should_not == z.load(:id => 1, :id2=>nil, :x => 4).hash
-    a.hash.should_not == y.load(:id => 1, :id2=>nil, :x => 3).hash
+    a.hash.must_equal z.load(:id => 1, :id2=>nil, :x => 3).hash
+    a.hash.wont_equal z.load(:id => 1, :id2=>nil, :x => 4).hash
+    a.hash.wont_equal y.load(:id => 1, :id2=>nil, :x => 3).hash
 
     a = z.load(:id =>nil, :id2 => nil, :x => 3)
-    a.hash.should == z.load(:id => nil, :id2=>nil, :x => 3).hash
-    a.hash.should_not == z.load(:id => nil, :id2=>nil, :x => 4).hash
-    a.hash.should_not == y.load(:id => nil, :id2=>nil, :x => 3).hash
+    a.hash.must_equal z.load(:id => nil, :id2=>nil, :x => 3).hash
+    a.hash.wont_equal z.load(:id => nil, :id2=>nil, :x => 4).hash
+    a.hash.wont_equal y.load(:id => nil, :id2=>nil, :x => 3).hash
 
     a = z.load(:id => 1, :x => 3)
-    a.hash.should == z.load(:id => 1, :x => 3).hash
-    a.hash.should_not == z.load(:id => 1, :id2=>nil, :x => 3).hash
-    a.hash.should_not == z.load(:id => 1, :x => 4).hash
-    a.hash.should_not == y.load(:id => 1, :x => 3).hash
+    a.hash.must_equal z.load(:id => 1, :x => 3).hash
+    a.hash.wont_equal z.load(:id => 1, :id2=>nil, :x => 3).hash
+    a.hash.wont_equal z.load(:id => 1, :x => 4).hash
+    a.hash.wont_equal y.load(:id => 1, :x => 3).hash
 
     a = z.load(:x => 3)
-    a.hash.should == z.load(:x => 3).hash
-    a.hash.should_not == z.load(:id => nil, :id2=>nil, :x => 3).hash
-    a.hash.should_not == z.load(:x => 4).hash
-    a.hash.should_not == y.load(:x => 3).hash
+    a.hash.must_equal z.load(:x => 3).hash
+    a.hash.wont_equal z.load(:id => nil, :id2=>nil, :x => 3).hash
+    a.hash.wont_equal z.load(:x => 4).hash
+    a.hash.wont_equal y.load(:x => 3).hash
   end
 
-  specify "should be the same only for objects with the same class and values if the no primary key" do
+  it "should be the same only for objects with the same class and values if the no primary key" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     z.no_primary_key
@@ -1606,9 +1606,9 @@ describe Sequel::Model, "#hash" do
     y.no_primary_key
     a = z.new(:x => 3)
     
-    a.hash.should_not == z.new(:x => 4).hash
-    a.hash.should == z.new(:x => 3).hash
-    a.hash.should_not == y.new(:x => 3).hash
+    a.hash.wont_equal z.new(:x => 4).hash
+    a.hash.must_equal z.new(:x => 3).hash
+    a.hash.wont_equal y.new(:x => 3).hash
   end
 
 end
@@ -1621,38 +1621,38 @@ describe Sequel::Model, "#initialize" do
     @c.strict_param_setting = false
   end
   
-  specify "should accept values" do
+  it "should accept values" do
     m = @c.new(:x => 2)
-    m.values.should == {:x => 2}
+    m.values.must_equal(:x => 2)
   end
   
-  specify "should not modify the primary key" do
+  it "should not modify the primary key" do
     m = @c.new(:id => 1, :x => 2)
-    m.values.should == {:x => 2}
+    m.values.must_equal(:x => 2)
   end
   
-  specify "should accept no values" do
+  it "should accept no values" do
     m = @c.new
-    m.values.should == {}
+    m.values.must_equal({})
   end
   
-  specify "should accept a block to execute" do
+  it "should accept a block to execute" do
     m = @c.new {|o| o[:id] = 1234}
-    m.id.should == 1234
+    m.id.must_equal 1234
   end
   
-  specify "should accept virtual attributes" do
+  it "should accept virtual attributes" do
     @c.send(:define_method, :blah=){|x| @blah = x}
     @c.send(:define_method, :blah){@blah}
     
     m = @c.new(:x => 2, :blah => 3)
-    m.values.should == {:x => 2}
-    m.blah.should == 3
+    m.values.must_equal(:x => 2)
+    m.blah.must_equal 3
   end
   
-  specify "should convert string keys into symbol keys" do
+  it "should convert string keys into symbol keys" do
     m = @c.new('x' => 2)
-    m.values.should == {:x => 2}
+    m.values.must_equal(:x => 2)
   end
 end
   
@@ -1661,21 +1661,21 @@ describe Sequel::Model, "#initialize_set" do
     @c = Class.new(Sequel::Model){columns :id, :x, :y}
   end
 
-  specify "should be called by initialize to set the column values" do
+  it "should be called by initialize to set the column values" do
     @c.send(:define_method, :initialize_set){|h| set(:y => 3)}
-    @c.new(:x => 2).values.should == {:y => 3}
+    @c.new(:x => 2).values.must_equal(:y => 3)
   end
 
-  specify "should be called with the hash given to initialize " do
+  it "should be called with the hash given to initialize " do
     x = nil
     @c.send(:define_method, :initialize_set){|y| x = y}
     @c.new(:x => 2)
-    x.should == {:x => 2}
+    x.must_equal(:x => 2)
   end
 
-  specify "should not cause columns modified by the method to be considered as changed" do
+  it "should not cause columns modified by the method to be considered as changed" do
     @c.send(:define_method, :initialize_set){|h| set(:y => 3)}
-    @c.new(:x => 2).changed_columns.should == []
+    @c.new(:x => 2).changed_columns.must_equal []
   end
 end
 
@@ -1690,31 +1690,31 @@ describe Sequel::Model, ".create" do
 
   it "should be able to create rows in the associated table" do
     o = @c.create(:x => 1)
-    o.class.should == @c
-    DB.sqls.should == ['INSERT INTO items (x) VALUES (1)', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    o.class.must_equal @c
+    DB.sqls.must_equal ['INSERT INTO items (x) VALUES (1)', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should be able to create rows without any values specified" do
     o = @c.create
-    o.class.should == @c
-    DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    o.class.must_equal @c
+    DB.sqls.must_equal ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 
   it "should accept a block and call it" do
     o1, o2, o3 =  nil, nil, nil
     o = @c.create {|o4| o1 = o4; o3 = o4; o2 = :blah; o3.x = 333}
-    o.class.should == @c
-    o1.should === o
-    o3.should === o
-    o2.should == :blah
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    o.class.must_equal @c
+    o1.must_be :===, o
+    o3.must_be :===, o
+    o2.must_equal :blah
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
   
   it "should create a row for a model with custom primary key" do
     @c.set_primary_key :x
     o = @c.create(:x => 30)
-    o.class.should == @c
-    DB.sqls.should == ["INSERT INTO items (x) VALUES (30)", "SELECT * FROM items WHERE (x = 30) LIMIT 1"]
+    o.class.must_equal @c
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (30)", "SELECT * FROM items WHERE (x = 30) LIMIT 1"]
   end
 end
 
@@ -1727,28 +1727,28 @@ describe Sequel::Model, "#refresh" do
     DB.reset
   end
 
-  specify "should reload the instance values from the database" do
+  it "should reload the instance values from the database" do
     @m = @c.new(:id => 555)
     @m[:x] = 'blah'
     @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 'kaboom', :id => 555}
     @m.refresh
-    @m[:x].should == 'kaboom'
-    DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
+    @m[:x].must_equal 'kaboom'
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
   
-  specify "should raise if the instance is not found" do
+  it "should raise if the instance is not found" do
     @m = @c.new(:id => 555)
     @c.instance_dataset._fetch =@c.dataset._fetch = []
-    proc {@m.refresh}.should raise_error(Sequel::Error)
-    DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
+    proc {@m.refresh}.must_raise(Sequel::Error)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
   
-  specify "should be aliased by #reload" do
+  it "should be aliased by #reload" do
     @m = @c.new(:id => 555)
     @c.instance_dataset._fetch =@c.dataset._fetch = {:x => 'kaboom', :id => 555}
     @m.reload
-    @m[:x].should == 'kaboom'
-    DB.sqls.should == ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
+    @m[:x].must_equal 'kaboom'
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
 end
 
@@ -1766,349 +1766,349 @@ describe Sequel::Model, "typecasting" do
     Sequel.datetime_class = Time
   end
 
-  specify "should not convert if typecasting is turned off" do
+  it "should not convert if typecasting is turned off" do
     @c.typecast_on_assignment = false
     m = @c.new
     m.x = '1'
-    m.x.should == '1'
+    m.x.must_equal '1'
   end
 
-  specify "should convert to integer for an integer field" do
+  it "should convert to integer for an integer field" do
     @c.db_schema = {:x=>{:type=>:integer}}
     m = @c.new
     m.x = '1'
-    m.x.should == 1
+    m.x.must_equal 1
     m.x = 1
-    m.x.should == 1
+    m.x.must_equal 1
     m.x = 1.3
-    m.x.should == 1
+    m.x.must_equal 1
   end
 
-  specify "should typecast '' to nil unless type is string or blob" do
+  it "should typecast '' to nil unless type is string or blob" do
     [:integer, :float, :decimal, :boolean, :date, :time, :datetime].each do |x|
       @c.db_schema = {:x=>{:type=>x}}
       m = @c.new
       m.x = ''
-      m.x.should == nil
+      m.x.must_equal nil
     end
    [:string, :blob].each do |x|
       @c.db_schema = {:x=>{:type=>x}}
       m = @c.new
       m.x = ''
-      m.x.should == ''
+      m.x.must_equal ''
     end
   end
 
-  specify "should not typecast '' to nil if typecast_empty_string_to_nil is false" do
+  it "should not typecast '' to nil if typecast_empty_string_to_nil is false" do
     m = @c.new
     m.typecast_empty_string_to_nil = false
-    proc{m.x = ''}.should raise_error
+    proc{m.x = ''}.must_raise Sequel::InvalidValue
     @c.typecast_empty_string_to_nil = false
-    proc{@c.new.x = ''}.should raise_error
+    proc{@c.new.x = ''}.must_raise Sequel::InvalidValue
   end
 
-  specify "should handle typecasting where == raises an error on the object" do
+  it "should handle typecasting where == raises an error on the object" do
     m = @c.new
     o = Object.new
     def o.==(v) raise ArgumentError end
     def o.to_i() 4 end
     m.x = o
-    m.x.should == 4
+    m.x.must_equal 4
   end
 
-  specify "should not typecast nil if NULLs are allowed" do
+  it "should not typecast nil if NULLs are allowed" do
     @c.db_schema[:x][:allow_null] = true
     m = @c.new
     m.x = nil
-    m.x.should == nil
+    m.x.must_equal nil
   end
 
-  specify "should raise an error if attempting to typecast nil and NULLs are not allowed" do
+  it "should raise an error if attempting to typecast nil and NULLs are not allowed" do
     @c.db_schema[:x][:allow_null] = false
-    proc{@c.new.x = nil}.should raise_error(Sequel::Error)
-    proc{@c.new.x = ''}.should raise_error(Sequel::Error)
+    proc{@c.new.x = nil}.must_raise(Sequel::InvalidValue)
+    proc{@c.new.x = ''}.must_raise(Sequel::InvalidValue)
   end
 
-  specify "should not raise an error if NULLs are not allowed and typecasting is turned off" do
+  it "should not raise an error if NULLs are not allowed and typecasting is turned off" do
     @c.typecast_on_assignment = false
     @c.db_schema[:x][:allow_null] = false
     m = @c.new
     m.x = nil
-    m.x.should == nil
+    m.x.must_equal nil
   end
 
-  specify "should not raise when typecasting nil to NOT NULL column but raise_on_typecast_failure is off" do
+  it "should not raise when typecasting nil to NOT NULL column but raise_on_typecast_failure is off" do
     @c.raise_on_typecast_failure = false
     @c.typecast_on_assignment = true
     m = @c.new
     m.x = ''
-    m.x.should == nil
+    m.x.must_equal nil
     m.x = nil
-    m.x.should == nil
+    m.x.must_equal nil
   end
 
-  specify "should raise an error if invalid data is used in an integer field" do
-    proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
+  it "should raise an error if invalid data is used in an integer field" do
+    proc{@c.new.x = 'a'}.must_raise(Sequel::InvalidValue)
   end
 
-  specify "should assign value if raise_on_typecast_failure is off and assigning invalid integer" do
+  it "should assign value if raise_on_typecast_failure is off and assigning invalid integer" do
     @c.raise_on_typecast_failure = false
     model = @c.new
     model.x = '1d'
-    model.x.should == '1d'
+    model.x.must_equal '1d'
   end
 
-  specify "should convert to float for a float field" do
+  it "should convert to float for a float field" do
     @c.db_schema = {:x=>{:type=>:float}}
     m = @c.new
     m.x = '1.3'
-    m.x.should == 1.3
+    m.x.must_equal 1.3
     m.x = 1
-    m.x.should == 1.0
+    m.x.must_equal 1.0
     m.x = 1.3
-    m.x.should == 1.3
+    m.x.must_equal 1.3
   end
 
-  specify "should raise an error if invalid data is used in an float field" do
+  it "should raise an error if invalid data is used in an float field" do
     @c.db_schema = {:x=>{:type=>:float}}
-    proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new.x = 'a'}.must_raise(Sequel::InvalidValue)
   end
 
-  specify "should assign value if raise_on_typecast_failure is off and assigning invalid float" do
+  it "should assign value if raise_on_typecast_failure is off and assigning invalid float" do
     @c.raise_on_typecast_failure = false
     @c.db_schema = {:x=>{:type=>:float}}
     model = @c.new
     model.x = '1d'
-    model.x.should == '1d'
+    model.x.must_equal '1d'
   end
 
-  specify "should convert to BigDecimal for a decimal field" do
+  it "should convert to BigDecimal for a decimal field" do
     @c.db_schema = {:x=>{:type=>:decimal}}
     m = @c.new
     bd = BigDecimal.new('1.0')
     m.x = '1.0'
-    m.x.should == bd
+    m.x.must_equal bd
     m.x = 1.0
-    m.x.should == bd
+    m.x.must_equal bd
     m.x = 1
-    m.x.should == bd
+    m.x.must_equal bd
     m.x = bd
-    m.x.should == bd
+    m.x.must_equal bd
     m.x = '0'
-    m.x.should == 0
+    m.x.must_equal 0
   end
 
-  specify "should raise an error if invalid data is used in an decimal field" do
+  it "should raise an error if invalid data is used in an decimal field" do
     @c.db_schema = {:x=>{:type=>:decimal}}
-    proc{@c.new.x = Date.today}.should raise_error(Sequel::InvalidValue)
-    proc{@c.new.x = 'foo'}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new.x = Date.today}.must_raise(Sequel::InvalidValue)
+    proc{@c.new.x = 'foo'}.must_raise(Sequel::InvalidValue)
   end
 
-  specify "should assign value if raise_on_typecast_failure is off and assigning invalid decimal" do
+  it "should assign value if raise_on_typecast_failure is off and assigning invalid decimal" do
     @c.raise_on_typecast_failure = false
     @c.db_schema = {:x=>{:type=>:decimal}}
     model = @c.new
     time = Time.now
     model.x = time
-    model.x.should == time
+    model.x.must_equal time
   end
 
-  specify "should convert to string for a string field" do
+  it "should convert to string for a string field" do
     @c.db_schema = {:x=>{:type=>:string}}
     m = @c.new
     m.x = '1.3'
-    m.x.should == '1.3'
+    m.x.must_equal '1.3'
     m.x = 1
-    m.x.should == '1'
+    m.x.must_equal '1'
     m.x = 1.3
-    m.x.should == '1.3'
+    m.x.must_equal '1.3'
   end
 
-  specify "should convert to boolean for a boolean field" do
+  it "should convert to boolean for a boolean field" do
     @c.db_schema = {:x=>{:type=>:boolean}}
     m = @c.new
     m.x = '1.3'
-    m.x.should == true
+    m.x.must_equal true
     m.x = 1
-    m.x.should == true
+    m.x.must_equal true
     m.x = 1.3
-    m.x.should == true
+    m.x.must_equal true
     m.x = 't'
-    m.x.should == true
+    m.x.must_equal true
     m.x = 'T'
-    m.x.should == true
+    m.x.must_equal true
     m.x = 'y'
-    m.x.should == true
+    m.x.must_equal true
     m.x = 'Y'
-    m.x.should == true
+    m.x.must_equal true
     m.x = true
-    m.x.should == true
+    m.x.must_equal true
     m.x = nil
-    m.x.should == nil
+    m.x.must_equal nil
     m.x = ''
-    m.x.should == nil
+    m.x.must_equal nil
     m.x = []
-    m.x.should == nil
+    m.x.must_equal nil
     m.x = 'f'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 'F'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 'false'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 'FALSE'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 'n'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 'N'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 'no'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 'NO'
-    m.x.should == false
+    m.x.must_equal false
     m.x = '0'
-    m.x.should == false
+    m.x.must_equal false
     m.x = 0
-    m.x.should == false
+    m.x.must_equal false
     m.x = false
-    m.x.should == false
+    m.x.must_equal false
   end
 
-  specify "should convert to date for a date field" do
+  it "should convert to date for a date field" do
     @c.db_schema = {:x=>{:type=>:date}}
     m = @c.new
     y = Date.new(2007,10,21)
     m.x = '2007-10-21'
-    m.x.should == y
+    m.x.must_equal y
     m.x = Date.parse('2007-10-21')
-    m.x.should == y
+    m.x.must_equal y
     m.x = Time.parse('2007-10-21')
-    m.x.should == y
+    m.x.must_equal y
     m.x = DateTime.parse('2007-10-21')
-    m.x.should == y
+    m.x.must_equal y
   end
 
-  specify "should accept a hash with symbol or string keys for a date field" do
+  it "should accept a hash with symbol or string keys for a date field" do
     @c.db_schema = {:x=>{:type=>:date}}
     m = @c.new
     y = Date.new(2007,10,21)
     m.x = {:year=>2007, :month=>10, :day=>21}
-    m.x.should == y
+    m.x.must_equal y
     m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21'}
-    m.x.should == y
+    m.x.must_equal y
   end
 
-  specify "should raise an error if invalid data is used in a date field" do
+  it "should raise an error if invalid data is used in a date field" do
     @c.db_schema = {:x=>{:type=>:date}}
-    proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
-    proc{@c.new.x = 100}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new.x = 'a'}.must_raise(Sequel::InvalidValue)
+    proc{@c.new.x = 100}.must_raise(Sequel::InvalidValue)
   end
 
-  specify "should assign value if raise_on_typecast_failure is off and assigning invalid date" do
+  it "should assign value if raise_on_typecast_failure is off and assigning invalid date" do
     @c.raise_on_typecast_failure = false
     @c.db_schema = {:x=>{:type=>:date}}
     model = @c.new
     model.x = 4
-    model.x.should == 4
+    model.x.must_equal 4
   end
 
-  specify "should convert to Sequel::SQLTime for a time field" do
+  it "should convert to Sequel::SQLTime for a time field" do
     @c.db_schema = {:x=>{:type=>:time}}
     m = @c.new
     x = '10:20:30'
     y = Sequel::SQLTime.parse(x)
     m.x = x
-    m.x.should == y
+    m.x.must_equal y
     m.x = y
-    m.x.should == y
-    m.x.should be_a_kind_of(Sequel::SQLTime)
+    m.x.must_equal y
+    m.x.must_be_kind_of(Sequel::SQLTime)
   end
 
-  specify "should accept a hash with symbol or string keys for a time field" do
+  it "should accept a hash with symbol or string keys for a time field" do
     @c.db_schema = {:x=>{:type=>:time}}
     m = @c.new
     y = Time.parse('10:20:30')
     m.x = {:hour=>10, :minute=>20, :second=>30}
-    m.x.should == y
+    m.x.must_equal y
     m.x = {'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
-    m.x.should == y
+    m.x.must_equal y
   end
 
-  specify "should raise an error if invalid data is used in a time field" do
+  it "should raise an error if invalid data is used in a time field" do
     @c.db_schema = {:x=>{:type=>:time}}
-    proc{@c.new.x = '0000'}.should raise_error
-    proc{@c.new.x = Date.parse('2008-10-21')}.should raise_error(Sequel::InvalidValue)
-    proc{@c.new.x = DateTime.parse('2008-10-21')}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new.x = '0000'}.must_raise(Sequel::InvalidValue)
+    proc{@c.new.x = Date.parse('2008-10-21')}.must_raise(Sequel::InvalidValue)
+    proc{@c.new.x = DateTime.parse('2008-10-21')}.must_raise(Sequel::InvalidValue)
   end
 
-  specify "should assign value if raise_on_typecast_failure is off and assigning invalid time" do
+  it "should assign value if raise_on_typecast_failure is off and assigning invalid time" do
     @c.raise_on_typecast_failure = false
     @c.db_schema = {:x=>{:type=>:time}}
     model = @c.new
     model.x = '0000'
-    model.x.should == '0000'
+    model.x.must_equal '0000'
   end
 
-  specify "should convert to the Sequel.datetime_class for a datetime field" do
+  it "should convert to the Sequel.datetime_class for a datetime field" do
     @c.db_schema = {:x=>{:type=>:datetime}}
     m = @c.new
     x = '2007-10-21T10:20:30-07:00'
     y = Time.parse(x)
     m.x = x
-    m.x.should == y
+    m.x.must_equal y
     m.x = DateTime.parse(x)
-    m.x.should == y
+    m.x.must_equal y
     m.x = Time.parse(x)
-    m.x.should == y
+    m.x.must_equal y
     m.x = Date.parse('2007-10-21')
-    m.x.should == Time.parse('2007-10-21')
+    m.x.must_equal Time.parse('2007-10-21')
     Sequel.datetime_class = DateTime
     y = DateTime.parse(x)
     m.x = x
-    m.x.should == y
+    m.x.must_equal y
     m.x = DateTime.parse(x)
-    m.x.should == y
+    m.x.must_equal y
     m.x = Time.parse(x)
-    m.x.should == y
+    m.x.must_equal y
     m.x = Date.parse('2007-10-21')
-    m.x.should == DateTime.parse('2007-10-21')
+    m.x.must_equal DateTime.parse('2007-10-21')
   end
 
-  specify "should accept a hash with symbol or string keys for a datetime field" do
+  it "should accept a hash with symbol or string keys for a datetime field" do
     @c.db_schema = {:x=>{:type=>:datetime}}
     m = @c.new
     y = Time.parse('2007-10-21 10:20:30')
     m.x = {:year=>2007, :month=>10, :day=>21, :hour=>10, :minute=>20, :second=>30}
-    m.x.should == y
+    m.x.must_equal y
     m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21', 'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
-    m.x.should == y
+    m.x.must_equal y
     Sequel.datetime_class = DateTime
     y = DateTime.parse('2007-10-21 10:20:30')
     m.x = {:year=>2007, :month=>10, :day=>21, :hour=>10, :minute=>20, :second=>30}
-    m.x.should == y
+    m.x.must_equal y
     m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21', 'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
-    m.x.should == y
+    m.x.must_equal y
   end
 
-  specify "should raise an error if invalid data is used in a datetime field" do
+  it "should raise an error if invalid data is used in a datetime field" do
     @c.db_schema = {:x=>{:type=>:datetime}}
-    proc{@c.new.x = '0000'}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new.x = '0000'}.must_raise(Sequel::InvalidValue)
     Sequel.datetime_class = DateTime
-    proc{@c.new.x = '0000'}.should raise_error(Sequel::InvalidValue)
-    proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
+    proc{@c.new.x = '0000'}.must_raise(Sequel::InvalidValue)
+    proc{@c.new.x = 'a'}.must_raise(Sequel::InvalidValue)
   end
 
-  specify "should assign value if raise_on_typecast_failure is off and assigning invalid datetime" do
+  it "should assign value if raise_on_typecast_failure is off and assigning invalid datetime" do
     @c.raise_on_typecast_failure = false
     @c.db_schema = {:x=>{:type=>:datetime}}
     model = @c.new
     model.x = '0000'
-    model.x.should == '0000'
+    model.x.must_equal '0000'
     Sequel.datetime_class = DateTime
     model = @c.new
     model.x = '0000'
-    model.x.should == '0000'
+    model.x.must_equal '0000'
     model.x = 'a'
-    model.x.should == 'a'
+    model.x.must_equal 'a'
   end
 end
 
@@ -2125,24 +2125,24 @@ describe "Model#lock!" do
     o = @c.new
     def o._refresh(x) raise Sequel::Error; super(x) end
     x = o.lock!
-    x.should == o
-    DB.sqls.should == []
+    x.must_equal o
+    DB.sqls.must_equal []
   end
     
   it "should refresh the record using for_update if it is not a new record" do
     o = @c.load(:id => 1)
     def o._refresh(x) instance_variable_set(:@a, 1); super(x) end
     x = o.lock!
-    x.should == o
-    o.instance_variable_get(:@a).should == 1
-    DB.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1 FOR UPDATE"]
+    x.must_equal o
+    o.instance_variable_get(:@a).must_equal 1
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1 FOR UPDATE"]
   end
 end
 
 describe "Model#schema_type_class" do
-  specify "should return the class or array of classes for the given type symbol" do
+  it "should return the class or array of classes for the given type symbol" do
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval{@db_schema = {:id=>{:type=>:integer}}}
-    @c.new.send(:schema_type_class, :id).should == Integer
+    @c.new.send(:schema_type_class, :id).must_equal Integer
   end
 end

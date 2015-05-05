@@ -9,50 +9,50 @@ describe "Sequel::Postgres::RangeOp" do
   end
 
   it "#pg_range should return self" do
-    @h.pg_range.should equal(@h)
+    @h.pg_range.must_be_same_as(@h)
   end
 
   it "Sequel.pg_range_op should return argument if already a RangeOp" do
-    Sequel.pg_range_op(@h).should equal(@h)
+    Sequel.pg_range_op(@h).must_be_same_as(@h)
   end
 
   it "Sequel.pg_range should return a new RangeOp if not given a range" do
-    @ds.literal(Sequel.pg_range(:h).lower).should == "lower(h)"
+    @ds.literal(Sequel.pg_range(:h).lower).must_equal "lower(h)"
   end
 
   it "#pg_range should return a RangeOp for literal strings, and expressions" do
-    @ds.literal(Sequel.function(:b, :h).pg_range.lower).should == "lower(b(h))"
-    @ds.literal(Sequel.lit('h').pg_range.lower).should == "lower(h)"
+    @ds.literal(Sequel.function(:b, :h).pg_range.lower).must_equal "lower(b(h))"
+    @ds.literal(Sequel.lit('h').pg_range.lower).must_equal "lower(h)"
   end
 
   it "PGRange#op should return a RangeOp" do
-    @ds.literal(Sequel.pg_range(1..2, :numrange).op.lower).should == "lower('[1,2]'::numrange)"
+    @ds.literal(Sequel.pg_range(1..2, :numrange).op.lower).must_equal "lower('[1,2]'::numrange)"
   end
 
   it "should define methods for all of the PostgreSQL range operators" do
-    @ds.literal(@h.contains(@h)).should == "(h @> h)"
-    @ds.literal(@h.contained_by(@h)).should == "(h <@ h)"
-    @ds.literal(@h.overlaps(@h)).should == "(h && h)"
-    @ds.literal(@h.left_of(@h)).should == "(h << h)"
-    @ds.literal(@h.right_of(@h)).should == "(h >> h)"
-    @ds.literal(@h.ends_before(@h)).should == "(h &< h)"
-    @ds.literal(@h.starts_after(@h)).should == "(h &> h)"
-    @ds.literal(@h.adjacent_to(@h)).should == "(h -|- h)"
+    @ds.literal(@h.contains(@h)).must_equal "(h @> h)"
+    @ds.literal(@h.contained_by(@h)).must_equal "(h <@ h)"
+    @ds.literal(@h.overlaps(@h)).must_equal "(h && h)"
+    @ds.literal(@h.left_of(@h)).must_equal "(h << h)"
+    @ds.literal(@h.right_of(@h)).must_equal "(h >> h)"
+    @ds.literal(@h.ends_before(@h)).must_equal "(h &< h)"
+    @ds.literal(@h.starts_after(@h)).must_equal "(h &> h)"
+    @ds.literal(@h.adjacent_to(@h)).must_equal "(h -|- h)"
   end
 
   it "should define methods for all of the PostgreSQL range functions" do
-    @ds.literal(@h.lower).should == "lower(h)"
-    @ds.literal(@h.upper).should == "upper(h)"
-    @ds.literal(@h.isempty).should == "isempty(h)"
-    @ds.literal(@h.lower_inc).should == "lower_inc(h)"
-    @ds.literal(@h.upper_inc).should == "upper_inc(h)"
-    @ds.literal(@h.lower_inf).should == "lower_inf(h)"
-    @ds.literal(@h.upper_inf).should == "upper_inf(h)"
+    @ds.literal(@h.lower).must_equal "lower(h)"
+    @ds.literal(@h.upper).must_equal "upper(h)"
+    @ds.literal(@h.isempty).must_equal "isempty(h)"
+    @ds.literal(@h.lower_inc).must_equal "lower_inc(h)"
+    @ds.literal(@h.upper_inc).must_equal "upper_inc(h)"
+    @ds.literal(@h.lower_inf).must_equal "lower_inf(h)"
+    @ds.literal(@h.upper_inf).must_equal "upper_inf(h)"
   end
 
   it "+ - * operators should be defined and return a RangeOp" do
-    @ds.literal((@h + @h).lower).should == "lower((h + h))"
-    @ds.literal((@h * @h).lower).should == "lower((h * h))"
-    @ds.literal((@h - @h).lower).should == "lower((h - h))"
+    @ds.literal((@h + @h).lower).must_equal "lower((h + h))"
+    @ds.literal((@h * @h).lower).must_equal "lower((h * h))"
+    @ds.literal((@h - @h).lower).must_equal "lower((h - h))"
   end
 end

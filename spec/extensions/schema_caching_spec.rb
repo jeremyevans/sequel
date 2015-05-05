@@ -12,30 +12,30 @@ describe "schema_caching extension" do
   end
 
   it "Database#dump_schema_cache should dump cached schema to the given file" do
-    File.exist?(@filename).should == false
+    File.exist?(@filename).must_equal false
     @db.dump_schema_cache(@filename)
-    File.exist?(@filename).should == true
-    File.size(@filename).should > 0
+    File.exist?(@filename).must_equal true
+    File.size(@filename).must_be :>,  0
   end
 
   it "Database#load_schema_cache should load cached schema from the given file dumped by #dump_schema_cache" do
     @db.dump_schema_cache(@filename)
     db = Sequel::Database.new.extension(:schema_caching)
     db.load_schema_cache(@filename)
-    @db.instance_variable_get(:@schemas).should == @schemas
+    @db.instance_variable_get(:@schemas).must_equal @schemas
   end
 
   it "Database#dump_schema_cache? should dump cached schema to the given file unless the file exists" do
     File.open(@filename, 'wb'){|f|}
-    File.size(@filename).should == 0
+    File.size(@filename).must_equal 0
     @db.dump_schema_cache?(@filename)
-    File.size(@filename).should == 0
+    File.size(@filename).must_equal 0
   end
 
   it "Database#load_schema_cache? should load cached schema from the given file if it exists" do
     db = Sequel::Database.new.extension(:schema_caching)
-    File.exist?(@filename).should == false
+    File.exist?(@filename).must_equal false
     db.load_schema_cache?(@filename)
-    db.instance_variable_get(:@schemas).should == {}
+    db.instance_variable_get(:@schemas).must_equal({})
   end
 end

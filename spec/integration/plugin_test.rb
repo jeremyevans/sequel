@@ -53,8 +53,8 @@ describe "Class Table Inheritance Plugin" do
     @db.drop_table? :staff, :executives, :managers, :employees
   end
 
-  specify "should return rows as subclass instances" do
-    Employee.order(:id).all.should == [
+  it "should return rows as subclass instances" do
+    Employee.order(:id).all.must_equal [
       Employee.load(:id=>@i1, :name=>'E', :kind=>'Employee'),
       Staff.load(:id=>@i2, :name=>'S', :kind=>'Staff'),
       Manager.load(:id=>@i3, :name=>'M', :kind=>'Manager'),
@@ -62,100 +62,100 @@ describe "Class Table Inheritance Plugin" do
     ]
   end
   
-  specify "should lazily load columns in subclass tables" do
-    Employee[@i2][:manager_id].should == nil
-    Employee[@i2].manager_id.should == @i4
-    Employee[@i3][:num_staff].should == nil
-    Employee[@i3].num_staff.should == 7
-    Employee[@i4][:num_staff].should == nil
-    Employee[@i4].num_staff.should == 5
-    Employee[@i4][:num_managers].should == nil
-    Employee[@i4].num_managers.should == 6
+  it "should lazily load columns in subclass tables" do
+    Employee[@i2][:manager_id].must_equal nil
+    Employee[@i2].manager_id.must_equal @i4
+    Employee[@i3][:num_staff].must_equal nil
+    Employee[@i3].num_staff.must_equal 7
+    Employee[@i4][:num_staff].must_equal nil
+    Employee[@i4].num_staff.must_equal 5
+    Employee[@i4][:num_managers].must_equal nil
+    Employee[@i4].num_managers.must_equal 6
   end
   
-  specify "should eagerly load columns in subclass tables when retrieving multiple objects" do
+  it "should eagerly load columns in subclass tables when retrieving multiple objects" do
     a = Employee.order(:id).all
-    a[1][:manager_id].should == nil
-    a[1].manager_id.should == @i4
-    a[2][:num_staff].should == nil
-    a[2].num_staff.should == 7
-    a[3][:num_staff].should == 5 # eagerly loaded by previous call
-    a[3].num_staff.should == 5
-    a[3][:num_managers].should == nil
-    a[3].num_managers.should == 6
+    a[1][:manager_id].must_equal nil
+    a[1].manager_id.must_equal @i4
+    a[2][:num_staff].must_equal nil
+    a[2].num_staff.must_equal 7
+    a[3][:num_staff].must_equal 5 # eagerly loaded by previous call
+    a[3].num_staff.must_equal 5
+    a[3][:num_managers].must_equal nil
+    a[3].num_managers.must_equal 6
   end
   
-  specify "should include schema for columns for tables for ancestor classes" do
-    Employee.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :name]
-    Staff.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :manager_id, :name]
-    Manager.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :name, :num_staff]
-    Executive.db_schema.keys.sort_by{|x| x.to_s}.should == [:id, :kind, :name, :num_managers, :num_staff]
+  it "should include schema for columns for tables for ancestor classes" do
+    Employee.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name]
+    Staff.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :manager_id, :name]
+    Manager.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_staff]
+    Executive.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_managers, :num_staff]
   end
   
-  specify "should include columns for tables for ancestor classes" do
-    Employee.columns.should == [:id, :name, :kind]
-    Staff.columns.should == [:id, :name, :kind, :manager_id]
-    Manager.columns.should == [:id, :name, :kind, :num_staff]
-    Executive.columns.should == [:id, :name, :kind, :num_staff, :num_managers]
+  it "should include columns for tables for ancestor classes" do
+    Employee.columns.must_equal [:id, :name, :kind]
+    Staff.columns.must_equal [:id, :name, :kind, :manager_id]
+    Manager.columns.must_equal [:id, :name, :kind, :num_staff]
+    Executive.columns.must_equal [:id, :name, :kind, :num_staff, :num_managers]
   end
   
-  specify "should delete rows from all tables" do
+  it "should delete rows from all tables" do
     e = Executive.first
     i = e.id
     e.staff_members_dataset.destroy
     e.destroy
-    @db[:executives][:id=>i].should == nil
-    @db[:managers][:id=>i].should == nil
-    @db[:employees][:id=>i].should == nil
+    @db[:executives][:id=>i].must_equal nil
+    @db[:managers][:id=>i].must_equal nil
+    @db[:employees][:id=>i].must_equal nil
   end
   
-  specify "should handle associations only defined in subclasses" do
-    Employee.filter(:employees__id=>@i2).all.first.manager.id.should == @i4
+  it "should handle associations only defined in subclasses" do
+    Employee.filter(:employees__id=>@i2).all.first.manager.id.must_equal @i4
   end
 
-  specify "should insert rows into all tables" do
+  it "should insert rows into all tables" do
     e = Executive.create(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
     i = e.id
-    @db[:employees][:id=>i].should == {:id=>i, :name=>'Ex2', :kind=>'Executive'}
-    @db[:managers][:id=>i].should == {:id=>i, :num_staff=>9}
-    @db[:executives][:id=>i].should == {:id=>i, :num_managers=>8}
+    @db[:employees][:id=>i].must_equal(:id=>i, :name=>'Ex2', :kind=>'Executive')
+    @db[:managers][:id=>i].must_equal(:id=>i, :num_staff=>9)
+    @db[:executives][:id=>i].must_equal(:id=>i, :num_managers=>8)
   end
   
-  specify "should update rows in all tables" do
+  it "should update rows in all tables" do
     Executive.first.update(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
-    @db[:employees][:id=>@i4].should == {:id=>@i4, :name=>'Ex2', :kind=>'Executive'}
-    @db[:managers][:id=>@i4].should == {:id=>@i4, :num_staff=>9}
-    @db[:executives][:id=>@i4].should == {:id=>@i4, :num_managers=>8}
+    @db[:employees][:id=>@i4].must_equal(:id=>@i4, :name=>'Ex2', :kind=>'Executive')
+    @db[:managers][:id=>@i4].must_equal(:id=>@i4, :num_staff=>9)
+    @db[:executives][:id=>@i4].must_equal(:id=>@i4, :num_managers=>8)
   end
   
-  specify "should handle many_to_one relationships" do
+  it "should handle many_to_one relationships" do
     m = Staff.first.manager
-    m.should == Manager[@i4]
-    m.should be_a_kind_of(Executive)
+    m.must_equal Manager[@i4]
+    m.must_be_kind_of(Executive)
   end
   
-  specify "should handle eagerly loading many_to_one relationships" do
-    Staff.limit(1).eager(:manager).all.map{|x| x.manager}.should == [Manager[@i4]]
+  it "should handle eagerly loading many_to_one relationships" do
+    Staff.limit(1).eager(:manager).all.map{|x| x.manager}.must_equal [Manager[@i4]]
   end
   
-  specify "should handle eagerly graphing many_to_one relationships" do
+  it "should handle eagerly graphing many_to_one relationships" do
     ss = Staff.eager_graph(:manager).all
-    ss.should == [Staff[@i2]]
-    ss.map{|x| x.manager}.should == [Manager[@i4]]
+    ss.must_equal [Staff[@i2]]
+    ss.map{|x| x.manager}.must_equal [Manager[@i4]]
   end
   
-  specify "should handle one_to_many relationships" do
-    Executive.first.staff_members.should == [Staff[@i2]]
+  it "should handle one_to_many relationships" do
+    Executive.first.staff_members.must_equal [Staff[@i2]]
   end
   
-  specify "should handle eagerly loading one_to_many relationships" do
-    Executive.limit(1).eager(:staff_members).first.staff_members.should == [Staff[@i2]]
+  it "should handle eagerly loading one_to_many relationships" do
+    Executive.limit(1).eager(:staff_members).first.staff_members.must_equal [Staff[@i2]]
   end
   
-  specify "should handle eagerly graphing one_to_many relationships" do
+  it "should handle eagerly graphing one_to_many relationships" do
     es = Executive.limit(1).eager_graph(:staff_members).all
-    es.should == [Executive[@i4]]
-    es.map{|x| x.staff_members}.should == [[Staff[@i2]]]
+    es.must_equal [Executive[@i4]]
+    es.map{|x| x.staff_members}.must_equal [[Staff[@i2]]]
   end
 end
 
@@ -209,129 +209,132 @@ describe "Many Through Many Plugin" do
   after(:all) do
     @db.drop_table? :albums_artists, :albums, :artists
   end
+  def around
+    DB.transaction(:rollback=>:always){super}
+  end
   
   def self_join(c)
     c.join(Sequel.as(c.table_name, :b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
   end
 
-  specify "should handle super simple case with 1 join table" do
+  it "should handle super simple case with 1 join table" do
     Artist.many_through_many :albums, [[:albums_artists, :artist_id, :album_id]]
-    Artist[@artist1.id].albums.map{|x| x.name}.sort.should == %w'A D'
-    Artist[@artist2.id].albums.map{|x| x.name}.sort.should == %w'A C'
-    Artist[@artist3.id].albums.map{|x| x.name}.sort.should == %w'B C'
-    Artist[@artist4.id].albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].albums.map{|x| x.name}.sort.must_equal %w'A D'
+    Artist[@artist2.id].albums.map{|x| x.name}.sort.must_equal %w'A C'
+    Artist[@artist3.id].albums.map{|x| x.name}.sort.must_equal %w'B C'
+    Artist[@artist4.id].albums.map{|x| x.name}.sort.must_equal %w'B D'
     
     Artist.plugin :prepared_statements_associations
-    Artist[@artist1.id].albums.map{|x| x.name}.sort.should == %w'A D'
-    Artist[@artist2.id].albums.map{|x| x.name}.sort.should == %w'A C'
-    Artist[@artist3.id].albums.map{|x| x.name}.sort.should == %w'B C'
-    Artist[@artist4.id].albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].albums.map{|x| x.name}.sort.must_equal %w'A D'
+    Artist[@artist2.id].albums.map{|x| x.name}.sort.must_equal %w'A C'
+    Artist[@artist3.id].albums.map{|x| x.name}.sort.must_equal %w'B C'
+    Artist[@artist4.id].albums.map{|x| x.name}.sort.must_equal %w'B D'
 
-    Artist.filter(:id=>1).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A D'
-    Artist.filter(:id=>2).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
-    Artist.filter(:id=>3).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
-    Artist.filter(:id=>4).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    Artist.filter(:id=>@artist1.id).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A D'
+    Artist.filter(:id=>@artist2.id).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A C'
+    Artist.filter(:id=>@artist3.id).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B C'
+    Artist.filter(:id=>@artist4.id).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
     
-    Artist.filter(:artists__id=>1).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A D'
-    Artist.filter(:artists__id=>2).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
-    Artist.filter(:artists__id=>3).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
-    Artist.filter(:artists__id=>4).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    Artist.filter(:artists__id=>@artist1.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A D'
+    Artist.filter(:artists__id=>@artist2.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A C'
+    Artist.filter(:artists__id=>@artist3.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B C'
+    Artist.filter(:artists__id=>@artist4.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
 
-    Artist.filter(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2'
-    Artist.filter(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'3 4'
-    Artist.filter(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'2 3'
-    Artist.filter(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'1 4'
+    Artist.filter(:albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'1 2'
+    Artist.filter(:albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'3 4'
+    Artist.filter(:albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'2 3'
+    Artist.filter(:albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'1 4'
 
-    Artist.exclude(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'3 4'
-    Artist.exclude(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2'
-    Artist.exclude(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 4'
-    Artist.exclude(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3'
+    Artist.exclude(:albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'3 4'
+    Artist.exclude(:albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'1 2'
+    Artist.exclude(:albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'1 4'
+    Artist.exclude(:albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'2 3'
 
-    Artist.filter(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    Artist.filter(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w'1 3 4'
+    Artist.filter(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    Artist.filter(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w'1 3 4'
 
-    Artist.exclude(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
-    Artist.exclude(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w'2'
+    Artist.exclude(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'4'
+    Artist.exclude(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w'2'
 
-    Artist.filter(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    Artist.exclude(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
+    Artist.filter(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    Artist.exclude(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
 
     c = self_join(Artist)
-    c.filter(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2'
-    c.filter(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'3 4'
-    c.filter(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'2 3'
-    c.filter(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'1 4'
+    c.filter(:albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'1 2'
+    c.filter(:albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'3 4'
+    c.filter(:albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'2 3'
+    c.filter(:albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'1 4'
 
-    c.exclude(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'3 4'
-    c.exclude(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2'
-    c.exclude(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 4'
-    c.exclude(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3'
+    c.exclude(:albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'3 4'
+    c.exclude(:albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'1 2'
+    c.exclude(:albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'1 4'
+    c.exclude(:albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'2 3'
 
-    c.filter(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    c.filter(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w'1 3 4'
+    c.filter(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.filter(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w'1 3 4'
 
-    c.exclude(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
-    c.exclude(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w'2'
+    c.exclude(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'4'
+    c.exclude(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w'2'
 
-    c.filter(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    c.exclude(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
+    c.filter(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.exclude(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
   end
 
-  specify "should handle typical case with 3 join tables" do
+  it "should handle typical case with 3 join tables" do
     Artist.many_through_many :related_artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]], :class=>Artist, :distinct=>true
-    Artist[@artist1.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
-    Artist[@artist2.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
-    Artist[@artist3.id].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
-    Artist[@artist4.id].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
+    Artist[@artist1.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 4'
+    Artist[@artist2.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 3'
+    Artist[@artist3.id].related_artists.map{|x| x.name}.sort.must_equal %w'2 3 4'
+    Artist[@artist4.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 3 4'
     
     Artist.plugin :prepared_statements_associations
-    Artist[@artist1.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
-    Artist[@artist2.id].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
-    Artist[@artist3.id].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
-    Artist[@artist4.id].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
+    Artist[@artist1.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 4'
+    Artist[@artist2.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 3'
+    Artist[@artist3.id].related_artists.map{|x| x.name}.sort.must_equal %w'2 3 4'
+    Artist[@artist4.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 3 4'
     
-    Artist.filter(:id=>@artist1.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
-    Artist.filter(:id=>@artist2.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
-    Artist.filter(:id=>@artist3.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
-    Artist.filter(:id=>@artist4.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
+    Artist.filter(:id=>@artist1.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 4'
+    Artist.filter(:id=>@artist2.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 3'
+    Artist.filter(:id=>@artist3.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'2 3 4'
+    Artist.filter(:id=>@artist4.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 3 4'
     
-    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
-    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
-    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
-    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
+    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 4'
+    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 3'
+    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'2 3 4'
+    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 3 4'
 
-    Artist.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'1 2 4'
-    Artist.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    Artist.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'2 3 4'
-    Artist.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'1 3 4'
+    Artist.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.must_equal %w'1 2 4'
+    Artist.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    Artist.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.must_equal %w'2 3 4'
+    Artist.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.must_equal %w'1 3 4'
 
-    Artist.exclude(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'3'
-    Artist.exclude(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'4'
-    Artist.exclude(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'1'
-    Artist.exclude(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'2'
+    Artist.exclude(:related_artists=>@artist1).all.map{|a| a.name}.sort.must_equal %w'3'
+    Artist.exclude(:related_artists=>@artist2).all.map{|a| a.name}.sort.must_equal %w'4'
+    Artist.exclude(:related_artists=>@artist3).all.map{|a| a.name}.sort.must_equal %w'1'
+    Artist.exclude(:related_artists=>@artist4).all.map{|a| a.name}.sort.must_equal %w'2'
 
-    Artist.filter(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
-    Artist.exclude(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w''
+    Artist.filter(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
+    Artist.exclude(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.must_equal %w''
 
-    Artist.filter(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'1 2 4'
-    Artist.exclude(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'3'
+    Artist.filter(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'1 2 4'
+    Artist.exclude(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'3'
 
     c = self_join(Artist)
-    c.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'1 2 4'
-    c.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    c.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'2 3 4'
-    c.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'1 3 4'
+    c.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.must_equal %w'1 2 4'
+    c.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.must_equal %w'2 3 4'
+    c.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.must_equal %w'1 3 4'
 
-    c.exclude(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'3'
-    c.exclude(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'4'
-    c.exclude(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'1'
-    c.exclude(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'2'
+    c.exclude(:related_artists=>@artist1).all.map{|a| a.name}.sort.must_equal %w'3'
+    c.exclude(:related_artists=>@artist2).all.map{|a| a.name}.sort.must_equal %w'4'
+    c.exclude(:related_artists=>@artist3).all.map{|a| a.name}.sort.must_equal %w'1'
+    c.exclude(:related_artists=>@artist4).all.map{|a| a.name}.sort.must_equal %w'2'
 
-    c.filter(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
-    c.exclude(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w''
+    c.filter(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
+    c.exclude(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.must_equal %w''
 
-    c.filter(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'1 2 4'
-    c.exclude(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'3'
+    c.filter(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'1 2 4'
+    c.exclude(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'3'
   end
 
   cspecify "should handle extreme case with 5 join tables", :fdbsql do
@@ -345,65 +348,65 @@ describe "Many Through Many Plugin" do
     @album4.add_artist(@artist3)
     @album4.add_artist(@artist4)
     
-    Artist[@artist1.id].related_albums.map{|x| x.name}.sort.should == %w'A B C'
-    Artist[@artist2.id].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
-    Artist[@artist3.id].related_albums.map{|x| x.name}.sort.should == %w'A B D'
-    Artist[@artist4.id].related_albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B C'
+    Artist[@artist2.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B C D'
+    Artist[@artist3.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B D'
+    Artist[@artist4.id].related_albums.map{|x| x.name}.sort.must_equal %w'B D'
     
     Artist.plugin :prepared_statements_associations
-    Artist[@artist1.id].related_albums.map{|x| x.name}.sort.should == %w'A B C'
-    Artist[@artist2.id].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
-    Artist[@artist3.id].related_albums.map{|x| x.name}.sort.should == %w'A B D'
-    Artist[@artist4.id].related_albums.map{|x| x.name}.sort.should == %w'B D'
+    Artist[@artist1.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B C'
+    Artist[@artist2.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B C D'
+    Artist[@artist3.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B D'
+    Artist[@artist4.id].related_albums.map{|x| x.name}.sort.must_equal %w'B D'
     
-    Artist.filter(:id=>@artist1.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
-    Artist.filter(:id=>@artist2.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
-    Artist.filter(:id=>@artist3.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
-    Artist.filter(:id=>@artist4.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    Artist.filter(:id=>@artist1.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C'
+    Artist.filter(:id=>@artist2.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C D'
+    Artist.filter(:id=>@artist3.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B D'
+    Artist.filter(:id=>@artist4.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
     
-    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
-    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
-    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
-    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C'
+    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C D'
+    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B D'
+    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
 
-    Artist.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    Artist.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
-    Artist.filter(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 2'
-    Artist.filter(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3 4'
+    Artist.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    Artist.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
+    Artist.filter(:related_albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'1 2'
+    Artist.filter(:related_albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'2 3 4'
 
-    Artist.exclude(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'4'
-    Artist.exclude(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w''
-    Artist.exclude(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'3 4'
-    Artist.exclude(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'1'
+    Artist.exclude(:related_albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'4'
+    Artist.exclude(:related_albums=>@album2).all.map{|a| a.name}.sort.must_equal %w''
+    Artist.exclude(:related_albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'3 4'
+    Artist.exclude(:related_albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'1'
 
-    Artist.filter(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    Artist.filter(:related_albums=>[@album3, @album4]).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
+    Artist.filter(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    Artist.filter(:related_albums=>[@album3, @album4]).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
 
-    Artist.exclude(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
-    Artist.exclude(:related_albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w''
+    Artist.exclude(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'4'
+    Artist.exclude(:related_albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w''
 
-    Artist.filter(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    Artist.exclude(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
+    Artist.filter(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    Artist.exclude(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
 
     c = self_join(Artist)
-    c.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    c.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
-    c.filter(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 2'
-    c.filter(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3 4'
+    c.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
+    c.filter(:related_albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'1 2'
+    c.filter(:related_albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'2 3 4'
 
-    c.exclude(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'4'
-    c.exclude(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w''
-    c.exclude(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'3 4'
-    c.exclude(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'1'
+    c.exclude(:related_albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'4'
+    c.exclude(:related_albums=>@album2).all.map{|a| a.name}.sort.must_equal %w''
+    c.exclude(:related_albums=>@album3).all.map{|a| a.name}.sort.must_equal %w'3 4'
+    c.exclude(:related_albums=>@album4).all.map{|a| a.name}.sort.must_equal %w'1'
 
-    c.filter(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    c.filter(:related_albums=>[@album3, @album4]).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
+    c.filter(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.filter(:related_albums=>[@album3, @album4]).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
 
-    c.exclude(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
-    c.exclude(:related_albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w''
+    c.exclude(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'4'
+    c.exclude(:related_albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w''
 
-    c.filter(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
-    c.exclude(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
+    c.filter(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.exclude(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
   end
 end
 
@@ -426,28 +429,28 @@ describe "Lazy Attributes plugin" do
     Object.send(:remove_const, :Item)
   end
   
-  specify "should not include lazy attribute columns by default" do
-    Item.first.should == Item.load(:id=>1, :name=>'J')
+  it "should not include lazy attribute columns by default" do
+    Item.first.must_equal Item.load(:id=>1, :name=>'J')
   end
   
-  specify "should load lazy attribute on access" do
-    Item.first.num.should == 1
+  it "should load lazy attribute on access" do
+    Item.first.num.must_equal 1
   end
   
-  specify "should typecast lazy attribute in setter" do
+  it "should typecast lazy attribute in setter" do
     i = Item.new
     i.num = '1'
-    i.num.should == 1
+    i.num.must_equal 1
   end
   
-  specify "should load lazy attribute for all items returned when accessing any item if using identity map " do
+  it "should load lazy attribute for all items returned when accessing any item if using identity map " do
     Item.create(:name=>'K', :num=>2)
     a = Item.order(:name).all
-    a.should == [Item.load(:id=>1, :name=>'J'), Item.load(:id=>2, :name=>'K')]
-    a.map{|x| x[:num]}.should == [nil, nil]
-    a.first.num.should == 1
-    a.map{|x| x[:num]}.should == [1, 2]
-    a.last.num.should == 2
+    a.must_equal [Item.load(:id=>1, :name=>'J'), Item.load(:id=>2, :name=>'K')]
+    a.map{|x| x[:num]}.must_equal [nil, nil]
+    a.first.num.must_equal 1
+    a.map{|x| x[:num]}.must_equal [1, 2]
+    a.last.num.must_equal 2
   end
 end
 
@@ -494,16 +497,16 @@ describe "Tactical Eager Loading Plugin" do
     @db.drop_table? :albums, :artists
   end
 
-  specify "should eagerly load associations for all items when accessing any item" do
+  it "should eagerly load associations for all items when accessing any item" do
     a = Artist.order(:name).all
-    a.map{|x| x.associations}.should == [{}, {}, {}, {}]
-    a.first.albums.should == [@album1, @album2]
-    a.map{|x| x.associations}.should == [{:albums=>[@album1, @album2]}, {:albums=>[@album3]}, {:albums=>[@album4]}, {:albums=>[]}]
+    a.map{|x| x.associations}.must_equal [{}, {}, {}, {}]
+    a.first.albums.must_equal [@album1, @album2]
+    a.map{|x| x.associations}.must_equal [{:albums=>[@album1, @album2]}, {:albums=>[@album3]}, {:albums=>[@album4]}, {:albums=>[]}]
     
     a = Album.order(:name).all
-    a.map{|x| x.associations}.should == [{}, {}, {}, {}]
-    a.first.artist.should == @artist1
-    a.map{|x| x.associations}.should == [{:artist=>@artist1}, {:artist=>@artist1}, {:artist=>@artist2}, {:artist=>@artist3}]
+    a.map{|x| x.associations}.must_equal [{}, {}, {}, {}]
+    a.first.artist.must_equal @artist1
+    a.map{|x| x.associations}.must_equal [{:artist=>@artist1}, {:artist=>@artist1}, {:artist=>@artist2}, {:artist=>@artist3}]
   end
 end
 
@@ -541,44 +544,47 @@ describe "Touch plugin" do
   after(:all) do
     @db.drop_table? :albums_artists, :albums, :artists
   end
+  def around
+    DB.transaction(:rollback=>:always){super}
+  end
 
-  specify "should update the timestamp column when touching the record" do
+  it "should update the timestamp column when touching the record" do
     Album.plugin :touch
-    @album.updated_at.should == nil
+    @album.updated_at.must_equal nil
     @album.touch
-    @album.updated_at.to_i.should be_within(2).of(Time.now.to_i)
+    @album.updated_at.to_i.must_be_close_to Time.now.to_i, 2
   end
   
   cspecify "should update the timestamp column for many_to_one associated records when the record is updated or destroyed", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
     Album.many_to_one :artist
     Album.plugin :touch, :associations=>:artist
-    @artist.updated_at.should == nil
+    @artist.updated_at.must_equal nil
     @album.update(:name=>'B')
     ua = @artist.reload.updated_at
     if ua.is_a?(Time)
-      ua.to_i.should be_within(60).of(Time.now.to_i)
+      ua.to_i.must_be_close_to Time.now.to_i, 60
     else
-      (DateTime.now - ua).should be_within(60.0/86400).of(0)
+      (DateTime.now - ua).must_be_close_to 0, 60.0/86400
     end
     @artist.update(:updated_at=>nil)
     @album.destroy
     if ua.is_a?(Time)
-      ua.to_i.should be_within(60).of(Time.now.to_i)
+      ua.to_i.must_be_close_to Time.now.to_i, 60
     else
-      (DateTime.now - ua).should be_within(60.0/86400).of(0)
+      (DateTime.now - ua).must_be_close_to 0, 60.0/86400
     end
   end
 
   cspecify "should update the timestamp column for one_to_many associated records when the record is updated", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
     Artist.one_to_many :albums
     Artist.plugin :touch, :associations=>:albums
-    @album.updated_at.should == nil
+    @album.updated_at.must_equal nil
     @artist.update(:name=>'B')
     ua = @album.reload.updated_at
     if ua.is_a?(Time)
-      ua.to_i.should be_within(60).of(Time.now.to_i)
+      ua.to_i.must_be_close_to Time.now.to_i, 60
     else
-      (DateTime.now - ua).should be_within(60.0/86400).of(0)
+      (DateTime.now - ua).must_be_close_to 0, 60.0/86400
     end
   end
 
@@ -586,13 +592,13 @@ describe "Touch plugin" do
     Artist.many_to_many :albums
     Artist.plugin :touch, :associations=>:albums
     @artist.add_album(@album)
-    @album.updated_at.should == nil
+    @album.updated_at.must_equal nil
     @artist.update(:name=>'B')
     ua = @album.reload.updated_at
     if ua.is_a?(Time)
-      ua.to_i.should be_within(60).of(Time.now.to_i)
+      ua.to_i.must_be_close_to Time.now.to_i, 60
     else
-      (DateTime.now - ua).should be_within(60.0/86400).of(0)
+      (DateTime.now - ua).must_be_close_to 0, 60.0/86400
     end
   end
 end
@@ -613,14 +619,14 @@ describe "Serialization plugin" do
     Object.send(:remove_const, :Item)
   end
 
-  specify "should serialize and deserialize items as needed" do
+  it "should serialize and deserialize items as needed" do
     i = Item.create(:stuff=>{:a=>1})
-    i.stuff.should == {:a=>1}
+    i.stuff.must_equal(:a=>1)
     i.stuff = [1, 2, 3]
     i.save
-    Item.first.stuff.should == [1, 2, 3]
+    Item.first.stuff.must_equal [1, 2, 3]
     i.update(:stuff=>Item.new)
-    Item.first.stuff.should == Item.new
+    Item.first.stuff.must_equal Item.new
   end
 end
 
@@ -645,24 +651,24 @@ describe "OptimisticLocking plugin" do
     Object.send(:remove_const, :Person)
   end
 
-  specify "should raise an error when updating a stale record" do
+  it "should raise an error when updating a stale record" do
     p1 = Person[@p.id]
     p2 = Person[@p.id]
     p1.update(:name=>'Jim')
-    proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+    proc{p2.update(:name=>'Bob')}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end
 
-  specify "should raise an error when destroying a stale record" do
+  it "should raise an error when destroying a stale record" do
     p1 = Person[@p.id]
     p2 = Person[@p.id]
     p1.update(:name=>'Jim')
-    proc{p2.destroy}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+    proc{p2.destroy}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end
 
-  specify "should not raise an error when updating the same record twice" do
+  it "should not raise an error when updating the same record twice" do
     p1 = Person[@p.id]
     p1.update(:name=>'Jim')
-    proc{p1.update(:name=>'Bob')}.should_not raise_error
+    p1.update(:name=>'Bob')
   end
 end
 
@@ -696,212 +702,212 @@ describe "Composition plugin" do
     Object.send(:remove_const, :Event)
   end
 
-  specify "should return a composed object if the underlying columns have a value" do
-    @e1.date.should == Date.civil(2010, 2, 15)
-    @e2.date.should == nil
+  it "should return a composed object if the underlying columns have a value" do
+    @e1.date.must_equal Date.civil(2010, 2, 15)
+    @e2.date.must_equal nil
   end
 
-  specify "should decompose the object when saving the record" do
+  it "should decompose the object when saving the record" do
     @e1.date = Date.civil(2009, 1, 2)
     @e1.save
-    @e1.year.should == 2009
-    @e1.month.should == 1
-    @e1.day.should == 2
+    @e1.year.must_equal 2009
+    @e1.month.must_equal 1
+    @e1.day.must_equal 2
   end
 
-  specify "should save all columns when saving changes" do
+  it "should save all columns when saving changes" do
     @e2.date = Date.civil(2009, 10, 2)
     @e2.save_changes
     @e2.reload
-    @e2.year.should == 2009
-    @e2.month.should == 10
-    @e2.day.should == 2
+    @e2.year.must_equal 2009
+    @e2.month.must_equal 10
+    @e2.day.must_equal 2
   end
 end
 
 describe "RcteTree Plugin" do
-  shared_examples_for "rcte tree plugin"  do
-    specify "should load all standard (not-CTE) methods correctly" do
-      @a.children.should == [@aa, @ab]
-      @b.children.should == [@ba, @bb]
-      @aa.children.should == [@aaa, @aab]
-      @ab.children.should == [@aba, @abb]
-      @ba.children.should == []
-      @bb.children.should == []
-      @aaa.children.should == [@aaaa, @aaab]
-      @aab.children.should == []
-      @aba.children.should == []
-      @abb.children.should == []
-      @aaaa.children.should == [@aaaaa]
-      @aaab.children.should == []
-      @aaaaa.children.should == []
+  RcteTreePluginSpecs = shared_description do
+    it "should load all standard (not-CTE) methods correctly" do
+      @a.children.must_equal [@aa, @ab]
+      @b.children.must_equal [@ba, @bb]
+      @aa.children.must_equal [@aaa, @aab]
+      @ab.children.must_equal [@aba, @abb]
+      @ba.children.must_equal []
+      @bb.children.must_equal []
+      @aaa.children.must_equal [@aaaa, @aaab]
+      @aab.children.must_equal []
+      @aba.children.must_equal []
+      @abb.children.must_equal []
+      @aaaa.children.must_equal [@aaaaa]
+      @aaab.children.must_equal []
+      @aaaaa.children.must_equal []
       
-      @a.parent.should == nil
-      @b.parent.should == nil
-      @aa.parent.should == @a
-      @ab.parent.should == @a
-      @ba.parent.should == @b
-      @bb.parent.should == @b
-      @aaa.parent.should == @aa
-      @aab.parent.should == @aa
-      @aba.parent.should == @ab
-      @abb.parent.should == @ab
-      @aaaa.parent.should == @aaa
-      @aaab.parent.should == @aaa
-      @aaaaa.parent.should == @aaaa
+      @a.parent.must_equal nil
+      @b.parent.must_equal nil
+      @aa.parent.must_equal @a
+      @ab.parent.must_equal @a
+      @ba.parent.must_equal @b
+      @bb.parent.must_equal @b
+      @aaa.parent.must_equal @aa
+      @aab.parent.must_equal @aa
+      @aba.parent.must_equal @ab
+      @abb.parent.must_equal @ab
+      @aaaa.parent.must_equal @aaa
+      @aaab.parent.must_equal @aaa
+      @aaaaa.parent.must_equal @aaaa
     end
     
-    specify "should load all ancestors and descendants lazily for a given instance" do
-      @a.descendants.should == [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
-      @b.descendants.should == [@ba, @bb]
-      @aa.descendants.should == [@aaa, @aaaa, @aaaaa, @aaab, @aab]
-      @ab.descendants.should == [@aba, @abb]
-      @ba.descendants.should == []
-      @bb.descendants.should == []
-      @aaa.descendants.should == [@aaaa, @aaaaa, @aaab]
-      @aab.descendants.should == []
-      @aba.descendants.should == []
-      @abb.descendants.should == []
-      @aaaa.descendants.should == [@aaaaa]
-      @aaab.descendants.should == []
-      @aaaaa.descendants.should == []
+    it "should load all ancestors and descendants lazily for a given instance" do
+      @a.descendants.must_equal [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
+      @b.descendants.must_equal [@ba, @bb]
+      @aa.descendants.must_equal [@aaa, @aaaa, @aaaaa, @aaab, @aab]
+      @ab.descendants.must_equal [@aba, @abb]
+      @ba.descendants.must_equal []
+      @bb.descendants.must_equal []
+      @aaa.descendants.must_equal [@aaaa, @aaaaa, @aaab]
+      @aab.descendants.must_equal []
+      @aba.descendants.must_equal []
+      @abb.descendants.must_equal []
+      @aaaa.descendants.must_equal [@aaaaa]
+      @aaab.descendants.must_equal []
+      @aaaaa.descendants.must_equal []
       
-      @a.ancestors.should == []
-      @b.ancestors.should == []
-      @aa.ancestors.should == [@a]
-      @ab.ancestors.should == [@a]
-      @ba.ancestors.should == [@b]
-      @bb.ancestors.should == [@b]
-      @aaa.ancestors.should == [@a, @aa]
-      @aab.ancestors.should == [@a, @aa]
-      @aba.ancestors.should == [@a, @ab]
-      @abb.ancestors.should == [@a, @ab]
-      @aaaa.ancestors.should == [@a, @aa, @aaa]
-      @aaab.ancestors.should == [@a, @aa, @aaa]
-      @aaaaa.ancestors.should == [@a, @aa, @aaa, @aaaa]
+      @a.ancestors.must_equal []
+      @b.ancestors.must_equal []
+      @aa.ancestors.must_equal [@a]
+      @ab.ancestors.must_equal [@a]
+      @ba.ancestors.must_equal [@b]
+      @bb.ancestors.must_equal [@b]
+      @aaa.ancestors.must_equal [@a, @aa]
+      @aab.ancestors.must_equal [@a, @aa]
+      @aba.ancestors.must_equal [@a, @ab]
+      @abb.ancestors.must_equal [@a, @ab]
+      @aaaa.ancestors.must_equal [@a, @aa, @aaa]
+      @aaab.ancestors.must_equal [@a, @aa, @aaa]
+      @aaaaa.ancestors.must_equal [@a, @aa, @aaa, @aaaa]
     end
     
-    specify "should eagerly load all ancestors and descendants for a dataset" do
+    it "should eagerly load all ancestors and descendants for a dataset" do
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:ancestors, :descendants).all
-      nodes.should == [@a, @aaa, @b]
-      nodes[0].descendants.should == [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
-      nodes[1].descendants.should == [@aaaa, @aaaaa, @aaab]
-      nodes[2].descendants.should == [@ba, @bb]
-      nodes[0].ancestors.should == []
-      nodes[1].ancestors.should == [@a, @aa]
-      nodes[2].ancestors.should == []
+      nodes.must_equal [@a, @aaa, @b]
+      nodes[0].descendants.must_equal [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
+      nodes[1].descendants.must_equal [@aaaa, @aaaaa, @aaab]
+      nodes[2].descendants.must_equal [@ba, @bb]
+      nodes[0].ancestors.must_equal []
+      nodes[1].ancestors.must_equal [@a, @aa]
+      nodes[2].ancestors.must_equal []
     end
 
-    specify "should eagerly load descendants to a given level" do
+    it "should eagerly load descendants to a given level" do
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>1).all
-      nodes.should == [@a, @aaa, @b]
-      nodes[0].descendants.should == [@aa, @ab]
-      nodes[1].descendants.should == [@aaaa, @aaab]
-      nodes[2].descendants.should == [@ba, @bb]
+      nodes.must_equal [@a, @aaa, @b]
+      nodes[0].descendants.must_equal [@aa, @ab]
+      nodes[1].descendants.must_equal [@aaaa, @aaab]
+      nodes[2].descendants.must_equal [@ba, @bb]
       
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>2).all
-      nodes.should == [@a, @aaa, @b]
-      nodes[0].descendants.should == [@aa, @aaa, @aab, @ab, @aba, @abb]
-      nodes[1].descendants.should == [@aaaa, @aaaaa, @aaab]
-      nodes[2].descendants.should == [@ba, @bb]
+      nodes.must_equal [@a, @aaa, @b]
+      nodes[0].descendants.must_equal [@aa, @aaa, @aab, @ab, @aba, @abb]
+      nodes[1].descendants.must_equal [@aaaa, @aaaaa, @aaab]
+      nodes[2].descendants.must_equal [@ba, @bb]
     end
     
-    specify "should populate all :children associations when eagerly loading descendants for a dataset" do
+    it "should populate all :children associations when eagerly loading descendants for a dataset" do
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants).all
-      nodes[0].associations[:children].should == [@aa, @ab]
-      nodes[1].associations[:children].should == [@aaaa, @aaab]
-      nodes[2].associations[:children].should == [@ba, @bb]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
-      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
-      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], []], [[], []]]
-      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[]], []]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[@aaaaa], []], []], [[], []]]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.should == [[[[[]], []], []], [[], []]]
+      nodes[0].associations[:children].must_equal [@aa, @ab]
+      nodes[1].associations[:children].must_equal [@aaaa, @aaab]
+      nodes[2].associations[:children].must_equal [@ba, @bb]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.must_equal [[@aaa, @aab], [@aba, @abb]]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.must_equal [[@aaaaa], []]
+      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.must_equal [[], []]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.must_equal [[[@aaaa, @aaab], []], [[], []]]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.must_equal [[[]], []]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.must_equal [[[[@aaaaa], []], []], [[], []]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.must_equal [[[[[]], []], []], [[], []]]
     end
     
-    specify "should not populate :children associations for final level when loading descendants to a given level" do
+    it "should not populate :children associations for final level when loading descendants to a given level" do
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>1).all
-      nodes[0].associations[:children].should == [@aa, @ab]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
-      nodes[1].associations[:children].should == [@aaaa, @aaab]
-      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
-      nodes[2].associations[:children].should == [@ba, @bb]
-      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
+      nodes[0].associations[:children].must_equal [@aa, @ab]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.must_equal [nil, nil]
+      nodes[1].associations[:children].must_equal [@aaaa, @aaab]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.must_equal [nil, nil]
+      nodes[2].associations[:children].must_equal [@ba, @bb]
+      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.must_equal [nil, nil]
       
-      nodes[0].associations[:children].map{|c1| c1.children}.should == [[@aaa, @aab], [@aba, @abb]]
-      nodes[1].associations[:children].map{|c1| c1.children}.should == [[@aaaaa], []]
-      nodes[2].associations[:children].map{|c1| c1.children}.should == [[], []]
+      nodes[0].associations[:children].map{|c1| c1.children}.must_equal [[@aaa, @aab], [@aba, @abb]]
+      nodes[1].associations[:children].map{|c1| c1.children}.must_equal [[@aaaaa], []]
+      nodes[2].associations[:children].map{|c1| c1.children}.must_equal [[], []]
       
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @b.pk, @aaa.pk]).order(:name).eager(:descendants=>2).all
-      nodes[0].associations[:children].should == [@aa, @ab]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], nil], [nil, nil]]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| c3.associations[:children]} : nil}}.should == [[[[@aaaaa], []], nil], [nil, nil]]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| (cc3 = c3.associations[:children]) ? cc3.map{|c4| c4.associations[:children]} : nil} : nil}}.should == [[[[nil], []], nil], [nil, nil]]
+      nodes[0].associations[:children].must_equal [@aa, @ab]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.must_equal [[@aaa, @aab], [@aba, @abb]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.must_equal [[[@aaaa, @aaab], nil], [nil, nil]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| c3.associations[:children]} : nil}}.must_equal [[[[@aaaaa], []], nil], [nil, nil]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| (cc3 = c3.associations[:children]) ? cc3.map{|c4| c4.associations[:children]} : nil} : nil}}.must_equal [[[[nil], []], nil], [nil, nil]]
       
-      nodes[1].associations[:children].should == [@aaaa, @aaab]
-      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
-      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[nil], []]
+      nodes[1].associations[:children].must_equal [@aaaa, @aaab]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.must_equal [[@aaaaa], []]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.must_equal [[nil], []]
       
-      nodes[2].associations[:children].should == [@ba, @bb]
-      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
+      nodes[2].associations[:children].must_equal [@ba, @bb]
+      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.must_equal [[], []]
       
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.should == [[[@aaaa, @aaab], []], [[], []]]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children}}}.should == [[[[@aaaaa], []], []], [[], []]]
-      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children.map{|c4| c4.children}}}}.should == [[[[[]], []], []], [[], []]]
-      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.should == [[[]], []]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.must_equal [[[@aaaa, @aaab], []], [[], []]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children}}}.must_equal [[[[@aaaaa], []], []], [[], []]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children.map{|c4| c4.children}}}}.must_equal [[[[[]], []], []], [[], []]]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.must_equal [[[]], []]
     end
     
-    specify "should populate all :children associations when lazily loading descendants" do
+    it "should populate all :children associations when lazily loading descendants" do
       @a.descendants
-      @a.associations[:children].should == [@aa, @ab]
-      @a.associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
-      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], []], [[], []]]
-      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[@aaaaa], []], []], [[], []]]
-      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.should == [[[[[]], []], []], [[], []]]
+      @a.associations[:children].must_equal [@aa, @ab]
+      @a.associations[:children].map{|c1| c1.associations[:children]}.must_equal [[@aaa, @aab], [@aba, @abb]]
+      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.must_equal [[[@aaaa, @aaab], []], [[], []]]
+      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.must_equal [[[[@aaaaa], []], []], [[], []]]
+      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.must_equal [[[[[]], []], []], [[], []]]
       
       @b.descendants
-      @b.associations[:children].should == [@ba, @bb]
-      @b.associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
+      @b.associations[:children].must_equal [@ba, @bb]
+      @b.associations[:children].map{|c1| c1.associations[:children]}.must_equal [[], []]
       
       @aaa.descendants
-      @aaa.associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
-      @aaa.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[]], []]
+      @aaa.associations[:children].map{|c1| c1.associations[:children]}.must_equal [[@aaaaa], []]
+      @aaa.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.must_equal [[[]], []]
     end
     
-    specify "should populate all :parent associations when eagerly loading ancestors for a dataset" do
+    it "should populate all :parent associations when eagerly loading ancestors for a dataset" do
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @ba.pk, @aaa.pk, @aaaaa.pk]).order(:name).eager(:ancestors).all
-      nodes[0].associations.fetch(:parent, 1).should == nil
-      nodes[1].associations[:parent].should == @aa
-      nodes[1].associations[:parent].associations[:parent].should == @a
-      nodes[1].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
-      nodes[2].associations[:parent].should == @aaaa
-      nodes[2].associations[:parent].associations[:parent].should == @aaa
-      nodes[2].associations[:parent].associations[:parent].associations[:parent].should == @aa
-      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].should == @a
-      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
-      nodes[3].associations[:parent].should == @b
-      nodes[3].associations[:parent].associations.fetch(:parent, 1).should == nil
+      nodes[0].associations.fetch(:parent, 1).must_equal nil
+      nodes[1].associations[:parent].must_equal @aa
+      nodes[1].associations[:parent].associations[:parent].must_equal @a
+      nodes[1].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+      nodes[2].associations[:parent].must_equal @aaaa
+      nodes[2].associations[:parent].associations[:parent].must_equal @aaa
+      nodes[2].associations[:parent].associations[:parent].associations[:parent].must_equal @aa
+      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].must_equal @a
+      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+      nodes[3].associations[:parent].must_equal @b
+      nodes[3].associations[:parent].associations.fetch(:parent, 1).must_equal nil
     end
     
-    specify "should populate all :parent associations when lazily loading ancestors" do
+    it "should populate all :parent associations when lazily loading ancestors" do
       @a.reload
       @a.ancestors
-      @a.associations[:parent].should == nil
+      @a.associations[:parent].must_equal nil
       
       @ba.reload
       @ba.ancestors
-      @ba.associations[:parent].should == @b
-      @ba.associations[:parent].associations.fetch(:parent, 1).should == nil
+      @ba.associations[:parent].must_equal @b
+      @ba.associations[:parent].associations.fetch(:parent, 1).must_equal nil
       
       @ba.reload
       @aaaaa.ancestors
-      @aaaaa.associations[:parent].should == @aaaa
-      @aaaaa.associations[:parent].associations[:parent].should == @aaa
-      @aaaaa.associations[:parent].associations[:parent].associations[:parent].should == @aa
-      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].should == @a
-      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
+      @aaaaa.associations[:parent].must_equal @aaaa
+      @aaaaa.associations[:parent].associations[:parent].must_equal @aaa
+      @aaaaa.associations[:parent].associations[:parent].associations[:parent].must_equal @aa
+      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].must_equal @a
+      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
     end
   end
 
@@ -938,18 +944,18 @@ describe "RcteTree Plugin" do
       @db.drop_table? :nodes
     end
     
-    it_should_behave_like "rcte tree plugin"
+    include RcteTreePluginSpecs
 
-    specify "should work correctly if not all columns are selected" do
+    it "should work correctly if not all columns are selected" do
       c = Class.new(Sequel::Model(@db[:nodes]))
       c.plugin :rcte_tree, :order=>:name
       c.plugin :lazy_attributes, :name
-      c[:name=>'aaaa'].descendants.should == [c.load(:parent_id=>11, :id=>13)]
-      c[:name=>'aa'].ancestors.should == [c.load(:parent_id=>nil, :id=>1)]
+      c[:name=>'aaaa'].descendants.must_equal [c.load(:parent_id=>11, :id=>13)]
+      c[:name=>'aa'].ancestors.must_equal [c.load(:parent_id=>nil, :id=>1)]
       nodes = c.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
-      nodes.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>3, :id=>7}, {:parent_id=>nil, :id=>2}].map{|x| c.load(x)}
-      nodes[2].descendants.should == [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| c.load(x)}
-      nodes[1].ancestors.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| c.load(x)}
+      nodes.must_equal [{:parent_id=>nil, :id=>1}, {:parent_id=>3, :id=>7}, {:parent_id=>nil, :id=>2}].map{|x| c.load(x)}
+      nodes[2].descendants.must_equal [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| c.load(x)}
+      nodes[1].ancestors.must_equal [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| c.load(x)}
     end
   end
 
@@ -986,7 +992,7 @@ describe "RcteTree Plugin" do
       @db.drop_table? :nodes
     end
     
-    it_should_behave_like "rcte tree plugin"
+    include RcteTreePluginSpecs
   end
 end if DB.dataset.supports_cte? and !Sequel.guarded?(:db2)
 
@@ -1014,42 +1020,42 @@ describe "Instance Filters plugin" do
     Object.send(:remove_const, :Item)
   end
   
-  specify "should not raise an error if saving only updates one row" do
+  it "should not raise an error if saving only updates one row" do
     @i.save
-    @i.refresh.name.should == 'K'
+    @i.refresh.name.must_equal 'K'
   end
   
-  specify "should raise error if saving doesn't update a row" do
+  it "should raise error if saving doesn't update a row" do
     @i.this.update(:number=>2)
-    proc{@i.save}.should raise_error(Sequel::Error)
+    proc{@i.save}.must_raise(Sequel::NoExistingObject)
   end
   
-  specify "should apply all instance filters" do
+  it "should apply all instance filters" do
     @i.instance_filter{cost <= 2}
     @i.this.update(:number=>2)
-    proc{@i.save}.should raise_error(Sequel::Error)
+    proc{@i.save}.must_raise(Sequel::NoExistingObject)
     @i.this.update(:number=>1, :cost=>3)
-    proc{@i.save}.should raise_error(Sequel::Error)
+    proc{@i.save}.must_raise(Sequel::NoExistingObject)
     @i.this.update(:cost=>2)
     @i.save
-    @i.refresh.name.should == 'K'
+    @i.refresh.name.must_equal 'K'
   end
   
-  specify "should clear instance filters after successful save" do
+  it "should clear instance filters after successful save" do
     @i.save
     @i.this.update(:number=>2)
     @i.update(:name=>'L')
-    @i.refresh.name.should == 'L'
+    @i.refresh.name.must_equal 'L'
   end
   
-  specify "should not raise an error if deleting only deletes one row" do
+  it "should not raise an error if deleting only deletes one row" do
     @i.destroy
-    proc{@i.refresh}.should raise_error(Sequel::Error, 'Record not found')
+    proc{@i.refresh}.must_raise(Sequel::Error, 'Record not found')
   end
   
-  specify "should raise error if destroying doesn't delete a row" do
+  it "should raise error if destroying doesn't delete a row" do
     @i.this.update(:number=>2)
-    proc{@i.destroy}.should raise_error(Sequel::Error)
+    proc{@i.destroy}.must_raise(Sequel::NoExistingObject)
   end
 end
 
@@ -1074,40 +1080,40 @@ describe "UpdatePrimaryKey plugin" do
     @db.drop_table?(:t)
   end
 
-  specify "should handle regular updates" do
+  it "should handle regular updates" do
     @c.first.update(:b=>4)
-    @db[:t].all.should == [{:a=>1, :b=>4}]
+    @db[:t].all.must_equal [{:a=>1, :b=>4}]
     @c.first.set(:b=>5).save
-    @db[:t].all.should == [{:a=>1, :b=>5}]
+    @db[:t].all.must_equal [{:a=>1, :b=>5}]
     @c.first.set(:b=>6).save(:columns=>:b)
-    @db[:t].all.should == [{:a=>1, :b=>6}]
+    @db[:t].all.must_equal [{:a=>1, :b=>6}]
   end
 
-  specify "should handle updating the primary key field with another field" do
+  it "should handle updating the primary key field with another field" do
     @c.first.update(:a=>2, :b=>4)
-    @db[:t].all.should == [{:a=>2, :b=>4}]
+    @db[:t].all.must_equal [{:a=>2, :b=>4}]
   end
 
-  specify "should handle updating just the primary key field when saving changes" do
+  it "should handle updating just the primary key field when saving changes" do
     @c.first.update(:a=>2)
-    @db[:t].all.should == [{:a=>2, :b=>3}]
+    @db[:t].all.must_equal [{:a=>2, :b=>3}]
     @c.first.set(:a=>3).save(:columns=>:a)
-    @db[:t].all.should == [{:a=>3, :b=>3}]
+    @db[:t].all.must_equal [{:a=>3, :b=>3}]
   end
 
-  specify "should handle saving after modifying the primary key field with another field" do
+  it "should handle saving after modifying the primary key field with another field" do
     @c.first.set(:a=>2, :b=>4).save
-    @db[:t].all.should == [{:a=>2, :b=>4}]
+    @db[:t].all.must_equal [{:a=>2, :b=>4}]
   end
 
-  specify "should handle saving after modifying just the primary key field" do
+  it "should handle saving after modifying just the primary key field" do
     @c.first.set(:a=>2).save
-    @db[:t].all.should == [{:a=>2, :b=>3}]
+    @db[:t].all.must_equal [{:a=>2, :b=>3}]
   end
 
-  specify "should handle saving after updating the primary key" do
+  it "should handle saving after updating the primary key" do
     @c.first.update(:a=>2).update(:b=>4).set(:b=>5).save
-    @db[:t].all.should == [{:a=>2, :b=>5}]
+    @db[:t].all.must_equal [{:a=>2, :b=>5}]
   end
 end
 
@@ -1236,203 +1242,203 @@ describe "AssociationPks plugin" do
     [:Artist, :Album, :Tag, :Vocalist, :Instrument, :Hit].each{|s| Object.send(:remove_const, s)}
   end
 
-  specify "should return correct associated pks for one_to_many associations" do
-    Artist.order(:id).all.map{|a| a.album_pks}.should == [[@al1, @al2, @al3], []]
+  it "should return correct associated pks for one_to_many associations" do
+    Artist.order(:id).all.map{|a| a.album_pks}.must_equal [[@al1, @al2, @al3], []]
   end
 
-  specify "should return correct associated pks for many_to_many associations" do
-    Album.order(:id).all.map{|a| a.tag_pks.sort}.should == [[@t1, @t2, @t3], [@t2], []]
+  it "should return correct associated pks for many_to_many associations" do
+    Album.order(:id).all.map{|a| a.tag_pks.sort}.must_equal [[@t1, @t2, @t3], [@t2], []]
   end
 
-  specify "should return correct associated right-side cpks for one_to_many associations" do
+  it "should return correct associated right-side cpks for one_to_many associations" do
     Album.one_to_many :vocalists, :order=>:first
-    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.should == [[@v1, @v2, @v3], [], []]
+    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.must_equal [[@v1, @v2, @v3], [], []]
   end
 
-  specify "should return correct associated right-side cpks for many_to_many associations" do
+  it "should return correct associated right-side cpks for many_to_many associations" do
     Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>:first
-    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.should == [[@v1, @v2, @v3], [@v2], []]
+    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.must_equal [[@v1, @v2, @v3], [@v2], []]
   end
 
-  specify "should return correct associated pks for left-side cpks for one_to_many associations" do
+  it "should return correct associated pks for left-side cpks for one_to_many associations" do
     Vocalist.one_to_many :instruments, :key=>[:first, :last], :order=>:id
-    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.should == [[@i1, @i2, @i3], [], []]
+    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.must_equal [[@i1, @i2, @i3], [], []]
   end
 
-  specify "should return correct associated pks for left-side cpks for many_to_many associations" do
+  it "should return correct associated pks for left-side cpks for many_to_many associations" do
     Vocalist.many_to_many :instruments, :join_table=>:vocalists_instruments, :left_key=>[:first, :last], :order=>:id
-    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.should == [[@i1, @i2, @i3], [@i2], []]
+    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.must_equal [[@i1, @i2, @i3], [@i2], []]
   end
 
-  specify "should return correct associated right-side cpks for left-side cpks for one_to_many associations" do
+  it "should return correct associated right-side cpks for left-side cpks for one_to_many associations" do
     Vocalist.one_to_many :hits, :key=>[:first, :last], :order=>:week
-    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.should == [[@h1, @h2, @h3], [], []]
+    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [], []]
   end
 
-  specify "should return correct associated right-side cpks for left-side cpks for many_to_many associations" do
+  it "should return correct associated right-side cpks for left-side cpks for many_to_many associations" do
     Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>:week
-    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.should == [[@h1, @h2, @h3], [@h2], []]
+    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [@h2], []]
   end
 
-  specify "should set associated pks correctly for a one_to_many association" do
+  it "should set associated pks correctly for a one_to_many association" do
     Artist.use_transactions = true
-    Album.order(:id).select_map(:artist_id).should == [@ar1, @ar1, @ar1]
+    Album.order(:id).select_map(:artist_id).must_equal [@ar1, @ar1, @ar1]
 
     Artist[@ar2].album_pks = [@t1, @t3]
-    Artist[@ar1].album_pks.should == [@t2]
-    Album.order(:id).select_map(:artist_id).should == [@ar2, @ar1, @ar2]
+    Artist[@ar1].album_pks.must_equal [@t2]
+    Album.order(:id).select_map(:artist_id).must_equal [@ar2, @ar1, @ar2]
 
     Artist[@ar1].album_pks = [@t1]
-    Artist[@ar2].album_pks.should == [@t3]
-    Album.order(:id).select_map(:artist_id).should == [@ar1, nil, @ar2]
+    Artist[@ar2].album_pks.must_equal [@t3]
+    Album.order(:id).select_map(:artist_id).must_equal [@ar1, nil, @ar2]
 
     Artist[@ar1].album_pks = [@t1, @t2]
-    Artist[@ar2].album_pks.should == [@t3]
-    Album.order(:id).select_map(:artist_id).should == [@ar1, @ar1, @ar2]
+    Artist[@ar2].album_pks.must_equal [@t3]
+    Album.order(:id).select_map(:artist_id).must_equal [@ar1, @ar1, @ar2]
   end
 
-  specify "should set associated pks correctly for a many_to_many association" do
+  it "should set associated pks correctly for a many_to_many association" do
     Artist.use_transactions = true
-    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == [@t1, @t2, @t3]
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).must_equal [@t1, @t2, @t3]
     Album[@al1].tag_pks = [@t1, @t3]
-    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == [@t1, @t3]
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).must_equal [@t1, @t3]
     Album[@al1].tag_pks = []
-    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).must_equal []
 
-    @db[:albums_tags].filter(:album_id=>@al2).select_order_map(:tag_id).should == [@t2]
+    @db[:albums_tags].filter(:album_id=>@al2).select_order_map(:tag_id).must_equal [@t2]
     Album[@al2].tag_pks = [@t1, @t2]
-    @db[:albums_tags].filter(:album_id=>@al2).select_order_map(:tag_id).should == [@t1, @t2]
+    @db[:albums_tags].filter(:album_id=>@al2).select_order_map(:tag_id).must_equal [@t1, @t2]
     Album[@al2].tag_pks = []
-    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).must_equal []
 
-    @db[:albums_tags].filter(:album_id=>@al3).select_order_map(:tag_id).should == []
+    @db[:albums_tags].filter(:album_id=>@al3).select_order_map(:tag_id).must_equal []
     Album[@al3].tag_pks = [@t1, @t3]
-    @db[:albums_tags].filter(:album_id=>@al3).select_order_map(:tag_id).should == [@t1, @t3]
+    @db[:albums_tags].filter(:album_id=>@al3).select_order_map(:tag_id).must_equal [@t1, @t3]
     Album[@al3].tag_pks = []
-    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).must_equal []
   end
 
-  specify "should set associated right-side cpks correctly for a one_to_many association" do
+  it "should set associated right-side cpks correctly for a one_to_many association" do
     Album.use_transactions = true
     Album.one_to_many :vocalists, :order=>:first
-    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.should == [[@v1, @v2, @v3], [], []]
+    Album.order(:id).all.map{|a| a.vocalist_pks.sort}.must_equal [[@v1, @v2, @v3], [], []]
 
     Album[@al2].vocalist_pks = [@v1, @v3]
-    Album[@al1].vocalist_pks.should == [@v2]
-    Vocalist.order(:first, :last).select_map(:album_id).should == [@al2, @al1, @al2]
+    Album[@al1].vocalist_pks.must_equal [@v2]
+    Vocalist.order(:first, :last).select_map(:album_id).must_equal [@al2, @al1, @al2]
 
     Album[@al1].vocalist_pks = [@v1]
-    Album[@al2].vocalist_pks.should == [@v3]
-    Vocalist.order(:first, :last).select_map(:album_id).should == [@al1, nil, @al2]
+    Album[@al2].vocalist_pks.must_equal [@v3]
+    Vocalist.order(:first, :last).select_map(:album_id).must_equal [@al1, nil, @al2]
 
     Album[@al1].vocalist_pks = [@v1, @v2]
-    Album[@al2].vocalist_pks.should == [@v3]
-    Vocalist.order(:first, :last).select_map(:album_id).should == [@al1, @al1, @al2]
+    Album[@al2].vocalist_pks.must_equal [@v3]
+    Vocalist.order(:first, :last).select_map(:album_id).must_equal [@al1, @al1, @al2]
   end
 
-  specify "should set associated right-side cpks correctly for a many_to_many association" do
+  it "should set associated right-side cpks correctly for a many_to_many association" do
     Album.use_transactions = true
     Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>:first
 
-    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == [@v1, @v2, @v3]
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).must_equal [@v1, @v2, @v3]
     Album[@al1].vocalist_pks = [@v1, @v3]
-    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == [@v1, @v3]
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).must_equal [@v1, @v3]
     Album[@al1].vocalist_pks = []
-    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == []
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).must_equal []
 
-    @db[:albums_vocalists].filter(:album_id=>@al2).select_order_map([:first, :last]).should == [@v2]
+    @db[:albums_vocalists].filter(:album_id=>@al2).select_order_map([:first, :last]).must_equal [@v2]
     Album[@al2].vocalist_pks = [@v1, @v2]
-    @db[:albums_vocalists].filter(:album_id=>@al2).select_order_map([:first, :last]).should == [@v1, @v2]
+    @db[:albums_vocalists].filter(:album_id=>@al2).select_order_map([:first, :last]).must_equal [@v1, @v2]
     Album[@al2].vocalist_pks = []
-    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == []
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).must_equal []
 
-    @db[:albums_vocalists].filter(:album_id=>@al3).select_order_map([:first, :last]).should == []
+    @db[:albums_vocalists].filter(:album_id=>@al3).select_order_map([:first, :last]).must_equal []
     Album[@al3].vocalist_pks = [@v1, @v3]
-    @db[:albums_vocalists].filter(:album_id=>@al3).select_order_map([:first, :last]).should == [@v1, @v3]
+    @db[:albums_vocalists].filter(:album_id=>@al3).select_order_map([:first, :last]).must_equal [@v1, @v3]
     Album[@al3].vocalist_pks = []
-    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).should == []
+    @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).must_equal []
   end
 
-  specify "should set associated pks correctly with left-side cpks for a one_to_many association" do
+  it "should set associated pks correctly with left-side cpks for a one_to_many association" do
     Vocalist.use_transactions = true
     Vocalist.one_to_many :instruments, :key=>[:first, :last], :order=>:id
-    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.should == [[@i1, @i2, @i3], [], []]
+    Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.must_equal [[@i1, @i2, @i3], [], []]
 
     Vocalist[@v2].instrument_pks = [@i1, @i3]
-    Vocalist[@v1].instrument_pks.should == [@i2]
-    Instrument.order(:id).select_map([:first, :last]).should == [@v2, @v1, @v2]
+    Vocalist[@v1].instrument_pks.must_equal [@i2]
+    Instrument.order(:id).select_map([:first, :last]).must_equal [@v2, @v1, @v2]
 
     Vocalist[@v1].instrument_pks = [@i1]
-    Vocalist[@v2].instrument_pks.should == [@i3]
-    Instrument.order(:id).select_map([:first, :last]).should == [@v1, [nil, nil], @v2]
+    Vocalist[@v2].instrument_pks.must_equal [@i3]
+    Instrument.order(:id).select_map([:first, :last]).must_equal [@v1, [nil, nil], @v2]
 
     Vocalist[@v1].instrument_pks = [@i1, @i2]
-    Vocalist[@v2].instrument_pks.should == [@i3]
-    Instrument.order(:id).select_map([:first, :last]).should == [@v1, @v1, @v2]
+    Vocalist[@v2].instrument_pks.must_equal [@i3]
+    Instrument.order(:id).select_map([:first, :last]).must_equal [@v1, @v1, @v2]
   end
 
-  specify "should set associated pks correctly with left-side cpks for a many_to_many association" do
+  it "should set associated pks correctly with left-side cpks for a many_to_many association" do
     Vocalist.use_transactions = true
     Vocalist.many_to_many :instruments, :join_table=>:vocalists_instruments, :left_key=>[:first, :last], :order=>:id
 
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == [@i1, @i2, @i3]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).must_equal [@i1, @i2, @i3]
     Vocalist[@v1].instrument_pks = [@i1, @i3]
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == [@i1, @i3]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).must_equal [@i1, @i3]
     Vocalist[@v1].instrument_pks = []
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == []
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).must_equal []
 
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v2]).select_order_map(:instrument_id).should == [@i2]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v2]).select_order_map(:instrument_id).must_equal [@i2]
     Vocalist[@v2].instrument_pks = [@i1, @i2]
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v2]).select_order_map(:instrument_id).should == [@i1, @i2]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v2]).select_order_map(:instrument_id).must_equal [@i1, @i2]
     Vocalist[@v2].instrument_pks = []
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == []
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).must_equal []
 
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v3]).select_order_map(:instrument_id).should == []
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v3]).select_order_map(:instrument_id).must_equal []
     Vocalist[@v3].instrument_pks = [@i1, @i3]
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v3]).select_order_map(:instrument_id).should == [@i1, @i3]
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v3]).select_order_map(:instrument_id).must_equal [@i1, @i3]
     Vocalist[@v3].instrument_pks = []
-    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).should == []
+    @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).must_equal []
   end
 
-  specify "should set associated right-side cpks correctly with left-side cpks for a one_to_many association" do
+  it "should set associated right-side cpks correctly with left-side cpks for a one_to_many association" do
     Vocalist.use_transactions = true
     Vocalist.one_to_many :hits, :key=>[:first, :last], :order=>:week
-    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.should == [[@h1, @h2, @h3], [], []]
+    Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [], []]
 
     Vocalist[@v2].hit_pks = [@h1, @h3]
-    Vocalist[@v1].hit_pks.should == [@h2]
-    Hit.order(:year, :week).select_map([:first, :last]).should == [@v2, @v1, @v2]
+    Vocalist[@v1].hit_pks.must_equal [@h2]
+    Hit.order(:year, :week).select_map([:first, :last]).must_equal [@v2, @v1, @v2]
 
     Vocalist[@v1].hit_pks = [@h1]
-    Vocalist[@v2].hit_pks.should == [@h3]
-    Hit.order(:year, :week).select_map([:first, :last]).should == [@v1, [nil, nil], @v2]
+    Vocalist[@v2].hit_pks.must_equal [@h3]
+    Hit.order(:year, :week).select_map([:first, :last]).must_equal [@v1, [nil, nil], @v2]
 
     Vocalist[@v1].hit_pks = [@h1, @h2]
-    Vocalist[@v2].hit_pks.should == [@h3]
-    Hit.order(:year, :week).select_map([:first, :last]).should == [@v1, @v1, @v2]
+    Vocalist[@v2].hit_pks.must_equal [@h3]
+    Hit.order(:year, :week).select_map([:first, :last]).must_equal [@v1, @v1, @v2]
   end
 
-  specify "should set associated right-side cpks correctly with left-side cpks for a many_to_many association" do
+  it "should set associated right-side cpks correctly with left-side cpks for a many_to_many association" do
     Vocalist.use_transactions = true
     Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>:week
 
-    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == [@h1, @h2, @h3]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).must_equal [@h1, @h2, @h3]
     Vocalist[@v1].hit_pks = [@h1, @h3]
-    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == [@h1, @h3]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).must_equal [@h1, @h3]
     Vocalist[@v1].hit_pks = []
-    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == []
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).must_equal []
 
-    @db[:vocalists_hits].filter([:first, :last]=>[@v2]).select_order_map([:year, :week]).should == [@h2]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v2]).select_order_map([:year, :week]).must_equal [@h2]
     Vocalist[@v2].hit_pks = [@h1, @h2]
-    @db[:vocalists_hits].filter([:first, :last]=>[@v2]).select_order_map([:year, :week]).should == [@h1, @h2]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v2]).select_order_map([:year, :week]).must_equal [@h1, @h2]
     Vocalist[@v2].hit_pks = []
-    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == []
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).must_equal []
 
-    @db[:vocalists_hits].filter([:first, :last]=>[@v3]).select_order_map([:year, :week]).should == []
+    @db[:vocalists_hits].filter([:first, :last]=>[@v3]).select_order_map([:year, :week]).must_equal []
     Vocalist[@v3].hit_pks = [@h1, @h3]
-    @db[:vocalists_hits].filter([:first, :last]=>[@v3]).select_order_map([:year, :week]).should == [@h1, @h3]
+    @db[:vocalists_hits].filter([:first, :last]=>[@v3]).select_order_map([:year, :week]).must_equal [@h1, @h3]
     Vocalist[@v3].hit_pks = []
-    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).should == []
+    @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).must_equal []
   end
 end
 
@@ -1459,63 +1465,63 @@ describe "List plugin without a scope" do
   end
 
   it "should return rows in order of position" do
-    @c.map(:position).should == [1,2,3]
-    @c.map(:name).should == %w[ abc def hig ]
+    @c.map(:position).must_equal [1,2,3]
+    @c.map(:name).must_equal %w[ abc def hig ]
   end
 
   it "should define prev and next" do
     i = @c[:name => "abc"]
-    i.prev.should == nil
+    i.prev.must_equal nil
     i = @c[:name => "def"]
-    i.prev.should == @c[:name => "abc"]
-    i.next.should == @c[:name => "hig"]
+    i.prev.must_equal @c[:name => "abc"]
+    i.next.must_equal @c[:name => "hig"]
     i = @c[:name => "hig"]
-    i.next.should == nil
+    i.next.must_equal nil
   end
 
   it "should define move_to" do
     @c[:name => "def"].move_to(1)
-    @c.map(:name).should == %w[ def abc hig ]
+    @c.map(:name).must_equal %w[ def abc hig ]
 
     @c[:name => "abc"].move_to(3)
-    @c.map(:name).should == %w[ def hig abc ]
+    @c.map(:name).must_equal %w[ def hig abc ]
 
     @c[:name => "abc"].move_to(-1)
-    @c.map(:name).should == %w[ abc def hig ]
+    @c.map(:name).must_equal %w[ abc def hig ]
     @c[:name => "abc"].move_to(10)
-    @c.map(:name).should == %w[ def hig abc ]
+    @c.map(:name).must_equal %w[ def hig abc ]
   end
 
   it "should define move_to_top and move_to_bottom" do
     @c[:name => "def"].move_to_top
-    @c.map(:name).should == %w[ def abc hig ]
+    @c.map(:name).must_equal %w[ def abc hig ]
 
     @c[:name => "def"].move_to_bottom
-    @c.map(:name).should == %w[ abc hig def ]
+    @c.map(:name).must_equal %w[ abc hig def ]
   end
 
   it "should define move_up and move_down" do
     @c[:name => "def"].move_up
-    @c.map(:name).should == %w[ def abc hig ]
+    @c.map(:name).must_equal %w[ def abc hig ]
 
     @c[:name => "abc"].move_down
-    @c.map(:name).should == %w[ def hig abc ]
+    @c.map(:name).must_equal %w[ def hig abc ]
 
     @c[:name => "abc"].move_up(2)
-    @c.map(:name).should == %w[ abc def hig ]
+    @c.map(:name).must_equal %w[ abc def hig ]
 
     @c[:name => "abc"].move_down(2)
-    @c.map(:name).should == %w[ def hig abc ]
+    @c.map(:name).must_equal %w[ def hig abc ]
 
     @c[:name => "abc"].move_up(10)
-    @c.map(:name).should == %w[ abc def hig ]
+    @c.map(:name).must_equal %w[ abc def hig ]
     @c[:name => "abc"].move_down(10)
-    @c.map(:name).should == %w[ def hig abc ]
+    @c.map(:name).must_equal %w[ def hig abc ]
   end
 
   it "should update positions on destroy" do
     @c[:name => "def"].destroy
-    @c.select_map([:position, :name]).should == [[1, 'abc'], [2, 'hig']]
+    @c.select_map([:position, :name]).must_equal [[1, 'abc'], [2, 'hig']]
   end
 end
 
@@ -1545,106 +1551,106 @@ describe "List plugin with a scope" do
     @db.drop_table?(:pages)
   end
 
-  specify "should return rows in order of position" do
-    @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
+  it "should return rows in order of position" do
+    @c.map(:name).must_equal %w[ Hm Ps Au P1 P2 P3 ]
   end
 
   it "should define prev and next" do
-    @c[:name => "Ps"].next.name.should == 'Au'
-    @c[:name => "Au"].prev.name.should == 'Ps'
-    @c[:name => "P1"].next.name.should == 'P2'
-    @c[:name => "P2"].prev.name.should == 'P1'
+    @c[:name => "Ps"].next.name.must_equal 'Au'
+    @c[:name => "Au"].prev.name.must_equal 'Ps'
+    @c[:name => "P1"].next.name.must_equal 'P2'
+    @c[:name => "P2"].prev.name.must_equal 'P1'
 
-    @c[:name => "P1"].next(2).name.should == 'P3'
-    @c[:name => "P2"].next(-1).name.should == 'P1'
-    @c[:name => "P3"].prev(2).name.should == 'P1'
-    @c[:name => "P2"].prev(-1).name.should == 'P3'
+    @c[:name => "P1"].next(2).name.must_equal 'P3'
+    @c[:name => "P2"].next(-1).name.must_equal 'P1'
+    @c[:name => "P3"].prev(2).name.must_equal 'P1'
+    @c[:name => "P2"].prev(-1).name.must_equal 'P3'
 
-    @c[:name => "Ps"].prev.should == nil
-    @c[:name => "Au"].next.should == nil
-    @c[:name => "P1"].prev.should == nil
-    @c[:name => "P3"].next.should == nil
+    @c[:name => "Ps"].prev.must_equal nil
+    @c[:name => "Au"].next.must_equal nil
+    @c[:name => "P1"].prev.must_equal nil
+    @c[:name => "P3"].next.must_equal nil
   end
 
-  specify "should define move_to" do
+  it "should define move_to" do
     @c[:name => "P2"].move_to(1)
-    @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P2 P1 P3 ]
 
     @c[:name => "P2"].move_to(3)
-    @c.map(:name).should == %w[ Hm Ps Au P1 P3 P2 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P1 P3 P2 ]
 
     @c[:name => "P2"].move_to(-1)
-    @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P2 P1 P3 ]
     @c[:name => "P2"].move_to(10)
-    @c.map(:name).should == %w[ Hm Ps Au P1 P3 P2 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P1 P3 P2 ]
   end
 
-  specify "should define move_to_top and move_to_bottom" do
+  it "should define move_to_top and move_to_bottom" do
     @c[:name => "Au"].move_to_top
-    @c.map(:name).should == %w[ Hm Au Ps P1 P2 P3 ]
+    @c.map(:name).must_equal %w[ Hm Au Ps P1 P2 P3 ]
 
     @c[:name => "Au"].move_to_bottom
-    @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P1 P2 P3 ]
   end
 
-  specify "should define move_up and move_down" do
+  it "should define move_up and move_down" do
     @c[:name => "P2"].move_up
-    @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P2 P1 P3 ]
 
     @c[:name => "P1"].move_down
-    @c.map(:name).should == %w[ Hm Ps Au P2 P3 P1 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P2 P3 P1 ]
 
     @c[:name => "P1"].move_up(10)
-    @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P1 P2 P3 ]
     @c[:name => "P1"].move_down(10)
-    @c.map(:name).should == %w[ Hm Ps Au P2 P3 P1 ]
+    @c.map(:name).must_equal %w[ Hm Ps Au P2 P3 P1 ]
   end
 
   it "should update positions on destroy" do
     @c[:name => "P2"].destroy
-    @c.select_order_map([:pos, :name]).should == [[1, "Hm"], [1, "P1"], [1, "Ps"], [2, "Au"], [2, "P3"]]
+    @c.select_order_map([:pos, :name]).must_equal [[1, "Hm"], [1, "P1"], [1, "Ps"], [2, "Au"], [2, "P3"]]
   end
 end
 
 describe "Sequel::Plugins::Tree" do
-  shared_examples_for "tree plugin" do
+  TreePluginSpecs = shared_description do
     it "should instantiate" do
-      @Node.all.size.should == 12
+      @Node.all.size.must_equal 12
     end
 
     it "should find all descendants of a node" do 
-      @Node.find(:name => 'two').descendants.map{|m| m.name}.should == %w'two.one two.two two.three two.two.one'
+      @Node.find(:name => 'two').descendants.map{|m| m.name}.must_equal %w'two.one two.two two.three two.two.one'
     end
 
     it "should find all ancestors of a node" do 
-      @Node.find(:name => "two.two.one").ancestors.map{|m| m.name}.should == %w'two.two two'
+      @Node.find(:name => "two.two.one").ancestors.map{|m| m.name}.must_equal %w'two.two two'
     end
     
     it "should find all siblings of a node, excepting self" do 
-      @Node.find(:name=>"two.one").siblings.map{|m| m.name}.should == %w'two.two two.three'
+      @Node.find(:name=>"two.one").siblings.map{|m| m.name}.must_equal %w'two.two two.three'
     end
 
     it "should find all siblings of a node, including self" do 
-      @Node.find(:name=>"two.one").self_and_siblings.map{|m| m.name}.should == %w'two.one two.two two.three'
+      @Node.find(:name=>"two.one").self_and_siblings.map{|m| m.name}.must_equal %w'two.one two.two two.three'
     end
 
     it "should find siblings for root nodes" do 
-      @Node.find(:name=>'three').self_and_siblings.map{|m| m.name}.should == %w'one two three four five'
+      @Node.find(:name=>'three').self_and_siblings.map{|m| m.name}.must_equal %w'one two three four five'
     end
 
     it "should find correct root for a node" do
-      @Node.find(:name=>"two.two.one").root.name.should == 'two'
-      @Node.find(:name=>"three").root.name.should == 'three'
-      @Node.find(:name=>"five.one").root.name.should == 'five'
+      @Node.find(:name=>"two.two.one").root.name.must_equal 'two'
+      @Node.find(:name=>"three").root.name.must_equal 'three'
+      @Node.find(:name=>"five.one").root.name.must_equal 'five'
     end
 
     it "iterate top-level nodes in order" do
-      @Node.roots_dataset.count.should == 5
-      @Node.roots.map{|p| p.name}.should == %w'one two three four five'
+      @Node.roots_dataset.count.must_equal 5
+      @Node.roots.map{|p| p.name}.must_equal %w'one two three four five'
     end
   
     it "should have children" do
-      @Node.find(:name=>'one').children.map{|m| m.name}.should == %w'one.one one.two'
+      @Node.find(:name=>'one').children.map{|m| m.name}.must_equal %w'one.one one.two'
     end
   end
 
@@ -1679,7 +1685,7 @@ describe "Sequel::Plugins::Tree" do
       @db.drop_table?(:nodes)
     end
 
-    it_should_behave_like "tree plugin"
+    include TreePluginSpecs
   end
 
   describe "with composite key" do
@@ -1716,7 +1722,7 @@ describe "Sequel::Plugins::Tree" do
       @db.drop_table?(:nodes)
     end
 
-    it_should_behave_like "tree plugin"
+    include TreePluginSpecs
   end
 end
 
@@ -1741,55 +1747,55 @@ describe "Sequel::Plugins::PreparedStatements" do
   end
 
   it "should work with looking up using Model.[]" do 
-    @c[@foo.id].should == @foo
-    @c[@bar.id].should == @bar
-    @c[0].should == nil
-    @c[nil].should == nil
+    @c[@foo.id].must_equal @foo
+    @c[@bar.id].must_equal @bar
+    @c[0].must_equal nil
+    @c[nil].must_equal nil
   end
 
   it "should work with looking up using Dataset#with_pk" do 
-    @c.dataset.with_pk(@foo.id).should == @foo
-    @c.dataset.with_pk(@bar.id).should == @bar
-    @c.dataset.with_pk(0).should == nil
-    @c.dataset.with_pk(nil).should == nil
+    @c.dataset.with_pk(@foo.id).must_equal @foo
+    @c.dataset.with_pk(@bar.id).must_equal @bar
+    @c.dataset.with_pk(0).must_equal nil
+    @c.dataset.with_pk(nil).must_equal nil
 
-    @c.dataset.filter(:i=>0).with_pk(@foo.id).should == nil
-    @c.dataset.filter(:i=>10).with_pk(@foo.id).should == @foo
-    @c.dataset.filter(:i=>20).with_pk(@bar.id).should == @bar
-    @c.dataset.filter(:i=>10).with_pk(nil).should == nil
-    @c.dataset.filter(:name=>'foo').with_pk(@foo.id).should == @foo
-    @c.dataset.filter(:name=>'bar').with_pk(@bar.id).should == @bar
-    @c.dataset.filter(:name=>'baz').with_pk(@bar.id).should == nil
-    @c.dataset.filter(:name=>'bar').with_pk(nil).should == nil
+    @c.dataset.filter(:i=>0).with_pk(@foo.id).must_equal nil
+    @c.dataset.filter(:i=>10).with_pk(@foo.id).must_equal @foo
+    @c.dataset.filter(:i=>20).with_pk(@bar.id).must_equal @bar
+    @c.dataset.filter(:i=>10).with_pk(nil).must_equal nil
+    @c.dataset.filter(:name=>'foo').with_pk(@foo.id).must_equal @foo
+    @c.dataset.filter(:name=>'bar').with_pk(@bar.id).must_equal @bar
+    @c.dataset.filter(:name=>'baz').with_pk(@bar.id).must_equal nil
+    @c.dataset.filter(:name=>'bar').with_pk(nil).must_equal nil
   end
 
   it "should work with Model#destroy" do 
     @foo.destroy
     @bar.destroy
-    @c[@foo.id].should == nil
-    @c[@bar.id].should == nil
+    @c[@foo.id].must_equal nil
+    @c[@bar.id].must_equal nil
   end
 
   it "should work with Model#update" do 
     @foo.update(:name=>'foo2', :i=>30)
-    @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo2', :i=>30)
+    @c[@foo.id].must_equal @c.load(:id=>@foo.id, :name=>'foo2', :i=>30)
     @foo.update(:name=>'foo3')
-    @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>30)
+    @c[@foo.id].must_equal @c.load(:id=>@foo.id, :name=>'foo3', :i=>30)
     @foo.update(:i=>40)
-    @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>40)
+    @c[@foo.id].must_equal @c.load(:id=>@foo.id, :name=>'foo3', :i=>40)
     @foo.update(:i=>nil)
-    @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>nil)
+    @c[@foo.id].must_equal @c.load(:id=>@foo.id, :name=>'foo3', :i=>nil)
   end
 
   it "should work with Model#create" do 
     o = @c.create(:name=>'foo2', :i=>30)
-    @c[o.id].should == @c.load(:id=>o.id, :name=>'foo2', :i=>30)
+    @c[o.id].must_equal @c.load(:id=>o.id, :name=>'foo2', :i=>30)
     o = @c.create(:name=>'foo2')
-    @c[o.id].should == @c.load(:id=>o.id, :name=>'foo2', :i=>nil)
+    @c[o.id].must_equal @c.load(:id=>o.id, :name=>'foo2', :i=>nil)
     o = @c.create(:i=>30)
-    @c[o.id].should == @c.load(:id=>o.id, :name=>nil, :i=>30)
+    @c[o.id].must_equal @c.load(:id=>o.id, :name=>nil, :i=>30)
     o = @c.create(:name=>nil, :i=>40)
-    @c[o.id].should == @c.load(:id=>o.id, :name=>nil, :i=>40)
+    @c[o.id].must_equal @c.load(:id=>o.id, :name=>nil, :i=>40)
   end
 end
 
@@ -1813,26 +1819,26 @@ describe "Sequel::Plugins::PreparedStatements with schema changes" do
 
   it "should handle added columns" do 
     foo = @c.create(:name=>'foo')
-    @c[foo.id].name.should == 'foo'
-    foo.ps_test.name.should == 'foo'
-    foo.ps_tests.map{|x| x.name}.should == %w'foo'
-    foo.mps_tests.map{|x| x.name}.should == %w'foo'
+    @c[foo.id].name.must_equal 'foo'
+    foo.ps_test.name.must_equal 'foo'
+    foo.ps_tests.map{|x| x.name}.must_equal %w'foo'
+    foo.mps_tests.map{|x| x.name}.must_equal %w'foo'
     foo.update(:name=>'foo2')
-    @c[foo.id].name.should == 'foo2'
+    @c[foo.id].name.must_equal 'foo2'
     foo.delete
-    foo.exists?.should == false
+    foo.exists?.must_equal false
 
     @db.alter_table(:ps_test){add_column :i, Integer}
 
     foo = @c.create(:name=>'foo')
-    @c[foo.id].name.should == 'foo'
-    foo.ps_test.name.should == 'foo'
-    foo.ps_tests.map{|x| x.name}.should == %w'foo'
-    foo.mps_tests.map{|x| x.name}.should == %w'foo'
+    @c[foo.id].name.must_equal 'foo'
+    foo.ps_test.name.must_equal 'foo'
+    foo.ps_tests.map{|x| x.name}.must_equal %w'foo'
+    foo.mps_tests.map{|x| x.name}.must_equal %w'foo'
     foo.update(:name=>'foo2')
-    @c[foo.id].name.should == 'foo2'
+    @c[foo.id].name.must_equal 'foo2'
     foo.delete
-    foo.exists?.should == false
+    foo.exists?.must_equal false
   end
 end
 
@@ -1858,17 +1864,17 @@ describe "Caching plugins" do
     @db.drop_table?(:albums, :artists)
   end
 
-  shared_examples_for "a caching plugin" do
+  CachingPluginSpecs = shared_description do
     it "should work with looking up using Model.[]" do 
-      @Artist[1].should equal(@Artist[1])
-      @Artist[:id=>1].should == @Artist[1]
-      @Artist[0].should == nil
-      @Artist[nil].should == nil
+      @Artist[1].must_be_same_as(@Artist[1])
+      @Artist[:id=>1].must_equal @Artist[1]
+      @Artist[0].must_equal nil
+      @Artist[nil].must_equal nil
     end
 
     it "should work with lookup up many_to_one associated objects" do 
       a = @Artist[1]
-      @Album.first.artist.should equal(a)
+      @Album.first.artist.must_be_same_as(a)
     end
   end
 
@@ -1885,7 +1891,7 @@ describe "Caching plugins" do
       @Album.many_to_one :artist, :class=>@Artist
     end
 
-    it_should_behave_like "a caching plugin"
+    include CachingPluginSpecs
   end
 
   describe "static_cache plugin" do
@@ -1895,7 +1901,7 @@ describe "Caching plugins" do
       @Album.many_to_one :artist, :class=>@Artist
     end
 
-    it_should_behave_like "a caching plugin"
+    include CachingPluginSpecs
   end
 end
 
@@ -1945,12 +1951,12 @@ describe "Sequel::Plugins::ConstraintValidations" do
     @db.drop_constraint_validations_table
   end
 
-  shared_examples_for "constraint validations" do
+  ConstraintValidationsSpecs = shared_description do
     cspecify "should set up constraints that work even outside the model", :mysql do 
-      proc{@ds.insert(@valid_row)}.should_not raise_error
+      @ds.insert(@valid_row)
 
       # Test for unique constraint
-      proc{@ds.insert(@valid_row)}.should raise_error(Sequel::DatabaseError)
+      proc{@ds.insert(@valid_row)}.must_raise(Sequel::DatabaseError, Sequel::UniqueConstraintViolation, Sequel::ConstraintViolation)
 
       @ds.delete
       @violations.each do |col, vals|
@@ -1958,24 +1964,25 @@ describe "Sequel::Plugins::ConstraintValidations" do
         vals += ['1234567'] if col == :minlen
         vals.each do |val|
           next if val.nil? && @validation_opts[:allow_nil]
+          next if val == '' && @validation_opts[:allow_nil] && @db.database_type == :oracle
           try[col] = val
-          proc{@ds.insert(try)}.should raise_error(Sequel::DatabaseError)
+          proc{@ds.insert(try)}.must_raise(Sequel::DatabaseError, Sequel::CheckConstraintViolation, Sequel::ConstraintViolation)
         end
       end
 
       # Test for dropping of constraint
       @db.alter_table(:cv_test){validate{drop :maxl2}}
-      proc{@ds.insert(@valid_row.merge(:minlen=>'1234567'))}.should_not raise_error
+      @ds.insert(@valid_row.merge(:minlen=>'1234567'))
     end
 
     it "should set up automatic validations inside the model" do 
       c = Class.new(Sequel::Model(@ds))
       c.plugin :constraint_validations
       c.dataset.delete
-      proc{c.create(@valid_row)}.should_not raise_error
+      c.create(@valid_row)
 
       # Test for unique validation 
-      c.new(@valid_row).should_not be_valid
+      c.new(@valid_row).wont_be :valid?
 
       c.dataset.delete
       @violations.each do |col, vals|
@@ -1983,7 +1990,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
         vals.each do |val|
           next if val.nil? && @validation_opts[:allow_nil]
           try[col] = val
-          c.new(try).should_not be_valid
+          c.new(try).wont_be :valid?
         end
       end
       c.db.constraint_validations = nil
@@ -2023,13 +2030,13 @@ describe "Sequel::Plugins::ConstraintValidations" do
         @validation_opts = {:allow_nil=>true}
         @table_block.call
       end
-      it_should_behave_like "constraint validations"
+      include ConstraintValidationsSpecs
     end
     describe "with :allow_nil=>false" do
       before(:all) do
         @table_block.call
       end
-      it_should_behave_like "constraint validations"
+      include ConstraintValidationsSpecs
     end
   end
 
@@ -2068,16 +2075,16 @@ describe "Sequel::Plugins::ConstraintValidations" do
         @validation_opts = {:allow_nil=>true}
         @table_block.call
       end
-      it_should_behave_like "constraint validations"
+      include ConstraintValidationsSpecs
     end
     describe "with :allow_nil=>false" do
       before(:all) do
         @table_block.call
       end
-      it_should_behave_like "constraint validations"
+      include ConstraintValidationsSpecs
     end
   end
-end unless DB.database_type == :fdbsql # doesn't handle check constraints
+end
 
 describe "date_arithmetic extension" do
   asd = begin
@@ -2112,12 +2119,12 @@ describe "date_arithmetic extension" do
     @check = lambda do |meth, in_date, in_interval, should|
       output = @db.get(Sequel.send(meth, in_date, in_interval))
       output = Time.parse(output.to_s) unless output.is_a?(Time) || output.is_a?(DateTime)
-      output.year.should == should.year
-      output.month.should == should.month
-      output.day.should == should.day
-      output.hour.should == should.hour
-      output.min.should == should.min
-      output.sec.should == should.sec
+      output.year.must_equal should.year
+      output.month.must_equal should.month
+      output.day.must_equal should.day
+      output.hour.must_equal should.hour
+      output.min.must_equal should.min
+      output.sec.must_equal should.sec
     end
   end
   after(:all) do
@@ -2127,7 +2134,7 @@ describe "date_arithmetic extension" do
   end
 
   if asd
-    specify "be able to use Sequel.date_add to add ActiveSupport::Duration objects to dates and datetimes" do
+    it "be able to use Sequel.date_add to add ActiveSupport::Duration objects to dates and datetimes" do
       @check.call(:date_add, @date, @d0, @dt)
       @check.call(:date_add, @date, @d1, @a1)
       @check.call(:date_add, @date, @d2, @a2)
@@ -2137,7 +2144,7 @@ describe "date_arithmetic extension" do
       @check.call(:date_add, @dt, @d2, @a2)
     end
 
-    specify "be able to use Sequel.date_sub to subtract ActiveSupport::Duration objects from dates and datetimes" do
+    it "be able to use Sequel.date_sub to subtract ActiveSupport::Duration objects from dates and datetimes" do
       @check.call(:date_sub, @date, @d0, @dt)
       @check.call(:date_sub, @date, @d1, @s1)
       @check.call(:date_sub, @date, @d2, @s2)
@@ -2148,7 +2155,7 @@ describe "date_arithmetic extension" do
     end
   end
 
-  specify "be able to use Sequel.date_add to add interval hashes to dates and datetimes" do
+  it "be able to use Sequel.date_add to add interval hashes to dates and datetimes" do
     @check.call(:date_add, @date, @h0, @dt)
     @check.call(:date_add, @date, @h1, @a1)
     @check.call(:date_add, @date, @h2, @a2)
@@ -2158,7 +2165,7 @@ describe "date_arithmetic extension" do
     @check.call(:date_add, @dt, @h2, @a2)
   end
 
-  specify "be able to use Sequel.date_sub to subtract interval hashes from dates and datetimes" do
+  it "be able to use Sequel.date_sub to subtract interval hashes from dates and datetimes" do
     @check.call(:date_sub, @date, @h0, @dt)
     @check.call(:date_sub, @date, @h1, @s1)
     @check.call(:date_sub, @date, @h2, @s2)

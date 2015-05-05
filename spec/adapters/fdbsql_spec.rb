@@ -13,67 +13,67 @@ describe 'Fdbsql' do
         @db.drop_table?(:test)
       end
 
-      specify 'without primary key' do
+      it 'without primary key' do
         @db.create_table(:test) do
           text :name
           int :value
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should == 2
-        schema[0][0].should == :name
-        schema[1][0].should == :value
-        schema.each {|col| col[1][:primary_key].should == nil}
+        schema.count.must_equal 2
+        schema[0][0].must_equal :name
+        schema[1][0].must_equal :value
+        schema.each {|col| col[1][:primary_key].must_equal nil}
       end
 
-      specify 'with one primary key' do
+      it 'with one primary key' do
         @db.create_table(:test) do
           text :name
           primary_key :id
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should == 2
+        schema.count.must_equal 2
         id_col = schema[0]
         name_col = schema[1]
-        name_col[0].should == :name
-        id_col[0].should == :id
-        name_col[1][:primary_key].should == nil
-        id_col[1][:primary_key].should == true
+        name_col[0].must_equal :name
+        id_col[0].must_equal :id
+        name_col[1][:primary_key].must_equal nil
+        id_col[1][:primary_key].must_equal true
       end
 
-      specify 'with multiple primary keys' do
+      it 'with multiple primary keys' do
         @db.create_table(:test) do
           Integer :id
           Integer :id2
           primary_key [:id, :id2]
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should == 2
+        schema.count.must_equal 2
         id_col = schema[0]
         id2_col = schema[1]
-        id_col[0].should == :id
-        id2_col[0].should == :id2
-        id_col[1][:primary_key].should == true
-        id2_col[1][:primary_key].should == true
+        id_col[0].must_equal :id
+        id2_col[0].must_equal :id2
+        id_col[1][:primary_key].must_equal true
+        id2_col[1][:primary_key].must_equal true
       end
 
-      specify 'with other constraints' do
+      it 'with other constraints' do
         @db.create_table(:test) do
           primary_key :id
           Integer :unique, :unique => true
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should == 2
+        schema.count.must_equal 2
         id_col = schema[0]
         unique_col = schema[1]
-        id_col[0].should == :id
-        unique_col[0].should == :unique
-        id_col[1][:primary_key].should == true
-        unique_col[1][:primary_key].should == nil
+        id_col[0].must_equal :id
+        unique_col[0].must_equal :unique
+        id_col[1][:primary_key].must_equal true
+        unique_col[1][:primary_key].must_equal nil
       end
       after do
         @db.drop_table?(:other_table)
       end
-      specify 'with other tables' do
+      it 'with other tables' do
         @db.create_table(:test) do
           Integer :id
           text :name
@@ -83,8 +83,8 @@ describe 'Fdbsql' do
           varchar :name, :unique => true
         end
         schema = DB.schema(:test, :reload => true)
-        schema.count.should == 2
-        schema.each {|col| col[1][:primary_key].should == nil}
+        schema.count.must_equal 2
+        schema.each {|col| col[1][:primary_key].must_equal nil}
       end
 
       describe 'with explicit schema' do
@@ -104,15 +104,15 @@ describe 'Fdbsql' do
           @db.drop_table?(:test)
         end
 
-        specify 'gets info for correct table' do
+        it 'gets info for correct table' do
           schema = DB.schema(:test, :reload => true, :schema => @second_schema)
-          schema.count.should == 2
+          schema.count.must_equal 2
           id2_col = schema[0]
           id_col = schema[1]
-          id_col[0].should == :id
-          id2_col[0].should == :id2
-          id_col[1][:primary_key].should == nil
-          id2_col[1][:primary_key].should == true
+          id_col[0].must_equal :id
+          id2_col[0].must_equal :id2
+          id_col[1][:primary_key].must_equal nil
+          id2_col[1][:primary_key].must_equal true
         end
       end
     end
@@ -123,40 +123,40 @@ describe 'Fdbsql' do
         @db.drop_table?(:other_table)
       end
 
-      specify 'without primary key' do
+      it 'without primary key' do
         @db.create_table(:test) do
           text :name
           int :value
         end
-        DB.primary_key(:test).should == nil
+        DB.primary_key(:test).must_equal nil
       end
 
-      specify 'with one primary key' do
+      it 'with one primary key' do
         @db.create_table(:test) do
           text :name
           primary_key :id
         end
-        DB.primary_key(:test).should == :id
+        DB.primary_key(:test).must_equal :id
       end
 
-      specify 'with multiple primary keys' do
+      it 'with multiple primary keys' do
         @db.create_table(:test) do
           Integer :id
           Integer :id2
           primary_key [:id, :id2]
         end
-        DB.primary_key(:test).should == [:id, :id2]
+        DB.primary_key(:test).must_equal [:id, :id2]
       end
 
-      specify 'with other constraints' do
+      it 'with other constraints' do
         @db.create_table(:test) do
           primary_key :id
           Integer :unique, :unique => true
         end
-        DB.primary_key(:test).should == :id
+        DB.primary_key(:test).must_equal :id
       end
 
-      specify 'with other tables' do
+      it 'with other tables' do
         @db.create_table(:test) do
           Integer :id
           text :name
@@ -165,10 +165,10 @@ describe 'Fdbsql' do
           primary_key :id
           varchar :name, :unique => true
         end
-        DB.primary_key(:other_table).should == :id
+        DB.primary_key(:other_table).must_equal :id
       end
 
-      specify 'responds to alter table' do
+      it 'responds to alter table' do
         @db.create_table(:test) do
           Integer :id
           text :name
@@ -176,7 +176,7 @@ describe 'Fdbsql' do
         @db.alter_table(:test) do
           add_primary_key :quid
         end
-        DB.primary_key(:test).should == :quid
+        DB.primary_key(:test).must_equal :quid
       end
 
       describe 'with explicit schema' do
@@ -195,8 +195,8 @@ describe 'Fdbsql' do
           @db.drop_table?(:test)
         end
 
-        specify 'gets correct primary key' do
-          DB.primary_key(:test, :schema => @second_schema).should == :id2
+        it 'gets correct primary key' do
+          DB.primary_key(:test, :schema => @second_schema).must_equal :id2
         end
       end
     end
@@ -216,15 +216,15 @@ describe 'Fdbsql' do
         @db.drop_table?(Sequel.qualify(@second_schema,:test2))
         @db.drop_table?(:test)
       end
-      specify 'on explicit schema' do
+      it 'on explicit schema' do
         tables = @db.tables(:schema => @second_schema)
-        tables.should include(:test2)
-        tables.should_not include(:test)
+        tables.must_include(:test2)
+        tables.wont_include(:test)
       end
-      specify 'qualified' do
+      it 'qualified' do
         tables = @db.tables(:qualify => true)
-        tables.should include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test))
-        tables.should_not include(:test)
+        tables.must_include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test))
+        tables.wont_include(:test)
       end
     end
 
@@ -250,15 +250,15 @@ describe 'Fdbsql' do
       after do
         drop_things
       end
-      specify 'on explicit schema' do
+      it 'on explicit schema' do
         views = @db.views(:schema => @second_schema)
-        views.should include(:test_view2)
-        views.should_not include(:test_view)
+        views.must_include(:test_view2)
+        views.wont_include(:test_view)
       end
-      specify 'qualified' do
+      it 'qualified' do
         views = @db.views(:qualify => true)
-        views.should include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test_view))
-        views.should_not include(:test)
+        views.must_include(Sequel::SQL::QualifiedIdentifier.new(@schema.to_sym, :test_view))
+        views.wont_include(:test)
       end
     end
 
@@ -280,24 +280,24 @@ describe 'Fdbsql' do
       end
 
       it 're-prepares on stale statement' do
-        @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+        @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.must_equal [{:a => 2, :b => 'trucks'}]
         drop_table
         create_table
-        @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+        @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.must_equal [{:a => 2, :b => 'trucks'}]
       end
 
       it 'can call already prepared' do
-        @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+        @db[:test].filter(:a=>:$n).prepare(:all, :select_a).call(:n=>2).to_a.must_equal [{:a => 2, :b => 'trucks'}]
         drop_table
         create_table
-        @db.call(:select_a, :n=>2).to_a.should == [{:a => 2, :b => 'trucks'}]
+        @db.call(:select_a, :n=>2).to_a.must_equal [{:a => 2, :b => 'trucks'}]
       end
     end
 
     describe 'Database schema modifiers' do
       # this test was copied from sequel's integration/schema_test because that one drops a serial primary key which is not
       # currently supported in fdbsql
-      specify "should be able to specify constraint names for column constraints" do
+      it "should be able to specify constraint names for column constraints" do
         @db.create_table!(:items2){Integer :id, :primary_key=>true, :primary_key_constraint_name=>:foo_pk}
         @db.create_table!(:items){foreign_key :id, :items2, :unique=>true, :foreign_key_constraint_name => :foo_fk, :unique_constraint_name => :foo_uk, :null=>false}
         @db.alter_table(:items){drop_constraint :foo_fk, :type=>:foreign_key; drop_constraint :foo_uk, :type=>:unique}
@@ -325,16 +325,16 @@ describe 'Fdbsql' do
         DB.drop_table?(:test)
       end
 
-      specify '#delete' do
-        DB[:test].where(:a => 8..10).delete.should == 0
-        DB[:test].where(:a => 5).delete.should == 1
-        DB[:test].where(:a => 1..3).delete.should == 3
+      it '#delete' do
+        DB[:test].where(:a => 8..10).delete.must_equal 0
+        DB[:test].where(:a => 5).delete.must_equal 1
+        DB[:test].where(:a => 1..3).delete.must_equal 3
       end
 
-      specify '#update' do
-        DB[:test].where(:a => 8..10).update(:a => Sequel.+(:a, 10)).should == 0
-        DB[:test].where(:a => 5).update(:a => Sequel.+(:a, 1000)).should == 1
-        DB[:test].where(:a => 1..3).update(:a => Sequel.+(:a, 100)).should == 3
+      it '#update' do
+        DB[:test].where(:a => 8..10).update(:a => Sequel.+(:a, 10)).must_equal 0
+        DB[:test].where(:a => 5).update(:a => Sequel.+(:a, 1000)).must_equal 1
+        DB[:test].where(:a => 1..3).update(:a => Sequel.+(:a, 100)).must_equal 3
       end
 
     end
@@ -362,12 +362,12 @@ describe 'Fdbsql' do
         DB.drop_table?(:test2)
       end
 
-      specify 'intersect all' do
-        @db[:test].intersect(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.sort.should == [[1, 10], [1,10], [2, 10]]
+      it 'intersect all' do
+        @db[:test].intersect(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.sort.must_equal [[1, 10], [1,10], [2, 10]]
       end
 
-      specify 'except all' do
-        @db[:test].except(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.sort.should == [[2,10], [2, 10], [8,15]]
+      it 'except all' do
+        @db[:test].except(@db[:test2], :all => true).map{|r| [r[:a],r[:b]]}.to_a.sort.must_equal [[2,10], [2, 10], [8,15]]
       end
     end
 
@@ -382,12 +382,12 @@ describe 'Fdbsql' do
         DB.drop_table?(:test)
       end
 
-      specify 'true' do
-        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:IS, :b, true)).map{|r| r[:a]}.should == [2]
+      it 'true' do
+        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:IS, :b, true)).map{|r| r[:a]}.must_equal [2]
       end
 
-      specify 'not true' do
-        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:'IS NOT', :b, true)).map{|r| r[:a]}.should == [1, 3]
+      it 'not true' do
+        DB[:test].select(:a).where(Sequel::SQL::ComplexExpression.new(:'IS NOT', :b, true)).map{|r| r[:a]}.must_equal [1, 3]
       end
     end
 
@@ -399,8 +399,8 @@ describe 'Fdbsql' do
         DB.drop_table?(:test)
       end
 
-      specify 'inserts defaults and returns pk' do
-        DB[:test].insert().should == 1 # 1 should be the pk
+      it 'inserts defaults and returns pk' do
+        DB[:test].insert().must_equal 1 # 1 should be the pk
       end
     end
 
@@ -415,14 +415,14 @@ describe 'Fdbsql' do
         DB.drop_table?(:test)
       end
 
-      specify 'evaluate' do
+      it 'evaluate' do
         DB[:test].select(Sequel.function(:now)).count == 1
-        DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b), :c)).map{|r| r[:c]}.should == ['1','2trucks','3foxes']
+        DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b), :c)).map{|r| r[:c]}.must_equal ['1','2trucks','3foxes']
       end
 
-      specify 'get quoted' do
-        DB[:test].select(Sequel.function(:now).quoted).sql.should =~ /"now"\(\)/
-        DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b).quoted, :c)).sql.should =~ /"concat"\("a", "b"\)/
+      it 'get quoted' do
+        DB[:test].select(Sequel.function(:now).quoted).sql.must_match /"now"\(\)/
+        DB[:test].select(Sequel.as(Sequel.function(:concat, :a, :b).quoted, :c)).sql.must_match /"concat"\("a", "b"\)/
       end
     end
   end

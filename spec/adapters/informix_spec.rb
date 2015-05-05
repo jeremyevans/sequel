@@ -13,11 +13,11 @@ DB.create_table :test do
 end
 
 describe "A Informix database" do
-  specify "should provide disconnect functionality" do
+  it "should provide disconnect functionality" do
     DB.execute("select user from dual")
-    DB.pool.size.should == 1
+    DB.pool.size.must_equal 1
     DB.disconnect
-    DB.pool.size.should == 0
+    DB.pool.size.must_equal 0
   end
 end
 
@@ -27,28 +27,28 @@ describe "A Informix dataset" do
     @d.delete # remove all records
   end
   
-  specify "should return the correct record count" do
-    @d.count.should == 0
+  it "should return the correct record count" do
+    @d.count.must_equal 0
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
-    @d.count.should == 3
+    @d.count.must_equal 3
   end
   
-  specify "should return the correct records" do
-    @d.to_a.should == []
+  it "should return the correct records" do
+    @d.to_a.must_equal []
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
 
-    @d.order(:value).to_a.should == [
+    @d.order(:value).to_a.must_equal [
       {:name => 'abc', :value => 123},
       {:name => 'abc', :value => 456},
       {:name => 'def', :value => 789}
     ]
   end
   
-  specify "should update records correctly" do
+  it "should update records correctly" do
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
@@ -56,45 +56,45 @@ describe "A Informix dataset" do
     
     # the third record should stay the same
     # floating-point precision bullshit
-    @d[:name => 'def'][:value].should == 789
-    @d.filter(:value => 530).count.should == 2
+    @d[:name => 'def'][:value].must_equal 789
+    @d.filter(:value => 530).count.must_equal 2
   end
   
-  specify "should delete records correctly" do
+  it "should delete records correctly" do
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
     @d.filter(:name => 'abc').delete
     
-    @d.count.should == 1
-    @d.first[:name].should == 'def'
+    @d.count.must_equal 1
+    @d.first[:name].must_equal 'def'
   end
   
-  specify "should be able to literalize booleans" do
-    proc {@d.literal(true)}.should_not raise_error
-    proc {@d.literal(false)}.should_not raise_error
+  it "should be able to literalize booleans" do
+    @d.literal(true)
+    @d.literal(false)
   end
   
-  specify "should support transactions" do
+  it "should support transactions" do
     DB.transaction do
       @d << {:name => 'abc', :value => 1}
     end
 
-    @d.count.should == 1
+    @d.count.must_equal 1
   end
   
-  specify "should support #first and #last" do
+  it "should support #first and #last" do
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
     
-    @d.order(:value).first.should == {:name => 'abc', :value => 123}
-    @d.order(:value).last.should == {:name => 'def', :value => 789}
+    @d.order(:value).first.must_equal(:name => 'abc', :value => 123)
+    @d.order(:value).last.must_equal(:name => 'def', :value => 789)
   end
 
-  specify "should return last inserted id" do
+  it "should return last inserted id" do
     first = @d.insert :name => 'abc', :value => 123
     second = @d.insert :name => 'abc', :value => 123
-    (second - first).should == 1
+    (second - first).must_equal 1
   end
 end

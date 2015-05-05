@@ -28,131 +28,131 @@ describe "Sequel::Plugins::AutoValidations" do
   end
 
   it "should have automatically created validations" do
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not present"], :name=>["is not present"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"])
 
     @m.name = ''
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not present"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not present"])
 
     @m.set(:d=>'/', :num=>'a', :name=>'1')
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not a valid date"], :num=>["is not a valid integer"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
 
     @m.set(:d=>Date.today, :num=>1)
-    @m.valid?.should == false
-    @m.errors.should == {[:name, :num]=>["is already taken"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal([:name, :num]=>["is already taken"])
 
     @m.set(:name=>'a'*51)
-    @m.valid?.should == false
-    @m.errors.should == {:name=>["is longer than 50 characters"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
   it "should handle databases that don't support index parsing" do
     def (@m.db).supports_index_parsing?() false end
     @m.model.send(:setup_auto_validations)
     @m.set(:d=>Date.today, :num=>1, :name=>'1')
-    @m.valid?.should == true
+    @m.valid?.must_equal true
   end
 
   it "should handle models that select from subqueries" do
     @c.set_dataset @c.dataset.from_self
-    proc{@c.send(:setup_auto_validations)}.should_not raise_error
+    @c.send(:setup_auto_validations)
   end
 
   it "should support :not_null=>:presence option" do
     @c.plugin :auto_validations, :not_null=>:presence
     @m.set(:d=>Date.today, :num=>'')
-    @m.valid?.should == false
-    @m.errors.should == {:name=>["is not present"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["is not present"])
   end
 
   it "should automatically validate explicit nil values for columns with not nil defaults" do
     @m.set(:d=>Date.today, :name=>1, :nnd=>nil)
     @m.id = nil
-    @m.valid?.should == false
-    @m.errors.should == {:id=>["is not present"], :nnd=>["is not present"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:id=>["is not present"], :nnd=>["is not present"])
   end
 
   it "should allow skipping validations by type" do
     @c = Class.new(@c)
     @m = @c.new
     @c.skip_auto_validations(:not_null)
-    @m.valid?.should == true
+    @m.valid?.must_equal true
 
     @m.set(:d=>'/', :num=>'a', :name=>'1')
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not a valid date"], :num=>["is not a valid integer"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
 
     @c.skip_auto_validations(:types)
-    @m.valid?.should == false
-    @m.errors.should == {[:name, :num]=>["is already taken"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal([:name, :num]=>["is already taken"])
 
     @c.skip_auto_validations(:unique)
-    @m.valid?.should == true
+    @m.valid?.must_equal true
 
     @m.set(:name=>'a'*51)
-    @m.valid?.should == false
-    @m.errors.should == {:name=>["is longer than 50 characters"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["is longer than 50 characters"])
 
     @c.skip_auto_validations(:max_length)
-    @m.valid?.should == true
+    @m.valid?.must_equal true
   end
 
   it "should allow skipping all auto validations" do
     @c = Class.new(@c)
     @m = @c.new
     @c.skip_auto_validations(:all)
-    @m.valid?.should == true
+    @m.valid?.must_equal true
     @m.set(:d=>'/', :num=>'a', :name=>'1')
-    @m.valid?.should == true
+    @m.valid?.must_equal true
     @m.set(:name=>'a'*51)
-    @m.valid?.should == true
+    @m.valid?.must_equal true
   end
 
   it "should work correctly in subclasses" do
     @c = Class.new(@c)
     @m = @c.new
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not present"], :name=>["is not present"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"])
 
     @m.set(:d=>'/', :num=>'a', :name=>'1')
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not a valid date"], :num=>["is not a valid integer"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
 
     @m.set(:d=>Date.today, :num=>1)
-    @m.valid?.should == false
-    @m.errors.should == {[:name, :num]=>["is already taken"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal([:name, :num]=>["is already taken"])
 
     @m.set(:name=>'a'*51)
-    @m.valid?.should == false
-    @m.errors.should == {:name=>["is longer than 50 characters"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
   it "should work correctly in STI subclasses" do
     @c.plugin(:single_table_inheritance, :num, :model_map=>{1=>@c}, :key_map=>proc{[1, 2]})
     sc = Class.new(@c)
     @m = sc.new
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not present"], :name=>["is not present"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not present"], :name=>["is not present"])
 
     @m.set(:d=>'/', :num=>'a', :name=>'1')
-    @m.valid?.should == false
-    @m.errors.should == {:d=>["is not a valid date"], :num=>["is not a valid integer"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:d=>["is not a valid date"], :num=>["is not a valid integer"])
 
     @m.db.sqls
     @m.set(:d=>Date.today, :num=>1)
-    @m.valid?.should == false
-    @m.errors.should == {[:name, :num]=>["is already taken"]}
-    @m.db.sqls.should == ["SELECT count(*) AS count FROM test WHERE ((name = '1') AND (num = 1)) LIMIT 1"]
+    @m.valid?.must_equal false
+    @m.errors.must_equal([:name, :num]=>["is already taken"])
+    @m.db.sqls.must_equal ["SELECT count(*) AS count FROM test WHERE ((name = '1') AND (num = 1)) LIMIT 1"]
 
     @m.set(:name=>'a'*51)
-    @m.valid?.should == false
-    @m.errors.should == {:name=>["is longer than 50 characters"]}
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
   it "should work correctly when changing the dataset" do
     @c.set_dataset(@c.db[:foo])
-    @c.new.valid?.should == true
+    @c.new.valid?.must_equal true
   end
 end

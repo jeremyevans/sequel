@@ -18,100 +18,100 @@ describe "AssociationDependencies plugin" do
     DB.reset
   end
 
-  specify "should allow destroying associated many_to_one associated object" do
+  it "should allow destroying associated many_to_one associated object" do
     @Album.add_association_dependencies :artist=>:destroy
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should allow deleting associated many_to_one associated object" do
+  it "should allow deleting associated many_to_one associated object" do
     @Album.add_association_dependencies :artist=>:delete
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE (artists.id = 2)']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE (artists.id = 2)']
   end
   
-  specify "should allow destroying associated one_to_one associated object" do
+  it "should allow destroying associated one_to_one associated object" do
     @Artist.add_association_dependencies :first_album=>:destroy
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    DB.sqls.should == ['SELECT * FROM albums WHERE ((position = 1) AND (albums.artist_id = 2)) LIMIT 1', 'DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['SELECT * FROM albums WHERE ((position = 1) AND (albums.artist_id = 2)) LIMIT 1', 'DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should allow deleting associated one_to_one associated object" do
+  it "should allow deleting associated one_to_one associated object" do
     @Artist.add_association_dependencies :first_album=>:delete
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE ((position = 1) AND (albums.artist_id = 2))', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE ((position = 1) AND (albums.artist_id = 2))', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should allow destroying associated one_to_many objects" do
+  it "should allow destroying associated one_to_many objects" do
     @Artist.add_association_dependencies :albums=>:destroy
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    DB.sqls.should == ['SELECT * FROM albums WHERE (albums.artist_id = 2)', 'DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['SELECT * FROM albums WHERE (albums.artist_id = 2)', 'DELETE FROM albums WHERE id = 1', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should allow deleting associated one_to_many objects" do
+  it "should allow deleting associated one_to_many objects" do
     @Artist.add_association_dependencies :albums=>:delete
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE (albums.artist_id = 2)', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE (albums.artist_id = 2)', 'DELETE FROM artists WHERE id = 2']
   end
   
-  specify "should allow nullifying associated one_to_one objects" do
+  it "should allow nullifying associated one_to_one objects" do
     @Artist.add_association_dependencies :first_album=>:nullify
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    DB.sqls.should == ['UPDATE albums SET artist_id = NULL WHERE ((position = 1) AND (artist_id = 2))', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['UPDATE albums SET artist_id = NULL WHERE ((position = 1) AND (artist_id = 2))', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should allow nullifying associated one_to_many objects" do
+  it "should allow nullifying associated one_to_many objects" do
     @Artist.add_association_dependencies :albums=>:nullify
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    DB.sqls.should == ['UPDATE albums SET artist_id = NULL WHERE (artist_id = 2)', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['UPDATE albums SET artist_id = NULL WHERE (artist_id = 2)', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should allow nullifying associated many_to_many associations" do
+  it "should allow nullifying associated many_to_many associations" do
     @Artist.add_association_dependencies :other_artists=>:nullify
     @Artist.load(:id=>2, :name=>'Ar').destroy
-    DB.sqls.should == ['DELETE FROM aoa WHERE (l = 2)', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['DELETE FROM aoa WHERE (l = 2)', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should raise an error if attempting to nullify a many_to_one association" do
-    proc{@Album.add_association_dependencies :artist=>:nullify}.should raise_error(Sequel::Error)
+  it "should raise an error if attempting to nullify a many_to_one association" do
+    proc{@Album.add_association_dependencies :artist=>:nullify}.must_raise(Sequel::Error)
   end
 
-  specify "should raise an error if using an unrecognized dependence action" do
-    proc{@Album.add_association_dependencies :artist=>:blah}.should raise_error(Sequel::Error)
+  it "should raise an error if using an unrecognized dependence action" do
+    proc{@Album.add_association_dependencies :artist=>:blah}.must_raise(Sequel::Error)
   end
 
-  specify "should raise an error if a nonexistent association is used" do
-    proc{@Album.add_association_dependencies :blah=>:delete}.should raise_error(Sequel::Error)
+  it "should raise an error if a nonexistent association is used" do
+    proc{@Album.add_association_dependencies :blah=>:delete}.must_raise(Sequel::Error)
   end
 
-  specify "should raise an error if a invalid association type is used" do
+  it "should raise an error if a invalid association type is used" do
     @Artist.plugin :many_through_many
     @Artist.many_through_many :other_albums, [[:id, :id, :id]]
-    proc{@Artist.add_association_dependencies :other_albums=>:nullify}.should raise_error(Sequel::Error)
+    proc{@Artist.add_association_dependencies :other_albums=>:nullify}.must_raise(Sequel::Error)
   end
 
-  specify "should raise an error if using a many_to_many association type without nullify" do
-    proc{@Artist.add_association_dependencies :other_artists=>:delete}.should raise_error(Sequel::Error)
+  it "should raise an error if using a many_to_many association type without nullify" do
+    proc{@Artist.add_association_dependencies :other_artists=>:delete}.must_raise(Sequel::Error)
   end
 
-  specify "should allow specifying association dependencies in the plugin call" do
+  it "should allow specifying association dependencies in the plugin call" do
     @Album.plugin :association_dependencies, :artist=>:destroy
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
   end
 
-  specify "should work with subclasses" do
+  it "should work with subclasses" do
     c = Class.new(@Album)
     c.add_association_dependencies :artist=>:destroy
     c.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
 
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE id = 1']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE id = 1']
 
     @Album.add_association_dependencies :artist=>:destroy
     c2 = Class.new(@Album)
     c2.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    DB.sqls.should == ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
+    DB.sqls.must_equal ['DELETE FROM albums WHERE id = 1', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE id = 2']
   end
 end

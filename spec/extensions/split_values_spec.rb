@@ -9,14 +9,14 @@ describe "Sequel::Plugins::SplitValues" do
     o = c.first
     c.db.reset
 
-    o.should == c.load(:id=>1, :x=>2)
-    o[:id].should == 1
-    o[:x].should == 2
-    o[:y].should == 3
-    {c.load(:id=>1, :x=>2)=>4}[o].should == 4
-    o.values.should == {:id=>1, :x=>2}
+    o.must_equal c.load(:id=>1, :x=>2)
+    o[:id].must_equal 1
+    o[:x].must_equal 2
+    o[:y].must_equal 3
+    {c.load(:id=>1, :x=>2)=>4}[o].must_equal 4
+    o.values.must_equal(:id=>1, :x=>2)
 
     o.save
-    c.db.sqls.should == ["UPDATE a SET x = 2 WHERE (id = 1)"]
+    c.db.sqls.must_equal ["UPDATE a SET x = 2 WHERE (id = 1)"]
   end
 end

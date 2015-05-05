@@ -22,188 +22,188 @@ describe "pg_array extension" do
 
   it "should parse single dimensional text arrays" do
     c = @converter[1009]
-    c.call("{a}").to_a.first.should be_a_kind_of(String)
-    c.call("{}").to_a.should == []
-    c.call('{""}').to_a.should == [""]
-    c.call('{"",""}').to_a.should == ["",""]
-    c.call('{"","",""}').to_a.should == ["","",""]
-    c.call("{a}").to_a.should == ['a']
-    c.call('{"a b"}').to_a.should == ['a b']
-    c.call('{a,b}').to_a.should == ['a', 'b']
+    c.call("{a}").to_a.first.must_be_kind_of(String)
+    c.call("{}").to_a.must_equal []
+    c.call('{""}').to_a.must_equal [""]
+    c.call('{"",""}').to_a.must_equal ["",""]
+    c.call('{"","",""}').to_a.must_equal ["","",""]
+    c.call("{a}").to_a.must_equal ['a']
+    c.call('{"a b"}').to_a.must_equal ['a b']
+    c.call('{a,b}').to_a.must_equal ['a', 'b']
   end
 
   it "should parse multi-dimensional text arrays" do
     c = @converter[1009]
-    c.call("{{}}").to_a.should == [[]]
-    c.call("{{a},{b}}").to_a.should == [['a'], ['b']]
-    c.call('{{"a b"},{c}}').to_a.should == [['a b'], ['c']]
-    c.call('{{{a},{b}},{{c},{d}}}').to_a.should == [[['a'], ['b']], [['c'], ['d']]]
-    c.call('{{{a,e},{b,f}},{{c,g},{d,h}}}').to_a.should == [[['a', 'e'], ['b', 'f']], [['c', 'g'], ['d', 'h']]]
+    c.call("{{}}").to_a.must_equal [[]]
+    c.call("{{a},{b}}").to_a.must_equal [['a'], ['b']]
+    c.call('{{"a b"},{c}}').to_a.must_equal [['a b'], ['c']]
+    c.call('{{{a},{b}},{{c},{d}}}').to_a.must_equal [[['a'], ['b']], [['c'], ['d']]]
+    c.call('{{{a,e},{b,f}},{{c,g},{d,h}}}').to_a.must_equal [[['a', 'e'], ['b', 'f']], [['c', 'g'], ['d', 'h']]]
   end
 
   it "should parse text arrays with embedded deliminaters" do
     c = @converter[1009]
-    c.call('{{"{},","\\",\\,\\\\\\"\\""}}').to_a.should == [['{},', '",,\\""']]
+    c.call('{{"{},","\\",\\,\\\\\\"\\""}}').to_a.must_equal [['{},', '",,\\""']]
   end
 
   it "should parse single dimensional integer arrays" do
     c = @converter[1007]
-    c.call("{1}").to_a.first.should be_a_kind_of(Integer)
-    c.call("{}").to_a.should == []
-    c.call("{1}").to_a.should == [1]
-    c.call('{2,3}').to_a.should == [2, 3]
-    c.call('{3,4,5}').to_a.should == [3, 4, 5]
+    c.call("{1}").to_a.first.must_be_kind_of(Integer)
+    c.call("{}").to_a.must_equal []
+    c.call("{1}").to_a.must_equal [1]
+    c.call('{2,3}').to_a.must_equal [2, 3]
+    c.call('{3,4,5}').to_a.must_equal [3, 4, 5]
   end
 
   it "should parse multiple dimensional integer arrays" do
     c = @converter[1007]
-    c.call("{{}}").to_a.should == [[]]
-    c.call("{{1}}").to_a.should == [[1]]
-    c.call('{{2},{3}}').to_a.should == [[2], [3]]
-    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.should == [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+    c.call("{{}}").to_a.must_equal [[]]
+    c.call("{{1}}").to_a.must_equal [[1]]
+    c.call('{{2},{3}}').to_a.must_equal [[2], [3]]
+    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.must_equal [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
   end
 
   it "should parse single dimensional float arrays" do
     c = @converter[1022]
-    c.call("{}").to_a.should == []
-    c.call("{1.5}").to_a.should == [1.5]
-    c.call('{2.5,3.5}').to_a.should == [2.5, 3.5]
-    c.call('{3.5,4.5,5.5}').to_a.should == [3.5, 4.5, 5.5]
+    c.call("{}").to_a.must_equal []
+    c.call("{1.5}").to_a.must_equal [1.5]
+    c.call('{2.5,3.5}').to_a.must_equal [2.5, 3.5]
+    c.call('{3.5,4.5,5.5}').to_a.must_equal [3.5, 4.5, 5.5]
   end
 
   it "should parse multiple dimensional float arrays" do
     c = @converter[1022]
-    c.call("{{}}").to_a.should == [[]]
-    c.call("{{1.5}}").to_a.should == [[1.5]]
-    c.call('{{2.5},{3.5}}').to_a.should == [[2.5], [3.5]]
-    c.call('{{{1.5,2.5},{3.5,4.5}},{{5.5,6.5},{7.5,8.5}}}').to_a.should == [[[1.5, 2.5], [3.5, 4.5]], [[5.5, 6.5], [7.5, 8.5]]]
+    c.call("{{}}").to_a.must_equal [[]]
+    c.call("{{1.5}}").to_a.must_equal [[1.5]]
+    c.call('{{2.5},{3.5}}').to_a.must_equal [[2.5], [3.5]]
+    c.call('{{{1.5,2.5},{3.5,4.5}},{{5.5,6.5},{7.5,8.5}}}').to_a.must_equal [[[1.5, 2.5], [3.5, 4.5]], [[5.5, 6.5], [7.5, 8.5]]]
   end
 
   it "should parse integers in float arrays as floats" do
     c = @converter[1022]
-    c.call("{1}").to_a.first.should be_a_kind_of(Float)
-    c.call("{1}").to_a.should == [1.0]
-    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.should == [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]
+    c.call("{1}").to_a.first.must_be_kind_of(Float)
+    c.call("{1}").to_a.must_equal [1.0]
+    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.must_equal [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]
   end
 
   it "should parse single dimensional decimal arrays" do
     c = @converter[1231]
-    c.call("{}").to_a.should == []
-    c.call("{1.5}").to_a.should == [BigDecimal.new('1.5')]
-    c.call('{2.5,3.5}').to_a.should == [BigDecimal.new('2.5'), BigDecimal.new('3.5')]
-    c.call('{3.5,4.5,5.5}').to_a.should == [BigDecimal.new('3.5'), BigDecimal.new('4.5'), BigDecimal.new('5.5')]
+    c.call("{}").to_a.must_equal []
+    c.call("{1.5}").to_a.must_equal [BigDecimal.new('1.5')]
+    c.call('{2.5,3.5}').to_a.must_equal [BigDecimal.new('2.5'), BigDecimal.new('3.5')]
+    c.call('{3.5,4.5,5.5}').to_a.must_equal [BigDecimal.new('3.5'), BigDecimal.new('4.5'), BigDecimal.new('5.5')]
   end
 
   it "should parse multiple dimensional decimal arrays" do
     c = @converter[1231]
-    c.call("{{}}").to_a.should == [[]]
-    c.call("{{1.5}}").to_a.should == [[BigDecimal.new('1.5')]]
-    c.call('{{2.5},{3.5}}').to_a.should == [[BigDecimal.new('2.5')], [BigDecimal.new('3.5')]]
-    c.call('{{{1.5,2.5},{3.5,4.5}},{{5.5,6.5},{7.5,8.5}}}').to_a.should == [[[BigDecimal.new('1.5'), BigDecimal.new('2.5')], [BigDecimal.new('3.5'), BigDecimal.new('4.5')]], [[BigDecimal.new('5.5'), BigDecimal.new('6.5')], [BigDecimal.new('7.5'), BigDecimal.new('8.5')]]]
+    c.call("{{}}").to_a.must_equal [[]]
+    c.call("{{1.5}}").to_a.must_equal [[BigDecimal.new('1.5')]]
+    c.call('{{2.5},{3.5}}').to_a.must_equal [[BigDecimal.new('2.5')], [BigDecimal.new('3.5')]]
+    c.call('{{{1.5,2.5},{3.5,4.5}},{{5.5,6.5},{7.5,8.5}}}').to_a.must_equal [[[BigDecimal.new('1.5'), BigDecimal.new('2.5')], [BigDecimal.new('3.5'), BigDecimal.new('4.5')]], [[BigDecimal.new('5.5'), BigDecimal.new('6.5')], [BigDecimal.new('7.5'), BigDecimal.new('8.5')]]]
   end
 
   it "should parse decimal values with arbitrary precision" do
     c = @converter[1231]
-    c.call("{1.000000000000000000005}").to_a.should == [BigDecimal.new('1.000000000000000000005')]
-    c.call("{{1.000000000000000000005,2.000000000000000000005},{3.000000000000000000005,4.000000000000000000005}}").to_a.should == [[BigDecimal.new('1.000000000000000000005'), BigDecimal.new('2.000000000000000000005')], [BigDecimal.new('3.000000000000000000005'), BigDecimal.new('4.000000000000000000005')]]
+    c.call("{1.000000000000000000005}").to_a.must_equal [BigDecimal.new('1.000000000000000000005')]
+    c.call("{{1.000000000000000000005,2.000000000000000000005},{3.000000000000000000005,4.000000000000000000005}}").to_a.must_equal [[BigDecimal.new('1.000000000000000000005'), BigDecimal.new('2.000000000000000000005')], [BigDecimal.new('3.000000000000000000005'), BigDecimal.new('4.000000000000000000005')]]
   end
 
   it "should parse integers in decimal arrays as BigDecimals" do
     c = @converter[1231]
-    c.call("{1}").to_a.first.should be_a_kind_of(BigDecimal)
-    c.call("{1}").to_a.should == [BigDecimal.new('1')]
-    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.should == [[[BigDecimal.new('1'), BigDecimal.new('2')], [BigDecimal.new('3'), BigDecimal.new('4')]], [[BigDecimal.new('5'), BigDecimal.new('6')], [BigDecimal.new('7'), BigDecimal.new('8')]]]
+    c.call("{1}").to_a.first.must_be_kind_of(BigDecimal)
+    c.call("{1}").to_a.must_equal [BigDecimal.new('1')]
+    c.call('{{{1,2},{3,4}},{{5,6},{7,8}}}').to_a.must_equal [[[BigDecimal.new('1'), BigDecimal.new('2')], [BigDecimal.new('3'), BigDecimal.new('4')]], [[BigDecimal.new('5'), BigDecimal.new('6')], [BigDecimal.new('7'), BigDecimal.new('8')]]]
   end
 
   it "should parse arrays with NULL values" do
     @converter.values_at(1007, 1009, 1022, 1231).each do |c|
-      c.call("{NULL}").should == [nil]
-      c.call("{NULL,NULL}").should == [nil,nil]
-      c.call("{{NULL,NULL},{NULL,NULL}}").should == [[nil,nil],[nil,nil]]
+      c.call("{NULL}").must_equal [nil]
+      c.call("{NULL,NULL}").must_equal [nil,nil]
+      c.call("{{NULL,NULL},{NULL,NULL}}").must_equal [[nil,nil],[nil,nil]]
     end
   end
 
   it 'should parse arrays with "NULL" values' do
     c = @converter[1009]
-    c.call('{NULL,"NULL",NULL}').to_a.should == [nil, "NULL", nil]
-    c.call('{NULLA,"NULL",NULL}').to_a.should == ["NULLA", "NULL", nil]
+    c.call('{NULL,"NULL",NULL}').to_a.must_equal [nil, "NULL", nil]
+    c.call('{NULLA,"NULL",NULL}').to_a.must_equal ["NULLA", "NULL", nil]
   end
 
   it "should raise errors when for certain recognized invalid arrays" do
     c = @converter[1009]
-    proc{c.call('')}.should raise_error(Sequel::Error)
-    proc{c.call('}')}.should raise_error(Sequel::Error)
-    proc{c.call('{{}')}.should raise_error(Sequel::Error)
-    proc{c.call('{}}')}.should raise_error(Sequel::Error)
-    proc{c.call('{a""}')}.should raise_error(Sequel::Error)
-    proc{c.call('{a{}}')}.should raise_error(Sequel::Error)
-    proc{c.call('{""a}')}.should raise_error(Sequel::Error)
+    proc{c.call('')}.must_raise(Sequel::Error)
+    proc{c.call('}')}.must_raise(Sequel::Error)
+    proc{c.call('{{}')}.must_raise(Sequel::Error)
+    proc{c.call('{}}')}.must_raise(Sequel::Error)
+    proc{c.call('{a""}')}.must_raise(Sequel::Error)
+    proc{c.call('{a{}}')}.must_raise(Sequel::Error)
+    proc{c.call('{""a}')}.must_raise(Sequel::Error)
   end
 
   it "should literalize arrays without types correctly" do
-    @db.literal(@m::PGArray.new([])).should == 'ARRAY[]'
-    @db.literal(@m::PGArray.new([1])).should == 'ARRAY[1]'
-    @db.literal(@m::PGArray.new([nil])).should == 'ARRAY[NULL]'
-    @db.literal(@m::PGArray.new([nil, 1])).should == 'ARRAY[NULL,1]'
-    @db.literal(@m::PGArray.new([1.0, 2.5])).should == 'ARRAY[1.0,2.5]'
-    @db.literal(@m::PGArray.new([BigDecimal.new('1'), BigDecimal.new('2.000000000000000000005')])).should == 'ARRAY[1.0,2.000000000000000000005]'
-    @db.literal(@m::PGArray.new([nil, "NULL"])).should == "ARRAY[NULL,'NULL']"
-    @db.literal(@m::PGArray.new([nil, "{},[]'\""])).should == "ARRAY[NULL,'{},[]''\"']"
+    @db.literal(@m::PGArray.new([])).must_equal 'ARRAY[]'
+    @db.literal(@m::PGArray.new([1])).must_equal 'ARRAY[1]'
+    @db.literal(@m::PGArray.new([nil])).must_equal 'ARRAY[NULL]'
+    @db.literal(@m::PGArray.new([nil, 1])).must_equal 'ARRAY[NULL,1]'
+    @db.literal(@m::PGArray.new([1.0, 2.5])).must_equal 'ARRAY[1.0,2.5]'
+    @db.literal(@m::PGArray.new([BigDecimal.new('1'), BigDecimal.new('2.000000000000000000005')])).must_equal 'ARRAY[1.0,2.000000000000000000005]'
+    @db.literal(@m::PGArray.new([nil, "NULL"])).must_equal "ARRAY[NULL,'NULL']"
+    @db.literal(@m::PGArray.new([nil, "{},[]'\""])).must_equal "ARRAY[NULL,'{},[]''\"']"
   end
 
   it "should literalize multidimensional arrays correctly" do
-    @db.literal(@m::PGArray.new([[]])).should == 'ARRAY[[]]'
-    @db.literal(@m::PGArray.new([[1, 2]])).should == 'ARRAY[[1,2]]'
-    @db.literal(@m::PGArray.new([[3], [5]])).should == 'ARRAY[[3],[5]]'
-    @db.literal(@m::PGArray.new([[[1.0]], [[2.5]]])).should == 'ARRAY[[[1.0]],[[2.5]]]'
-    @db.literal(@m::PGArray.new([[[["NULL"]]]])).should == "ARRAY[[[['NULL']]]]"
-    @db.literal(@m::PGArray.new([["a", "b"], ["{},[]'\"", nil]])).should == "ARRAY[['a','b'],['{},[]''\"',NULL]]"
+    @db.literal(@m::PGArray.new([[]])).must_equal 'ARRAY[[]]'
+    @db.literal(@m::PGArray.new([[1, 2]])).must_equal 'ARRAY[[1,2]]'
+    @db.literal(@m::PGArray.new([[3], [5]])).must_equal 'ARRAY[[3],[5]]'
+    @db.literal(@m::PGArray.new([[[1.0]], [[2.5]]])).must_equal 'ARRAY[[[1.0]],[[2.5]]]'
+    @db.literal(@m::PGArray.new([[[["NULL"]]]])).must_equal "ARRAY[[[['NULL']]]]"
+    @db.literal(@m::PGArray.new([["a", "b"], ["{},[]'\"", nil]])).must_equal "ARRAY[['a','b'],['{},[]''\"',NULL]]"
   end
 
   it "should literalize with types correctly" do
-    @db.literal(@m::PGArray.new([], :int4)).should == "'{}'::int4[]"
-    @db.literal(@m::PGArray.new([1], :int4)).should == 'ARRAY[1]::int4[]'
-    @db.literal(@m::PGArray.new([nil], :text)).should == 'ARRAY[NULL]::text[]'
-    @db.literal(@m::PGArray.new([nil, 1], :int8)).should == 'ARRAY[NULL,1]::int8[]'
-    @db.literal(@m::PGArray.new([1.0, 2.5], :real)).should == 'ARRAY[1.0,2.5]::real[]'
-    @db.literal(@m::PGArray.new([BigDecimal.new('1'), BigDecimal.new('2.000000000000000000005')], :decimal)).should == 'ARRAY[1.0,2.000000000000000000005]::decimal[]'
-    @db.literal(@m::PGArray.new([nil, "NULL"], :varchar)).should == "ARRAY[NULL,'NULL']::varchar[]"
-    @db.literal(@m::PGArray.new([nil, "{},[]'\""], :"varchar(255)")).should == "ARRAY[NULL,'{},[]''\"']::varchar(255)[]"
+    @db.literal(@m::PGArray.new([], :int4)).must_equal "'{}'::int4[]"
+    @db.literal(@m::PGArray.new([1], :int4)).must_equal 'ARRAY[1]::int4[]'
+    @db.literal(@m::PGArray.new([nil], :text)).must_equal 'ARRAY[NULL]::text[]'
+    @db.literal(@m::PGArray.new([nil, 1], :int8)).must_equal 'ARRAY[NULL,1]::int8[]'
+    @db.literal(@m::PGArray.new([1.0, 2.5], :real)).must_equal 'ARRAY[1.0,2.5]::real[]'
+    @db.literal(@m::PGArray.new([BigDecimal.new('1'), BigDecimal.new('2.000000000000000000005')], :decimal)).must_equal 'ARRAY[1.0,2.000000000000000000005]::decimal[]'
+    @db.literal(@m::PGArray.new([nil, "NULL"], :varchar)).must_equal "ARRAY[NULL,'NULL']::varchar[]"
+    @db.literal(@m::PGArray.new([nil, "{},[]'\""], :"varchar(255)")).must_equal "ARRAY[NULL,'{},[]''\"']::varchar(255)[]"
   end
 
   it "should have Sequel.pg_array method for easy PGArray creation" do
-    @db.literal(Sequel.pg_array([1])).should == 'ARRAY[1]'
-    @db.literal(Sequel.pg_array([1, 2], :int4)).should == 'ARRAY[1,2]::int4[]'
-    @db.literal(Sequel.pg_array([[[1], [2]], [[3], [4]]], :real)).should == 'ARRAY[[[1],[2]],[[3],[4]]]::real[]'
+    @db.literal(Sequel.pg_array([1])).must_equal 'ARRAY[1]'
+    @db.literal(Sequel.pg_array([1, 2], :int4)).must_equal 'ARRAY[1,2]::int4[]'
+    @db.literal(Sequel.pg_array([[[1], [2]], [[3], [4]]], :real)).must_equal 'ARRAY[[[1],[2]],[[3],[4]]]::real[]'
   end
 
   it "should have Sequel.pg_array return existing PGArrays as-is" do
     a = Sequel.pg_array([1])
-    Sequel.pg_array(a).should equal(a)
+    Sequel.pg_array(a).object_id.must_equal(a.object_id)
   end
 
   it "should have Sequel.pg_array create a new PGArrays if type of existing does not match" do
     a = Sequel.pg_array([1], :int4)
     b = Sequel.pg_array(a, :int8)
-    a.should == b
-    a.should_not equal(b)
-    a.array_type.should == :int4
-    b.array_type.should == :int8
+    a.must_equal b
+    a.wont_be_same_as(b)
+    a.array_type.must_equal :int4
+    b.array_type.must_equal :int8
   end
 
   it "should support using arrays as bound variables" do
-    @db.bound_variable_arg(1, nil).should == 1
-    @db.bound_variable_arg(Sequel.pg_array([1,2]), nil).should == '{1,2}'
-    @db.bound_variable_arg([1,2], nil).should == '{1,2}'
-    @db.bound_variable_arg([[1,2]], nil).should == '{{1,2}}'
-    @db.bound_variable_arg([1.0,2.0], nil).should == '{1.0,2.0}'
-    @db.bound_variable_arg([Sequel.lit('a'), Sequel.blob("a\0'\"")], nil).should == '{a,"a\\\\000\\\\047\\""}'
-    @db.bound_variable_arg(["\\ \"", 'NULL', nil], nil).should == '{"\\\\ \\"","NULL",NULL}'
+    @db.bound_variable_arg(1, nil).must_equal 1
+    @db.bound_variable_arg(Sequel.pg_array([1,2]), nil).must_equal '{1,2}'
+    @db.bound_variable_arg([1,2], nil).must_equal '{1,2}'
+    @db.bound_variable_arg([[1,2]], nil).must_equal '{{1,2}}'
+    @db.bound_variable_arg([1.0,2.0], nil).must_equal '{1.0,2.0}'
+    @db.bound_variable_arg([Sequel.lit('a'), Sequel.blob("a\0'\"")], nil).must_equal '{a,"a\\\\000\\\\047\\""}'
+    @db.bound_variable_arg(["\\ \"", 'NULL', nil], nil).must_equal '{"\\\\ \\"","NULL",NULL}'
   end
 
   it "should parse array types from the schema correctly" do
     @db.fetch = [{:name=>'id', :db_type=>'integer'}, {:name=>'i', :db_type=>'integer[]'}, {:name=>'f', :db_type=>'real[]'}, {:name=>'d', :db_type=>'numeric[]'}, {:name=>'t', :db_type=>'text[]'}]
-    @db.schema(:items).map{|e| e[1][:type]}.should == [:integer, :integer_array, :real_array, :decimal_array, :string_array]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:integer, :integer_array, :real_array, :decimal_array, :string_array]
   end
 
   it "should support typecasting of the various array types" do
@@ -228,147 +228,147 @@ describe "pg_array extension" do
 
       [[array_in]].each do |input|
         v = @db.typecast_value(meth, input)
-        v.should == [value]
-        v.first.should be_a_kind_of(klass)
-        v.array_type.should_not be_nil
-        @db.typecast_value(meth, Sequel.pg_array([value])).should == v
-        @db.typecast_value(meth, v).should equal(v)
+        v.must_equal [value]
+        v.first.must_be_kind_of(klass)
+        v.array_type.wont_equal nil
+        @db.typecast_value(meth, Sequel.pg_array([value])).must_equal v
+        @db.typecast_value(meth, v).object_id.must_equal(v.object_id)
       end
 
       [[[array_in]]].each do |input|
         v = @db.typecast_value(meth, input)
-        v.should == [[value]]
-        v.first.first.should be_a_kind_of(klass)
-        v.array_type.should_not be_nil
-        @db.typecast_value(meth, Sequel.pg_array([[value]])).should == v
-        @db.typecast_value(meth, v).should equal(v)
+        v.must_equal [[value]]
+        v.first.first.must_be_kind_of(klass)
+        v.array_type.wont_equal nil
+        @db.typecast_value(meth, Sequel.pg_array([[value]])).must_equal v
+        @db.typecast_value(meth, v).object_id.must_equal(v.object_id)
       end
 
-      @db.literal(@db.typecast_value(meth, [array_in])).should == "ARRAY[#{output}]::#{db_type}[]"
-      @db.literal(@db.typecast_value(meth, [])).should == "'{}'::#{db_type}[]"
+      @db.literal(@db.typecast_value(meth, [array_in])).must_equal "ARRAY[#{output}]::#{db_type}[]"
+      @db.literal(@db.typecast_value(meth, [])).must_equal "'{}'::#{db_type}[]"
     end
-    proc{@db.typecast_value(:integer_array, {})}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:integer_array, {})}.must_raise(Sequel::InvalidValue)
   end
 
   it "should support SQL::AliasMethods" do
-    @db.select(Sequel.pg_array([1], :integer).as(:col1)).sql.should == 'SELECT ARRAY[1]::integer[] AS col1'
+    @db.select(Sequel.pg_array([1], :integer).as(:col1)).sql.must_equal 'SELECT ARRAY[1]::integer[] AS col1'
   end
 
   it "should support registering custom array types" do
     Sequel::Postgres::PGArray.register('foo')
-    @db.typecast_value(:foo_array, []).should be_a_kind_of(Sequel::Postgres::PGArray)
+    @db.typecast_value(:foo_array, []).class.must_equal(Sequel::Postgres::PGArray)
     @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
-    @db.schema(:items).map{|e| e[1][:type]}.should == [:foo_array]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:foo_array]
   end
 
   it "should support registering custom types with :type_symbol option" do
     Sequel::Postgres::PGArray.register('foo', :type_symbol=>:bar)
-    @db.typecast_value(:bar_array, []).should be_a_kind_of(Sequel::Postgres::PGArray)
+    @db.typecast_value(:bar_array, []).class.must_equal(Sequel::Postgres::PGArray)
     @db.fetch = [{:name=>'id', :db_type=>'foo[]'}]
-    @db.schema(:items).map{|e| e[1][:type]}.should == [:bar_array]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:bar_array]
   end
 
   it "should support using a block as a custom conversion proc given as block" do
     Sequel::Postgres::PGArray.register('foo', :oid=>1234){|s| (s*2).to_i}
-    @converter[1234].call('{1}').should == [11]
+    @converter[1234].call('{1}').must_equal [11]
   end
 
   it "should support using a block as a custom conversion proc given as :converter option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>1234, :converter=>proc{|s| (s*2).to_i})
-    @converter[1234].call('{1}').should == [11]
+    @converter[1234].call('{1}').must_equal [11]
   end
 
   it "should support using an existing scaler conversion proc via the :scalar_oid option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>1234, :scalar_oid=>16)
-    @converter[1234].call('{t}').should == [true]
+    @converter[1234].call('{t}').must_equal [true]
   end
 
   it "should support using a given conversion procs hash via the :type_procs option" do
     h = {16=>proc{|s| "!#{s}"}}
     Sequel::Postgres::PGArray.register('foo', :oid=>1234, :scalar_oid=>16, :type_procs=>h)
-    h[1234].call('{t}').should == ["!t"]
+    h[1234].call('{t}').must_equal ["!t"]
   end
 
   it "should support adding methods to the given module via the :typecast_methods_module option" do
     m = Module.new
     Sequel::Postgres::PGArray.register('foo15', :scalar_typecast=>:boolean, :typecast_methods_module=>m)
-    @db.typecast_value(:foo15_array, ['t']).should == ['t']
+    @db.typecast_value(:foo15_array, ['t']).must_equal ['t']
     @db.extend(m)
-    @db.typecast_value(:foo15_array, ['t']).should == [true]
+    @db.typecast_value(:foo15_array, ['t']).must_equal [true]
   end
 
   it "should not raise an error if using :scalar_oid option with unexisting scalar conversion proc" do
     h = {}
     Sequel::Postgres::PGArray.register('foo', :oid=>1234, :scalar_oid=>0, :type_procs=>h)
-    h[1234].call('{t}').should == ["t"]
+    h[1234].call('{t}').must_equal ["t"]
   end
 
   it "should raise an error if using :converter option and a block argument" do
-    proc{Sequel::Postgres::PGArray.register('foo', :converter=>proc{}){}}.should raise_error(Sequel::Error)
+    proc{Sequel::Postgres::PGArray.register('foo', :converter=>proc{}){}}.must_raise(Sequel::Error)
   end
 
   it "should raise an error if using :scalar_oid option and a block argument" do
-    proc{Sequel::Postgres::PGArray.register('foo', :scalar_oid=>16){}}.should raise_error(Sequel::Error)
+    proc{Sequel::Postgres::PGArray.register('foo', :scalar_oid=>16){}}.must_raise(Sequel::Error)
   end
 
   it "should support registering custom types with :oid option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>1)
-    Sequel::Postgres::PG_TYPES[1].call('{1}').should be_a_kind_of(Sequel::Postgres::PGArray)
+    Sequel::Postgres::PG_TYPES[1].call('{1}').class.must_equal(Sequel::Postgres::PGArray)
   end
 
   it "should support registering custom types with :parser=>:json option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>2, :parser=>:json)
-    Sequel::Postgres::PG_TYPES[2].should be_a_kind_of(Sequel::Postgres::PGArray::JSONCreator)
+    Sequel::Postgres::PG_TYPES[2].must_be_kind_of(Sequel::Postgres::PGArray::JSONCreator)
   end
 
   it "should support registering converters with :parser=>:json option and blocks" do
     Sequel::Postgres::PGArray.register('foo', :oid=>4, :parser=>:json){|s| s * 2}
-    Sequel::Postgres::PG_TYPES[4].call('{{1, 2}, {3, 4}}').should == [[2, 4], [6, 8]]
+    Sequel::Postgres::PG_TYPES[4].call('{{1, 2}, {3, 4}}').must_equal [[2, 4], [6, 8]]
   end
 
   it "should support registering custom types with :array_type option" do
     Sequel::Postgres::PGArray.register('foo', :oid=>3, :array_type=>:blah)
-    @db.literal(Sequel::Postgres::PG_TYPES[3].call('{}')).should == "'{}'::blah[]"
+    @db.literal(Sequel::Postgres::PG_TYPES[3].call('{}')).must_equal "'{}'::blah[]"
   end
 
   it "should support registering custom array types on a per-Database basis" do
     @db.register_array_type('banana', :oid=>7865){|s| s}
-    @db.typecast_value(:banana_array, []).should be_a_kind_of(Sequel::Postgres::PGArray)
+    @db.typecast_value(:banana_array, []).class.must_equal(Sequel::Postgres::PGArray)
     @db.fetch = [{:name=>'id', :db_type=>'banana[]'}]
-    @db.schema(:items).map{|e| e[1][:type]}.should == [:banana_array]
-    @db.conversion_procs.should have_key(7865)
-    @db.respond_to?(:typecast_value_banana_array, true).should == true
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana_array]
+    @db.conversion_procs.must_include(7865)
+    @db.respond_to?(:typecast_value_banana_array, true).must_equal true
 
     db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
     db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
     db.extension(:pg_array)
     db.fetch = [{:name=>'id', :db_type=>'banana[]'}]
-    db.schema(:items).map{|e| e[1][:type]}.should == [nil]
-    db.conversion_procs.should_not have_key(7865)
-    db.respond_to?(:typecast_value_banana_array, true).should == false
+    db.schema(:items).map{|e| e[1][:type]}.must_equal [nil]
+    db.conversion_procs.wont_include(7865)
+    db.respond_to?(:typecast_value_banana_array, true).must_equal false
   end
 
   it "should automatically look up the array and scalar oids when registering per-Database types" do
     @db.fetch = [[{:oid=>21, :typarray=>7866}], [{:name=>'id', :db_type=>'banana[]'}]]
     @db.register_array_type('banana', :scalar_typecast=>:integer)
-    @db.sqls.should == ["SELECT typarray, oid FROM pg_type WHERE (typname = 'banana') LIMIT 1"]
-    @db.schema(:items).map{|e| e[1][:type]}.should == [:banana_array]
-    @db.conversion_procs[7866].call("{1,2}").should == [1,2]
-    @db.typecast_value(:banana_array, %w'1 2').should == [1,2]
+    @db.sqls.must_equal ["SELECT typarray, oid FROM pg_type WHERE (typname = 'banana') LIMIT 1"]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana_array]
+    @db.conversion_procs[7866].call("{1,2}").must_equal [1,2]
+    @db.typecast_value(:banana_array, %w'1 2').must_equal [1,2]
   end
 
   it "should not automatically look up oids if given both scalar and array oids" do
     @db.register_array_type('banana', :oid=>7866, :scalar_oid=>21, :scalar_typecast=>:integer)
-    @db.sqls.should == []
-    @db.conversion_procs[7866].call("{1,2}").should == [1,2]
-    @db.typecast_value(:banana_array, %w'1 2').should == [1,2]
+    @db.sqls.must_equal []
+    @db.conversion_procs[7866].call("{1,2}").must_equal [1,2]
+    @db.typecast_value(:banana_array, %w'1 2').must_equal [1,2]
   end
 
   it "should not automatically look up oids if given array oid and block" do
     @db.register_array_type('banana', :oid=>7866, :scalar_typecast=>:integer){|s| s.to_i}
-    @db.sqls.should == []
-    @db.conversion_procs[7866].call("{1,2}").should == [1,2]
-    @db.typecast_value(:banana_array, %w'1 2').should == [1,2]
+    @db.sqls.must_equal []
+    @db.conversion_procs[7866].call("{1,2}").must_equal [1,2]
+    @db.typecast_value(:banana_array, %w'1 2').must_equal [1,2]
   end
 
   it "should set appropriate timestamp conversion procs when resetting conversion procs" do
@@ -376,20 +376,20 @@ describe "pg_array extension" do
     @db.fetch = [[{:oid=>2222, :typname=>'foo'}], [{:oid=>2222, :typarray=>2223, :typname=>'foo'}]]
     @db.reset_conversion_procs
     procs = @db.conversion_procs
-    procs[1185].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
-    procs[1115].call('{"2011-10-20 11:12:13"}').should == [Time.local(2011, 10, 20, 11, 12, 13)]
-    procs[2222].call('1').should == '11'
-    procs[2223].call('{"2"}').should == ['22']
+    procs[1185].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
+    procs[1115].call('{"2011-10-20 11:12:13"}').must_equal [Time.local(2011, 10, 20, 11, 12, 13)]
+    procs[2222].call('1').must_equal '11'
+    procs[2223].call('{"2"}').must_equal ['22']
   end
 
   it "should return correct results for Database#schema_type_class" do
     @db.register_array_type('banana', :oid=>7866, :scalar_typecast=>:integer){|s| s.to_i}
-    @db.schema_type_class(:banana_array).should == Sequel::Postgres::PGArray
-    @db.schema_type_class(:integer).should == Integer
+    @db.schema_type_class(:banana_array).must_equal Sequel::Postgres::PGArray
+    @db.schema_type_class(:integer).must_equal Integer
   end
 
   it "should convert ruby arrays to pg arrays as :default option values" do
     @db.create_table('a'){column :b, 'c[]', :default=>[]; Integer :d}
-    @db.sqls.should == ['CREATE TABLE a (b c[] DEFAULT (ARRAY[]::c[]), d integer)']
+    @db.sqls.must_equal ['CREATE TABLE a (b c[] DEFAULT (ARRAY[]::c[]), d integer)']
   end
 end

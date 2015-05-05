@@ -26,7 +26,7 @@ DB2 = Sequel.connect("#{CONN_PREFIX}#{BIN_SPEC_DB2}")
 File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
 File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
 
-require File.join(File.dirname(File.expand_path(__FILE__)), "rspec_helper.rb")
+require 'minitest/autorun'
 
 describe "bin/sequel" do
   def bin(opts={})
@@ -41,22 +41,20 @@ describe "bin/sequel" do
     File.delete(BIN_SPEC_DB) if File.file?(BIN_SPEC_DB)
     File.delete(BIN_SPEC_DB2) if File.file?(BIN_SPEC_DB2)
     File.delete(TMP_FILE) if File.file?(TMP_FILE)
-  end
-  after(:all) do
     File.delete(OUTPUT) if File.file?(OUTPUT)
   end
   
   it "-h should print the help" do
     help = bin(:args=>"-h", :no_conn=>true)
-    help.should =~ /\ASequel: The Database Toolkit for Ruby/
-    help.should =~ /^Usage: sequel /
+    help.must_match /\ASequel: The Database Toolkit for Ruby/
+    help.must_match /^Usage: sequel /
   end
 
   it "-c should run code" do
-    bin(:args=>'-c "print DB.tables.inspect"').should == '[]'
+    bin(:args=>'-c "print DB.tables.inspect"').must_equal '[]'
     DB.create_table(:a){Integer :a}
-    bin(:args=>'-c "print DB.tables.inspect"').should == '[:a]'
-    bin(:args=>'-v -c "print DB.tables.inspect"').should == "sequel #{Sequel.version}\n[:a]"
+    bin(:args=>'-c "print DB.tables.inspect"').must_equal '[:a]'
+    bin(:args=>'-v -c "print DB.tables.inspect"').strip.must_equal "sequel #{Sequel.version}\n[:a]"
   end
 
   it "-C should copy databases" do
@@ -70,7 +68,7 @@ describe "bin/sequel" do
     end
     DB[:a].insert(1, 'foo')
     DB[:b].insert(1)
-    bin(:args=>'-C', :post=>"#{CONN_PREFIX}#{BIN_SPEC_DB2}").should =~ Regexp.new(<<END)
+    bin(:args=>'-C', :post=>"#{CONN_PREFIX}#{BIN_SPEC_DB2}").must_match Regexp.new(<<END)
 Databases connections successful
 Migrations dumped successfully
 Tables created
@@ -86,15 +84,15 @@ Begin adding foreign key constraints
 Finished adding foreign key constraints
 Database copy finished in \\d\\.\\d+ seconds
 END
-    DB2.tables.sort_by{|t| t.to_s}.should == [:a, :b]
-    DB[:a].all.should == [{:a=>1, :name=>'foo'}]
-    DB[:b].all.should == [{:a=>1}]
-    DB2.schema(:a).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.should == [[:a, false, nil, true, "integer", :integer, nil], [:name, true, nil, false, "varchar(255)", :string, nil]]
-    DB2.schema(:b).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.should == [[:a, true, nil, false, "integer", :integer, nil]]
-    DB2.indexes(:a).should == {}
-    DB2.indexes(:b).should == {:b_a_index=>{:unique=>false, :columns=>[:a]}}
-    DB2.foreign_key_list(:a).should == []
-    DB2.foreign_key_list(:b).should == [{:columns=>[:a], :table=>:a, :key=>nil, :on_update=>:no_action, :on_delete=>:no_action}]
+    DB2.tables.sort_by{|t| t.to_s}.must_equal [:a, :b]
+    DB[:a].all.must_equal [{:a=>1, :name=>'foo'}]
+    DB[:b].all.must_equal [{:a=>1}]
+    DB2.schema(:a).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, false, nil, true, "integer", :integer, nil], [:name, true, nil, false, "varchar(255)", :string, nil]]
+    DB2.schema(:b).map{|col, sch| [col, *sch.values_at(:allow_null, :default, :primary_key, :db_type, :type, :ruby_default)]}.must_equal [[:a, true, nil, false, "integer", :integer, nil]]
+    DB2.indexes(:a).must_equal({})
+    DB2.indexes(:b).must_equal(:b_a_index=>{:unique=>false, :columns=>[:a]})
+    DB2.foreign_key_list(:a).must_equal []
+    DB2.foreign_key_list(:b).must_equal [{:columns=>[:a], :table=>:a, :key=>nil, :on_update=>:no_action, :on_delete=>:no_action}]
   end
 
   it "-d and -D should dump generic and specific migrations" do
@@ -106,7 +104,7 @@ END
       foreign_key :a, :a
       index :a
     end
-    bin(:args=>'-d').should == <<END
+    bin(:args=>'-d').must_equal <<END
 Sequel.migration do
   change do
     create_table(:a) do
@@ -122,7 +120,7 @@ Sequel.migration do
   end
 end
 END
-    bin(:args=>'-D').should == <<END
+    bin(:args=>'-D').must_equal <<END
 Sequel.migration do
   change do
     create_table(:a) do
@@ -141,79 +139,79 @@ END
   end
 
   it "-E should echo SQL statements to stdout" do
-    bin(:args=>'-E -c DB.tables').should =~ %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
+    bin(:args=>'-E -c DB.tables').must_match %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
   end
 
   it "-I should include directory in load path" do
-    bin(:args=>'-Ifoo -c "p 1 if $:.include?(\'foo\')"').should == "1\n"
+    bin(:args=>'-Ifoo -c "p 1 if $:.include?(\'foo\')"').must_equal "1\n"
   end
 
   it "-l should log SQL statements to file" do
-    bin(:args=>"-l #{TMP_FILE} -c DB.tables").should == ''
-    File.read(TMP_FILE).should =~ %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
+    bin(:args=>"-l #{TMP_FILE} -c DB.tables").must_equal ''
+    File.read(TMP_FILE).must_match %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
   end
 
   it "-L should load all *.rb files in given directory" do
-    bin(:args=>'-L ./lib/sequel/connection_pool -c "p [Sequel::SingleConnectionPool, Sequel::ThreadedConnectionPool, Sequel::ShardedSingleConnectionPool, Sequel::ShardedThreadedConnectionPool].length"').should == "4\n"
+    bin(:args=>'-L ./lib/sequel/connection_pool -c "p [Sequel::SingleConnectionPool, Sequel::ThreadedConnectionPool, Sequel::ShardedSingleConnectionPool, Sequel::ShardedThreadedConnectionPool].length"').must_equal "4\n"
   end
 
   it "-m should migrate database up" do
-    bin(:args=>"-m spec/files/integer_migrations").should == ''
-    DB.tables.sort_by{|t| t.to_s}.should == [:schema_info, :sm1111, :sm2222, :sm3333]
+    bin(:args=>"-m spec/files/integer_migrations").must_equal ''
+    DB.tables.sort_by{|t| t.to_s}.must_equal [:schema_info, :sm1111, :sm2222, :sm3333]
   end
 
   it "-M should specify version to migrate to" do
-    bin(:args=>"-m spec/files/integer_migrations -M 2").should == ''
-    DB.tables.sort_by{|t| t.to_s}.should == [:schema_info, :sm1111, :sm2222]
+    bin(:args=>"-m spec/files/integer_migrations -M 2").must_equal ''
+    DB.tables.sort_by{|t| t.to_s}.must_equal [:schema_info, :sm1111, :sm2222]
   end
 
   it "-N should not test for a valid connection" do
-    bin(:no_conn=>true, :args=>"-c '' -N #{CONN_PREFIX}spec/nonexistent/foo").should == ''
-    bin(:no_conn=>true, :args=>"-c '' #{CONN_PREFIX}spec/nonexistent/foo", :stderr=>true).should =~ /\AError: Sequel::DatabaseConnectionError: /
+    bin(:no_conn=>true, :args=>"-c '' -N #{CONN_PREFIX}spec/nonexistent/foo").must_equal ''
+    bin(:no_conn=>true, :args=>"-c '' #{CONN_PREFIX}spec/nonexistent/foo", :stderr=>true).must_match /\AError: Sequel::DatabaseConnectionError: /
   end
 
   it "-r should require a given library" do
-    bin(:args=>'-rsequel/extensions/sql_expr -c "print DB.literal(1.sql_expr)"').should == "1"
+    bin(:args=>'-rsequel/extensions/sql_expr -c "print DB.literal(1.sql_expr)"').must_equal "1"
   end
 
   it "-S should dump the schema cache" do
-    bin(:args=>"-S #{TMP_FILE}").should == ''
-    Marshal.load(File.read(TMP_FILE)).should == {}
+    bin(:args=>"-S #{TMP_FILE}").must_equal ''
+    Marshal.load(File.read(TMP_FILE)).must_equal({})
     DB.create_table(:a){Integer :a}
-    bin(:args=>"-S #{TMP_FILE}").should == ''
-    Marshal.load(File.read(TMP_FILE)).should == {"`a`"=>[[:a, {:type=>:integer, :db_type=>"integer", :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false}]]}
+    bin(:args=>"-S #{TMP_FILE}").must_equal ''
+    Marshal.load(File.read(TMP_FILE)).must_equal("`a`"=>[[:a, {:type=>:integer, :db_type=>"integer", :ruby_default=>nil, :allow_null=>true, :default=>nil, :primary_key=>false}]])
   end
 
   it "-t should output full backtraces on error" do
-    bin(:args=>'-c "lambda{lambda{lambda{raise \'foo\'}.call}.call}.call"', :stderr=>true).count("\n").should < 3
-    bin(:args=>'-t -c "lambda{lambda{lambda{raise \'foo\'}.call}.call}.call"', :stderr=>true).count("\n").should > 3
+    bin(:args=>'-c "lambda{lambda{lambda{raise \'foo\'}.call}.call}.call"', :stderr=>true).count("\n").must_be :<,  3
+    bin(:args=>'-t -c "lambda{lambda{lambda{raise \'foo\'}.call}.call}.call"', :stderr=>true).count("\n").must_be :>,  3
   end
 
   it "-v should output the Sequel version and exit if database is not given" do
-    bin(:args=>"-v", :no_conn=>true).should == "sequel #{Sequel.version}\n"
+    bin(:args=>"-v", :no_conn=>true).strip.must_equal "sequel #{Sequel.version}"
   end
 
   it "should error if using -M without -m" do
-    bin(:args=>'-M 2', :stderr=>true).should == "Error: Must specify -m if using -M\n"
+    bin(:args=>'-M 2', :stderr=>true).must_equal "Error: Must specify -m if using -M\n"
   end
 
   it "should error if using mutually exclusive options together" do
-    bin(:args=>'-c foo -d', :stderr=>true).should == "Error: Cannot specify -c and -d together\n"
-    bin(:args=>'-D -d', :stderr=>true).should == "Error: Cannot specify -D and -d together\n"
-    bin(:args=>'-m foo -d', :stderr=>true).should == "Error: Cannot specify -m and -d together\n"
-    bin(:args=>'-S foo -d', :stderr=>true).should == "Error: Cannot specify -S and -d together\n"
-    bin(:args=>'-S foo -C', :stderr=>true).should == "Error: Cannot specify -S and -C together\n"
+    bin(:args=>'-c foo -d', :stderr=>true).must_equal "Error: Cannot specify -c and -d together\n"
+    bin(:args=>'-D -d', :stderr=>true).must_equal "Error: Cannot specify -D and -d together\n"
+    bin(:args=>'-m foo -d', :stderr=>true).must_equal "Error: Cannot specify -m and -d together\n"
+    bin(:args=>'-S foo -d', :stderr=>true).must_equal "Error: Cannot specify -S and -d together\n"
+    bin(:args=>'-S foo -C', :stderr=>true).must_equal "Error: Cannot specify -S and -C together\n"
   end
 
   it "should use a mock database if no database is given" do
-    bin(:args=>'-c "print DB.adapter_scheme"', :no_conn=>true).should == "mock"
+    bin(:args=>'-c "print DB.adapter_scheme"', :no_conn=>true).must_equal "mock"
   end
 
   it "should work with a yaml config file" do
     File.open(TMP_FILE, 'wb'){|f| f.write(YAML.dump(CONN_HASH))}
-    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).should == "[]"
+    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).must_equal "[]"
     DB.create_table(:a){Integer :a}
-    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).should == "[:a]"
+    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).must_equal "[:a]"
   end
 
   it "should work with a yaml config file with string keys" do
@@ -221,36 +219,36 @@ END
     CONN_HASH.each{|k,v| h[k.to_s] = v}
     File.open(TMP_FILE, 'wb'){|f| f.write(YAML.dump(h))}
     DB.create_table(:a){Integer :a}
-    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).should == "[:a]"
+    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).must_equal "[:a]"
   end
 
   it "should work with a yaml config file with environments" do
     File.open(TMP_FILE, 'wb'){|f| f.write(YAML.dump(:development=>CONN_HASH))}
-    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).should == "[]"
+    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).must_equal "[]"
     DB.create_table(:a){Integer :a}
-    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).should == "[:a]"
+    bin(:args=>"-c \"print DB.tables.inspect\" #{TMP_FILE}", :no_conn=>true).must_equal "[:a]"
   end
 
   it "-e should set environment for yaml config file" do
     File.open(TMP_FILE, 'wb'){|f| f.write(YAML.dump(:foo=>CONN_HASH))}
-    bin(:args=>"-c \"print DB.tables.inspect\" -e foo #{TMP_FILE}", :no_conn=>true).should == "[]"
+    bin(:args=>"-c \"print DB.tables.inspect\" -e foo #{TMP_FILE}", :no_conn=>true).must_equal "[]"
     DB.create_table(:a){Integer :a}
-    bin(:args=>"-c \"print DB.tables.inspect\" -e foo #{TMP_FILE}", :no_conn=>true).should == "[:a]"
+    bin(:args=>"-c \"print DB.tables.inspect\" -e foo #{TMP_FILE}", :no_conn=>true).must_equal "[:a]"
     File.open(TMP_FILE, 'wb'){|f| f.write(YAML.dump('foo'=>CONN_HASH))}
-    bin(:args=>"-c \"print DB.tables.inspect\" -e foo #{TMP_FILE}", :no_conn=>true).should == "[:a]"
+    bin(:args=>"-c \"print DB.tables.inspect\" -e foo #{TMP_FILE}", :no_conn=>true).must_equal "[:a]"
   end
 
   it "should run code in given filenames" do
     File.open(TMP_FILE, 'wb'){|f| f.write('print DB.tables.inspect')}
-    bin(:post=>TMP_FILE).should == '[]'
+    bin(:post=>TMP_FILE).must_equal '[]'
     DB.create_table(:a){Integer :a}
-    bin(:post=>TMP_FILE).should == '[:a]'
-    bin(:post=>TMP_FILE, :args=>'-v').should == "sequel #{Sequel.version}\n[:a]"
+    bin(:post=>TMP_FILE).must_equal '[:a]'
+    bin(:post=>TMP_FILE, :args=>'-v').strip.must_equal "sequel #{Sequel.version}\n[:a]"
   end
 
   it "should run code provided on stdin" do
-    bin(:pre=>'echo print DB.tables.inspect | ').should == '[]'
+    bin(:pre=>'echo print DB.tables.inspect | ').must_equal '[]'
     DB.create_table(:a){Integer :a}
-    bin(:pre=>'echo print DB.tables.inspect | ').should == '[:a]'
+    bin(:pre=>'echo print DB.tables.inspect | ').must_equal '[:a]'
   end
 end

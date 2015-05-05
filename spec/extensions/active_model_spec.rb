@@ -24,7 +24,7 @@ rescue LoadError => e
   skip_warn "active_model plugin: can't load active_model (#{e.class}: #{e})"
 else
 describe "ActiveModel plugin" do
-  specify "should be compliant to the ActiveModel spec" do
+  it "should be compliant to the ActiveModel spec" do
     tc = Class.new(test_class)
     tc.class_eval do
       define_method(:setup) do
@@ -53,7 +53,7 @@ describe "ActiveModel plugin" do
 
       # Should return self, not a proxy object
       def test__to_model
-        assert_equal @m.to_model.object_id.should, @m.object_id
+        assert_equal @m.to_model.object_id, @m.object_id
       end
       
       def test__to_key
@@ -116,7 +116,7 @@ describe "ActiveModel plugin" do
       if res.failure_count > 0
         puts res.instance_variable_get(:@failures)
       end
-      res.failure_count.should == 0
+      res.failure_count.must_equal 0
     end
   end
 end 

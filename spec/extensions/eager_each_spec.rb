@@ -15,12 +15,12 @@ describe "Sequel::Plugins::EagerEach" do
     ds._fetch = [{:id=>1, :parent_id=>nil}, {:id=>2, :parent_id=>nil}]
     @c.dataset._fetch = [{:id=>3, :parent_id=>1}, {:id=>4, :parent_id=>1}, {:id=>5, :parent_id=>2}, {:id=>6, :parent_id=>2}]
     ds.each{|c| a << c}
-    a.should == [@c.load(:id=>1, :parent_id=>nil), @c.load(:id=>2, :parent_id=>nil)]
-    a.map{|c| c.associations[:children]}.should == [[@c.load(:id=>3, :parent_id=>1), @c.load(:id=>4, :parent_id=>1)], [@c.load(:id=>5, :parent_id=>2), @c.load(:id=>6, :parent_id=>2)]]
+    a.must_equal [@c.load(:id=>1, :parent_id=>nil), @c.load(:id=>2, :parent_id=>nil)]
+    a.map{|c| c.associations[:children]}.must_equal [[@c.load(:id=>3, :parent_id=>1), @c.load(:id=>4, :parent_id=>1)], [@c.load(:id=>5, :parent_id=>2), @c.load(:id=>6, :parent_id=>2)]]
     sqls = @c.db.sqls
-    sqls.shift.should == 'SELECT * FROM items'
+    sqls.shift.must_equal 'SELECT * FROM items'
     ['SELECT * FROM items WHERE (items.parent_id IN (1, 2))', 
-     'SELECT * FROM items WHERE (items.parent_id IN (2, 1))'].should include(sqls.pop)
+     'SELECT * FROM items WHERE (items.parent_id IN (2, 1))'].must_include(sqls.pop)
   end
 
   it "should make #each on an eager_graph dataset do eager loading" do
@@ -29,14 +29,14 @@ describe "Sequel::Plugins::EagerEach" do
     ds._fetch = []
     ds._fetch = [{:id=>1, :parent_id=>nil, :children_id=>3, :children_parent_id=>1}, {:id=>1, :parent_id=>nil, :children_id=>4, :children_parent_id=>1}, {:id=>2, :parent_id=>nil, :children_id=>5, :children_parent_id=>2}, {:id=>2, :parent_id=>nil, :children_id=>6, :children_parent_id=>2}]
     ds.each{|c| a << c}
-    a.should == [@c.load(:id=>1, :parent_id=>nil), @c.load(:id=>2, :parent_id=>nil)]
-    a.map{|c| c.associations[:children]}.should == [[@c.load(:id=>3, :parent_id=>1), @c.load(:id=>4, :parent_id=>1)], [@c.load(:id=>5, :parent_id=>2), @c.load(:id=>6, :parent_id=>2)]]
-    @c.db.sqls.should == ['SELECT items.id, items.parent_id, children.id AS children_id, children.parent_id AS children_parent_id FROM items LEFT OUTER JOIN items AS children ON (children.parent_id = items.id)']
+    a.must_equal [@c.load(:id=>1, :parent_id=>nil), @c.load(:id=>2, :parent_id=>nil)]
+    a.map{|c| c.associations[:children]}.must_equal [[@c.load(:id=>3, :parent_id=>1), @c.load(:id=>4, :parent_id=>1)], [@c.load(:id=>5, :parent_id=>2), @c.load(:id=>6, :parent_id=>2)]]
+    @c.db.sqls.must_equal ['SELECT items.id, items.parent_id, children.id AS children_id, children.parent_id AS children_parent_id FROM items LEFT OUTER JOIN items AS children ON (children.parent_id = items.id)']
   end
 
   it "should not attempt to eager load when getting the columns" do
     ds = @c.eager(:children)
     def ds.all; raise; end
-    proc{ds.columns!}.should_not raise_error
+    ds.columns!
   end
 end

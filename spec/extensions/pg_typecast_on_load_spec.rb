@@ -10,54 +10,54 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
     @c.plugin :pg_typecast_on_load, :b, :y
   end 
 
-  specify "should call the database conversion proc for all given columns" do
-    @c.first.values.should == {:id=>1, :b=>true, :y=>0}
+  it "should call the database conversion proc for all given columns" do
+    @c.first.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  specify "should call the database conversion proc with value when reloading the object, for all given columns" do
-    @c.first.refresh.values.should == {:id=>1, :b=>true, :y=>0}
+  it "should call the database conversion proc with value when reloading the object, for all given columns" do
+    @c.first.refresh.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  specify "should not fail if schema oid does not have a related conversion proc" do
+  it "should not fail if schema oid does not have a related conversion proc" do
     @c.db_schema[:b][:oid] = 0
-    @c.first.refresh.values.should == {:id=>1, :b=>"t", :y=>0}
+    @c.first.refresh.values.must_equal(:id=>1, :b=>"t", :y=>0)
   end
 
-  specify "should call the database conversion proc with value when automatically reloading the object on creation via insert_select" do
+  it "should call the database conversion proc with value when automatically reloading the object on creation via insert_select" do
     @c.dataset.meta_def(:insert_select){|h| insert(h); first}
-    @c.create.values.should == {:id=>1, :b=>true, :y=>0}
+    @c.create.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  specify "should allowing setting columns separately via add_pg_typecast_on_load_columns" do
+  it "should allowing setting columns separately via add_pg_typecast_on_load_columns" do
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.plugin :pg_typecast_on_load
-    @c.first.values.should == {:id=>1, :b=>"t", :y=>"0"}
+    @c.first.values.must_equal(:id=>1, :b=>"t", :y=>"0")
     @c.add_pg_typecast_on_load_columns :b
-    @c.first.values.should == {:id=>1, :b=>true, :y=>"0"}
+    @c.first.values.must_equal(:id=>1, :b=>true, :y=>"0")
     @c.add_pg_typecast_on_load_columns :y
-    @c.first.values.should == {:id=>1, :b=>true, :y=>0}
+    @c.first.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 
-  specify "should work with subclasses" do
+  it "should work with subclasses" do
     @c = Class.new(Sequel::Model(@db[:items]))
     @c.plugin :pg_typecast_on_load
-    @c.first.values.should == {:id=>1, :b=>"t", :y=>"0"}
+    @c.first.values.must_equal(:id=>1, :b=>"t", :y=>"0")
 
     c1 = Class.new(@c)
     @c.add_pg_typecast_on_load_columns :b
-    @c.first.values.should == {:id=>1, :b=>true, :y=>"0"}
-    c1.first.values.should == {:id=>1, :b=>"t", :y=>"0"}
+    @c.first.values.must_equal(:id=>1, :b=>true, :y=>"0")
+    c1.first.values.must_equal(:id=>1, :b=>"t", :y=>"0")
 
     c2 = Class.new(@c)
     @c.add_pg_typecast_on_load_columns :y
-    @c.first.values.should == {:id=>1, :b=>true, :y=>0}
-    c2.first.values.should == {:id=>1, :b=>true, :y=>"0"}
+    @c.first.values.must_equal(:id=>1, :b=>true, :y=>0)
+    c2.first.values.must_equal(:id=>1, :b=>true, :y=>"0")
     
     c1.add_pg_typecast_on_load_columns :y
-    c1.first.values.should == {:id=>1, :b=>"t", :y=>0}
+    c1.first.values.must_equal(:id=>1, :b=>"t", :y=>0)
   end
 
-  specify "should not mark the object as modified" do
-    @c.first.modified?.should == false
+  it "should not mark the object as modified" do
+    @c.first.modified?.must_equal false
   end
 end

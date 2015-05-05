@@ -10,21 +10,21 @@ describe "Composition plugin" do
   end
   
   it ".composition should add compositions" do
-    @o.should_not respond_to(:date)
+    @o.wont_respond_to(:date)
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @o.date.should == Date.new(1, 2, 3)
+    @o.date.must_equal Date.new(1, 2, 3)
   end
 
   it "loading the plugin twice should not remove existing compositions" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @c.plugin :composition
-    @c.compositions.keys.should == [:date]
+    @c.compositions.keys.must_equal [:date]
   end
 
   it ".composition should raise an error if :composer and :decomposer options are not present and :mapping option is not provided" do
-    proc{@c.composition :date}.should raise_error(Sequel::Error)
-    proc{@c.composition :date, :composer=>proc{}, :decomposer=>proc{}}.should_not raise_error
-    proc{@c.composition :date, :mapping=>[]}.should_not raise_error
+    proc{@c.composition :date}.must_raise(Sequel::Error)
+    @c.composition :date, :composer=>proc{}, :decomposer=>proc{}
+    @c.composition :date, :mapping=>[]
   end
 
   it "should handle validations of underlying columns" do
@@ -33,45 +33,45 @@ describe "Composition plugin" do
     def o.validate
       [:year, :month, :day].each{|c| errors.add(c, "not present") unless send(c)}
     end
-    o.valid?.should == false
+    o.valid?.must_equal false
     o.date = Date.new(1, 2, 3)
-    o.valid?.should == true
+    o.valid?.must_equal true
   end
 
   it "should set column values even when not validating" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @c.load({}).set(:date=>Date.new(4, 8, 12)).save(:validate=>false)
     sql = DB.sqls.last
-    sql.should include("year = 4")
-    sql.should include("month = 8")
-    sql.should include("day = 12")
+    sql.must_include("year = 4")
+    sql.must_include("month = 8")
+    sql.must_include("day = 12")
   end
 
   it ".compositions should return the reflection hash of compositions" do
-    @c.compositions.should == {}
+    @c.compositions.must_equal({})
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @c.compositions.keys.should == [:date]
+    @c.compositions.keys.must_equal [:date]
     r = @c.compositions.values.first
-    r[:mapping].should == [:year, :month, :day]
-    r[:composer].should be_a_kind_of(Proc)
-    r[:decomposer].should be_a_kind_of(Proc)
+    r[:mapping].must_equal [:year, :month, :day]
+    assert_kind_of Proc, r[:composer]
+    assert_kind_of Proc, r[:decomposer]
   end
 
   it "#compositions should be a hash of cached values of compositions" do
-    @o.compositions.should == {}
+    @o.compositions.must_equal({})
     @c.composition :date, :mapping=>[:year, :month, :day]
     @o.date
-    @o.compositions.should == {:date=>Date.new(1, 2, 3)}
+    @o.compositions.must_equal(:date=>Date.new(1, 2, 3))
   end
 
   it "should work with custom :composer and :decomposer options" do
     @c.composition :date, :composer=>proc{Date.new(year+1, month+2, day+3)}, :decomposer=>proc{[:year, :month, :day].each{|s| self.send("#{s}=", date.send(s) * 2)}}
-    @o.date.should == Date.new(2, 4, 6)
+    @o.date.must_equal Date.new(2, 4, 6)
     @o.save
     sql = DB.sqls.last
-    sql.should include("year = 4")
-    sql.should include("month = 8")
-    sql.should include("day = 12")
+    sql.must_include("year = 4")
+    sql.must_include("month = 8")
+    sql.must_include("day = 12")
   end
 
   it "should allow call super in composition getter and setter method definition in class" do
@@ -84,75 +84,75 @@ describe "Composition plugin" do
         super(v - 3)
       end
     end
-    @o.date.should == Date.new(1, 2, 4)
-    @o.compositions[:date].should == Date.new(1, 2, 3)
+    @o.date.must_equal Date.new(1, 2, 4)
+    @o.compositions[:date].must_equal Date.new(1, 2, 3)
     @o.date = Date.new(1, 3, 5)
-    @o.compositions[:date].should == Date.new(1, 3, 2)
-    @o.date.should == Date.new(1, 3, 3)
+    @o.compositions[:date].must_equal Date.new(1, 3, 2)
+    @o.date.must_equal Date.new(1, 3, 3)
   end
 
   it "should mark the object as modified whenever the composition is set" do
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @o.modified?.should == false
+    @o.modified?.must_equal false
     @o.date = Date.new(3, 4, 5)
-    @o.modified?.should == true
+    @o.modified?.must_equal true
   end
 
   it "should only decompose existing compositions" do
     called = false
     @c.composition :date, :composer=>proc{}, :decomposer=>proc{called = true}
-    called.should == false
+    called.must_equal false
     @o.save
-    called.should == false
+    called.must_equal false
     @o.date = Date.new(1,2,3)
-    called.should == false
+    called.must_equal false
     @o.save_changes
-    called.should == true
+    called.must_equal true
   end
 
   it "should clear compositions cache when refreshing" do
     @c.composition :date, :composer=>proc{}, :decomposer=>proc{}
     @o.date = Date.new(3, 4, 5)
     @o.refresh
-    @o.compositions.should == {}
+    @o.compositions.must_equal({})
   end
 
   it "should not clear compositions cache when refreshing after save" do
     @c.composition :date, :composer=>proc{}, :decomposer=>proc{}
-    @c.create(:date=>Date.new(3, 4, 5)).compositions.should == {:date=>Date.new(3, 4, 5)}
+    @c.create(:date=>Date.new(3, 4, 5)).compositions.must_equal(:date=>Date.new(3, 4, 5))
   end
 
   it "should not clear compositions cache when saving with insert_select" do
     def (@c.instance_dataset).supports_insert_select?() true end
     def (@c.instance_dataset).insert_select(*) {:id=>1} end
     @c.composition :date, :composer=>proc{}, :decomposer=>proc{}
-    @c.create(:date=>Date.new(3, 4, 5)).compositions.should == {:date=>Date.new(3, 4, 5)}
+    @c.create(:date=>Date.new(3, 4, 5)).compositions.must_equal(:date=>Date.new(3, 4, 5))
   end
 
   it "should instantiate compositions lazily" do
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @o.compositions.should == {}
+    @o.compositions.must_equal({})
     @o.date
-    @o.compositions.should == {:date=>Date.new(1,2,3)}
+    @o.compositions.must_equal(:date=>Date.new(1,2,3))
   end
 
   it "should cache value of composition" do
     times = 0
     @c.composition :date, :composer=>proc{times+=1}, :decomposer=>proc{}
-    times.should == 0
+    times.must_equal 0
     @o.date
-    times.should == 1
+    times.must_equal 1
     @o.date
-    times.should == 1
+    times.must_equal 1
   end
 
   it ":class option should take an string, symbol, or class" do
     @c.composition :date1, :class=>'Date', :mapping=>[:year, :month, :day]
     @c.composition :date2, :class=>:Date, :mapping=>[:year, :month, :day]
     @c.composition :date3, :class=>Date, :mapping=>[:year, :month, :day]
-    @o.date1.should == Date.new(1, 2, 3)
-    @o.date2.should == Date.new(1, 2, 3)
-    @o.date3.should == Date.new(1, 2, 3)
+    @o.date1.must_equal Date.new(1, 2, 3)
+    @o.date2.must_equal Date.new(1, 2, 3)
+    @o.date3.must_equal Date.new(1, 2, 3)
   end
 
   it ":mapping option should work with a single array of symbols" do
@@ -168,13 +168,13 @@ describe "Composition plugin" do
       end
     end
     @c.composition :date, :class=>c, :mapping=>[:year, :month]
-    @o.date.year.should == 2
-    @o.date.month.should == 6
+    @o.date.year.must_equal 2
+    @o.date.month.must_equal 6
     @o.date = c.new(3, 4)
     @o.save
     sql = DB.sqls.last
-    sql.should include("year = 6")
-    sql.should include("month = 12")
+    sql.must_include("year = 6")
+    sql.must_include("month = 12")
   end
 
   it ":mapping option should work with an array of two pairs of symbols" do
@@ -190,18 +190,18 @@ describe "Composition plugin" do
       end
     end
     @c.composition :date, :class=>c, :mapping=>[[:year, :y], [:month, :m]]
-    @o.date.y.should == 2
-    @o.date.m.should == 6
+    @o.date.y.must_equal 2
+    @o.date.m.must_equal 6
     @o.date = c.new(3, 4)
     @o.save
     sql = DB.sqls.last
-    sql.should include("year = 6")
-    sql.should include("month = 12")
+    sql.must_include("year = 6")
+    sql.must_include("month = 12")
   end
 
   it ":mapping option :composer should return nil if all values are nil" do
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @c.new.date.should == nil
+    @c.new.date.must_equal nil
   end
 
   it ":mapping option :decomposer should set all related fields to nil if nil" do
@@ -209,34 +209,34 @@ describe "Composition plugin" do
     @o.date = nil
     @o.save
     sql = DB.sqls.last
-    sql.should include("year = NULL")
-    sql.should include("month = NULL")
-    sql.should include("day = NULL")
+    sql.must_include("year = NULL")
+    sql.must_include("month = NULL")
+    sql.must_include("day = NULL")
   end
 
   it "should work with frozen instances" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @o.freeze
-    @o.date.should == Date.new(1, 2, 3)
-    proc{@o.date = Date.today}.should raise_error
+    @o.date.must_equal Date.new(1, 2, 3)
+    proc{@o.date = Date.today}.must_raise FrozenError
   end
 
   it "should have #dup duplicate compositions" do
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @o.date.should == Date.new(1, 2, 3)
-    @o.dup.compositions.should == @o.compositions
-    @o.dup.compositions.should_not equal(@o.compositions)
+    @o.date.must_equal Date.new(1, 2, 3)
+    @o.dup.compositions.must_equal @o.compositions
+    @o.dup.compositions.wont_be_same_as(@o.compositions)
   end
 
   it "should work correctly with subclasses" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     c = Class.new(@c)
     o = c.load(:id=>1, :year=>1, :month=>2, :day=>3)
-    o.date.should == Date.new(1, 2, 3)
+    o.date.must_equal Date.new(1, 2, 3)
     o.save
     sql = DB.sqls.last
-    sql.should include("year = 1")
-    sql.should include("month = 2")
-    sql.should include("day = 3")
+    sql.must_include("year = 1")
+    sql.must_include("month = 2")
+    sql.must_include("day = 3")
   end
 end

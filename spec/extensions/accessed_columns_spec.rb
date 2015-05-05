@@ -10,42 +10,42 @@ describe "accessed_columns plugin" do
   end
 
   it "should record columns accessed" do
-    @o.accessed_columns.should == []
+    @o.accessed_columns.must_equal []
     @o.name
-    @o.accessed_columns.should == [:name]
+    @o.accessed_columns.must_equal [:name]
     @o.name
-    @o.accessed_columns.should == [:name]
+    @o.accessed_columns.must_equal [:name]
     @o.b
-    @o.accessed_columns.sort_by{|s| s.to_s}.should == [:b, :name]
+    @o.accessed_columns.sort_by{|s| s.to_s}.must_equal [:b, :name]
   end
 
   it "should clear accessed columns when refreshing" do
     @o.name
     @o.refresh
-    @o.accessed_columns.should == []
+    @o.accessed_columns.must_equal []
   end
 
   it "should clear accessed columns when saving" do
     @o.name
     @o.save
-    @o.accessed_columns.should == []
+    @o.accessed_columns.must_equal []
   end
 
   it "should work when duping and cloning instances" do
     @o.name
     o = @o.dup
-    @o.accessed_columns.should == [:name]
+    @o.accessed_columns.must_equal [:name]
     @o.b
-    @o.accessed_columns.sort_by{|s| s.to_s}.should == [:b, :name]
-    o.accessed_columns.should == [:name]
+    @o.accessed_columns.sort_by{|s| s.to_s}.must_equal [:b, :name]
+    o.accessed_columns.must_equal [:name]
     o2 = o.clone
     o2.refresh
-    o.accessed_columns.should == [:name]
-    o2.accessed_columns.should == []
+    o.accessed_columns.must_equal [:name]
+    o2.accessed_columns.must_equal []
   end
 
   it "should not raise exceptions when object is frozen" do
     @o.freeze
-    proc{@o.name}.should_not raise_error
+    @o.name
   end
 end

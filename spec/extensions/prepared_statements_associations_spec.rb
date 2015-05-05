@@ -29,30 +29,30 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @db.sqls
   end
 
-  specify "should run correct SQL for associations" do
+  it "should run correct SQL for associations" do
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) -- prepared"]
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) -- prepared"]
 
     @Artist.load(:id=>1).album
-    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2).artist
-    @db.sqls.should == ["SELECT id, id2 FROM artists WHERE (artists.id = 2) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT id, id2 FROM artists WHERE (artists.id = 2) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2).tags
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2).tag
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) LIMIT 1 -- prepared"]
 
     @Artist.load(:id=>1).tags
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) -- prepared"]
 
     @Artist.load(:id=>1).tag
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
   end
 
-  specify "should run correct SQL for composite key associations" do
+  it "should run correct SQL for composite key associations" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>[:artist_id, :artist_id2], :primary_key=>[:id, :id2]
     @Artist.one_to_one :album, :class=>@Album, :key=>[:artist_id, :artist_id2], :primary_key=>[:id, :id2]
     @Album.many_to_one :artist, :class=>@Artist, :key=>[:artist_id, :artist_id2], :primary_key=>[:id, :id2]
@@ -63,97 +63,97 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @Artist.one_through_many :tag, :clone=>:tags
 
     @Artist.load(:id=>1, :id2=>2).albums
-    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
 
     @Artist.load(:id=>1, :id2=>2).album
-    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2, :artist_id2=>3).artist
-    @db.sqls.should == ["SELECT id, id2 FROM artists WHERE ((artists.id = 2) AND (artists.id2 = 3)) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT id, id2 FROM artists WHERE ((artists.id = 2) AND (artists.id2 = 3)) LIMIT 1 -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2, :id2=>3).tags
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) -- prepared"]
 
     @Album.load(:id=>1, :artist_id=>2, :id2=>3).tag
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) WHERE ((albums_tags.album_id = 1) AND (albums_tags.album_id2 = 3)) LIMIT 1 -- prepared"]
 
     @Artist.load(:id=>1, :id2=>2).tags
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) -- prepared"]
 
     @Artist.load(:id=>1, :id2=>2).tag
-    @db.sqls.should == ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON ((albums_tags.tag_id = tags.id) AND (albums_tags.tag_id2 = tags.id2)) INNER JOIN albums ON ((albums.id = albums_tags.album_id) AND (albums.id2 = albums_tags.album_id2)) WHERE ((albums.artist_id = 1) AND (albums.artist_id2 = 2)) LIMIT 1 -- prepared"]
   end
 
-  specify "should not run query if no objects can be associated" do
-    @Artist.new.albums.should == []
-    @Album.new.artist.should == nil
-    @db.sqls.should == []
+  it "should not run query if no objects can be associated" do
+    @Artist.new.albums.must_equal []
+    @Album.new.artist.must_equal nil
+    @db.sqls.must_equal []
   end
 
-  specify "should run a regular query if not caching association metadata" do
+  it "should run a regular query if not caching association metadata" do
     @Artist.cache_associations = false
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
     @Artist.load(:id=>1).album
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
   end
 
-  specify "should run a regular query if there is a callback" do
+  it "should run a regular query if there is a callback" do
     @Artist.load(:id=>1).albums(proc{|ds| ds})
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
     @Artist.load(:id=>1).album(proc{|ds| ds})
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
   end
 
-  specify "should run a regular query if :prepared_statement=>false option is used for the association" do
+  it "should run a regular query if :prepared_statement=>false option is used for the association" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :prepared_statement=>false
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
 
-  specify "should run a regular query if unrecognized association is used" do
+  it "should run a regular query if unrecognized association is used" do
     a = @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
     a[:type] = :foo
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
 
-  specify "should run a regular query if a block is used when defining the association" do
+  it "should run a regular query if a block is used when defining the association" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id do |ds| ds end
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
 
-  specify "should use a prepared statement if the associated dataset has conditions" do
+  it "should use a prepared statement if the associated dataset has conditions" do
     @Album.dataset = @Album.dataset.where(:a=>2)
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
-  specify "should use a prepared statement if the :conditions association option" do
+  it "should use a prepared statement if the :conditions association option" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{:a=>2} 
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
-  specify "should not use a prepared statement if :conditions association option uses an identifier" do
+  it "should not use a prepared statement if :conditions association option uses an identifier" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :conditions=>{Sequel.identifier('a')=>2}
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE ((a = 2) AND (albums.artist_id = 1)) -- prepared"]
   end
 
-  specify "should run a regular query if :dataset option is used when defining the association" do
+  it "should run a regular query if :dataset option is used when defining the association" do
     album = @Album
     @Artist.one_to_many :albums, :class=>@Album, :dataset=>proc{album.filter(:artist_id=>id)} 
     @Artist.load(:id=>1).albums
-    @db.sqls.should == ["SELECT * FROM albums WHERE (artist_id = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (artist_id = 1)"]
   end
 
-  specify "should run a regular query if :cloning an association that doesn't used prepared statements" do
+  it "should run a regular query if :cloning an association that doesn't used prepared statements" do
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id do |ds| ds end
     @Artist.one_to_many :oalbums, :clone=>:albums
     @Artist.load(:id=>1).oalbums
-    @db.sqls.should == ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
 end

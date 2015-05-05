@@ -11,10 +11,10 @@ describe "Sequel::Plugins::UnlimitedUpdate" do
 
   it "should remove limit from update dataset" do
     @o.save
-    @db.sqls.should == ["UPDATE test SET name = 'a' WHERE (id = 1) LIMIT 1"]
+    @db.sqls.must_equal ["UPDATE test SET name = 'a' WHERE (id = 1) LIMIT 1"]
 
     @c.plugin :unlimited_update
     @o.save
-    @db.sqls.should == ["UPDATE test SET name = 'a' WHERE (id = 1)"]
+    @db.sqls.must_equal ["UPDATE test SET name = 'a' WHERE (id = 1)"]
   end
 end

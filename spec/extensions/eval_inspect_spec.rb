@@ -9,7 +9,7 @@ describe "eval_inspect extension" do
     @ds.meta_def(:literal_blob_append){|sql, s| sql << "X'#{s}'"}
   end
 
-  specify "should make eval(obj.inspect) == obj for all Sequel::SQL::Expression subclasses" do
+  it "should make eval(obj.inspect) == obj for all Sequel::SQL::Expression subclasses" do
     [
       # Objects with components where eval(inspect) == self
       Sequel::SQL::AliasedExpression.new(:b, :a),
@@ -66,8 +66,8 @@ describe "eval_inspect extension" do
       Sequel::SQL::AliasedExpression.new(Sequel::CURRENT_TIMESTAMP, :a),
     ].each do |o|
       v = eval(o.inspect)
-      v.should == o
-      @ds.literal(v).should == @ds.literal(o)
+      v.must_equal o
+      @ds.literal(v).must_equal @ds.literal(o)
     end
   end
 end

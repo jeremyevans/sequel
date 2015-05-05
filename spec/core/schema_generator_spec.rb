@@ -20,82 +20,82 @@ describe Sequel::Schema::Generator do
   end
   
   it "should respond to everything" do
-    @generator.respond_to?(:foo).should == true
+    @generator.respond_to?(:foo).must_equal true
   end if RUBY_VERSION >= '1.9'
 
   it "should primary key column first" do
-    @columns.first[:name].should == :id
-    @columns.first[:primary_key].should == true
-    @columns[3][:name].should == :parent_id
-    @columns[3][:primary_key].should == nil
+    @columns.first[:name].must_equal :id
+    @columns.first[:primary_key].must_equal true
+    @columns[3][:name].must_equal :parent_id
+    @columns[3][:primary_key].must_equal nil
   end
   
   it "counts definitions correctly" do
-    @columns.size.should == 6
-    @indexes.size.should == 2
-    @constraints.size.should == 4
+    @columns.size.must_equal 6
+    @indexes.size.must_equal 2
+    @constraints.size.must_equal 4
   end
   
   it "retrieves primary key name" do
-    @generator.primary_key_name.should == :id
+    @generator.primary_key_name.must_equal :id
   end
 
   it "keeps columns in order" do
-    @columns[1][:name].should == :title
-    @columns[1][:type].should == :string
-    @columns[2][:name].should == :body
-    @columns[2][:type].should == :text
+    @columns[1][:name].must_equal :title
+    @columns[1][:type].must_equal :string
+    @columns[2][:name].must_equal :body
+    @columns[2][:type].must_equal :text
   end
   
   it "creates foreign key column" do
-    @columns[3][:name].should == :parent_id
-    @columns[3][:type].should == Integer
-    @columns[4][:name].should == :node_id
-    @columns[4][:type].should == Integer
+    @columns[3][:name].must_equal :parent_id
+    @columns[3][:type].must_equal Integer
+    @columns[4][:name].must_equal :node_id
+    @columns[4][:type].must_equal Integer
   end
 
   it "creates deferrable altered foreign key column" do
-    @columns[5][:name].should == :deferrable_node_id
-    @columns[5][:type].should == Integer
-    @columns[5][:deferrable].should == true
+    @columns[5][:name].must_equal :deferrable_node_id
+    @columns[5][:type].must_equal Integer
+    @columns[5][:deferrable].must_equal true
   end
   
   it "uses table for foreign key columns, if specified" do
-    @columns[3][:table].should == nil
-    @columns[4][:table].should == :nodes
-    @constraints[3][:table].should == :nodes_props
+    @columns[3][:table].must_equal nil
+    @columns[4][:table].must_equal :nodes
+    @constraints[3][:table].must_equal :nodes_props
   end
   
   it "finds columns" do
     [:title, :body, :parent_id, :id].each do |col|
-      @generator.has_column?(col).should == true
+      @generator.has_column?(col).must_equal true
     end
-    @generator.has_column?(:foo).should_not == true
+    @generator.has_column?(:foo).wont_equal true
   end
   
   it "creates constraints" do
-    @constraints[0][:name].should == nil
-    @constraints[0][:type].should == :check
-    @constraints[0][:check].should == ['price > 100']
+    @constraints[0][:name].must_equal nil
+    @constraints[0][:type].must_equal :check
+    @constraints[0][:check].must_equal ['price > 100']
 
-    @constraints[1][:name].should == :xxx
-    @constraints[1][:type].should == :check
-    @constraints[1][:check].should be_a_kind_of(Proc)
+    @constraints[1][:name].must_equal :xxx
+    @constraints[1][:type].must_equal :check
+    assert_kind_of Proc, @constraints[1][:check]
 
-    @constraints[2][:name].should == :cpk
-    @constraints[2][:type].should == :primary_key
-    @constraints[2][:columns].should == [ :title, :parent_id ]
+    @constraints[2][:name].must_equal :cpk
+    @constraints[2][:type].must_equal :primary_key
+    @constraints[2][:columns].must_equal [ :title, :parent_id ]
 
-    @constraints[3][:name].should == :cfk
-    @constraints[3][:type].should == :foreign_key
-    @constraints[3][:columns].should == [ :node_id, :prop_id ]
-    @constraints[3][:table].should == :nodes_props
+    @constraints[3][:name].must_equal :cfk
+    @constraints[3][:type].must_equal :foreign_key
+    @constraints[3][:columns].must_equal [ :node_id, :prop_id ]
+    @constraints[3][:table].must_equal :nodes_props
   end
   
   it "creates indexes" do
-    @indexes[0][:columns].should include(:title)
-    @indexes[1][:columns].should include(:title)
-    @indexes[1][:columns].should include(:body)
+    @indexes[0][:columns].must_include(:title)
+    @indexes[1][:columns].must_include(:title)
+    @indexes[1][:columns].must_include(:body)
   end
 end
 
@@ -128,8 +128,8 @@ describe Sequel::Schema::AlterTableGenerator do
     end
   end
   
-  specify "should generate operation records" do
-    @generator.operations.should == [
+  it "should generate operation records" do
+    @generator.operations.must_equal [
       {:op => :add_column, :name => :aaa, :type => :text},
       {:op => :drop_column, :name => :bbb},
       {:op => :rename_column, :name => :ccc, :new_name => :ho},
@@ -174,6 +174,6 @@ describe "Sequel::Schema::Generator generic type methods" do
       File :k
       TrueClass :l
       FalseClass :m
-    end.columns.map{|c| c[:type]}.should == [String, Integer, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
+    end.columns.map{|c| c[:type]}.must_equal [String, Integer, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
   end
 end

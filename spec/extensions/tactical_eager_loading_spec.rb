@@ -29,30 +29,30 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
 
   it "Dataset#all should set the retrieved_by and retrieved_with attributes" do
     ts = @c.all
-    ts.map{|x| [x.retrieved_by, x.retrieved_with]}.should == [[@ds,ts], [@ds,ts], [@ds,ts], [@ds,ts]]
+    ts.map{|x| [x.retrieved_by, x.retrieved_with]}.must_equal [[@ds,ts], [@ds,ts], [@ds,ts], [@ds,ts]]
   end
 
   it "Dataset#all shouldn't raise an error if a Sequel::Model instance is not returned" do
-    proc{@c.naked.all}.should_not raise_error
+    @c.naked.all
   end
 
   it "association getter methods should eagerly load the association if the association isn't cached" do
-    DB.sqls.length.should == 0
+    DB.sqls.length.must_equal 0
     ts = @c.all
-    DB.sqls.length.should == 1
-    ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    DB.sqls.length.should == 1
-    ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
-    DB.sqls.length.should == 1
+    DB.sqls.length.must_equal 1
+    ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
+    DB.sqls.length.must_equal 1
+    ts.map{|x| x.children}.must_equal [[], [], [ts[0]], [ts[1]]]
+    DB.sqls.length.must_equal 1
   end
 
   it "association getter methods should not eagerly load the association if the association is cached" do
-    DB.sqls.length.should == 0
+    DB.sqls.length.must_equal 0
     ts = @c.all
-    DB.sqls.length.should == 1
-    ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    @ds.should_not_receive(:eager_load)
-    ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
+    DB.sqls.length.must_equal 1
+    ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
+    def @fs.eager_load(*) raise end
+    ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
   end
 
   it "should handle case where an association is valid on an instance, but not on all instances" do
@@ -65,18 +65,18 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
   it "association getter methods should not eagerly load the association if an instance is frozen" do
     ts = @c.all
     ts.first.freeze
-    DB.sqls.length.should == 1
-    ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    DB.sqls.length.should == 2
-    ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
-    DB.sqls.length.should == 2
-    ts.map{|x| x.parent}.should == [ts[2], ts[3], nil, nil]
-    DB.sqls.length.should == 1
-    ts.map{|x| x.children}.should == [[], [], [ts[0]], [ts[1]]]
-    DB.sqls.length.should == 1
+    DB.sqls.length.must_equal 1
+    ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
+    DB.sqls.length.must_equal 2
+    ts.map{|x| x.children}.must_equal [[], [], [ts[0]], [ts[1]]]
+    DB.sqls.length.must_equal 2
+    ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
+    DB.sqls.length.must_equal 1
+    ts.map{|x| x.children}.must_equal [[], [], [ts[0]], [ts[1]]]
+    DB.sqls.length.must_equal 1
   end
 
   it "#marshallable should make marshalling not fail" do
-    proc{Marshal.dump(@c.all.map{|x| x.marshallable!})}.should_not raise_error
+    Marshal.dump(@c.all.map{|x| x.marshallable!})
   end
 end

@@ -12,17 +12,17 @@ describe Sequel::Model, "hook_class_methods plugin" do
     DB.reset
   end
   
-  specify "should be definable using a block" do
+  it "should be definable using a block" do
     adds = []
     c = model_class.call Sequel::Model do
       before_save{adds << 'hi'}
     end
     
     c.new.before_save
-    adds.should == ['hi']
+    adds.must_equal ['hi']
   end
   
-  specify "should be definable using a method name" do
+  it "should be definable using a method name" do
     adds = []
     c = model_class.call Sequel::Model do
       define_method(:bye){adds << 'bye'}
@@ -30,10 +30,10 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     c.new.before_save
-    adds.should == ['bye']
+    adds.must_equal ['bye']
   end
 
-  specify "should be additive" do
+  it "should be additive" do
     adds = []
     c = model_class.call Sequel::Model do
       after_save{adds << 'hyiyie'}
@@ -41,10 +41,10 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
 
     c.new.after_save
-    adds.should == ['hyiyie', 'byiyie']
+    adds.must_equal ['hyiyie', 'byiyie']
   end
   
-  specify "before hooks should run in reverse order" do
+  it "before hooks should run in reverse order" do
     adds = []
     c = model_class.call Sequel::Model do
       before_save{adds << 'hyiyie'}
@@ -52,10 +52,10 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     c.new.before_save
-    adds.should == ['byiyie', 'hyiyie']
+    adds.must_equal ['byiyie', 'hyiyie']
   end
 
-  specify "should not be additive if the method or tag already exists" do
+  it "should not be additive if the method or tag already exists" do
     adds = []
     c = model_class.call Sequel::Model do
       define_method(:bye){adds << 'bye'}
@@ -64,7 +64,7 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     c.new.before_save
-    adds.should == ['bye']
+    adds.must_equal ['bye']
 
     adds = []
     d = model_class.call Sequel::Model do
@@ -73,7 +73,7 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     d.new.before_save
-    adds.should == ['byiyie']
+    adds.must_equal ['byiyie']
 
     adds = []
     e = model_class.call Sequel::Model do
@@ -83,7 +83,7 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     e.new.before_save
-    adds.should == ['byiyie']
+    adds.must_equal ['byiyie']
 
     adds = []
     e = model_class.call Sequel::Model do
@@ -93,10 +93,10 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     e.new.before_save
-    adds.should == ['bye']
+    adds.must_equal ['bye']
   end
   
-  specify "should be inheritable" do
+  it "should be inheritable" do
     adds = []
     a = model_class.call Sequel::Model do
       after_save{adds << '123'}
@@ -109,10 +109,10 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     b.new.after_save
-    adds.should == ['123', '456', '789']
+    adds.must_equal ['123', '456', '789']
   end
   
-  specify "should be overridable in descendant classes" do
+  it "should be overridable in descendant classes" do
     adds = []
     a = model_class.call Sequel::Model do
       before_save{adds << '123'}
@@ -124,13 +124,13 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     a.new.before_save
-    adds.should == ['123']
+    adds.must_equal ['123']
     adds = []
     b.new.before_save
-    adds.should == ['456']
+    adds.must_equal ['456']
   end
   
-  specify "should stop processing if a before hook returns false" do
+  it "should stop processing if a before hook returns false" do
     flag = true
     adds = []
     
@@ -140,18 +140,18 @@ describe Sequel::Model, "hook_class_methods plugin" do
     end
     
     a.new.before_save
-    adds.should == ['blah', 'cruel']
+    adds.must_equal ['blah', 'cruel']
 
     # chain should not break on nil
     adds = []
     flag = nil
     a.new.before_save
-    adds.should == ['blah', 'cruel']
+    adds.must_equal ['blah', 'cruel']
     
     adds = []
     flag = false
     a.new.before_save
-    adds.should == ['blah']
+    adds.must_equal ['blah']
     
     b = Class.new(a)
     b.class_eval do
@@ -160,7 +160,7 @@ describe Sequel::Model, "hook_class_methods plugin" do
     
     adds = []
     b.new.before_save
-    adds.should == ['mau', 'blah']
+    adds.must_equal ['mau', 'blah']
   end
 end
 
@@ -176,36 +176,36 @@ describe "Model#before_create && Model#after_create" do
     end
   end
   
-  specify "should be called around new record creation" do
+  it "should be called around new record creation" do
     @c.before_create {DB << "BLAH before"}
     @c.create(:x => 2)
-    DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
+    DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
   end
 
-  specify ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
+  it ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
     @c.before_create{false}
-    proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == []
+    proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal []
   end
 
-  specify ".create should cancel the save and raise an error if before_create calls cancel_action and raise_on_save_failure is true" do
+  it ".create should cancel the save and raise an error if before_create calls cancel_action and raise_on_save_failure is true" do
     @c.before_create{cancel_action}
-    proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == []
+    proc{@c.create(:x => 2)}.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal []
   end
 
-  specify ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
+  it ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
     @c.before_create{false}
     @c.raise_on_save_failure = false
-    @c.create(:x => 2).should == nil
-    DB.sqls.should == []
+    @c.create(:x => 2).must_equal nil
+    DB.sqls.must_equal []
   end
 
-  specify ".create should cancel the save and return nil if before_create calls cancel_action and raise_on_save_failure is false" do
+  it ".create should cancel the save and return nil if before_create calls cancel_action and raise_on_save_failure is false" do
     @c.before_create{cancel_action}
     @c.raise_on_save_failure = false
-    @c.create(:x => 2).should == nil
-    DB.sqls.should == []
+    @c.create(:x => 2).must_equal nil
+    DB.sqls.must_equal []
   end
 end
 
@@ -218,24 +218,24 @@ describe "Model#before_update && Model#after_update" do
     end
   end
   
-  specify "should be called around record update" do
+  it "should be called around record update" do
     @c.before_update {DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save
-    DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
+    DB.sqls.must_equal ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
 
-  specify "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
+  it "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
     @c.before_update{false}
-    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == []
+    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal []
   end
 
-  specify "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
+  it "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
     @c.before_update{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.should == nil
-    DB.sqls.should == []
+    @c.load(:id => 2233).save.must_equal nil
+    DB.sqls.must_equal []
   end
 end
 
@@ -249,31 +249,31 @@ describe "Model#before_save && Model#after_save" do
     end
   end
   
-  specify "should be called around record update" do
+  it "should be called around record update" do
     @c.before_save {DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
     m.save
-    DB.sqls.should == ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
+    DB.sqls.must_equal ['BLAH before', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'BLAH after']
   end
   
-  specify "should be called around record creation" do
+  it "should be called around record creation" do
     @c.before_save {DB << "BLAH before"}
     @c.no_primary_key
     @c.create(:x => 2)
-    DB.sqls.should == ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
+    DB.sqls.must_equal ['BLAH before', 'INSERT INTO items (x) VALUES (2)', 'BLAH after']
   end
 
-  specify "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
+  it "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
     @c.before_save{false}
-    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == []
+    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal []
   end
 
-  specify "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
+  it "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
     @c.before_save{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.should == nil
-    DB.sqls.should == []
+    @c.load(:id => 2233).save.must_equal nil
+    DB.sqls.must_equal []
   end
 end
 
@@ -286,24 +286,24 @@ describe "Model#before_destroy && Model#after_destroy" do
     end
   end
   
-  specify "should be called around record destruction" do
+  it "should be called around record destruction" do
     @c.before_destroy {DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.destroy
-    DB.sqls.should == ['BLAH before', "DELETE FROM items WHERE id = 2233", 'BLAH after']
+    DB.sqls.must_equal ['BLAH before', "DELETE FROM items WHERE id = 2233", 'BLAH after']
   end
 
-  specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
+  it "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
     @c.before_destroy{false}
-    proc{@c.load(:id => 2233).destroy}.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == []
+    proc{@c.load(:id => 2233).destroy}.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal []
   end
 
-  specify "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
+  it "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
     @c.before_destroy{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).destroy.should == nil
-    DB.sqls.should == []
+    @c.load(:id => 2233).destroy.must_equal nil
+    DB.sqls.must_equal []
   end
 end
 
@@ -322,42 +322,42 @@ describe "Model#before_validation && Model#after_validation" do
     end
   end
   
-  specify "should be called around validation" do
+  it "should be called around validation" do
     @c.before_validation{DB << "BLAH before"}
     m = @c.load(:id => 2233)
-    m.should be_valid
-    DB.sqls.should == ['BLAH before', 'BLAH after']
+    m.must_be :valid?
+    DB.sqls.must_equal ['BLAH before', 'BLAH after']
 
     DB.sqls.clear
     m = @c.load(:id => 22)
-    m.should_not be_valid
-    DB.sqls.should == ['BLAH before', 'BLAH after']
+    m.wont_be :valid?
+    DB.sqls.must_equal ['BLAH before', 'BLAH after']
   end
 
-  specify "should be called when calling save" do
+  it "should be called when calling save" do
     @c.before_validation{DB << "BLAH before"}
     m = @c.load(:id => 2233, :x=>123)
-    m.save.should == m
-    DB.sqls.should == ['BLAH before', 'BLAH after', 'UPDATE items SET x = 123 WHERE (id = 2233)']
+    m.save.must_equal m
+    DB.sqls.must_equal ['BLAH before', 'BLAH after', 'UPDATE items SET x = 123 WHERE (id = 2233)']
 
     DB.sqls.clear
     m = @c.load(:id => 22)
     m.raise_on_save_failure = false
-    m.save.should == nil
-    DB.sqls.should == ['BLAH before', 'BLAH after']
+    m.save.must_equal nil
+    DB.sqls.must_equal ['BLAH before', 'BLAH after']
   end
 
-  specify "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
+  it "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
     @c.before_validation{false}
-    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::HookFailed)
-    DB.sqls.should == []
+    proc{@c.load(:id => 2233).save}.must_raise(Sequel::HookFailed)
+    DB.sqls.must_equal []
   end
 
-  specify "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
+  it "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
     @c.before_validation{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.should == nil
-    DB.sqls.should == []
+    @c.load(:id => 2233).save.must_equal nil
+    DB.sqls.must_equal []
   end
 end
 
@@ -366,18 +366,18 @@ describe "Model.has_hooks?" do
     @c = model_class.call(Sequel::Model(:items))
   end
   
-  specify "should return false if no hooks are defined" do
-    @c.has_hooks?(:before_save).should == false
+  it "should return false if no hooks are defined" do
+    @c.has_hooks?(:before_save).must_equal false
   end
   
-  specify "should return true if hooks are defined" do
+  it "should return true if hooks are defined" do
     @c.before_save {'blah'}
-    @c.has_hooks?(:before_save).should == true
+    @c.has_hooks?(:before_save).must_equal true
   end
   
-  specify "should return true if hooks are inherited" do
+  it "should return true if hooks are inherited" do
     @d = Class.new(@c)
-    @d.has_hooks?(:before_save).should == false
+    @d.has_hooks?(:before_save).must_equal false
   end
 end
 
@@ -399,31 +399,31 @@ describe "Model#add_hook_type" do
     Object.send(:remove_const, :Foo)
   end
 
-  specify "should have before_bar and after_bar class methods" do
-    @f.should respond_to(:before_bar)
-    @f.should respond_to(:before_bar)
+  it "should have before_bar and after_bar class methods" do
+    @f.must_respond_to(:before_bar)
+    @f.must_respond_to(:before_bar)
   end
 
-  specify "should have before_bar and after_bar instance methods" do
-    @f.new.should respond_to(:before_bar)
-    @f.new.should respond_to(:before_bar)
+  it "should have before_bar and after_bar instance methods" do
+    @f.new.must_respond_to(:before_bar)
+    @f.new.must_respond_to(:before_bar)
   end
 
-  specify "it should return true for bar when before_bar and after_bar hooks are returing true" do
+  it "it should return true for bar when before_bar and after_bar hooks are returing true" do
     a = 1
     @f.before_bar { a += 1}
-    @f.new.bar.should == true
-    a.should == 2
+    @f.new.bar.must_equal true
+    a.must_equal 2
     @f.after_bar { a *= 2}
-    @f.new.bar.should == true
-    a.should == 6
+    @f.new.bar.must_equal true
+    a.must_equal 6
   end
 
-  specify "it should return nil for bar when before_bar and after_bar hooks are returing false" do
-    @f.new.bar.should == true
+  it "it should return nil for bar when before_bar and after_bar hooks are returing false" do
+    @f.new.bar.must_equal true
     @f.after_bar { false }
-    @f.new.bar.should == :a
+    @f.new.bar.must_equal :a
     @f.before_bar { false }
-    @f.new.bar.should == :b
+    @f.new.bar.must_equal :b
   end
 end

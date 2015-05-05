@@ -13,78 +13,78 @@ describe "Database transactions" do
     @db.drop_table?(:items)
   end
 
-  specify "should support transactions" do
+  it "should support transactions" do
     @db.transaction{@d << {:name => 'abc', :value => 1}}
-    @d.count.should == 1
+    @d.count.must_equal 1
   end
 
-  specify "should have #transaction yield the connection" do
-    @db.transaction{|conn| conn.should_not == nil}
+  it "should have #transaction yield the connection" do
+    @db.transaction{|conn| conn.wont_equal nil}
   end
 
-  specify "should have #in_transaction? work correctly" do
-    @db.in_transaction?.should == false
+  it "should have #in_transaction? work correctly" do
+    @db.in_transaction?.must_equal false
     c = nil
     @db.transaction{c = @db.in_transaction?}
-    c.should == true
+    c.must_equal true
   end
 
-  specify "should correctly rollback transactions" do
+  it "should correctly rollback transactions" do
     proc do
       @db.transaction do
         @d << {:name => 'abc', :value => 1}
         raise Interrupt, 'asdf'
       end
-    end.should raise_error(Interrupt)
+    end.must_raise(Interrupt)
 
     @db.transaction do
       @d << {:name => 'abc', :value => 1}
       raise Sequel::Rollback
-    end.should be_nil
+    end.must_equal nil
 
     proc do
       @db.transaction(:rollback=>:reraise) do
         @d << {:name => 'abc', :value => 1}
         raise Sequel::Rollback
       end
-    end.should raise_error(Sequel::Rollback)
+    end.must_raise(Sequel::Rollback)
 
     @db.transaction(:rollback=>:always) do
       @d << {:name => 'abc', :value => 1}
       2
-    end.should be_nil
+    end.must_equal nil
 
-    @d.count.should == 0
+    @d.count.must_equal 0
   end
 
-  specify "should support nested transactions" do
+  it "should support nested transactions" do
     @db.transaction do
       @db.transaction do
         @d << {:name => 'abc', :value => 1}
       end 
     end 
-    @d.count.should == 1
+    @d.count.must_equal 1
 
     @d.delete
-    proc {@db.transaction do
+    @db.transaction do
       @d << {:name => 'abc', :value => 1}
       @db.transaction do
         raise Sequel::Rollback
       end 
-    end}.should_not raise_error
-    @d.count.should == 0
+    end
+    @d.count.must_equal 0
 
     proc {@db.transaction do
       @d << {:name => 'abc', :value => 1}
       @db.transaction do
         raise Interrupt, 'asdf'
       end 
-    end}.should raise_error(Interrupt)
-    @d.count.should == 0
+    end}.must_raise(Interrupt)
+    @d.count.must_equal 0
   end 
   
   if DB.supports_savepoints?
-    specify "should support nested transactions through savepoints using the savepoint option" do
+    it "should support nested transactions through savepoints using the savepoint option" do
       @db.transaction do
         @d << {:name => '1'}
         @db.transaction(:savepoint=>true) do
@@ -105,10 +105,10 @@ describe "Database transactions" do
         @d << {:name => '5'}
       end
 
-      @d.order(:name).map(:name).should == %w{1 4 5 6}
+      @d.order(:name).map(:name).must_equal %w{1 4 5 6}
     end
 
-    specify "should support nested transactions through savepoints using the auto_savepoint option" do
+    it "should support nested transactions through savepoints using the auto_savepoint option" do
       @db.transaction(:auto_savepoint=>true) do
         @d << {:name => '1'}
         @db.transaction do
@@ -129,11 +129,11 @@ describe "Database transactions" do
         @d << {:name => '5'}
       end
 
-      @d.order(:name).map(:name).should == %w{1 4 5 6}
+      @d.order(:name).map(:name).must_equal %w{1 4 5 6}
     end
   end
 
-  specify "should handle returning inside of the block by committing" do
+  it "should handle returning inside of the block by committing" do
     def @db.ret_commit
       transaction do
         self[:items] << {:name => 'abc'}
@@ -141,143 +141,143 @@ describe "Database transactions" do
       end
     end
 
-    @d.count.should == 0
+    @d.count.must_equal 0
     @db.ret_commit
-    @d.count.should == 1
+    @d.count.must_equal 1
     @db.ret_commit
-    @d.count.should == 2
+    @d.count.must_equal 2
     proc do
       @db.transaction do
         raise Interrupt, 'asdf'
       end
-    end.should raise_error(Interrupt)
+    end.must_raise(Interrupt)
 
-    @d.count.should == 2
+    @d.count.must_equal 2
   end
 
   if DB.supports_prepared_transactions?
-    specify "should allow saving and destroying of model objects" do
+    it "should allow saving and destroying of model objects" do
       c = Class.new(Sequel::Model(@d))
       c.set_primary_key :name
       c.unrestrict_primary_key
       c.use_after_commit_rollback = false
       @db.transaction(:prepare=>'XYZ'){c.create(:name => '1'); c.create(:name => '2').destroy}
       @db.commit_prepared_transaction('XYZ')
-      @d.select_order_map(:name).should == ['1']
+      @d.select_order_map(:name).must_equal ['1']
     end
 
-    specify "should commit prepared transactions using commit_prepared_transaction" do
+    it "should commit prepared transactions using commit_prepared_transaction" do
       @db.transaction(:prepare=>'XYZ'){@d << {:name => '1'}}
       @db.commit_prepared_transaction('XYZ')
-      @d.select_order_map(:name).should == ['1']
+      @d.select_order_map(:name).must_equal ['1']
     end
 
-    specify "should rollback prepared transactions using rollback_prepared_transaction" do
+    it "should rollback prepared transactions using rollback_prepared_transaction" do
       @db.transaction(:prepare=>'XYZ'){@d << {:name => '1'}}
       @db.rollback_prepared_transaction('XYZ')
-      @d.select_order_map(:name).should == []
+      @d.select_order_map(:name).must_equal []
     end
 
     if DB.supports_savepoints_in_prepared_transactions?
-      specify "should support savepoints when using prepared transactions" do
+      it "should support savepoints when using prepared transactions" do
         @db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@d << {:name => '1'}}}
         @db.commit_prepared_transaction('XYZ')
-        @d.select_order_map(:name).should == ['1']
+        @d.select_order_map(:name).must_equal ['1']
       end
     end
   end
 
-  specify "should support all transaction isolation levels" do
+  it "should support all transaction isolation levels" do
     [:uncommitted, :committed, :repeatable, :serializable].each_with_index do |l, i|
       @db.transaction(:isolation=>l){@d << {:name => 'abc', :value => 1}}
-      @d.count.should == i + 1
+      @d.count.must_equal i + 1
     end
   end
 
-  specify "should support after_commit outside transactions" do
+  it "should support after_commit outside transactions" do
     c = nil
     @db.after_commit{c = 1}
-    c.should == 1
+    c.must_equal 1
   end
 
-  specify "should support after_rollback outside transactions" do
+  it "should support after_rollback outside transactions" do
     c = nil
     @db.after_rollback{c = 1}
-    c.should be_nil
+    c.must_equal nil
   end
 
-  specify "should support after_commit inside transactions" do
+  it "should support after_commit inside transactions" do
     c = nil
-    @db.transaction{@db.after_commit{c = 1}; c.should be_nil}
-    c.should == 1
+    @db.transaction{@db.after_commit{c = 1}; c.must_equal nil}
+    c.must_equal 1
   end
 
-  specify "should support after_rollback inside transactions" do
+  it "should support after_rollback inside transactions" do
     c = nil
-    @db.transaction{@db.after_rollback{c = 1}; c.should be_nil}
-    c.should be_nil
+    @db.transaction{@db.after_rollback{c = 1}; c.must_equal nil}
+    c.must_equal nil
   end
 
-  specify "should not call after_commit if the transaction rolls back" do
+  it "should not call after_commit if the transaction rolls back" do
     c = nil
-    @db.transaction{@db.after_commit{c = 1}; c.should be_nil; raise Sequel::Rollback}
-    c.should be_nil
+    @db.transaction{@db.after_commit{c = 1}; c.must_equal nil; raise Sequel::Rollback}
+    c.must_equal nil
   end
 
-  specify "should call after_rollback if the transaction rolls back" do
+  it "should call after_rollback if the transaction rolls back" do
     c = nil
-    @db.transaction{@db.after_rollback{c = 1}; c.should be_nil; raise Sequel::Rollback}
-    c.should == 1
+    @db.transaction{@db.after_rollback{c = 1}; c.must_equal nil; raise Sequel::Rollback}
+    c.must_equal 1
   end
 
-  specify "should support multiple after_commit blocks inside transactions" do
+  it "should support multiple after_commit blocks inside transactions" do
     c = []
-    @db.transaction{@db.after_commit{c << 1}; @db.after_commit{c << 2}; c.should == []}
-    c.should == [1, 2]
+    @db.transaction{@db.after_commit{c << 1}; @db.after_commit{c << 2}; c.must_equal []}
+    c.must_equal [1, 2]
   end
 
-  specify "should support multiple after_rollback blocks inside transactions" do
+  it "should support multiple after_rollback blocks inside transactions" do
     c = []
-    @db.transaction{@db.after_rollback{c << 1}; @db.after_rollback{c << 2}; c.should == []; raise Sequel::Rollback}
-    c.should == [1, 2]
+    @db.transaction{@db.after_rollback{c << 1}; @db.after_rollback{c << 2}; c.must_equal []; raise Sequel::Rollback}
+    c.must_equal [1, 2]
   end
 
-  specify "should support after_commit inside nested transactions" do
+  it "should support after_commit inside nested transactions" do
     c = nil
-    @db.transaction{@db.transaction{@db.after_commit{c = 1}}; c.should be_nil}
-    c.should == 1
+    @db.transaction{@db.transaction{@db.after_commit{c = 1}}; c.must_equal nil}
+    c.must_equal 1
   end
 
-  specify "should support after_rollback inside nested transactions" do
+  it "should support after_rollback inside nested transactions" do
     c = nil
-    @db.transaction{@db.transaction{@db.after_rollback{c = 1}}; c.should be_nil; raise Sequel::Rollback}
-    c.should == 1
+    @db.transaction{@db.transaction{@db.after_rollback{c = 1}}; c.must_equal nil; raise Sequel::Rollback}
+    c.must_equal 1
   end
 
   if DB.supports_savepoints?
-    specify "should support after_commit inside savepoints" do
+    it "should support after_commit inside savepoints" do
       c = nil
-      @db.transaction{@db.transaction(:savepoint=>true){@db.after_commit{c = 1}}; c.should be_nil}
-      c.should == 1
+      @db.transaction{@db.transaction(:savepoint=>true){@db.after_commit{c = 1}}; c.must_equal nil}
+      c.must_equal 1
     end
 
-    specify "should support after_rollback inside savepoints" do
+    it "should support after_rollback inside savepoints" do
       c = nil
-      @db.transaction{@db.transaction(:savepoint=>true){@db.after_rollback{c = 1}}; c.should be_nil; raise Sequel::Rollback}
-      c.should == 1
+      @db.transaction{@db.transaction(:savepoint=>true){@db.after_rollback{c = 1}}; c.must_equal nil; raise Sequel::Rollback}
+      c.must_equal 1
     end
   end
 
   if DB.supports_prepared_transactions?
-    specify "should raise an error if you attempt to use after_commit or after_rollback inside a prepared transaction" do
-      proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{}}}.should raise_error(Sequel::Error)
-      proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{}}}.should raise_error(Sequel::Error)
+    it "should raise an error if you attempt to use after_commit or after_rollback inside a prepared transaction" do
+      proc{@db.transaction(:prepare=>'XYZ'){@db.after_commit{}}}.must_raise(Sequel::Error)
+      proc{@db.transaction(:prepare=>'XYZ'){@db.after_rollback{}}}.must_raise(Sequel::Error)
     end
 
     if DB.supports_savepoints_in_prepared_transactions?
-      specify "should raise an error if you attempt to use after_commit or after rollback inside a savepoint in a prepared transaction" do
-        proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{}}}}.should raise_error(Sequel::Error)
-        proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{}}}}.should raise_error(Sequel::Error)
+      it "should raise an error if you attempt to use after_commit or after rollback inside a savepoint in a prepared transaction" do
+        proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_commit{}}}}.must_raise(Sequel::Error)
+        proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{}}}}.must_raise(Sequel::Error)
       end
     end
   end
@@ -294,7 +294,7 @@ if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' &&
       @db.drop_table?(:items)
     end
 
-    specify "should handle transactions inside threads" do
+    it "should handle transactions inside threads" do
       q = Queue.new
       q1 = Queue.new
       t = Thread.new do
@@ -307,11 +307,11 @@ if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' &&
       end
       q1.pop
       t.kill
-      @d.count.should == 0
+      @d.count.must_equal 0
     end
 
     if DB.supports_savepoints?
-      specify "should handle transactions with savepoints inside threads" do
+      it "should handle transactions with savepoints inside threads" do
         q = Queue.new
         q1 = Queue.new
         t = Thread.new do
@@ -328,7 +328,7 @@ if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or (RUBY_ENGINE == 'rbx' &&
         end
         q1.pop
         t.kill
-        @d.count.should == 0
+        @d.count.must_equal 0
       end
     end
   end
@@ -355,7 +355,7 @@ describe "Database transaction retrying" do
       s = s.succ
       @d.insert(s)
     end
-    @d.select_order_map(:a).should == %w'b c d'
+    @d.select_order_map(:a).must_equal %w'b c d'
   end
 
   cspecify "should limit number of retries via the :num_retries option", [:db2] do
@@ -367,8 +367,8 @@ describe "Database transaction retrying" do
         s = s.succ
         @d.insert(s)
       end
-    end.should raise_error(Sequel::ConstraintViolation)
-    @d.select_order_map(:a).should == %w'b c'
+    end.must_raise(Sequel::UniqueConstraintViolation, Sequel::ConstraintViolation)
+    @d.select_order_map(:a).must_equal %w'b c'
   end
 end
 

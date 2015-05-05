@@ -11,6 +11,8 @@ def logger.method_missing(m, msg)
 end
 DB.loggers << logger
 
+DB.extension :pg_array, :pg_hstore, :pg_range, :pg_interval, :pg_row, :pg_inet, :pg_json, :pg_enum
+
 describe "PostgreSQL", '#create_table' do
   before do
     @db = DB
@@ -20,97 +22,97 @@ describe "PostgreSQL", '#create_table' do
     @db.drop_table?(:tmp_dolls, :unlogged_dolls)
   end
 
-  specify "should create a temporary table" do
+  it "should create a temporary table" do
     @db.create_table(:tmp_dolls, :temp => true){text :name}
     check_sqls do
-      @db.sqls.should == ['CREATE TEMPORARY TABLE "tmp_dolls" ("name" text)']
+      @db.sqls.must_equal ['CREATE TEMPORARY TABLE "tmp_dolls" ("name" text)']
     end
   end
 
-  specify "temporary table should support :on_commit option" do
+  it "temporary table should support :on_commit option" do
     @db.drop_table?(:some_table)
     @db.transaction do
       @db.create_table(:some_table, :temp => true, :on_commit => :drop){text :name}
     end
-    @db.table_exists?(:some_table).should == false
+    @db.table_exists?(:some_table).must_equal false
 
     @db.transaction do
       @db.create_table(:some_table, :temp => true, :on_commit => :delete_rows){text :name}
       @db[:some_table].insert('a')
     end
-    @db.table_exists?(:some_table).should == true
-    @db[:some_table].empty?.should == true
+    @db.table_exists?(:some_table).must_equal true
+    @db[:some_table].empty?.must_equal true
 
     @db.drop_table(:some_table)
     @db.transaction do
       @db.create_table(:some_table, :temp => true, :on_commit => :preserve_rows){text :name}
       @db[:some_table].insert('a')
     end
-    @db.table_exists?(:some_table).should == true
-    @db[:some_table].count.should == 1
+    @db.table_exists?(:some_table).must_equal true
+    @db[:some_table].count.must_equal 1
     @db.drop_table(:some_table)
   end
 
-  specify "temporary table should accept :on_commit with :as option" do
+  it "temporary table should accept :on_commit with :as option" do
     @db.drop_table?(:some_table)
     @db.transaction do
       @db.create_table(:some_table, :temp => true, :on_commit => :drop, :as => 'select 1')
     end
-    @db.table_exists?(:some_table).should == false
+    @db.table_exists?(:some_table).must_equal false
   end
 
-  specify ":on_commit should raise error if not used on a temporary table" do
-    proc{@db.create_table(:some_table, :on_commit => :drop)}.should raise_error(Sequel::Error)
+  it ":on_commit should raise error if not used on a temporary table" do
+    proc{@db.create_table(:some_table, :on_commit => :drop)}.must_raise(Sequel::Error)
   end
 
-  specify ":on_commit should raise error if given unsupported value" do
-    proc{@db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}}.should raise_error(Sequel::Error)
+  it ":on_commit should raise error if given unsupported value" do
+    proc{@db.create_table(:some_table, :temp => true, :on_commit => :unsupported){text :name}}.must_raise(Sequel::Error)
   end
 
-  specify "should create an unlogged table" do
+  it "should create an unlogged table" do
     @db.create_table(:unlogged_dolls, :unlogged => true){text :name}
     check_sqls do
-      @db.sqls.should == ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
+      @db.sqls.must_equal ['CREATE UNLOGGED TABLE "unlogged_dolls" ("name" text)']
     end
   end
 
-  specify "should create a table inheriting from another table" do
+  it "should create a table inheriting from another table" do
     @db.create_table(:unlogged_dolls){text :name}
     @db.create_table(:tmp_dolls, :inherits=>:unlogged_dolls){}
     @db[:tmp_dolls].insert('a')
-    @db[:unlogged_dolls].all.should == [{:name=>'a'}]
+    @db[:unlogged_dolls].all.must_equal [{:name=>'a'}]
   end
 
-  specify "should create a table inheriting from multiple tables" do
+  it "should create a table inheriting from multiple tables" do
     begin
       @db.create_table(:unlogged_dolls){text :name}
       @db.create_table(:tmp_dolls){text :bar}
       @db.create_table!(:items, :inherits=>[:unlogged_dolls, :tmp_dolls]){text :foo}
       @db[:items].insert(:name=>'a', :bar=>'b', :foo=>'c')
-      @db[:unlogged_dolls].all.should == [{:name=>'a'}]
-      @db[:tmp_dolls].all.should == [{:bar=>'b'}]
-      @db[:items].all.should == [{:name=>'a', :bar=>'b', :foo=>'c'}]
+      @db[:unlogged_dolls].all.must_equal [{:name=>'a'}]
+      @db[:tmp_dolls].all.must_equal [{:bar=>'b'}]
+      @db[:items].all.must_equal [{:name=>'a', :bar=>'b', :foo=>'c'}]
     ensure
       @db.drop_table?(:items)
     end
   end
 
-  specify "should not allow to pass both :temp and :unlogged" do
+  it "should not allow to pass both :temp and :unlogged" do
     proc do
       @db.create_table(:temp_unlogged_dolls, :temp => true, :unlogged => true){text :name}
-    end.should raise_error(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
+    end.must_raise(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
   end
 
-  specify "should support pg_loose_count extension" do
+  it "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}
-    @db.loose_count(:tmp_dolls).should be_a_kind_of(Integer)
-    @db.loose_count(:tmp_dolls).should == 0
-    @db.loose_count(:public__tmp_dolls).should == 0
+    @db.loose_count(:tmp_dolls).must_be_kind_of(Integer)
+    @db.loose_count(:tmp_dolls).must_equal 0
+    @db.loose_count(:public__tmp_dolls).must_equal 0
     @db[:tmp_dolls].insert('a')
     @db << 'VACUUM ANALYZE tmp_dolls'
-    @db.loose_count(:tmp_dolls).should == 1
-    @db.loose_count(:public__tmp_dolls).should == 1
+    @db.loose_count(:tmp_dolls).must_equal 1
+    @db.loose_count(:public__tmp_dolls).must_equal 1
   end
 end
 
@@ -128,41 +130,41 @@ describe "PostgreSQL views" do
     @db.drop_table?(:items)
   end
 
-  specify "should support temporary views" do
+  it "should support temporary views" do
     @db.create_view(:items_view, @db[:items].where(:number=>10), :temp=>true)
-    @db[:items_view].map(:number).should == [10]
+    @db[:items_view].map(:number).must_equal [10]
     @db.create_or_replace_view(:items_view, @db[:items].where(:number=>20),  :temp=>true)
-    @db[:items_view].map(:number).should == [20]
+    @db[:items_view].map(:number).must_equal [20]
   end
 
-  specify "should support recursive views" do
+  it "should support recursive views" do
     @db.create_view(:items_view, @db[:items].where(:number=>10).union(@db[:items, :items_view].where(Sequel.-(:number, 5)=>:n).select(:number), :all=>true, :from_self=>false), :recursive=>[:n])
-    @db[:items_view].select_order_map(:n).should == [10]
+    @db[:items_view].select_order_map(:n).must_equal [10]
     @db[:items].insert(15)
-    @db[:items_view].select_order_map(:n).should == [10, 15, 20]
+    @db[:items_view].select_order_map(:n).must_equal [10, 15, 20]
   end if DB.server_version >= 90300
 
-  specify "should support materialized views" do
+  it "should support materialized views" do
     @opts = {:materialized=>true}
     @db.create_view(:items_view, @db[:items].where{number >= 10}, @opts)
-    @db[:items_view].select_order_map(:number).should == [10, 20]
+    @db[:items_view].select_order_map(:number).must_equal [10, 20]
     @db[:items].insert(15)
-    @db[:items_view].select_order_map(:number).should == [10, 20]
+    @db[:items_view].select_order_map(:number).must_equal [10, 20]
     @db.refresh_view(:items_view)
-    @db[:items_view].select_order_map(:number).should == [10, 15, 20]
+    @db[:items_view].select_order_map(:number).must_equal [10, 15, 20]
   end if DB.server_version >= 90300
 
-  specify "should support refreshing materialized views concurrently" do
+  it "should support refreshing materialized views concurrently" do
     @opts = {:materialized=>true}
     @db.create_view(:items_view, @db[:items].where{number >= 10}, @opts)
     @db.refresh_view(:items_view)
-    proc{@db.refresh_view(:items_view, :concurrently=>true)}.should raise_error(Sequel::DatabaseError)
+    proc{@db.refresh_view(:items_view, :concurrently=>true)}.must_raise(Sequel::DatabaseError)
     @db.add_index :items_view, :number, :unique=>true
-    proc{@db.refresh_view(:items_view, :concurrently=>true)}.should_not raise_error
+    @db.refresh_view(:items_view, :concurrently=>true)
   end if DB.server_version >= 90400
 
-  specify "should support :if_exists=>true for not raising an error if the view does not exist" do
-    proc{@db.drop_view(:items_view, :if_exists=>true)}.should_not raise_error
+  it "should support :if_exists=>true for not raising an error if the view does not exist" do
+    @db.drop_view(:items_view, :if_exists=>true)
   end
 end 
     
@@ -175,41 +177,42 @@ describe "A PostgreSQL database" do
     @db.drop_table?(:public__testfk)
   end
 
-  specify "should provide the server version" do
-    @db.server_version.should > 70000
+  it "should provide the server version" do
+    @db.server_version.must_be :>,  70000
   end
 
-  specify "should create a dataset using the VALUES clause via #values" do
-    @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).should == [[1, 2], [3, 4]]
+  it "should create a dataset using the VALUES clause via #values" do
+    @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
   end
 
-  specify "should support ordering and limiting with #values" do
-    @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).limit(1).map([:column1, :column2]).should == [[3, 4]]
-    @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).offset(1).map([:column1, :column2]).should == [[1, 2]]
+  it "should support ordering and limiting with #values" do
+    @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).limit(1).map([:column1, :column2]).must_equal [[3, 4]]
+    @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).offset(1).map([:column1, :column2]).must_equal [[1, 2]]
   end
 
-  specify "should support subqueries with #values" do
-    @db.values([[1, 2]]).from_self.cross_join(@db.values([[3, 4]]).as(:x, [:c1, :c2])).map([:column1, :column2, :c1, :c2]).should == [[1, 2, 3, 4]]
+  it "should support subqueries with #values" do
+    @db.values([[1, 2]]).from_self.cross_join(@db.values([[3, 4]]).as(:x, [:c1, :c2])).map([:column1, :column2, :c1, :c2]).must_equal [[1, 2, 3, 4]]
   end
 
-  specify "should respect the :read_only option per-savepoint" do
-    proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].insert}}}.should raise_error(Sequel::DatabaseError)
-    proc{@db.transaction(:auto_savepoint=>true, :read_only=>true){@db.transaction(:read_only=>false){@db[:public__testfk].insert}}}.should raise_error(Sequel::DatabaseError)
-    proc{@db.transaction{@db[:public__testfk].insert; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}}.should_not raise_error
-    proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){}; @db[:public__testfk].insert}}.should_not raise_error
-    proc{@db.transaction{@db[:public__testfk].all; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}}.should_not raise_error
+  it "should respect the :read_only option per-savepoint" do
+    proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].insert}}}.must_raise(Sequel::DatabaseError)
+    proc{@db.transaction(:auto_savepoint=>true, :read_only=>true){@db.transaction(:read_only=>false){@db[:public__testfk].insert}}}.must_raise(Sequel::DatabaseError)
+    @db[:public__testfk].delete
+    @db.transaction{@db[:public__testfk].insert; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}
+    @db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){}; @db[:public__testfk].insert}
+    @db.transaction{@db[:public__testfk].all; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}
   end
 
-  specify "should support disable_insert_returning" do
+  it "should support disable_insert_returning" do
     ds = @db[:public__testfk].disable_insert_returning
     ds.delete
-    ds.insert.should == nil
+    ds.insert.must_equal nil
     id = ds.max(:id)
-    ds.select_order_map([:id, :i]).should == [[id, nil]]
-    ds.insert(:i=>id).should == nil
-    ds.select_order_map([:id, :i]).should == [[id, nil], [id+1, id]]
-    ds.insert_select(:i=>ds.max(:id)).should == nil
-    ds.select_order_map([:id, :i]).should == [[id, nil], [id+1, id]]
+    ds.select_order_map([:id, :i]).must_equal [[id, nil]]
+    ds.insert(:i=>id).must_equal nil
+    ds.select_order_map([:id, :i]).must_equal [[id, nil], [id+1, id]]
+    ds.insert_select(:i=>ds.max(:id)).must_equal nil
+    ds.select_order_map([:id, :i]).must_equal [[id, nil], [id+1, id]]
     c = Class.new(Sequel::Model(ds))
     c.class_eval do
       def before_create
@@ -217,69 +220,70 @@ describe "A PostgreSQL database" do
         super
       end
     end
-    c.create(:i=>id+1).should == c.load(:id=>id+2, :i=>id+1)
-    ds.select_order_map([:id, :i]).should == [[id, nil], [id+1, id], [id+2, id+1]]
+    c.create(:i=>id+1).must_equal c.load(:id=>id+2, :i=>id+1)
+    ds.select_order_map([:id, :i]).must_equal [[id, nil], [id+1, id], [id+2, id+1]]
     ds.delete
   end
 
-  specify "should support functions with and without quoting" do
+  it "should support functions with and without quoting" do
     ds = @db[:public__testfk]
     ds.delete
     ds.insert
-    ds.get{sum(1)}.should == 1
-    ds.get{Sequel.function('pg_catalog.sum', 1)}.should == 1
-    ds.get{sum.function(1)}.should == 1
-    ds.get{pg_catalog__sum.function(1)}.should == 1
+    ds.get{sum(1)}.must_equal 1
+    ds.get{Sequel.function('pg_catalog.sum', 1)}.must_equal 1
+    ds.get{sum.function(1)}.must_equal 1
+    ds.get{pg_catalog__sum.function(1)}.must_equal 1
     ds.delete
   end
 
-  specify "should support a :qualify option to tables and views" do
-    @db.tables(:qualify=>true).should include(Sequel.qualify(:public, :testfk))
+  it "should support a :qualify option to tables and views" do
+    @db.tables(:qualify=>true).must_include(Sequel.qualify(:public, :testfk))
     begin
       @db.create_view(:testfkv, @db[:testfk])
-      @db.views(:qualify=>true).should include(Sequel.qualify(:public, :testfkv))
+      @db.views(:qualify=>true).must_include(Sequel.qualify(:public, :testfkv))
     ensure
       @db.drop_view(:testfkv)
     end
   end
 
-  specify "should not typecast the int2vector type incorrectly" do
-    @db.get(Sequel.cast('10 20', :int2vector)).should_not == 10
+  it "should not typecast the int2vector type incorrectly" do
+    @db.get(Sequel.cast('10 20', :int2vector)).wont_equal 10
   end
 
-  cspecify "should not typecast the money type incorrectly", :do do
-    @db.get(Sequel.cast('10.01', :money)).should_not == 0
+  cspecify "should not typecast the money type incorrectly", [:do] do
+    @db.get(Sequel.cast('10.01', :money)).wont_equal 0
   end
 
-  specify "should correctly parse the schema" do
-    @db.schema(:public__testfk, :reload=>true).map{|c,s| [c, s[:oid]]}.should == [[:id, 23], [:i, 23]]
+  it "should correctly parse the schema" do
+    @db.schema(:public__testfk, :reload=>true).map{|c,s| [c, s[:oid]]}.must_equal [[:id, 23], [:i, 23]]
   end
 
-  specify "should parse foreign keys for tables in a schema" do
-    @db.foreign_key_list(:public__testfk).should == [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
+  it "should parse foreign keys for tables in a schema" do
+    @db.foreign_key_list(:public__testfk).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
   end
 
-  specify "should return uuid fields as strings" do
-    @db.get(Sequel.cast('550e8400-e29b-41d4-a716-446655440000', :uuid)).should == '550e8400-e29b-41d4-a716-446655440000'
+  it "should return uuid fields as strings" do
+    @db.get(Sequel.cast('550e8400-e29b-41d4-a716-446655440000', :uuid)).must_equal '550e8400-e29b-41d4-a716-446655440000'
   end
 
-  specify "should handle inserts with placeholder literal string tables" do
+  it "should handle inserts with placeholder literal string tables" do
     ds = @db.from(Sequel.lit('?', :testfk))
+    ds.delete
     ds.insert(:id=>1)
-    ds.select_map(:id).should == [1]
+    ds.select_map(:id).must_equal [1]
   end
 
-  specify "should have notice receiver receive notices" do
+  it "should have notice receiver receive notices" do
     a = nil
     Sequel.connect(DB.opts.merge(:notice_receiver=>proc{|r| a = r.result_error_message})){|db| db.do("BEGIN\nRAISE WARNING 'foo';\nEND;")}
-    a.should == "WARNING:  foo\n"
+    a.must_equal "WARNING:  foo\n"
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
 
   # These only test the SQL created, because a true test using file_fdw or postgres_fdw
   # requires superuser permissions, and you should not be running the tests as a superuser.
-  specify "should support creating and dropping foreign tables" do
-    DB.send(:create_table_sql, :t, DB.create_table_generator{Integer :a}, :foreign=>:f, :options=>{:o=>1}).should == 'CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')'
-    DB.send(:drop_table_sql, :t, :foreign=>true).should == 'DROP FOREIGN TABLE "t"'
+  it "should support creating and dropping foreign tables" do
+    DB.send(:create_table_sql, :t, DB.create_table_generator{Integer :a}, :foreign=>:f, :options=>{:o=>1}).must_equal 'CREATE FOREIGN TABLE "t" ("a" integer) SERVER "f" OPTIONS (o \'1\')'
+    DB.send(:drop_table_sql, :t, :foreign=>true).must_equal 'DROP FOREIGN TABLE "t"'
   end
 end
 
@@ -295,10 +299,10 @@ describe "A PostgreSQL database with domain types" do
     @db << "DROP DOMAIN positive_number"
   end
 
-  specify "should correctly parse the schema" do
+  it "should correctly parse the schema" do
     sch = @db.schema(:testfk, :reload=>true)
-    sch.first.last.delete(:domain_oid).should be_a_kind_of(Integer)
-    sch.first.last[:db_domain_type].should == 'positive_number'
+    sch.first.last.delete(:domain_oid).must_be_kind_of(Integer)
+    sch.first.last[:db_domain_type].must_equal 'positive_number'
   end
 end
 
@@ -322,288 +326,288 @@ describe "A PostgreSQL dataset" do
     @db.drop_table?(:test)
   end
 
-  specify "should quote columns and tables using double quotes if quoting identifiers" do
+  it "should quote columns and tables using double quotes if quoting identifiers" do
     check_sqls do
-      @d.select(:name).sql.should == 'SELECT "name" FROM "test"'
-      @d.select(Sequel.lit('COUNT(*)')).sql.should == 'SELECT COUNT(*) FROM "test"'
-      @d.select(Sequel.function(:max, :value)).sql.should == 'SELECT max("value") FROM "test"'
-      @d.select(Sequel.function(:NOW)).sql.should == 'SELECT NOW() FROM "test"'
-      @d.select(Sequel.function(:max, :items__value)).sql.should == 'SELECT max("items"."value") FROM "test"'
-      @d.order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
-      @d.select(Sequel.lit('test.name AS item_name')).sql.should == 'SELECT test.name AS item_name FROM "test"'
-      @d.select(Sequel.lit('"name"')).sql.should == 'SELECT "name" FROM "test"'
-      @d.select(Sequel.lit('max(test."name") AS "max_name"')).sql.should == 'SELECT max(test."name") AS "max_name" FROM "test"'
-      @d.insert_sql(:x => :y).should =~ /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
+      @d.select(:name).sql.must_equal 'SELECT "name" FROM "test"'
+      @d.select(Sequel.lit('COUNT(*)')).sql.must_equal 'SELECT COUNT(*) FROM "test"'
+      @d.select(Sequel.function(:max, :value)).sql.must_equal 'SELECT max("value") FROM "test"'
+      @d.select(Sequel.function(:NOW)).sql.must_equal 'SELECT NOW() FROM "test"'
+      @d.select(Sequel.function(:max, :items__value)).sql.must_equal 'SELECT max("items"."value") FROM "test"'
+      @d.order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" DESC'
+      @d.select(Sequel.lit('test.name AS item_name')).sql.must_equal 'SELECT test.name AS item_name FROM "test"'
+      @d.select(Sequel.lit('"name"')).sql.must_equal 'SELECT "name" FROM "test"'
+      @d.select(Sequel.lit('max(test."name") AS "max_name"')).sql.must_equal 'SELECT max(test."name") AS "max_name" FROM "test"'
+      @d.insert_sql(:x => :y).must_match /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
 
-      @d.select(Sequel.function(:test, :abc, 'hello')).sql.should == "SELECT test(\"abc\", 'hello') FROM \"test\""
-      @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.should == "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
-      @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.should == "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
-      @d.insert_sql(:value => 333).should =~ /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
+      @d.select(Sequel.function(:test, :abc, 'hello')).sql.must_equal "SELECT test(\"abc\", 'hello') FROM \"test\""
+      @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
+      @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
+      @d.insert_sql(:value => 333).must_match /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
     end
   end
 
-  specify "should quote fields correctly when reversing the order if quoting identifiers" do
+  it "should quote fields correctly when reversing the order if quoting identifiers" do
     check_sqls do
-      @d.reverse_order(:name).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC'
-      @d.reverse_order(Sequel.desc(:name)).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC'
-      @d.reverse_order(:name, Sequel.desc(:test)).sql.should == 'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
-      @d.reverse_order(Sequel.desc(:name), :test).sql.should == 'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
+      @d.reverse_order(:name).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" DESC'
+      @d.reverse_order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" ASC'
+      @d.reverse_order(:name, Sequel.desc(:test)).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
+      @d.reverse_order(Sequel.desc(:name), :test).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
     end
   end
 
-  specify "should support regexps" do
+  it "should support regexps" do
     @d << {:name => 'abc', :value => 1}
     @d << {:name => 'bcd', :value => 2}
-    @d.filter(:name => /bc/).count.should == 2
-    @d.filter(:name => /^bc/).count.should == 1
+    @d.filter(:name => /bc/).count.must_equal 2
+    @d.filter(:name => /^bc/).count.must_equal 1
   end
 
-  specify "should support NULLS FIRST and NULLS LAST" do
+  it "should support NULLS FIRST and NULLS LAST" do
     @d << {:name => 'abc'}
     @d << {:name => 'bcd'}
     @d << {:name => 'bcd', :value => 2}
-    @d.order(Sequel.asc(:value, :nulls=>:first), :name).select_map(:name).should == %w[abc bcd bcd]
-    @d.order(Sequel.asc(:value, :nulls=>:last), :name).select_map(:name).should == %w[bcd abc bcd]
-    @d.order(Sequel.asc(:value, :nulls=>:first), :name).reverse.select_map(:name).should == %w[bcd bcd abc]
+    @d.order(Sequel.asc(:value, :nulls=>:first), :name).select_map(:name).must_equal %w[abc bcd bcd]
+    @d.order(Sequel.asc(:value, :nulls=>:last), :name).select_map(:name).must_equal %w[bcd abc bcd]
+    @d.order(Sequel.asc(:value, :nulls=>:first), :name).reverse.select_map(:name).must_equal %w[bcd bcd abc]
   end
 
-  specify "should support selecting from LATERAL functions" do
+  it "should support selecting from LATERAL functions" do
     @d.from{[generate_series(1,3,1).as(:a), pow(:a, 2).lateral.as(:b)]}.select_map([:a, :b])== [[1, 1], [2, 4], [3, 9]]
   end if DB.server_version >= 90300
 
-  specify "should support ordered-set and hypothetical-set aggregate functions" do
-    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{mode{}.within_group(:a)}.should == 1
+  it "should support ordered-set and hypothetical-set aggregate functions" do
+    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{mode{}.within_group(:a)}.must_equal 1
   end if DB.server_version >= 90400
 
-  specify "should support filtered aggregate functions" do
-    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{count(:a).filter(:a=>1)}.should == 2
+  it "should support filtered aggregate functions" do
+    @d.from{generate_series(1,3,1).as(:a)}.select{(a.sql_number % 2).as(:a)}.from_self.get{count(:a).filter(:a=>1)}.must_equal 2
   end if DB.server_version >= 90400
 
-  specify "should support functions with ordinality" do
-    @d.from{generate_series(1,10,3).with_ordinality}.select_map([:generate_series, :ordinality]).should == [[1, 1], [4, 2], [7, 3], [10, 4]]
+  it "should support functions with ordinality" do
+    @d.from{generate_series(1,10,3).with_ordinality}.select_map([:generate_series, :ordinality]).must_equal [[1, 1], [4, 2], [7, 3], [10, 4]]
   end if DB.server_version >= 90400
 
-  specify "#lock should lock tables and yield if a block is given" do
+  it "#lock should lock tables and yield if a block is given" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end
 
-  specify "should support exclusion constraints when creating or altering tables" do
+  it "should support exclusion constraints when creating or altering tables" do
     @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}}
     @db[:atest].insert(1)
     @db[:atest].insert(2)
-    proc{@db[:atest].insert(2)}.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
+    proc{@db[:atest].insert(2)}.must_raise(Sequel::Postgres::ExclusionConstraintViolation)
 
     @db.create_table!(:atest){Integer :t}
     @db.alter_table(:atest){add_exclusion_constraint [[:t, '=']], :using=>:btree, :name=>'atest_ex'}
     @db[:atest].insert(1)
     @db[:atest].insert(2)
-    proc{@db[:atest].insert(2)}.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
+    proc{@db[:atest].insert(2)}.must_raise(Sequel::Postgres::ExclusionConstraintViolation)
     @db.alter_table(:atest){drop_constraint 'atest_ex'}
   end if DB.server_version >= 90000
   
-  specify "should support deferrable exclusion constraints" do
+  it "should support deferrable exclusion constraints" do
     @db.create_table!(:atest){Integer :t; exclude [[Sequel.desc(:t, :nulls=>:last), '=']], :using=>:btree, :where=>proc{t > 0}, :deferrable => true}
     proc do 
       @db.transaction do
         @db[:atest].insert(2)
-        proc{@db[:atest].insert(2)}.should_not raise_error
+        @db[:atest].insert(2)
       end
-    end.should raise_error(Sequel::Postgres::ExclusionConstraintViolation)
+    end.must_raise(Sequel::Postgres::ExclusionConstraintViolation)
   end if DB.server_version >= 90000
 
-  specify "should support Database#error_info for getting info hash on the given error" do
+  it "should support Database#error_info for getting info hash on the given error" do
     @db.create_table!(:atest){Integer :t; Integer :t2, :null=>false, :default=>1; constraint :f, :t=>0}
     begin
       @db[:atest].insert(1)
     rescue => e
     end
-    e.should_not be_nil
+    e.wont_equal nil
     info = @db.error_info(e)
-    info[:schema].should == 'public'
-    info[:table].should == 'atest'
-    info[:constraint].should == 'f'
-    info[:column].should be_nil
-    info[:type].should be_nil
+    info[:schema].must_equal 'public'
+    info[:table].must_equal 'atest'
+    info[:constraint].must_equal 'f'
+    info[:column].must_equal nil
+    info[:type].must_equal nil
 
     begin
       @db[:atest].insert(0, nil)
     rescue => e
     end
-    e.should_not be_nil
+    e.wont_equal nil
     info = @db.error_info(e.wrapped_exception)
-    info[:schema].should == 'public'
-    info[:table].should == 'atest'
-    info[:constraint].should be_nil
-    info[:column].should == 't2'
-    info[:type].should be_nil
+    info[:schema].must_equal 'public'
+    info[:table].must_equal 'atest'
+    info[:constraint].must_equal nil
+    info[:column].must_equal 't2'
+    info[:type].must_equal nil
   end if DB.server_version >= 90300 && DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
 
-  specify "should support Database#do for executing anonymous code blocks" do
+  it "should support Database#do for executing anonymous code blocks" do
     @db.drop_table?(:btest)
     @db.do "BEGIN EXECUTE 'CREATE TABLE btest (a INTEGER)'; EXECUTE 'INSERT INTO btest VALUES (1)'; END"
-    @db[:btest].select_map(:a).should == [1]
+    @db[:btest].select_map(:a).must_equal [1]
 
     @db.do "BEGIN EXECUTE 'DROP TABLE btest; CREATE TABLE atest (a INTEGER)'; EXECUTE 'INSERT INTO atest VALUES (1)'; END", :language=>:plpgsql
-    @db[:atest].select_map(:a).should == [1]
+    @db[:atest].select_map(:a).must_equal [1]
   end if DB.server_version >= 90000
 
-  specify "should support adding foreign key constarints that are not yet valid, and validating them later" do
+  it "should support adding foreign key constarints that are not yet valid, and validating them later" do
     @db.create_table!(:atest){primary_key :id; Integer :fk}
     @db[:atest].insert(1, 5)
     @db.alter_table(:atest){add_foreign_key [:fk], :atest, :not_valid=>true, :name=>:atest_fk}
     @db[:atest].insert(2, 1)
-    proc{@db[:atest].insert(3, 4)}.should raise_error(Sequel::DatabaseError)
+    proc{@db[:atest].insert(3, 4)}.must_raise(Sequel::ForeignKeyConstraintViolation)
 
-    proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should raise_error(Sequel::DatabaseError)
+    proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.must_raise(Sequel::ForeignKeyConstraintViolation)
     @db[:atest].where(:id=>1).update(:fk=>2)
     @db.alter_table(:atest){validate_constraint :atest_fk}
-    proc{@db.alter_table(:atest){validate_constraint :atest_fk}}.should_not raise_error
+    @db.alter_table(:atest){validate_constraint :atest_fk}
   end if DB.server_version >= 90200
 
-  specify "should support adding check constarints that are not yet valid, and validating them later" do
+  it "should support adding check constarints that are not yet valid, and validating them later" do
     @db.create_table!(:atest){Integer :a}
     @db[:atest].insert(5)
     @db.alter_table(:atest){add_constraint({:name=>:atest_check, :not_valid=>true}){a >= 10}}
     @db[:atest].insert(10)
-    proc{@db[:atest].insert(6)}.should raise_error(Sequel::DatabaseError)
+    proc{@db[:atest].insert(6)}.must_raise(Sequel::CheckConstraintViolation)
 
-    proc{@db.alter_table(:atest){validate_constraint :atest_check}}.should raise_error(Sequel::DatabaseError)
+    proc{@db.alter_table(:atest){validate_constraint :atest_check}}.must_raise(Sequel::CheckConstraintViolation, Sequel::DatabaseError)
     @db[:atest].where{a < 10}.update(:a=>Sequel.+(:a, 10))
     @db.alter_table(:atest){validate_constraint :atest_check}
-    proc{@db.alter_table(:atest){validate_constraint :atest_check}}.should_not raise_error
+    @db.alter_table(:atest){validate_constraint :atest_check}
   end if DB.server_version >= 90200
 
-  specify "should support :using when altering a column's type" do
+  it "should support :using when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
     @db[:atest].insert(1262304000)
     @db.alter_table(:atest){set_column_type :t, Time, :using=>Sequel.cast('epoch', Time) + Sequel.cast('1 second', :interval) * :t}
-    @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
+    @db[:atest].get(Sequel.extract(:year, :t)).must_equal 2010
   end
 
-  specify "should support :using with a string when altering a column's type" do
+  it "should support :using with a string when altering a column's type" do
     @db.create_table!(:atest){Integer :t}
     @db[:atest].insert(1262304000)
     @db.alter_table(:atest){set_column_type :t, Time, :using=>"'epoch'::timestamp + '1 second'::interval * t"}
-    @db[:atest].get(Sequel.extract(:year, :t)).should == 2010
+    @db[:atest].get(Sequel.extract(:year, :t)).must_equal 2010
   end
 
-  specify "should be able to parse the default value for an interval type" do
+  it "should be able to parse the default value for an interval type" do
     @db.create_table!(:atest){interval :t, :default=>'1 week'}
-    @db.schema(:atest).first.last[:ruby_default].should == '7 days'
+    @db.schema(:atest).first.last[:ruby_default].must_equal '7 days'
   end
 
-  specify "should have #transaction support various types of synchronous options" do
+  it "should have #transaction support various types of synchronous options" do
     @db.transaction(:synchronous=>:on){}
     @db.transaction(:synchronous=>true){}
     @db.transaction(:synchronous=>:off){}
     @db.transaction(:synchronous=>false){}
-    @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = off", "SET LOCAL synchronous_commit = off"]
+    @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = on", "SET LOCAL synchronous_commit = off", "SET LOCAL synchronous_commit = off"]
 
     @db.sqls.clear
     @db.transaction(:synchronous=>nil){}
     check_sqls do
-      @db.sqls.should == ['BEGIN', 'COMMIT']
+      @db.sqls.must_equal ['BEGIN', 'COMMIT']
     end
 
     if @db.server_version >= 90100
       @db.sqls.clear
       @db.transaction(:synchronous=>:local){}
       check_sqls do
-        @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = local"]
+        @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = local"]
       end
 
       if @db.server_version >= 90200
         @db.sqls.clear
         @db.transaction(:synchronous=>:remote_write){}
         check_sqls do
-          @db.sqls.grep(/synchronous/).should == ["SET LOCAL synchronous_commit = remote_write"]
+          @db.sqls.grep(/synchronous/).must_equal ["SET LOCAL synchronous_commit = remote_write"]
         end
       end
     end
   end
 
-  specify "should have #transaction support read only transactions" do
+  it "should have #transaction support read only transactions" do
     @db.transaction(:read_only=>true){}
     @db.transaction(:read_only=>false){}
     @db.transaction(:isolation=>:serializable, :read_only=>true){}
     @db.transaction(:isolation=>:serializable, :read_only=>false){}
-    @db.sqls.grep(/READ/).should == ["SET TRANSACTION READ ONLY", "SET TRANSACTION READ WRITE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE"]
+    @db.sqls.grep(/READ/).must_equal ["SET TRANSACTION READ ONLY", "SET TRANSACTION READ WRITE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE"]
   end
 
-  specify "should have #transaction support deferrable transactions" do
+  it "should have #transaction support deferrable transactions" do
     @db.transaction(:deferrable=>true){}
     @db.transaction(:deferrable=>false){}
     @db.transaction(:deferrable=>true, :read_only=>true){}
     @db.transaction(:deferrable=>false, :read_only=>false){}
     @db.transaction(:isolation=>:serializable, :deferrable=>true, :read_only=>true){}
     @db.transaction(:isolation=>:serializable, :deferrable=>false, :read_only=>false){}
-    @db.sqls.grep(/DEF/).should == ["SET TRANSACTION DEFERRABLE", "SET TRANSACTION NOT DEFERRABLE", "SET TRANSACTION READ ONLY DEFERRABLE", "SET TRANSACTION READ WRITE NOT DEFERRABLE",  "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE"]
+    @db.sqls.grep(/DEF/).must_equal ["SET TRANSACTION DEFERRABLE", "SET TRANSACTION NOT DEFERRABLE", "SET TRANSACTION READ ONLY DEFERRABLE", "SET TRANSACTION READ WRITE NOT DEFERRABLE",  "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ ONLY DEFERRABLE", "SET TRANSACTION ISOLATION LEVEL SERIALIZABLE READ WRITE NOT DEFERRABLE"]
   end if DB.server_version >= 90100
 
-  specify "should support creating indexes concurrently" do
+  it "should support creating indexes concurrently" do
     @db.add_index :test, [:name, :value], :concurrently=>true
     check_sqls do
-      @db.sqls.should == ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")']
+      @db.sqls.must_equal ['CREATE INDEX CONCURRENTLY "test_name_value_index" ON "test" ("name", "value")']
     end
   end
 
-  specify "should support dropping indexes only if they already exist" do
+  it "should support dropping indexes only if they already exist" do
     @db.add_index :test, [:name, :value], :name=>'tnv1'
     @db.sqls.clear
     @db.drop_index :test, [:name, :value], :if_exists=>true, :name=>'tnv1'
     check_sqls do
-      @db.sqls.should == ['DROP INDEX IF EXISTS "tnv1"']
+      @db.sqls.must_equal ['DROP INDEX IF EXISTS "tnv1"']
     end
   end
 
-  specify "should support CASCADE when dropping indexes" do
+  it "should support CASCADE when dropping indexes" do
     @db.add_index :test, [:name, :value], :name=>'tnv2'
     @db.sqls.clear
     @db.drop_index :test, [:name, :value], :cascade=>true, :name=>'tnv2'
     check_sqls do
-      @db.sqls.should == ['DROP INDEX "tnv2" CASCADE']
+      @db.sqls.must_equal ['DROP INDEX "tnv2" CASCADE']
     end
   end
 
-  specify "should support dropping indexes concurrently" do
+  it "should support dropping indexes concurrently" do
     @db.add_index :test, [:name, :value], :name=>'tnv2'
     @db.sqls.clear
     @db.drop_index :test, [:name, :value], :concurrently=>true, :name=>'tnv2'
     check_sqls do
-      @db.sqls.should == ['DROP INDEX CONCURRENTLY "tnv2"']
+      @db.sqls.must_equal ['DROP INDEX CONCURRENTLY "tnv2"']
     end
   end if DB.server_version >= 90200
 
-  specify "#lock should lock table if inside a transaction" do
+  it "#lock should lock table if inside a transaction" do
     @db.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end
 
-  specify "#lock should return nil" do
-    @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.should == nil
-    @db.transaction{@d.lock('EXCLUSIVE').should == nil; @d.insert(:name=>'a')}
+  it "#lock should return nil" do
+    @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.must_equal nil
+    @db.transaction{@d.lock('EXCLUSIVE').must_equal nil; @d.insert(:name=>'a')}
   end
 
-  specify "should raise an error if attempting to update a joined dataset with a single FROM table" do
-    proc{@db[:test].join(:test, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
+  it "should raise an error if attempting to update a joined dataset with a single FROM table" do
+    proc{@db[:test].join(:test, [:name]).update(:name=>'a')}.must_raise(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
   end
 
-  specify "should truncate with options" do
+  it "should truncate with options" do
     @d << { :name => 'abc', :value => 1}
-    @d.count.should == 1
+    @d.count.must_equal 1
     @d.truncate(:cascade => true)
-    @d.count.should == 0
+    @d.count.must_equal 0
     if @d.db.server_version > 80400
       @d << { :name => 'abc', :value => 1}
       @d.truncate(:cascade => true, :only=>true, :restart=>true)
-      @d.count.should == 0
+      @d.count.must_equal 0
     end
   end
 
-  specify "should truncate multiple tables at once" do
+  it "should truncate multiple tables at once" do
     tables = [:test, :test]
     tables.each{|t| @d.from(t).insert}
     @d.from(:test, :test).truncate
-    tables.each{|t| @d.from(t).count.should == 0}
+    tables.each{|t| @d.from(t).count.must_equal 0}
   end
 end
 
@@ -623,10 +627,10 @@ describe "Dataset#distinct" do
   it "#distinct with arguments should return results distinct on those arguments" do
     @ds.insert(20, 10)
     @ds.insert(30, 10)
-    @ds.order(:b, :a).distinct.map(:a).should == [20, 30]
-    @ds.order(:b, Sequel.desc(:a)).distinct.map(:a).should == [30, 20]
-    @ds.order(:b, :a).distinct(:b).map(:a).should == [20]
-    @ds.order(:b, Sequel.desc(:a)).distinct(:b).map(:a).should == [30]
+    @ds.order(:b, :a).distinct.map(:a).must_equal [20, 30]
+    @ds.order(:b, Sequel.desc(:a)).distinct.map(:a).must_equal [30, 20]
+    @ds.order(:b, :a).distinct(:b).map(:a).must_equal [20]
+    @ds.order(:b, Sequel.desc(:a)).distinct(:b).map(:a).must_equal [30]
   end
 end
 
@@ -645,7 +649,7 @@ if DB.pool.respond_to?(:max_size) and DB.pool.max_size > 1
       DB.disconnect
     end
 
-    specify "should handle FOR UPDATE" do
+    it "should handle FOR UPDATE" do
       @ds.insert(:number=>20)
       c, t = nil, nil
       q = Queue.new
@@ -664,10 +668,10 @@ if DB.pool.respond_to?(:max_size) and DB.pool.max_size > 1
       end
       q.pop
       t.join
-      c.should == {:id=>1, :number=>30, :name=>'Jim'}
+      c.must_equal(:id=>1, :number=>30, :name=>'Jim')
     end
 
-    specify "should handle FOR SHARE" do
+    it "should handle FOR SHARE" do
       @ds.insert(:number=>20)
       c, t = nil
       q = Queue.new
@@ -681,7 +685,7 @@ if DB.pool.respond_to?(:max_size) and DB.pool.max_size > 1
         end
         q.pop
         @ds.filter(:id=>1).update(:name=>'Jim')
-        c.should == {:id=>1, :number=>20, :name=>nil}
+        c.must_equal(:id=>1, :number=>20, :name=>nil)
       end
       t.join
     end
@@ -707,106 +711,106 @@ describe "A PostgreSQL dataset with a timestamp field" do
     @db.drop_table?(:test3)
   end
 
-  cspecify "should store milliseconds in time fields for Time objects", :do, :swift do
+  cspecify "should store milliseconds in time fields for Time objects", [:do], [:swift] do
     t = Time.now
     @d << {:time=>t}
     t2 = @d.get(:time)
-    @d.literal(t2).should == @d.literal(t)
-    t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
-    (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).should == t.usec
+    @d.literal(t2).must_equal @d.literal(t)
+    t2.strftime('%Y-%m-%d %H:%M:%S').must_equal t.strftime('%Y-%m-%d %H:%M:%S')
+    (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).must_equal t.usec
   end
 
-  cspecify "should store milliseconds in time fields for DateTime objects", :do, :swift do
+  cspecify "should store milliseconds in time fields for DateTime objects", [:do], [:swift] do
     t = DateTime.now
     @d << {:time=>t}
     t2 = @d.get(:time)
-    @d.literal(t2).should == @d.literal(t)
-    t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
-    (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).should == t.strftime('%N').to_i/1000
+    @d.literal(t2).must_equal @d.literal(t)
+    t2.strftime('%Y-%m-%d %H:%M:%S').must_equal t.strftime('%Y-%m-%d %H:%M:%S')
+    (t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000).must_equal t.strftime('%N').to_i/1000
   end
 
   if DB.adapter_scheme == :postgres
-    specify "should handle infinite timestamps if convert_infinite_timestamps is set" do
+    it "should handle infinite timestamps if convert_infinite_timestamps is set" do
       @d << {:time=>Sequel.cast('infinity', DateTime)}
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:time).should == nil
+      @db[:test3].get(:time).must_equal nil
       @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:time).should == 'infinity'
+      @db[:test3].get(:time).must_equal 'infinity'
       @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:time).should == 1.0/0.0
+      @db[:test3].get(:time).must_equal 1.0/0.0
       @db.convert_infinite_timestamps = 'nil'
-      @db[:test3].get(:time).should == nil
+      @db[:test3].get(:time).must_equal nil
       @db.convert_infinite_timestamps = 'string'
-      @db[:test3].get(:time).should == 'infinity'
+      @db[:test3].get(:time).must_equal 'infinity'
       @db.convert_infinite_timestamps = 'float'
-      @db[:test3].get(:time).should == 1.0/0.0
+      @db[:test3].get(:time).must_equal 1.0/0.0
       @db.convert_infinite_timestamps = 't'
-      @db[:test3].get(:time).should == 1.0/0.0
+      @db[:test3].get(:time).must_equal 1.0/0.0
       if ((Time.parse('infinity'); nil) rescue true)
         # Skip for loose time parsing (e.g. old rbx)
         @db.convert_infinite_timestamps = 'f'
-        proc{@db[:test3].get(:time)}.should raise_error
+        proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
         @db.convert_infinite_timestamps = nil
-        proc{@db[:test3].get(:time)}.should raise_error
+        proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
         @db.convert_infinite_timestamps = false
-        proc{@db[:test3].get(:time)}.should raise_error
+        proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
       end
 
       @d.update(:time=>Sequel.cast('-infinity', DateTime))
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:time).should == nil
+      @db[:test3].get(:time).must_equal nil
       @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:time).should == '-infinity'
+      @db[:test3].get(:time).must_equal '-infinity'
       @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:time).should == -1.0/0.0
+      @db[:test3].get(:time).must_equal -1.0/0.0
     end
 
-    specify "should handle conversions from infinite strings/floats in models" do
+    it "should handle conversions from infinite strings/floats in models" do
       c = Class.new(Sequel::Model(:test3))
       @db.convert_infinite_timestamps = :float
-      c.new(:time=>'infinity').time.should == 'infinity'
-      c.new(:time=>'-infinity').time.should == '-infinity'
-      c.new(:time=>1.0/0.0).time.should == 1.0/0.0
-      c.new(:time=>-1.0/0.0).time.should == -1.0/0.0
+      c.new(:time=>'infinity').time.must_equal 'infinity'
+      c.new(:time=>'-infinity').time.must_equal '-infinity'
+      c.new(:time=>1.0/0.0).time.must_equal 1.0/0.0
+      c.new(:time=>-1.0/0.0).time.must_equal -1.0/0.0
     end
 
-    specify "should handle infinite dates if convert_infinite_timestamps is set" do
+    it "should handle infinite dates if convert_infinite_timestamps is set" do
       @d << {:date=>Sequel.cast('infinity', Date)}
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:date).should == nil
+      @db[:test3].get(:date).must_equal nil
       @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:date).should == 'infinity'
+      @db[:test3].get(:date).must_equal 'infinity'
       @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:date).should == 1.0/0.0
+      @db[:test3].get(:date).must_equal 1.0/0.0
 
       @d.update(:date=>Sequel.cast('-infinity', :timestamp))
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:date).should == nil
+      @db[:test3].get(:date).must_equal nil
       @db.convert_infinite_timestamps = :string
-      @db[:test3].get(:date).should == '-infinity'
+      @db[:test3].get(:date).must_equal '-infinity'
       @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:date).should == -1.0/0.0
+      @db[:test3].get(:date).must_equal -1.0/0.0
     end
 
-    specify "should handle conversions from infinite strings/floats in models" do
+    it "should handle conversions from infinite strings/floats in models" do
       c = Class.new(Sequel::Model(:test3))
       @db.convert_infinite_timestamps = :float
-      c.new(:date=>'infinity').date.should == 'infinity'
-      c.new(:date=>'-infinity').date.should == '-infinity'
-      c.new(:date=>1.0/0.0).date.should == 1.0/0.0
-      c.new(:date=>-1.0/0.0).date.should == -1.0/0.0
+      c.new(:date=>'infinity').date.must_equal 'infinity'
+      c.new(:date=>'-infinity').date.must_equal '-infinity'
+      c.new(:date=>1.0/0.0).date.must_equal 1.0/0.0
+      c.new(:date=>-1.0/0.0).date.must_equal -1.0/0.0
     end
   end
 
-  specify "explain and analyze should not raise errors" do
+  it "explain and analyze should not raise errors" do
     @d = DB[:test3]
-    proc{@d.explain}.should_not raise_error
-    proc{@d.analyze}.should_not raise_error
+    @d.explain
+    @d.analyze
   end
 
-  specify "#locks should be a dataset returning database locks " do
-    @db.locks.should be_a_kind_of(Sequel::Dataset)
-    @db.locks.all.should be_a_kind_of(Array)
+  it "#locks should be a dataset returning database locks " do
+    @db.locks.must_be_kind_of(Sequel::Dataset)
+    @db.locks.all.must_be_kind_of(Array)
   end
 end
 
@@ -822,36 +826,36 @@ describe "A PostgreSQL database" do
     @db.drop_table?(:test2)
   end
 
-  specify "should support column operations" do
+  it "should support column operations" do
     @db.create_table!(:test2){text :name; integer :value}
     @db[:test2] << {}
-    @db[:test2].columns.should == [:name, :value]
+    @db[:test2].columns.must_equal [:name, :value]
 
     @db.add_column :test2, :xyz, :text, :default => '000'
-    @db[:test2].columns.should == [:name, :value, :xyz]
+    @db[:test2].columns.must_equal [:name, :value, :xyz]
     @db[:test2] << {:name => 'mmm', :value => 111}
-    @db[:test2].first[:xyz].should == '000'
+    @db[:test2].first[:xyz].must_equal '000'
 
-    @db[:test2].columns.should == [:name, :value, :xyz]
+    @db[:test2].columns.must_equal [:name, :value, :xyz]
     @db.drop_column :test2, :xyz
 
-    @db[:test2].columns.should == [:name, :value]
+    @db[:test2].columns.must_equal [:name, :value]
 
     @db[:test2].delete
     @db.add_column :test2, :xyz, :text, :default => '000'
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
 
-    @db[:test2].columns.should == [:name, :value, :xyz]
+    @db[:test2].columns.must_equal [:name, :value, :xyz]
     @db.rename_column :test2, :xyz, :zyx
-    @db[:test2].columns.should == [:name, :value, :zyx]
-    @db[:test2].first[:zyx].should == 'qqqq'
+    @db[:test2].columns.must_equal [:name, :value, :zyx]
+    @db[:test2].first[:zyx].must_equal 'qqqq'
 
     @db.add_column :test2, :xyz, :float
     @db[:test2].delete
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}
     @db.set_column_type :test2, :xyz, :integer
 
-    @db[:test2].first[:xyz].should == 57
+    @db[:test2].first[:xyz].must_equal 57
   end
 end
 
@@ -865,129 +869,129 @@ describe "A PostgreSQL database" do
     @db.drop_table?(:posts)
   end
 
-  specify "should support resetting the primary key sequence" do
+  it "should support resetting the primary key sequence" do
     @db.create_table(:posts){primary_key :a}
-    @db[:posts].insert(:a=>20).should == 20
-    @db[:posts].insert.should == 1
-    @db[:posts].insert.should == 2
-    @db[:posts].insert(:a=>10).should == 10
-    @db.reset_primary_key_sequence(:posts).should == 21
-    @db[:posts].insert.should == 21
-    @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
+    @db[:posts].insert(:a=>20).must_equal 20
+    @db[:posts].insert.must_equal 1
+    @db[:posts].insert.must_equal 2
+    @db[:posts].insert(:a=>10).must_equal 10
+    @db.reset_primary_key_sequence(:posts).must_equal 21
+    @db[:posts].insert.must_equal 21
+    @db[:posts].order(:a).map(:a).must_equal [1, 2, 10, 20, 21]
   end
     
-  specify "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
+  it "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
     @db.create_table(:posts){primary_key :a, :type=>Integer}
-    @db[:posts].insert.should == 1
-    @db[:posts].insert.should == 2
+    @db[:posts].insert.must_equal 1
+    @db[:posts].insert.must_equal 2
     @db.create_table!(:posts){primary_key :a, :type=>Fixnum}
-    @db[:posts].insert.should == 1
-    @db[:posts].insert.should == 2
+    @db[:posts].insert.must_equal 1
+    @db[:posts].insert.must_equal 2
     @db.create_table!(:posts){primary_key :a, :type=>Bignum}
-    @db[:posts].insert.should == 1
-    @db[:posts].insert.should == 2
+    @db[:posts].insert.must_equal 1
+    @db[:posts].insert.must_equal 2
   end
 
-  specify "should not raise an error if attempting to resetting the primary key sequence for a table without a primary key" do
+  it "should not raise an error if attempting to resetting the primary key sequence for a table without a primary key" do
     @db.create_table(:posts){Integer :a}
-    @db.reset_primary_key_sequence(:posts).should == nil
+    @db.reset_primary_key_sequence(:posts).must_equal nil
   end
 
-  specify "should support opclass specification" do
+  it "should support opclass specification" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :int4_ops, :type => :btree)}
     check_sqls do
-      @db.sqls.should == [
+      @db.sqls.must_equal [
       'CREATE TABLE "posts" ("title" text, "body" text, "user_id" integer)',
       'CREATE INDEX "posts_user_id_index" ON "posts" USING btree ("user_id" int4_ops)'
       ]
     end
   end
 
-  specify "should support fulltext indexes and searching" do
+  it "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french', :index_type=>:gist}
 
     @db[:posts].insert(:title=>'ruby rails', :body=>'yowsa')
     @db[:posts].insert(:title=>'sequel', :body=>'ruby')
     @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
 
-    @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
-    @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.should == [:title=>'ruby rails', :body=>'yowsa']
-    @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.should == [{:title=>'ruby scooby', :body=>'x'}]
+    @db[:posts].full_text_search(:title, 'rails').all.must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.must_equal [:title=>'ruby rails', :body=>'yowsa']
+    @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.must_equal [{:title=>'ruby scooby', :body=>'x'}]
 
-    @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
-    @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').should == [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search(:title, :$n).call(:select, :n=>'rails').must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search(:title, :$n).prepare(:select, :fts_select).call(:n=>'rails').must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
 
     @db[:posts].insert(:title=>'jruby rubinius ruby maglev mri iron')
     @db[:posts].insert(:title=>'ruby jruby maglev mri rubinius iron')
-    @db[:posts].full_text_search(:title, 'rubinius ruby', :phrase=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron']
-    @db[:posts].full_text_search(:title, 'jruby maglev', :phrase=>true).select_order_map(:title).should == ['ruby jruby maglev mri rubinius iron']
-    @db[:posts].full_text_search(:title, 'rubinius ruby', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
-    @db[:posts].full_text_search(:title, 'jruby maglev', :plain=>true).select_order_map(:title).should == ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
+    @db[:posts].full_text_search(:title, 'rubinius ruby', :phrase=>true).select_order_map(:title).must_equal ['jruby rubinius ruby maglev mri iron']
+    @db[:posts].full_text_search(:title, 'jruby maglev', :phrase=>true).select_order_map(:title).must_equal ['ruby jruby maglev mri rubinius iron']
+    @db[:posts].full_text_search(:title, 'rubinius ruby', :plain=>true).select_order_map(:title).must_equal ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
+    @db[:posts].full_text_search(:title, 'jruby maglev', :plain=>true).select_order_map(:title).must_equal ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
 
-    @db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rails', :tsvector=>true).all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
-    @db[:posts].full_text_search(:title, Sequel.function(:to_tsquery, 'simple', 'rails'), :tsquery=>true).all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
-    proc{@db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rubinius ruby', :tsvector=>true, :phrase=>true)}.should raise_error(Sequel::Error)
-    proc{@db[:posts].full_text_search(:title, Sequel.function(:to_tsquery, 'simple', 'rails'), :tsquery=>true, :phrase=>true)}.should raise_error(Sequel::Error)
+    @db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rails', :tsvector=>true).all.must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search(:title, Sequel.function(:to_tsquery, 'simple', 'rails'), :tsquery=>true).all.must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
+    proc{@db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rubinius ruby', :tsvector=>true, :phrase=>true)}.must_raise(Sequel::Error)
+    proc{@db[:posts].full_text_search(:title, Sequel.function(:to_tsquery, 'simple', 'rails'), :tsquery=>true, :phrase=>true)}.must_raise(Sequel::Error)
 
     @db[:posts].delete
     t1 = "bork " * 1000 + "ruby sequel"
     t2 = "ruby sequel " * 1000
     @db[:posts].insert(:title=>t1)
     @db[:posts].insert(:title=>t2)
-    @db[:posts].full_text_search(:title, 'ruby & sequel', :rank=>true).select_map(:title).should == [t1, t2]
+    @db[:posts].full_text_search(:title, 'ruby & sequel', :rank=>true).select_map(:title).must_equal [t1, t2]
   end
 
-  specify "should support spatial indexes" do
+  it "should support spatial indexes" do
     @db.create_table(:posts){box :geom; spatial_index [:geom]}
     check_sqls do
-      @db.sqls.should == [
+      @db.sqls.must_equal [
         'CREATE TABLE "posts" ("geom" box)',
         'CREATE INDEX "posts_geom_index" ON "posts" USING gist ("geom")'
       ]
     end
   end
 
-  specify "should support indexes with index type" do
+  it "should support indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'hash'}
     check_sqls do
-      @db.sqls.should == [
+      @db.sqls.must_equal [
         'CREATE TABLE "posts" ("title" varchar(5))',
         'CREATE INDEX "posts_title_index" ON "posts" USING hash ("title")'
       ]
     end
   end
 
-  specify "should support unique indexes with index type" do
+  it "should support unique indexes with index type" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'btree', :unique => true}
     check_sqls do
-      @db.sqls.should == [
+      @db.sqls.must_equal [
         'CREATE TABLE "posts" ("title" varchar(5))',
         'CREATE UNIQUE INDEX "posts_title_index" ON "posts" USING btree ("title")'
       ]
     end
   end
 
-  specify "should support partial indexes" do
+  it "should support partial indexes" do
     @db.create_table(:posts){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
     check_sqls do
-      @db.sqls.should == [
+      @db.sqls.must_equal [
         'CREATE TABLE "posts" ("title" varchar(5))',
         'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
       ]
     end
   end
 
-  specify "should support identifiers for table names in indicies" do
+  it "should support identifiers for table names in indicies" do
     @db.create_table(Sequel::SQL::Identifier.new(:posts)){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
     check_sqls do
-      @db.sqls.should == [
+      @db.sqls.must_equal [
         'CREATE TABLE "posts" ("title" varchar(5))',
         'CREATE INDEX "posts_title_index" ON "posts" ("title") WHERE ("title" = \'5\')'
       ]
     end
   end
 
-  specify "should support renaming tables" do
+  it "should support renaming tables" do
     @db.create_table!(:posts1){primary_key :a}
     @db.rename_table(:posts1, :posts)
   end
@@ -1005,27 +1009,27 @@ describe "Postgres::Dataset#import" do
   end
 
 
-  specify "#import should a single insert statement" do
+  it "#import should a single insert statement" do
     @ds.import([:x, :y], [[1, 2], [3, 4]])
     check_sqls do
-      @db.sqls.should == ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)', 'COMMIT']
+      @db.sqls.must_equal ['BEGIN', 'INSERT INTO "test" ("x", "y") VALUES (1, 2), (3, 4)', 'COMMIT']
     end
-    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+    @ds.all.must_equal [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 
-  specify "#import should work correctly when returning primary keys" do
-    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key).should == [1, 3]
-    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  it "#import should work correctly when returning primary keys" do
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key).must_equal [1, 3]
+    @ds.all.must_equal [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 
-  specify "#import should work correctly when returning primary keys with :slice option" do
-    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key, :slice=>1).should == [1, 3]
-    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  it "#import should work correctly when returning primary keys with :slice option" do
+    @ds.import([:x, :y], [[1, 2], [3, 4]], :return=>:primary_key, :slice=>1).must_equal [1, 3]
+    @ds.all.must_equal [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 
-  specify "#import should work correctly with an arbitrary returning value" do
-    @ds.returning(:y, :x).import([:x, :y], [[1, 2], [3, 4]]).should == [{:y=>2, :x=>1}, {:y=>4, :x=>3}]
-    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
+  it "#import should work correctly with an arbitrary returning value" do
+    @ds.returning(:y, :x).import([:x, :y], [[1, 2], [3, 4]]).must_equal [{:y=>2, :x=>1}, {:y=>4, :x=>3}]
+    @ds.all.must_equal [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 end
 
@@ -1040,55 +1044,55 @@ describe "Postgres::Dataset#insert" do
     @db.drop_table?(:test5)
   end
 
-  specify "should work with static SQL" do
-    @ds.with_sql('INSERT INTO test5 (value) VALUES (10)').insert.should == nil
-    @db['INSERT INTO test5 (value) VALUES (20)'].insert.should == nil
-    @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}]
+  it "should work with static SQL" do
+    @ds.with_sql('INSERT INTO test5 (value) VALUES (10)').insert.must_equal nil
+    @db['INSERT INTO test5 (value) VALUES (20)'].insert.must_equal nil
+    @ds.all.must_equal [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}]
   end
 
-  specify "should insert correctly if using a column array and a value array" do
-    @ds.insert([:value], [10]).should == 1
-    @ds.all.should == [{:xid=>1, :value=>10}]
+  it "should insert correctly if using a column array and a value array" do
+    @ds.insert([:value], [10]).must_equal 1
+    @ds.all.must_equal [{:xid=>1, :value=>10}]
   end
 
-  specify "should use INSERT RETURNING" do
-    @ds.insert(:value=>10).should == 1
+  it "should use INSERT RETURNING" do
+    @ds.insert(:value=>10).must_equal 1
     check_sqls do
-      @db.sqls.last.should == 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"'
+      @db.sqls.last.must_equal 'INSERT INTO "test5" ("value") VALUES (10) RETURNING "xid"'
     end
   end
 
-  specify "should have insert_select insert the record and return the inserted record" do
+  it "should have insert_select insert the record and return the inserted record" do
     h = @ds.insert_select(:value=>10)
-    h[:value].should == 10
-    @ds.first(:xid=>h[:xid])[:value].should == 10
+    h[:value].must_equal 10
+    @ds.first(:xid=>h[:xid])[:value].must_equal 10
   end
 
-  specify "should have insert_select respect existing returning clause" do
+  it "should have insert_select respect existing returning clause" do
     h = @ds.returning(:value___v, :xid___x).insert_select(:value=>10)
-    h[:v].should == 10
-    @ds.first(:xid=>h[:x])[:value].should == 10
+    h[:v].must_equal 10
+    @ds.first(:xid=>h[:x])[:value].must_equal 10
   end
 
-  specify "should have prepared insert_select respect existing returning clause" do
+  it "should have prepared insert_select respect existing returning clause" do
     h = @ds.returning(:value___v, :xid___x).prepare(:insert_select, :insert_select, :value=>10).call
-    h[:v].should == 10
-    @ds.first(:xid=>h[:x])[:value].should == 10
+    h[:v].must_equal 10
+    @ds.first(:xid=>h[:x])[:value].must_equal 10
   end
 
-  specify "should correctly return the inserted record's primary key value" do
+  it "should correctly return the inserted record's primary key value" do
     value1 = 10
     id1 = @ds.insert(:value=>value1)
-    @ds.first(:xid=>id1)[:value].should == value1
+    @ds.first(:xid=>id1)[:value].must_equal value1
     value2 = 20
     id2 = @ds.insert(:value=>value2)
-    @ds.first(:xid=>id2)[:value].should == value2
+    @ds.first(:xid=>id2)[:value].must_equal value2
   end
 
-  specify "should return nil if the table has no primary key" do
+  it "should return nil if the table has no primary key" do
     @db.create_table!(:test5){String :name; Integer :value}
     @ds.delete
-    @ds.insert(:name=>'a').should == nil
+    @ds.insert(:name=>'a').must_equal nil
   end
 end
 
@@ -1103,100 +1107,100 @@ describe "Postgres::Database schema qualified tables" do
     @db << "DROP SCHEMA schema_test CASCADE"
   end
 
-  specify "should be able to create, drop, select and insert into tables in a given schema" do
+  it "should be able to create, drop, select and insert into tables in a given schema" do
     @db.create_table(:schema_test__schema_test){primary_key :i}
-    @db[:schema_test__schema_test].first.should == nil
-    @db[:schema_test__schema_test].insert(:i=>1).should == 1
-    @db[:schema_test__schema_test].first.should == {:i=>1}
-    @db.from(Sequel.lit('schema_test.schema_test')).first.should == {:i=>1}
+    @db[:schema_test__schema_test].first.must_equal nil
+    @db[:schema_test__schema_test].insert(:i=>1).must_equal 1
+    @db[:schema_test__schema_test].first.must_equal(:i=>1)
+    @db.from(Sequel.lit('schema_test.schema_test')).first.must_equal(:i=>1)
     @db.drop_table(:schema_test__schema_test)
     @db.create_table(Sequel.qualify(:schema_test, :schema_test)){integer :i}
-    @db[:schema_test__schema_test].first.should == nil
-    @db.from(Sequel.lit('schema_test.schema_test')).first.should == nil
+    @db[:schema_test__schema_test].first.must_equal nil
+    @db.from(Sequel.lit('schema_test.schema_test')).first.must_equal nil
     @db.drop_table(Sequel.qualify(:schema_test, :schema_test))
   end
 
-  specify "#tables should not include tables in a default non-public schema" do
+  it "#tables should not include tables in a default non-public schema" do
     @db.create_table(:schema_test__schema_test){integer :i}
-    @db.tables(:schema=>:schema_test).should include(:schema_test)
-    @db.tables.should_not include(:pg_am)
-    @db.tables.should_not include(:domain_udt_usage)
+    @db.tables(:schema=>:schema_test).must_include(:schema_test)
+    @db.tables.wont_include(:pg_am)
+    @db.tables.wont_include(:domain_udt_usage)
   end
 
-  specify "#tables should return tables in the schema provided by the :schema argument" do
+  it "#tables should return tables in the schema provided by the :schema argument" do
     @db.create_table(:schema_test__schema_test){integer :i}
-    @db.tables(:schema=>:schema_test).should == [:schema_test]
+    @db.tables(:schema=>:schema_test).must_equal [:schema_test]
   end
 
-  specify "#schema should not include columns from tables in a default non-public schema" do
+  it "#schema should not include columns from tables in a default non-public schema" do
     @db.create_table(:schema_test__domains){integer :i}
     sch = @db.schema(:schema_test__domains)
     cs = sch.map{|x| x.first}
-    cs.should include(:i)
-    cs.should_not include(:data_type)
+    cs.must_include(:i)
+    cs.wont_include(:data_type)
   end
 
-  specify "#schema should only include columns from the table in the given :schema argument" do
+  it "#schema should only include columns from the table in the given :schema argument" do
     @db.create_table!(:domains){integer :d}
     @db.create_table(:schema_test__domains){integer :i}
     sch = @db.schema(:domains, :schema=>:schema_test)
     cs = sch.map{|x| x.first}
-    cs.should include(:i)
-    cs.should_not include(:d)
+    cs.must_include(:i)
+    cs.wont_include(:d)
     @db.drop_table(:domains)
   end
 
-  specify "#schema should not include columns in tables from other domains by default" do
+  it "#schema should not include columns in tables from other domains by default" do
     @db.create_table!(:public__domains){integer :d}
     @db.create_table(:schema_test__domains){integer :i}
     begin
-      @db.schema(:domains).map{|x| x.first}.should == [:d]
-      @db.schema(:schema_test__domains).map{|x| x.first}.should == [:i]
+      @db.schema(:domains).map{|x| x.first}.must_equal [:d]
+      @db.schema(:schema_test__domains).map{|x| x.first}.must_equal [:i]
     ensure
       @db.drop_table?(:public__domains)
     end
   end
 
-  specify "#table_exists? should see if the table is in a given schema" do
+  it "#table_exists? should see if the table is in a given schema" do
     @db.create_table(:schema_test__schema_test){integer :i}
-    @db.table_exists?(:schema_test__schema_test).should == true
+    @db.table_exists?(:schema_test__schema_test).must_equal true
   end
 
-  specify "should be able to add and drop indexes in a schema" do
+  it "should be able to add and drop indexes in a schema" do
     @db.create_table(:schema_test__schema_test){Integer :i, :index=>true}
-    @db.indexes(:schema_test__schema_test).keys.should == [:schema_test_schema_test_i_index]
+    @db.indexes(:schema_test__schema_test).keys.must_equal [:schema_test_schema_test_i_index]
     @db.drop_index :schema_test__schema_test, :i
-    @db.indexes(:schema_test__schema_test).keys.should == []
+    @db.indexes(:schema_test__schema_test).keys.must_equal []
   end
 
-  specify "should be able to get primary keys for tables in a given schema" do
+  it "should be able to get primary keys for tables in a given schema" do
     @db.create_table(:schema_test__schema_test){primary_key :i}
-    @db.primary_key(:schema_test__schema_test).should == 'i'
+    @db.primary_key(:schema_test__schema_test).must_equal 'i'
   end
 
-  specify "should be able to get serial sequences for tables in a given schema" do
+  it "should be able to get serial sequences for tables in a given schema" do
     @db.create_table(:schema_test__schema_test){primary_key :i}
-    @db.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
+    @db.primary_key_sequence(:schema_test__schema_test).must_equal '"schema_test"."schema_test_i_seq"'
   end
 
-  specify "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
+  it "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
     @db.create_table(:"schema_test__schema test"){primary_key :i}
-    @db.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."schema test_i_seq"'
+    @db.primary_key_sequence(:"schema_test__schema test").must_equal '"schema_test"."schema test_i_seq"'
   end
 
-  specify "should be able to get custom sequences for tables in a given schema" do
+  it "should be able to get custom sequences for tables in a given schema" do
     @db << "CREATE SEQUENCE schema_test.kseq"
     @db.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.kseq'::regclass)")}
-    @db.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".kseq'
+    @db.primary_key_sequence(:schema_test__schema_test).must_equal '"schema_test".kseq'
   end
 
-  specify "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
+  it "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
     @db << "CREATE SEQUENCE schema_test.\"ks eq\""
     @db.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.\"ks eq\"'::regclass)")}
-    @db.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
+    @db.primary_key_sequence(:"schema_test__schema test").must_equal '"schema_test"."ks eq"'
   end
 
-  specify "should handle schema introspection cases with tables with same name in multiple schemas" do
+  it "should handle schema introspection cases with tables with same name in multiple schemas" do
     begin
       @db.create_table(:schema_test__schema_test) do
         primary_key :id
@@ -1208,11 +1212,11 @@ describe "Postgres::Database schema qualified tables" do
       end
 
       h = @db.schema(:schema_test)
-      h.length.should == 2
-      h.last.first.should == :j
+      h.length.must_equal 2
+      h.last.first.must_equal :j
 
-      @db.indexes(:schema_test).should == {:public_test_sti=>{:unique=>false, :columns=>[:j], :deferrable=>nil}}
-      @db.foreign_key_list(:schema_test).should == [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey}]
+      @db.indexes(:schema_test).must_equal(:public_test_sti=>{:unique=>false, :columns=>[:j], :deferrable=>nil})
+      @db.foreign_key_list(:schema_test).must_equal [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey}]
     ensure
       @db.drop_table?(:public__schema_test)
     end
@@ -1268,131 +1272,131 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     @db.run "DROP SCHEMA s CASCADE"
   end
 
-  specify "should return all eager graphs correctly" do
+  it "should return all eager graphs correctly" do
     bands = @Band.order(:bands__name).eager_graph(:albums).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
 
     bands = @Band.order(:bands__name).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
 
     bands = @Band.order(:bands__name).eager_graph({:albums=>:tracks}, :members).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
   end
 
-  specify "should have eager graphs work with previous joins" do
+  it "should have eager graphs work with previous joins" do
     bands = @Band.order(:bands__name).select_all(:s__bands).join(:s__members, :band_id=>:id).from_self(:alias=>:bands0).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
   end
 
-  specify "should have eager graphs work with joins with the same tables" do
+  it "should have eager graphs work with joins with the same tables" do
     bands = @Band.order(:bands__name).select_all(:s__bands).join(:s__members, :band_id=>:id).eager_graph({:albums=>:tracks}, :members).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
   end
 
-  specify "should have eager graphs work with self referential associations" do
+  it "should have eager graphs work with self referential associations" do
     bands = @Band.order(:bands__name).eager_graph(:tracks=>{:album=>:band}).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
-    bands.map{|x| x.tracks.map{|y| y.album}}.should == [[@a1, @a1, @a2, @a2], []]
-    bands.map{|x| x.tracks.map{|y| y.album.band}}.should == [[@b1, @b1, @b1, @b1], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
+    bands.map{|x| x.tracks.map{|y| y.album}}.must_equal [[@a1, @a1, @a2, @a2], []]
+    bands.map{|x| x.tracks.map{|y| y.album.band}}.must_equal [[@b1, @b1, @b1, @b1], []]
 
     members = @Member.order(:members__name).eager_graph(:members).all
-    members.should == [@m4, @m3, @m1, @m2]
-    members.map{|x| x.members}.should == [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
+    members.must_equal [@m4, @m3, @m1, @m2]
+    members.map{|x| x.members}.must_equal [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
 
     members = @Member.order(:members__name).eager_graph(:band, :members=>:band).all
-    members.should == [@m4, @m3, @m1, @m2]
-    members.map{|x| x.band}.should == [@b2, @b2, @b1, @b1]
-    members.map{|x| x.members}.should == [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
-    members.map{|x| x.members.map{|y| y.band}}.should == [[@b2, @b2], [@b2, @b2], [@b1, @b1], [@b1, @b1]]
+    members.must_equal [@m4, @m3, @m1, @m2]
+    members.map{|x| x.band}.must_equal [@b2, @b2, @b1, @b1]
+    members.map{|x| x.members}.must_equal [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
+    members.map{|x| x.members.map{|y| y.band}}.must_equal [[@b2, @b2], [@b2, @b2], [@b1, @b1], [@b1, @b1]]
   end
 
-  specify "should have eager graphs work with a from_self dataset" do
+  it "should have eager graphs work with a from_self dataset" do
     bands = @Band.order(:bands__name).from_self.eager_graph(:tracks=>{:album=>:band}).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
-    bands.map{|x| x.tracks.map{|y| y.album}}.should == [[@a1, @a1, @a2, @a2], []]
-    bands.map{|x| x.tracks.map{|y| y.album.band}}.should == [[@b1, @b1, @b1, @b1], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
+    bands.map{|x| x.tracks.map{|y| y.album}}.must_equal [[@a1, @a1, @a2, @a2], []]
+    bands.map{|x| x.tracks.map{|y| y.album.band}}.must_equal [[@b1, @b1, @b1, @b1], []]
   end
 
-  specify "should have eager graphs work with different types of aliased from tables" do
+  it "should have eager graphs work with different types of aliased from tables" do
     bands = @Band.order(:tracks__name).from(:s__bands___tracks).eager_graph(:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
     bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as(:tracks)).eager_graph(:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
     bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as(Sequel.identifier(:tracks))).eager_graph(:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
     bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as('tracks')).eager_graph(:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
   end
 
-  specify "should have eager graphs work with join tables with aliases" do
+  it "should have eager graphs work with join tables with aliases" do
     bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums___tracks, :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
     bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, :tracks), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
     bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, 'tracks'), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
     bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, Sequel.identifier(:tracks)), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
     bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>:tracks).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
     bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>'tracks').eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
     bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>Sequel.identifier(:tracks)).eager_graph(:albums=>:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
-    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
   end
 
-  specify "should have eager graphs work with different types of qualified from tables" do
+  it "should have eager graphs work with different types of qualified from tables" do
     bands = @Band.order(:bands__name).from(Sequel.qualify(:s, :bands)).eager_graph(:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
     bands = @Band.order(:bands__name).from(Sequel.identifier(:bands).qualify(:s)).eager_graph(:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
     bands = @Band.order(:bands__name).from(Sequel::SQL::QualifiedIdentifier.new(:s, 'bands')).eager_graph(:tracks).all
-    bands.should == [@b1, @b2]
-    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.must_equal [@b1, @b2]
+    bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
   end
 
 end
@@ -1414,22 +1418,22 @@ if DB.server_version >= 80300
       DB.drop_table?(:test6)
     end
 
-    specify "should search by indexed column" do
+    it "should search by indexed column" do
       record =  {:title => "oopsla conference", :body => "test"}
       @ds << record
-      @ds.full_text_search(:title, "oopsla").all.should include(record)
+      @ds.full_text_search(:title, "oopsla").all.must_include(record)
     end
 
-    specify "should join multiple coumns with spaces to search by last words in row" do
+    it "should join multiple coumns with spaces to search by last words in row" do
       record = {:title => "multiple words", :body => "are easy to search"}
       @ds << record
-      @ds.full_text_search([:title, :body], "words").all.should include(record)
+      @ds.full_text_search([:title, :body], "words").all.must_include(record)
     end
 
-    specify "should return rows with a NULL in one column if a match in another column" do
+    it "should return rows with a NULL in one column if a match in another column" do
       record = {:title => "multiple words", :body =>nil}
       @ds << record
-      @ds.full_text_search([:title, :body], "words").all.should include(record)
+      @ds.full_text_search([:title, :body], "words").all.must_include(record)
     end
   end
 end
@@ -1451,15 +1455,15 @@ if DB.dataset.supports_window_functions?
       @db.drop_table?(:i1)
     end
 
-    specify "should give correct results for window functions" do
-      @ds.window(:win, :partition=>:group_id, :order=>:id).select(:id){sum(:amount).over(:window=>win)}.all.should ==
-        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.window(:win, :partition=>:group_id).select(:id){sum(:amount).over(:window=>win, :order=>id)}.all.should ==
-        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.window(:win, {}).select(:id){sum(:amount).over(:window=>:win, :order=>id)}.all.should ==
-        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
-      @ds.window(:win, :partition=>:group_id).select(:id){sum(:amount).over(:window=>:win, :order=>id, :frame=>:all)}.all.should ==
-        [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
+    it "should give correct results for window functions" do
+      @ds.window(:win, :partition=>:group_id, :order=>:id).select(:id){sum(:amount).over(:window=>win)}.all.
+        must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.window(:win, :partition=>:group_id).select(:id){sum(:amount).over(:window=>win, :order=>id)}.all.
+        must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.window(:win, {}).select(:id){sum(:amount).over(:window=>:win, :order=>id)}.all.
+        must_equal [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
+      @ds.window(:win, :partition=>:group_id).select(:id){sum(:amount).over(:window=>:win, :order=>id, :frame=>:all)}.all.
+        must_equal [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
     end
   end
 end
@@ -1476,81 +1480,81 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.drop_table?(:test)
   end
 
-  specify "#create_function and #drop_function should create and drop functions" do
-    proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
+  it "#create_function and #drop_function should create and drop functions" do
+    proc{@d['SELECT tf()'].all}.must_raise(Sequel::DatabaseError)
     args = ['tf', 'SELECT 1', {:returns=>:integer}]
-    @d.send(:create_function_sql, *args).should =~ /\A\s*CREATE FUNCTION tf\(\)\s+RETURNS integer\s+LANGUAGE SQL\s+AS 'SELECT 1'\s*\z/
+    @d.send(:create_function_sql, *args).must_match /\A\s*CREATE FUNCTION tf\(\)\s+RETURNS integer\s+LANGUAGE SQL\s+AS 'SELECT 1'\s*\z/
     @d.create_function(*args)
-    @d['SELECT tf()'].all.should == [{:tf=>1}]
-    @d.send(:drop_function_sql, 'tf').should == 'DROP FUNCTION tf()'
+    @d['SELECT tf()'].all.must_equal [{:tf=>1}]
+    @d.send(:drop_function_sql, 'tf').must_equal 'DROP FUNCTION tf()'
     @d.drop_function('tf')
-    proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
+    proc{@d['SELECT tf()'].all}.must_raise(Sequel::DatabaseError)
   end
 
-  specify "#create_function and #drop_function should support options" do
+  it "#create_function and #drop_function should support options" do
     args = ['tf', 'SELECT $1 + $2', {:args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :set=>{:search_path => 'public'}}]
-    @d.send(:create_function_sql,*args).should =~ /\A\s*CREATE OR REPLACE FUNCTION tf\(a integer, integer\)\s+RETURNS integer\s+LANGUAGE SQL\s+IMMUTABLE\s+STRICT\s+SECURITY DEFINER\s+COST 2\s+SET search_path = public\s+AS 'SELECT \$1 \+ \$2'\s*\z/
+    @d.send(:create_function_sql,*args).must_match /\A\s*CREATE OR REPLACE FUNCTION tf\(a integer, integer\)\s+RETURNS integer\s+LANGUAGE SQL\s+IMMUTABLE\s+STRICT\s+SECURITY DEFINER\s+COST 2\s+SET search_path = public\s+AS 'SELECT \$1 \+ \$2'\s*\z/
     @d.create_function(*args)
     # Make sure replace works
     @d.create_function(*args)
-    @d['SELECT tf(1, 2)'].all.should == [{:tf=>3}]
+    @d['SELECT tf(1, 2)'].all.must_equal [{:tf=>3}]
     args = ['tf', {:if_exists=>true, :cascade=>true, :args=>[[:integer, :a], :integer]}]
-    @d.send(:drop_function_sql,*args).should == 'DROP FUNCTION IF EXISTS tf(a integer, integer) CASCADE'
+    @d.send(:drop_function_sql,*args).must_equal 'DROP FUNCTION IF EXISTS tf(a integer, integer) CASCADE'
     @d.drop_function(*args)
     # Make sure if exists works
     @d.drop_function(*args)
   end
 
-  specify "#create_language and #drop_language should create and drop languages" do
-    @d.send(:create_language_sql, :plpgsql).should == 'CREATE LANGUAGE plpgsql'
+  it "#create_language and #drop_language should create and drop languages" do
+    @d.send(:create_language_sql, :plpgsql).must_equal 'CREATE LANGUAGE plpgsql'
     @d.create_language(:plpgsql, :replace=>true) if @d.server_version < 90000
-    proc{@d.create_language(:plpgsql)}.should raise_error(Sequel::DatabaseError)
-    @d.send(:drop_language_sql, :plpgsql).should == 'DROP LANGUAGE plpgsql'
+    proc{@d.create_language(:plpgsql)}.must_raise(Sequel::DatabaseError)
+    @d.send(:drop_language_sql, :plpgsql).must_equal 'DROP LANGUAGE plpgsql'
     @d.drop_language(:plpgsql) if @d.server_version < 90000
-    proc{@d.drop_language(:plpgsql)}.should raise_error(Sequel::DatabaseError) if @d.server_version < 90000
-    @d.send(:create_language_sql, :plpgsql, :replace=>true, :trusted=>true, :handler=>:a, :validator=>:b).should == (@d.server_version >= 90000 ? 'CREATE OR REPLACE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b' : 'CREATE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b')
-    @d.send(:drop_language_sql, :plpgsql, :if_exists=>true, :cascade=>true).should == 'DROP LANGUAGE IF EXISTS plpgsql CASCADE'
+    proc{@d.drop_language(:plpgsql)}.must_raise(Sequel::DatabaseError) if @d.server_version < 90000
+    @d.send(:create_language_sql, :plpgsql, :replace=>true, :trusted=>true, :handler=>:a, :validator=>:b).must_equal(@d.server_version >= 90000 ? 'CREATE OR REPLACE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b' : 'CREATE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b')
+    @d.send(:drop_language_sql, :plpgsql, :if_exists=>true, :cascade=>true).must_equal 'DROP LANGUAGE IF EXISTS plpgsql CASCADE'
     # Make sure if exists works
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
   end
 
-  specify "#create_schema and #drop_schema should create and drop schemas" do
-    @d.send(:create_schema_sql, :sequel).should == 'CREATE SCHEMA "sequel"'
-    @d.send(:create_schema_sql, :sequel, :if_not_exists=>true, :owner=>:foo).should == 'CREATE SCHEMA IF NOT EXISTS "sequel" AUTHORIZATION "foo"'
-    @d.send(:drop_schema_sql, :sequel).should == 'DROP SCHEMA "sequel"'
-    @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).should == 'DROP SCHEMA IF EXISTS "sequel" CASCADE'
+  it "#create_schema and #drop_schema should create and drop schemas" do
+    @d.send(:create_schema_sql, :sequel).must_equal 'CREATE SCHEMA "sequel"'
+    @d.send(:create_schema_sql, :sequel, :if_not_exists=>true, :owner=>:foo).must_equal 'CREATE SCHEMA IF NOT EXISTS "sequel" AUTHORIZATION "foo"'
+    @d.send(:drop_schema_sql, :sequel).must_equal 'DROP SCHEMA "sequel"'
+    @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).must_equal 'DROP SCHEMA IF EXISTS "sequel" CASCADE'
     @d.create_schema(:sequel)
     @d.create_schema(:sequel, :if_not_exists=>true) if @d.server_version >= 90300
     @d.create_table(:sequel__test){Integer :a}
     @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
   end
 
-  specify "#create_trigger and #drop_trigger should create and drop triggers" do
+  it "#create_trigger and #drop_trigger should create and drop triggers" do
     @d.create_language(:plpgsql) if @d.server_version < 90000
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW EXECUTE PROCEDURE tf()'
+    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).must_equal 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW EXECUTE PROCEDURE tf()'
     @d.create_table(:test){String :name; Integer :value}
     @d.create_trigger(:test, :identity, :tf, :each_row=>true)
     @d[:test].insert(:name=>'a', :value=>1)
-    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>1}]
-    proc{@d[:test].filter(:name=>'a').update(:value=>nil)}.should raise_error(Sequel::DatabaseError)
-    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>1}]
+    @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>1}]
+    proc{@d[:test].filter(:name=>'a').update(:value=>nil)}.must_raise(Sequel::DatabaseError)
+    @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>1}]
     @d[:test].filter(:name=>'a').update(:value=>3)
-    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>3}]
-    @d.send(:drop_trigger_sql, :test, :identity).should == 'DROP TRIGGER identity ON "test"'
+    @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>3}]
+    @d.send(:drop_trigger_sql, :test, :identity).must_equal 'DROP TRIGGER identity ON "test"'
     @d.drop_trigger(:test, :identity)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).should == 'CREATE TRIGGER identity AFTER INSERT ON "test" EXECUTE PROCEDURE tf(1, \'a\')'
-    @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON "test" CASCADE'
+    @d.send(:create_trigger_sql, :test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).must_equal 'CREATE TRIGGER identity AFTER INSERT ON "test" EXECUTE PROCEDURE tf(1, \'a\')'
+    @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).must_equal 'DROP TRIGGER IF EXISTS identity ON "test" CASCADE'
     # Make sure if exists works
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
 
     if @d.supports_trigger_conditions?
-      @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true, :when=> {:new__name => 'b'}).should == %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()}
+      @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true, :when=> {:new__name => 'b'}).must_equal %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()}
       @d.create_trigger(:test, :identity, :tf, :each_row=>true, :events => :update, :when=> {:new__name => 'b'})
-      proc{@d[:test].filter(:name=>'a').update(:value=>nil)}.should_not raise_error
-      @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>nil}]
-      proc{@d[:test].filter(:name=>'a').update(:name=>'b')}.should raise_error(Sequel::DatabaseError)
-      @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>nil}]
+      @d[:test].filter(:name=>'a').update(:value=>nil)
+      @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>nil}]
+      proc{@d[:test].filter(:name=>'a').update(:name=>'b')}.must_raise(Sequel::DatabaseError)
+      @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>nil}]
       @d.drop_trigger(:test, :identity)
     end
   end
@@ -1569,11 +1573,11 @@ if DB.adapter_scheme == :postgres
       @db.drop_table?(:test_cursor)
     end
 
-    specify "should return the same results as the non-cursor use" do
-      @ds.all.should == @ds.use_cursor.all
+    it "should return the same results as the non-cursor use" do
+      @ds.all.must_equal @ds.use_cursor.all
     end
 
-    specify "should not swallow errors if closing cursor raises an error" do
+    it "should not swallow errors if closing cursor raises an error" do
       proc do
         @db.synchronize do |c|
           @ds.use_cursor.each do |r|
@@ -1581,40 +1585,40 @@ if DB.adapter_scheme == :postgres
             raise ArgumentError
           end
         end
-      end.should raise_error(ArgumentError)
+      end.must_raise(ArgumentError)
     end
 
-    specify "should respect the :rows_per_fetch option" do
+    it "should respect the :rows_per_fetch option" do
       @db.sqls.clear
       @ds.use_cursor.all
       check_sqls do
-        @db.sqls.length.should == 6
+        @db.sqls.length.must_equal 6
         @db.sqls.clear
       end
       @ds.use_cursor(:rows_per_fetch=>100).all
       check_sqls do
-        @db.sqls.length.should == 15
+        @db.sqls.length.must_equal 15
       end
     end
 
-    specify "should respect the :hold=>true option for creating the cursor WITH HOLD and not using a transaction" do
-      @ds.use_cursor.each{@db.in_transaction?.should == true}
-      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.should == false}
-      @ds.use_cursor(:hold=>true).each{@db.in_transaction?.should == false}
-      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.should == true}
+    it "should respect the :hold=>true option for creating the cursor WITH HOLD and not using a transaction" do
+      @ds.use_cursor.each{@db.in_transaction?.must_equal true}
+      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.must_equal false}
+      @ds.use_cursor(:hold=>true).each{@db.in_transaction?.must_equal false}
+      check_sqls{@db.sqls.any?{|s| s =~ /WITH HOLD/}.must_equal true}
     end
 
-    specify "should support updating individual rows based on a cursor" do
+    it "should support updating individual rows based on a cursor" do
       @db.transaction(:rollback=>:always) do
         @ds.use_cursor(:rows_per_fetch=>1).each do |row|
           @ds.where_current_of.update(:x=>Sequel.*(row[:x], 10))
         end
-        @ds.select_order_map(:x).should == (0..1000).map{|x| x * 10}
+        @ds.select_order_map(:x).must_equal((0..1000).map{|x| x * 10})
       end
-      @ds.select_order_map(:x).should == (0..1000).to_a
+      @ds.select_order_map(:x).must_equal((0..1000).to_a)
     end
 
-    specify "should respect the :cursor_name option" do
+    it "should respect the :cursor_name option" do
       one_rows = []
       two_rows = []
       @ds.order(:x).use_cursor(:cursor_name => 'cursor_one').each do |one|
@@ -1626,53 +1630,54 @@ if DB.adapter_scheme == :postgres
           end
         end
       end
-      one_rows.should == two_rows
+      one_rows.must_equal two_rows
     end
 
-    specify "should handle returning inside block" do
+    it "should handle returning inside block" do
       def @ds.check_return
         use_cursor.each{|r| return}
       end
       @ds.check_return
-      @ds.all.should == @ds.use_cursor.all
+      @ds.all.must_equal @ds.use_cursor.all
     end
   end
 
   describe "Postgres::PG_NAMED_TYPES" do
-    before do
+    before(:all) do
       @db = DB
-      Sequel::Postgres::PG_NAMED_TYPES[:interval] = lambda{|v| v.reverse}
-      @db.extension :pg_array
+      @old_cp = @db.conversion_procs[1013]
+      @db.conversion_procs.delete(1013)
+      Sequel::Postgres::PG_NAMED_TYPES[:oidvector] = lambda{|v| v.reverse}
       @db.reset_conversion_procs
+      @db.register_array_type('oidvector')
     end
-    after do
-      Sequel::Postgres::PG_NAMED_TYPES.delete(:interval)
-      @db.reset_conversion_procs
+    after(:all) do
+      Sequel::Postgres::PG_NAMED_TYPES.delete(:oidvector)
+      @db.conversion_procs.delete(30)
+      @db.conversion_procs[1013] = @old_cp
       @db.drop_table?(:foo)
+      @db.drop_enum(:foo_enum)
     end
 
-    specify "should look up conversion procs by name" do
-      @db.create_table!(:foo){interval :bar}
-      @db[:foo].insert(Sequel.cast('21 days', :interval))
-      @db[:foo].get(:bar).should == 'syad 12'
+    it "should look up conversion procs by name" do
+      @db.create_table!(:foo){oidvector :bar}
+      @db[:foo].insert(Sequel.cast('21', :oidvector))
+      @db[:foo].get(:bar).must_equal '12'
     end
 
-    specify "should handle array types of named types" do
-      @db.create_table!(:foo){column :bar, 'interval[]'}
-      @db[:foo].insert(Sequel.pg_array(['21 days'], :interval))
-      @db[:foo].get(:bar).should == ['syad 12']
+    it "should handle array types of named types" do
+      @db.create_table!(:foo){column :bar, 'oidvector[]'}
+      @db[:foo].insert(Sequel.pg_array(['21'], :oidvector))
+      @db[:foo].get(:bar).must_equal ['12']
     end
 
-    specify "should work with conversion procs on enums" do
+    it "should work with conversion procs on enums" do
+      @db.drop_enum(:foo_enum) rescue nil
       @db.create_enum(:foo_enum, %w(foo bar))
       @db.add_named_conversion_proc(:foo_enum){|string| string.reverse}
       @db.create_table!(:foo){foo_enum :bar}
-      @db[:foo].insert(:bar => 'test string')
-      @db[:foo].get(:bar).should == 'test string'.reverse
-
-      # need to drop teh table here so we can drop the enum as well.
-      @db.drop_table?(:foo)
-      @db.drop_enum(:foo_enum)
+      @db[:foo].insert(:bar => 'foo')
+      @db[:foo].get(:bar).must_equal 'foo'.reverse
     end
   end
 end
@@ -1691,69 +1696,69 @@ if ((DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_sc
       @db.drop_table?(:test_copy)
     end
 
-    specify "should work with a :data option containing data in PostgreSQL text format" do
+    it "should work with a :data option containing data in PostgreSQL text format" do
       @db.copy_into(:test_copy, :data=>"1\t2\n3\t4\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+      @ds.select_map([:x, :y]).must_equal [[1, 2], [3, 4]]
     end
 
-    specify "should work with :format=>:csv option and :data option containing data in CSV format" do
+    it "should work with :format=>:csv option and :data option containing data in CSV format" do
       @db.copy_into(:test_copy, :format=>:csv, :data=>"1,2\n3,4\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+      @ds.select_map([:x, :y]).must_equal [[1, 2], [3, 4]]
     end
 
-    specify "should respect given :options" do
+    it "should respect given :options" do
       @db.copy_into(:test_copy, :options=>"FORMAT csv, HEADER TRUE", :data=>"x,y\n1,2\n3,4\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+      @ds.select_map([:x, :y]).must_equal [[1, 2], [3, 4]]
     end
 
-    specify "should respect given :options options when :format is used" do
+    it "should respect given :options options when :format is used" do
       @db.copy_into(:test_copy, :options=>"QUOTE '''', DELIMITER '|'", :format=>:csv, :data=>"'1'|'2'\n'3'|'4'\n")
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+      @ds.select_map([:x, :y]).must_equal [[1, 2], [3, 4]]
     end
 
-    specify "should accept :columns option to online copy the given columns" do
+    it "should accept :columns option to online copy the given columns" do
       @db.copy_into(:test_copy, :data=>"1\t2\n3\t4\n", :columns=>[:y, :x])
-      @ds.select_map([:x, :y]).should == [[2, 1], [4, 3]]
+      @ds.select_map([:x, :y]).must_equal [[2, 1], [4, 3]]
     end
 
-    specify "should accept a block and use returned values for the copy in data stream" do
+    it "should accept a block and use returned values for the copy in data stream" do
       buf = ["1\t2\n", "3\t4\n"]
       @db.copy_into(:test_copy){buf.shift}
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+      @ds.select_map([:x, :y]).must_equal [[1, 2], [3, 4]]
     end
 
-    specify "should work correctly with a block and :format=>:csv" do
+    it "should work correctly with a block and :format=>:csv" do
       buf = ["1,2\n", "3,4\n"]
       @db.copy_into(:test_copy, :format=>:csv){buf.shift}
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+      @ds.select_map([:x, :y]).must_equal [[1, 2], [3, 4]]
     end
 
-    specify "should accept an enumerable as the :data option" do
+    it "should accept an enumerable as the :data option" do
       @db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"])
-      @ds.select_map([:x, :y]).should == [[1, 2], [3, 4]]
+      @ds.select_map([:x, :y]).must_equal [[1, 2], [3, 4]]
     end
 
-    specify "should have an exception, cause a rollback of copied data and still have a usable connection" do
+    it "should have an exception, cause a rollback of copied data and still have a usable connection" do
       2.times do
         sent = false
-        proc{@db.copy_into(:test_copy){raise ArgumentError if sent; sent = true; "1\t2\n"}}.should raise_error(ArgumentError)
-        @ds.select_map([:x, :y]).should == []
+        proc{@db.copy_into(:test_copy){raise ArgumentError if sent; sent = true; "1\t2\n"}}.must_raise(ArgumentError)
+        @ds.select_map([:x, :y]).must_equal []
       end
     end
 
-    specify "should handle database errors with a rollback of copied data and still have a usable connection" do
+    it "should handle database errors with a rollback of copied data and still have a usable connection" do
       2.times do
-        proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\ta\n"])}.should raise_error(Sequel::DatabaseError)
-        @ds.select_map([:x, :y]).should == []
+        proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\ta\n"])}.must_raise(Sequel::DatabaseError)
+        @ds.select_map([:x, :y]).must_equal []
       end
     end
 
-    specify "should raise an Error if both :data and a block are provided" do
-      proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"]){}}.should raise_error(Sequel::Error)
+    it "should raise an Error if both :data and a block are provided" do
+      proc{@db.copy_into(:test_copy, :data=>["1\t2\n", "3\t4\n"]){}}.must_raise(Sequel::Error)
     end
 
-    specify "should raise an Error if neither :data or a block are provided" do
-      proc{@db.copy_into(:test_copy)}.should raise_error(Sequel::Error)
+    it "should raise an Error if neither :data or a block are provided" do
+      proc{@db.copy_into(:test_copy)}.must_raise(Sequel::Error)
     end
   end
 
@@ -1769,62 +1774,62 @@ if ((DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_sc
       @db.drop_table?(:test_copy)
     end
 
-    specify "without a block or options should return a text version of the table as a single string" do
-      @db.copy_table(:test_copy).should == "1\t2\n3\t4\n"
+    it "without a block or options should return a text version of the table as a single string" do
+      @db.copy_table(:test_copy).must_equal "1\t2\n3\t4\n"
     end
 
-    specify "without a block and with :format=>:csv should return a csv version of the table as a single string" do
-      @db.copy_table(:test_copy, :format=>:csv).should == "1,2\n3,4\n"
+    it "without a block and with :format=>:csv should return a csv version of the table as a single string" do
+      @db.copy_table(:test_copy, :format=>:csv).must_equal "1,2\n3,4\n"
     end
 
-    specify "should treat string as SQL code" do
-      @db.copy_table('COPY "test_copy" TO STDOUT').should == "1\t2\n3\t4\n"
+    it "should treat string as SQL code" do
+      @db.copy_table('COPY "test_copy" TO STDOUT').must_equal "1\t2\n3\t4\n"
     end
 
-    specify "should respect given :options options" do
-      @db.copy_table(:test_copy, :options=>"FORMAT csv, HEADER TRUE").should == "x,y\n1,2\n3,4\n"
+    it "should respect given :options options" do
+      @db.copy_table(:test_copy, :options=>"FORMAT csv, HEADER TRUE").must_equal "x,y\n1,2\n3,4\n"
     end
 
-    specify "should respect given :options options when :format is used" do
-      @db.copy_table(:test_copy, :format=>:csv, :options=>"QUOTE '''', FORCE_QUOTE *").should == "'1','2'\n'3','4'\n"
+    it "should respect given :options options when :format is used" do
+      @db.copy_table(:test_copy, :format=>:csv, :options=>"QUOTE '''', FORCE_QUOTE *").must_equal "'1','2'\n'3','4'\n"
     end
 
-    specify "should accept dataset as first argument" do
-      @db.copy_table(@db[:test_copy].cross_join(:test_copy___tc).order(:test_copy__x, :test_copy__y, :tc__x, :tc__y)).should == "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
+    it "should accept dataset as first argument" do
+      @db.copy_table(@db[:test_copy].cross_join(:test_copy___tc).order(:test_copy__x, :test_copy__y, :tc__x, :tc__y)).must_equal "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
     end
 
-    specify "with a block and no options should yield each row as a string in text format" do
+    it "with a block and no options should yield each row as a string in text format" do
       buf = []
       @db.copy_table(:test_copy){|b| buf << b}
-      buf.should == ["1\t2\n", "3\t4\n"]
+      buf.must_equal ["1\t2\n", "3\t4\n"]
     end
 
-    specify "with a block and :format=>:csv should yield each row as a string in csv format" do
+    it "with a block and :format=>:csv should yield each row as a string in csv format" do
       buf = []
       @db.copy_table(:test_copy, :format=>:csv){|b| buf << b}
-      buf.should == ["1,2\n", "3,4\n"]
+      buf.must_equal ["1,2\n", "3,4\n"]
     end
 
-    specify "should work fine when using a block that is terminated early with a following copy_table" do
+    it "should work fine when using a block that is terminated early with a following copy_table" do
       buf = []
-      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.should raise_error(Sequel::DatabaseDisconnectError)
-      buf.should == ["1,2\n"]
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.must_raise(Sequel::DatabaseDisconnectError)
+      buf.must_equal ["1,2\n"]
       buf.clear
-      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; raise ArgumentError}}.should raise_error(Sequel::DatabaseDisconnectError)
-      buf.should == ["1,2\n"]
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; raise ArgumentError}}.must_raise(Sequel::DatabaseDisconnectError)
+      buf.must_equal ["1,2\n"]
       buf.clear
       @db.copy_table(:test_copy){|b| buf << b}
-      buf.should == ["1\t2\n", "3\t4\n"]
+      buf.must_equal ["1\t2\n", "3\t4\n"]
     end
 
-    specify "should work fine when using a block that is terminated early with a following regular query" do
+    it "should work fine when using a block that is terminated early with a following regular query" do
       buf = []
-      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.should raise_error(Sequel::DatabaseDisconnectError)
-      buf.should == ["1,2\n"]
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; break}}.must_raise(Sequel::DatabaseDisconnectError)
+      buf.must_equal ["1,2\n"]
       buf.clear
-      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; raise ArgumentError}}.should raise_error(Sequel::DatabaseDisconnectError)
-      buf.should == ["1,2\n"]
-      @db[:test_copy].select_order_map(:x).should == [1, 3]
+      proc{@db.copy_table(:test_copy, :format=>:csv){|b| buf << b; raise ArgumentError}}.must_raise(Sequel::DatabaseDisconnectError)
+      buf.must_equal ["1,2\n"]
+      @db[:test_copy].select_order_map(:x).must_equal [1, 3]
     end
   end
 end
@@ -1835,79 +1840,79 @@ if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_versio
       @db = DB
     end
 
-    specify "should support listen and notify" do
+    it "should support listen and notify" do
       notify_pid = @db.synchronize{|conn| conn.backend_pid}
 
       called = false
       @db.listen('foo', :after_listen=>proc{@db.notify('foo')}) do |ev, pid, payload|
-        ev.should == 'foo'
-        pid.should == notify_pid
-        ['', nil].should include(payload)
+        ev.must_equal 'foo'
+        pid.must_equal notify_pid
+        ['', nil].must_include(payload)
         called = true
-      end.should == 'foo'
-      called.should == true
+      end.must_equal 'foo'
+      called.must_equal true
 
       # Check weird identifier names
       called = false
       @db.listen('FOO bar', :after_listen=>proc{@db.notify('FOO bar')}) do |ev, pid, payload|
-        ev.should == 'FOO bar'
-        pid.should == notify_pid
-        ['', nil].should include(payload)
+        ev.must_equal 'FOO bar'
+        pid.must_equal notify_pid
+        ['', nil].must_include(payload)
         called = true
-      end.should == 'FOO bar'
-      called.should == true
+      end.must_equal 'FOO bar'
+      called.must_equal true
 
       # Check identifier symbols
       called = false
       @db.listen(:foo, :after_listen=>proc{@db.notify(:foo)}) do |ev, pid, payload|
-        ev.should == 'foo'
-        pid.should == notify_pid
-        ['', nil].should include(payload)
+        ev.must_equal 'foo'
+        pid.must_equal notify_pid
+        ['', nil].must_include(payload)
         called = true
-      end.should == 'foo'
-      called.should == true
+      end.must_equal 'foo'
+      called.must_equal true
 
       called = false
       @db.listen('foo', :after_listen=>proc{@db.notify('foo', :payload=>'bar')}) do |ev, pid, payload|
-        ev.should == 'foo'
-        pid.should == notify_pid
-        payload.should == 'bar'
+        ev.must_equal 'foo'
+        pid.must_equal notify_pid
+        payload.must_equal 'bar'
         called = true
-      end.should == 'foo'
-      called.should == true
+      end.must_equal 'foo'
+      called.must_equal true
 
-      @db.listen('foo', :after_listen=>proc{@db.notify('foo')}).should == 'foo'
+      @db.listen('foo', :after_listen=>proc{@db.notify('foo')}).must_equal 'foo'
 
       called = false
       called2 = false
       i = 0
       @db.listen(['foo', 'bar'], :after_listen=>proc{@db.notify('foo', :payload=>'bar'); @db.notify('bar', :payload=>'foo')}, :loop=>proc{i+=1}) do |ev, pid, payload|
         if !called
-          ev.should == 'foo'
-          pid.should == notify_pid
-          payload.should == 'bar'
+          ev.must_equal 'foo'
+          pid.must_equal notify_pid
+          payload.must_equal 'bar'
           called = true
         else
-          ev.should == 'bar'
-          pid.should == notify_pid
-          payload.should == 'foo'
+          ev.must_equal 'bar'
+          pid.must_equal notify_pid
+          payload.must_equal 'foo'
           called2 = true
           break
         end
-      end.should be_nil
-      called.should == true
-      called2.should == true
-      i.should == 1
+      end.must_equal nil
+      called.must_equal true
+      called2.must_equal true
+      i.must_equal 1
     end
 
-    specify "should accept a :timeout option in listen" do
-      @db.listen('foo2', :timeout=>0.001).should == nil
+    it "should accept a :timeout option in listen" do
+      @db.listen('foo2', :timeout=>0.001).must_equal nil
       called = false
-      @db.listen('foo2', :timeout=>0.001){|ev, pid, payload| called = true}.should == nil
-      called.should == false
+      @db.listen('foo2', :timeout=>0.001){|ev, pid, payload| called = true}.must_equal nil
+      called.must_equal false
       i = 0
-      @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.should == nil
-      i.should == 4
+      @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_equal nil
+      i.must_equal 4
     end unless RUBY_PLATFORM =~ /mingw/ # Ruby freezes on this spec on this platform/version
   end
 end
@@ -1924,39 +1929,39 @@ describe 'PostgreSQL special float handling' do
   end
 
   check_sqls do
-    specify 'should quote NaN' do
+    it 'should quote NaN' do
       nan = 0.0/0.0
-      @ds.insert_sql(:value => nan).should == %q{INSERT INTO "test5" ("value") VALUES ('NaN')}
+      @ds.insert_sql(:value => nan).must_equal %q{INSERT INTO "test5" ("value") VALUES ('NaN')}
     end
 
-    specify 'should quote +Infinity' do
+    it 'should quote +Infinity' do
       inf = 1.0/0.0
-      @ds.insert_sql(:value => inf).should == %q{INSERT INTO "test5" ("value") VALUES ('Infinity')}
+      @ds.insert_sql(:value => inf).must_equal %q{INSERT INTO "test5" ("value") VALUES ('Infinity')}
     end
 
-    specify 'should quote -Infinity' do
+    it 'should quote -Infinity' do
       inf = -1.0/0.0
-      @ds.insert_sql(:value => inf).should == %q{INSERT INTO "test5" ("value") VALUES ('-Infinity')}
+      @ds.insert_sql(:value => inf).must_equal %q{INSERT INTO "test5" ("value") VALUES ('-Infinity')}
     end
   end
 
   if DB.adapter_scheme == :postgres
-    specify 'inserts NaN' do
+    it 'inserts NaN' do
       nan = 0.0/0.0
       @ds.insert(:value=>nan)
-      @ds.all[0][:value].nan?.should == true
+      @ds.all[0][:value].nan?.must_equal true
     end
 
-    specify 'inserts +Infinity' do
+    it 'inserts +Infinity' do
       inf = 1.0/0.0
       @ds.insert(:value=>inf)
-      @ds.all[0][:value].infinite?.should > 0
+      @ds.all[0][:value].infinite?.must_be :>,  0
     end
 
-    specify 'inserts -Infinity' do
+    it 'inserts -Infinity' do
       inf = -1.0/0.0
       @ds.insert(:value=>inf)
-      @ds.all[0][:value].infinite?.should < 0
+      @ds.all[0][:value].infinite?.must_be :<,  0
     end
   end
 end
@@ -1964,7 +1969,6 @@ end
 describe 'PostgreSQL array handling' do
   before(:all) do
     @db = DB
-    @db.extension :pg_array
     @ds = @db[:items]
     @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
     @tp = lambda{@db.schema(:items).map{|a| a.last[:type]}}
@@ -1973,7 +1977,7 @@ describe 'PostgreSQL array handling' do
     @db.drop_table?(:items)
   end
 
-  specify 'insert and retrieve integer and float arrays of various sizes' do
+  it 'insert and retrieve integer and float arrays of various sizes' do
     @db.create_table!(:items) do
       column :i2, 'int2[]'
       column :i4, 'int4[]'
@@ -1981,17 +1985,17 @@ describe 'PostgreSQL array handling' do
       column :r, 'real[]'
       column :dp, 'double precision[]'
     end
-    @tp.call.should == [:smallint_array, :integer_array, :bigint_array, :real_array, :float_array]
+    @tp.call.must_equal [:smallint_array, :integer_array, :bigint_array, :real_array, :float_array]
     @ds.insert(Sequel.pg_array([1], :int2), Sequel.pg_array([nil, 2], :int4), Sequel.pg_array([3, nil], :int8), Sequel.pg_array([4, nil, 4.5], :real), Sequel.pg_array([5, nil, 5.5], "double precision"))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     rs = @ds.all
     if @native
-      rs.should == [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:i2=>[1], :i4=>[nil, 2], :i8=>[3, nil], :r=>[4.0, nil, 4.5], :dp=>[5.0, nil, 5.5]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
 
     @ds.delete
@@ -1999,78 +2003,78 @@ describe 'PostgreSQL array handling' do
 
     rs = @ds.all
     if @native
-      rs.should == [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:i2=>[[1], [2]], :i4=>[[nil, 2], [3, 4]], :i8=>[[3, nil], [nil, nil]], :r=>[[4, nil], [nil, 4.5]], :dp=>[[5, nil], [nil, 5.5]]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'insert and retrieve decimal arrays' do
+  it 'insert and retrieve decimal arrays' do
     @db.create_table!(:items) do
       column :n, 'numeric[]'
     end
-    @tp.call.should == [:decimal_array]
+    @tp.call.must_equal [:decimal_array]
     @ds.insert(Sequel.pg_array([BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')], :numeric))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     rs = @ds.all
     if @native
-      rs.should == [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:n=>[BigDecimal.new('1.000000000000000000001'), nil, BigDecimal.new('1')]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
 
     @ds.delete
     @ds.insert(Sequel.pg_array([[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]], :numeric))
     rs = @ds.all
     if @native
-      rs.should == [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:n=>[[BigDecimal.new('1.0000000000000000000000000000001'), nil], [nil, BigDecimal.new('1')]]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'insert and retrieve string arrays' do
+  it 'insert and retrieve string arrays' do
     @db.create_table!(:items) do
       column :c, 'char(4)[]'
       column :vc, 'varchar[]'
       column :t, 'text[]'
     end
-    @tp.call.should == [:character_array, :varchar_array, :string_array]
+    @tp.call.must_equal [:character_array, :varchar_array, :string_array]
     @ds.insert(Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], 'char(4)'), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c', '', ''], :varchar), Sequel.pg_array(['a', nil, 'NULL', 'b"\'c'], :text))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     rs = @ds.all
     if @native
-      rs.should == [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c', '', ''], :t=>['a', nil, 'NULL', 'b"\'c']}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:c=>['a   ', nil, 'NULL', 'b"\'c'], :vc=>['a', nil, 'NULL', 'b"\'c', '', ''], :t=>['a', nil, 'NULL', 'b"\'c']}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
 
     @ds.delete
     @ds.insert(Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], 'char(4)'), Sequel.pg_array([[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :varchar), Sequel.pg_array([[['a'], [nil]], [['NULL'], ['b"\'c']]], :text))
     rs = @ds.all
     if @native
-      rs.should == [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:c=>[[['a   '], [nil]], [['NULL'], ['b"\'c']]], :vc=>[[['a[],\\[\\]\\,\\""NULL",'], ['']], [['NULL'], ['b"\'c']]], :t=>[[['a'], [nil]], [['NULL'], ['b"\'c']]]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'insert and retrieve arrays of other types' do
+  it 'insert and retrieve arrays of other types' do
     @db.create_table!(:items) do
       column :b, 'bool[]'
       column :d, 'date[]'
@@ -2078,22 +2082,22 @@ describe 'PostgreSQL array handling' do
       column :ts, 'timestamp[]'
       column :tstz, 'timestamptz[]'
     end
-    @tp.call.should == [:boolean_array, :date_array, :time_array, :datetime_array, :datetime_timezone_array]
+    @tp.call.must_equal [:boolean_array, :date_array, :time_array, :datetime_array, :datetime_timezone_array]
 
     d = Date.today
     t = Sequel::SQLTime.create(10, 20, 30)
     ts = Time.local(2011, 1, 2, 3, 4, 5)
 
     @ds.insert(Sequel.pg_array([true, false], :bool), Sequel.pg_array([d, nil], :date), Sequel.pg_array([t, nil], :time), Sequel.pg_array([ts, nil], :timestamp), Sequel.pg_array([ts, nil], :timestamptz))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     rs = @ds.all
     if @native
-      rs.should == [{:b=>[true, false], :d=>[d, nil], :t=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:b=>[true, false], :d=>[d, nil], :t=>[t, nil], :ts=>[ts, nil], :tstz=>[ts, nil]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
 
     @db.create_table!(:items) do
@@ -2101,17 +2105,17 @@ describe 'PostgreSQL array handling' do
       column :tz, 'timetz[]'
       column :o, 'oid[]'
     end
-    @tp.call.should == [:blob_array, :time_timezone_array, :oid_array]
+    @tp.call.must_equal [:blob_array, :time_timezone_array, :oid_array]
     @ds.insert(Sequel.pg_array([Sequel.blob("a\0"), nil], :bytea), Sequel.pg_array([t, nil], :timetz), Sequel.pg_array([1, 2, 3], :oid))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
-      rs.should == [{:ba=>[Sequel.blob("a\0"), nil], :tz=>[t, nil], :o=>[1, 2, 3]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:ba=>[Sequel.blob("a\0"), nil], :tz=>[t, nil], :o=>[1, 2, 3]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
 
     @db.create_table!(:items) do
@@ -2123,11 +2127,9 @@ describe 'PostgreSQL array handling' do
       column :xi, 'xid[]'
       column :c, 'cid[]'
       column :n, 'name[]'
-      column :t, 'tid[]'
-      column :i, 'int2vector[]'
       column :o, 'oidvector[]'
     end
-    @tp.call.should == [:xml_array, :money_array, :bit_array, :varbit_array, :uuid_array, :xid_array, :cid_array, :name_array, :tid_array, :int2vector_array, :oidvector_array]
+    @tp.call.must_equal [:xml_array, :money_array, :bit_array, :varbit_array, :uuid_array, :xid_array, :cid_array, :name_array, :oidvector_array]
     @ds.insert(Sequel.pg_array(['<a></a>'], :xml),
                Sequel.pg_array(['1'], :money),
                Sequel.pg_array(['1'], :bit),
@@ -2136,62 +2138,60 @@ describe 'PostgreSQL array handling' do
                Sequel.pg_array(['12'], :xid),
                Sequel.pg_array(['12'], :cid),
                Sequel.pg_array(['N'], :name),
-               Sequel.pg_array(['(1,2)'], :tid),
-               Sequel.pg_array(['1 2'], :int2vector),
                Sequel.pg_array(['1 2'], :oidvector))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
       r = rs.first
       m = r.delete(:m)
-      m.should_not be_a_kind_of(Array)
-      m.to_a.should be_a_kind_of(Array)
-      m.first.should be_a_kind_of(String)
-      r.should == {:x=>['<a></a>'], :b=>['1'], :vb=>['10'], :u=>['c0f24910-39e7-11e4-916c-0800200c9a66'], :xi=>['12'], :c=>['12'], :n=>['N'], :t=>['(1,2)'], :i=>['1 2'], :o=>['1 2']}
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      m.class.must_equal(Sequel::Postgres::PGArray)
+      m.to_a.must_be_kind_of(Array)
+      m.first.must_be_kind_of(String)
+      r.must_be(:==, :x=>['<a></a>'], :b=>['1'], :vb=>['10'], :u=>['c0f24910-39e7-11e4-916c-0800200c9a66'], :xi=>['12'], :c=>['12'], :n=>['N'], :o=>['1 2'])
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       r[:m] = m
       @ds.delete
       @ds.insert(r)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'insert and retrieve empty arrays' do
+  it 'insert and retrieve empty arrays' do
     @db.create_table!(:items) do
       column :n, 'integer[]'
     end
     @ds.insert(:n=>Sequel.pg_array([], :integer))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
-      rs.should == [{:n=>[]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:n=>[]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'convert ruby array :default values' do
+  it 'convert ruby array :default values' do
     @db.create_table!(:items) do
       column :n, 'integer[]', :default=>[]
     end
     @ds.insert
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
-      rs.should == [{:n=>[]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:n=>[]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'insert and retrieve custom array types' do
+  it 'insert and retrieve custom array types' do
     int2vector = Class.new do
       attr_reader :array
       def initialize(array)
@@ -2212,82 +2212,82 @@ describe 'PostgreSQL array handling' do
     @db.create_table!(:items) do
       column :b, 'int2vector[]'
     end
-    @tp.call.should == [:int2vector_array]
+    @tp.call.must_equal [:int2vector_array]
     int2v = int2vector.new([1, 2])
     @ds.insert(Sequel.pg_array([int2v], :int2vector))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     rs = @ds.all
     if @native
-      rs.should == [{:b=>[int2v]}]
-      rs.first.values.each{|v| v.should_not be_a_kind_of(Array)}
-      rs.first.values.each{|v| v.to_a.should be_a_kind_of(Array)}
+      rs.must_equal [{:b=>[int2v]}]
+      rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+      rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'use arrays in bound variables' do
+  it 'use arrays in bound variables' do
     @db.create_table!(:items) do
       column :i, 'int4[]'
     end
     @ds.call(:insert, {:i=>[1,2]}, {:i=>:$i})
-    @ds.get(:i).should == [1, 2]
-    @ds.filter(:i=>:$i).call(:first, :i=>[1,2]).should == {:i=>[1,2]}
-    @ds.filter(:i=>:$i).call(:first, :i=>[1,3]).should == nil
+    @ds.get(:i).must_equal [1, 2]
+    @ds.filter(:i=>:$i).call(:first, :i=>[1,2]).must_equal(:i=>[1,2])
+    @ds.filter(:i=>:$i).call(:first, :i=>[1,3]).must_equal nil
 
     # NULL values
     @ds.delete
     @ds.call(:insert, {:i=>[nil,nil]}, {:i=>:$i})
-    @ds.first.should == {:i=>[nil, nil]}
+    @ds.first.must_equal(:i=>[nil, nil])
 
     @db.create_table!(:items) do
       column :i, 'text[]'
     end
     a = ["\"\\\\\"{}\n\t\r \v\b123afP", 'NULL', nil, '']
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a))
-    @ds.get(:i).should == a
-    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
-    @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).should == nil
+    @ds.get(:i).must_equal a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
+    @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).must_equal nil
 
     @db.create_table!(:items) do
       column :i, 'date[]'
     end
     a = [Date.today]
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'date'))
-    @ds.get(:i).should == a
-    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Date.today-1], 'date')).should == nil
+    @ds.get(:i).must_equal a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Date.today-1], 'date')).must_equal nil
 
     @db.create_table!(:items) do
       column :i, 'timestamp[]'
     end
     a = [Time.local(2011, 1, 2, 3, 4, 5)]
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'timestamp'))
-    @ds.get(:i).should == a
-    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([a.first-1], 'timestamp')).should == nil
+    @ds.get(:i).must_equal a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([a.first-1], 'timestamp')).must_equal nil
 
     @db.create_table!(:items) do
       column :i, 'boolean[]'
     end
     a = [true, false]
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'boolean'))
-    @ds.get(:i).should == a
-    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([false, true], 'boolean')).should == nil
+    @ds.get(:i).must_equal a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([false, true], 'boolean')).must_equal nil
 
     @db.create_table!(:items) do
       column :i, 'bytea[]'
     end
     a = [Sequel.blob("a\0'\"")]
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'bytea'))
-    @ds.get(:i).should == a
-    @ds.filter(:i=>:$i).call(:first, :i=>a).should == {:i=>a}
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.blob("b\0")], 'bytea')).should == nil
+    @ds.get(:i).must_equal a
+    @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.blob("b\0")], 'bytea')).must_equal nil
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'with models' do
+  it 'with models' do
     @db.create_table!(:items) do
       primary_key :id
       column :i, 'integer[]'
@@ -2299,13 +2299,13 @@ describe 'PostgreSQL array handling' do
     c.plugin :pg_typecast_on_load, :i, :f, :d, :t unless @native
     h = {:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']]}
     o = c.create(h)
-    o.i.should == [1, 2, nil]
-    o.f.should == [[1, 2.5], [3, 4.5]]
-    o.d.should == [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
-    o.t.should == [%w'a b c', ['NULL', nil, '1']]
-    c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.should == [o]
+    o.i.must_equal [1, 2, nil]
+    o.f.must_equal [[1, 2.5], [3, 4.5]]
+    o.d.must_equal [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
+    o.t.must_equal [%w'a b c', ['NULL', nil, '1']]
+    c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.must_equal [o]
     o2 = c.new(h)
-    c.where(:i=>o2.i, :f=>o2.f, :d=>o2.d, :t=>o2.t).all.should == [o]
+    c.where(:i=>o2.i, :f=>o2.f, :d=>o2.d, :t=>o2.t).all.must_equal [o]
 
     @db.create_table!(:items) do
       primary_key :id
@@ -2317,92 +2317,92 @@ describe 'PostgreSQL array handling' do
     c = Class.new(Sequel::Model(@db[:items]))
     c.plugin :pg_typecast_on_load, :i, :f, :d, :t unless @native
     o = c.create(:i=>[1,2, nil], :f=>[[1, 2.5], [3, 4.5]], :d=>[1, BigDecimal.new('1.000000000000000000001')], :t=>[%w'a b c', ['NULL', nil, '1']])
-    o.i.should == [1, 2, nil]
-    o.f.should == [[1, 2.5], [3, 4.5]]
-    o.d.should == [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
-    o.t.should == [%w'a b c', ['NULL', nil, '1']]
-    c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.should == [o]
+    o.i.must_equal [1, 2, nil]
+    o.f.must_equal [[1, 2.5], [3, 4.5]]
+    o.d.must_equal [BigDecimal.new('1'), BigDecimal.new('1.000000000000000000001')]
+    o.t.must_equal [%w'a b c', ['NULL', nil, '1']]
+    c.where(:i=>o.i, :f=>o.f, :d=>o.d, :t=>o.t).all.must_equal [o]
     o2 = c.new(h)
-    c.where(:i=>o2.i, :f=>o2.f, :d=>o2.d, :t=>o2.t).all.should == [o]
+    c.where(:i=>o2.i, :f=>o2.f, :d=>o2.d, :t=>o2.t).all.must_equal [o]
   end
 
-  specify 'operations/functions with pg_array_ops' do
+  it 'operations/functions with pg_array_ops' do
     Sequel.extension :pg_array_ops
     @db.create_table!(:items){column :i, 'integer[]'; column :i2, 'integer[]'; column :i3, 'integer[]'; column :i4, 'integer[]'; column :i5, 'integer[]'}
     @ds.insert(Sequel.pg_array([1, 2, 3]), Sequel.pg_array([2, 1]), Sequel.pg_array([4, 4]), Sequel.pg_array([[5, 5], [4, 3]]), Sequel.pg_array([1, nil, 5]))
 
-    @ds.get(Sequel.pg_array(:i) > :i3).should == false
-    @ds.get(Sequel.pg_array(:i3) > :i).should == true
+    @ds.get(Sequel.pg_array(:i) > :i3).must_equal false
+    @ds.get(Sequel.pg_array(:i3) > :i).must_equal true
 
-    @ds.get(Sequel.pg_array(:i) >= :i3).should == false
-    @ds.get(Sequel.pg_array(:i) >= :i).should == true
+    @ds.get(Sequel.pg_array(:i) >= :i3).must_equal false
+    @ds.get(Sequel.pg_array(:i) >= :i).must_equal true
 
-    @ds.get(Sequel.pg_array(:i3) < :i).should == false
-    @ds.get(Sequel.pg_array(:i) < :i3).should == true
+    @ds.get(Sequel.pg_array(:i3) < :i).must_equal false
+    @ds.get(Sequel.pg_array(:i) < :i3).must_equal true
 
-    @ds.get(Sequel.pg_array(:i3) <= :i).should == false
-    @ds.get(Sequel.pg_array(:i) <= :i).should == true
+    @ds.get(Sequel.pg_array(:i3) <= :i).must_equal false
+    @ds.get(Sequel.pg_array(:i) <= :i).must_equal true
 
-    @ds.get(Sequel.expr(5=>Sequel.pg_array(:i).any)).should == false
-    @ds.get(Sequel.expr(1=>Sequel.pg_array(:i).any)).should == true
+    @ds.get(Sequel.expr(5=>Sequel.pg_array(:i).any)).must_equal false
+    @ds.get(Sequel.expr(1=>Sequel.pg_array(:i).any)).must_equal true
 
-    @ds.get(Sequel.expr(1=>Sequel.pg_array(:i3).all)).should == false
-    @ds.get(Sequel.expr(4=>Sequel.pg_array(:i3).all)).should == true
+    @ds.get(Sequel.expr(1=>Sequel.pg_array(:i3).all)).must_equal false
+    @ds.get(Sequel.expr(4=>Sequel.pg_array(:i3).all)).must_equal true
 
-    @ds.get(Sequel.expr(1=>Sequel.pg_array(:i)[1..1].any)).should == true
-    @ds.get(Sequel.expr(2=>Sequel.pg_array(:i)[1..1].any)).should == false
+    @ds.get(Sequel.expr(1=>Sequel.pg_array(:i)[1..1].any)).must_equal true
+    @ds.get(Sequel.expr(2=>Sequel.pg_array(:i)[1..1].any)).must_equal false
 
-    @ds.get(Sequel.pg_array(:i2)[1]).should == 2
-    @ds.get(Sequel.pg_array(:i2)[1]).should == 2
-    @ds.get(Sequel.pg_array(:i2)[2]).should == 1
+    @ds.get(Sequel.pg_array(:i2)[1]).must_equal 2
+    @ds.get(Sequel.pg_array(:i2)[1]).must_equal 2
+    @ds.get(Sequel.pg_array(:i2)[2]).must_equal 1
 
-    @ds.get(Sequel.pg_array(:i4)[2][1]).should == 4
-    @ds.get(Sequel.pg_array(:i4)[2][2]).should == 3
+    @ds.get(Sequel.pg_array(:i4)[2][1]).must_equal 4
+    @ds.get(Sequel.pg_array(:i4)[2][2]).must_equal 3
 
-    @ds.get(Sequel.pg_array(:i).contains(:i2)).should == true
-    @ds.get(Sequel.pg_array(:i).contains(:i3)).should == false
+    @ds.get(Sequel.pg_array(:i).contains(:i2)).must_equal true
+    @ds.get(Sequel.pg_array(:i).contains(:i3)).must_equal false
 
-    @ds.get(Sequel.pg_array(:i2).contained_by(:i)).should == true
-    @ds.get(Sequel.pg_array(:i).contained_by(:i2)).should == false
+    @ds.get(Sequel.pg_array(:i2).contained_by(:i)).must_equal true
+    @ds.get(Sequel.pg_array(:i).contained_by(:i2)).must_equal false
 
-    @ds.get(Sequel.pg_array(:i).overlaps(:i2)).should == true
-    @ds.get(Sequel.pg_array(:i2).overlaps(:i3)).should == false
+    @ds.get(Sequel.pg_array(:i).overlaps(:i2)).must_equal true
+    @ds.get(Sequel.pg_array(:i2).overlaps(:i3)).must_equal false
 
-    @ds.get(Sequel.pg_array(:i).dims).should == '[1:3]'
-    @ds.get(Sequel.pg_array(:i).length).should == 3
-    @ds.get(Sequel.pg_array(:i).lower).should == 1
+    @ds.get(Sequel.pg_array(:i).dims).must_equal '[1:3]'
+    @ds.get(Sequel.pg_array(:i).length).must_equal 3
+    @ds.get(Sequel.pg_array(:i).lower).must_equal 1
 
     if @db.server_version >= 80400
-      @ds.select(Sequel.pg_array(:i).unnest).from_self.count.should == 3
+      @ds.select(Sequel.pg_array(:i).unnest).from_self.count.must_equal 3
     end
     if @db.server_version >= 90000
-      @ds.get(Sequel.pg_array(:i5).join).should == '15'
-      @ds.get(Sequel.pg_array(:i5).join(':')).should == '1:5'
-      @ds.get(Sequel.pg_array(:i5).join(':', '*')).should == '1:*:5'
+      @ds.get(Sequel.pg_array(:i5).join).must_equal '15'
+      @ds.get(Sequel.pg_array(:i5).join(':')).must_equal '1:5'
+      @ds.get(Sequel.pg_array(:i5).join(':', '*')).must_equal '1:*:5'
     end
     if @db.server_version >= 90300
-      @ds.get(Sequel.pg_array(:i5).remove(1).length).should == 2
-      @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([1])).should == false
-      @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([4])).should == true
+      @ds.get(Sequel.pg_array(:i5).remove(1).length).must_equal 2
+      @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([1])).must_equal false
+      @ds.get(Sequel.pg_array(:i5).replace(1, 4).contains([4])).must_equal true
     end
     if @db.server_version >= 90400
-      @ds.get(Sequel.pg_array(:i).cardinality).should == 3
-      @ds.get(Sequel.pg_array(:i4).cardinality).should == 4
-      @ds.get(Sequel.pg_array(:i5).cardinality).should == 3
+      @ds.get(Sequel.pg_array(:i).cardinality).must_equal 3
+      @ds.get(Sequel.pg_array(:i4).cardinality).must_equal 4
+      @ds.get(Sequel.pg_array(:i5).cardinality).must_equal 3
 
-      @ds.from{Sequel.pg_array([1,2,3]).op.unnest([4,5,6], [7,8]).as(:t1, [:a, :b, :c])}.select_order_map([:a, :b, :c]).should == [[1, 4, 7], [2, 5, 8], [3, 6, nil]]
+      @ds.from{Sequel.pg_array([1,2,3]).op.unnest([4,5,6], [7,8]).as(:t1, [:a, :b, :c])}.select_order_map([:a, :b, :c]).must_equal [[1, 4, 7], [2, 5, 8], [3, 6, nil]]
     end
 
     if @native
-      @ds.get(Sequel.pg_array(:i).push(4)).should == [1, 2, 3, 4]
-      @ds.get(Sequel.pg_array(:i).unshift(4)).should == [4, 1, 2, 3]
-      @ds.get(Sequel.pg_array(:i).concat(:i2)).should == [1, 2, 3, 2, 1]
+      @ds.get(Sequel.pg_array(:i).push(4)).must_equal [1, 2, 3, 4]
+      @ds.get(Sequel.pg_array(:i).unshift(4)).must_equal [4, 1, 2, 3]
+      @ds.get(Sequel.pg_array(:i).concat(:i2)).must_equal [1, 2, 3, 2, 1]
     end
 
     if @db.type_supported?(:hstore)
-      Sequel.extension :pg_hstore, :pg_hstore_ops
-      @db.get(Sequel.pg_array(['a', 'b']).op.hstore['a']).should == 'b'
-      @db.get(Sequel.pg_array(['a', 'b']).op.hstore(['c', 'd'])['a']).should == 'c'
+      Sequel.extension :pg_hstore_ops
+      @db.get(Sequel.pg_array(['a', 'b']).op.hstore['a']).must_equal 'b'
+      @db.get(Sequel.pg_array(['a', 'b']).op.hstore(['c', 'd'])['a']).must_equal 'c'
     end
   end
 end
@@ -2410,7 +2410,6 @@ end
 describe 'PostgreSQL hstore handling' do
   before(:all) do
     @db = DB
-    @db.extension :pg_array, :pg_hstore
     @ds = @db[:items]
     @h = {'a'=>'b', 'c'=>nil, 'd'=>'NULL', 'e'=>'\\\\" \\\' ,=>'}
     @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
@@ -2419,64 +2418,64 @@ describe 'PostgreSQL hstore handling' do
     @db.drop_table?(:items)
   end
 
-  specify 'insert and retrieve hstore values' do
+  it 'insert and retrieve hstore values' do
     @db.create_table!(:items) do
       column :h, :hstore
     end
     @ds.insert(Sequel.hstore(@h))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
       v = rs.first[:h]
-      v.should == @h
-      v.should_not be_a_kind_of(Hash)
-      v.to_hash.should be_a_kind_of(Hash)
-      v.to_hash.should == @h
+      v.must_equal @h
+      v.class.must_equal(Sequel::Postgres::HStore)
+      v.to_hash.must_be_kind_of(Hash)
+      v.to_hash.must_equal @h
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'insert and retrieve hstore[] values' do
+  it 'insert and retrieve hstore[] values' do
     @db.create_table!(:items) do
       column :h, 'hstore[]'
     end
     @ds.insert(Sequel.pg_array([Sequel.hstore(@h)], :hstore))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
       v = rs.first[:h].first
-      v.should_not be_a_kind_of(Hash)
-      v.to_hash.should be_a_kind_of(Hash)
-      v.to_hash.should == @h
+      v.class.must_equal(Sequel::Postgres::HStore)
+      v.to_hash.must_be_kind_of(Hash)
+      v.to_hash.must_equal @h
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'use hstore in bound variables' do
+  it 'use hstore in bound variables' do
     @db.create_table!(:items) do
       column :i, :hstore
     end
     @ds.call(:insert, {:i=>Sequel.hstore(@h)}, {:i=>:$i})
-    @ds.get(:i).should == @h
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore(@h)).should == {:i=>@h}
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore({})).should == nil
+    @ds.get(:i).must_equal @h
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore(@h)).must_equal(:i=>@h)
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore({})).must_equal nil
 
     @ds.delete
     @ds.call(:insert, {:i=>Sequel.hstore('a'=>nil)}, {:i=>:$i})
-    @ds.get(:i).should == Sequel.hstore('a'=>nil)
+    @ds.get(:i).must_equal Sequel.hstore('a'=>nil)
 
     @ds.delete
     @ds.call(:insert, {:i=>@h}, {:i=>:$i})
-    @ds.get(:i).should == @h
-    @ds.filter(:i=>:$i).call(:first, :i=>@h).should == {:i=>@h}
-    @ds.filter(:i=>:$i).call(:first, :i=>{}).should == nil
+    @ds.get(:i).must_equal @h
+    @ds.filter(:i=>:$i).call(:first, :i=>@h).must_equal(:i=>@h)
+    @ds.filter(:i=>:$i).call(:first, :i=>{}).must_equal nil
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'with models and associations' do
+  it 'with models and associations' do
     @db.create_table!(:items) do
       primary_key :id
       column :h, :hstore
@@ -2500,7 +2499,7 @@ describe 'PostgreSQL hstore handling' do
     h = {'item_id'=>"2", 'left_item_id'=>"1"}
     o2 = c.create(:id=>2)
     o = c.create(:id=>1, :h=>h)
-    o.h.should == h
+    o.h.must_equal h
 
     c.many_to_one :item, :class=>c, :key_column=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer)
     c.one_to_many :items, :class=>c, :key=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer), :key_method=>:item_id
@@ -2525,137 +2524,136 @@ describe 'PostgreSQL hstore handling' do
       :right_primary_key_method=>:left_item_id
 
     # Lazily Loading
-    o.item.should == o2
-    o2.items.should == [o]
-    o.related_items.should == [o2]
-    o2.other_item.should == o
-    o.other_items.should == [o2]
-    o.other_related_items.should == [o]
-    o.mtm_items.should == [o]
+    o.item.must_equal o2
+    o2.items.must_equal [o]
+    o.related_items.must_equal [o2]
+    o2.other_item.must_equal o
+    o.other_items.must_equal [o2]
+    o.other_related_items.must_equal [o]
+    o.mtm_items.must_equal [o]
 
     # Eager Loading via eager
     os = c.eager(:item, :related_items, :other_items, :other_related_items, :mtm_items).where(:id=>1).all.first
-    os.item.should == o2
-    os.related_items.should == [o2]
-    os.other_items.should == [o2]
-    os.other_related_items.should == [o]
-    os.mtm_items.should == [o]
+    os.item.must_equal o2
+    os.related_items.must_equal [o2]
+    os.other_items.must_equal [o2]
+    os.other_related_items.must_equal [o]
+    os.mtm_items.must_equal [o]
     os = c.eager(:items, :other_item).where(:id=>2).all.first
-    os.items.should == [o]
-    os.other_item.should == o
+    os.items.must_equal [o]
+    os.other_item.must_equal o
 
     # Eager Loading via eager_graph
-    c.eager_graph(:item).where(:items__id=>1).all.first.item.should == o2
-    c.eager_graph(:items).where(:items__id=>2).all.first.items.should == [o]
-    c.eager_graph(:related_items).where(:items__id=>1).all.first.related_items.should == [o2]
-    c.eager_graph(:other_item).where(:items__id=>2).all.first.other_item.should == o
-    c.eager_graph(:other_items).where(:items__id=>1).all.first.other_items.should == [o2]
-    c.eager_graph(:other_related_items).where(:items__id=>1).all.first.other_related_items.should == [o]
-    c.eager_graph(:mtm_items).where(:items__id=>1).all.first.mtm_items.should == [o]
+    c.eager_graph(:item).where(:items__id=>1).all.first.item.must_equal o2
+    c.eager_graph(:items).where(:items__id=>2).all.first.items.must_equal [o]
+    c.eager_graph(:related_items).where(:items__id=>1).all.first.related_items.must_equal [o2]
+    c.eager_graph(:other_item).where(:items__id=>2).all.first.other_item.must_equal o
+    c.eager_graph(:other_items).where(:items__id=>1).all.first.other_items.must_equal [o2]
+    c.eager_graph(:other_related_items).where(:items__id=>1).all.first.other_related_items.must_equal [o]
+    c.eager_graph(:mtm_items).where(:items__id=>1).all.first.mtm_items.must_equal [o]
 
     # Filter By Associations - Model Instances
-    c.filter(:item=>o2).all.should == [o]
-    c.filter(:items=>o).all.should == [o2]
-    c.filter(:related_items=>o2).all.should == [o]
-    c.filter(:other_item=>o).all.should == [o2]
-    c.filter(:other_items=>o2).all.should == [o]
-    c.filter(:other_related_items=>o).all.should == [o]
-    c.filter(:mtm_items=>o).all.should == [o]
+    c.filter(:item=>o2).all.must_equal [o]
+    c.filter(:items=>o).all.must_equal [o2]
+    c.filter(:related_items=>o2).all.must_equal [o]
+    c.filter(:other_item=>o).all.must_equal [o2]
+    c.filter(:other_items=>o2).all.must_equal [o]
+    c.filter(:other_related_items=>o).all.must_equal [o]
+    c.filter(:mtm_items=>o).all.must_equal [o]
    
     # Filter By Associations - Model Datasets
-    c.filter(:item=>c.filter(:id=>o2.id)).all.should == [o]
-    c.filter(:items=>c.filter(:id=>o.id)).all.should == [o2]
-    c.filter(:related_items=>c.filter(:id=>o2.id)).all.should == [o]
-    c.filter(:other_item=>c.filter(:id=>o.id)).all.should == [o2]
-    c.filter(:other_items=>c.filter(:id=>o2.id)).all.should == [o]
-    c.filter(:other_related_items=>c.filter(:id=>o.id)).all.should == [o]
-    c.filter(:mtm_items=>c.filter(:id=>o.id)).all.should == [o]
+    c.filter(:item=>c.filter(:id=>o2.id)).all.must_equal [o]
+    c.filter(:items=>c.filter(:id=>o.id)).all.must_equal [o2]
+    c.filter(:related_items=>c.filter(:id=>o2.id)).all.must_equal [o]
+    c.filter(:other_item=>c.filter(:id=>o.id)).all.must_equal [o2]
+    c.filter(:other_items=>c.filter(:id=>o2.id)).all.must_equal [o]
+    c.filter(:other_related_items=>c.filter(:id=>o.id)).all.must_equal [o]
+    c.filter(:mtm_items=>c.filter(:id=>o.id)).all.must_equal [o]
   end
 
-  specify 'operations/functions with pg_hstore_ops' do
-    Sequel.extension :pg_hstore_ops, :pg_array, :pg_array_ops
+  it 'operations/functions with pg_hstore_ops' do
+    Sequel.extension :pg_hstore_ops, :pg_array_ops
     @db.create_table!(:items){hstore :h1; hstore :h2; hstore :h3; String :t}
     @ds.insert(Sequel.hstore('a'=>'b', 'c'=>nil), Sequel.hstore('a'=>'b'), Sequel.hstore('d'=>'e'))
     h1 = Sequel.hstore(:h1)
     h2 = Sequel.hstore(:h2)
     h3 = Sequel.hstore(:h3)
     
-    @ds.get(h1['a']).should == 'b'
-    @ds.get(h1['d']).should == nil
+    @ds.get(h1['a']).must_equal 'b'
+    @ds.get(h1['d']).must_equal nil
 
-    @ds.get(h2.concat(h3).keys.length).should == 2
-    @ds.get(h1.concat(h3).keys.length).should == 3
-    @ds.get(h2.merge(h3).keys.length).should == 2
-    @ds.get(h1.merge(h3).keys.length).should == 3
+    @ds.get(h2.concat(h3).keys.length).must_equal 2
+    @ds.get(h1.concat(h3).keys.length).must_equal 3
+    @ds.get(h2.merge(h3).keys.length).must_equal 2
+    @ds.get(h1.merge(h3).keys.length).must_equal 3
 
-    @ds.get(h1.contain_all(%w'a c')).should == true
-    @ds.get(h1.contain_all(%w'a d')).should == false
+    @ds.get(h1.contain_all(%w'a c')).must_equal true
+    @ds.get(h1.contain_all(%w'a d')).must_equal false
 
-    @ds.get(h1.contain_any(%w'a d')).should == true
-    @ds.get(h1.contain_any(%w'e d')).should == false
+    @ds.get(h1.contain_any(%w'a d')).must_equal true
+    @ds.get(h1.contain_any(%w'e d')).must_equal false
 
-    @ds.get(h1.contains(h2)).should == true
-    @ds.get(h1.contains(h3)).should == false
+    @ds.get(h1.contains(h2)).must_equal true
+    @ds.get(h1.contains(h3)).must_equal false
 
-    @ds.get(h2.contained_by(h1)).should == true
-    @ds.get(h2.contained_by(h3)).should == false
+    @ds.get(h2.contained_by(h1)).must_equal true
+    @ds.get(h2.contained_by(h3)).must_equal false
 
-    @ds.get(h1.defined('a')).should == true
-    @ds.get(h1.defined('c')).should == false
-    @ds.get(h1.defined('d')).should == false
+    @ds.get(h1.defined('a')).must_equal true
+    @ds.get(h1.defined('c')).must_equal false
+    @ds.get(h1.defined('d')).must_equal false
 
-    @ds.get(h1.delete('a')['c']).should == nil
-    @ds.get(h1.delete(%w'a d')['c']).should == nil
-    @ds.get(h1.delete(h2)['c']).should == nil
+    @ds.get(h1.delete('a')['c']).must_equal nil
+    @ds.get(h1.delete(%w'a d')['c']).must_equal nil
+    @ds.get(h1.delete(h2)['c']).must_equal nil
 
-    @ds.from(Sequel.hstore('a'=>'b', 'c'=>nil).op.each).order(:key).all.should == [{:key=>'a', :value=>'b'}, {:key=>'c', :value=>nil}]
+    @ds.from(Sequel.hstore('a'=>'b', 'c'=>nil).op.each).order(:key).all.must_equal [{:key=>'a', :value=>'b'}, {:key=>'c', :value=>nil}]
 
-    @ds.get(h1.has_key?('c')).should == true
-    @ds.get(h1.include?('c')).should == true
-    @ds.get(h1.key?('c')).should == true
-    @ds.get(h1.member?('c')).should == true
-    @ds.get(h1.exist?('c')).should == true
-    @ds.get(h1.has_key?('d')).should == false
-    @ds.get(h1.include?('d')).should == false
-    @ds.get(h1.key?('d')).should == false
-    @ds.get(h1.member?('d')).should == false
-    @ds.get(h1.exist?('d')).should == false
+    @ds.get(h1.has_key?('c')).must_equal true
+    @ds.get(h1.include?('c')).must_equal true
+    @ds.get(h1.key?('c')).must_equal true
+    @ds.get(h1.member?('c')).must_equal true
+    @ds.get(h1.exist?('c')).must_equal true
+    @ds.get(h1.has_key?('d')).must_equal false
+    @ds.get(h1.include?('d')).must_equal false
+    @ds.get(h1.key?('d')).must_equal false
+    @ds.get(h1.member?('d')).must_equal false
+    @ds.get(h1.exist?('d')).must_equal false
 
-    @ds.get(h1.hstore.hstore.hstore.keys.length).should == 2
-    @ds.get(h1.keys.length).should == 2
-    @ds.get(h2.keys.length).should == 1
-    @ds.get(h1.akeys.length).should == 2
-    @ds.get(h2.akeys.length).should == 1
+    @ds.get(h1.hstore.hstore.hstore.keys.length).must_equal 2
+    @ds.get(h1.keys.length).must_equal 2
+    @ds.get(h2.keys.length).must_equal 1
+    @ds.get(h1.akeys.length).must_equal 2
+    @ds.get(h2.akeys.length).must_equal 1
 
-    @ds.from(Sequel.hstore('t'=>'s').op.populate(Sequel::SQL::Cast.new(nil, :items))).select_map(:t).should == ['s']
-    @ds.from(:items___i).select(Sequel.hstore('t'=>'s').op.record_set(:i).as(:r)).from_self(:alias=>:s).select(Sequel.lit('(r).*')).from_self.select_map(:t).should == ['s']
+    @ds.from(Sequel.hstore('t'=>'s').op.populate(Sequel::SQL::Cast.new(nil, :items))).select_map(:t).must_equal ['s']
+    @ds.from(:items___i).select(Sequel.hstore('t'=>'s').op.record_set(:i).as(:r)).from_self(:alias=>:s).select(Sequel.lit('(r).*')).from_self.select_map(:t).must_equal ['s']
 
-    @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.skeys.as(:s)).select_order_map(:s).should == %w'a t'
-    @ds.from((Sequel.hstore('t'=>'s', 'a'=>'b').op - 'a').skeys.as(:s)).select_order_map(:s).should == %w't'
+    @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.skeys.as(:s)).select_order_map(:s).must_equal %w'a t'
+    @ds.from((Sequel.hstore('t'=>'s', 'a'=>'b').op - 'a').skeys.as(:s)).select_order_map(:s).must_equal %w't'
 
-    @ds.get(h1.slice(%w'a c').keys.length).should == 2
-    @ds.get(h1.slice(%w'd c').keys.length).should == 1
-    @ds.get(h1.slice(%w'd e').keys.length).should == nil
+    @ds.get(h1.slice(%w'a c').keys.length).must_equal 2
+    @ds.get(h1.slice(%w'd c').keys.length).must_equal 1
+    @ds.get(h1.slice(%w'd e').keys.length).must_equal nil
 
-    @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.svals.as(:s)).select_order_map(:s).should == %w'b s'
+    @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.svals.as(:s)).select_order_map(:s).must_equal %w'b s'
 
-    @ds.get(h1.to_array.length).should == 4
-    @ds.get(h2.to_array.length).should == 2
+    @ds.get(h1.to_array.length).must_equal 4
+    @ds.get(h2.to_array.length).must_equal 2
 
-    @ds.get(h1.to_matrix.length).should == 2
-    @ds.get(h2.to_matrix.length).should == 1
+    @ds.get(h1.to_matrix.length).must_equal 2
+    @ds.get(h2.to_matrix.length).must_equal 1
 
-    @ds.get(h1.values.length).should == 2
-    @ds.get(h2.values.length).should == 1
-    @ds.get(h1.avals.length).should == 2
-    @ds.get(h2.avals.length).should == 1
+    @ds.get(h1.values.length).must_equal 2
+    @ds.get(h2.values.length).must_equal 1
+    @ds.get(h1.avals.length).must_equal 2
+    @ds.get(h2.avals.length).must_equal 1
   end
 end if DB.type_supported?(:hstore)
 
 describe 'PostgreSQL json type' do
   before(:all) do
     @db = DB
-    @db.extension :pg_array, :pg_json
     @ds = @db[:items]
     @a = [1, 2, {'a'=>'b'}, 3.0]
     @h = {'a'=>'b', '1'=>[3, 4, 5]}
@@ -2671,146 +2669,149 @@ describe 'PostgreSQL json type' do
     json_array_type = "#{json_type}[]"
     pg_json = lambda{|v| Sequel.send(:"pg_#{json_type}", v)}
 
-    specify 'insert and retrieve json values' do
+    it 'insert and retrieve json values' do
+      hash_class = json_type == :jsonb ? Sequel::Postgres::JSONBHash : Sequel::Postgres::JSONHash
+      array_class = json_type == :jsonb ? Sequel::Postgres::JSONBArray : Sequel::Postgres::JSONArray
+
       @db.create_table!(:items){column :j, json_type}
       @ds.insert(pg_json.call(@h))
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         rs = @ds.all
         v = rs.first[:j]
-        v.should_not be_a_kind_of(Hash)
-        v.to_hash.should be_a_kind_of(Hash)
-        v.should == @h
-        v.to_hash.should == @h
+        v.class.must_equal(hash_class)
+        v.to_hash.must_be_kind_of(Hash)
+        v.must_equal @h
+        v.to_hash.must_equal @h
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
       end
 
       @ds.delete
       @ds.insert(pg_json.call(@a))
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         rs = @ds.all
         v = rs.first[:j]
-        v.should_not be_a_kind_of(Array)
-        v.to_a.should be_a_kind_of(Array)
-        v.should == @a
-        v.to_a.should == @a
+        v.class.must_equal(array_class)
+        v.to_a.must_be_kind_of(Array)
+        v.must_equal @a
+        v.to_a.must_equal @a
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
       end
     end
 
-    specify 'insert and retrieve json[] values' do
+    it 'insert and retrieve json[] values' do
       @db.create_table!(:items){column :j, json_array_type}
       j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])])
       @ds.insert(j)
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         rs = @ds.all
         v = rs.first[:j]
-        v.should_not be_a_kind_of(Array)
-        v.to_a.should be_a_kind_of(Array)
-        v.should == j
-        v.to_a.should == j
+        v.class.must_equal(Sequel::Postgres::PGArray)
+        v.to_a.must_be_kind_of(Array)
+        v.must_equal j
+        v.to_a.must_equal j
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
       end
     end
 
-    specify 'with models' do
+    it 'with models' do
       @db.create_table!(:items) do
         primary_key :id
         column :h, json_type
       end
       c = Class.new(Sequel::Model(@db[:items]))
       c.plugin :pg_typecast_on_load, :h unless @native
-      c.create(:h=>pg_json.call(@h)).h.should == @h
-      c.create(:h=>pg_json.call(@a)).h.should == @a
+      c.create(:h=>pg_json.call(@h)).h.must_equal @h
+      c.create(:h=>pg_json.call(@a)).h.must_equal @a
     end
 
-    specify 'use json in bound variables' do
+    it 'use json in bound variables' do
       @db.create_table!(:items){column :i, json_type}
       @ds.call(:insert, {:i=>pg_json.call(@h)}, {:i=>:$i})
-      @ds.get(:i).should == @h
+      @ds.get(:i).must_equal @h
 
       @ds.delete
       @ds.call(:insert, {:i=>pg_json.call('a'=>nil)}, {:i=>:$i})
-      @ds.get(:i).should == pg_json.call('a'=>nil)
+      @ds.get(:i).must_equal pg_json.call('a'=>nil)
 
       @db.create_table!(:items){column :i, json_array_type}
       j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])], json_type)
       @ds.call(:insert, {:i=>j}, {:i=>:$i})
-      @ds.get(:i).should == j
+      @ds.get(:i).must_equal j
     end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-    specify 'operations/functions with pg_json_ops' do
+    it 'operations/functions with pg_json_ops' do
       Sequel.extension :pg_json_ops
       jo = pg_json.call('a'=>1, 'b'=>{'c'=>2, 'd'=>{'e'=>3}}).op
       ja = pg_json.call([2, 3, %w'a b']).op
 
-      @db.get(jo['a']).should == 1
-      @db.get(jo['b']['c']).should == 2
-      @db.get(jo[%w'b c']).should == 2
-      @db.get(jo['b'].get_text(%w'd e')).should == "3"
-      @db.get(jo[%w'b d'].get_text('e')).should == "3"
-      @db.get(ja[1]).should == 3
-      @db.get(ja[%w'2 1']).should == 'b'
+      @db.get(jo['a']).must_equal 1
+      @db.get(jo['b']['c']).must_equal 2
+      @db.get(jo[%w'b c']).must_equal 2
+      @db.get(jo['b'].get_text(%w'd e')).must_equal "3"
+      @db.get(jo[%w'b d'].get_text('e')).must_equal "3"
+      @db.get(ja[1]).must_equal 3
+      @db.get(ja[%w'2 1']).must_equal 'b'
 
-      @db.get(jo.extract('a')).should == 1
-      @db.get(jo.extract('b').extract('c')).should == 2
-      @db.get(jo.extract('b', 'c')).should == 2
-      @db.get(jo.extract('b', 'd', 'e')).should == 3
-      @db.get(jo.extract_text('b', 'd')).gsub(' ', '').should == '{"e":3}'
-      @db.get(jo.extract_text('b', 'd', 'e')).should == '3'
+      @db.get(jo.extract('a')).must_equal 1
+      @db.get(jo.extract('b').extract('c')).must_equal 2
+      @db.get(jo.extract('b', 'c')).must_equal 2
+      @db.get(jo.extract('b', 'd', 'e')).must_equal 3
+      @db.get(jo.extract_text('b', 'd')).gsub(' ', '').must_equal '{"e":3}'
+      @db.get(jo.extract_text('b', 'd', 'e')).must_equal '3'
 
-      @db.get(ja.array_length).should == 3
-      @db.from(ja.array_elements.as(:v)).select_map(:v).should == [2, 3, %w'a b']
+      @db.get(ja.array_length).must_equal 3
+      @db.from(ja.array_elements.as(:v)).select_map(:v).must_equal [2, 3, %w'a b']
 
       if DB.server_version >= 90400 
-        @db.get(jo.typeof).should == 'object'
-        @db.get(ja.typeof).should == 'array'
-        @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.should == ['2', '3', '["a","b"]']
-        @db.from(jo.to_record.as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).should == [1]
-        @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).should == [1]
+        @db.get(jo.typeof).must_equal 'object'
+        @db.get(ja.typeof).must_equal 'array'
+        @db.from(ja.array_elements_text.as(:v)).select_map(:v).map{|s| s.gsub(' ', '')}.must_equal ['2', '3', '["a","b"]']
+        @db.from(jo.to_record.as(:v, [Sequel.lit('a integer'), Sequel.lit('b text')])).select_map(:a).must_equal [1]
+        @db.from(pg_json.call([{'a'=>1, 'b'=>1}]).op.to_recordset.as(:v, [Sequel.lit('a integer'), Sequel.lit('b integer')])).select_map(:a).must_equal [1]
 
         if json_type == :jsonb
-          @db.get(jo.has_key?('a')).should == true
-          @db.get(jo.has_key?('c')).should == false
-          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('2')).should == true
-          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('4')).should == false
+          @db.get(jo.has_key?('a')).must_equal true
+          @db.get(jo.has_key?('c')).must_equal false
+          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('2')).must_equal true
+          @db.get(pg_json.call(['2', '3', %w'a b']).op.include?('4')).must_equal false
 
-          @db.get(jo.contain_all(['a', 'b'])).should == true
-          @db.get(jo.contain_all(['a', 'c'])).should == false
-          @db.get(jo.contain_all(['d', 'c'])).should == false
-          @db.get(jo.contain_any(['a', 'b'])).should == true
-          @db.get(jo.contain_any(['a', 'c'])).should == true
-          @db.get(jo.contain_any(['d', 'c'])).should == false
+          @db.get(jo.contain_all(['a', 'b'])).must_equal true
+          @db.get(jo.contain_all(['a', 'c'])).must_equal false
+          @db.get(jo.contain_all(['d', 'c'])).must_equal false
+          @db.get(jo.contain_any(['a', 'b'])).must_equal true
+          @db.get(jo.contain_any(['a', 'c'])).must_equal true
+          @db.get(jo.contain_any(['d', 'c'])).must_equal false
 
-          @db.get(jo.contains(jo)).should == true
-          @db.get(jo.contained_by(jo)).should == true
-          @db.get(jo.contains('a'=>1)).should == true
-          @db.get(jo.contained_by('a'=>1)).should == false
-          @db.get(pg_json.call('a'=>1).op.contains(jo)).should == false
-          @db.get(pg_json.call('a'=>1).op.contained_by(jo)).should == true
+          @db.get(jo.contains(jo)).must_equal true
+          @db.get(jo.contained_by(jo)).must_equal true
+          @db.get(jo.contains('a'=>1)).must_equal true
+          @db.get(jo.contained_by('a'=>1)).must_equal false
+          @db.get(pg_json.call('a'=>1).op.contains(jo)).must_equal false
+          @db.get(pg_json.call('a'=>1).op.contained_by(jo)).must_equal true
 
-          @db.get(ja.contains(ja)).should == true
-          @db.get(ja.contained_by(ja)).should == true
-          @db.get(ja.contains([2,3])).should == true
-          @db.get(ja.contained_by([2,3])).should == false
-          @db.get(pg_json.call([2,3]).op.contains(ja)).should == false
-          @db.get(pg_json.call([2,3]).op.contained_by(ja)).should == true
+          @db.get(ja.contains(ja)).must_equal true
+          @db.get(ja.contained_by(ja)).must_equal true
+          @db.get(ja.contains([2,3])).must_equal true
+          @db.get(ja.contained_by([2,3])).must_equal false
+          @db.get(pg_json.call([2,3]).op.contains(ja)).must_equal false
+          @db.get(pg_json.call([2,3]).op.contained_by(ja)).must_equal true
         end
       end
 
-      @db.from(jo.keys.as(:k)).select_order_map(:k).should == %w'a b'
-      @db.from(jo.each).select_order_map(:key).should == %w'a b'
-      @db.from(jo.each).order(:key).select_map(:value).should == [1, {'c'=>2, 'd'=>{'e'=>3}}]
-      @db.from(jo.each_text).select_order_map(:key).should == %w'a b'
-      @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).gsub(' ', '').should =~ /\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/
+      @db.from(jo.keys.as(:k)).select_order_map(:k).must_equal %w'a b'
+      @db.from(jo.each).select_order_map(:key).must_equal %w'a b'
+      @db.from(jo.each).order(:key).select_map(:value).must_equal [1, {'c'=>2, 'd'=>{'e'=>3}}]
+      @db.from(jo.each_text).select_order_map(:key).must_equal %w'a b'
+      @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).gsub(' ', '').must_match /\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/
 
       Sequel.extension :pg_row_ops
       @db.create_table!(:items) do
@@ -2818,11 +2819,11 @@ describe 'PostgreSQL json type' do
         String :b
       end
       j = Sequel.pg_json('a'=>1, 'b'=>'c').op
-      @db.get(j.populate(Sequel.cast(nil, :items)).pg_row[:a]).should == 1
-      @db.get(j.populate(Sequel.cast(nil, :items)).pg_row[:b]).should == 'c'
+      @db.get(j.populate(Sequel.cast(nil, :items)).pg_row[:a]).must_equal 1
+      @db.get(j.populate(Sequel.cast(nil, :items)).pg_row[:b]).must_equal 'c'
       j = Sequel.pg_json([{'a'=>1, 'b'=>'c'}, {'a'=>2, 'b'=>'d'}]).op
-      @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:a).should == [1, 2]
-      @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:b).should == %w'c d'
+      @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:a).must_equal [1, 2]
+      @db.from(j.populate_set(Sequel.cast(nil, :items))).select_order_map(:b).must_equal %w'c d'
     end if DB.server_version >= 90300 && (DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc)
   end
 end if DB.server_version >= 90200
@@ -2832,7 +2833,6 @@ describe 'PostgreSQL inet/cidr types' do
 
   before(:all) do
     @db = DB
-    @db.extension :pg_array, :pg_inet
     @ds = @db[:items]
     @v4 = '127.0.0.1'
     @v4nm = '127.0.0.0/8'
@@ -2850,84 +2850,84 @@ describe 'PostgreSQL inet/cidr types' do
     @db.drop_table?(:items)
   end
 
-  specify 'insert and retrieve inet/cidr values' do
+  it 'insert and retrieve inet/cidr values' do
     @db.create_table!(:items){inet :i; cidr :c}
     @ds.insert(@ipv4, @ipv4nm)
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
-      rs.first[:i].should == @ipv4
-      rs.first[:c].should == @ipv4nm
-      rs.first[:i].should be_a_kind_of(IPAddr)
-      rs.first[:c].should be_a_kind_of(IPAddr)
+      rs.first[:i].must_equal @ipv4
+      rs.first[:c].must_equal @ipv4nm
+      rs.first[:i].must_be_kind_of(IPAddr)
+      rs.first[:c].must_be_kind_of(IPAddr)
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
 
     unless ipv6_broken
       @ds.delete
       @ds.insert(@ipv6, @ipv6nm)
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         rs = @ds.all
         rs.first[:j]
-        rs.first[:i].should == @ipv6
-        rs.first[:c].should == @ipv6nm
-        rs.first[:i].should be_a_kind_of(IPAddr)
-        rs.first[:c].should be_a_kind_of(IPAddr)
+        rs.first[:i].must_equal @ipv6
+        rs.first[:c].must_equal @ipv6nm
+        rs.first[:i].must_be_kind_of(IPAddr)
+        rs.first[:c].must_be_kind_of(IPAddr)
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
       end
     end
   end
 
-  specify 'insert and retrieve inet/cidr/macaddr array values' do
+  it 'insert and retrieve inet/cidr/macaddr array values' do
     @db.create_table!(:items){column :i, 'inet[]'; column :c, 'cidr[]'; column :m, 'macaddr[]'}
     @ds.insert(Sequel.pg_array([@ipv4], 'inet'), Sequel.pg_array([@ipv4nm], 'cidr'), Sequel.pg_array(['12:34:56:78:90:ab'], 'macaddr'))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
-      rs.first.values.all?{|c| c.is_a?(Sequel::Postgres::PGArray)}.should == true
-      rs.first[:i].first.should == @ipv4
-      rs.first[:c].first.should == @ipv4nm
-      rs.first[:m].first.should == '12:34:56:78:90:ab'
-      rs.first[:i].first.should be_a_kind_of(IPAddr)
-      rs.first[:c].first.should be_a_kind_of(IPAddr)
+      rs.first.values.all?{|c| c.is_a?(Sequel::Postgres::PGArray)}.must_equal true
+      rs.first[:i].first.must_equal @ipv4
+      rs.first[:c].first.must_equal @ipv4nm
+      rs.first[:m].first.must_equal '12:34:56:78:90:ab'
+      rs.first[:i].first.must_be_kind_of(IPAddr)
+      rs.first[:c].first.must_be_kind_of(IPAddr)
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'use ipaddr in bound variables' do
+  it 'use ipaddr in bound variables' do
     @db.create_table!(:items){inet :i; cidr :c}
 
     @ds.call(:insert, {:i=>@ipv4, :c=>@ipv4nm}, {:i=>:$i, :c=>:$c})
-    @ds.get(:i).should == @ipv4
-    @ds.get(:c).should == @ipv4nm
-    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).should == {:i=>@ipv4, :c=>@ipv4nm}
-    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).should == nil
-    @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv4, :c=>@ipv4nm).should == 1
+    @ds.get(:i).must_equal @ipv4
+    @ds.get(:c).must_equal @ipv4nm
+    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).must_equal(:i=>@ipv4, :c=>@ipv4nm)
+    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).must_equal nil
+    @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv4, :c=>@ipv4nm).must_equal 1
 
     unless ipv6_broken
       @ds.call(:insert, {:i=>@ipv6, :c=>@ipv6nm}, {:i=>:$i, :c=>:$c})
-      @ds.get(:i).should == @ipv6
-      @ds.get(:c).should == @ipv6nm
-      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).should == {:i=>@ipv6, :c=>@ipv6nm}
-      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).should == nil
-      @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv6, :c=>@ipv6nm).should == 1
+      @ds.get(:i).must_equal @ipv6
+      @ds.get(:c).must_equal @ipv6nm
+      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).must_equal(:i=>@ipv6, :c=>@ipv6nm)
+      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).must_equal nil
+      @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv6, :c=>@ipv6nm).must_equal 1
     end
 
     @db.create_table!(:items){column :i, 'inet[]'; column :c, 'cidr[]'; column :m, 'macaddr[]'}
     @ds.call(:insert, {:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']}, {:i=>:$i, :c=>:$c, :m=>:$m})
-    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).should == {:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']}
-    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[], :c=>[], :m=>[]).should == nil
-    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:delete, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).should == 1
+    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).must_equal(:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab'])
+    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[], :c=>[], :m=>[]).must_equal nil
+    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:delete, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).must_equal 1
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'with models' do
+  it 'with models' do
     @db.create_table!(:items) do
       primary_key :id
       inet :i
@@ -2935,9 +2935,9 @@ describe 'PostgreSQL inet/cidr types' do
     end
     c = Class.new(Sequel::Model(@db[:items]))
     c.plugin :pg_typecast_on_load, :i, :c unless @native
-    c.create(:i=>@v4, :c=>@v4nm).values.values_at(:i, :c).should == [@ipv4, @ipv4nm]
+    c.create(:i=>@v4, :c=>@v4nm).values.values_at(:i, :c).must_equal [@ipv4, @ipv4nm]
     unless ipv6_broken
-      c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).should == [@ipv6, @ipv6nm]
+      c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).must_equal [@ipv6, @ipv6nm]
     end
   end
 end
@@ -2945,7 +2945,6 @@ end
 describe 'PostgreSQL range types' do
   before(:all) do
     @db = DB
-    @db.extension :pg_array, :pg_range
     @ds = @db[:items]
     @map = {:i4=>'int4range', :i8=>'int8range', :n=>'numrange', :d=>'daterange', :t=>'tsrange', :tz=>'tstzrange'}
     @r = {:i4=>1...2, :i8=>2...3, :n=>BigDecimal.new('1.0')..BigDecimal.new('2.0'), :d=>Date.today...(Date.today+1), :t=>Time.local(2011, 1)..Time.local(2011, 2), :tz=>Time.local(2011, 1)..Time.local(2011, 2)}
@@ -2961,164 +2960,163 @@ describe 'PostgreSQL range types' do
     @db.drop_table?(:items)
   end
 
-  specify 'insert and retrieve range type values' do
+  it 'insert and retrieve range type values' do
     @db.create_table!(:items){int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
     [@r, @pgr].each do |input|
       h = {}
       input.each{|k, v| h[k] = Sequel.cast(v, @map[k])}
       @ds.insert(h)
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         rs = @ds.all
         rs.first.each do |k, v|
-          v.should_not be_a_kind_of(Range)
-          v.to_range.should be_a_kind_of(Range)
-          v.should == @r[k]
-          v.to_range.should == @r[k]
+          v.class.must_equal(Sequel::Postgres::PGRange)
+          v.to_range.must_be_kind_of(Range)
+          v.must_be :==, @r[k]
+          v.to_range.must_equal @r[k]
         end
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
       end
       @ds.delete
     end
   end
 
-  specify 'insert and retrieve arrays of range type values' do
+  it 'insert and retrieve arrays of range type values' do
     @db.create_table!(:items){column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
     [@ra, @pgra].each do |input|
       @ds.insert(input)
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         rs = @ds.all
         rs.first.each do |k, v|
-          v.should_not be_a_kind_of(Array)
-          v.to_a.should be_a_kind_of(Array)
-          v.first.should_not be_a_kind_of(Range)
-          v.first.to_range.should be_a_kind_of(Range)
-          v.should == @ra[k].to_a
-          v.first.should == @r[k]
+          v.class.must_equal(Sequel::Postgres::PGArray)
+          v.to_a.must_be_kind_of(Array)
+          v.first.class.must_equal(Sequel::Postgres::PGRange)
+          v.first.to_range.must_be_kind_of(Range)
+          v.must_be :==, @ra[k].to_a
+          v.first.must_be :==, @r[k]
         end
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
       end
       @ds.delete
     end
   end
 
-  specify 'use range types in bound variables' do
+  it 'use range types in bound variables' do
     @db.create_table!(:items){int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
     h = {}
     @r.keys.each{|k| h[k] = :"$#{k}"}
     r2 = {}
     @r.each{|k, v| r2[k] = Range.new(v.begin, v.end+2)}
     @ds.call(:insert, @r, h)
-    @ds.first.should == @r
-    @ds.filter(h).call(:first, @r).should == @r
-    @ds.filter(h).call(:first, @pgr).should == @r
-    @ds.filter(h).call(:first, r2).should == nil
-    @ds.filter(h).call(:delete, @r).should == 1
+    @ds.first.must_be :==, @r
+    @ds.filter(h).call(:first, @r).must_be :==, @r
+    @ds.filter(h).call(:first, @pgr).must_be :==, @r
+    @ds.filter(h).call(:first, r2).must_equal nil
+    @ds.filter(h).call(:delete, @r).must_equal 1
 
     @db.create_table!(:items){column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
     @r.each{|k, v| r2[k] = [Range.new(v.begin, v.end+2)]}
     @ds.call(:insert, @ra, h)
-    @ds.filter(h).call(:first, @ra).each{|k, v| v.should == @ra[k].to_a}
-    @ds.filter(h).call(:first, @pgra).each{|k, v| v.should == @ra[k].to_a}
-    @ds.filter(h).call(:first, r2).should == nil
-    @ds.filter(h).call(:delete, @ra).should == 1
+    @ds.filter(h).call(:first, @ra).each{|k, v| v.must_be :==, @ra[k].to_a}
+    @ds.filter(h).call(:first, @pgra).each{|k, v| v.must_be :==, @ra[k].to_a}
+    @ds.filter(h).call(:first, r2).must_equal nil
+    @ds.filter(h).call(:delete, @ra).must_equal 1
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'with models' do
+  it 'with models' do
     @db.create_table!(:items){primary_key :id; int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
     c = Class.new(Sequel::Model(@db[:items]))
     c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
     v = c.create(@r).values
     v.delete(:id)
-    v.should == @r
+    v.must_be :==, @r
 
     @db.create_table!(:items){primary_key :id; column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
     c = Class.new(Sequel::Model(@db[:items]))
     c.plugin :pg_typecast_on_load, :i4, :i8, :n, :d, :t, :tz unless @native
     v = c.create(@ra).values
     v.delete(:id)
-    v.each{|k,v1| v1.should == @ra[k].to_a}
+    v.each{|k,v1| v1.must_be :==, @ra[k].to_a}
   end
 
-  specify 'operations/functions with pg_range_ops' do
+  it 'operations/functions with pg_range_ops' do
     Sequel.extension :pg_range_ops
 
-    @db.get(Sequel.pg_range(1..5, :int4range).op.contains(2..4)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.contains(3..6)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.contains(0..6)).should == false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contains(2..4)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contains(3..6)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contains(0..6)).must_equal false
 
-    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(0..6)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(3..6)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(2..4)).should == false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(0..6)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(3..6)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.contained_by(2..4)).must_equal false
 
-    @db.get(Sequel.pg_range(1..5, :int4range).op.overlaps(5..6)).should == true
-    @db.get(Sequel.pg_range(1...5, :int4range).op.overlaps(5..6)).should == false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.overlaps(5..6)).must_equal true
+    @db.get(Sequel.pg_range(1...5, :int4range).op.overlaps(5..6)).must_equal false
     
-    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(6..10)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(5..10)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(-1..0)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(-1..3)).should == false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(6..10)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(5..10)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(-1..0)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.left_of(-1..3)).must_equal false
 
-    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(6..10)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(5..10)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(-1..0)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(-1..3)).should == false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(6..10)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(5..10)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(-1..0)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.right_of(-1..3)).must_equal false
 
-    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(6..10)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(5..10)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(-1..0)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(-1..3)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(-1..7)).should == true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(6..10)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(5..10)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(-1..0)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(-1..3)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.ends_before(-1..7)).must_equal true
 
-    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(6..10)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(5..10)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(3..10)).should == false
-    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-1..10)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-1..0)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-1..3)).should == true
-    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-5..-1)).should == true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(6..10)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(5..10)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(3..10)).must_equal false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-1..10)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-1..0)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-1..3)).must_equal true
+    @db.get(Sequel.pg_range(1..5, :int4range).op.starts_after(-5..-1)).must_equal true
 
-    @db.get(Sequel.pg_range(1..5, :int4range).op.adjacent_to(6..10)).should == true
-    @db.get(Sequel.pg_range(1...5, :int4range).op.adjacent_to(6..10)).should == false
+    @db.get(Sequel.pg_range(1..5, :int4range).op.adjacent_to(6..10)).must_equal true
+    @db.get(Sequel.pg_range(1...5, :int4range).op.adjacent_to(6..10)).must_equal false
 
-    @db.get((Sequel.pg_range(1..5, :int4range).op + (6..10)).adjacent_to(6..10)).should == false
-    @db.get((Sequel.pg_range(1..5, :int4range).op + (6..10)).adjacent_to(11..20)).should == true
+    @db.get((Sequel.pg_range(1..5, :int4range).op + (6..10)).adjacent_to(6..10)).must_equal false
+    @db.get((Sequel.pg_range(1..5, :int4range).op + (6..10)).adjacent_to(11..20)).must_equal true
 
-    @db.get((Sequel.pg_range(1..5, :int4range).op * (2..6)).adjacent_to(6..10)).should == true
-    @db.get((Sequel.pg_range(1..4, :int4range).op * (2..6)).adjacent_to(6..10)).should == false
+    @db.get((Sequel.pg_range(1..5, :int4range).op * (2..6)).adjacent_to(6..10)).must_equal true
+    @db.get((Sequel.pg_range(1..4, :int4range).op * (2..6)).adjacent_to(6..10)).must_equal false
 
-    @db.get((Sequel.pg_range(1..5, :int4range).op - (2..6)).adjacent_to(2..10)).should == true
-    @db.get((Sequel.pg_range(0..4, :int4range).op - (3..6)).adjacent_to(4..10)).should == false
+    @db.get((Sequel.pg_range(1..5, :int4range).op - (2..6)).adjacent_to(2..10)).must_equal true
+    @db.get((Sequel.pg_range(0..4, :int4range).op - (3..6)).adjacent_to(4..10)).must_equal false
 
-    @db.get(Sequel.pg_range(0..4, :int4range).op.lower).should == 0
-    @db.get(Sequel.pg_range(0..4, :int4range).op.upper).should == 5
+    @db.get(Sequel.pg_range(0..4, :int4range).op.lower).must_equal 0
+    @db.get(Sequel.pg_range(0..4, :int4range).op.upper).must_equal 5
 
-    @db.get(Sequel.pg_range(0..4, :int4range).op.isempty).should == false
-    @db.get(Sequel::Postgres::PGRange.empty(:int4range).op.isempty).should == true
+    @db.get(Sequel.pg_range(0..4, :int4range).op.isempty).must_equal false
+    @db.get(Sequel::Postgres::PGRange.empty(:int4range).op.isempty).must_equal true
 
-    @db.get(Sequel.pg_range(1..5, :numrange).op.lower_inc).should == true
-    @db.get(Sequel::Postgres::PGRange.new(1, 5, :exclude_begin=>true, :db_type=>:numrange).op.lower_inc).should == false
+    @db.get(Sequel.pg_range(1..5, :numrange).op.lower_inc).must_equal true
+    @db.get(Sequel::Postgres::PGRange.new(1, 5, :exclude_begin=>true, :db_type=>:numrange).op.lower_inc).must_equal false
 
-    @db.get(Sequel.pg_range(1..5, :numrange).op.upper_inc).should == true
-    @db.get(Sequel.pg_range(1...5, :numrange).op.upper_inc).should == false
+    @db.get(Sequel.pg_range(1..5, :numrange).op.upper_inc).must_equal true
+    @db.get(Sequel.pg_range(1...5, :numrange).op.upper_inc).must_equal false
 
-    @db.get(Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range).op.lower_inf).should == false
-    @db.get(Sequel::Postgres::PGRange.new(nil, 5, :db_type=>:int4range).op.lower_inf).should == true
+    @db.get(Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range).op.lower_inf).must_equal false
+    @db.get(Sequel::Postgres::PGRange.new(nil, 5, :db_type=>:int4range).op.lower_inf).must_equal true
 
-    @db.get(Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range).op.upper_inf).should == false
-    @db.get(Sequel::Postgres::PGRange.new(1, nil, :db_type=>:int4range).op.upper_inf).should == true
+    @db.get(Sequel::Postgres::PGRange.new(1, 5, :db_type=>:int4range).op.upper_inf).must_equal false
+    @db.get(Sequel::Postgres::PGRange.new(1, nil, :db_type=>:int4range).op.upper_inf).must_equal true
   end
 end if DB.server_version >= 90200
 
 describe 'PostgreSQL interval types' do
   before(:all) do
     @db = DB
-    @db.extension :pg_array, :pg_interval
     @ds = @db[:items]
     @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
@@ -3129,7 +3127,7 @@ describe 'PostgreSQL interval types' do
     @db.drop_table?(:items)
   end
 
-  specify 'insert and retrieve interval values' do
+  it 'insert and retrieve interval values' do
     @db.create_table!(:items){interval :i}
     [
       ['0', '00:00:00',  0, []],
@@ -3152,57 +3150,57 @@ describe 'PostgreSQL interval types' do
       ['+2 years -1 months +3 weeks -4 days +5 hours -6 minutes +7 seconds', '1 year 11 mons 17 days 04:54:07', 31557600 + 11*86400*30 + 3*86400*7 - 4*86400 + 5*3600 - 6*60 + 7, [[:years, 1], [:months, 11], [:days, 17], [:seconds, 17647]]],
     ].each do |instr, outstr, value, parts|
       @ds.insert(instr)
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
-        @ds.get(Sequel.cast(:i, String)).should == outstr
+        @ds.get(Sequel.cast(:i, String)).must_equal outstr
         rs = @ds.all
-        rs.first[:i].is_a?(ActiveSupport::Duration).should == true
-        rs.first[:i].should == ActiveSupport::Duration.new(value, parts)
-        rs.first[:i].parts.sort_by{|k,v| k.to_s}.reject{|k,v| v == 0}.should == parts.sort_by{|k,v| k.to_s}
+        rs.first[:i].is_a?(ActiveSupport::Duration).must_equal true
+        rs.first[:i].must_equal ActiveSupport::Duration.new(value, parts)
+        rs.first[:i].parts.sort_by{|k,v| k.to_s}.reject{|k,v| v == 0}.must_equal parts.sort_by{|k,v| k.to_s}
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
       end
       @ds.delete
     end
   end
 
-  specify 'insert and retrieve interval array values' do
+  it 'insert and retrieve interval array values' do
     @db.create_table!(:items){column :i, 'interval[]'}
     @ds.insert(Sequel.pg_array(['1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds'], 'interval'))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       rs = @ds.all
-      rs.first[:i].is_a?(Sequel::Postgres::PGArray).should == true
-      rs.first[:i].first.is_a?(ActiveSupport::Duration).should == true
-      rs.first[:i].first.should == ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
-      rs.first[:i].first.parts.sort_by{|k,v| k.to_s}.should == [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
+      rs.first[:i].is_a?(Sequel::Postgres::PGArray).must_equal true
+      rs.first[:i].first.is_a?(ActiveSupport::Duration).must_equal true
+      rs.first[:i].first.must_equal ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
+      rs.first[:i].first.parts.sort_by{|k,v| k.to_s}.must_equal [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,v| k.to_s}
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
     end
   end
 
-  specify 'use intervals in bound variables' do
+  it 'use intervals in bound variables' do
     @db.create_table!(:items){interval :i}
     @ds.insert('1 year 2 months 3 weeks 4 days 5 hours 6 minutes 7 seconds')
     d = @ds.get(:i)
     @ds.delete
 
     @ds.call(:insert, {:i=>d}, {:i=>:$i})
-    @ds.get(:i).should == d
-    @ds.filter(:i=>:$i).call(:first, :i=>d).should == {:i=>d}
-    @ds.filter(:i=>:$i).call(:first, :i=>'0').should == nil
-    @ds.filter(:i=>:$i).call(:delete, :i=>d).should == 1
+    @ds.get(:i).must_equal d
+    @ds.filter(:i=>:$i).call(:first, :i=>d).must_equal(:i=>d)
+    @ds.filter(:i=>:$i).call(:first, :i=>'0').must_equal nil
+    @ds.filter(:i=>:$i).call(:delete, :i=>d).must_equal 1
 
     @db.create_table!(:items){column :i, 'interval[]'}
     @ds.call(:insert, {:i=>[d]}, {:i=>:$i})
-    @ds.filter(:i=>:$i).call(:first, :i=>[d]).should == {:i=>[d]}
-    @ds.filter(:i=>:$i).call(:first, :i=>[]).should == nil
-    @ds.filter(:i=>:$i).call(:delete, :i=>[d]).should == 1
+    @ds.filter(:i=>:$i).call(:first, :i=>[d]).must_equal(:i=>[d])
+    @ds.filter(:i=>:$i).call(:first, :i=>[]).must_equal nil
+    @ds.filter(:i=>:$i).call(:delete, :i=>[d]).must_equal 1
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'with models' do
+  it 'with models' do
     @db.create_table!(:items) do
       primary_key :id
       interval :i
@@ -3210,16 +3208,15 @@ describe 'PostgreSQL interval types' do
     c = Class.new(Sequel::Model(@db[:items]))
     c.plugin :pg_typecast_on_load, :i, :c unless @native
     v = c.create(:i=>'1 year 2 mons 25 days 05:06:07').i
-    v.is_a?(ActiveSupport::Duration).should == true
-    v.should == ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
-    v.parts.sort_by{|k,_| k.to_s}.should == [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,_| k.to_s}
+    v.is_a?(ActiveSupport::Duration).must_equal true
+    v.must_equal ActiveSupport::Duration.new(31557600 + 2*86400*30 + 3*86400*7 + 4*86400 + 5*3600 + 6*60 + 7, [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]])
+    v.parts.sort_by{|k,_| k.to_s}.must_equal [[:years, 1], [:months, 2], [:days, 25], [:seconds, 18367]].sort_by{|k,_| k.to_s}
   end
 end if (begin require 'active_support/duration'; require 'active_support/inflector'; require 'active_support/core_ext/string/inflections'; true; rescue LoadError; false end)
 
 describe 'PostgreSQL row-valued/composite types' do
   before(:all) do
     @db = DB
-    @db.extension :pg_array, :pg_row
     Sequel.extension :pg_array_ops, :pg_row_ops
     @ds = @db[:person]
 
@@ -3251,28 +3248,28 @@ describe 'PostgreSQL row-valued/composite types' do
     [:company, :person, :address].each{|t| @db[t].delete}
   end
 
-  specify 'insert and retrieve row types' do
+  it 'insert and retrieve row types' do
     @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       # Single row valued type
       rs = @ds.all
       v = rs.first[:address]
-      v.should_not be_a_kind_of(Hash)
-      v.to_hash.should be_a_kind_of(Hash)
-      v.to_hash.should == {:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}
+      v.class.superclass.must_equal(Sequel::Postgres::PGRow::HashRow)
+      v.to_hash.must_be_kind_of(Hash)
+      v.to_hash.must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
       @ds.delete
       @ds.insert(rs.first)
-      @ds.all.should == rs
+      @ds.all.must_equal rs
 
       # Nested row value type
       p = @ds.get(:person)
-      p[:id].should == 1
-      p[:address].should == v
+      p[:id].must_equal 1
+      p[:address].must_equal v
     end
   end
 
-  specify 'insert and retrieve row types containing domains' do
+  it 'insert and retrieve row types containing domains' do
     begin
       @db << "DROP DOMAIN IF EXISTS positive_integer CASCADE"
       @db << "CREATE DOMAIN positive_integer AS integer CHECK (VALUE > 0)"
@@ -3280,76 +3277,76 @@ describe 'PostgreSQL row-valued/composite types' do
         positive_integer :id
       end
       @db.register_row_type(:domain_check)
-      @db.get(@db.row_type(:domain_check, [1])).should == {:id=>1}
+      @db.get(@db.row_type(:domain_check, [1])).must_equal(:id=>1)
     ensure
       @db.drop_table(:domain_check)
       @db << "DROP DOMAIN positive_integer"
     end
   end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
 
-  specify 'insert and retrieve arrays of row types' do
+  it 'insert and retrieve arrays of row types' do
     @ds = @db[:company]
     @ds.insert(:id=>1, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))
-    @ds.count.should == 1
+    @ds.count.must_equal 1
     if @native
       v = @ds.get(:company)
-      v.should_not be_a_kind_of(Hash)
-      v.to_hash.should be_a_kind_of(Hash)
-      v[:id].should == 1
+      v.class.superclass.must_equal(Sequel::Postgres::PGRow::HashRow)
+      v.to_hash.must_be_kind_of(Hash)
+      v[:id].must_equal 1
       employees = v[:employees]
-      employees.should_not be_a_kind_of(Array)
-      employees.to_a.should be_a_kind_of(Array)
-      employees.should == [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
+      employees.class.must_equal(Sequel::Postgres::PGArray)
+      employees.to_a.must_be_kind_of(Array)
+      employees.must_equal [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
       @ds.delete
       @ds.insert(v[:id], v[:employees])
-      @ds.get(:company).should == v
+      @ds.get(:company).must_equal v
     end
   end
 
-  specify 'use row types in bound variables' do
+  it 'use row types in bound variables' do
     @ds.call(:insert, {:address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])}, {:address=>:$address, :id=>1})
-    @ds.get(:address).should == {:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}
-    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))[:id].should == 1
-    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])).should == nil
+    @ds.get(:address).must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
+    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))[:id].must_equal 1
+    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])).must_equal nil
 
     @ds.delete
     @ds.call(:insert, {:address=>Sequel.pg_row([nil, nil, nil])}, {:address=>:$address, :id=>1})
-    @ds.get(:address).should == {:street=>nil, :city=>nil, :zip=>nil}
+    @ds.get(:address).must_equal(:street=>nil, :city=>nil, :zip=>nil)
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'use arrays of row types in bound variables' do
+  it 'use arrays of row types in bound variables' do
     @ds = @db[:company]
     @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])])}, {:employees=>:$employees, :id=>1})
-    @ds.get(:company).should == {:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]}
-    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))[:id].should == 1
-    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).should == nil
+    @ds.get(:company).must_equal(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])
+    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))[:id].must_equal 1
+    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).must_equal nil
 
     @ds.delete
     @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row([nil, nil, nil])])])}, {:employees=>:$employees, :id=>1})
-    @ds.get(:employees).should == [{:address=>{:city=>nil, :zip=>nil, :street=>nil}, :id=>1}]
+    @ds.get(:employees).must_equal [{:address=>{:city=>nil, :zip=>nil, :street=>nil}, :id=>1}]
   end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-  specify 'operations/functions with pg_row_ops' do
+  it 'operations/functions with pg_row_ops' do
     @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
-    @ds.get(Sequel.pg_row(:address)[:street]).should == '123 Sesame St'
-    @ds.get(Sequel.pg_row(:address)[:city]).should == 'Somewhere'
-    @ds.get(Sequel.pg_row(:address)[:zip]).should == '12345'
+    @ds.get(Sequel.pg_row(:address)[:street]).must_equal '123 Sesame St'
+    @ds.get(Sequel.pg_row(:address)[:city]).must_equal 'Somewhere'
+    @ds.get(Sequel.pg_row(:address)[:zip]).must_equal '12345'
 
     @ds = @db[:company]
     @ds.insert(:id=>1, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))
-    @ds.get(Sequel.pg_row(:company)[:id]).should == 1
+    @ds.get(Sequel.pg_row(:company)[:id]).must_equal 1
     if @native
-      @ds.get(Sequel.pg_row(:company)[:employees]).should == [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
-      @ds.get(Sequel.pg_row(:company)[:employees][1]).should == {:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}
-      @ds.get(Sequel.pg_row(:company)[:employees][1][:address]).should == {:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}
+      @ds.get(Sequel.pg_row(:company)[:employees]).must_equal [{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}]
+      @ds.get(Sequel.pg_row(:company)[:employees][1]).must_equal(:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'})
+      @ds.get(Sequel.pg_row(:company)[:employees][1][:address]).must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
     end
-    @ds.get(Sequel.pg_row(:company)[:employees][1][:id]).should == 1
-    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:street]).should == '123 Sesame St'
-    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:city]).should == 'Somewhere'
-    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:zip]).should == '12345'
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:id]).must_equal 1
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:street]).must_equal '123 Sesame St'
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:city]).must_equal 'Somewhere'
+    @ds.get(Sequel.pg_row(:company)[:employees][1][:address][:zip]).must_equal '12345'
   end
 
-  context "#splat and #*" do
+  describe "#splat and #*" do
     before(:all) do
       @db.create_table!(:a){Integer :a}
       @db.create_table!(:b){a :b; Integer :a}
@@ -3361,34 +3358,34 @@ describe 'PostgreSQL row-valued/composite types' do
       @db.drop_table?(:b, :a)
     end
 
-    specify "splat should reference the table type" do
-      @db[:b].select(:a).first.should == {:a=>1}
-      @db[:b].select(:b__a).first.should == {:a=>1}
-      @db[:b].select(Sequel.pg_row(:b)[:a]).first.should == {:a=>2}
-      @db[:b].select(Sequel.pg_row(:b).splat[:a]).first.should == {:a=>1}
+    it "splat should reference the table type" do
+      @db[:b].select(:a).first.must_equal(:a=>1)
+      @db[:b].select(:b__a).first.must_equal(:a=>1)
+      @db[:b].select(Sequel.pg_row(:b)[:a]).first.must_equal(:a=>2)
+      @db[:b].select(Sequel.pg_row(:b).splat[:a]).first.must_equal(:a=>1)
 
       if @native
-        @db[:b].select(:b).first.should == {:b=>{:a=>2}}
-        @db[:b].select(Sequel.pg_row(:b).splat).first.should == {:a=>1, :b=>{:a=>2}}
-        @db[:b].select(Sequel.pg_row(:b).splat(:b)).first.should == {:b=>{:a=>1, :b=>{:a=>2}}}
+        @db[:b].select(:b).first.must_equal(:b=>{:a=>2})
+        @db[:b].select(Sequel.pg_row(:b).splat).first.must_equal(:a=>1, :b=>{:a=>2})
+        @db[:b].select(Sequel.pg_row(:b).splat(:b)).first.must_equal(:b=>{:a=>1, :b=>{:a=>2}})
       end
     end
 
-    specify "* should expand the table type into separate columns" do
+    it "* should expand the table type into separate columns" do
       ds = @db[:b].select(Sequel.pg_row(:b).splat(:b)).from_self(:alias=>:t)
       if @native
-        ds.first.should == {:b=>{:a=>1, :b=>{:a=>2}}}
-        ds.select(Sequel.pg_row(:b).*).first.should == {:a=>1, :b=>{:a=>2}}
-        ds.select(Sequel.pg_row(:b)[:b]).first.should == {:b=>{:a=>2}}
-        ds.select(Sequel.pg_row(:t__b).*).first.should == {:a=>1, :b=>{:a=>2}}
-        ds.select(Sequel.pg_row(:t__b)[:b]).first.should == {:b=>{:a=>2}}
+        ds.first.must_equal(:b=>{:a=>1, :b=>{:a=>2}})
+        ds.select(Sequel.pg_row(:b).*).first.must_equal(:a=>1, :b=>{:a=>2})
+        ds.select(Sequel.pg_row(:b)[:b]).first.must_equal(:b=>{:a=>2})
+        ds.select(Sequel.pg_row(:t__b).*).first.must_equal(:a=>1, :b=>{:a=>2})
+        ds.select(Sequel.pg_row(:t__b)[:b]).first.must_equal(:b=>{:a=>2})
       end
-      ds.select(Sequel.pg_row(:b)[:a]).first.should == {:a=>1}
-      ds.select(Sequel.pg_row(:t__b)[:a]).first.should == {:a=>1}
+      ds.select(Sequel.pg_row(:b)[:a]).first.must_equal(:a=>1)
+      ds.select(Sequel.pg_row(:t__b)[:a]).first.must_equal(:a=>1)
     end
   end
 
-  context "with models" do
+  describe "with models" do
     before(:all) do
       class Address < Sequel::Model(:address)
         plugin :pg_row
@@ -3408,77 +3405,77 @@ describe 'PostgreSQL row-valued/composite types' do
       Object.send(:remove_const, :Company) rescue nil
     end
 
-    specify 'insert and retrieve row types as model objects' do
+    it 'insert and retrieve row types as model objects' do
       @ds.insert(:id=>1, :address=>@a)
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         # Single row valued type
         rs = @ds.all
         v = rs.first[:address]
-        v.should be_a_kind_of(Address)
-        v.should == @a
+        v.must_be_kind_of(Address)
+        v.must_equal @a
         @ds.delete
         @ds.insert(rs.first)
-        @ds.all.should == rs
+        @ds.all.must_equal rs
 
         # Nested row value type
         p = @ds.get(:person)
-        p.should be_a_kind_of(Person)
-        p.id.should == 1
-        p.address.should be_a_kind_of(Address)
-        p.address.should == @a
+        p.must_be_kind_of(Person)
+        p.id.must_equal 1
+        p.address.must_be_kind_of(Address)
+        p.address.must_equal @a
       end
     end
 
-    specify 'insert and retrieve arrays of row types as model objects' do
+    it 'insert and retrieve arrays of row types as model objects' do
       @ds = @db[:company]
       @ds.insert(:id=>1, :employees=>@es)
-      @ds.count.should == 1
+      @ds.count.must_equal 1
       if @native
         v = @ds.get(:company)
-        v.should be_a_kind_of(Company)
-        v.id.should == 1
+        v.must_be_kind_of(Company)
+        v.id.must_equal 1
         employees = v[:employees]
-        employees.should_not be_a_kind_of(Array)
-        employees.to_a.should be_a_kind_of(Array)
-        employees.should == @es
+        employees.class.must_equal(Sequel::Postgres::PGArray)
+        employees.to_a.must_be_kind_of(Array)
+        employees.must_equal @es
         @ds.delete
         @ds.insert(v.id, v.employees)
-        @ds.get(:company).should == v
+        @ds.get(:company).must_equal v
       end
     end
 
-    specify 'use model objects in bound variables' do
+    it 'use model objects in bound variables' do
       @ds.call(:insert, {:address=>@a}, {:address=>:$address, :id=>1})
-      @ds.get(:address).should == @a
-      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>@a)[:id].should == 1
-      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12356')).should == nil
+      @ds.get(:address).must_equal @a
+      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>@a)[:id].must_equal 1
+      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12356')).must_equal nil
     end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-    specify 'use arrays of model objects in bound variables' do
+    it 'use arrays of model objects in bound variables' do
       @ds = @db[:company]
       @ds.call(:insert, {:employees=>@es}, {:employees=>:$employees, :id=>1})
-      @ds.get(:company).should == Company.new(:id=>1, :employees=>@es)
-      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>@es)[:id].should == 1
-      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).should == nil
+      @ds.get(:company).must_equal Company.new(:id=>1, :employees=>@es)
+      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>@es)[:id].must_equal 1
+      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).must_equal nil
     end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
 
-    specify 'model typecasting' do
+    it 'model typecasting' do
       Person.plugin :pg_typecast_on_load, :address unless @native
       a = Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
       o = Person.create(:id=>1, :address=>['123 Sesame St', 'Somewhere', '12345'])
-      o.address.should == a
+      o.address.must_equal a
       o = Person.create(:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'})
-      o.address.should == a
+      o.address.must_equal a
       o = Person.create(:id=>1, :address=>a)
-      o.address.should == a
+      o.address.must_equal a
 
       Company.plugin :pg_typecast_on_load, :employees unless @native
       e = Person.new(:id=>1, :address=>a)
       o = Company.create(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])
-      o.employees.should == [e]
+      o.employees.must_equal [e]
       o = Company.create(:id=>1, :employees=>[e])
-      o.employees.should == [e]
+      o.employees.must_equal [e]
     end
   end
 end
@@ -3503,8 +3500,8 @@ describe 'pg_static_cache_updater extension' do
     @db.drop_function(@db.default_static_cache_update_name)
   end
 
-  specify "should reload model static cache when underlying table changes" do
-    @Thing.all.should == []
+  it "should reload model static cache when underlying table changes" do
+    @Thing.all.must_equal []
     q = Queue.new
     q1 = Queue.new
 
@@ -3513,15 +3510,15 @@ describe 'pg_static_cache_updater extension' do
     q.pop
     q1.push(proc{@db[:things].insert(1, 'A')})
     q.pop
-    @Thing.all.should == [@Thing.load(:id=>1, :name=>'A')]
+    @Thing.all.must_equal [@Thing.load(:id=>1, :name=>'A')]
 
     q1.push(proc{@db[:things].update(:name=>'B')})
     q.pop
-    @Thing.all.should == [@Thing.load(:id=>1, :name=>'B')]
+    @Thing.all.must_equal [@Thing.load(:id=>1, :name=>'B')]
 
     q1.push(proc{@db[:things].delete})
     q.pop
-    @Thing.all.should == []
+    @Thing.all.must_equal []
 
     q1.push(proc{throw :stop})
     q.pop
@@ -3529,35 +3526,34 @@ describe 'pg_static_cache_updater extension' do
 end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_version >= 90000
 
 describe 'PostgreSQL enum types' do
-  before(:all) do
+  before do
     @db = DB
-    @db.extension :pg_array, :pg_enum
     @db.create_enum(:test_enum, %w'a b c d')
 
     @db.create_table!(:test_enumt) do
       test_enum  :t
     end
   end
-  after(:all) do
+  after do
     @db.drop_table?(:test_enumt)
     @db.drop_enum(:test_enum)
   end
 
-  specify "should return correct entries in the schema" do
+  it "should return correct entries in the schema" do
     s = @db.schema(:test_enumt)
-    s.first.last[:type].should == :enum
-    s.first.last[:enum_values].should == %w'a b c d'
+    s.first.last[:type].must_equal :enum
+    s.first.last[:enum_values].must_equal %w'a b c d'
   end
 
   it "should add array parsers for enum values" do
-    @db.get(Sequel.pg_array(%w'a b', :test_enum)).should == %w'a b'
+    @db.get(Sequel.pg_array(%w'a b', :test_enum)).must_equal %w'a b'
   end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
 
   it "should set up model typecasting correctly" do
     c = Class.new(Sequel::Model(:test_enumt))
     o = c.new
     o.t = :a
-    o.t.should == 'a'
+    o.t.must_equal 'a'
   end
 
   it "should add values to existing enum" do
@@ -3565,6 +3561,6 @@ describe 'PostgreSQL enum types' do
     @db.add_enum_value(:test_enum, 'f', :after=>'a')
     @db.add_enum_value(:test_enum, 'g', :before=>'b')
     @db.add_enum_value(:test_enum, 'a', :if_not_exists=>true) if @db.server_version >= 90300
-    @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].should == %w'a f g b c d e'
+    @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].must_equal %w'a f g b c d e'
   end if DB.server_version >= 90100
 end

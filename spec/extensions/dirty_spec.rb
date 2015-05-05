@@ -8,104 +8,104 @@ describe "Sequel::Plugins::Dirty" do
     @c.columns :initial, :initial_changed, :missing, :missing_changed
   end
 
-  shared_examples_for "dirty plugin" do
+  dirty_plugin_specs = shared_description do
     it "initial_value should be the current value if value has not changed" do
-      @o.initial_value(:initial).should == 'i'
-      @o.initial_value(:missing).should == nil
+      @o.initial_value(:initial).must_equal 'i'
+      @o.initial_value(:missing).must_equal nil
     end
 
     it "initial_value should be the intial value if value has changed" do
-      @o.initial_value(:initial_changed).should == 'ic'
-      @o.initial_value(:missing_changed).should == nil
+      @o.initial_value(:initial_changed).must_equal 'ic'
+      @o.initial_value(:missing_changed).must_equal nil
     end
 
     it "initial_value should handle case where initial value is reassigned later" do
       @o.initial_changed = 'ic'
-      @o.initial_value(:initial_changed).should == 'ic'
+      @o.initial_value(:initial_changed).must_equal 'ic'
       @o.missing_changed = nil
-      @o.initial_value(:missing_changed).should == nil
+      @o.initial_value(:missing_changed).must_equal nil
     end
 
     it "changed_columns should handle case where initial value is reassigned later" do
-      @o.changed_columns.should == [:initial_changed, :missing_changed]
+      @o.changed_columns.must_equal [:initial_changed, :missing_changed]
       @o.initial_changed = 'ic'
-      @o.changed_columns.should == [:missing_changed]
+      @o.changed_columns.must_equal [:missing_changed]
       @o.missing_changed = nil
-      @o.changed_columns.should == [:missing_changed]
+      @o.changed_columns.must_equal [:missing_changed]
     end
 
     it "column_change should give initial and current values if there has been a change made" do
-      @o.column_change(:initial_changed).should == ['ic', 'ic2']
-      @o.column_change(:missing_changed).should == [nil, 'mc2']
+      @o.column_change(:initial_changed).must_equal ['ic', 'ic2']
+      @o.column_change(:missing_changed).must_equal [nil, 'mc2']
     end
 
     it "column_change should be nil if no change has been made" do
-      @o.column_change(:initial).should == nil
-      @o.column_change(:missing).should == nil
+      @o.column_change(:initial).must_equal nil
+      @o.column_change(:missing).must_equal nil
     end
 
     it "column_changed? should return whether the column has changed" do
-      @o.column_changed?(:initial).should == false
-      @o.column_changed?(:initial_changed).should == true
-      @o.column_changed?(:missing).should == false
-      @o.column_changed?(:missing_changed).should == true
+      @o.column_changed?(:initial).must_equal false
+      @o.column_changed?(:initial_changed).must_equal true
+      @o.column_changed?(:missing).must_equal false
+      @o.column_changed?(:missing_changed).must_equal true
     end
 
     it "column_changed? should handle case where initial value is reassigned later" do
       @o.initial_changed = 'ic'
-      @o.column_changed?(:initial_changed).should == false
+      @o.column_changed?(:initial_changed).must_equal false
       @o.missing_changed = nil
-      @o.column_changed?(:missing_changed).should == false
+      @o.column_changed?(:missing_changed).must_equal false
     end
 
     it "changed_columns should handle case where initial value is reassigned later" do
-      @o.changed_columns.should == [:initial_changed, :missing_changed]
+      @o.changed_columns.must_equal [:initial_changed, :missing_changed]
       @o.initial_changed = 'ic'
-      @o.changed_columns.should == [:missing_changed]
+      @o.changed_columns.must_equal [:missing_changed]
       @o.missing_changed = nil
-      @o.changed_columns.should == [:missing_changed]
+      @o.changed_columns.must_equal [:missing_changed]
     end
 
     it "column_changes should give initial and current values" do
-      @o.column_changes.should == {:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2']}
+      @o.column_changes.must_equal(:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2'])
     end
 
     it "reset_column should reset the column to its initial value" do
       @o.reset_column(:initial)
-      @o.initial.should == 'i'
+      @o.initial.must_equal 'i'
       @o.reset_column(:initial_changed)
-      @o.initial_changed.should == 'ic'
+      @o.initial_changed.must_equal 'ic'
       @o.reset_column(:missing)
-      @o.missing.should == nil
+      @o.missing.must_equal nil
       @o.reset_column(:missing_changed)
-      @o.missing_changed.should == nil
+      @o.missing_changed.must_equal nil
     end
 
     it "reset_column should remove missing values from the values" do
       @o.reset_column(:missing)
-      @o.values.has_key?(:missing).should == false
+      @o.values.has_key?(:missing).must_equal false
       @o.reset_column(:missing_changed)
-      @o.values.has_key?(:missing_changed).should == false
+      @o.values.has_key?(:missing_changed).must_equal false
     end
     
     it "refresh should clear the cached initial values" do
       @o.refresh
-      @o.column_changes.should == {}
+      @o.column_changes.must_equal({})
     end
     
     it "will_change_column should be used to signal in-place modification to column" do
       @o.will_change_column(:initial)
       @o.initial << 'b'
-      @o.column_change(:initial).should == ['i', 'ib']
+      @o.column_change(:initial).must_equal ['i', 'ib']
       @o.will_change_column(:initial_changed)
       @o.initial_changed << 'b'
-      @o.column_change(:initial_changed).should == ['ic', 'ic2b']
+      @o.column_change(:initial_changed).must_equal ['ic', 'ic2b']
       @o.will_change_column(:missing)
       @o.values[:missing] = 'b'
-      @o.column_change(:missing).should == [nil, 'b']
+      @o.column_change(:missing).must_equal [nil, 'b']
       @o.will_change_column(:missing_changed)
       @o.missing_changed << 'b'
-      @o.column_change(:missing_changed).should == [nil, 'mc2b']
+      @o.column_change(:missing_changed).must_equal [nil, 'mc2b']
     end
 
     it "will_change_column should different types of existing objects" do
@@ -113,23 +113,23 @@ describe "Sequel::Plugins::Dirty" do
         o = @c.new(:initial=>v)
         o.will_change_column(:initial)
         o.initial = 'a'
-        o.column_change(:initial).should == [v, 'a']
+        o.column_change(:initial).must_equal [v, 'a']
       end
     end
 
     it "should work when freezing objects" do
       @o.freeze
-      @o.initial_value(:initial).should == 'i'
-      proc{@o.initial = 'b'}.should raise_error
+      @o.initial_value(:initial).must_equal 'i'
+      proc{@o.initial = 'b'}.must_raise FrozenError
     end
 
     it "should have #dup duplicate structures" do
-      @o.dup.initial_values.should == @o.initial_values
-      @o.dup.initial_values.should_not equal(@o.initial_values)
-      @o.dup.instance_variable_get(:@missing_initial_values).should == @o.instance_variable_get(:@missing_initial_values)
-      @o.dup.instance_variable_get(:@missing_initial_values).should_not equal(@o.instance_variable_get(:@missing_initial_values))
-      @o.dup.previous_changes.should == @o.previous_changes
-      @o.dup.previous_changes.should_not equal(@o.previous_changes) if @o.previous_changes
+      @o.dup.initial_values.must_equal @o.initial_values
+      @o.dup.initial_values.wont_be_same_as(@o.initial_values)
+      @o.dup.instance_variable_get(:@missing_initial_values).must_equal @o.instance_variable_get(:@missing_initial_values)
+      @o.dup.instance_variable_get(:@missing_initial_values).wont_be_same_as(@o.instance_variable_get(:@missing_initial_values))
+      @o.dup.previous_changes.must_equal @o.previous_changes
+      @o.dup.previous_changes.wont_be_same_as(@o.previous_changes) if @o.previous_changes
     end
   end
 
@@ -140,18 +140,18 @@ describe "Sequel::Plugins::Dirty" do
       @o.missing_changed = 'mc2'
     end
 
-    it_should_behave_like "dirty plugin"
+    include dirty_plugin_specs
 
     it "save should clear the cached initial values" do
       @o.save
-      @o.column_changes.should == {}
+      @o.column_changes.must_equal({})
     end
 
     it "save_changes should clear the cached initial values" do
       def (@c.instance_dataset).supports_insert_select?() true end
       def (@c.instance_dataset).insert_select(*) {:id=>1} end
       @o.save
-      @o.column_changes.should == {}
+      @o.column_changes.must_equal({})
     end
   end
 
@@ -162,19 +162,19 @@ describe "Sequel::Plugins::Dirty" do
       @o.missing_changed = 'mc2'
     end
 
-    it_should_behave_like "dirty plugin"
+    include dirty_plugin_specs
 
     it "previous_changes should be the previous changes after saving" do
       @o.save
-      @o.previous_changes.should == {:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2']}
+      @o.previous_changes.must_equal(:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2'])
     end
 
     it "should work when freezing objects after saving" do
       @o.initial = 'a'
       @o.save
       @o.freeze
-      @o.previous_changes[:initial].should == ['i', 'a']
-      proc{@o.initial = 'b'}.should raise_error
+      @o.previous_changes[:initial].must_equal ['i', 'a']
+      proc{@o.initial = 'b'}.must_raise FrozenError
     end
   end
 end

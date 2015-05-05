@@ -82,98 +82,75 @@ end
 
 ### Specs
 
-begin
-  begin
-    raise LoadError if ENV['RSPEC1']
-    # RSpec 2
-    require "rspec/core/rake_task"
-    spec_class = RSpec::Core::RakeTask
-    spec_files_meth = :pattern=
-    spec_opts_meth = :rspec_opts=
-  rescue LoadError
-    # RSpec 1
-    require "spec/rake/spectask"
-    spec_class = Spec::Rake::SpecTask
-    spec_files_meth = :spec_files=
-    spec_opts_meth = :spec_opts=
+run_spec = proc do |patterns|
+  lib_dir = File.join(File.dirname(File.expand_path(__FILE__)), 'lib')
+  rubylib = ENV['RUBYLIB']
+  ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
+  if RUBY_PLATFORM =~ /mingw32/
+    patterns = patterns.split.map{|pat| Dir[pat].to_a}.flatten.join(' ')
+  end
+  sh "#{FileUtils::RUBY} -e \"ARGV.each{|f| require f}\" #{patterns}"
+  ENV['RUBYLIB'] = rubylib
+end
+
+spec_task = proc do |description, name, files|
+  desc description
+  task name do
+    run_spec.call(files)
   end
 
-  spec = lambda do |name, files, d|
-    lib_dir = File.join(File.dirname(File.expand_path(__FILE__)), 'lib')
-    ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
-
-    desc "#{d} with -w, some warnings filtered"
-    task "#{name}_w" do
-      ENV['RUBYOPT'] ? (ENV['RUBYOPT'] += " -w") : (ENV['RUBYOPT'] = '-w')
-      rake = ENV['RAKE'] || "#{FileUtils::RUBY} -S rake"
-      sh "#{rake} #{name} 2>&1 | egrep -v \"(spec/.*: warning: (possibly )?useless use of == in void context|: warning: instance variable @.* not initialized|: warning: method redefined; discarding old|: warning: previous definition of)|rspec\""
-    end
-
-    desc d
-    spec_class.new(name) do |t|
-      t.send spec_files_meth, files
-      t.send spec_opts_meth, ENV['SEQUEL_SPEC_OPTS'].split if ENV['SEQUEL_SPEC_OPTS']
-    end
+  desc "#{description} with warnings, some warnings filtered"
+  task :"#{name}_w" do
+    ENV['RUBYOPT'] ? (ENV['RUBYOPT'] += " -w") : (ENV['RUBYOPT'] = '-w')
+    rake = ENV['RAKE'] || "#{FileUtils::RUBY} -S rake"
+    sh "#{rake} #{name} 2>&1 | egrep -v \"(: warning: instance variable @.* not initialized|: warning: method redefined; discarding old|: warning: previous definition of)\""
   end
 
-  spec_with_cov = lambda do |name, files, d, &b|
-    spec.call(name, files, d)
-    if RUBY_VERSION < '1.9'
-      t = spec.call("#{name}_cov", files, "#{d} with coverage")
-      t.rcov = true
-      t.rcov_opts = File.file?("spec/rcov.opts") ? File.read("spec/rcov.opts").split("\n") : []
-      b.call(t) if b
-    else
-      desc "#{d} with coverage"
-      task "#{name}_cov" do
-        ENV['COVERAGE'] = '1'
-        Rake::Task[name].invoke
-      end
-    end
-    t
+  desc "#{description} with coverage"
+  task :"#{name}_cov" do
+    ENV['COVERAGE'] = 1
+    run_spec.call(files)
+    ENV.delete('COVERAGE')
+  end
+end
+
+desc "Run the core, model, and extension/plugin specs"
+task :default => :spec
+desc "Run the core, model, and extension/plugin specs"
+task :spec => [:spec_core, :spec_model, :spec_plugin]
+
+spec_task.call("Run core specs", :spec_core, './spec/core/*_spec.rb')
+spec_task.call("Run model specs", :spec_model, './spec/model/*_spec.rb')
+spec_task.call("Run plugin/extension specs", :spec_plugin, './spec/extensions/*_spec.rb')
+spec_task.call("Run bin/sequel specs", :spec_bin, './spec/bin_spec.rb')
+spec_task.call("Run core extensions specs", :spec_core_ext, './spec/core_extensions_spec.rb')
+spec_task.call("Run integration tests", :spec_integration, './spec/integration/*_test.rb')
+
+%w'postgres sqlite mysql informix oracle firebird mssql db2 sqlanywhere'.each do |adapter|
+  spec_task.call("Run #{adapter} tests", :"spec_#{adapter}", "./spec/adapters/#{adapter}_spec.rb ./spec/integration/*_test.rb")
+end
+
+spec_task.call("Run model specs without the associations code", :_spec_model_no_assoc, Dir["./spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}.join(' '))
+desc "Run model specs without the associations code"
+task :spec_model_no_assoc do
+  ENV['SEQUEL_NO_ASSOCIATIONS'] = '1'
+  Rake::Task['_spec_model_no_assoc'].invoke
+end
+
+task :spec_travis=>[:spec_core, :spec_model, :spec_plugin, :spec_core_ext] do
+  if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+    ENV['SEQUEL_SQLITE_URL'] = "jdbc:sqlite::memory:"
+    ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost/sequel_test?user=postgres"
+    ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://localhost/sequel_test?user=root"
+  else
+    ENV['SEQUEL_SQLITE_URL'] = "sqlite:/"
+    ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost/sequel_test?user=postgres"
+    ENV['SEQUEL_MYSQL_URL'] = "mysql2://localhost/sequel_test?user=root"
   end
 
-  desc "Run the core, model, and extension/plugin specs"
-  task :default => [:spec, :spec_plugin]
-
-  spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/(adapters/([a-ln-z]|m[a-np-z])|extensions/core_extensions)"')}
-  spec.call("spec_bin", ["spec/bin_spec.rb"], "Run bin/sequel specs")
-  spec.call("spec_core", Dir["spec/core/*_spec.rb"], "Run core specs")
-  spec.call("spec_model", Dir["spec/model/*_spec.rb"], "Run model specs")
-  spec.call("_spec_model_no_assoc", Dir["spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}, '')
-  spec_with_cov.call("spec_core_ext", ["spec/core_extensions_spec.rb"], "Run core extensions specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|adapters|connection_pool|database|dataset|model)"')}
-  spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"].sort_by{rand}, "Run extension/plugin specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|adapters|connection_pool|database|dataset|model)"')}
-  spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
-
-  %w'postgres sqlite mysql informix oracle fdbsql firebird mssql db2 sqlanywhere'.each do |adapter|
-    spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs"){|t| t.rcov_opts.concat(%w'--exclude "lib/sequel/([a-z_]+\.rb|connection_pool|database|dataset|model|extensions|plugins)"')}
-  end
-
-  task :spec_travis=>[:spec, :spec_plugin, :spec_core_ext] do
-    if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
-      ENV['SEQUEL_SQLITE_URL'] = "jdbc:sqlite::memory:"
-      ENV['SEQUEL_POSTGRES_URL'] = "jdbc:postgresql://localhost/sequel_test?user=postgres"
-      ENV['SEQUEL_MYSQL_URL'] = "jdbc:mysql://localhost/sequel_test?user=root"
-    else
-      ENV['SEQUEL_SQLITE_URL'] = "sqlite:/"
-      ENV['SEQUEL_POSTGRES_URL'] = "postgres://localhost/sequel_test?user=postgres"
-      ENV['SEQUEL_MYSQL_URL'] = "mysql2://localhost/sequel_test?user=root"
-    end
-
-    Rake::Task['spec_sqlite'].invoke
-    Rake::Task['spec_postgres'].invoke
-    Rake::Task['spec_mysql'].invoke
-  end
-
-  desc "Run model specs without the associations code"
-  task :spec_model_no_assoc do
-    ENV['SEQUEL_NO_ASSOCIATIONS'] = '1'
-    Rake::Task['_spec_model_no_assoc'].invoke
-  end
-rescue LoadError
-  task :default do
-    puts "Must install rspec to run the default task (which runs specs)"
-  end
+  Rake::Task['spec_sqlite'].invoke
+  Rake::Task['spec_postgres'].invoke
+  Rake::Task['spec_mysql'].invoke
 end
 
 desc "Print Sequel version"

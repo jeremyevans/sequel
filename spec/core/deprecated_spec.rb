@@ -20,51 +20,51 @@ describe "Sequel::Deprecated" do
     @d.backtrace_filter = @prev_backtrace_filter
   end
 
-  specify "should output full messages to the given output" do
+  it "should output full messages to the given output" do
     @d.deprecate("foo")
-    @output.should == ['foo']
+    @output.must_equal ['foo']
   end
 
-  specify "should consider two arguments to be a method name and additional text" do
+  it "should consider two arguments to be a method name and additional text" do
     @d.deprecate("foo", "Use bar instead")
-    @output.should == ['foo is deprecated and will be removed in a future version of Sequel.  Use bar instead.']
+    @output.must_equal ['foo is deprecated and will be removed in a future version of Sequel.  Use bar instead.']
   end
 
-  specify "should include a prefix if set" do
+  it "should include a prefix if set" do
     @d.prefix = "DEPWARN: "
     @d.deprecate("foo")
-    @output.should == ['DEPWARN: foo']
+    @output.must_equal ['DEPWARN: foo']
   end
 
-  specify "should not output anything if output is false" do
+  it "should not output anything if output is false" do
     @d.output = false
-    proc{@d.deprecate("foo")}.should_not raise_error
+    @d.deprecate("foo")
   end
 
-  specify "should include full backtrace if backtrace_filter is true" do
+  it "should include full backtrace if backtrace_filter is true" do
     @d.backtrace_filter = true
     @d.deprecate("foo")
-    @output.first.should == 'foo'
-    (4..100).should include(@output.count)
+    @output.first.must_equal 'foo'
+    (4..100).must_include(@output.count)
   end
 
-  specify "should include given lines of backtrace if backtrace_filter is an integer" do
+  it "should include given lines of backtrace if backtrace_filter is an integer" do
     @d.backtrace_filter = 1
     @d.deprecate("foo")
-    @output.first.should == 'foo'
-    @output.count.should == 2
+    @output.first.must_equal 'foo'
+    @output.count.must_equal 2
     
     @output.clear
     @d.backtrace_filter = 3
     @d.deprecate("foo")
-    @output.first.should == 'foo'
-    @output.count.should == 4
+    @output.first.must_equal 'foo'
+    @output.count.must_equal 4
   end
 
-  specify "should select backtrace lines if backtrace_filter is a proc" do
+  it "should select backtrace lines if backtrace_filter is a proc" do
     @d.backtrace_filter = lambda{|line, line_no| line_no < 3 && line =~ /./}
     @d.deprecate("foo")
-    @output.first.should == 'foo'
-    @output.count.should == 4
+    @output.first.must_equal 'foo'
+    @output.count.must_equal 4
   end
 end

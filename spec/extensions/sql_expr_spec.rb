@@ -7,54 +7,54 @@ describe "Sequel sql_expr extension" do
     @ds = Sequel.mock.dataset
   end
 
-  specify "Object#sql_expr should wrap the object in a GenericComplexExpression" do
+  it "Object#sql_expr should wrap the object in a GenericComplexExpression" do
     o = Object.new
     def o.sql_literal(ds) 'foo' end
     s = o.sql_expr
-    @ds.literal(s).should == "foo"
-    @ds.literal(s+1).should == "(foo + 1)"
-    @ds.literal(s & true).should == "(foo AND 't')"
-    @ds.literal(s < 1).should == "(foo < 1)"
-    @ds.literal(s.sql_subscript(1)).should == "foo[1]"
-    @ds.literal(s.like('a')).should == "(foo LIKE 'a' ESCAPE '\\')"
-    @ds.literal(s.as(:a)).should == "foo AS a"
-    @ds.literal(s.cast(Integer)).should == "CAST(foo AS integer)"
-    @ds.literal(s.desc).should == "foo DESC"
-    @ds.literal(s.sql_string + '1').should == "(foo || '1')"
+    @ds.literal(s).must_equal "foo"
+    @ds.literal(s+1).must_equal "(foo + 1)"
+    @ds.literal(s & true).must_equal "(foo AND 't')"
+    @ds.literal(s < 1).must_equal "(foo < 1)"
+    @ds.literal(s.sql_subscript(1)).must_equal "foo[1]"
+    @ds.literal(s.like('a')).must_equal "(foo LIKE 'a' ESCAPE '\\')"
+    @ds.literal(s.as(:a)).must_equal "foo AS a"
+    @ds.literal(s.cast(Integer)).must_equal "CAST(foo AS integer)"
+    @ds.literal(s.desc).must_equal "foo DESC"
+    @ds.literal(s.sql_string + '1').must_equal "(foo || '1')"
   end
 
-  specify "Numeric#sql_expr should wrap the object in a NumericExpression" do
+  it "Numeric#sql_expr should wrap the object in a NumericExpression" do
     [1, 2.0, 2^70, BigDecimal.new('1.0')].each do |o|
-      @ds.literal(o.sql_expr).should == @ds.literal(o)
-      @ds.literal(o.sql_expr + 1).should == "(#{@ds.literal(o)} + 1)"
+      @ds.literal(o.sql_expr).must_equal @ds.literal(o)
+      @ds.literal(o.sql_expr + 1).must_equal "(#{@ds.literal(o)} + 1)"
     end
   end
 
-  specify "String#sql_expr should wrap the object in a StringExpression" do
-    @ds.literal("".sql_expr).should == "''"
-    @ds.literal("".sql_expr + :a).should == "('' || a)"
+  it "String#sql_expr should wrap the object in a StringExpression" do
+    @ds.literal("".sql_expr).must_equal "''"
+    @ds.literal("".sql_expr + :a).must_equal "('' || a)"
   end
 
-  specify "NilClass, TrueClass, and FalseClass#sql_expr should wrap the object in a BooleanExpression" do
+  it "NilClass, TrueClass, and FalseClass#sql_expr should wrap the object in a BooleanExpression" do
     [nil, true, false].each do |o|
-      @ds.literal(o.sql_expr).should == @ds.literal(o)
-      @ds.literal(o.sql_expr & :a).should == "(#{@ds.literal(o)} AND a)"
+      @ds.literal(o.sql_expr).must_equal @ds.literal(o)
+      @ds.literal(o.sql_expr & :a).must_equal "(#{@ds.literal(o)} AND a)"
     end
   end
 
-  specify "Proc#sql_expr should should treat the object as a virtual row block" do
-    @ds.literal(proc{a}.sql_expr).should == "a"
-    @ds.literal(proc{a__b}.sql_expr).should == "a.b"
-    @ds.literal(proc{a(b)}.sql_expr).should == "a(b)"
+  it "Proc#sql_expr should should treat the object as a virtual row block" do
+    @ds.literal(proc{a}.sql_expr).must_equal "a"
+    @ds.literal(proc{a__b}.sql_expr).must_equal "a.b"
+    @ds.literal(proc{a(b)}.sql_expr).must_equal "a(b)"
   end
 
-  specify "Proc#sql_expr should should wrap the object in a GenericComplexExpression if the object is not already an expression" do
-    @ds.literal(proc{1}.sql_expr).should == "1"
-    @ds.literal(proc{1}.sql_expr + 2).should == "(1 + 2)"
+  it "Proc#sql_expr should should wrap the object in a GenericComplexExpression if the object is not already an expression" do
+    @ds.literal(proc{1}.sql_expr).must_equal "1"
+    @ds.literal(proc{1}.sql_expr + 2).must_equal "(1 + 2)"
   end
 
-  specify "Proc#sql_expr should should convert a hash or array of two element arrays to a BooleanExpression" do
-    @ds.literal(proc{{a=>b}}.sql_expr).should == "(a = b)"
-    @ds.literal(proc{[[a, b]]}.sql_expr & :a).should == "((a = b) AND a)"
+  it "Proc#sql_expr should should convert a hash or array of two element arrays to a BooleanExpression" do
+    @ds.literal(proc{{a=>b}}.sql_expr).must_equal "(a = b)"
+    @ds.literal(proc{[[a, b]]}.sql_expr & :a).must_equal "((a = b) AND a)"
   end
 end

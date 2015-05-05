@@ -7,26 +7,26 @@ describe "Migration.descendants" do
     Sequel::Migration.descendants.clear
   end
 
-  specify "should include Migration subclasses" do
+  it "should include Migration subclasses" do
     @class = Class.new(Sequel::Migration)
     
-    Sequel::Migration.descendants.should == [@class]
+    Sequel::Migration.descendants.must_equal [@class]
   end
   
-  specify "should include Migration subclasses in order of creation" do
+  it "should include Migration subclasses in order of creation" do
     @c1 = Class.new(Sequel::Migration)
     @c2 = Class.new(Sequel::Migration)
     @c3 = Class.new(Sequel::Migration)
     
-    Sequel::Migration.descendants.should == [@c1, @c2, @c3]
+    Sequel::Migration.descendants.must_equal [@c1, @c2, @c3]
   end
 
-  specify "should include SimpleMigration instances created by migration DSL" do
+  it "should include SimpleMigration instances created by migration DSL" do
     i1 = Sequel.migration{}
     i2 = Sequel.migration{}
     i3 = Sequel.migration{}
     
-    Sequel::Migration.descendants.should == [i1, i2, i3]
+    Sequel::Migration.descendants.must_equal [i1, i2, i3]
   end
 end
 
@@ -39,29 +39,29 @@ describe "Migration.apply" do
     @db = @c.new
   end
   
-  specify "should raise for an invalid direction" do
-    proc {Sequel::Migration.apply(@db, :hahaha)}.should raise_error(ArgumentError)
+  it "should raise for an invalid direction" do
+    proc {Sequel::Migration.apply(@db, :hahaha)}.must_raise(ArgumentError)
   end
   
-  specify "should apply the up and down directions correctly" do
+  it "should apply the up and down directions correctly" do
     m = Class.new(Sequel::Migration) do
       define_method(:up) {one(3333)}
       define_method(:down) {two(4444)}
     end
-    m.apply(@db, :up).should == [1111, 3333]
-    m.apply(@db, :down).should == [2222, 4444]
+    m.apply(@db, :up).must_equal [1111, 3333]
+    m.apply(@db, :down).must_equal [2222, 4444]
   end
 
-  specify "should have default up and down actions that do nothing" do
+  it "should have default up and down actions that do nothing" do
     m = Class.new(Sequel::Migration)
-    m.apply(@db, :up).should == nil
-    m.apply(@db, :down).should == nil
+    m.apply(@db, :up).must_equal nil
+    m.apply(@db, :down).must_equal nil
   end
 
-  specify "should respond to the methods the database responds to" do
+  it "should respond to the methods the database responds to" do
     m = Sequel::Migration.new(Sequel.mock)
-    m.respond_to?(:foo).should == false
-    m.respond_to?(:execute).should == true
+    m.respond_to?(:foo).must_equal false
+    m.respond_to?(:execute).must_equal true
   end if RUBY_VERSION >= '1.9'
 end
 
@@ -74,23 +74,23 @@ describe "SimpleMigration#apply" do
     @db = @c.new
   end
   
-  specify "should raise for an invalid direction" do
-    proc {Sequel.migration{}.apply(@db, :hahaha)}.should raise_error(ArgumentError)
+  it "should raise for an invalid direction" do
+    proc {Sequel.migration{}.apply(@db, :hahaha)}.must_raise(ArgumentError)
   end
   
-  specify "should apply the up and down directions correctly" do
+  it "should apply the up and down directions correctly" do
     m = Sequel.migration do
       up{one(3333)}
       down{two(4444)}
     end
-    m.apply(@db, :up).should == [1111, 3333]
-    m.apply(@db, :down).should == [2222, 4444]
+    m.apply(@db, :up).must_equal [1111, 3333]
+    m.apply(@db, :down).must_equal [2222, 4444]
   end
 
-  specify "should have default up and down actions that do nothing" do
+  it "should have default up and down actions that do nothing" do
     m = Sequel.migration{}
-    m.apply(@db, :up).should == nil
-    m.apply(@db, :down).should == nil
+    m.apply(@db, :up).must_equal nil
+    m.apply(@db, :down).must_equal nil
   end
 end
 
@@ -143,10 +143,10 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
     end
   end
   
-  specify "should apply up with normal actions in normal order" do
+  it "should apply up with normal actions in normal order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :up)
-    @db.actions.should == [[:create_table, :a, {:foo=>:bar}],
+    @db.actions.must_equal [[:create_table, :a, {:foo=>:bar}],
       [:add_column, :a, :b, String],
       [:add_index, :a, :b],
       [:rename_column, :a, :b, :c],
@@ -167,10 +167,10 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
   end
 
-  specify "should execute down with reversing actions in reverse order" do
+  it "should execute down with reversing actions in reverse order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :down)
-    @db.actions.should == [
+    @db.actions.must_equal [
       [:drop_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
       [:drop_view, :c, {:foo=>:bar}],
       [:alter_table, [
@@ -192,37 +192,37 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:drop_table, :a, {:foo=>:bar}]]
   end
   
-  specify "should raise in the down direction if migration uses unsupported method" do
+  it "should raise in the down direction if migration uses unsupported method" do
     m = Sequel.migration{change{run 'SQL'}}
-    proc{m.apply(@db, :up)}.should_not raise_error
-    proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
+    m.apply(@db, :up)
+    proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
   end
   
-  specify "should raise in the down direction if migration uses add_primary_key with an array" do
+  it "should raise in the down direction if migration uses add_primary_key with an array" do
     m = Sequel.migration{change{alter_table(:a){add_primary_key [:b]}}}
-    proc{m.apply(@db, :up)}.should_not raise_error
-    proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
+    m.apply(@db, :up)
+    proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
   end
   
-  specify "should raise in the down direction if migration uses add_foreign_key with an array" do
+  it "should raise in the down direction if migration uses add_foreign_key with an array" do
     m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
-    proc{m.apply(@db, :up)}.should_not raise_error
-    proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
+    m.apply(@db, :up)
+    proc{m.apply(@db, :down)}.must_raise(Sequel::Error)
   end
 end
 
 describe "Sequel::Migrator.migrator_class" do
-  specify "should return IntegerMigrator if not using timestamp migrations" do
-    Sequel::Migrator.migrator_class("spec/files/integer_migrations").should == Sequel::IntegerMigrator
+  it "should return IntegerMigrator if not using timestamp migrations" do
+    Sequel::Migrator.migrator_class("spec/files/integer_migrations").must_equal Sequel::IntegerMigrator
   end
 
-  specify "should return TimestampMigrator if using timestamp migrations" do
-    Sequel::Migrator.migrator_class('spec/files/timestamped_migrations').should == Sequel::TimestampMigrator
+  it "should return TimestampMigrator if using timestamp migrations" do
+    Sequel::Migrator.migrator_class('spec/files/timestamped_migrations').must_equal Sequel::TimestampMigrator
   end
 
-  specify "should return self if run on a subclass" do
-    Sequel::IntegerMigrator.migrator_class("spec/files/timestamped_migrations").should == Sequel::IntegerMigrator
-    Sequel::TimestampMigrator.migrator_class("spec/files/integer_migrations").should == Sequel::TimestampMigrator
+  it "should return self if run on a subclass" do
+    Sequel::IntegerMigrator.migrator_class("spec/files/timestamped_migrations").must_equal Sequel::IntegerMigrator
+    Sequel::TimestampMigrator.migrator_class("spec/files/integer_migrations").must_equal Sequel::TimestampMigrator
   end
 end
 
@@ -273,126 +273,126 @@ describe "Sequel::IntegerMigrator" do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
   end
   
-  specify "should raise and error if there is a missing integer migration version" do
-    proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.should raise_error(Sequel::Migrator::Error)
+  it "should raise and error if there is a missing integer migration version" do
+    proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
   
-  specify "should not raise and error if there is a missing integer migration version and allow_missing_migration_files is true" do
+  it "should not raise and error if there is a missing integer migration version and allow_missing_migration_files is true" do
     Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true)
-    @db.sqls.last.should == "UPDATE schema_info SET version = 3"
+    @db.sqls.last.must_equal "UPDATE schema_info SET version = 3"
     Sequel::Migrator.run(@db, "spec/files/missing_integer_migrations", :allow_missing_migration_files => true, :target=>0)
-    @db.sqls.last.should == "UPDATE schema_info SET version = 0"
+    @db.sqls.last.must_equal "UPDATE schema_info SET version = 0"
   end
 
-  specify "should raise and error if there is a duplicate integer migration version" do
-    proc{Sequel::Migrator.apply(@db, "spec/files/duplicate_integer_migrations")}.should raise_error(Sequel::Migrator::Error)
+  it "should raise and error if there is a duplicate integer migration version" do
+    proc{Sequel::Migrator.apply(@db, "spec/files/duplicate_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
 
-  specify "should add a column name if it doesn't already exist in the schema_info table" do
+  it "should add a column name if it doesn't already exist in the schema_info table" do
     @db.create_table(:schema_info){Integer :v}
-    @db.should_receive(:alter_table).with('schema_info')
+    def @db.alter_table(*); end
     Sequel::Migrator.apply(@db, @dirname)
   end
 
-  specify "should automatically create the schema_info table with the version column" do
-    @db.table_exists?(:schema_info).should == false
+  it "should automatically create the schema_info table with the version column" do
+    @db.table_exists?(:schema_info).must_equal false
     Sequel::Migrator.run(@db, @dirname, :target=>0)
-    @db.table_exists?(:schema_info).should == true
-    @db.dataset.columns.should == [:version]
+    @db.table_exists?(:schema_info).must_equal true
+    @db.dataset.columns.must_equal [:version]
   end
 
-  specify "should allow specifying the table and columns" do
-    @db.table_exists?(:si).should == false
+  it "should allow specifying the table and columns" do
+    @db.table_exists?(:si).must_equal false
     Sequel::Migrator.run(@db, @dirname, :target=>0, :table=>:si, :column=>:sic)
-    @db.table_exists?(:si).should == true
-    @db.dataset.columns.should == [:sic]
+    @db.table_exists?(:si).must_equal true
+    @db.dataset.columns.must_equal [:sic]
   end
   
-  specify "should apply migrations correctly in the up direction if no target is given" do
+  it "should apply migrations correctly in the up direction if no target is given" do
     Sequel::Migrator.apply(@db, @dirname)
-    @db.creates.should == [1111, 2222, 3333]
-    @db.version.should == 3
-    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2, 3]
+    @db.creates.must_equal [1111, 2222, 3333]
+    @db.version.must_equal 3
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1, 2, 3]
   end
   
-  specify "should be able to tell whether there are outstanding migrations" do
-    Sequel::Migrator.is_current?(@db, @dirname).should == false
+  it "should be able to tell whether there are outstanding migrations" do
+    Sequel::Migrator.is_current?(@db, @dirname).must_equal false
     Sequel::Migrator.apply(@db, @dirname)
-    Sequel::Migrator.is_current?(@db, @dirname).should == true
+    Sequel::Migrator.is_current?(@db, @dirname).must_equal true
   end 
 
-  specify "should have #check_current raise an exception if the migrator is not current" do
-    proc{Sequel::Migrator.check_current(@db, @dirname)}.should raise_error(Sequel::Migrator::NotCurrentError)
+  it "should have #check_current raise an exception if the migrator is not current" do
+    proc{Sequel::Migrator.check_current(@db, @dirname)}.must_raise(Sequel::Migrator::NotCurrentError)
     Sequel::Migrator.apply(@db, @dirname)
-    proc{Sequel::Migrator.check_current(@db, @dirname)}.should_not raise_error
+    Sequel::Migrator.check_current(@db, @dirname)
   end
 
-  specify "should apply migrations correctly in the up direction with target" do
+  it "should apply migrations correctly in the up direction with target" do
     Sequel::Migrator.apply(@db, @dirname, 2)
-    @db.creates.should == [1111, 2222]
-    @db.version.should == 2
-    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2]
+    @db.creates.must_equal [1111, 2222]
+    @db.version.must_equal 2
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1, 2]
   end
   
-  specify "should apply migrations correctly in the up direction with target and existing" do
+  it "should apply migrations correctly in the up direction with target and existing" do
     Sequel::Migrator.apply(@db, @dirname, 2, 1)
-    @db.creates.should == [2222]
-    @db.version.should == 2
-    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [2]
+    @db.creates.must_equal [2222]
+    @db.version.must_equal 2
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [2]
   end
 
-  specify "should apply migrations correctly in the down direction with target" do
+  it "should apply migrations correctly in the down direction with target" do
     @db.create_table(:schema_info){Integer :version, :default=>0}
     @db[:schema_info].insert(:version=>3)
-    @db.version.should == 3
+    @db.version.must_equal 3
     Sequel::Migrator.apply(@db, @dirname, 0)
-    @db.drops.should == [3333, 2222, 1111]
-    @db.version.should == 0
-    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [2, 1, 0]
+    @db.drops.must_equal [3333, 2222, 1111]
+    @db.version.must_equal 0
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [2, 1, 0]
   end
   
-  specify "should apply migrations correctly in the down direction with target and existing" do
+  it "should apply migrations correctly in the down direction with target and existing" do
     Sequel::Migrator.apply(@db, @dirname, 1, 2)
-    @db.drops.should == [2222]
-    @db.version.should == 1
-    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1]
+    @db.drops.must_equal [2222]
+    @db.version.must_equal 1
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1]
   end
   
-  specify "should return the target version" do
-    Sequel::Migrator.apply(@db, @dirname, 3, 2).should == 3
-    Sequel::Migrator.apply(@db, @dirname, 0).should == 0
-    Sequel::Migrator.apply(@db, @dirname).should == 3
+  it "should return the target version" do
+    Sequel::Migrator.apply(@db, @dirname, 3, 2).must_equal 3
+    Sequel::Migrator.apply(@db, @dirname, 0).must_equal 0
+    Sequel::Migrator.apply(@db, @dirname).must_equal 3
   end
 
-  specify "should use IntegerMigrator if IntegerMigrator.apply called, even for timestamped migration directory" do
-    proc{Sequel::IntegerMigrator.apply(@db, "spec/files/timestamped_migrations")}.should raise_error(Sequel::Migrator::Error)
+  it "should use IntegerMigrator if IntegerMigrator.apply called, even for timestamped migration directory" do
+    proc{Sequel::IntegerMigrator.apply(@db, "spec/files/timestamped_migrations")}.must_raise(Sequel::Migrator::Error)
   end
 
-  specify "should not use transactions by default" do
+  it "should not use transactions by default" do
     Sequel::Migrator.apply(@db, "spec/files/transaction_unspecified_migrations")
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
+    @db.sqls.must_equal ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
   end
 
-  specify "should use transactions by default if the database supports transactional ddl" do
+  it "should use transactions by default if the database supports transactional ddl" do
     @db.meta_def(:supports_transactional_ddl?){true}
     Sequel::Migrator.apply(@db, "spec/files/transaction_unspecified_migrations")
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2", "COMMIT"]
+    @db.sqls.must_equal ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2", "COMMIT"]
   end
 
-  specify "should respect transaction use on a per migration basis" do
+  it "should respect transaction use on a per migration basis" do
     @db.meta_def(:supports_transactional_ddl?){true}
     Sequel::Migrator.apply(@db, "spec/files/transaction_specified_migrations")
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
+    @db.sqls.must_equal ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
   end
 
-  specify "should force transactions if enabled in the migrator" do
+  it "should force transactions if enabled in the migrator" do
     Sequel::Migrator.run(@db, "spec/files/transaction_specified_migrations", :use_transactions=>true)
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2", "COMMIT"]
+    @db.sqls.must_equal ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2", "COMMIT"]
   end
 
-  specify "should not use transactions if disabled in the migrator" do
+  it "should not use transactions if disabled in the migrator" do
     Sequel::Migrator.run(@db, "spec/files/transaction_unspecified_migrations", :use_transactions=>false)
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
+    @db.sqls.must_equal ["CREATE TABLE schema_info (version integer DEFAULT 0 NOT NULL)", "SELECT 1 AS one FROM schema_info LIMIT 1", "INSERT INTO schema_info (version) VALUES (0)", "SELECT version FROM schema_info LIMIT 1", "CREATE TABLE sm11111 (smc1 integer)", "UPDATE schema_info SET version = 1", "CREATE TABLE sm (smc1 integer)", "UPDATE schema_info SET version = 2"]
   end
 end
 
@@ -474,239 +474,239 @@ describe "Sequel::TimestampMigrator" do
     Object.send(:remove_const, "CreateAlbums") if Object.const_defined?("CreateAlbums")
   end
   
-  specify "should handle migrating up or down all the way" do
+  it "should handle migrating up or down all the way" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
     @m.apply(@db, @dir, 0)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == []
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal []
   end
 
-  specify "should handle migrating up or down to specific timestamps" do
+  it "should handle migrating up or down to specific timestamps" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir, 1273253851)
-    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should == true}
-    @db.table_exists?(:sm3333).should == false
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
+    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).must_equal true}
+    @db.table_exists?(:sm3333).must_equal false
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
     @m.apply(@db, @dir, 1273253849)
-    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db.table_exists?(:sm1111).should == true
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb'
+    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db.table_exists?(:sm1111).must_equal true
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb'
   end
 
-  specify "should not be current when there are migrations to apply" do
+  it "should not be current when there are migrations to apply" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    @m.is_current?(@db, @dir).should == true
+    @m.is_current?(@db, @dir).must_equal true
     @dir = 'spec/files/interleaved_timestamped_migrations'
-    @m.is_current?(@db, @dir).should == false
+    @m.is_current?(@db, @dir).must_equal false
   end
 
-  specify "should raise an exception if the migrator is not current" do
+  it "should raise an exception if the migrator is not current" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    proc{@m.check_current(@db, @dir)}.should_not raise_error
+    @m.check_current(@db, @dir)
     @dir = 'spec/files/interleaved_timestamped_migrations'
-    proc{@m.check_current(@db, @dir)}.should raise_error(Sequel::Migrator::NotCurrentError)
+    proc{@m.check_current(@db, @dir)}.must_raise(Sequel::Migrator::NotCurrentError)
   end
 
-  specify "should apply all missing files when migrating up" do
+  it "should apply all missing files when migrating up" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
     @dir = 'spec/files/interleaved_timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253850_create_artists.rb 1273253851_create_nodes.rb 1273253852_create_albums.rb 1273253853_3_create_users.rb'
+    [:schema_migrations, :sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253850_create_artists.rb 1273253851_create_nodes.rb 1273253852_create_albums.rb 1273253853_3_create_users.rb'
   end
 
-  specify "should not apply down action to migrations where up action hasn't been applied" do
+  it "should not apply down action to migrations where up action hasn't been applied" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
     @dir = 'spec/files/interleaved_timestamped_migrations'
     @m.apply(@db, @dir, 0)
-    [:sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == []
+    [:sm1111, :sm1122, :sm2222, :sm2233, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal []
   end
 
-  specify "should handle updating to a specific timestamp when interleaving migrations" do
+  it "should handle updating to a specific timestamp when interleaving migrations" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
     @dir = 'spec/files/interleaved_timestamped_migrations'
     @m.apply(@db, @dir, 1273253851)
-    [:schema_migrations, :sm1111, :sm1122, :sm2222].each{|n| @db.table_exists?(n).should == true}
-    [:sm2233, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253850_create_artists.rb 1273253851_create_nodes.rb'
+    [:schema_migrations, :sm1111, :sm1122, :sm2222].each{|n| @db.table_exists?(n).must_equal true}
+    [:sm2233, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253850_create_artists.rb 1273253851_create_nodes.rb'
   end
 
-  specify "should correctly update schema_migrations table when an error occurs when migrating up or down" do
+  it "should correctly update schema_migrations table when an error occurs when migrating up or down" do
     @dir = 'spec/files/bad_timestamped_migrations'
-    proc{@m.apply(@db, @dir)}.should raise_error
-    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should == true}
-    @db.table_exists?(:sm3333).should == false
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
-    proc{@m.apply(@db, @dir, 0)}.should raise_error
-    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db.table_exists?(:sm1111).should == true
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb'
+    proc{@m.apply(@db, @dir)}.must_raise NoMethodError
+    [:schema_migrations, :sm1111, :sm2222].each{|n| @db.table_exists?(n).must_equal true}
+    @db.table_exists?(:sm3333).must_equal false
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb'
+    proc{@m.apply(@db, @dir, 0)}.must_raise NoMethodError
+    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db.table_exists?(:sm1111).must_equal true
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb'
   end
 
-  specify "should handle multiple migrations with the same timestamp correctly" do
+  it "should handle multiple migrations with the same timestamp correctly" do
     @dir = 'spec/files/duplicate_timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
     @m.apply(@db, @dir, 1273253853)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253853_create_nodes.rb 1273253853_create_users.rb'
     @m.apply(@db, @dir, 1273253849)
-    [:sm1111].each{|n| @db.table_exists?(n).should == true}
-    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb'
+    [:sm1111].each{|n| @db.table_exists?(n).must_equal true}
+    [:sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb'
     @m.apply(@db, @dir, 1273253848)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == []
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal []
   end
 
-  specify "should convert schema_info table to schema_migrations table" do
+  it "should convert schema_info table to schema_migrations table" do
     @dir = 'spec/files/integer_migrations'
     @m.apply(@db, @dir)
-    [:schema_info, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    [:schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
+    [:schema_info, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    [:schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal false}
 
     @dir = 'spec/files/convert_to_timestamp_migrations'
     @m.apply(@db, @dir)
-    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb 1273253852_create_albums.rb'
+    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb 1273253852_create_albums.rb'
 
     @m.apply(@db, @dir, 4)
-    [:schema_info, :schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    [:sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb'
+    [:schema_info, :schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    [:sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb'
 
     @m.apply(@db, @dir, 0)
-    [:schema_info, :schema_migrations].each{|n| @db.table_exists?(n).should == true}
-    [:sm1111, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == []
+    [:schema_info, :schema_migrations].each{|n| @db.table_exists?(n).must_equal true}
+    [:sm1111, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal []
   end
 
-  specify "should handle unapplied migrations when migrating schema_info table to schema_migrations table" do
+  it "should handle unapplied migrations when migrating schema_info table to schema_migrations table" do
     @dir = 'spec/files/integer_migrations'
     @m.apply(@db, @dir, 2)
-    [:schema_info, :sm1111, :sm2222].each{|n| @db.table_exists?(n).should == true}
-    [:schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
+    [:schema_info, :sm1111, :sm2222].each{|n| @db.table_exists?(n).must_equal true}
+    [:schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal false}
 
     @dir = 'spec/files/convert_to_timestamp_migrations'
     @m.apply(@db, @dir, 1273253850)
-    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122].each{|n| @db.table_exists?(n).should == true}
-    [:sm2233].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb'
+    [:schema_info, :sm1111, :sm2222, :sm3333, :schema_migrations, :sm1122].each{|n| @db.table_exists?(n).must_equal true}
+    [:sm2233].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb'
   end
 
-  specify "should handle unapplied migrations when migrating schema_info table to schema_migrations table and target is less than last integer migration version" do
+  it "should handle unapplied migrations when migrating schema_info table to schema_migrations table and target is less than last integer migration version" do
     @dir = 'spec/files/integer_migrations'
     @m.apply(@db, @dir, 1)
-    [:schema_info, :sm1111].each{|n| @db.table_exists?(n).should == true}
-    [:schema_migrations, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
+    [:schema_info, :sm1111].each{|n| @db.table_exists?(n).must_equal true}
+    [:schema_migrations, :sm2222, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal false}
 
     @dir = 'spec/files/convert_to_timestamp_migrations'
     @m.apply(@db, @dir, 2)
-    [:schema_info, :sm1111, :sm2222, :schema_migrations].each{|n| @db.table_exists?(n).should == true}
-    [:sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb'
+    [:schema_info, :sm1111, :sm2222, :schema_migrations].each{|n| @db.table_exists?(n).must_equal true}
+    [:sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'001_create_sessions.rb 002_create_nodes.rb'
 
     @m.apply(@db, @dir)
-    [:schema_info, :sm1111, :sm2222, :schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb 1273253852_create_albums.rb'
+    [:schema_info, :sm1111, :sm2222, :schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb 1273253852_create_albums.rb'
   end
 
-  specify "should raise error for applied migrations not in file system" do
+  it "should raise error for applied migrations not in file system" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
 
     @dir = 'spec/files/missing_timestamped_migrations'
-    proc{@m.apply(@db, @dir, 0)}.should raise_error(Sequel::Migrator::Error)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    proc{@m.apply(@db, @dir, 0)}.must_raise(Sequel::Migrator::Error)
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
   end
   
-  specify "should not raise error for applied migrations not in file system if :allow_missing_migration_files is true" do
+  it "should not raise error for applied migrations not in file system if :allow_missing_migration_files is true" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
 
     @dir = 'spec/files/missing_timestamped_migrations'
-    proc{@m.run(@db, @dir, :allow_missing_migration_files => true)}.should_not raise_error
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    @m.run(@db, @dir, :allow_missing_migration_files => true)
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
   end
   
-  specify "should raise error missing column name in existing schema_migrations table" do
+  it "should raise error missing column name in existing schema_migrations table" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)
-    proc{@m.run(@db, @dir, :column=>:fn)}.should raise_error(Sequel::Migrator::Error)
+    proc{@m.run(@db, @dir, :column=>:fn)}.must_raise(Sequel::Migrator::Error)
   end
   
-  specify "should handle migration filenames in a case insensitive manner" do
+  it "should handle migration filenames in a case insensitive manner" do
     @dir = 'spec/files/uppercase_timestamped_migrations'
     @m.apply(@db, @dir)
-    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:schema_migrations].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir, 0)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db[:schema_migrations].select_order_map(:filename).should == []
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:schema_migrations].select_order_map(:filename).must_equal []
   end
 
-  specify "should :table and :column options" do
+  it "should :table and :column options" do
     @dir = 'spec/files/timestamped_migrations'
     @m.run(@db, @dir, :table=>:sm, :column=>:fn)
-    [:sm, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == true}
-    @db[:sm].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    [:sm, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal true}
+    @db[:sm].select_order_map(:filename).must_equal %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
     @m.run(@db, @dir, :target=>0, :table=>:sm, :column=>:fn)
-    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should == false}
-    @db[:sm].select_order_map(:fn).should == []
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).must_equal false}
+    @db[:sm].select_order_map(:fn).must_equal []
   end
 
-  specify "should return nil" do
+  it "should return nil" do
     @dir = 'spec/files/timestamped_migrations'
-    @m.apply(@db, @dir, 1273253850).should == nil
-    @m.apply(@db, @dir, 0).should == nil
-    @m.apply(@db, @dir).should == nil
+    @m.apply(@db, @dir, 1273253850).must_equal nil
+    @m.apply(@db, @dir, 0).must_equal nil
+    @m.apply(@db, @dir).must_equal nil
   end
 
-  specify "should use TimestampMigrator if TimestampMigrator.apply is called even for integer migrations directory" do
+  it "should use TimestampMigrator if TimestampMigrator.apply is called even for integer migrations directory" do
     Sequel::TimestampMigrator.apply(@db, "spec/files/integer_migrations")
-    @db.sqls.should == ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm1111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_sessions.rb')", "CREATE TABLE sm2222 (smc2 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_nodes.rb')", "CREATE TABLE sm3333 (smc3 integer)", "INSERT INTO schema_migrations (filename) VALUES ('003_3_create_users.rb')"]
+    @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm1111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_sessions.rb')", "CREATE TABLE sm2222 (smc2 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_nodes.rb')", "CREATE TABLE sm3333 (smc3 integer)", "INSERT INTO schema_migrations (filename) VALUES ('003_3_create_users.rb')"]
   end
 
-  specify "should not use transactions by default" do
+  it "should not use transactions by default" do
     Sequel::TimestampMigrator.apply(@db, "spec/files/transaction_unspecified_migrations")
-    @db.sqls.should == ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
+    @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
   end
 
-  specify "should use transactions by default if database supports transactional ddl" do
+  it "should use transactions by default if database supports transactional ddl" do
     @db.meta_def(:supports_transactional_ddl?){true}
     Sequel::TimestampMigrator.apply(@db, "spec/files/transaction_unspecified_migrations")
-    @db.sqls.should == ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')", "COMMIT"]
+    @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')", "COMMIT"]
   end
 
-  specify "should support transaction use on a per migration basis" do
+  it "should support transaction use on a per migration basis" do
     Sequel::TimestampMigrator.apply(@db, "spec/files/transaction_specified_migrations")
-    @db.sqls.should == ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
+    @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
   end
 
-  specify "should force transactions if enabled by the migrator" do
+  it "should force transactions if enabled by the migrator" do
     Sequel::TimestampMigrator.run(@db, "spec/files/transaction_specified_migrations", :use_transactions=>true)
-    @db.sqls.should == ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')", "COMMIT"]
+    @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "BEGIN", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "COMMIT", "BEGIN", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')", "COMMIT"]
   end
 
-  specify "should not use transactions if disabled in the migrator" do
+  it "should not use transactions if disabled in the migrator" do
     Sequel::TimestampMigrator.run(@db, "spec/files/transaction_unspecified_migrations", :use_transactions=>false)
-    @db.sqls.should == ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
+    @db.sqls.must_equal ["SELECT NULL AS nil FROM schema_migrations LIMIT 1", "CREATE TABLE schema_migrations (filename varchar(255) PRIMARY KEY)", "SELECT NULL AS nil FROM schema_info LIMIT 1", "SELECT filename FROM schema_migrations ORDER BY filename", "CREATE TABLE sm11111 (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('001_create_alt_basic.rb')", "CREATE TABLE sm (smc1 integer)", "INSERT INTO schema_migrations (filename) VALUES ('002_create_basic.rb')"]
   end
 end

@@ -6,16 +6,16 @@ describe "from_block extension" do
     @db.extension(:from_block)
   end
 
-  specify "should make Database#from blocks apply to FROM" do
-    @db.from{f}.sql.should == 'SELECT * FROM f'
-    @db.from{[f, g(f)]}.sql.should == 'SELECT * FROM f, g(f)'
+  it "should make Database#from blocks apply to FROM" do
+    @db.from{f}.sql.must_equal 'SELECT * FROM f'
+    @db.from{[f, g(f)]}.sql.must_equal 'SELECT * FROM f, g(f)'
   end
 
-  specify "should handle from blocks with method arguments" do
-    @db.from(:f){g(f)}.sql.should == 'SELECT * FROM f, g(f)'
+  it "should handle from blocks with method arguments" do
+    @db.from(:f){g(f)}.sql.must_equal 'SELECT * FROM f, g(f)'
   end
 
-  specify "should handle from without block" do
-    @db.from(:f).sql.should == 'SELECT * FROM f'
+  it "should handle from without block" do
+    @db.from(:f).sql.must_equal 'SELECT * FROM f'
   end
 end

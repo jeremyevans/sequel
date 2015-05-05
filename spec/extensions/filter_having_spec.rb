@@ -7,34 +7,34 @@ describe "filter_having extension" do
   end
 
   it "should make filter operate on HAVING clause if dataset has a HAVING clause" do
-    @dsh.filter(:b).sql.should == 'SELECT * FROM t HAVING (a AND b)'
+    @dsh.filter(:b).sql.must_equal 'SELECT * FROM t HAVING (a AND b)'
   end
 
   it "should make filter operate on WHERE clause if dataset does not have a HAVING clause" do
-    @ds.filter(:b).sql.should == 'SELECT * FROM t WHERE b'
+    @ds.filter(:b).sql.must_equal 'SELECT * FROM t WHERE b'
   end
 
   it "should make and operate on HAVING clause if dataset has a HAVING clause" do
-    @dsh.and(:b).sql.should == 'SELECT * FROM t HAVING (a AND b)'
+    @dsh.and(:b).sql.must_equal 'SELECT * FROM t HAVING (a AND b)'
   end
 
   it "should make and operate on WHERE clause if dataset does not have a HAVING clause" do
-    @ds.where(:a).and(:b).sql.should == 'SELECT * FROM t WHERE (a AND b)'
+    @ds.where(:a).and(:b).sql.must_equal 'SELECT * FROM t WHERE (a AND b)'
   end
 
   it "should make or operate on HAVING clause if dataset has a HAVING clause" do
-    @dsh.or(:b).sql.should == 'SELECT * FROM t HAVING (a OR b)'
+    @dsh.or(:b).sql.must_equal 'SELECT * FROM t HAVING (a OR b)'
   end
 
   it "should make or operate on WHERE clause if dataset does not have a HAVING clause" do
-    @ds.where(:a).or(:b).sql.should == 'SELECT * FROM t WHERE (a OR b)'
+    @ds.where(:a).or(:b).sql.must_equal 'SELECT * FROM t WHERE (a OR b)'
   end
 
   it "should make exclude operate on HAVING clause if dataset has a HAVING clause" do
-    @dsh.exclude(:b).sql.should == 'SELECT * FROM t HAVING (a AND NOT b)'
+    @dsh.exclude(:b).sql.must_equal 'SELECT * FROM t HAVING (a AND NOT b)'
   end
 
   it "should make exclude operate on WHERE clause if dataset does not have a HAVING clause" do
-    @ds.exclude(:b).sql.should == 'SELECT * FROM t WHERE NOT b'
+    @ds.exclude(:b).sql.must_equal 'SELECT * FROM t WHERE NOT b'
   end
 end

@@ -15,29 +15,29 @@ describe "LooserTypecasting Extension" do
     end
   end
 
-  specify "should not raise errors for invalid strings in integer columns" do
-    @c.new(:b=>'a').b.should == 0
-    @c.new(:b=>'a').b.should be_a_kind_of(Integer)
+  it "should not raise errors for invalid strings in integer columns" do
+    @c.new(:b=>'a').b.must_equal 0
+    @c.new(:b=>'a').b.must_be_kind_of(Integer)
   end
 
-  specify "should not raise errors for invalid strings in float columns" do
-    @c.new(:z=>'a').z.should == 0.0
-    @c.new(:z=>'a').z.should be_a_kind_of(Float)
+  it "should not raise errors for invalid strings in float columns" do
+    @c.new(:z=>'a').z.must_equal 0.0
+    @c.new(:z=>'a').z.must_be_kind_of(Float)
   end
 
-  specify "should not raise errors for hash or array input to string columns" do
-    @c.new(:s=>'a').s.should == 'a'
-    @c.new(:s=>[]).s.should be_a_kind_of(String)
-    @c.new(:s=>{}).s.should be_a_kind_of(String)
+  it "should not raise errors for hash or array input to string columns" do
+    @c.new(:s=>'a').s.must_equal 'a'
+    @c.new(:s=>[]).s.must_be_kind_of(String)
+    @c.new(:s=>{}).s.must_be_kind_of(String)
   end
 
-  specify "should not raise errors for invalid strings in decimal columns" do
-    @c.new(:d=>'a').d.should == 0.0
-    @c.new(:d=>'a').d.should be_a_kind_of(BigDecimal)
+  it "should not raise errors for invalid strings in decimal columns" do
+    @c.new(:d=>'a').d.must_equal 0.0
+    @c.new(:d=>'a').d.must_be_kind_of(BigDecimal)
   end
 
-  specify "should not affect conversions of other types in decimal columns" do
-    @c.new(:d=>1).d.should == 1
-    @c.new(:d=>1).d.should be_a_kind_of(BigDecimal)
+  it "should not affect conversions of other types in decimal columns" do
+    @c.new(:d=>1).d.must_equal 1
+    @c.new(:d=>1).d.must_be_kind_of(BigDecimal)
   end
 end

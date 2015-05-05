@@ -21,70 +21,7 @@ Sequel::Model.cache_associations = false if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
 Sequel::Model.use_transactions = false
 Sequel.cache_anonymous_models = false
 
-unless defined?(RSpec)
-  module Spec::Matchers
-    class BeWithin
-      include Spec::Matchers
-      def initialize(delta); @delta = delta; end
-      def of(expected); be_close(expected, @delta); end 
-    end
-    def be_within(delta)
-      BeWithin.new(delta)
-    end
-  end
-end
-
-def Sequel.guarded?(*checked)
-  unless ENV['SEQUEL_NO_PENDING']
-    checked.each do |c|
-      case c
-      when DB.database_type
-        return c
-      when Array
-        case c.length
-        when 1
-          return c if c.first == DB.adapter_scheme
-        when 2
-          if c.first.is_a?(Proc)
-            return c if c.last == DB.database_type && c.first.call(DB)
-          elsif c.last.is_a?(Proc)
-            return c if c.first == DB.adapter_scheme && c.last.call(DB)
-          else
-            return c if c.first == DB.adapter_scheme && c.last == DB.database_type
-          end
-        when 3
-          return c if c[0] == DB.adapter_scheme && c[1] == DB.database_type && c[2].call(DB)
-        end          
-      end
-    end
-  end
-  false
-end
-
-require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
-
-RSPEC_EXAMPLE_GROUP.class_eval do
-  def log
-    begin
-      DB.loggers << Logger.new(STDOUT)
-      yield
-    ensure
-     DB.loggers.pop
-    end
-  end
-  
-  def self.cspecify(message, *checked, &block)
-    if pending = Sequel.guarded?(*checked)
-      specify(message) do
-        method = RSPEC_SKIP_PENDING && !ENV['SEQUEL_NO_SKIP_PENDING'] ? :skip : :pending
-        send(method, "Not yet working on #{Array(pending).map{|x| x.is_a?(Proc) ? :proc : x}.join(', ')}")
-        instance_eval(&block)
-      end
-    else
-      specify(message, &block)
-    end
-  end
-end
+require './spec/guards_helper'
 
 unless defined?(DB)
   DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'])

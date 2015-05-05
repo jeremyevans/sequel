@@ -29,47 +29,47 @@ describe "Sequel::Plugins::Timestamps" do
       errors.add(model.create_timestamp_field, 'not present') unless send(model.create_timestamp_field)
       errors.add(model.update_timestamp_field, 'not present') unless send(model.update_timestamp_field)
     end
-    o.valid?.should == true
+    o.valid?.must_equal true
   end
 
   it "should set timestamp fields when skipping validations" do
     @c.plugin :timestamps
     @c.new.save(:validate=>false)
-    @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
+    @c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
   end
 
   it "should set the create timestamp field on creation" do
     o = @c.create
-    @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
-    o.created_at.should == '2009-08-01'
+    @c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
+    o.created_at.must_equal '2009-08-01'
   end
 
   it "should set the update timestamp field on update" do
     o = @c.load(:id=>1).save
-    @c.db.sqls.should == ["UPDATE t SET updated_at = '2009-08-01' WHERE (id = 1)"]
-    o.updated_at.should == '2009-08-01'
+    @c.db.sqls.must_equal ["UPDATE t SET updated_at = '2009-08-01' WHERE (id = 1)"]
+    o.updated_at.must_equal '2009-08-01'
   end
 
   it "should work with current_datetime_timestamp extension" do
     Sequel.datetime_class = Time
     @c.dataset = @c.dataset.extension(:current_datetime_timestamp)
     o = @c.create
-    @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES (CURRENT_TIMESTAMP)"]
+    @c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES (CURRENT_TIMESTAMP)"]
     o = @c.load(:id=>1).save
-    @c.db.sqls.should == ["UPDATE t SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
+    @c.db.sqls.must_equal ["UPDATE t SET updated_at = CURRENT_TIMESTAMP WHERE (id = 1)"]
   end
 
   it "should not update the update timestamp on creation" do
-    @c.create.updated_at.should == nil
+    @c.create.updated_at.must_equal nil
   end
 
   it "should use the same value for the creation and update timestamps when creating if the :update_on_create option is given" do
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create
     sqls = @c.db.sqls
-    sqls.shift.should =~ /INSERT INTO t \((creat|updat)ed_at, (creat|updat)ed_at\) VALUES \('2009-08-01', '2009-08-01'\)/
-    sqls.should == []
-    o.created_at.should === o.updated_at
+    sqls.shift.must_match /INSERT INTO t \((creat|updat)ed_at, (creat|updat)ed_at\) VALUES \('2009-08-01', '2009-08-01'\)/
+    sqls.must_equal []
+    o.created_at.must_be :===, o.updated_at
   end
 
   it "should allow specifying the create timestamp field via the :create option" do
@@ -80,8 +80,8 @@ describe "Sequel::Plugins::Timestamps" do
       def _save_refresh(*) end
     end
     o = c.create
-    c.db.sqls.should == ["INSERT INTO t (c) VALUES ('2009-08-01')"]
-    o.c.should == '2009-08-01'
+    c.db.sqls.must_equal ["INSERT INTO t (c) VALUES ('2009-08-01')"]
+    o.c.must_equal '2009-08-01'
   end
 
   it "should allow specifying the update timestamp field via the :update option" do
@@ -92,8 +92,8 @@ describe "Sequel::Plugins::Timestamps" do
       db.reset
     end
     o = c.load(:id=>1).save
-    c.db.sqls.should == ["UPDATE t SET u = '2009-08-01' WHERE (id = 1)"]
-    o.u.should == '2009-08-01'
+    c.db.sqls.must_equal ["UPDATE t SET u = '2009-08-01' WHERE (id = 1)"]
+    o.u.must_equal '2009-08-01'
   end
 
   it "should not raise an error if the model doesn't have the timestamp columns" do
@@ -106,55 +106,55 @@ describe "Sequel::Plugins::Timestamps" do
     end
     c.create(:x=>2)
     c.load(:id=>1, :x=>2).save
-    c.db.sqls.should == ["INSERT INTO t (x) VALUES (2)", "UPDATE t SET x = 2 WHERE (id = 1)"] 
+    c.db.sqls.must_equal ["INSERT INTO t (x) VALUES (2)", "UPDATE t SET x = 2 WHERE (id = 1)"] 
   end
 
   it "should not overwrite an existing create timestamp" do
     o = @c.create(:created_at=>'2009-08-03')
-    @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-03')"]
-    o.created_at.should == '2009-08-03'
+    @c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES ('2009-08-03')"]
+    o.created_at.must_equal '2009-08-03'
   end
 
   it "should overwrite an existing create timestamp if the :force option is used" do
     @c.plugin :timestamps, :force=>true
     o = @c.create(:created_at=>'2009-08-03')
-    @c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
-    o.created_at.should == '2009-08-01'
+    @c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES ('2009-08-01')"]
+    o.created_at.must_equal '2009-08-01'
   end
 
   it "should have create_timestamp_field give the create timestamp field" do
-    @c.create_timestamp_field.should == :created_at
+    @c.create_timestamp_field.must_equal :created_at
     @c.plugin :timestamps, :create=>:c
-    @c.create_timestamp_field.should == :c
+    @c.create_timestamp_field.must_equal :c
   end
 
   it "should have update_timestamp_field give the update timestamp field" do
-    @c.update_timestamp_field.should == :updated_at
+    @c.update_timestamp_field.must_equal :updated_at
     @c.plugin :timestamps, :update=>:u
-    @c.update_timestamp_field.should == :u
+    @c.update_timestamp_field.must_equal :u
   end
 
   it "should have create_timestamp_overwrite? give the whether to overwrite an existing create timestamp" do
-    @c.create_timestamp_overwrite?.should == false
+    @c.create_timestamp_overwrite?.must_equal false
     @c.plugin :timestamps, :force=>true
-    @c.create_timestamp_overwrite?.should == true
+    @c.create_timestamp_overwrite?.must_equal true
   end
 
   it "should have set_update_timestamp_on_create? give whether to set the update timestamp on create" do
-    @c.set_update_timestamp_on_create?.should == false
+    @c.set_update_timestamp_on_create?.must_equal false
     @c.plugin :timestamps, :update_on_create=>true
-    @c.set_update_timestamp_on_create?.should == true
+    @c.set_update_timestamp_on_create?.must_equal true
   end
 
   it "should work with subclasses" do
     c = Class.new(@c)
     o = c.create
-    o.created_at.should == '2009-08-01'
-    o.updated_at.should == nil
+    o.created_at.must_equal '2009-08-01'
+    o.updated_at.must_equal nil
     o = c.load(:id=>1).save
-    o.updated_at.should == '2009-08-01'
-    c.db.sqls.should == ["INSERT INTO t (created_at) VALUES ('2009-08-01')", "UPDATE t SET updated_at = '2009-08-01' WHERE (id = 1)"]
-    c.create(:created_at=>'2009-08-03').created_at.should == '2009-08-03'
+    o.updated_at.must_equal '2009-08-01'
+    c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES ('2009-08-01')", "UPDATE t SET updated_at = '2009-08-01' WHERE (id = 1)"]
+    c.create(:created_at=>'2009-08-03').created_at.must_equal '2009-08-03'
 
     c.class_eval do
       columns :id, :c, :u
@@ -163,13 +163,13 @@ describe "Sequel::Plugins::Timestamps" do
     c2 = Class.new(c)
     c2.db.reset
     o = c2.create
-    o.c.should == '2009-08-01'
-    o.u.should === o.c 
-    c2.db.sqls.first.should =~ /INSERT INTO t \([cu], [cu]\) VALUES \('2009-08-01', '2009-08-01'\)/
+    o.c.must_equal '2009-08-01'
+    o.u.must_be :===, o.c 
+    c2.db.sqls.first.must_match /INSERT INTO t \([cu], [cu]\) VALUES \('2009-08-01', '2009-08-01'\)/
     c2.db.reset
     o = c2.load(:id=>1).save
-    o.u.should == '2009-08-01'
-    c2.db.sqls.should == ["UPDATE t SET u = '2009-08-01' WHERE (id = 1)"]
-    c2.create(:c=>'2009-08-03').c.should == '2009-08-01'
+    o.u.must_equal '2009-08-01'
+    c2.db.sqls.must_equal ["UPDATE t SET u = '2009-08-01' WHERE (id = 1)"]
+    c2.create(:c=>'2009-08-03').c.must_equal '2009-08-01'
   end
 end

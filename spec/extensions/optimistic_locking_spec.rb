@@ -47,55 +47,55 @@ describe "optimistic_locking plugin" do
     @c.plugin :optimistic_locking
   end
 
-  specify "should raise an error when updating a stale record" do
+  it "should raise an error when updating a stale record" do
     p1 = @c[1]
     p2 = @c[1]
     p1.update(:name=>'Jim')
-    proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+    proc{p2.update(:name=>'Bob')}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end 
 
-  specify "should raise an error when destroying a stale record" do
+  it "should raise an error when destroying a stale record" do
     p1 = @c[1]
     p2 = @c[1]
     p1.update(:name=>'Jim')
-    proc{p2.destroy}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+    proc{p2.destroy}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end 
 
-  specify "should not raise an error when updating the same record twice" do
+  it "should not raise an error when updating the same record twice" do
     p1 = @c[1]
     p1.update(:name=>'Jim')
-    proc{p1.update(:name=>'Bob')}.should_not raise_error
+    p1.update(:name=>'Bob')
   end
 
-  specify "should allow changing the lock column via model.lock_column=" do
+  it "should allow changing the lock column via model.lock_column=" do
     @lv.replace('lv')
     @c.columns :id, :name, :lv
     @c.lock_column = :lv
     p1 = @c[1]
     p2 = @c[1]
     p1.update(:name=>'Jim')
-    proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+    proc{p2.update(:name=>'Bob')}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end
 
-  specify "should allow changing the lock column via plugin option" do
+  it "should allow changing the lock column via plugin option" do
     @lv.replace('lv')
     @c.columns :id, :name, :lv
     @c.plugin :optimistic_locking, :lock_column=>:lv
     p1 = @c[1]
     p2 = @c[1]
     p1.update(:name=>'Jim')
-    proc{p2.destroy}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+    proc{p2.destroy}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end
 
-  specify "should work when subclassing" do
+  it "should work when subclassing" do
     c = Class.new(@c)
     p1 = c[1]
     p2 = c[1]
     p1.update(:name=>'Jim')
-    proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+    proc{p2.update(:name=>'Bob')}.must_raise(Sequel::Plugins::OptimisticLocking::Error)
   end
 
-  specify "should work correctly if attempting to refresh and save again after a failed save" do
+  it "should work correctly if attempting to refresh and save again after a failed save" do
     p1 = @c[1]
     p2 = @c[1]
     p1.update(:name=>'Jim')
@@ -104,25 +104,25 @@ describe "optimistic_locking plugin" do
     rescue Sequel::Plugins::OptimisticLocking::Error
       p2.refresh
       @c.db.sqls
-      proc{p2.update(:name=>'Bob')}.should_not raise_error
+      p2.update(:name=>'Bob')
     end
-    @c.db.sqls.first.should =~ /UPDATE people SET (name = 'Bob', lock_version = 4|lock_version = 4, name = 'Bob') WHERE \(\(id = 1\) AND \(lock_version = 3\)\)/
+    @c.db.sqls.first.must_match /UPDATE people SET (name = 'Bob', lock_version = 4|lock_version = 4, name = 'Bob') WHERE \(\(id = 1\) AND \(lock_version = 3\)\)/
   end
 
-  specify "should increment the lock column when #modified! even if no columns are changed" do
+  it "should increment the lock column when #modified! even if no columns are changed" do
     p1 = @c[1]
     p1.modified!
     lv = p1.lock_version
     p1.save_changes
-    p1.lock_version.should == lv + 1
+    p1.lock_version.must_equal lv + 1
   end
 
-  specify "should not increment the lock column when the update fails" do
-    @c.instance_dataset.meta_def(:update) { raise Exception }
+  it "should not increment the lock column when the update fails" do
+    @c.instance_dataset.meta_def(:update) {|_| raise }
     p1 = @c[1]
     p1.modified!
     lv = p1.lock_version
-    proc{p1.save_changes}.should raise_error(Exception)
-    p1.lock_version.should == lv
+    proc{p1.save_changes}.must_raise(RuntimeError)
+    p1.lock_version.must_equal lv
   end
 end

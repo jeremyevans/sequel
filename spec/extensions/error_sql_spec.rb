@@ -5,16 +5,16 @@ describe "error_sql extension" do
     @db = Sequel.mock(:fetch=>proc{|sql| @db.log_yield(sql){raise StandardError}}).extension(:error_sql)
   end
 
-  specify "should have Sequel::DatabaseError#sql give the SQL causing the error" do
+  it "should have Sequel::DatabaseError#sql give the SQL causing the error" do
     @db["SELECT"].all rescue (e = $!)
-    e.sql.should == "SELECT"
+    e.sql.must_equal "SELECT"
   end
 
-  specify "should have Sequel::DatabaseError#sql give the SQL causing the error when using a logger" do
+  it "should have Sequel::DatabaseError#sql give the SQL causing the error when using a logger" do
     l = Object.new
     def l.method_missing(*) end
     @db.loggers = [l]
     @db["SELECT"].all rescue (e = $!)
-    e.sql.should == "SELECT"
+    e.sql.must_equal "SELECT"
   end
 end

@@ -15,10 +15,10 @@ describe "Sequel::Plugins::AfterInitialize" do
   end
 
   it "should have after_initialize hook be called for new objects" do
-    @c.new(:name=>'foo').values.should == {:name=>'foofoo'}
+    @c.new(:name=>'foo').values.must_equal(:name=>'foofoo')
   end
 
   it "should have after_initialize hook be called for objects loaded from the database" do
-    @c.call(:id=>1, :name=>'foo').values.should == {:id=>3, :name=>'foofoo'}
+    @c.call(:id=>1, :name=>'foo').values.must_equal(:id=>3, :name=>'foofoo')
   end
 end

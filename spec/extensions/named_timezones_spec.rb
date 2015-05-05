@@ -26,21 +26,21 @@ describe "Sequel named_timezones extension" do
   end
   
   it "should convert string arguments to *_timezone= to TZInfo::Timezone instances" do
-    Sequel.application_timezone.should == @tz_in
-    Sequel.database_timezone.should == @tz_out
+    Sequel.application_timezone.must_equal @tz_in
+    Sequel.database_timezone.must_equal @tz_out
   end
     
   it "should convert string arguments for Database#timezone= to TZInfo::Timezone instances for database-specific timezones" do
     @db.extension :named_timezones
     @db.timezone = 'America/Los_Angeles'
-    @db.timezone.should == @tz_in
+    @db.timezone.must_equal @tz_in
   end
     
   it "should accept TZInfo::Timezone instances in *_timezone=" do
     Sequel.application_timezone = @tz_in
     Sequel.database_timezone = @tz_out
-    Sequel.application_timezone.should == @tz_in
-    Sequel.database_timezone.should == @tz_out
+    Sequel.application_timezone.must_equal @tz_in
+    Sequel.database_timezone.must_equal @tz_out
   end
     
   it "should convert datetimes going into the database to named database_timezone" do
@@ -48,36 +48,36 @@ describe "Sequel named_timezones extension" do
     def ds.supports_timestamp_timezones?; true; end
     def ds.supports_timestamp_usecs?; false; end
     ds.insert([@dt, DateTime.civil(2009,6,1,3,20,30,-7/24.0), DateTime.civil(2009,6,1,6,20,30,-1/6.0)])
-    @db.sqls.should == ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
+    @db.sqls.must_equal ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
   end
   
   it "should convert datetimes coming out of the database from database_timezone to application_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30-0400')
-    dt.should == @dt
-    dt.offset.should == -7/24.0
+    dt.must_equal @dt
+    dt.offset.must_equal -7/24.0
     
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30+0000')
-    dt.should == @dt
-    dt.offset.should == -7/24.0
+    dt.must_equal @dt
+    dt.offset.must_equal -7/24.0
   end
     
   it "should raise an error for ambiguous timezones by default" do
-    proc{Sequel.database_to_application_timestamp('2004-10-31T01:30:00')}.should raise_error(Sequel::InvalidValue)
+    proc{Sequel.database_to_application_timestamp('2004-10-31T01:30:00')}.must_raise(Sequel::InvalidValue)
   end
 
   it "should support tzinfo_disambiguator= to handle ambiguous timezones automatically" do
     Sequel.tzinfo_disambiguator = proc{|datetime, periods| periods.first}
-    Sequel.database_to_application_timestamp('2004-10-31T01:30:00').should == DateTime.parse('2004-10-30T22:30:00-07:00')
+    Sequel.database_to_application_timestamp('2004-10-31T01:30:00').must_equal DateTime.parse('2004-10-30T22:30:00-07:00')
   end
 
   it "should assume datetimes coming out of the database that don't have an offset as coming from database_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30')
-    dt.should == @dt
-    dt.offset.should == -7/24.0
+    dt.must_equal @dt
+    dt.offset.must_equal -7/24.0
     
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30')
-    dt.should == @dt + 1/6.0
-    dt.offset.should == -7/24.0
+    dt.must_equal @dt + 1/6.0
+    dt.offset.must_equal -7/24.0
   end
   
   it "should work with the thread_local_timezones extension" do
@@ -101,8 +101,8 @@ describe "Sequel named_timezones extension" do
     q1.push nil
     t1.join
     t2.join
-    tz1.should == @tz_out
-    tz2.should == @tz_in
+    tz1.must_equal @tz_out
+    tz2.must_equal @tz_in
   end
 end
 end

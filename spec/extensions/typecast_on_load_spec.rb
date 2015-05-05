@@ -16,65 +16,65 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
     end
   end 
 
-  specify "should call setter method with value when loading the object, for all given columns" do
+  it "should call setter method with value when loading the object, for all given columns" do
     @c.plugin :typecast_on_load, :b
     o = @c.load(:id=>1, :b=>"1", :y=>"0")
-    o.values.should == {:id=>1, :b=>1, :y=>"0"}
-    o.bset.should == true
+    o.values.must_equal(:id=>1, :b=>1, :y=>"0")
+    o.bset.must_equal true
   end
 
-  specify "should call setter method with value when reloading the object, for all given columns" do
+  it "should call setter method with value when reloading the object, for all given columns" do
     @c.plugin :typecast_on_load, :b
     o = @c.load(:id=>1, :b=>"1", :y=>"0")
     o.refresh
-    o.values.should == {:id=>1, :b=>1, :y=>"0"}
-    o.bset.should == true
+    o.values.must_equal(:id=>1, :b=>1, :y=>"0")
+    o.bset.must_equal true
   end
 
-  specify "should call setter method with value when automatically reloading the object on creation" do
+  it "should call setter method with value when automatically reloading the object on creation" do
     @c.plugin :typecast_on_load, :b
     o = @c.new(:b=>"1", :y=>"0")
-    o.save.values.should == {:id=>1, :b=>1, :y=>"0"}
-    o.bset.should == true
+    o.save.values.must_equal(:id=>1, :b=>1, :y=>"0")
+    o.bset.must_equal true
   end
 
-  specify "should call setter method with value when automatically reloading the object on creation via insert_select" do
+  it "should call setter method with value when automatically reloading the object on creation via insert_select" do
     @c.plugin :typecast_on_load, :b
     @c.dataset.meta_def(:insert_select){|h| insert(h); first}
     o = @c.new(:b=>"1", :y=>"0")
-    o.save.values.should == {:id=>1, :b=>1, :y=>"0"}
-    o.bset.should == true
+    o.save.values.must_equal(:id=>1, :b=>1, :y=>"0")
+    o.bset.must_equal true
   end
 
-  specify "should allowing setting columns separately via add_typecast_on_load_columns" do
+  it "should allowing setting columns separately via add_typecast_on_load_columns" do
     @c.plugin :typecast_on_load
-    @c.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>"1", :y=>"0"}
+    @c.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>"1", :y=>"0")
     @c.add_typecast_on_load_columns :b
-    @c.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>1, :y=>"0"}
+    @c.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>1, :y=>"0")
     @c.add_typecast_on_load_columns :y
-    @c.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>1, :y=>false}
+    @c.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>1, :y=>false)
   end
 
-  specify "should work with subclasses" do
+  it "should work with subclasses" do
     @c.plugin :typecast_on_load
-    @c.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>"1", :y=>"0"}
+    @c.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>"1", :y=>"0")
 
     c1 = Class.new(@c)
     @c.add_typecast_on_load_columns :b
-    @c.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>1, :y=>"0"}
-    c1.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>"1", :y=>"0"}
+    @c.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>1, :y=>"0")
+    c1.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>"1", :y=>"0")
 
     c2 = Class.new(@c)
     @c.add_typecast_on_load_columns :y
-    @c.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>1, :y=>false}
-    c2.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>1, :y=>"0"}
+    @c.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>1, :y=>false)
+    c2.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>1, :y=>"0")
     
     c1.add_typecast_on_load_columns :y
-    c1.load(:id=>1, :b=>"1", :y=>"0").values.should == {:id=>1, :b=>"1", :y=>false}
+    c1.load(:id=>1, :b=>"1", :y=>"0").values.must_equal(:id=>1, :b=>"1", :y=>false)
   end
 
-  specify "should not mark the object as modified" do
+  it "should not mark the object as modified" do
     @c.plugin :typecast_on_load, :b
-    @c.load(:id=>1, :b=>"1", :y=>"0").modified?.should == false
+    @c.load(:id=>1, :b=>"1", :y=>"0").modified?.must_equal false
   end
 end

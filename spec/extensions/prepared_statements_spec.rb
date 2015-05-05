@@ -12,28 +12,28 @@ describe "prepared_statements plugin" do
     @db.sqls
   end
 
-  specify "should correctly lookup by primary key" do
-    @c[1].should == @p
-    @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+  it "should correctly lookup by primary key" do
+    @c[1].must_equal @p
+    @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
-  shared_examples_for "prepared_statements plugin" do
-    specify "should correctly delete instance" do
-      @p.destroy.should == @p
-      @db.sqls.should == ["DELETE FROM people WHERE (id = 1)"]
+  prepared_statements_spec = shared_description do
+    it "should correctly delete instance" do
+      @p.destroy.must_equal @p
+      @db.sqls.must_equal ["DELETE FROM people WHERE (id = 1)"]
     end
 
-    specify "should correctly update instance" do
-      @p.update(:name=>'bar').should == @c.load(:id=>1, :name=>'bar', :i => 2)
-      @db.sqls.should == ["UPDATE people SET name = 'bar' WHERE (id = 1)"]
+    it "should correctly update instance" do
+      @p.update(:name=>'bar').must_equal @c.load(:id=>1, :name=>'bar', :i => 2)
+      @db.sqls.must_equal ["UPDATE people SET name = 'bar' WHERE (id = 1)"]
     end
 
-    specify "should correctly create instance" do
-      @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
-      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo')", "SELECT #{@columns} FROM people WHERE (id = 1) LIMIT 1"]
+    it "should correctly create instance" do
+      @c.create(:name=>'foo').must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
+      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo')", "SELECT #{@columns} FROM people WHERE (id = 1) LIMIT 1"]
     end
 
-    specify "should correctly create instance if dataset supports insert_select" do
+    it "should correctly create instance if dataset supports insert_select" do
       @c.dataset_module do
         def supports_insert_select?
           true
@@ -49,12 +49,12 @@ describe "prepared_statements plugin" do
           "#{insert_sql(*v)} RETURNING #{(opts[:returning] && !opts[:returning].empty?) ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}"
         end
       end
-      @c.create(:name=>'foo').should == @c.load(:id=>1, :name=>'foo', :i => 2)
-      @db.sqls.should == ["INSERT INTO people (name) VALUES ('foo') RETURNING #{@columns}"]
+      @c.create(:name=>'foo').must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
+      @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo') RETURNING #{@columns}"]
     end
   end
 
-  it_should_behave_like "prepared_statements plugin"
+  include prepared_statements_spec
 
   describe "when #use_prepared_statements_for? returns false" do
     before do
@@ -62,13 +62,13 @@ describe "prepared_statements plugin" do
       @c.class_eval{def use_prepared_statements_for?(type) false end}
     end
 
-    it_should_behave_like "prepared_statements plugin"
+    include prepared_statements_spec
   end
 
-  specify "should work correctly when subclassing" do
+  it "should work correctly when subclassing" do
     c = Class.new(@c)
-    c[1].should == c.load(:id=>1, :name=>'foo', :i=>2)
-    @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+    c[1].must_equal c.load(:id=>1, :name=>'foo', :i=>2)
+    @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
   describe " with placeholder type specifiers" do 
@@ -76,12 +76,12 @@ describe "prepared_statements plugin" do
       @ds.meta_def(:requires_placeholder_type_specifiers?){true}
     end
 
-    specify "should correctly handle without schema type" do
-      @c[1].should == @p
-      @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+    it "should correctly handle without schema type" do
+      @c[1].must_equal @p
+      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
     end
 
-    specify "should correctly handle with schema type" do
+    it "should correctly handle with schema type" do
       @c.db_schema[:id][:type] = :integer
       ds = @c.send(:prepared_lookup)
       def ds.literal_symbol_append(sql, v)
@@ -96,8 +96,8 @@ describe "prepared_statements plugin" do
           super
         end
       end
-      @c[1].should == @p
-      @db.sqls.should == ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+      @c[1].must_equal @p
+      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
     end 
   end
 end

@@ -26,42 +26,42 @@ describe Sequel::Model, ".plugin" do
   end
   
   it "should raise LoadError if the plugin is not found" do
-    proc{@c.plugin :something_or_other}.should raise_error(LoadError)
+    proc{@c.plugin :something_or_other}.must_raise(LoadError)
   end
   
   it "should store the plugin in .plugins" do
-    @c.plugins.should_not include(@t)
+    @c.plugins.wont_include(@t)
     @c.plugin @t
-    @c.plugins.should include(@t)
+    @c.plugins.must_include(@t)
   end
   
   it "should be inherited in subclasses" do
-    @c.plugins.should_not include(@t)
+    @c.plugins.wont_include(@t)
     c1 = Class.new(@c)
     @c.plugin @t
     c2 = Class.new(@c)
-    @c.plugins.should include(@t)
-    c1.plugins.should_not include(@t)
-    c2.plugins.should include(@t)
+    @c.plugins.must_include(@t)
+    c1.plugins.wont_include(@t)
+    c2.plugins.must_include(@t)
   end
   
   it "should accept a symbol and load the module from the Sequel::Plugins namespace" do
     @c.plugin :timestamped
-    @c.plugins.should include(@t)
+    @c.plugins.must_include(@t)
   end
 
   it "should accept a module" do
     m = Module.new
     @c.plugin m
-    @c.plugins.should include(m)
+    @c.plugins.must_include(m)
   end
 
   it "should not attempt to load a plugin twice" do
-    @c.plugins.should_not include(@t)
+    @c.plugins.wont_include(@t)
     @c.plugin @t
-    @c.plugins.reject{|m| m != @t}.length.should == 1
+    @c.plugins.reject{|m| m != @t}.length.must_equal 1
     @c.plugin @t
-    @c.plugins.reject{|m| m != @t}.length.should == 1
+    @c.plugins.reject{|m| m != @t}.length.must_equal 1
   end
 
   it "should call apply and configure if the plugin responds to it, with the args and block used" do
@@ -86,15 +86,15 @@ describe Sequel::Model, ".plugin" do
     b = lambda{42}
     @c.plugin(m, 123, 1=>2, &b)
     
-    m.args.should == [123, {1=>2}]
-    m.block.should == b
-    m.block_call.should == 42
-    @c.new.blah.should == 43
+    m.args.must_equal [123, {1=>2}]
+    assert_equal b, m.block
+    m.block_call.must_equal 42
+    @c.new.blah.must_equal 43
     
-    m.args2.should == [123, {1=>2}]
-    m.block2.should == b
-    m.block2_call.should == 42
-    @c.new.blag.should == 44
+    m.args2.must_equal [123, {1=>2}]
+    assert_equal b, m.block2
+    m.block2_call.must_equal 42
+    @c.new.blag.must_equal 44
   end
   
   it "should call configure even if the plugin has already been loaded" do
@@ -108,11 +108,11 @@ describe Sequel::Model, ".plugin" do
     
     b = lambda{42}
     @c.plugin(m, 123, 1=>2, &b)
-    m.args.should == [[b, 123, {1=>2}]]
+    m.args.must_equal [[b, 123, {1=>2}]]
     
     b2 = lambda{44}
     @c.plugin(m, 234, 2=>3, &b2)
-    m.args.should == [[b, 123, {1=>2}], [b2, 234, {2=>3}]]
+    m.args.must_equal [[b, 123, {1=>2}], [b2, 234, {2=>3}]]
   end
   
   it "should call things in the following order: apply, ClassMethods, InstanceMethods, DatasetMethods, configure" do
@@ -144,43 +144,43 @@ describe Sequel::Model, ".plugin" do
     
     b = lambda{44}
     @c.plugin(m, 123, 1=>2, &b)
-    m.args.should == [:apply, :cm, :im, :dm, :configure]
+    m.args.must_equal [:apply, :cm, :im, :dm, :configure]
     @c.plugin(m, 234, 2=>3, &b)
-    m.args.should == [:apply, :cm, :im, :dm, :configure, :configure]
+    m.args.must_equal [:apply, :cm, :im, :dm, :configure, :configure]
   end
 
   it "should include an InstanceMethods module in the class if the plugin includes it" do
     @c.plugin @t
     m = @c.new
-    m.should respond_to(:get_stamp)
-    m.should respond_to(:abc)
-    m.abc.should == 123
+    m.must_respond_to(:get_stamp)
+    m.must_respond_to(:abc)
+    m.abc.must_equal 123
     t = Time.now
     m[:stamp] = t
-    m.get_stamp.should == t
+    m.get_stamp.must_equal t
   end
 
   it "should extend the class with a ClassMethods module if the plugin includes it" do
     @c.plugin @t
-    @c.def.should == 234
+    @c.def.must_equal 234
   end
 
   it "should extend the class's dataset with a DatasetMethods module if the plugin includes it" do
     @c.plugin @t
-    @c.dataset.ghi.should == 345
+    @c.dataset.ghi.must_equal 345
   end
 
   it "should save the DatasetMethods module and apply it later if the class doesn't have a dataset" do
     c = Class.new(Sequel::Model)
     c.plugin @t
     c.dataset = DB[:i]
-    c.dataset.ghi.should == 345
+    c.dataset.ghi.must_equal 345
   end
   
   it "should save the DatasetMethods module and apply it later if the class has a dataset" do
     @c.plugin @t
     @c.dataset = DB[:i]
-    @c.dataset.ghi.should == 345
+    @c.dataset.ghi.must_equal 345
   end
 
   it "should not define class methods for private instance methods in DatasetMethod" do
@@ -192,11 +192,11 @@ describe Sequel::Model, ".plugin" do
       end
     end
     @c.plugin m
-    @c.dataset.b.should == 2
-    lambda{@c.dataset.a}.should raise_error(NoMethodError)
-    @c.dataset.send(:a).should == 1
-    lambda{@c.a}.should raise_error(NoMethodError)
-    lambda{@c.send(:a)}.should raise_error(NoMethodError)
+    @c.dataset.b.must_equal 2
+    lambda{@c.dataset.a}.must_raise(NoMethodError)
+    @c.dataset.send(:a).must_equal 1
+    lambda{@c.a}.must_raise(NoMethodError)
+    lambda{@c.send(:a)}.must_raise(NoMethodError)
   end
 
   it "should not raise an error if the DatasetMethod module has no public instance methods" do
@@ -206,24 +206,24 @@ describe Sequel::Model, ".plugin" do
         def a; 1; end
       end
     end
-    lambda{@c.plugin m}.should_not raise_error
+    @c.plugin m
   end
 
   it "should not raise an error if plugin submodule names exist higher up in the namespace hierarchy" do
     class ::ClassMethods; end
     @c.plugin(m = Module.new)
     Object.send(:remove_const, :ClassMethods)
-    @c.plugins.should include(m)
+    @c.plugins.must_include(m)
 
     class ::InstanceMethods; end
     @c.plugin(m = Module.new)
     Object.send(:remove_const, :InstanceMethods)
-    @c.plugins.should include(m)
+    @c.plugins.must_include(m)
 
     class ::DatasetMethods; end
     @c.plugin(m = Module.new)
     Object.send(:remove_const, :DatasetMethods)
-    @c.plugins.should include(m)
+    @c.plugins.must_include(m)
   end
 end
 
@@ -244,7 +244,7 @@ describe Sequel::Plugins do
       end
     end
     @c.plugin m
-    @c.one.should == 1
+    @c.one.must_equal 1
   end
   
   it "should have def_dataset_methods accept an array with multiple methods" do
@@ -262,8 +262,8 @@ describe Sequel::Plugins do
       end
     end
     @c.plugin m
-    @c.one.should == 1
-    @c.two.should == 2
+    @c.one.must_equal 1
+    @c.two.must_equal 2
   end
 
   it "should have inherited_instance_variables add instance variables to copy into the subclass" do
@@ -277,7 +277,7 @@ describe Sequel::Plugins do
       end
     end
     @c.plugin m
-    Class.new(@c).one.should == 1
+    Class.new(@c).one.must_equal 1
   end
   
   it "should have after_set_dataset add a method to call after set_dataset" do
@@ -291,9 +291,9 @@ describe Sequel::Plugins do
       end
     end
     @c.plugin m
-    @c.dataset.opts[:foo].should == nil
+    @c.dataset.opts[:foo].must_equal nil
     @c.set_dataset :blah
-    @c.dataset.opts[:foo].should == 1
+    @c.dataset.opts[:foo].must_equal 1
   end
 end
   

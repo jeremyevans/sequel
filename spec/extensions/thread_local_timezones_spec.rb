@@ -11,33 +11,33 @@ describe "Sequel thread_local_timezones extension" do
   end
   
   it "should allow specifying thread local timezones via thread_*_timezone=" do
-    proc{Sequel.thread_application_timezone = :local}.should_not raise_error
-    proc{Sequel.thread_database_timezone = :utc}.should_not raise_error
-    proc{Sequel.thread_typecast_timezone = nil}.should_not raise_error
+    Sequel.thread_application_timezone = :local
+    Sequel.thread_database_timezone = :utc
+    Sequel.thread_typecast_timezone = nil
   end
     
   it "should use thread local timezone if available" do
     Sequel.thread_application_timezone = :local
-    Sequel.application_timezone.should == :local
+    Sequel.application_timezone.must_equal :local
     Sequel.thread_database_timezone = :utc
-    Sequel.database_timezone.should == :utc
+    Sequel.database_timezone.must_equal :utc
     Sequel.thread_typecast_timezone = nil
-    Sequel.typecast_timezone.should == nil
+    Sequel.typecast_timezone.must_equal nil
   end
   
   it "should fallback to default timezone if no thread_local timezone" do
     Sequel.default_timezone = :utc
-    Sequel.application_timezone.should == :utc
-    Sequel.database_timezone.should == :utc
-    Sequel.typecast_timezone.should == :utc
+    Sequel.application_timezone.must_equal :utc
+    Sequel.database_timezone.must_equal :utc
+    Sequel.typecast_timezone.must_equal :utc
   end
   
   it "should use a nil thread_local_timezone if set instead of falling back to the default timezone if thread_local_timezone is set to :nil" do
     Sequel.typecast_timezone = :utc
     Sequel.thread_typecast_timezone = nil
-    Sequel.typecast_timezone.should == :utc
+    Sequel.typecast_timezone.must_equal :utc
     Sequel.thread_typecast_timezone = :nil
-    Sequel.typecast_timezone.should == nil
+    Sequel.typecast_timezone.must_equal nil
   end
     
   it "should be thread safe" do
@@ -61,7 +61,7 @@ describe "Sequel thread_local_timezones extension" do
     q1.push nil
     t1.join
     t2.join
-    tz1.should == :utc
-    tz2.should == :local
+    tz1.must_equal :utc
+    tz2.must_equal :local
   end
 end

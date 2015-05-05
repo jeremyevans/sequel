@@ -7,11 +7,11 @@ describe "Sequel::Plugins::SkipCreateRefresh" do
     c.db.reset
     c.instance_dataset.meta_def(:insert){|*a| super(*a); 2}
     c.create(:x=>1)
-    c.db.sqls.should == ['INSERT INTO a (x) VALUES (1)', 'SELECT * FROM a WHERE (id = 2) LIMIT 1']
+    c.db.sqls.must_equal ['INSERT INTO a (x) VALUES (1)', 'SELECT * FROM a WHERE (id = 2) LIMIT 1']
 
     c.plugin :skip_create_refresh
     c.db.reset
-    c.create(:x=>3).values.should == {:id=>2, :x=>3}
-    c.db.sqls.should == ['INSERT INTO a (x) VALUES (3)']
+    c.create(:x=>3).values.must_equal(:id=>2, :x=>3)
+    c.db.sqls.must_equal ['INSERT INTO a (x) VALUES (3)']
   end
 end

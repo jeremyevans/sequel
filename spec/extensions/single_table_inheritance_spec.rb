@@ -19,9 +19,9 @@ describe Sequel::Model, "single table inheritance plugin" do
     Object.send(:remove_const, :StiTest)
   end
 
-  specify "should have simple_table = nil" do
-    StiTest.simple_table.should == "sti_tests"
-    StiTestSub1.simple_table.should == nil
+  it "should have simple_table = nil" do
+    StiTest.simple_table.must_equal "sti_tests"
+    StiTestSub1.simple_table.must_equal nil
   end
   
   it "should allow changing the inheritance column via a plugin :single_table_inheritance call" do
@@ -31,31 +31,31 @@ describe Sequel::Model, "single table inheritance plugin" do
     class ::StiTestSub1 < StiTest; end 
     class ::StiTestSub2 < StiTest; end 
     @ds._fetch = [{:blah=>'StiTest'}, {:blah=>'StiTestSub1'}, {:blah=>'StiTestSub2'}]
-    StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
-    StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
-    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub1'))"
-    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub2'))"
+    StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTestSub1, StiTestSub2]
+    StiTest.dataset.sql.must_equal "SELECT * FROM sti_tests"
+    StiTestSub1.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub1'))"
+    StiTestSub2.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub2'))"
   end 
   
   it "should return rows with the correct class based on the polymorphic_key value" do
     @ds._fetch = [{:kind=>'StiTest'}, {:kind=>'StiTestSub1'}, {:kind=>'StiTestSub2'}]
-    StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
+    StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTestSub1, StiTestSub2]
   end 
 
   it "should return rows with the correct class based on the polymorphic_key value when retreiving by primary key" do
     @ds._fetch = [{:kind=>'StiTestSub1'}]
-    StiTest[1].class.should == StiTestSub1
+    StiTest[1].class.must_equal StiTestSub1
   end 
 
   it "should return rows with the correct class for subclasses based on the polymorphic_key value" do
     class ::StiTestSub1Sub < StiTestSub1; end 
     StiTestSub1.dataset._fetch = [{:kind=>'StiTestSub1'}, {:kind=>'StiTestSub1Sub'}]
-    StiTestSub1.all.collect{|x| x.class}.should == [StiTestSub1, StiTestSub1Sub]
+    StiTestSub1.all.collect{|x| x.class}.must_equal [StiTestSub1, StiTestSub1Sub]
   end 
 
   it "should fallback to the main class if the given class does not exist" do
     @ds._fetch = {:kind=>'StiTestSub3'}
-    StiTest.all.collect{|x| x.class}.should == [StiTest]
+    StiTest.all.collect{|x| x.class}.must_equal [StiTest]
   end
 
   it "should fallback to the main class if the sti_key field is empty or nil without calling constantize" do
@@ -66,22 +66,22 @@ describe Sequel::Model, "single table inheritance plugin" do
     end
     StiTest.plugin :single_table_inheritance, :kind
     @ds._fetch = [{:kind=>''}, {:kind=>nil}]
-    StiTest.all.collect{|x| x.class}.should == [StiTest, StiTest]
-    called.should == false
+    StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTest]
+    called.must_equal false
   end
 
   it "should set the model class name when saving" do
     StiTest.new.save
     StiTestSub1.new.save
     StiTestSub2.new.save
-    DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 10)) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 10)) LIMIT 1"]
   end
 
   it "should destroy the model correctly" do
     StiTest.load(:id=>1).destroy
     StiTestSub1.load(:id=>1).destroy
     StiTestSub2.load(:id=>1).destroy
-    DB.sqls.should == ["DELETE FROM sti_tests WHERE id = 1", "DELETE FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 1))", "DELETE FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 1))"]
+    DB.sqls.must_equal ["DELETE FROM sti_tests WHERE id = 1", "DELETE FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 1))", "DELETE FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub2')) AND (id = 1))"]
   end
 
   it "should handle validations on the type column field" do
@@ -89,43 +89,43 @@ describe Sequel::Model, "single table inheritance plugin" do
     def o.validate
       errors.add(:kind, 'not present') unless kind
     end
-    o.valid?.should == true
+    o.valid?.must_equal true
   end
 
   it "should set type column field even if validations are skipped" do
     StiTestSub1.new.save(:validate=>false)
-    DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE ((sti_tests.kind IN ('StiTestSub1')) AND (id = 10)) LIMIT 1"]
   end
 
   it "should override an existing value in the class name field" do
     StiTest.create(:kind=>'StiTestSub1')
-    DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
   end
 
   it "should handle type column with the same name as existing method names" do
     StiTest.plugin :single_table_inheritance, :type
     StiTest.columns :id, :type
     StiTest.create
-    DB.sqls.should == ["INSERT INTO sti_tests (type) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO sti_tests (type) VALUES ('StiTest')", "SELECT * FROM sti_tests WHERE (id = 10) LIMIT 1"]
   end
 
   it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
-    StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
-    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1'))"
-    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2'))"
+    StiTest.dataset.sql.must_equal "SELECT * FROM sti_tests"
+    StiTestSub1.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1'))"
+    StiTestSub2.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2'))"
   end
 
   it "should add a correct filter for multiple levels of subclasses" do
     class ::StiTestSub1A < StiTestSub1; end
-    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1', 'StiTestSub1A'))"
-    StiTestSub1A.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1A'))"
+    StiTestSub1.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1', 'StiTestSub1A'))"
+    StiTestSub1A.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1A'))"
     class ::StiTestSub2A < StiTestSub2; end
-    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2', 'StiTestSub2A'))"
-    StiTestSub2A.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2A'))"
+    StiTestSub2.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2', 'StiTestSub2A'))"
+    StiTestSub2A.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2A'))"
     class ::StiTestSub1B < StiTestSub1A; end
-    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1', 'StiTestSub1A', 'StiTestSub1B'))"
-    StiTestSub1A.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1A', 'StiTestSub1B'))"
-    StiTestSub1B.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1B'))"
+    StiTestSub1.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1', 'StiTestSub1A', 'StiTestSub1B'))"
+    StiTestSub1A.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1A', 'StiTestSub1B'))"
+    StiTestSub1B.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1B'))"
   end
   
   it "should work correctly with the :caching plugin" do
@@ -139,16 +139,16 @@ describe Sequel::Model, "single table inheritance plugin" do
     StiTest.plugin :caching, cache
     def StiTest.cache_key_prefix; "stitest" end
     c2 = Class.new StiTest
-    c2.cache_key(:id).should == StiTest.cache_key(:id)
+    c2.cache_key(:id).must_equal StiTest.cache_key(:id)
 
     obj2 = c2.new
     obj2.values[:x] = 2
     obj2.save
     c2[obj2.id]
-    c2.cache_get_pk(obj2.id).values.should == StiTest.cache_get_pk(obj2.id).values
+    c2.cache_get_pk(obj2.id).values.must_equal StiTest.cache_get_pk(obj2.id).values
     obj2.save
-    c2.cache_get_pk(obj2.id).should == nil
-    StiTest.cache_get_pk(obj2.id).should == nil
+    c2.cache_get_pk(obj2.id).must_equal nil
+    StiTest.cache_get_pk(obj2.id).must_equal nil
   end
 
   describe "with custom options" do
@@ -164,91 +164,91 @@ describe Sequel::Model, "single table inheritance plugin" do
       Object.send(:remove_const, :StiTest4)
     end
 
-    specify "should have working row_proc if using set_dataset in subclass to remove columns" do
+    it "should have working row_proc if using set_dataset in subclass to remove columns" do
       StiTest2.plugin :single_table_inheritance, :kind
       class ::StiTest3 < ::StiTest2
         set_dataset(dataset.select(*(columns - [:blah])))
       end
       class ::StiTest4 < ::StiTest3; end
       StiTest3.dataset._fetch = {:id=>1, :kind=>'StiTest4'}
-      StiTest3[1].should == StiTest4.load(:id=>1, :kind=>'StiTest4')
+      StiTest3[1].must_equal StiTest4.load(:id=>1, :kind=>'StiTest4')
     end
 
     it "should work with custom procs with strings" do
       StiTest2.plugin :single_table_inheritance, :kind, :model_map=>proc{|v| v == 1 ? 'StiTest3' : 'StiTest4'}, :key_map=>proc{|klass| klass.name == 'StiTest3' ? 1 : 2}
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
-      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest4)
-      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
-      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>0).must_be_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>1).must_be_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).must_be_instance_of(StiTest4)
 
-      StiTest2.create.kind.should == 2
-      StiTest3.create.kind.should == 1
-      StiTest4.create.kind.should == 2
+      StiTest2.create.kind.must_equal 2
+      StiTest3.create.kind.must_equal 1
+      StiTest4.create.kind.must_equal 2
     end
 
     it "should work with custom procs with symbols" do
       StiTest2.plugin :single_table_inheritance, :kind, :model_map=>proc{|v| v == 1 ? :StiTest3 : :StiTest4}, :key_map=>proc{|klass| klass.name == 'StiTest3' ? 1 : 2}
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
-      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest4)
-      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
-      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>0).must_be_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>1).must_be_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).must_be_instance_of(StiTest4)
 
-      StiTest2.create.kind.should == 2
-      StiTest3.create.kind.should == 1
-      StiTest4.create.kind.should == 2
+      StiTest2.create.kind.must_equal 2
+      StiTest3.create.kind.must_equal 1
+      StiTest4.create.kind.must_equal 2
     end
 
     it "should work with custom hashes" do
       StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>StiTest2, 1=>:StiTest3, 2=>'StiTest4'}, :key_map=>{StiTest2=>4, 'StiTest3'=>5, 'StiTest4'=>6}
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
-      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest2)
-      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
-      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
-      StiTest3.sti_model_map.should == StiTest2.sti_model_map
+      StiTest2.dataset.row_proc.call(:kind=>0).must_be_instance_of(StiTest2)
+      StiTest2.dataset.row_proc.call(:kind=>1).must_be_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).must_be_instance_of(StiTest4)
+      StiTest3.sti_model_map.must_equal StiTest2.sti_model_map
 
-      StiTest2.create.kind.should == 4
-      StiTest3.create.kind.should == 5
-      StiTest4.create.kind.should == 6
+      StiTest2.create.kind.must_equal 4
+      StiTest3.create.kind.must_equal 5
+      StiTest4.create.kind.must_equal 6
 
       class ::StiTest5 < ::StiTest4; end
-      StiTest5.create.kind.should == nil
+      StiTest5.create.kind.must_equal nil
     end
 
     it "should infer key_map from model_map if provided as a hash" do
       StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>StiTest2, 1=>'StiTest3', 2=>:StiTest4}
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
-      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest2)
-      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
-      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>0).must_be_instance_of(StiTest2)
+      StiTest2.dataset.row_proc.call(:kind=>1).must_be_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).must_be_instance_of(StiTest4)
 
-      StiTest2.create.kind.should == 0
-      StiTest3.create.kind.should == 1
-      StiTest4.create.kind.should == 2
+      StiTest2.create.kind.must_equal 0
+      StiTest3.create.kind.must_equal 1
+      StiTest4.create.kind.must_equal 2
     end
 
     it "should raise exceptions if a bad model value is used" do
       StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>1,1=>1.5, 2=>Date.today}
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
-      proc{StiTest2.dataset.row_proc.call(:kind=>0)}.should raise_error(Sequel::Error)
-      proc{StiTest2.dataset.row_proc.call(:kind=>1)}.should raise_error(Sequel::Error)
-      proc{StiTest2.dataset.row_proc.call(:kind=>2)}.should raise_error(Sequel::Error)
+      proc{StiTest2.dataset.row_proc.call(:kind=>0)}.must_raise(Sequel::Error)
+      proc{StiTest2.dataset.row_proc.call(:kind=>1)}.must_raise(Sequel::Error)
+      proc{StiTest2.dataset.row_proc.call(:kind=>2)}.must_raise(Sequel::Error)
     end
 
     it "should work with non-bijective mappings" do
       StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>'StiTest3', 1=>'StiTest3', 2=>'StiTest4'}
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
-      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest3)
-      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
-      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>0).must_be_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>1).must_be_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).must_be_instance_of(StiTest4)
 
-      [0,1].should include(StiTest3.create.kind)
-      StiTest4.create.kind.should == 2
+      [0,1].must_include(StiTest3.create.kind)
+      StiTest4.create.kind.must_equal 2
     end
 
     it "should work with non-bijective mappings and key map procs" do
@@ -257,9 +257,9 @@ describe Sequel::Model, "single table inheritance plugin" do
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
 
-      StiTest2.dataset.sql.should == "SELECT * FROM sti_test2s"
-      StiTest3.dataset.sql.should == "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (0, 1))"
-      StiTest4.dataset.sql.should == "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (2))"
+      StiTest2.dataset.sql.must_equal "SELECT * FROM sti_test2s"
+      StiTest3.dataset.sql.must_equal "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (0, 1))"
+      StiTest4.dataset.sql.must_equal "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (2))"
     end
 
     it "should create correct sql with non-bijective mappings" do
@@ -267,9 +267,9 @@ describe Sequel::Model, "single table inheritance plugin" do
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
     
-      StiTest2.dataset.sql.should == "SELECT * FROM sti_test2s"
+      StiTest2.dataset.sql.must_equal "SELECT * FROM sti_test2s"
       ["SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (0, 1))",
-       "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (1, 0))"].should include(StiTest3.dataset.sql)
+       "SELECT * FROM sti_test2s WHERE (sti_test2s.kind IN (1, 0))"].must_include(StiTest3.dataset.sql)
     end
 
     it "should destroy the model correctly" do
@@ -279,10 +279,10 @@ describe Sequel::Model, "single table inheritance plugin" do
       StiTest2.load(:id=>1).destroy
       StiTest3.load(:id=>1).destroy
       sqls = DB.sqls
-      sqls.shift.should == "DELETE FROM sti_test2s WHERE id = 1"
+      sqls.shift.must_equal "DELETE FROM sti_test2s WHERE id = 1"
       ["DELETE FROM sti_test2s WHERE ((sti_test2s.kind IN ('sti3', 'sti3b')) AND (id = 1))",
-       "DELETE FROM sti_test2s WHERE ((sti_test2s.kind IN ('sti3b', 'sti3')) AND (id = 1))"].should include(sqls.pop)
-      sqls.should == []
+       "DELETE FROM sti_test2s WHERE ((sti_test2s.kind IN ('sti3b', 'sti3')) AND (id = 1))"].must_include(sqls.pop)
+      sqls.must_equal []
     end
 
     it "should honor a :key_chooser" do
@@ -290,8 +290,8 @@ describe Sequel::Model, "single table inheritance plugin" do
       class ::StiTest3 < ::StiTest2; end
       class ::StiTest4 < ::StiTest2; end
 
-      StiTest3.create.kind.should == 'stitest3'
-      StiTest4.create.kind.should == 'stitest4'
+      StiTest3.create.kind.must_equal 'stitest3'
+      StiTest4.create.kind.must_equal 'stitest4'
     end
   end
 end

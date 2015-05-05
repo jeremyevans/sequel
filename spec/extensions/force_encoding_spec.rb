@@ -9,79 +9,79 @@ describe "force_encoding plugin" do
     @e1 = Encoding.find('UTF-8')
   end
 
-  specify "should force encoding to given encoding on load" do
+  it "should force encoding to given encoding on load" do
     s = 'blah'
     s.force_encoding('US-ASCII')
     o = @c.load(:id=>1, :x=>s)
-    o.x.should == 'blah'
-    o.x.encoding.should == @e1
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal @e1
   end
   
-  specify "should force encoding to given encoding when setting column values" do
+  it "should force encoding to given encoding when setting column values" do
     s = 'blah'
     s.force_encoding('US-ASCII')
     o = @c.new(:x=>s)
-    o.x.should == 'blah'
-    o.x.encoding.should == @e1
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal @e1
   end
   
-  specify "should work correctly when given a frozen string" do
+  it "should work correctly when given a frozen string" do
     s = 'blah'
     s.force_encoding('US-ASCII')
     s.freeze
     o = @c.new(:x=>s)
-    o.x.should == 'blah'
-    o.x.encoding.should == @e1
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal @e1
   end
   
-  specify "should have a forced_encoding class accessor" do
+  it "should have a forced_encoding class accessor" do
     s = 'blah'
     s.force_encoding('US-ASCII')
     @c.forced_encoding = 'Windows-1258'
     o = @c.load(:id=>1, :x=>s)
-    o.x.should == 'blah'
-    o.x.encoding.should == Encoding.find('Windows-1258')
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal Encoding.find('Windows-1258')
   end
   
-  specify "should not force encoding if forced_encoding is nil" do
+  it "should not force encoding if forced_encoding is nil" do
     s = 'blah'
     s.force_encoding('US-ASCII')
     @c.forced_encoding = nil
     o = @c.load(:id=>1, :x=>s)
-    o.x.should == 'blah'
-    o.x.encoding.should == Encoding.find('US-ASCII')
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal Encoding.find('US-ASCII')
   end
   
-  specify "should work correctly when subclassing" do
+  it "should work correctly when subclassing" do
     c = Class.new(@c)
     s = 'blah'
     s.force_encoding('US-ASCII')
     o = c.load(:id=>1, :x=>s)
-    o.x.should == 'blah'
-    o.x.encoding.should == @e1
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal @e1
     
     c.plugin :force_encoding, 'UTF-16LE'
     s = ''
     s.force_encoding('US-ASCII')
     o = c.load(:id=>1, :x=>s)
-    o.x.should == ''
-    o.x.encoding.should == Encoding.find('UTF-16LE')
+    o.x.must_equal ''
+    o.x.encoding.must_equal Encoding.find('UTF-16LE')
     
     @c.plugin :force_encoding, 'UTF-32LE'
     s = ''
     s.force_encoding('US-ASCII')
     o = @c.load(:id=>1, :x=>s)
-    o.x.should == ''
-    o.x.encoding.should == Encoding.find('UTF-32LE')
+    o.x.must_equal ''
+    o.x.encoding.must_equal Encoding.find('UTF-32LE')
     
     s = ''
     s.force_encoding('US-ASCII')
     o = c.load(:id=>1, :x=>s)
-    o.x.should == ''
-    o.x.encoding.should == Encoding.find('UTF-16LE')
+    o.x.must_equal ''
+    o.x.encoding.must_equal Encoding.find('UTF-16LE')
   end
   
-  specify "should work when saving new model instances" do
+  it "should work when saving new model instances" do
     o = @c.new
     ds = DB[:a]
     def ds.first
@@ -91,11 +91,11 @@ describe "force_encoding plugin" do
     end
     @c.dataset = ds
     o.save
-    o.x.should == 'blah'
-    o.x.encoding.should == @e1
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal @e1
   end
   
-  specify "should work when refreshing model instances" do
+  it "should work when refreshing model instances" do
     o = @c.load(:id=>1, :x=>'as')
     ds = DB[:a]
     def ds.first
@@ -105,8 +105,8 @@ describe "force_encoding plugin" do
     end
     @c.dataset = ds
     o.refresh
-    o.x.should == 'blah'
-    o.x.encoding.should == @e1
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal @e1
   end
 end 
 else

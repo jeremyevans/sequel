@@ -5,27 +5,10 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
-require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
-
-RSPEC_EXAMPLE_GROUP.class_eval do
-  if ENV['SEQUEL_DEPRECATION_WARNINGS']
-    class << self
-      alias qspecify specify
-    end
-  else
-    def self.qspecify(*a, &block)
-      specify(*a) do
-        begin
-          output = Sequel::Deprecation.output
-          Sequel::Deprecation.output = false
-          instance_exec(&block)
-        ensure
-          Sequel::Deprecation.output = output 
-        end
-      end
-    end
-  end
-end
+gem 'minitest'
+require 'minitest/autorun'
+require 'minitest/hooks/default'
+FrozenError = RUBY_VERSION < '1.9' ? TypeError : RuntimeError
 
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil

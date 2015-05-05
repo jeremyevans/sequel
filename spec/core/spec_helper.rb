@@ -11,29 +11,15 @@ unless Object.const_defined?('Sequel')
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
-require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
+gem 'minitest'
+require 'minitest/autorun'
+require 'minitest/hooks/default'
+require 'minitest/shared_description'
+FrozenError = RUBY_VERSION < '1.9' ? TypeError : RuntimeError
 
-RSPEC_EXAMPLE_GROUP.class_eval do
+class Minitest::HooksSpec
   def meta_def(obj, name, &block)
     (class << obj; self end).send(:define_method, name, &block)
-  end
-
-  if ENV['SEQUEL_DEPRECATION_WARNINGS']
-    class << self
-      alias qspecify specify
-    end
-  else
-    def self.qspecify(*a, &block)
-      specify(*a) do
-        begin
-          output = Sequel::Deprecation.output
-          Sequel::Deprecation.output = false
-          instance_exec(&block)
-        ensure
-          Sequel::Deprecation.output = output 
-        end
-      end
-    end
   end
 end
 

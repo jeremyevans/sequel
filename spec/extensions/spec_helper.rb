@@ -37,27 +37,11 @@ def skip_warn(s)
   warn "Skipping test of #{s}" if ENV["SKIPPED_TEST_WARN"]
 end
 
-require File.join(File.dirname(File.expand_path(__FILE__)), "../rspec_helper.rb")
-
-RSPEC_EXAMPLE_GROUP.class_eval do
-  if ENV['SEQUEL_DEPRECATION_WARNINGS']
-    class << self
-      alias qspecify specify
-    end
-  else
-    def self.qspecify(*a, &block)
-      specify(*a) do
-        begin
-          output = Sequel::Deprecation.output
-          Sequel::Deprecation.output = false
-          instance_exec(&block)
-        ensure
-          Sequel::Deprecation.output = output 
-        end
-      end
-    end
-  end
-end
+gem 'minitest'
+require 'minitest/autorun'
+require 'minitest/hooks/default'
+require 'minitest/shared_description'
+FrozenError = RUBY_VERSION < '1.9' ? TypeError : RuntimeError
 
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil

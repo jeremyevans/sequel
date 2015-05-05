@@ -8,62 +8,62 @@ describe "Sequel::Model()" do
   it "should return a model subclass with the given dataset if given a dataset" do
     ds = @db[:blah]
     c = Sequel::Model(ds)
-    c.superclass.should == Sequel::Model
-    c.dataset.should == ds
+    c.superclass.must_equal Sequel::Model
+    c.dataset.must_equal ds
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given a Symbol" do
     c = Sequel::Model(:blah)
-    c.superclass.should == Sequel::Model
-    c.db.should == @db
-    c.table_name.should == :blah
+    c.superclass.must_equal Sequel::Model
+    c.db.must_equal @db
+    c.table_name.must_equal :blah
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given a LiteralString" do
     c = Sequel::Model(Sequel.lit('blah'))
-    c.superclass.should == Sequel::Model
-    c.db.should == @db
-    c.table_name.should == Sequel.lit('blah')
+    c.superclass.must_equal Sequel::Model
+    c.db.must_equal @db
+    c.table_name.must_equal Sequel.lit('blah')
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given an SQL::Identifier" do
     c = Sequel::Model(Sequel.identifier(:blah))
-    c.superclass.should == Sequel::Model
-    c.db.should == @db
-    c.table_name.should == Sequel.identifier(:blah)
+    c.superclass.must_equal Sequel::Model
+    c.db.must_equal @db
+    c.table_name.must_equal Sequel.identifier(:blah)
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given an SQL::QualifiedIdentifier" do
     c = Sequel::Model(Sequel.qualify(:boo, :blah))
-    c.superclass.should == Sequel::Model
-    c.db.should == @db
-    c.table_name.should == Sequel.qualify(:boo, :blah)
+    c.superclass.must_equal Sequel::Model
+    c.db.must_equal @db
+    c.table_name.must_equal Sequel.qualify(:boo, :blah)
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given an SQL::AliasedExpression" do
     c = Sequel::Model(Sequel.as(:blah, :boo))
-    c.superclass.should == Sequel::Model
-    c.db.should == @db
-    c.table_name.should == :boo
+    c.superclass.must_equal Sequel::Model
+    c.db.must_equal @db
+    c.table_name.must_equal :boo
   end
 
   it "should return a model subclass with the given dataset if given a dataset using an SQL::Identifier" do
     ds = @db[Sequel.identifier(:blah)]
     c = Sequel::Model(ds)
-    c.superclass.should == Sequel::Model
-    c.dataset.should == ds
+    c.superclass.must_equal Sequel::Model
+    c.dataset.must_equal ds
   end
 
   it "should return a model subclass associated to the given database if given a database" do
     db = Sequel.mock
     c = Sequel::Model(db)
-    c.superclass.should == Sequel::Model
-    c.db.should == db
-    proc{c.dataset}.should raise_error(Sequel::Error)
+    c.superclass.must_equal Sequel::Model
+    c.db.must_equal db
+    proc{c.dataset}.must_raise(Sequel::Error)
     class SmBlahTest < c
     end
-    SmBlahTest.db.should == db
-    SmBlahTest.table_name.should == :sm_blah_tests
+    SmBlahTest.db.must_equal db
+    SmBlahTest.table_name.must_equal :sm_blah_tests
   end
 
   describe "reloading" do
@@ -76,59 +76,43 @@ describe "Sequel::Model()" do
     end
 
     it "should work without raising an exception with a symbol" do
-      proc do
-        class ::Album < Sequel::Model(:table); end
-        class ::Album < Sequel::Model(:table); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(:table); end
+      class ::Album < Sequel::Model(:table); end
     end
 
     it "should work without raising an exception with an SQL::Identifier " do
-      proc do
-        class ::Album < Sequel::Model(Sequel.identifier(:table)); end
-        class ::Album < Sequel::Model(Sequel.identifier(:table)); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(Sequel.identifier(:table)); end
+      class ::Album < Sequel::Model(Sequel.identifier(:table)); end
     end
 
     it "should work without raising an exception with an SQL::QualifiedIdentifier " do
-      proc do
-        class ::Album < Sequel::Model(Sequel.qualify(:schema, :table)); end
-        class ::Album < Sequel::Model(Sequel.qualify(:schema, :table)); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(Sequel.qualify(:schema, :table)); end
+      class ::Album < Sequel::Model(Sequel.qualify(:schema, :table)); end
     end
 
     it "should work without raising an exception with an SQL::AliasedExpression" do
-      proc do
-        class ::Album < Sequel::Model(Sequel.as(:table, :alias)); end
-        class ::Album < Sequel::Model(Sequel.as(:table, :alias)); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(Sequel.as(:table, :alias)); end
+      class ::Album < Sequel::Model(Sequel.as(:table, :alias)); end
     end
 
     it "should work without raising an exception with an LiteralString" do
-      proc do
-        class ::Album < Sequel::Model(Sequel.lit('table')); end
-        class ::Album < Sequel::Model(Sequel.lit('table')); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(Sequel.lit('table')); end
+      class ::Album < Sequel::Model(Sequel.lit('table')); end
     end
 
     it "should work without raising an exception with a database" do
-      proc do
-        class ::Album < Sequel::Model(@db); end
-        class ::Album < Sequel::Model(@db); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(@db); end
+      class ::Album < Sequel::Model(@db); end
     end
 
     it "should work without raising an exception with a dataset" do
-      proc do
-        class ::Album < Sequel::Model(@db[:table]); end
-        class ::Album < Sequel::Model(@db[:table]); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(@db[:table]); end
+      class ::Album < Sequel::Model(@db[:table]); end
     end
 
     it "should work without raising an exception with a dataset with an SQL::Identifier" do
-      proc do
-        class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
-        class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
-      end.should_not raise_error
+      class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
+      class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
     end
 
     it "should raise an exception if anonymous model caching is disabled" do
@@ -136,31 +120,31 @@ describe "Sequel::Model()" do
       proc do
         class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
         class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
-      end.should raise_error
+      end.must_raise TypeError
     end
   end
 end
 
 describe Sequel::Model do
   it "should have class method aliased as model" do
-    Sequel::Model.instance_methods.collect{|x| x.to_s}.should include("model")
+    Sequel::Model.instance_methods.collect{|x| x.to_s}.must_include("model")
 
     model_a = Class.new(Sequel::Model(:items))
-    model_a.new.model.should be(model_a)
+    model_a.new.model.wont_be_nil
   end
 
   it "should be associated with a dataset" do
     model_a = Class.new(Sequel::Model) { set_dataset DB[:as] }
 
-    model_a.dataset.should be_a_kind_of(Sequel::Mock::Dataset)
-    model_a.dataset.opts[:from].should == [:as]
+    model_a.dataset.must_be_kind_of(Sequel::Mock::Dataset)
+    model_a.dataset.opts[:from].must_equal [:as]
 
     model_b = Class.new(Sequel::Model) { set_dataset DB[:bs] }
 
-    model_b.dataset.should be_a_kind_of(Sequel::Mock::Dataset)
-    model_b.dataset.opts[:from].should == [:bs]
+    model_b.dataset.must_be_kind_of(Sequel::Mock::Dataset)
+    model_b.dataset.opts[:from].must_equal [:bs]
 
-    model_a.dataset.opts[:from].should == [:as]
+    model_a.dataset.opts[:from].must_equal [:as]
   end
 end
 
@@ -170,71 +154,71 @@ describe Sequel::Model do
   end
 
   it "has table_name return name of table" do
-    @model.table_name.should == :items
+    @model.table_name.must_equal :items
   end
 
   it "defaults to primary key of id" do
-    @model.primary_key.should == :id
+    @model.primary_key.must_equal :id
   end
 
   it "allow primary key change" do
     @model.set_primary_key :ssn
-    @model.primary_key.should == :ssn
+    @model.primary_key.must_equal :ssn
   end
 
   it "allows dataset change" do
     @model.set_dataset(DB[:foo])
-    @model.table_name.should == :foo
+    @model.table_name.must_equal :foo
   end
 
   it "allows set_dataset to accept a Symbol" do
     @model.db = DB
     @model.set_dataset(:foo)
-    @model.table_name.should == :foo
+    @model.table_name.must_equal :foo
   end
 
   it "allows set_dataset to accept a LiteralString" do
     @model.db = DB
     @model.set_dataset(Sequel.lit('foo'))
-    @model.table_name.should == Sequel.lit('foo')
+    @model.table_name.must_equal Sequel.lit('foo')
   end
 
   it "allows set_dataset to acceptan SQL::Identifier" do
     @model.db = DB
     @model.set_dataset(Sequel.identifier(:foo))
-    @model.table_name.should == Sequel.identifier(:foo)
+    @model.table_name.must_equal Sequel.identifier(:foo)
   end
 
   it "allows set_dataset to acceptan SQL::QualifiedIdentifier" do
     @model.db = DB
     @model.set_dataset(Sequel.qualify(:bar, :foo))
-    @model.table_name.should == Sequel.qualify(:bar, :foo)
+    @model.table_name.must_equal Sequel.qualify(:bar, :foo)
   end
 
   it "allows set_dataset to acceptan SQL::AliasedExpression" do
     @model.db = DB
     @model.set_dataset(Sequel.as(:foo, :bar))
-    @model.table_name.should == :bar
+    @model.table_name.must_equal :bar
   end
 
   it "table_name should respect table aliases" do
     @model.set_dataset(:foo___x)
-    @model.table_name.should == :x
+    @model.table_name.must_equal :x
   end
   
   it "set_dataset should raise an error unless given a Symbol or Dataset" do
-    proc{@model.set_dataset(Object.new)}.should raise_error(Sequel::Error)
+    proc{@model.set_dataset(Object.new)}.must_raise(Sequel::Error)
   end
 
   it "set_dataset should add the destroy method to the dataset that destroys each object" do
     ds = DB[:foo]
-    ds.should_not respond_to(:destroy)
+    ds.wont_respond_to(:destroy)
     @model.set_dataset(ds)
-    ds.should respond_to(:destroy)
+    ds.must_respond_to(:destroy)
     DB.sqls
     ds._fetch = [{:id=>1}, {:id=>2}]
-    ds.destroy.should == 2
-    DB.sqls.should == ["SELECT * FROM foo", "DELETE FROM foo WHERE id = 1", "DELETE FROM foo WHERE id = 2"]
+    ds.destroy.must_equal 2
+    DB.sqls.must_equal ["SELECT * FROM foo", "DELETE FROM foo WHERE id = 1", "DELETE FROM foo WHERE id = 2"]
   end
 
   it "set_dataset should add the destroy method that respects sharding with transactions" do
@@ -243,34 +227,34 @@ describe Sequel::Model do
     @model.use_transactions = true
     @model.set_dataset(ds)
     db.sqls
-    ds.destroy.should == 0
-    db.sqls.should == ["BEGIN -- s1", "SELECT * FROM foo -- s1", "COMMIT -- s1"]
+    ds.destroy.must_equal 0
+    db.sqls.must_equal ["BEGIN -- s1", "SELECT * FROM foo -- s1", "COMMIT -- s1"]
   end
 
   it "should raise an error on set_dataset if there is an error connecting to the database" do
     def @model.columns() raise Sequel::DatabaseConnectionError end
-    proc{@model.set_dataset(Sequel::Database.new[:foo].join(:blah))}.should raise_error
+    proc{@model.set_dataset(Sequel::Database.new[:foo].join(:blah))}.must_raise Sequel::DatabaseConnectionError
   end
 
   it "should not raise an error if there is a problem getting the columns for a dataset" do
     def @model.columns() raise Sequel::Error end
-    proc{@model.set_dataset(DB[:foo].join(:blah))}.should_not raise_error
+    @model.set_dataset(DB[:foo].join(:blah))
   end
 
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
     def @model.get_db_schema(*) raise Sequel::Error end
-    proc{@model.set_dataset(DB[:foo])}.should_not raise_error
+    @model.set_dataset(DB[:foo])
   end
 
   it "doesn't raise an error on inherited if there is an error setting the dataset" do
     def @model.set_dataset(*) raise Sequel::Error end
-    proc{Class.new(@model)}.should_not raise_error
+    Class.new(@model)
   end
 
   it "should raise if bad inherited instance variable value is used" do
     def @model.inherited_instance_variables() super.merge(:@a=>:foo) end
     @model.instance_eval{@a=1}
-    proc{Class.new(@model)}.should raise_error(Sequel::Error)
+    proc{Class.new(@model)}.must_raise(Sequel::Error)
   end
 
   it "copy inherited instance variables into subclass if set" do
@@ -279,10 +263,10 @@ describe Sequel::Model do
     m = Class.new(@model)
     @model.instance_eval{@a=5; @b << 6; @c[3] << 7; @c[8] = [9]; @d=40}
     m.instance_eval do
-      @a.should == 1
-      @b.should == [2]
-      @c.should == {3=>[4]}
-      @d.should == 20
+      @a.must_equal 1
+      @b.must_equal [2]
+      @c.must_equal(3=>[4])
+      @d.must_equal 20
     end
   end
 end
@@ -295,38 +279,38 @@ describe Sequel::Model, "constructors" do
 
   it "should accept a hash" do
     m = @m.new(:a => 1, :b => 2)
-    m.values.should == {:a => 1, :b => 2}
-    m.should be_new
+    m.values.must_equal(:a => 1, :b => 2)
+    m.must_be :new?
   end
   
   it "should accept a block and yield itself to the block" do
     block_called = false
-    m = @m.new {|i| block_called = true; i.should be_a_kind_of(@m); i.values[:a] = 1}
+    m = @m.new {|i| block_called = true; i.must_be_kind_of(@m); i.values[:a] = 1}
     
-    block_called.should == true
-    m.values[:a].should == 1
+    block_called.must_equal true
+    m.values[:a].must_equal 1
   end
   
   it "should have dataset row_proc create an existing object" do
     @m.dataset = Sequel.mock.dataset
     o = @m.dataset.row_proc.call(:a=>1)
-    o.should be_a_kind_of(@m)
-    o.values.should == {:a=>1}
-    o.new?.should == false
+    o.must_be_kind_of(@m)
+    o.values.must_equal(:a=>1)
+    o.new?.must_equal false
   end
   
   it "should have .call create an existing object" do
     o = @m.call(:a=>1)
-    o.should be_a_kind_of(@m)
-    o.values.should == {:a=>1}
-    o.new?.should == false
+    o.must_be_kind_of(@m)
+    o.values.must_equal(:a=>1)
+    o.new?.must_equal false
   end
   
   it "should have .load create an existing object" do
     o = @m.load(:a=>1)
-    o.should be_a_kind_of(@m)
-    o.values.should == {:a=>1}
-    o.new?.should == false
+    o.must_be_kind_of(@m)
+    o.values.must_equal(:a=>1)
+    o.new?.must_equal false
   end
 end
 
@@ -340,14 +324,14 @@ describe Sequel::Model, "new" do
 
   it "should be marked as new?" do
     o = @m.new
-    o.should be_new
+    o.must_be :new?
   end
 
   it "should not be marked as new? once it is saved" do
     o = @m.new(:x => 1)
-    o.should be_new
+    o.must_be :new?
     o.save
-    o.should_not be_new
+    o.wont_be :new?
   end
 
   it "should use the last inserted id as primary key if not in values" do
@@ -356,11 +340,11 @@ describe Sequel::Model, "new" do
 
     o = @m.new(:x => 1)
     o.save
-    o.id.should == 1234
+    o.id.must_equal 1234
 
     o = @m.load(:x => 1, :id => 333)
     o.save
-    o.id.should == 333
+    o.id.must_equal 333
   end
 end
 
@@ -370,27 +354,27 @@ describe Sequel::Model, ".subset" do
     DB.reset
   end
 
-  specify "should create a filter on the underlying dataset" do
-    proc {@c.new_only}.should raise_error(NoMethodError)
+  it "should create a filter on the underlying dataset" do
+    proc {@c.new_only}.must_raise(NoMethodError)
     
     @c.subset(:new_only){age < 'new'}
     
-    @c.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
-    @c.dataset.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
+    @c.new_only.sql.must_equal "SELECT * FROM items WHERE (age < 'new')"
+    @c.dataset.new_only.sql.must_equal "SELECT * FROM items WHERE (age < 'new')"
     
     @c.subset(:pricey){price > 100}
     
-    @c.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
-    @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
+    @c.pricey.sql.must_equal "SELECT * FROM items WHERE (price > 100)"
+    @c.dataset.pricey.sql.must_equal "SELECT * FROM items WHERE (price > 100)"
     
-    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE ((price > 100) AND (age < 'new'))"
-    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age < 'new') AND (price > 100))"
+    @c.pricey.new_only.sql.must_equal "SELECT * FROM items WHERE ((price > 100) AND (age < 'new'))"
+    @c.new_only.pricey.sql.must_equal "SELECT * FROM items WHERE ((age < 'new') AND (price > 100))"
   end
 
-  specify "should not override existing model methods" do
+  it "should not override existing model methods" do
     def @c.active() true end
     @c.subset(:active, :active)
-    @c.active.should == true
+    @c.active.must_equal true
   end
 end
 
@@ -402,19 +386,19 @@ describe Sequel::Model, ".find" do
   end
   
   it "should return the first record matching the given filter" do
-    @c.find(:name => 'sharon').should be_a_kind_of(@c)
-    DB.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
+    @c.find(:name => 'sharon').must_be_kind_of(@c)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"]
 
-    @c.find(Sequel.expr(:name).like('abc%')).should be_a_kind_of(@c)
-    DB.sqls.should == ["SELECT * FROM items WHERE (name LIKE 'abc%' ESCAPE '\\') LIMIT 1"]
+    @c.find(Sequel.expr(:name).like('abc%')).must_be_kind_of(@c)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (name LIKE 'abc%' ESCAPE '\\') LIMIT 1"]
   end
   
-  specify "should accept filter blocks" do
-    @c.find{id > 1}.should be_a_kind_of(@c)
-    DB.sqls.should == ["SELECT * FROM items WHERE (id > 1) LIMIT 1"]
+  it "should accept filter blocks" do
+    @c.find{id > 1}.must_be_kind_of(@c)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (id > 1) LIMIT 1"]
 
-    @c.find{(x > 1) & (y < 2)}.should be_a_kind_of(@c)
-    DB.sqls.should == ["SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"]
+    @c.find{(x > 1) & (y < 2)}.must_be_kind_of(@c)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"]
   end
 end
 
@@ -432,71 +416,71 @@ describe Sequel::Model, ".finder" do
     @db.sqls
   end
 
-  specify "should create a method that calls the method given and returns the first instance" do
+  it "should create a method that calls the method given and returns the first instance" do
     @c.finder :foo
-    @c.first_foo(1, 2).should == @o
-    @c.first_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
+    @c.first_foo(1, 2).must_equal @o
+    @c.first_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
   end
 
-  specify "should work correctly when subclassing" do
+  it "should work correctly when subclassing" do
     @c.finder(:foo)
     @sc = Class.new(@c)
     @sc.set_dataset :foos
     @db.sqls
-    @sc.first_foo(1, 2).should == @sc.load(@h)
-    @sc.first_foo(3, 4).should == @sc.load(@h)
-    @db.sqls.should == ["SELECT * FROM foos WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
+    @sc.first_foo(1, 2).must_equal @sc.load(@h)
+    @sc.first_foo(3, 4).must_equal @sc.load(@h)
+    @db.sqls.must_equal ["SELECT * FROM foos WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
   end
 
-  specify "should work correctly when dataset is modified" do
+  it "should work correctly when dataset is modified" do
     @c.finder(:foo)
-    @c.first_foo(1, 2).should == @o
+    @c.first_foo(1, 2).must_equal @o
     @c.set_dataset :foos
-    @c.first_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
+    @c.first_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
   end
 
-  specify "should create a method based on the given block if no method symbol provided" do
+  it "should create a method based on the given block if no method symbol provided" do
     @c.finder(:name=>:first_foo){|pl, ds| ds.where(pl.arg).limit(1)}
-    @c.first_foo(:id=>1).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    @c.first_foo(:id=>1).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
 
-  specify "should raise an error if both a block and method symbol given" do
-    proc{@c.finder(:foo, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.should raise_error(Sequel::Error)
+  it "should raise an error if both a block and method symbol given" do
+    proc{@c.finder(:foo, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
   end
 
-  specify "should raise an error if two option hashes are provided" do
-    proc{@c.finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.should raise_error(Sequel::Error)
+  it "should raise an error if two option hashes are provided" do
+    proc{@c.finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
   end
 
-  specify "should support :type option" do
+  it "should support :type option" do
     @c.finder :foo, :type=>:all
     @c.finder :foo, :type=>:each
     @c.finder :foo, :type=>:get
 
     a = []
-    @c.all_foo(1, 2){|r| a << r}.should == [@o]
-    a.should == [@o]
+    @c.all_foo(1, 2){|r| a << r}.must_equal [@o]
+    a.must_equal [@o]
    
     a = []
     @c.each_foo(3, 4){|r| a << r}
-    a.should == [@o]
+    a.must_equal [@o]
 
-    @c.get_foo(5, 6).should == [:id, 1]
+    @c.get_foo(5, 6).must_equal [:id, 1]
 
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4", "SELECT * FROM items WHERE (bar = 5) ORDER BY 6 LIMIT 1"]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4", "SELECT * FROM items WHERE (bar = 5) ORDER BY 6 LIMIT 1"]
   end
 
-  specify "should support :name option" do
+  it "should support :name option" do
     @c.finder :foo, :name=>:find_foo
-    @c.find_foo(1, 2).should == @o
-    @c.find_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
+    @c.find_foo(1, 2).must_equal @o
+    @c.find_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
   end
 
-  specify "should support :arity option" do
+  it "should support :arity option" do
     def @c.foobar(*b)
       ds = dataset
       b.each_with_index do |a, i|
@@ -508,23 +492,23 @@ describe Sequel::Model, ".finder" do
     @c.finder :foobar, :arity=>2, :name=>:find_foobar_2
     @c.find_foobar_1(:a)
     @c.find_foobar_2(:a, :b)
-    @db.sqls.should == ["SELECT * FROM items WHERE (0 = a) LIMIT 1", "SELECT * FROM items WHERE ((0 = a) AND (1 = b)) LIMIT 1"]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (0 = a) LIMIT 1", "SELECT * FROM items WHERE ((0 = a) AND (1 = b)) LIMIT 1"]
   end
 
-  specify "should support :mod option" do
+  it "should support :mod option" do
     m = Module.new
     @c.finder :foo, :mod=>m
-    proc{@c.first_foo}.should raise_error
+    proc{@c.first_foo}.must_raise NoMethodError
     @c.extend m
-    @c.first_foo(1, 2).should == @o
-    @c.first_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
+    @c.first_foo(1, 2).must_equal @o
+    @c.first_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1"]
   end
 
-  specify "should raise error when calling with the wrong arity" do
+  it "should raise error when calling with the wrong arity" do
     @c.finder :foo
-    proc{@c.first_foo(1)}.should raise_error
-    proc{@c.first_foo(1,2,3)}.should raise_error
+    proc{@c.first_foo(1)}.must_raise Sequel::Error
+    proc{@c.first_foo(1,2,3)}.must_raise Sequel::Error
   end
 end
 
@@ -549,68 +533,68 @@ describe Sequel::Model, ".prepared_finder" do
     @db.sqls
   end
 
-  specify "should create a method that calls the method given and returns the first instance" do
+  it "should create a method that calls the method given and returns the first instance" do
     @c.prepared_finder :foo
-    @c.first_foo(1, 2).should == @o
-    @c.first_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+    @c.first_foo(1, 2).must_equal @o
+    @c.first_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
   end
 
-  specify "should work correctly when subclassing" do
+  it "should work correctly when subclassing" do
     @c.prepared_finder(:foo)
     @sc = Class.new(@c)
     @sc.set_dataset :foos
     @db.sqls
-    @sc.first_foo(1, 2).should == @sc.load(@h)
-    @sc.first_foo(3, 4).should == @sc.load(@h)
-    @db.sqls.should == ["SELECT * FROM foos WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+    @sc.first_foo(1, 2).must_equal @sc.load(@h)
+    @sc.first_foo(3, 4).must_equal @sc.load(@h)
+    @db.sqls.must_equal ["SELECT * FROM foos WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
   end
 
-  specify "should work correctly when dataset is modified" do
+  it "should work correctly when dataset is modified" do
     @c.prepared_finder(:foo)
-    @c.first_foo(1, 2).should == @o
+    @c.first_foo(1, 2).must_equal @o
     @c.set_dataset :foos
-    @c.first_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+    @c.first_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM foos LIMIT 1", "SELECT * FROM foos WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
   end
 
-  specify "should create a method based on the given block if no method symbol provided" do
+  it "should create a method based on the given block if no method symbol provided" do
     @c.prepared_finder(:name=>:first_foo){|a1| where(:id=>a1).limit(1)}
-    @c.first_foo(1).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1 -- prepared"]
+    @c.first_foo(1).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1 -- prepared"]
   end
 
-  specify "should raise an error if both a block and method symbol given" do
-    proc{@c.prepared_finder(:foo, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.should raise_error(Sequel::Error)
+  it "should raise an error if both a block and method symbol given" do
+    proc{@c.prepared_finder(:foo, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
   end
 
-  specify "should raise an error if two option hashes are provided" do
-    proc{@c.prepared_finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.should raise_error(Sequel::Error)
+  it "should raise an error if two option hashes are provided" do
+    proc{@c.prepared_finder({:name2=>:foo}, :name=>:first_foo){|pl, ds| ds.where(pl.arg)}}.must_raise(Sequel::Error)
   end
 
-  specify "should support :type option" do
+  it "should support :type option" do
     @c.prepared_finder :foo, :type=>:all
     @c.prepared_finder :foo, :type=>:each
 
     a = []
-    @c.all_foo(1, 2){|r| a << r}.should == [@o]
-    a.should == [@o]
+    @c.all_foo(1, 2){|r| a << r}.must_equal [@o]
+    a.must_equal [@o]
    
     a = []
     @c.each_foo(3, 4){|r| a << r}
-    a.should == [@o]
+    a.must_equal [@o]
 
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 -- prepared"]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 -- prepared"]
   end
 
-  specify "should support :name option" do
+  it "should support :name option" do
     @c.prepared_finder :foo, :name=>:find_foo
-    @c.find_foo(1, 2).should == @o
-    @c.find_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+    @c.find_foo(1, 2).must_equal @o
+    @c.find_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
   end
 
-  specify "should support :arity option" do
+  it "should support :arity option" do
     def @c.foobar(*b)
       ds = dataset
       b.each_with_index do |a, i|
@@ -622,24 +606,24 @@ describe Sequel::Model, ".prepared_finder" do
     @c.prepared_finder :foobar, :arity=>2, :name=>:find_foobar_2
     @c.find_foobar_1(:a)
     @c.find_foobar_2(:a, :b)
-    @db.sqls.should == ["SELECT * FROM items WHERE (0 = a) LIMIT 1 -- prepared", "SELECT * FROM items WHERE ((0 = a) AND (1 = b)) LIMIT 1 -- prepared"]
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (0 = a) LIMIT 1 -- prepared", "SELECT * FROM items WHERE ((0 = a) AND (1 = b)) LIMIT 1 -- prepared"]
   end
 
-  specify "should support :mod option" do
+  it "should support :mod option" do
     m = Module.new
     @c.prepared_finder :foo, :mod=>m
-    proc{@c.first_foo}.should raise_error
+    proc{@c.first_foo}.must_raise NoMethodError
     @c.extend m
-    @c.first_foo(1, 2).should == @o
-    @c.first_foo(3, 4).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
+    @c.first_foo(1, 2).must_equal @o
+    @c.first_foo(3, 4).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4 LIMIT 1 -- prepared"]
   end
 
-  specify "should handle models with names" do
+  it "should handle models with names" do
     def @c.name; 'foobar' end
     @c.prepared_finder :foo
-    @c.first_foo(1, 2).should == @o
-    @db.sqls.should == ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared"]
+    @c.first_foo(1, 2).must_equal @o
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2 LIMIT 1 -- prepared"]
   end
 end
 
@@ -650,13 +634,13 @@ describe Sequel::Model, ".fetch" do
   end
   
   it "should return instances of Model" do
-    @c.fetch("SELECT * FROM items").first.should be_a_kind_of(@c)
+    @c.fetch("SELECT * FROM items").first.must_be_kind_of(@c)
   end
 
   it "should return true for .empty? and not raise an error on empty selection" do
     rows = @c.fetch("SELECT * FROM items WHERE FALSE")
     @c.send(:define_method, :fetch_rows){|sql| yield({:count => 0})}
-    proc {rows.empty?}.should_not raise_error
+    rows.empty?
   end
 end
 
@@ -673,15 +657,15 @@ describe Sequel::Model, ".find_or_create" do
   it "should find the record" do
     @db.fetch = [{:x=>1, :id=>1}]
     @db.autoid = 1
-    @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
-    @db.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
+    @c.find_or_create(:x => 1).must_equal @c.load(:x=>1, :id=>1)
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
   end
   
   it "should create the record if not found" do
     @db.fetch = [[], {:x=>1, :id=>1}]
     @db.autoid = 1
-    @c.find_or_create(:x => 1).should == @c.load(:x=>1, :id=>1)
-    @db.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
+    @c.find_or_create(:x => 1).must_equal @c.load(:x=>1, :id=>1)
+    @db.sqls.must_equal ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
       "INSERT INTO items (x) VALUES (1)",
       "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
@@ -689,18 +673,18 @@ describe Sequel::Model, ".find_or_create" do
   it "should pass the new record to be created to the block if no record is found" do
     @db.fetch = [[], {:x=>1, :id=>1}]
     @db.autoid = 1
-    @c.find_or_create(:x => 1){|x| x[:y] = 2}.should == @c.load(:x=>1, :id=>1)
+    @c.find_or_create(:x => 1){|x| x[:y] = 2}.must_equal @c.load(:x=>1, :id=>1)
     sqls = @db.sqls
-    sqls.first.should == "SELECT * FROM items WHERE (x = 1) LIMIT 1"
-    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(sqls[1])
-    sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+    sqls.first.must_equal "SELECT * FROM items WHERE (x = 1) LIMIT 1"
+    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].must_include(sqls[1])
+    sqls.last.must_equal "SELECT * FROM items WHERE (id = 1) LIMIT 1"
   end
 end
 
 describe Sequel::Model, ".all" do
   it "should return all records in the dataset" do
     c = Class.new(Sequel::Model(:items))
-    c.all.should == [c.load(:x=>1, :id=>1)]
+    c.all.must_equal [c.load(:x=>1, :id=>1)]
   end
 end
 
@@ -715,26 +699,26 @@ describe Sequel::Model, "A model class without a primary key" do
 
   it "should be able to insert records without selecting them back" do
     i = nil
-    proc {i = @c.create(:x => 1)}.should_not raise_error
-    i.class.should be(@c)
-    i.values.to_hash.should == {:x => 1}
+    i = @c.create(:x => 1)
+    i.class.wont_be_nil
+    i.values.to_hash.must_equal(:x => 1)
 
-    DB.sqls.should == ['INSERT INTO items (x) VALUES (1)']
+    DB.sqls.must_equal ['INSERT INTO items (x) VALUES (1)']
   end
 
   it "should raise when deleting" do
-    proc{@c.load(:x=>1).delete}.should raise_error
+    proc{@c.load(:x=>1).delete}.must_raise Sequel::Error
   end
 
   it "should raise when updating" do
-    proc{@c.load(:x=>1).update(:x=>2)}.should raise_error
+    proc{@c.load(:x=>1).update(:x=>2)}.must_raise Sequel::Error
   end
 
   it "should insert a record when saving" do
     o = @c.new(:x => 2)
-    o.should be_new
+    o.must_be :new?
     o.save
-    DB.sqls.should == ['INSERT INTO items (x) VALUES (2)']
+    DB.sqls.must_equal ['INSERT INTO items (x) VALUES (2)']
   end
 end
 
@@ -752,20 +736,20 @@ describe Sequel::Model, "attribute accessors" do
 
   it "should be created on set_dataset" do
     %w'x z x= z='.each do |x|
-      @c.instance_methods.collect{|z| z.to_s}.should_not include(x)
+      @c.instance_methods.collect{|z| z.to_s}.wont_include(x)
     end
     @c.set_dataset(@dataset)
     %w'x z x= z='.each do |x|
-      @c.instance_methods.collect{|z| z.to_s}.should include(x)
+      @c.instance_methods.collect{|z| z.to_s}.must_include(x)
     end
     o = @c.new
     %w'x z x= z='.each do |x|
-      o.methods.collect{|z| z.to_s}.should include(x)
+      o.methods.collect{|z| z.to_s}.must_include(x)
     end
 
-    o.x.should be_nil
+    o.x.must_equal nil
     o.x = 34
-    o.x.should == 34
+    o.x.must_equal 34
   end
 
   it "should be only accept one argument for the write accessor" do
@@ -773,9 +757,9 @@ describe Sequel::Model, "attribute accessors" do
     o = @c.new
 
     o.x = 34
-    o.x.should == 34
-    proc{o.send(:x=)}.should raise_error
-    proc{o.send(:x=, 3, 4)}.should raise_error
+    o.x.must_equal 34
+    proc{o.send(:x=)}.must_raise ArgumentError
+    proc{o.send(:x=, 3, 4)}.must_raise ArgumentError
   end
 
   it "should have a working typecasting setter even if the column is not selected" do
@@ -783,7 +767,7 @@ describe Sequel::Model, "attribute accessors" do
     o = @c.new
 
     o.x = '34'
-    o.x.should == 34
+    o.x.must_equal 34
   end
 
   it "should typecast if the new value is the same as the existing but has a different class" do
@@ -792,9 +776,9 @@ describe Sequel::Model, "attribute accessors" do
 
     o.x = 34
     o.x = 34.0
-    o.x.should == 34.0
+    o.x.must_equal 34.0
     o.x = 34
-    o.x.should == 34
+    o.x.must_equal 34
   end
 end
 
@@ -806,42 +790,42 @@ describe Sequel::Model, ".[]" do
   end
 
   it "should return the first record for the given pk" do
-    @c[1].should == @c.load(:name => 'sharon', :id => 1)
-    DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
-    @c[9999].should == @c.load(:name => 'sharon', :id => 1)
-    DB.sqls.should == ["SELECT * FROM items WHERE id = 9999"]
+    @c[1].must_equal @c.load(:name => 'sharon', :id => 1)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE id = 1"]
+    @c[9999].must_equal @c.load(:name => 'sharon', :id => 1)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE id = 9999"]
   end
 
   it "should have #[] return nil if no rows match" do
     @c.dataset._fetch = []
-    @c[1].should == nil
-    DB.sqls.should == ["SELECT * FROM items WHERE id = 1"]
+    @c[1].must_equal nil
+    DB.sqls.must_equal ["SELECT * FROM items WHERE id = 1"]
   end
 
   it "should work correctly for custom primary key" do
     @c.set_primary_key :name
-    @c['sharon'].should == @c.load(:name => 'sharon', :id => 1)
-    DB.sqls.should == ["SELECT * FROM items WHERE name = 'sharon'"]
+    @c['sharon'].must_equal @c.load(:name => 'sharon', :id => 1)
+    DB.sqls.must_equal ["SELECT * FROM items WHERE name = 'sharon'"]
   end
 
   it "should use a qualified primary key if the dataset is joined" do
     @c.dataset = @c.dataset.cross_join(:a)
-    @c[1].should == @c.load(:name => 'sharon', :id => 1)
-    DB.sqls.should == ["SELECT * FROM items CROSS JOIN a WHERE (items.id = 1) LIMIT 1"]
+    @c[1].must_equal @c.load(:name => 'sharon', :id => 1)
+    DB.sqls.must_equal ["SELECT * FROM items CROSS JOIN a WHERE (items.id = 1) LIMIT 1"]
   end
 
   it "should work correctly for composite primary key specified as array" do
     @c.set_primary_key [:node_id, :kind]
-    @c[3921, 201].should be_a_kind_of(@c)
+    @c[3921, 201].must_be_kind_of(@c)
     sqls = DB.sqls
-    sqls.length.should == 1
-    sqls.first.should =~ /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
+    sqls.length.must_equal 1
+    sqls.first.must_match /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
   end
 end
 
 describe "Model#inspect" do
-  specify "should include the class name and the values" do
-    Sequel::Model.load(:x => 333).inspect.should == '#<Sequel::Model @values={:x=>333}>'
+  it "should include the class name and the values" do
+    Sequel::Model.load(:x => 333).inspect.must_equal '#<Sequel::Model @values={:x=>333}>'
   end
 end
 
@@ -855,7 +839,7 @@ describe "Model.db_schema" do
     @dataset = @db[:items]
   end
   
-  specify "should not call database's schema if it isn't supported" do
+  it "should not call database's schema if it isn't supported" do
     def @db.supports_schema_parsing?() false end
     def @db.schema(table, opts = {})
       raise Sequel::Error
@@ -863,105 +847,105 @@ describe "Model.db_schema" do
     @dataset.instance_variable_set(:@columns, [:x, :y])
 
     @c.dataset = @dataset
-    @c.db_schema.should == {:x=>{}, :y=>{}}
-    @c.columns.should == [:x, :y]
-    @c.dataset.instance_variable_get(:@columns).should == [:x, :y]
+    @c.db_schema.must_equal(:x=>{}, :y=>{})
+    @c.columns.must_equal [:x, :y]
+    @c.dataset.instance_variable_get(:@columns).must_equal [:x, :y]
   end
 
-  specify "should use the database's schema and set the columns and dataset columns" do
+  it "should use the database's schema and set the columns and dataset columns" do
     def @db.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
     end
     @c.dataset = @dataset
-    @c.db_schema.should == {:x=>{:type=>:integer}, :y=>{:type=>:string}}
-    @c.columns.should == [:x, :y]
-    @c.dataset.instance_variable_get(:@columns).should == [:x, :y]
+    @c.db_schema.must_equal(:x=>{:type=>:integer}, :y=>{:type=>:string})
+    @c.columns.must_equal [:x, :y]
+    @c.dataset.instance_variable_get(:@columns).must_equal [:x, :y]
   end
 
-  specify "should not restrict the schema for datasets with a :select option" do
+  it "should not restrict the schema for datasets with a :select option" do
     def @c.columns; [:x, :z]; end
     def @db.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
     end
     @c.dataset = @dataset.select(:x, :y___z)
-    @c.db_schema.should == {:x=>{:type=>:integer}, :z=>{}, :y=>{:type=>:string}}
+    @c.db_schema.must_equal(:x=>{:type=>:integer}, :z=>{}, :y=>{:type=>:string})
   end
 
-  specify "should fallback to fetching records if schema raises an error" do
+  it "should fallback to fetching records if schema raises an error" do
     def @db.schema(table, opts={})
       raise Sequel::Error
     end
     @c.dataset = @dataset.join(:x, :id).columns(:id, :x)
-    @c.db_schema.should == {:x=>{}, :id=>{}}
+    @c.db_schema.must_equal(:x=>{}, :id=>{})
   end
   
-  specify "should automatically set a singular primary key based on the schema" do
+  it "should automatically set a singular primary key based on the schema" do
     ds = @dataset
     d = ds.db
     def d.schema(table, *opts) [[:x, {:primary_key=>true}]] end
-    @c.primary_key.should == :id
+    @c.primary_key.must_equal :id
     @c.dataset = ds
-    @c.db_schema.should == {:x=>{:primary_key=>true}}
-    @c.primary_key.should == :x
+    @c.db_schema.must_equal(:x=>{:primary_key=>true})
+    @c.primary_key.must_equal :x
   end
   
-  specify "should automatically set a singular primary key even if there are specific columns selected" do
+  it "should automatically set a singular primary key even if there are specific columns selected" do
     ds = @dataset.select(:a, :b, :x)
     d = ds.db
     def d.schema(table, *opts) [[:a, {:primary_key=>false}], [:b, {:primary_key=>false}], [:x, {:primary_key=>true}]] end
-    @c.primary_key.should == :id
+    @c.primary_key.must_equal :id
     @c.dataset = ds
-    @c.db_schema.should == {:a=>{:primary_key=>false}, :b=>{:primary_key=>false}, :x=>{:primary_key=>true}}
-    @c.primary_key.should == :x
+    @c.db_schema.must_equal(:a=>{:primary_key=>false}, :b=>{:primary_key=>false}, :x=>{:primary_key=>true})
+    @c.primary_key.must_equal :x
   end
   
-  specify "should automatically set the composite primary key based on the schema" do
+  it "should automatically set the composite primary key based on the schema" do
     ds = @dataset
     d = ds.db
     def d.schema(table, *opts) [[:x, {:primary_key=>true}], [:y, {:primary_key=>true}]] end
-    @c.primary_key.should == :id
+    @c.primary_key.must_equal :id
     @c.dataset = ds
-    @c.db_schema.should == {:x=>{:primary_key=>true}, :y=>{:primary_key=>true}}
-    @c.primary_key.should == [:x, :y]
+    @c.db_schema.must_equal(:x=>{:primary_key=>true}, :y=>{:primary_key=>true})
+    @c.primary_key.must_equal [:x, :y]
   end
 
-  specify "should set an immutable composite primary key based on the schema" do
+  it "should set an immutable composite primary key based on the schema" do
     ds = @dataset
     d = ds.db
     def d.schema(table, *opts) [[:x, {:primary_key=>true}], [:y, {:primary_key=>true}]] end
     @c.dataset = ds
-    @c.primary_key.should == [:x, :y]
-    proc{@c.primary_key.pop}.should raise_error
+    @c.primary_key.must_equal [:x, :y]
+    proc{@c.primary_key.pop}.must_raise FrozenError
   end
   
-  specify "should automatically set no primary key based on the schema" do
+  it "should automatically set no primary key based on the schema" do
     ds = @dataset
     d = ds.db
     def d.schema(table, *opts) [[:x, {:primary_key=>false}], [:y, {:primary_key=>false}]] end
-    @c.primary_key.should == :id
+    @c.primary_key.must_equal :id
     @c.dataset = ds
-    @c.db_schema.should == {:x=>{:primary_key=>false}, :y=>{:primary_key=>false}}
-    @c.primary_key.should == nil
+    @c.db_schema.must_equal(:x=>{:primary_key=>false}, :y=>{:primary_key=>false})
+    @c.primary_key.must_equal nil
   end
   
-  specify "should automatically set primary key for dataset selecting table.*" do
+  it "should automatically set primary key for dataset selecting table.*" do
     ds = @dataset.select_all(:items)
     d = ds.db
     def d.schema(table, *opts) [[:x, {:primary_key=>true}]] end
-    @c.primary_key.should == :id
+    @c.primary_key.must_equal :id
     @c.dataset = ds
-    @c.db_schema.should == {:x=>{:primary_key=>true}}
-    @c.primary_key.should == :x
+    @c.db_schema.must_equal(:x=>{:primary_key=>true})
+    @c.primary_key.must_equal :x
   end
   
-  specify "should not modify the primary key unless all column schema hashes have a :primary_key entry" do
+  it "should not modify the primary key unless all column schema hashes have a :primary_key entry" do
     ds = @dataset
     d = ds.db
     def d.schema(table, *opts) [[:x, {:primary_key=>false}], [:y, {}]] end
-    @c.primary_key.should == :id
+    @c.primary_key.must_equal :id
     @c.dataset = ds
-    @c.db_schema.should == {:x=>{:primary_key=>false}, :y=>{}}
-    @c.primary_key.should == :id
+    @c.db_schema.must_equal(:x=>{:primary_key=>false}, :y=>{})
+    @c.primary_key.must_equal :id
   end
 end
 
@@ -970,23 +954,23 @@ describe "Model#use_transactions" do
     @c = Class.new(Sequel::Model(:items))
   end
 
-  specify "should return class value by default" do
+  it "should return class value by default" do
     @c.use_transactions = true
-    @c.new.use_transactions.should == true
+    @c.new.use_transactions.must_equal true
     @c.use_transactions = false
-    @c.new.use_transactions.should == false
+    @c.new.use_transactions.must_equal false
   end
 
-  specify "should return set value if manually set" do
+  it "should return set value if manually set" do
     instance = @c.new
     instance.use_transactions = false
-    instance.use_transactions.should == false
+    instance.use_transactions.must_equal false
     @c.use_transactions = true
-    instance.use_transactions.should == false
+    instance.use_transactions.must_equal false
     
     instance.use_transactions = true
-    instance.use_transactions.should == true
+    instance.use_transactions.must_equal true
     @c.use_transactions = false
-    instance.use_transactions.should == true
+    instance.use_transactions.must_equal true
   end
 end
