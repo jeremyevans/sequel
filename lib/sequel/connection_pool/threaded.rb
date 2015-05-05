@@ -4,7 +4,9 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Whether or not a ConditionVariable should be used to wait for connections.
   # True except on ruby 1.8, where ConditionVariable#wait does not support a
   # timeout.
-  USE_WAITER = RUBY_VERSION >= '1.9'
+  unless defined?(USE_WAITER)
+    USE_WAITER = RUBY_VERSION >= '1.9'
+  end
 
   # The maximum number of connections this pool will create (per shard/server
   # if sharding).
