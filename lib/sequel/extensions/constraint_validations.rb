@@ -224,6 +224,16 @@ module Sequel
       end
     end
 
+    # Modify the default create_table generator to include
+    # the constraint validation methods.
+    def create_table_generator(&block)
+      super do
+        extend CreateTableGeneratorMethods
+        @validations = []
+        instance_eval(&block) if block
+      end
+    end
+
     # Drop the constraint validations table.
     def drop_constraint_validations_table
       drop_table(constraint_validations_table)
@@ -262,8 +272,6 @@ module Sequel
       ds.delete
     end
 
-    private
-
     # Modify the default alter_table generator to include
     # the constraint validation methods.
     def alter_table_generator(&block)
@@ -273,6 +281,8 @@ module Sequel
         instance_eval(&block) if block
       end
     end
+
+    private
 
     # After running all of the table alteration statements,
     # if there were any constraint validations, run table alteration
@@ -315,16 +325,6 @@ module Sequel
         process_generator_validations(name, generator, generator.validations)
       end
       super
-    end
-
-    # Modify the default create_table generator to include
-    # the constraint validation methods.
-    def create_table_generator(&block)
-      super do
-        extend CreateTableGeneratorMethods
-        @validations = []
-        instance_eval(&block) if block
-      end
     end
 
     # For the given table, generator, and validations, add constraints
