@@ -8,7 +8,7 @@
 # as instances of Sequel::Postgres::HStore.  HStore is
 # a DelegateClass of Hash, so it mostly acts like a hash, but not
 # completely (is_a?(Hash) is false).  If you want the actual hash,
-# you can call Hstore#to_hash.  This is done so that Sequel does not
+# you can call HStore#to_hash.  This is done so that Sequel does not
 # treat a HStore like a Hash by default, which would cause issues.
 #
 # In addition to the parsers, this extension comes with literalizers
