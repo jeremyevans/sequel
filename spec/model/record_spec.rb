@@ -1038,7 +1038,7 @@ describe Sequel::Model, "#set" do
     @o1.strict_param_setting = true
     l = Symbol.all_symbols.length
     proc{@o1.set('sadojafdso' => 1)}.must_raise(Sequel::MassAssignmentRestriction)
-    Symbol.all_symbols.length.must_equal l
+    Symbol.all_symbols.map(&:to_s).wont_include('sadojafdso')
   end
 
   it "#set should correctly handle cases where an instance method is added to the class" do
