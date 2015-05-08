@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove the fdbsql, jdbc/fdbsql, and openbase adapters (jeremyevans)
+
 * Database#transaction now returns block return value if :rollback=>:always is used (jeremyevans)
 
 * Allow postgresql:// connection strings as aliases to postgres://, for compatibility with libpq (jeremyevans) (#1004)

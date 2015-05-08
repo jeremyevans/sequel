@@ -88,7 +88,7 @@ describe "Database schema parser" do
     DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.must_equal [:number1, :number2]
   end
 
-  cspecify "should parse autoincrementing primary keys from the schema properly", :sqlite, :oracle, :fdbsql do
+  cspecify "should parse autoincrementing primary keys from the schema properly", :sqlite, :oracle do
     DB.create_table!(:items){Integer :number}
     DB.schema(:items).collect{|k,v| k if v[:primary_key] && v[:auto_increment]}.compact.must_equal []
     DB.create_table!(:items){primary_key :number}
@@ -380,7 +380,7 @@ describe "Database schema modifiers" do
     end
   end
 
-  cspecify "should create temporary tables without raising an exception", :fdbsql do
+  it "should create temporary tables without raising an exception" do
     @db.create_table!(:items_temp, :temp=>true){Integer :number}
   end
 
@@ -436,7 +436,7 @@ describe "Database schema modifiers" do
     @ds.insert([10])
   end
 
-  cspecify "should be able to specify constraint names for column constraints", :fdbsql do
+  it "should be able to specify constraint names for column constraints" do
     @db.create_table!(:items2){primary_key :id, :primary_key_constraint_name=>:foo_pk}
     @db.create_table!(:items){foreign_key :id, :items2, :unique=>true, :foreign_key_constraint_name => :foo_fk, :unique_constraint_name => :foo_uk, :null=>false}
     @db.alter_table(:items){drop_constraint :foo_fk, :type=>:foreign_key; drop_constraint :foo_uk, :type=>:unique}
@@ -697,7 +697,7 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.must_equal [:id]
   end
 
-  cspecify "should work correctly with many operations in a single alter_table call", [:jdbc, :db2], [:db2], :fdbsql do
+  cspecify "should work correctly with many operations in a single alter_table call", [:jdbc, :db2], [:db2] do
     @db.create_table!(:items) do
       primary_key :id
       String :name2

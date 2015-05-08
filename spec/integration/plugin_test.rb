@@ -337,7 +337,7 @@ describe "Many Through Many Plugin" do
     c.exclude(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'3'
   end
 
-  cspecify "should handle extreme case with 5 join tables", :fdbsql do
+  it "should handle extreme case with 5 join tables" do
     Artist.many_through_many :related_albums, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]], :class=>Album, :distinct=>true
     @db[:albums_artists].delete
     @album1.add_artist(@artist1)
@@ -458,7 +458,7 @@ describe "Tactical Eager Loading Plugin" do
   before(:all) do
     @db = DB
     @db.instance_variable_set(:@schemas, {})
-    @db.drop_table?(:albums_artists) # work around fdbsql disconnect bug
+    @db.drop_table?(:albums_artists)
     @db.create_table!(:artists) do
       primary_key :id
       String :name

@@ -37,7 +37,6 @@ module Sequel
         'cubrid'=>'Cubrid',
         'db2'=>'DB2',
         'firebird'=>'Firebird',
-        'fdbsql'=>'Fdbsql',
         'informix'=>'Informix',
         'mssql'=>'MSSQL',
         'mysql'=>'MySQL',

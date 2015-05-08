@@ -161,7 +161,7 @@ describe "Prepared Statements and Bound Arguments" do
     @db.call(:select_n, :n=>10){|r| r[:numb] *= 2}.must_equal [20]
   end
     
-  cspecify "should support prepared statements being called multiple times with different arguments", [:jdbc, :fdbsql] do
+  it "should support prepared statements being called multiple times with different arguments" do
     @ds.filter(:numb=>:$n).prepare(:select, :select_n)
     @db.call(:select_n, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @db.call(:select_n, :n=>0).must_equal []

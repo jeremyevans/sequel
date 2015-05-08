@@ -123,10 +123,6 @@ module Sequel
               expr = Sequel.+(expr, Sequel.lit(["", " "], value, sql_unit))
             end
             false
-          when :fdbsql
-            each_valid_interval_unit(h, FDBSQL_DURATION_UNITS) do |value, sql_unit|
-              expr = Sequel.+(expr, Sequel.lit(["INTERVAL ", " "], value, sql_unit))
-            end
           else
             raise Error, "date arithmetic is not implemented on #{db.database_type}"
           end
