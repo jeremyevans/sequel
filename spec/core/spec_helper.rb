@@ -15,7 +15,7 @@ gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 require 'minitest/shared_description'
-FrozenError = RUBY_VERSION < '1.9' ? TypeError : RuntimeError
+FrozenError = RUBY_VERSION < '1.9' ? TypeError : RuntimeError unless defined?(FrozenError)
 
 class Minitest::HooksSpec
   def meta_def(obj, name, &block)

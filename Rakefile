@@ -119,6 +119,7 @@ task :default => :spec
 desc "Run the core, model, and extension/plugin specs"
 task :spec => [:spec_core, :spec_model, :spec_plugin]
 
+spec_task.call("Run core and model specs together", :spec_core_model, './spec/core/*_spec.rb ./spec/model/*_spec.rb')
 spec_task.call("Run core specs", :spec_core, './spec/core/*_spec.rb')
 spec_task.call("Run model specs", :spec_model, './spec/model/*_spec.rb')
 spec_task.call("Run plugin/extension specs", :spec_plugin, './spec/extensions/*_spec.rb')
