@@ -1,13 +1,5 @@
 require 'rubygems'
 
-if defined?(RSpec)
-  begin
-    require 'rspec/expectations'
-  rescue LoadError
-    nil
-  end
-end
-
 if ENV['COVERAGE']
   require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/(extensions|plugins)/\w+\.rb\z})

@@ -32,7 +32,7 @@ end
 
 module Minitest::Spec::DSL
   def cspecify(message, *checked, &block)
-    if !ENV['SEQUEL_NO_SKIP_PENDING'] && (pending = Sequel.guarded?(*checked))
+    if pending = Sequel.guarded?(*checked)
       it(message) do
         skip "Not yet working on #{Array(pending).map{|x| x.is_a?(Proc) ? :proc : x}.join(', ')}"
       end

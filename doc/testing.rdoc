@@ -126,15 +126,19 @@ The order in which you delete/truncate the tables is important if you are using 
 
 = Testing Sequel Itself
 
-Sequel has multiple separate test suites.  All test suites run under rspec >=1.3.
+Sequel has multiple separate test suites.  All test suites use minitest/spec, with the minitest-hooks and minitest-shared_description extensions.
 
 == rake
 
-The default rake task runs Sequel's core, model, plugin, and extension specs, the same as <tt>rake spec spec_plugin</tt>.
+The default rake task runs Sequel's core, model, plugin, and extension specs, the same as <tt>rake spec</tt>.
 
-== rake spec
+== rake spec_core
 
-The +spec+ rake task runs Sequel's core and model specs.  These specs use a mocked database connection, and test for specific SQL used and for generally correct behavior.
+The +spec_core+ rake task runs Sequel's core specs.  These specs use a mocked database connection, and test for specific SQL used and for generally correct behavior.
+
+== rake spec_model
+
+The +spec_model+ rake task runs Sequel's model specs.  These specs also use a mocked database connection, and operate similar to the core tests.
 
 == rake spec_plugin
 
@@ -166,12 +170,10 @@ The SEQUEL_INTEGRATION_URL environment variable specifies the Database connectio
 
 === Other
 
-RSPEC1 :: Use RSpec 1 to run the tests even if a newer version is installed
 SEQUEL_COLUMNS_INTROSPECTION :: Use the columns_introspection extension when running the specs
 SEQUEL_CONNECTION_VALIDATOR :: Use the connection validator extension when running the specs
 SEQUEL_ERROR_SQL :: Use the error_sql extension when running the specs
 SEQUEL_NO_CACHE_ASSOCIATIONS :: Don't cache association metadata when running the specs
 SEQUEL_NO_CHECK_SQLS :: Don't check for specific SQL syntax when running the specs
-SEQUEL_NO_PENDING :: Don't mark any specs as pending, try running all specs (note, can cause lockups for some adapters)
-SEQUEL_NO_SKIP_PENDING :: On RSpec 3, run specs marked as pending, and fail the pending spec if it passes (note, can cause lockups for some adapters)
+SEQUEL_NO_PENDING :: Don't skip any specs, try running all specs (note, can cause lockups for some adapters)
 SKIPPED_TEST_WARN :: Warn when skipping any tests because libraries aren't available
