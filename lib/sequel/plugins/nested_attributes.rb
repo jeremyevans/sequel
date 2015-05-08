@@ -37,14 +37,16 @@ module Sequel
     # of creating a new album.
     #
     # If you would like to delete the associated object instead of updating it, you add a _delete
-    # entry to the hash:
+    # entry to the hash, and also pass the :destroy option when calling +nested_attributes+:
     #
+    #   Artist.nested_attributes :albums, :destroy=>true
     #   a.update(:albums_attributes => [{:id=>1, :_delete=>true}])
     #
     # This will delete the related associated object from the database.  If you want to leave the
     # associated object in the database, but just remove it from the association, add a _remove
-    # entry in the hash:
+    # entry in the hash, and also pass the :remove option when calling +nested_attributes+:
     #
+    #   Artist.nested_attributes :albums, :remove=>true
     #   a.update(:albums_attributes => [{:id=>1, :_remove=>true}])
     #
     # The above example was for a one_to_many association, but the plugin also works similarly
