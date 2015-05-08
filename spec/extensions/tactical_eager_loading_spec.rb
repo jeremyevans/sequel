@@ -51,7 +51,7 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
     ts = @c.all
     DB.sqls.length.must_equal 1
     ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
-    def @fs.eager_load(*) raise end
+    def @ds.eager_load(*) raise end
     ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
   end
 
