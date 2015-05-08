@@ -18,7 +18,7 @@
 # Just like any user-created type, after creating the type, you
 # can create tables that have a column of that type:
 #
-#   DB.create_table(:table_name)
+#   DB.create_table(:table_name) do
 #     enum_type_name :column_name
 #   end
 #
@@ -31,7 +31,7 @@
 # If the pg_array extension is used, arrays of enums are returned as a
 # PGArray:
 #
-#   DB.create_table(:table_name)
+#   DB.create_table(:table_name) do
 #     column :column_name, 'enum_type_name[]'
 #   end
 #   DB[:table_name].get(:column_name)
