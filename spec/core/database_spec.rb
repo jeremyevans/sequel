@@ -806,14 +806,14 @@ DatabaseTransactionSpecs = shared_description do
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
     @db.transaction(:rollback=>:always){raise Sequel::Rollback}.must_equal nil
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
-    @db.transaction(:rollback=>:always){1}.must_equal nil
+    @db.transaction(:rollback=>:always){1}.must_equal 1
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
     catch(:foo) do
       @db.transaction(:rollback=>:always){throw :foo}
     end
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
   end
-  
+
   it "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
     meta_def(@db, :commit_transaction){raise ArgumentError}
     lambda{@db.transaction{}}.must_raise(ArgumentError)
@@ -1019,7 +1019,7 @@ describe "Sequel.transaction" do
   end
   
   it "should pass options to all the blocks" do
-    Sequel.transaction([@db1, @db2, @db3], :rollback=>:always){1}.must_equal nil
+    Sequel.transaction([@db1, @db2, @db3], :rollback=>:always){1}.must_equal 1
     @sqls.must_equal ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3', 'ROLLBACK -- 3', 'ROLLBACK -- 2', 'ROLLBACK -- 1']
   end
   

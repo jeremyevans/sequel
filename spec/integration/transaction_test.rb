@@ -52,7 +52,7 @@ describe "Database transactions" do
     @db.transaction(:rollback=>:always) do
       @d << {:name => 'abc', :value => 1}
       2
-    end.must_equal nil
+    end.must_equal 2
 
     @d.count.must_equal 0
   end

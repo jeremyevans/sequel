@@ -124,7 +124,7 @@ module Sequel
         begin_transaction(conn, opts)
         if rollback == :always
           begin
-            yield(conn)
+            ret = yield(conn)
           rescue Exception => e1
             raise e1
           ensure
@@ -139,6 +139,7 @@ module Sequel
         rescue Exception
         end
         transaction_error(e, :conn=>conn, :rollback=>rollback)
+        ret
       ensure
         begin
           committed = commit_or_rollback_transaction(e, conn, opts)

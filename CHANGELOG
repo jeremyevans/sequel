@@ -1,5 +1,7 @@
 === HEAD
 
+* Database#transaction now returns block return value if :rollback=>:always is used (jeremyevans)
+
 * Allow postgresql:// connection strings as aliases to postgres://, for compatibility with libpq (jeremyevans) (#1004)
 
 * Make Model#move_to in the list plugin handle out-of-range targets without raising an exception (jeremyevans) (#1003)
