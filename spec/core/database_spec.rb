@@ -1159,6 +1159,7 @@ end
 
 describe "A Database adapter with a scheme" do
   before do
+    require 'sequel/adapters/mock'
     @ccc = Class.new(Sequel::Mock::Database)
     @ccc.send(:set_adapter_scheme, :ccc)
   end
