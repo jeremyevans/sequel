@@ -210,9 +210,9 @@ module Sequel
       private
 
       # Return a placeholder literal with the given str and args, wrapped
-      # in an JSONOp, used by operators that return json.
+      # in an JSONOp or JSONBOp, used by operators that return json or jsonb.
       def json_op(str, args)
-        JSONOp.new(Sequel::SQL::PlaceholderLiteralString.new(str, [self, args]))
+        self.class.new(Sequel::SQL::PlaceholderLiteralString.new(str, [self, args]))
       end
 
       # Return a function with the given name, and the receiver as the first

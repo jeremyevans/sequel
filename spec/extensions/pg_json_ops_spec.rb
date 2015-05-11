@@ -21,9 +21,11 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@j[Sequel.pg_array(:a)]].must_equal "(j #> a)"
   end
 
-  it "should have #[] return a JSONOp" do
-    @l[@j[1][2]].must_equal "((j -> 1) -> 2)"
+  it "should have #[] return an object of the same class" do
+    @l[@j[1].to_recordset].must_equal "json_to_recordset((j -> 1))"
     @l[@j[%w'a b'][2]].must_equal "((j #> ARRAY['a','b']) -> 2)"
+    @l[@jb[1].to_recordset].must_equal "jsonb_to_recordset((j -> 1))"
+    @l[@jb[%w'a b'][2]].must_equal "((j #> ARRAY['a','b']) -> 2)"
   end
 
   it "should have #get be an alias to #[]" do

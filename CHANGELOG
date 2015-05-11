@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Postgres::JSONBOp#[] and #get_text return JSONBOp instances (jeremyevans) (#1005)
+
 * Remove the fdbsql, jdbc/fdbsql, and openbase adapters (jeremyevans)
 
 * Database#transaction now returns block return value if :rollback=>:always is used (jeremyevans)
