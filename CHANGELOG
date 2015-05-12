@@ -1,5 +1,7 @@
 === HEAD
 
+* Add delay_add_association plugin, for delaying add_* method calls on new objects until after saving the object (jeremyevans)
+
 * Add validate_associated plugin, for validating associated objects when validating the current object (jeremyevans)
 
 * Make Postgres::JSONBOp#[] and #get_text return JSONBOp instances (jeremyevans) (#1005)
