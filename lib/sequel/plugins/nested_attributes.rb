@@ -73,9 +73,9 @@ module Sequel
     # To save changes to the artist, create the first album and associate it to the artist,
     # and update the other existing associated album.
     module NestedAttributes
-      # Depend on the instance_hooks plugin.
+      # Depend on the validate_associated plugin.
       def self.apply(model)
-        model.plugin(:instance_hooks)
+        model.plugin(:validate_associated)
       end
       
       module ClassMethods
@@ -168,7 +168,7 @@ module Sequel
           reflection = meta[:reflection]
           obj = reflection.associated_class.new
           nested_attributes_set_attributes(meta, obj, attributes)
-          after_validation_hook{validate_associated_object(meta, obj)}
+          delay_validate_associated_object(reflection, obj)
           if reflection.returns_array?
             send(reflection[:name]) << obj
             after_save_hook{send(reflection.add_method, obj)}
@@ -284,7 +284,7 @@ module Sequel
         # Returns the object updated.
         def nested_attributes_update(meta, obj, attributes)
           nested_attributes_update_attributes(meta, obj, attributes)
-          after_validation_hook{validate_associated_object(meta, obj)}
+          delay_validate_associated_object(meta[:reflection], obj)
           # Don't need to validate the object twice if :validate association option is not false
           # and don't want to validate it at all if it is false.
           after_save_hook{obj.save_changes(:validate=>false)}
@@ -295,28 +295,6 @@ module Sequel
         def nested_attributes_update_attributes(meta, obj, attributes)
           nested_attributes_check_key_modifications(meta, obj) do
             nested_attributes_set_attributes(meta, obj, attributes)
-          end
-        end
-
-        # Validate the given associated object, adding any validation error messages from the
-        # given object to the parent object.
-        def validate_associated_object(meta, obj)
-          reflection = meta[:reflection]
-          return if reflection[:validate] == false
-          association = reflection[:name]
-          if (reflection[:type] == :one_to_many || reflection[:type] == :one_to_one) && (key = reflection[:key]).is_a?(Symbol) && !(pk_val = obj.values[key])
-            # There could be a presence validation on the foreign key in the associated model,
-            # which will fail if we validate before saving the current object.  If there is
-            # no value for the foreign key, set it to the current primary key value, or a dummy
-            # value of 0 if we haven't saved the current object.
-            p_key = pk unless pk.is_a?(Array)
-            obj.values[key] = p_key || 0
-            key = nil if p_key
-          end
-          obj.errors.full_messages.each{|m| errors.add(association, m)} unless obj.valid?
-          if key && !pk_val
-            # If we used a dummy value of 0, remove it so it doesn't accidently remain.
-            obj.values.delete(key)
           end
         end
       end

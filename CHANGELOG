@@ -1,5 +1,7 @@
 === HEAD
 
+* Add validate_associated plugin, for validating associated objects when validating the current object (jeremyevans)
+
 * Make Postgres::JSONBOp#[] and #get_text return JSONBOp instances (jeremyevans) (#1005)
 
 * Remove the fdbsql, jdbc/fdbsql, and openbase adapters (jeremyevans)
