@@ -108,9 +108,9 @@ describe "Sequel::Database dump methods" do
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2]}]}
     s = @d.dump_table_schema(:t6)
-    s.must_match /create_table\(:t6\) do\n  primary_key :c1, /
-    s.must_match /:table=>:t2/
-    s.must_match /:key=>\[:c2\]/
+    s.must_match(/create_table\(:t6\) do\n  primary_key :c1, /)
+    s.must_match(/:table=>:t2/)
+    s.must_match(/:key=>\[:c2\]/)
   end
 
   it "should handle foreign key options" do
@@ -118,11 +118,11 @@ describe "Sequel::Database dump methods" do
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:restrict, :on_update=>:set_null, :deferrable=>true}]}
     s = @d.dump_table_schema(:t6)
-    s.must_match /create_table\(:t6\) do\n  foreign_key :c1, :t2, /
-    s.must_match /:key=>\[:c2\]/
-    s.must_match /:on_delete=>:restrict/
-    s.must_match /:on_update=>:set_null/
-    s.must_match /:deferrable=>true/
+    s.must_match(/create_table\(:t6\) do\n  foreign_key :c1, :t2, /)
+    s.must_match(/:key=>\[:c2\]/)
+    s.must_match(/:on_delete=>:restrict/)
+    s.must_match(/:on_update=>:set_null/)
+    s.must_match(/:deferrable=>true/)
   end
 
   it "should handle foreign key options in the primary key" do
@@ -130,12 +130,12 @@ describe "Sequel::Database dump methods" do
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:restrict, :on_update=>:set_null, :deferrable=>true}]}
     s = @d.dump_table_schema(:t6)
-    s.must_match /create_table\(:t6\) do\n  primary_key :c1, /
-    s.must_match /:table=>:t2/
-    s.must_match /:key=>\[:c2\]/
-    s.must_match /:on_delete=>:restrict/
-    s.must_match /:on_update=>:set_null/
-    s.must_match /:deferrable=>true/
+    s.must_match(/create_table\(:t6\) do\n  primary_key :c1, /)
+    s.must_match(/:table=>:t2/)
+    s.must_match(/:key=>\[:c2\]/)
+    s.must_match(/:on_delete=>:restrict/)
+    s.must_match(/:on_update=>:set_null/)
+    s.must_match(/:deferrable=>true/)
   end
 
   it "should omit foreign key options that are the same as defaults" do
@@ -143,11 +143,11 @@ describe "Sequel::Database dump methods" do
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>false}]}
     s = @d.dump_table_schema(:t6)
-    s.must_match /create_table\(:t6\) do\n  foreign_key :c1, :t2, /
-    s.must_match /:key=>\[:c2\]/
-    s.wont_match /:on_delete/
-    s.wont_match /:on_update/
-    s.wont_match /:deferrable/
+    s.must_match(/create_table\(:t6\) do\n  foreign_key :c1, :t2, /)
+    s.must_match(/:key=>\[:c2\]/)
+    s.wont_match(/:on_delete/)
+    s.wont_match(/:on_update/)
+    s.wont_match(/:deferrable/)
   end
 
   it "should omit foreign key options that are the same as defaults in the primary key" do
@@ -155,12 +155,12 @@ describe "Sequel::Database dump methods" do
     @d.meta_def(:supports_foreign_key_parsing?){true}
     @d.meta_def(:foreign_key_list){|*s| [{:columns=>[:c1], :table=>:t2, :key=>[:c2], :on_delete=>:no_action, :on_update=>:no_action, :deferrable=>false}]}
     s = @d.dump_table_schema(:t6)
-    s.must_match /create_table\(:t6\) do\n  primary_key :c1, /
-    s.must_match /:table=>:t2/
-    s.must_match /:key=>\[:c2\]/
-    s.wont_match /:on_delete/
-    s.wont_match /:on_update/
-    s.wont_match /:deferrable/
+    s.must_match(/create_table\(:t6\) do\n  primary_key :c1, /)
+    s.must_match(/:table=>:t2/)
+    s.must_match(/:key=>\[:c2\]/)
+    s.wont_match(/:on_delete/)
+    s.wont_match(/:on_update/)
+    s.wont_match(/:deferrable/)
   end
 
   it "should dump primary key columns with explicit type equal to the database type when :same_db option is passed" do
@@ -454,7 +454,7 @@ END_MIG
     @d.meta_def(:foreign_key_list) do |t|
       t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
     end
-    @d.dump_schema_migration(:indexes=>false).wont_match /foreign_key/
+    @d.dump_schema_migration(:indexes=>false).wont_match(/foreign_key/)
   end
 
   it "should have :foreign_keys option override :indexes => false disabling of foreign keys" do
@@ -462,7 +462,7 @@ END_MIG
     @d.meta_def(:foreign_key_list) do |t|
       t == :t1 ? [{:columns=>[:c2], :table=>:t2, :key=>[:c1]}] : []
     end
-    @d.dump_schema_migration(:indexes=>false, :foreign_keys=>true).must_match /foreign_key/
+    @d.dump_schema_migration(:indexes=>false, :foreign_keys=>true).must_match(/foreign_key/)
   end
 
   it "should support dumping just indexes as a migration" do

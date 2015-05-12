@@ -239,9 +239,9 @@ describe "class_table_inheritance plugin" do
     Executive.create(:num_managers=>3, :num_staff=>2, :name=>'E')
     sqls = @db.sqls
     sqls.length.must_equal 3
-    sqls[0].must_match /INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Executive)', '(E|Executive)'\)/
-    sqls[1].must_match /INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/
-    sqls[2].must_match /INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/
+    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Executive)', '(E|Executive)'\)/)
+    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/)
+    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/)
     end
     
   it "should insert the correct rows into all tables with a given primary key" do
@@ -250,9 +250,9 @@ describe "class_table_inheritance plugin" do
     e.save
     sqls = @db.sqls
     sqls.length.must_equal 3
-    sqls[0].must_match /INSERT INTO employees \((name|kind|id), (name|kind|id), (name|kind|id)\) VALUES \(('E'|'Executive'|2), ('E'|'Executive'|2), ('E'|'Executive'|2)\)/
-    sqls[1].must_match /INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/
-    sqls[2].must_match /INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/
+    sqls[0].must_match(/INSERT INTO employees \((name|kind|id), (name|kind|id), (name|kind|id)\) VALUES \(('E'|'Executive'|2), ('E'|'Executive'|2), ('E'|'Executive'|2)\)/)
+    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/)
+    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/)
   end
 
   it "should update the correct rows in all tables when updating" do

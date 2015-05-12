@@ -54,11 +54,11 @@ describe "Sequel named_timezones extension" do
   it "should convert datetimes coming out of the database from database_timezone to application_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30-0400')
     dt.must_equal @dt
-    dt.offset.must_equal -7/24.0
+    dt.offset.must_equal(-7/24.0)
     
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30+0000')
     dt.must_equal @dt
-    dt.offset.must_equal -7/24.0
+    dt.offset.must_equal(-7/24.0)
   end
     
   it "should raise an error for ambiguous timezones by default" do
@@ -73,11 +73,11 @@ describe "Sequel named_timezones extension" do
   it "should assume datetimes coming out of the database that don't have an offset as coming from database_timezone" do
     dt = Sequel.database_to_application_timestamp('2009-06-01 06:20:30')
     dt.must_equal @dt
-    dt.offset.must_equal -7/24.0
+    dt.offset.must_equal(-7/24.0)
     
     dt = Sequel.database_to_application_timestamp('2009-06-01 10:20:30')
     dt.must_equal @dt + 1/6.0
-    dt.offset.must_equal -7/24.0
+    dt.offset.must_equal(-7/24.0)
   end
   
   it "should work with the thread_local_timezones extension" do

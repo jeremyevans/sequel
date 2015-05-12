@@ -819,9 +819,9 @@ describe "MySQL::Dataset#insert and related methods" do
 
     check_sqls do
       DB.sqls.length.must_equal 3
-      DB.sqls[0].must_match /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\)\z/
-      DB.sqls[1].must_match /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
-      DB.sqls[2].must_match /\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/
+      DB.sqls[0].must_match(/\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\)\z/)
+      DB.sqls[1].must_match(/\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/)
+      DB.sqls[2].must_match(/\AINSERT INTO `items` \(`(name|value)`, `(name|value)`\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE `name`=VALUES\(`name`\), `value`=6\z/)
     end
 
     @d.all.must_equal [{:name => 'abc', :value => 6}, {:name => 'def', :value => 2}]

@@ -23,7 +23,7 @@ describe "Touch plugin" do
     c.plugin :touch
     c.columns :id, :updated_at
     c.load(:id=>1).touch
-    DB.sqls.first.must_match /UPDATE a SET updated_at = '[-0-9 :.]+' WHERE \(id = 1\)/
+    DB.sqls.first.must_match(/UPDATE a SET updated_at = '[-0-9 :.]+' WHERE \(id = 1\)/)
   end
 
   it "should work with current_datetime_timestamp extension" do

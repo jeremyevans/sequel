@@ -287,7 +287,7 @@ describe "Database#log_yield" do
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
     @o.logs.first.first.must_equal :info
-    @o.logs.first.last.must_match /\A\(\d\.\d{6}s\) blah\z/ 
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
   it "should respect sql_log_level setting" do
@@ -296,7 +296,7 @@ describe "Database#log_yield" do
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
     @o.logs.first.first.must_equal :debug
-    @o.logs.first.last.must_match /\A\(\d\.\d{6}s\) blah\z/ 
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
   it "should log message with duration at warn level if duration greater than log_warn_duration" do
@@ -305,7 +305,7 @@ describe "Database#log_yield" do
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
     @o.logs.first.first.must_equal :warn
-    @o.logs.first.last.must_match /\A\(\d\.\d{6}s\) blah\z/ 
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
   it "should log message with duration at info level if duration less than log_warn_duration" do
@@ -314,7 +314,7 @@ describe "Database#log_yield" do
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
     @o.logs.first.first.must_equal :info
-    @o.logs.first.last.must_match /\A\(\d\.\d{6}s\) blah\z/ 
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah\z/)
   end
 
   it "should log message at error level if block raises an error" do
@@ -323,7 +323,7 @@ describe "Database#log_yield" do
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
     @o.logs.first.first.must_equal :error
-    @o.logs.first.last.must_match /\ASequel::Error: adsf: blah\z/ 
+    @o.logs.first.last.must_match(/\ASequel::Error: adsf: blah\z/)
   end
 
   it "should include args with message if args passed" do
@@ -331,7 +331,7 @@ describe "Database#log_yield" do
     @o.logs.length.must_equal 1
     @o.logs.first.length.must_equal 2
     @o.logs.first.first.must_equal :info
-    @o.logs.first.last.must_match /\A\(\d\.\d{6}s\) blah; \[1, 2\]\z/ 
+    @o.logs.first.last.must_match(/\A\(\d\.\d{6}s\) blah; \[1, 2\]\z/)
   end
 end
 
@@ -1515,11 +1515,11 @@ describe "Database#inspect" do
   end
 
   it "should include the class name and the connection options if an options hash was given" do
-    Sequel.connect(:adapter=>:mock).inspect.must_match /#<Sequel::Mock::Database: \{:adapter=>:mock\}>/
+    Sequel.connect(:adapter=>:mock).inspect.must_match(/#<Sequel::Mock::Database: \{:adapter=>:mock\}>/)
   end
 
   it "should include the class name, uri, and connection options if uri and options hash was given" do
-    Sequel.connect('mock://foo', :database=>'bar').inspect.must_match /#<Sequel::Mock::Database: "mock:\/\/foo" \{:database=>"bar"\}>/
+    Sequel.connect('mock://foo', :database=>'bar').inspect.must_match(/#<Sequel::Mock::Database: "mock:\/\/foo" \{:database=>"bar"\}>/)
   end
 end
 
@@ -2103,7 +2103,7 @@ describe "Database#typecast_value" do
       @db.typecast_value(:date, 'a')
       true.must_equal false
     rescue Sequel::InvalidValue => e
-      e.inspect.must_match /\A#<Sequel::InvalidValue: ArgumentError: .*>\z/
+      e.inspect.must_match(/\A#<Sequel::InvalidValue: ArgumentError: .*>\z/)
     end
   end
 end
@@ -2302,10 +2302,10 @@ describe "Database#column_schema_to_ruby_default" do
     p[nil, :integer].must_equal nil
     p[1, :integer].must_equal 1
     p['1', :integer].must_equal 1
-    p['-1', :integer].must_equal -1
+    p['-1', :integer].must_equal(-1)
     p[1.0, :float].must_equal 1.0
     p['1.0', :float].must_equal 1.0
-    p['-1.0', :float].must_equal -1.0
+    p['-1.0', :float].must_equal(-1.0)
     p['1.0', :decimal].must_equal BigDecimal.new('1.0')
     p['-1.0', :decimal].must_equal BigDecimal.new('-1.0')
     p[true, :boolean].must_equal true
@@ -2341,8 +2341,8 @@ describe "Database#column_schema_to_ruby_default" do
     p["''::text", :string].must_equal ""
     p["'\\a''b'::character varying", :string].must_equal "\\a'b"
     p["'a'::bpchar", :string].must_equal "a"
-    p["(-1)", :integer].must_equal -1
-    p["(-1.0)", :float].must_equal -1.0
+    p["(-1)", :integer].must_equal(-1)
+    p["(-1.0)", :float].must_equal(-1.0)
     p['(-1.0)', :decimal].must_equal BigDecimal.new('-1.0')
     p["'a'::bytea", :blob].must_equal Sequel.blob('a')
     p["'a'::bytea", :blob].must_be_kind_of(Sequel::SQL::Blob)
@@ -2354,7 +2354,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["\\a'b", :string].must_equal "\\a'b"
     p["a", :string].must_equal "a"
     p["NULL", :string].must_equal "NULL"
-    p["-1", :float].must_equal -1.0
+    p["-1", :float].must_equal(-1.0)
     p['-1', :decimal].must_equal BigDecimal.new('-1.0')
     p["2009-10-29", :date].must_equal Date.new(2009,10,29)
     p["2009-10-29 10:20:30", :datetime].must_equal DateTime.parse('2009-10-29 10:20:30')
@@ -2364,7 +2364,7 @@ describe "Database#column_schema_to_ruby_default" do
     
     db = Sequel.mock(:host=>'mssql')
     p["(N'a')", :string].must_equal "a"
-    p["((-12))", :integer].must_equal -12
+    p["((-12))", :integer].must_equal(-12)
     p["((12.1))", :float].must_equal 12.1
     p["((-12.1))", :decimal].must_equal BigDecimal.new('-12.1')
   end

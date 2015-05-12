@@ -806,8 +806,8 @@ describe Sequel::Model, "one_to_one" do
     @c1.dataset._fetch = {:id=>3, :y=>6}
     @c2.load(:id => 1234, :x=>5).attribute = attrib
     sqls = DB.sqls
-    sqls.last.must_match /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
-    sqls.first.must_match /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
+    sqls.last.must_match(/UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/)
+    sqls.first.must_match(/UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/)
     sqls.length.must_equal 2
   end
 
@@ -1271,7 +1271,7 @@ describe Sequel::Model, "one_to_many" do
     @c1.dataset._fetch = @c1.instance_dataset._fetch = {:node_id => 1234, :id => 234}
     a.must_equal n.add_attribute(a)
     sqls = DB.sqls
-    sqls.shift.must_match /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
+    sqls.shift.must_match(/INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/)
     sqls.must_equal ["SELECT * FROM attributes WHERE (id = 234) LIMIT 1"]
     a.values.must_equal(:node_id => 1234, :id => 234)
   end
@@ -1303,7 +1303,7 @@ describe Sequel::Model, "one_to_many" do
     @c1.dataset._fetch = @c1.instance_dataset._fetch = {:node_id => 1234, :id => 234}
     n.add_attribute(:id => 234).must_equal @c1.load(:node_id => 1234, :id => 234)
     sqls = DB.sqls
-    sqls.shift.must_match /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
+    sqls.shift.must_match(/INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/)
     sqls.must_equal ["SELECT * FROM attributes WHERE (id = 234) LIMIT 1"]
   end
 
@@ -1371,7 +1371,7 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.load(:id => 2345)
     n.add_attribute(a).must_equal a
     sqls = DB.sqls
-    sqls.shift.must_match /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 2345\)/
+    sqls.shift.must_match(/UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 2345\)/)
     sqls.must_equal []
   end
 
@@ -1384,8 +1384,8 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.load(:id => 2345, :z => 8, :node_id => 1234, :y=>5)
     n.add_attribute([2345, 8]).must_equal a
     sqls = DB.sqls
-    sqls.shift.must_match /SELECT \* FROM attributes WHERE \(\((id|z) = (2345|8)\) AND \((id|z) = (2345|8)\)\) LIMIT 1/
-    sqls.shift.must_match /UPDATE attributes SET (node_id|y) = (1234|5), (node_id|y) = (1234|5) WHERE \(\((id|z) = (2345|8)\) AND \((id|z) = (2345|8)\)\)/
+    sqls.shift.must_match(/SELECT \* FROM attributes WHERE \(\((id|z) = (2345|8)\) AND \((id|z) = (2345|8)\)\) LIMIT 1/)
+    sqls.shift.must_match(/UPDATE attributes SET (node_id|y) = (1234|5), (node_id|y) = (1234|5) WHERE \(\((id|z) = (2345|8)\) AND \((id|z) = (2345|8)\)\)/)
     sqls.must_equal []
   end
   
@@ -1396,7 +1396,7 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.load(:id => 2345, :node_id=>1234, :y=>5)
     n.remove_attribute(a).must_equal a
     sqls = DB.sqls
-    sqls.pop.must_match /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(id = 2345\)/
+    sqls.pop.must_match(/UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(id = 2345\)/)
     sqls.must_equal ["SELECT 1 AS one FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.y = 5) AND (id = 2345)) LIMIT 1"]
   end
   
@@ -1408,8 +1408,8 @@ describe Sequel::Model, "one_to_many" do
     n.remove_attribute([234, 5]).must_equal @c1.load(:node_id => nil, :y => 5, :id => 234)
     sqls = DB.sqls
     sqls.length.must_equal 2
-    sqls.first.must_match /SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \(attributes\.(id|y) = (234|5)\) AND \(attributes\.(id|y) = (234|5)\)\) LIMIT 1/
-    sqls.last.must_match /UPDATE attributes SET node_id = NULL WHERE \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)/
+    sqls.first.must_match(/SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \(attributes\.(id|y) = (234|5)\) AND \(attributes\.(id|y) = (234|5)\)\) LIMIT 1/)
+    sqls.last.must_match(/UPDATE attributes SET node_id = NULL WHERE \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)/)
   end
   
   it "should raise an error in add_ and remove_ if the passed object returns false to save (is not valid)" do
@@ -1668,7 +1668,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :y], :primary_key=>[:id, :x]
     @c2.new(:id => 1234, :x=>5).remove_all_attributes
     sqls = DB.sqls
-    sqls.pop.must_match /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\)\)/
+    sqls.pop.must_match(/UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\)\)/)
     sqls.must_equal []
   end
 
@@ -2289,8 +2289,8 @@ describe Sequel::Model, "many_to_many" do
     @c1.dataset._fetch = {:id => 2345, :z=>8}
     n.add_attribute([2345, 8]).must_equal a
     sqls = DB.sqls
-    sqls.shift.must_match /SELECT \* FROM attributes WHERE \(\((id|z) = (8|2345)\) AND \((id|z) = (8|2345)\)\) LIMIT 1/
-    sqls.pop.must_match /INSERT INTO attributes_nodes \([lr][12], [lr][12], [lr][12], [lr][12]\) VALUES \((1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8)\)/
+    sqls.shift.must_match(/SELECT \* FROM attributes WHERE \(\((id|z) = (8|2345)\) AND \((id|z) = (8|2345)\)\) LIMIT 1/)
+    sqls.pop.must_match(/INSERT INTO attributes_nodes \([lr][12], [lr][12], [lr][12], [lr][12]\) VALUES \((1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8)\)/)
     sqls.must_equal []
   end
 

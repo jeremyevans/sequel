@@ -1071,7 +1071,7 @@ describe Sequel::Model, "#eager" do
     a = EagerBand.eager(:top_10_albums=>{proc{|ds| ds.select(:id, :name)}=>:tracks}).all
     a.must_equal [EagerBand.load(:id => 2)]
     sqls = DB.sqls
-    sqls.pop.must_match /SELECT \* FROM tracks WHERE \(tracks.album_id IN \((\d+, ){10}\d+\)\)/
+    sqls.pop.must_match(/SELECT \* FROM tracks WHERE \(tracks.album_id IN \((\d+, ){10}\d+\)\)/)
     sqls.must_equal ['SELECT * FROM bands', 'SELECT id, name FROM albums WHERE (albums.band_id IN (2))']
     a = a.first
     a.top_10_albums.must_equal((1..10).map{|i| EagerAlbum.load(:band_id=>2, :id=>i)})

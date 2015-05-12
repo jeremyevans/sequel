@@ -8,16 +8,16 @@ describe "Sequel::Dataset #set_defaults" do
   it "should set the default values for inserts" do
     @ds.insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
     @ds.insert_sql(:x=>2).must_equal "INSERT INTO items (x) VALUES (2)"
-    @ds.insert_sql(:y=>2).must_match /INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/
-    @ds.set_defaults(:y=>2).insert_sql.must_match /INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/
+    @ds.insert_sql(:y=>2).must_match(/INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/)
+    @ds.set_defaults(:y=>2).insert_sql.must_match(/INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/)
     @ds.set_defaults(:x=>2).insert_sql.must_equal "INSERT INTO items (x) VALUES (2)"
   end
 
   it "should set the default values for updates" do
     @ds.update_sql.must_equal "UPDATE items SET x = 1"
     @ds.update_sql(:x=>2).must_equal "UPDATE items SET x = 2"
-    @ds.update_sql(:y=>2).must_match /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
-    @ds.set_defaults(:y=>2).update_sql.must_match /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
+    @ds.update_sql(:y=>2).must_match(/UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/)
+    @ds.set_defaults(:y=>2).update_sql.must_match(/UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/)
     @ds.set_defaults(:x=>2).update_sql.must_equal "UPDATE items SET x = 2"
   end
 
@@ -40,16 +40,16 @@ describe "Sequel::Dataset #set_overrides" do
   it "should override the given values for inserts" do
     @ds.insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
     @ds.insert_sql(:x=>2).must_equal "INSERT INTO items (x) VALUES (1)"
-    @ds.insert_sql(:y=>2).must_match /INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/
-    @ds.set_overrides(:y=>2).insert_sql.must_match /INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/
+    @ds.insert_sql(:y=>2).must_match(/INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/)
+    @ds.set_overrides(:y=>2).insert_sql.must_match(/INSERT INTO items \([xy], [xy]\) VALUES \([21], [21]\)/)
     @ds.set_overrides(:x=>2).insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
   end
 
   it "should override the given values for updates" do
     @ds.update_sql.must_equal "UPDATE items SET x = 1"
     @ds.update_sql(:x=>2).must_equal "UPDATE items SET x = 1"
-    @ds.update_sql(:y=>2).must_match /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
-    @ds.set_overrides(:y=>2).update_sql.must_match /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
+    @ds.update_sql(:y=>2).must_match(/UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/)
+    @ds.set_overrides(:y=>2).update_sql.must_match(/UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/)
     @ds.set_overrides(:x=>2).update_sql.must_equal "UPDATE items SET x = 1"
   end
 

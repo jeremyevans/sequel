@@ -30,7 +30,7 @@ module Sequel
         meths.each do |meth|
           module_eval("def #{meth}(sql, opts=Sequel::OPTS) #{code}; super end", __FILE__, __LINE__)
         end
-        private *meths
+        private(*meths)
       end
     end
     private_class_method :prepared_statements_module

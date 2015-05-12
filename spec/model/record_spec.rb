@@ -850,7 +850,7 @@ describe Sequel::Model, "#this" do
   it "should support composite primary keys" do
     @example.set_primary_key [:x, :y]
     instance = @example.load(:x => 4, :y => 5)
-    instance.this.sql.must_match /SELECT \* FROM examples WHERE \(\([xy] = [45]\) AND \([xy] = [45]\)\) LIMIT 1/
+    instance.this.sql.must_match(/SELECT \* FROM examples WHERE \(\([xy] = [45]\) AND \([xy] = [45]\)\) LIMIT 1/)
   end
 end
 
@@ -1036,7 +1036,6 @@ describe Sequel::Model, "#set" do
 
   it "should not create a symbol if strict_param_setting is true and string is given" do
     @o1.strict_param_setting = true
-    l = Symbol.all_symbols.length
     proc{@o1.set('sadojafdso' => 1)}.must_raise(Sequel::MassAssignmentRestriction)
     Symbol.all_symbols.map(&:to_s).wont_include('sadojafdso')
   end
@@ -1238,7 +1237,7 @@ describe Sequel::Model, "#update_fields" do
     @o1.update_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
     @o1.values.must_equal(:x => 1, :y => 2, :id=>1)
     sqls = DB.sqls
-    sqls.pop.must_match /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
+    sqls.pop.must_match(/UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/)
     sqls.must_equal []
 
     @o1.update_fields({:x => 1, :y => 5, :z=>6, :id=>7}, [:x, :y])

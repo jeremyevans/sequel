@@ -819,7 +819,7 @@ describe Sequel::Model, ".[]" do
     @c[3921, 201].must_be_kind_of(@c)
     sqls = DB.sqls
     sqls.length.must_equal 1
-    sqls.first.must_match /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
+    sqls.first.must_match(/^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/)
   end
 end
 

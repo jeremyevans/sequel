@@ -67,7 +67,7 @@ describe "Sequel::Plugins::Timestamps" do
     @c.plugin :timestamps, :update_on_create=>true
     o = @c.create
     sqls = @c.db.sqls
-    sqls.shift.must_match /INSERT INTO t \((creat|updat)ed_at, (creat|updat)ed_at\) VALUES \('2009-08-01', '2009-08-01'\)/
+    sqls.shift.must_match(/INSERT INTO t \((creat|updat)ed_at, (creat|updat)ed_at\) VALUES \('2009-08-01', '2009-08-01'\)/)
     sqls.must_equal []
     o.created_at.must_be :===, o.updated_at
   end
@@ -165,7 +165,7 @@ describe "Sequel::Plugins::Timestamps" do
     o = c2.create
     o.c.must_equal '2009-08-01'
     o.u.must_be :===, o.c 
-    c2.db.sqls.first.must_match /INSERT INTO t \([cu], [cu]\) VALUES \('2009-08-01', '2009-08-01'\)/
+    c2.db.sqls.first.must_match(/INSERT INTO t \([cu], [cu]\) VALUES \('2009-08-01', '2009-08-01'\)/)
     c2.db.reset
     o = c2.load(:id=>1).save
     o.u.must_equal '2009-08-01'

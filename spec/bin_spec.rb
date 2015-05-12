@@ -46,8 +46,8 @@ describe "bin/sequel" do
   
   it "-h should print the help" do
     help = bin(:args=>"-h", :no_conn=>true)
-    help.must_match /\ASequel: The Database Toolkit for Ruby/
-    help.must_match /^Usage: sequel /
+    help.must_match(/\ASequel: The Database Toolkit for Ruby/)
+    help.must_match(/^Usage: sequel /)
   end
 
   it "-c should run code" do
@@ -167,7 +167,7 @@ END
 
   it "-N should not test for a valid connection" do
     bin(:no_conn=>true, :args=>"-c '' -N #{CONN_PREFIX}spec/nonexistent/foo").must_equal ''
-    bin(:no_conn=>true, :args=>"-c '' #{CONN_PREFIX}spec/nonexistent/foo", :stderr=>true).must_match /\AError: Sequel::DatabaseConnectionError: /
+    bin(:no_conn=>true, :args=>"-c '' #{CONN_PREFIX}spec/nonexistent/foo", :stderr=>true).must_match(/\AError: Sequel::DatabaseConnectionError: /)
   end
 
   it "-r should require a given library" do

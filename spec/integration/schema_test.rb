@@ -776,7 +776,7 @@ describe "Database#tables" do
   it "should respect the database's identifier_output_method" do
     @db.identifier_output_method = :xxxxx
     @db.identifier_input_method = :xxxxx
-    @db.tables.each{|t| t.to_s.must_match /\Ax{5}\d+\z/}
+    @db.tables.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
   end
 end if DB.supports_table_listing?
 
@@ -812,6 +812,6 @@ describe "Database#views" do
   it "should respect the database's identifier_output_method" do
     @db.identifier_output_method = :xxxxx
     @db.identifier_input_method = :xxxxx
-    @db.views.each{|t| t.to_s.must_match /\Ax{5}\d+\z/}
+    @db.views.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
   end
 end if DB.supports_view_listing?

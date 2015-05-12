@@ -1262,7 +1262,7 @@ describe "Sequel::Dataset DSL support" do
   it "should work with the bitwise compliment operator" do
     @ds.insert(-3, 3)
     @ds.get{~a.sql_number}.to_i.must_equal 2
-    @ds.get{~b.sql_number}.to_i.must_equal -4
+    @ds.get{~b.sql_number}.to_i.must_equal(-4)
   end
   
   cspecify "should work with the bitwise xor operator", :derby do

@@ -60,12 +60,11 @@ describe "PrettyTable" do
   it "should infer the columns if not given" do
     Sequel::PrettyTable.print(@data1)
     @output.rewind
-    @output.read.must_match \
-      /\n(\|x\|y\|)|(\|y\|x\|)\n/
+    @output.read.must_match(/\n(\|x\|y\|)|(\|y\|x\|)\n/)
   end
   
   it "should have #string return the string without printing" do
-    Sequel::PrettyTable.string(@data1).must_match /\n(\|x\|y\|)|(\|y\|x\|)\n/
+    Sequel::PrettyTable.string(@data1).must_match(/\n(\|x\|y\|)|(\|y\|x\|)\n/)
     @output.rewind
     @output.read.must_equal ''
   end

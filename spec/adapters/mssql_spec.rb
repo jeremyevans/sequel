@@ -121,33 +121,33 @@ describe "MSSQL Dataset#output" do
   end
 
   it "should format OUTPUT clauses without INTO for DELETE statements" do
-    @ds.output(nil, [:deleted__name, :deleted__value]).delete_sql.must_match /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\]/
-    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:deleted)]).delete_sql.must_match /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].*/
+    @ds.output(nil, [:deleted__name, :deleted__value]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\]/)
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:deleted)]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].*/)
   end
   
   it "should format OUTPUT clauses with INTO for DELETE statements" do
-    @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.must_match /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\]/
-    @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete_sql.must_match /DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/
+    @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\]/)
+    @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
   end
 
   it "should format OUTPUT clauses without INTO for INSERT statements" do
-    @ds.output(nil, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).must_match /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] VALUES \((N'name'|1), (N'name'|1)\)/
-    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).insert_sql(:name => "name", :value => 1).must_match /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].* VALUES \((N'name'|1), (N'name'|1)\)/
+    @ds.output(nil, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] VALUES \((N'name'|1), (N'name'|1)\)/)
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].* VALUES \((N'name'|1), (N'name'|1)\)/)
   end
 
   it "should format OUTPUT clauses with INTO for INSERT statements" do
-    @ds.output(:out, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).must_match /INSERT INTO \[ITEMS\] \((\[NAME\]|\[VALUE\]), (\[NAME\]|\[VALUE\])\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] VALUES \((N'name'|1), (N'name'|1)\)/
-    @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert_sql(:name => "name", :value => 1).must_match /INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) VALUES \((N'name'|1), (N'name'|1)\)/
+    @ds.output(:out, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \((\[NAME\]|\[VALUE\]), (\[NAME\]|\[VALUE\])\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] VALUES \((N'name'|1), (N'name'|1)\)/)
+    @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) VALUES \((N'name'|1), (N'name'|1)\)/)
   end
 
   it "should format OUTPUT clauses without INTO for UPDATE statements" do
-    @ds.output(nil, [:inserted__name, :deleted__value]).update_sql(:value => 2).must_match /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\]/
-    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).update_sql(:value => 2).must_match /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[INSERTED\].*/
+    @ds.output(nil, [:inserted__name, :deleted__value]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\]/)
+    @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[INSERTED\].*/)
   end
 
   it "should format OUTPUT clauses with INTO for UPDATE statements" do
-    @ds.output(:out, [:inserted__name, :deleted__value]).update_sql(:value => 2).must_match /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\]/
-    @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update_sql(:value => 2).must_match /UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/
+    @ds.output(:out, [:inserted__name, :deleted__value]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\]/)
+    @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
   end
 
   it "should execute OUTPUT clauses in DELETE statements" do

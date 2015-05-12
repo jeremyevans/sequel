@@ -89,11 +89,11 @@ describe "An SQLite database" do
     @db.use_timestamp_timezones = true
     @db.create_table!(:fk){Time :time}
     @db[:fk].insert(Time.now)
-    @db[:fk].get(Sequel.cast(:time, String)).must_match /[-+]\d\d\d\d\z/
+    @db[:fk].get(Sequel.cast(:time, String)).must_match(/[-+]\d\d\d\d\z/)
     @db.use_timestamp_timezones = false
     @db[:fk].delete
     @db[:fk].insert(Time.now)
-    @db[:fk].get(Sequel.cast(:time, String)).wont_match /[-+]\d\d\d\d\z/
+    @db[:fk].get(Sequel.cast(:time, String)).wont_match(/[-+]\d\d\d\d\z/)
   end
   
   it "should provide a list of existing tables" do

@@ -90,7 +90,7 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls[0].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
     sqls[1].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
     sqls[2].must_equal 'BEGIN'
-    sqls[3].must_match /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
+    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/)
     sqls[4].must_equal 'COMMIT'
     sqls.length.must_equal 5
   end
@@ -143,8 +143,8 @@ describe "Sequel::Plugins::AssociationPks" do
     @Vocalist.one_to_many :instruments, :class=>@Instrument, :key=>[:first, :last]
     @Vocalist.load(:first=>'F1', :last=>'L1').instrument_pks = [1, 2]
     sqls = @db.sqls
-    sqls[0].must_match /UPDATE instruments SET (first = 'F1', last = 'L1'|last = 'L1', first = 'F1') WHERE \(id IN \(1, 2\)\)/
-    sqls[1].must_match /UPDATE instruments SET (first = NULL, last = NULL|last = NULL, first = NULL) WHERE \(\(instruments.first = 'F1'\) AND \(instruments.last = 'L1'\) AND \(id NOT IN \(1, 2\)\)\)/
+    sqls[0].must_match(/UPDATE instruments SET (first = 'F1', last = 'L1'|last = 'L1', first = 'F1') WHERE \(id IN \(1, 2\)\)/)
+    sqls[1].must_match(/UPDATE instruments SET (first = NULL, last = NULL|last = NULL, first = NULL) WHERE \(\(instruments.first = 'F1'\) AND \(instruments.last = 'L1'\) AND \(id NOT IN \(1, 2\)\)\)/)
     sqls.length.must_equal 2
   end
 
@@ -176,8 +176,8 @@ describe "Sequel::Plugins::AssociationPks" do
     @Vocalist.one_to_many :hits, :class=>@Hit, :key=>[:first, :last], :order=>:week
     @Vocalist.load(:first=>'F1', :last=>'L1').hit_pks = [[1997, 1], [1997, 2]]
     sqls = @db.sqls
-    sqls[0].must_match /UPDATE hits SET (first = 'F1', last = 'L1'|last = 'L1', first = 'F1') WHERE \(\(year, week\) IN \(\(1997, 1\), \(1997, 2\)\)\)/
-    sqls[1].must_match /UPDATE hits SET (first = NULL, last = NULL|last = NULL, first = NULL) WHERE \(\(hits.first = 'F1'\) AND \(hits.last = 'L1'\) AND \(\(year, week\) NOT IN \(\(1997, 1\), \(1997, 2\)\)\)\)/
+    sqls[0].must_match(/UPDATE hits SET (first = 'F1', last = 'L1'|last = 'L1', first = 'F1') WHERE \(\(year, week\) IN \(\(1997, 1\), \(1997, 2\)\)\)/)
+    sqls[1].must_match(/UPDATE hits SET (first = NULL, last = NULL|last = NULL, first = NULL) WHERE \(\(hits.first = 'F1'\) AND \(hits.last = 'L1'\) AND \(\(year, week\) NOT IN \(\(1997, 1\), \(1997, 2\)\)\)\)/)
     sqls.length.must_equal 2
   end
 
@@ -208,7 +208,7 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls[0].must_equal "BEGIN"
     sqls[1].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
     sqls[2].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[3].must_match /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
+    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/)
     sqls[4].must_equal "COMMIT"
     sqls.length.must_equal 5
   end
@@ -233,7 +233,7 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
     sqls[1].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[3].must_match /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
+    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/)
     sqls.length.must_equal 5
   end
 
@@ -243,8 +243,8 @@ describe "Sequel::Plugins::AssociationPks" do
     sqls = @db.sqls
     sqls[0].must_equal "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN ('1', '3')))"
     sqls[1].must_equal 'SELECT tag_id FROM albums_tags WHERE (album_id = 2)'
-    sqls[3].must_match /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '1'|'1', 2)\)/
-    sqls[4].must_match /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '3'|'3', 2)\)/
+    sqls[3].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '1'|'1', 2)\)/)
+    sqls[4].must_match(/INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '3'|'3', 2)\)/)
     sqls.length.must_equal 6
   end
 

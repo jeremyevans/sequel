@@ -337,12 +337,12 @@ describe "A PostgreSQL dataset" do
       @d.select(Sequel.lit('test.name AS item_name')).sql.must_equal 'SELECT test.name AS item_name FROM "test"'
       @d.select(Sequel.lit('"name"')).sql.must_equal 'SELECT "name" FROM "test"'
       @d.select(Sequel.lit('max(test."name") AS "max_name"')).sql.must_equal 'SELECT max(test."name") AS "max_name" FROM "test"'
-      @d.insert_sql(:x => :y).must_match /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
+      @d.insert_sql(:x => :y).must_match(/\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/)
 
       @d.select(Sequel.function(:test, :abc, 'hello')).sql.must_equal "SELECT test(\"abc\", 'hello') FROM \"test\""
       @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
       @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
-      @d.insert_sql(:value => 333).must_match /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
+      @d.insert_sql(:value => 333).must_match(/\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/)
     end
   end
 
@@ -762,7 +762,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
       @db.convert_infinite_timestamps = :string
       @db[:test3].get(:time).must_equal '-infinity'
       @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:time).must_equal -1.0/0.0
+      @db[:test3].get(:time).must_equal(-1.0/0.0)
     end
 
     it "should handle conversions from infinite strings/floats in models" do
@@ -771,7 +771,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
       c.new(:time=>'infinity').time.must_equal 'infinity'
       c.new(:time=>'-infinity').time.must_equal '-infinity'
       c.new(:time=>1.0/0.0).time.must_equal 1.0/0.0
-      c.new(:time=>-1.0/0.0).time.must_equal -1.0/0.0
+      c.new(:time=>-1.0/0.0).time.must_equal(-1.0/0.0)
     end
 
     it "should handle infinite dates if convert_infinite_timestamps is set" do
@@ -789,7 +789,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
       @db.convert_infinite_timestamps = :string
       @db[:test3].get(:date).must_equal '-infinity'
       @db.convert_infinite_timestamps = :float
-      @db[:test3].get(:date).must_equal -1.0/0.0
+      @db[:test3].get(:date).must_equal(-1.0/0.0)
     end
 
     it "should handle conversions from infinite strings/floats in models" do
@@ -798,7 +798,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
       c.new(:date=>'infinity').date.must_equal 'infinity'
       c.new(:date=>'-infinity').date.must_equal '-infinity'
       c.new(:date=>1.0/0.0).date.must_equal 1.0/0.0
-      c.new(:date=>-1.0/0.0).date.must_equal -1.0/0.0
+      c.new(:date=>-1.0/0.0).date.must_equal(-1.0/0.0)
     end
   end
 
@@ -1483,7 +1483,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
   it "#create_function and #drop_function should create and drop functions" do
     proc{@d['SELECT tf()'].all}.must_raise(Sequel::DatabaseError)
     args = ['tf', 'SELECT 1', {:returns=>:integer}]
-    @d.send(:create_function_sql, *args).must_match /\A\s*CREATE FUNCTION tf\(\)\s+RETURNS integer\s+LANGUAGE SQL\s+AS 'SELECT 1'\s*\z/
+    @d.send(:create_function_sql, *args).must_match(/\A\s*CREATE FUNCTION tf\(\)\s+RETURNS integer\s+LANGUAGE SQL\s+AS 'SELECT 1'\s*\z/)
     @d.create_function(*args)
     @d['SELECT tf()'].all.must_equal [{:tf=>1}]
     @d.send(:drop_function_sql, 'tf').must_equal 'DROP FUNCTION tf()'
@@ -1493,7 +1493,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
 
   it "#create_function and #drop_function should support options" do
     args = ['tf', 'SELECT $1 + $2', {:args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :set=>{:search_path => 'public'}}]
-    @d.send(:create_function_sql,*args).must_match /\A\s*CREATE OR REPLACE FUNCTION tf\(a integer, integer\)\s+RETURNS integer\s+LANGUAGE SQL\s+IMMUTABLE\s+STRICT\s+SECURITY DEFINER\s+COST 2\s+SET search_path = public\s+AS 'SELECT \$1 \+ \$2'\s*\z/
+    @d.send(:create_function_sql,*args).must_match(/\A\s*CREATE OR REPLACE FUNCTION tf\(a integer, integer\)\s+RETURNS integer\s+LANGUAGE SQL\s+IMMUTABLE\s+STRICT\s+SECURITY DEFINER\s+COST 2\s+SET search_path = public\s+AS 'SELECT \$1 \+ \$2'\s*\z/)
     @d.create_function(*args)
     # Make sure replace works
     @d.create_function(*args)
@@ -2811,7 +2811,7 @@ describe 'PostgreSQL json type' do
       @db.from(jo.each).select_order_map(:key).must_equal %w'a b'
       @db.from(jo.each).order(:key).select_map(:value).must_equal [1, {'c'=>2, 'd'=>{'e'=>3}}]
       @db.from(jo.each_text).select_order_map(:key).must_equal %w'a b'
-      @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).gsub(' ', '').must_match /\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/
+      @db.from(jo.each_text).order(:key).where(:key=>'b').get(:value).gsub(' ', '').must_match(/\{"d":\{"e":3\},"c":2\}|\{"c":2,"d":\{"e":3\}\}/)
 
       Sequel.extension :pg_row_ops
       @db.create_table!(:items) do

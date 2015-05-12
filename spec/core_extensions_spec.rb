@@ -310,7 +310,7 @@ end
 
 describe "String#lit" do
   before do
-    @ds = ds = Sequel::Database.new[:t]
+    @ds = Sequel::Database.new[:t]
   end
 
   it "should return an LiteralString object" do
