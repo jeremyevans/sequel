@@ -23,6 +23,11 @@ describe "column_conflicts plugin" do
     @o.get_column_value(:use_transactions).must_equal 4
   end
 
+  it "should work correctly if there are no conflicts" do
+    @o.get_column_value(:foo).must_equal 4
+    @o.set_column_value(:model=, 2).must_equal 2
+  end
+
   it "should allow manual setting of conflicted columns" do
     @c.send(:define_method, :foo){raise}
     @c.get_column_conflict!(:foo)

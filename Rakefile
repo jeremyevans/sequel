@@ -108,7 +108,7 @@ spec_task = proc do |description, name, files|
 
   desc "#{description} with coverage"
   task :"#{name}_cov" do
-    ENV['COVERAGE'] = 1
+    ENV['COVERAGE'] = '1'
     run_spec.call(files)
     ENV.delete('COVERAGE')
   end

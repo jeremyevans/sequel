@@ -54,8 +54,6 @@ describe "prepared_statements plugin" do
     end
   end
 
-  include prepared_statements_spec
-
   describe "when #use_prepared_statements_for? returns false" do
     before do
       @columns = "*"
@@ -64,6 +62,8 @@ describe "prepared_statements plugin" do
 
     include prepared_statements_spec
   end
+
+  include prepared_statements_spec
 
   it "should work correctly when subclassing" do
     c = Class.new(@c)

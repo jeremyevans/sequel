@@ -192,8 +192,13 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
           deadline ||= time + @timeout
           current_time = Time.now
           raise(::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{current_time - time}") if current_time > deadline
+          # :nocov:
+          # It's difficult to get to this point, it can only happen if there is a race condition
+          # where a connection cannot be acquired even after the thread is signalled by the condition
+          # variable that a connection is ready.
           @waiters[server].wait(@mutex, deadline - current_time)
           Thread.pass
+          # :nocov:
         end
 
         conn

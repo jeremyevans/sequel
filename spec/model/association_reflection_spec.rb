@@ -44,6 +44,15 @@ describe Sequel::Model::Associations::AssociationReflection, "#primary_key" do
   end
 end
 
+describe Sequel::Model::Associations::AssociationReflection, "#reciprocal_type" do
+  it "should include a specific type if only one matches" do
+    c = Class.new(Sequel::Model(:a))
+    c.one_to_many :cs, :class=>c, :key=>:c_id
+    c.many_to_one :c, :class=>c, :key=>:c_id
+    c.association_reflection(:c).send(:reciprocal_type).must_equal :one_to_many
+  end
+end
+
 describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
   before do
     class ::ParParent < Sequel::Model; end

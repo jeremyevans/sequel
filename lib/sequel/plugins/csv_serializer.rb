@@ -1,5 +1,7 @@
 if RUBY_VERSION < "1.9"
+  # :nocov:
   require 'fastercsv'
+  # :nocov:
 else
   require 'csv'
 end

@@ -246,6 +246,12 @@ describe Sequel::Model do
     @model.set_dataset(DB[:foo])
   end
 
+  it "reload_db_schema? should be false by default" do
+    c = Class.new
+    c.extend Sequel::Model::ClassMethods
+    c.send(:reload_db_schema?).must_equal false
+  end
+
   it "doesn't raise an error on inherited if there is an error setting the dataset" do
     def @model.set_dataset(*) raise Sequel::Error end
     Class.new(@model)
