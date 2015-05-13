@@ -1726,6 +1726,33 @@ describe "Sequel::Plugins::Tree" do
   end
 end
 
+describe "Sequel::Plugins::UpdateRefresh" do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:tests) do
+      primary_key :id
+      String :name
+      Integer :i
+    end
+    @c = Class.new(Sequel::Model(@db[:tests]))
+    @c.plugin :update_refresh
+  end
+  before do
+    @c.dataset.delete
+    @foo = @c.create(:name=>'foo', :i=>10)
+  end
+  after(:all) do
+    @db.drop_table?(:tests)
+  end
+
+  it "should refresh when updating" do 
+    @foo.this.update(:i=>20)
+    @foo.update(:name=>'bar')
+    @foo.name.must_equal 'bar'
+    @foo.i.must_equal 20
+  end
+end
+
 describe "Sequel::Plugins::PreparedStatements" do
   before(:all) do
     @db = DB
