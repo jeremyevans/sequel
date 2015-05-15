@@ -1294,9 +1294,9 @@ module Sequel
       #            returned rows also include the exact phrase used.
       # :rank :: Set to true to order by the rank, so that closer matches are returned first.
       # :tsquery :: Specifies the terms argument is already a valid SQL expression returning a
-      #            tsquery, and can be used directly in the query.
+      #             tsquery, and can be used directly in the query.
       # :tsvector :: Specifies the cols argument is already a valid SQL expression returning a
-      #            tsvector, and can be used directly in the query.
+      #              tsvector, and can be used directly in the query.
       def full_text_search(cols, terms, opts = OPTS)
         lang = Sequel.cast(opts[:language] || 'simple', :regconfig)
 
