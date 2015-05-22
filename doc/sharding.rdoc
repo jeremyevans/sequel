@@ -56,12 +56,13 @@ the symbol name defined in the connect options. For example:
 Let's say you have 4 slave database servers with names slave_server0,
 slave_server1, slave_server2, and slave_server3.
 
-  DB=Sequel.connect('postgres://master_server/database', \
-    :servers=>{:read_only=>proc{|db| {:host=>db.get_slave_host}}})
-  def DB.get_slave_host
-    @current_host ||= -1
-    "slave_server#{(@current_host+=1)%4}"
+  num_read_only = 4
+  read_only_host = rand(num_read_only)
+  read_only_proc = proc do |db|
+    {:host=>"slave_server#{(read_only_host+=1) % num_read_only}"}
   end
+  DB=Sequel.connect('postgres://master_server/database', \
+    :servers=>{:read_only=>read_only_proc})
 
 This will use one of the slave servers for SELECT queries and use the
 master_server for other queries.  It's also possible to pick a random host
@@ -74,17 +75,18 @@ This involves the same basic idea as the multiple slaves, single master, but
 it shows that the master database is named :default.  So for 4 masters and
 4 slaves:
 
+  num_read_only = 4
+  read_only_host = rand(num_read_only)
+  read_only_proc = proc do |db|
+    {:host=>"slave_server#{(read_only_host+=1) % num_read_only}"}
+  end
+  num_default = 4
+  default_host = rand(num_default)
+  default_proc = proc do |db|
+    {:host=>"master_server#{(default_host+=1) % num_default}"}
+  end
   DB=Sequel.connect('postgres://master_server/database', \
-    :servers=>{:read_only=>proc{|db| {:host=>db.get_slave_host}}, \
-      :default=>proc{|db| {:host=>db.get_master_host}}})
-  def DB.get_slave_host
-    @current_slave_host ||= -1
-    "slave_server#{(@current_slave_host+=1)%4}"
-  end
-  def DB.get_master_host
-    @current_master_host ||= -1
-    "master_server#{(@current_master_host+=1)%4}"
-  end
+    :servers=>{:default=>default_proc, :read_only=>read_only_proc})
   
 == Sharding
 
