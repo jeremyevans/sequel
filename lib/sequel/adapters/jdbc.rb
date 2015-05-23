@@ -698,6 +698,7 @@ module Sequel
             sql = @sproc_name
             opts = Hash[opts]
             opts[:args] = @sproc_args
+            opts[:sproc] = true
             opts[:type] = :insert
             super
           end
