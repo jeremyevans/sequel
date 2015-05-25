@@ -199,12 +199,20 @@ module Sequel
       @actions << [:alter_table, table, MigrationAlterTableReverser.new.reverse(&block)]
     end
 
+    def create_function(name, _, opts=OPTS)
+      @actions << [:drop_function, name]
+    end
+
     def create_join_table(*args)
       @actions << [:drop_join_table, *args]
     end
 
     def create_table(name, opts=OPTS)
       @actions << [:drop_table, name, opts]
+    end
+
+    def create_trigger(table, name, _, opts=OPTS)
+      @actions << [:drop_trigger, table, name]
     end
 
     def create_view(name, _, opts=OPTS)

@@ -71,7 +71,9 @@ it will attempt to create a +down+ block for you, assuming that it knows how to
 reverse the given migration.  The +change+ block can usually correctly reverse
 the following methods:
 
+* +create_function+
 * +create_table+
+* +create_trigger+
 * +add_column+
 * +add_index+
 * +rename_column+

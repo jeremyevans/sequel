@@ -140,6 +140,8 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       end
       create_view(:c, 'SELECT * FROM b', :foo=>:bar)
       create_join_table(:cat_id=>:cats, :dog_id=>:dogs)
+      create_function(:function, 'BEGIN; END;')
+      create_trigger(:b, :trigger, :function)
     end
   end
   
@@ -164,13 +166,17 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         [:rename_column, :e, :g]]
       ],
       [:create_view, :c, "SELECT * FROM b", {:foo=>:bar}],
-      [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}]]
+      [:create_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
+      [:create_function, :function, "BEGIN; END;"],
+      [:create_trigger, :b, :trigger, :function]]
   end
 
   it "should execute down with reversing actions in reverse order" do
     p = @p
     Sequel.migration{change(&p)}.apply(@db, :down)
     @db.actions.must_equal [
+      [:drop_trigger, :b, :trigger],
+      [:drop_function, :function],
       [:drop_join_table, {:cat_id=>:cats, :dog_id=>:dogs}],
       [:drop_view, :c, {:foo=>:bar}],
       [:alter_table, [
