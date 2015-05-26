@@ -3604,4 +3604,4 @@ describe "PostgreSQL stored procedures for datasets" do
 
     @ds.call(:all).must_equal [{:id=>1, :numb=>100}]
   end
-end if DB.adapter_scheme == :jdbc && DB.database_type == :postgres
+end if DB.adapter_scheme == :jdbc
