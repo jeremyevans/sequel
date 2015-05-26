@@ -3564,3 +3564,44 @@ describe 'PostgreSQL enum types' do
     @db.schema(:test_enumt, :reload=>true).first.last[:enum_values].must_equal %w'a f g b c d e'
   end if DB.server_version >= 90100
 end
+
+describe "PostgreSQL stored procedures for datasets" do
+  before do
+    require 'sequel/adapters/utils/stored_procedures'
+
+    @db = DB
+    @db.create_table!(:items) do
+      primary_key :id
+      integer :numb
+    end
+    @db.execute(<<-SQL)
+      create or replace function insert_item(numb bigint)
+      returns items.id%type
+      as $$
+        declare
+          l_id items.id%type;
+        begin
+          l_id := 1;
+
+          insert into items(id, numb) values(l_id, numb);
+
+          return l_id;
+        end;
+      $$ language plpgsql;
+    SQL
+
+    @ds = @db[:items]
+  end
+
+  after do
+    @db.drop_function("insert_item", :if_exists=>true)
+    @db.drop_table?(:items)
+  end
+
+  it "should correctly call stored procedure for inserting record" do
+    result = @ds.call_sproc(:insert, :insert_item, 100)
+    result.must_equal nil
+
+    @ds.call(:all).must_equal [{:id=>1, :numb=>100}]
+  end
+end if DB.adapter_scheme == :jdbc && DB.database_type == :postgres
