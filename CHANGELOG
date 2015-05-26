@@ -1,6 +1,6 @@
 === HEAD
 
-* Make dataset.call_sproc(:insert) work in the jdbc adapter (flash-gordan) (#1013)
+* Make dataset.call_sproc(:insert) work in the jdbc adapter (flash-gordon) (#1013)
 
 * Add update_refresh plugin, for refreshing a model instance when updating (jeremyevans)
 
