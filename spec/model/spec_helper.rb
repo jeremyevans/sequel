@@ -8,7 +8,6 @@ Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line 
 gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
-FrozenError = RUBY_VERSION < '1.9' ? TypeError : RuntimeError unless defined?(FrozenError)
 
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil

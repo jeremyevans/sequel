@@ -68,7 +68,7 @@ describe "instance_filters plugin" do
   it "shouldn't allow instance filters on frozen objects" do
     @p.instance_filter(:name=>'Joe')
     @p.freeze
-    proc{@p.instance_filter(:name=>'Jim')}.must_raise FrozenError
+    proc{@p.instance_filter(:name=>'Jim')}.must_raise
   end 
 
   it "should have dup duplicate internal structures" do

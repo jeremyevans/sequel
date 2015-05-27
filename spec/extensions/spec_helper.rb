@@ -33,7 +33,6 @@ gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 require 'minitest/shared_description'
-FrozenError = RUBY_VERSION < '1.9' ? TypeError : RuntimeError
 
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil

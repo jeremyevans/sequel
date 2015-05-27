@@ -120,7 +120,7 @@ describe "Sequel::Plugins::Dirty" do
     it "should work when freezing objects" do
       @o.freeze
       @o.initial_value(:initial).must_equal 'i'
-      proc{@o.initial = 'b'}.must_raise FrozenError
+      proc{@o.initial = 'b'}.must_raise
     end
 
     it "should have #dup duplicate structures" do
@@ -174,7 +174,7 @@ describe "Sequel::Plugins::Dirty" do
       @o.save
       @o.freeze
       @o.previous_changes[:initial].must_equal ['i', 'a']
-      proc{@o.initial = 'b'}.must_raise FrozenError
+      proc{@o.initial = 'b'}.must_raise
     end
   end
 end

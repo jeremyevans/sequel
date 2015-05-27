@@ -80,7 +80,7 @@ describe Sequel::Schema::Generator do
 
     @constraints[1][:name].must_equal :xxx
     @constraints[1][:type].must_equal :check
-    assert_kind_of Proc, @constraints[1][:check]
+    @constraints[1][:check].must_be_kind_of Proc
 
     @constraints[2][:name].must_equal :cpk
     @constraints[2][:type].must_equal :primary_key

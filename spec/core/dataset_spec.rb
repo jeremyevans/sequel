@@ -113,7 +113,7 @@ describe "Dataset#clone" do
     clone.class.must_equal @dataset.class
     clone.db.must_equal @dataset.db
     clone.opts.must_equal @dataset.opts
-    assert_equal @dataset.row_proc, clone.row_proc
+    clone.row_proc.must_equal @dataset.row_proc
   end
   
   it "should copy the dataset opts" do

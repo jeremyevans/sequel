@@ -921,7 +921,7 @@ describe "Model.db_schema" do
     def d.schema(table, *opts) [[:x, {:primary_key=>true}], [:y, {:primary_key=>true}]] end
     @c.dataset = ds
     @c.primary_key.must_equal [:x, :y]
-    proc{@c.primary_key.pop}.must_raise FrozenError
+    proc{@c.primary_key.pop}.must_raise
   end
   
   it "should automatically set no primary key based on the schema" do

@@ -916,7 +916,7 @@ AllConnectionPoolClassesSpecs = shared_description do
     a = []
     p = @class.new(mock_db.call{123}, {})
     p.after_connect = pr = proc{|c| a << c}
-    assert_equal pr, p.after_connect
+    p.after_connect.must_equal pr
     a.must_equal []
     p.hold{}
     a.must_equal [123]

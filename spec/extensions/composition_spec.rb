@@ -53,8 +53,8 @@ describe "Composition plugin" do
     @c.compositions.keys.must_equal [:date]
     r = @c.compositions.values.first
     r[:mapping].must_equal [:year, :month, :day]
-    assert_kind_of Proc, r[:composer]
-    assert_kind_of Proc, r[:decomposer]
+    r[:composer].must_be_kind_of Proc
+    r[:decomposer].must_be_kind_of Proc
   end
 
   it "#compositions should be a hash of cached values of compositions" do
@@ -218,7 +218,7 @@ describe "Composition plugin" do
     @c.composition :date, :mapping=>[:year, :month, :day]
     @o.freeze
     @o.date.must_equal Date.new(1, 2, 3)
-    proc{@o.date = Date.today}.must_raise FrozenError
+    proc{@o.date = Date.today}.must_raise
   end
 
   it "should have #dup duplicate compositions" do

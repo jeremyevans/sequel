@@ -87,12 +87,12 @@ describe Sequel::Model, ".plugin" do
     @c.plugin(m, 123, 1=>2, &b)
     
     m.args.must_equal [123, {1=>2}]
-    assert_equal b, m.block
+    m.block.must_equal b
     m.block_call.must_equal 42
     @c.new.blah.must_equal 43
     
     m.args2.must_equal [123, {1=>2}]
-    assert_equal b, m.block2
+    m.block2.must_equal b
     m.block2_call.must_equal 42
     @c.new.blag.must_equal 44
   end

@@ -309,8 +309,8 @@ describe "Serialization plugin" do
     o.abc.must_equal 1
     o.def.must_equal "hello"
     o.def.must_equal "hello"
-    proc{o.abc = 2}.must_raise FrozenError
-    proc{o.def = 'h'}.must_raise FrozenError
+    proc{o.abc = 2}.must_raise
+    proc{o.def = 'h'}.must_raise
   end
 
   it "should have dup duplicate internal structures" do
