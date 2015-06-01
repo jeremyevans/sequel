@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.23.0 (2015-06-01)
 
 * Make dataset.call_sproc(:insert) work in the jdbc adapter (flash-gordon) (#1013)
 
