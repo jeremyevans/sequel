@@ -75,15 +75,17 @@
             with id 1 instead of creating a new album.</p>
             
             <p>If you would like to delete the associated object instead of updating it,
-            you add a _delete entry to the hash:</p>
+            you add a _delete entry to the hash, and also pass the :destroy option when
+            calling <code>nested_attributes</code>:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_delete=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">destroy=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_delete=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
             
             <p>This will delete the related associated object from the database.  If you
             want to leave the associated object in the database, but just remove it
-            from the association, add a _remove entry in the hash:</p>
+            from the association, add a _remove entry in the hash, and also pass the
+            :remove option when calling <code>nested_attributes</code>:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_remove=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">nested_attributes</span> :<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">remove=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">albums_attributes</span> =<span class="ruby-operator">&gt;</span> [{:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">_remove=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}])</pre>
             
             <p>The above example was for a one_to_many association, but the plugin also
             works similarly for other association types.  For one_to_one and
@@ -135,13 +137,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Depend on the instance_hooks plugin.</p>
+                  <p>Depend on the validate_associated plugin.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:instance_hooks</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/nested_attributes.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:validate_associated</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

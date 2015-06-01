@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::DelayAddAssociation</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::DelayAddAssociation
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/delay_add_association_rb.html">lib/sequel/plugins/delay_add_association.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The delay_add_association plugin delays the adding of associated objects to
+            a new (unsaved) object until after the new object is saved.  By default, if
+            you attempt to add associated objects to a new object, <a
+            href="../../Sequel.html">Sequel</a> will raise an error, because you need
+            to have a primary key before saving the objects.</p>
+            
+            <p>When delaying the add of an associated object, the object will be
+            immediately added to the cached association array. When saving the current
+            object, it will also attempt to validate any associated objects, and if the
+            associated objects are not valid, the current object will also be
+            considered not valid.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Make all model subclass delay add_association for new objects</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">delay_add_association</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class delay add_association for new objects</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">delay_add_association</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-apply">apply</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="DelayAddAssociation/InstanceMethods.html">Sequel::Plugins::DelayAddAssociation::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-apply'>
+                <a name='method-c-apply'></a>
+                <div class='synopsis'>
+                  <span class='name'>apply</span>
+                  <span class='arguments'>(mod)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Depend on the validate_associated plugin.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/delay_add_association.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">mod</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:validate_associated</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

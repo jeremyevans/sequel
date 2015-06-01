@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-11-20 12:20:00 -0800</span>
+          <span class='datetime'>2015-05-03 08:50:29 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -39,8 +39,31 @@
           <div id='description'>
             
             <p>The pagination extension adds the Sequel::Dataset#paginate and each_page
-            methods, which return paginated (limited and offset) datasets with some
-            helpful methods that make creating a paginated display easier.</p>
+            methods, which return paginated (limited and offset) datasets with the
+            following methods added that make creating a paginated display easier:</p>
+            <ul><li>
+            <p><code>page_size</code></p>
+            </li><li>
+            <p><code>page_count</code></p>
+            </li><li>
+            <p><code>page_range</code></p>
+            </li><li>
+            <p><code>current_page</code></p>
+            </li><li>
+            <p><code>next_page</code></p>
+            </li><li>
+            <p><code>prev_page</code></p>
+            </li><li>
+            <p><code>first_page?</code></p>
+            </li><li>
+            <p><code>last_page?</code></p>
+            </li><li>
+            <p><code>pagination_record_count</code></p>
+            </li><li>
+            <p><code>current_page_record_count</code></p>
+            </li><li>
+            <p><code>current_page_record_range</code></p>
+            </li></ul>
             
             <p>This extension uses Object#extend at runtime, which can hurt performance.</p>
             

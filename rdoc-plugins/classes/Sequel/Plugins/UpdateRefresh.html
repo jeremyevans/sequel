@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::JDBC::Fdbsql</title>
+    <title>Sequel::Plugins::UpdateRefresh</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -27,11 +27,11 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>module</span>
-          Sequel::JDBC::Fdbsql
+          Sequel::Plugins::UpdateRefresh
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../files/lib/sequel/adapters/jdbc/fdbsql_rb.html">lib/sequel/adapters/jdbc/fdbsql.rb</a>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/update_refresh_rb.html">lib/sequel/plugins/update_refresh.rb</a>
           </li>
         </ol>
       </div>
@@ -39,18 +39,25 @@
         <div id='text'>
           <div id='description'>
             
-            <p>Adapter, <a href="Database.html">Database</a>, and <a
-            href="Fdbsql/Dataset.html">Dataset</a> support for accessing the
-            FoundationDB <a href="../SQL.html">SQL</a> Layer via <a
-            href="../JDBC.html">JDBC</a></p>
+            <p>The update_refresh plugin makes the model class refresh the object after
+            updating.  By default, <a href="../../Sequel.html">Sequel</a> only
+            refreshes automatically after inserting new rows, not after updating. 
+            However, if you are using triggers to modify the contents of updated rows,
+            it can be helpful to immediately get the current data after updating.</p>
+            
+            <p>If the dataset supports UPDATE RETURNING, this plugin will use it so that
+            it can retrieve the current data in the same query it uses for the update.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Make all model subclasses refresh after update</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_refresh</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class refresh after update</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_refresh</span></pre>
           </div>
           <div id='context'>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
             <ol>
-              <li><a target="docwin" href="Fdbsql/DatabaseMethods.html">Sequel::JDBC::Fdbsql::DatabaseMethods</a></li>
-              <li><a target="docwin" href="Fdbsql/Dataset.html">Sequel::JDBC::Fdbsql::Dataset</a></li>
+              <li><a target="docwin" href="UpdateRefresh/InstanceMethods.html">Sequel::Plugins::UpdateRefresh::InstanceMethods</a></li>
             </ol>
           </div>
           <div id='section'>

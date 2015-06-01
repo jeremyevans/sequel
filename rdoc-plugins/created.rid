@@ -1,15 +1,15 @@
-Fri, 01 May 2015 09:16:57 -0700
+Mon, 01 Jun 2015 07:57:55 -0700
 lib/sequel/extensions/_pretty_table.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/columns_introspection.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/connection_validator.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/constraint_validations.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/extensions/constraint_validations.rb	Thu, 07 May 2015 16:35:25 -0700
 lib/sequel/extensions/core_extensions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/core_refinements.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/current_datetime_timestamp.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/dataset_source_alias.rb	Mon, 09 Mar 2015 19:27:17 -0700
-lib/sequel/extensions/date_arithmetic.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/extensions/date_arithmetic.rb	Fri, 08 May 2015 15:48:36 -0700
 lib/sequel/extensions/empty_array_ignore_nulls.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/error_sql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/eval_inspect.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -24,16 +24,16 @@ lib/sequel/extensions/migration.rb	Fri, 23 Jan 2015 08:15:01 -0800
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/named_timezones.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/null_dataset.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/pagination.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/pagination.rb	Sun, 03 May 2015 08:50:29 -0700
 lib/sequel/extensions/pg_array.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/extensions/pg_array_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/pg_enum.rb	Fri, 20 Feb 2015 08:17:56 -0800
-lib/sequel/extensions/pg_hstore.rb	Sun, 22 Mar 2015 20:21:32 -0700
+lib/sequel/extensions/pg_enum.rb	Fri, 08 May 2015 15:48:36 -0700
+lib/sequel/extensions/pg_hstore.rb	Thu, 07 May 2015 16:35:25 -0700
 lib/sequel/extensions/pg_hstore_ops.rb	Thu, 12 Mar 2015 11:48:25 -0700
 lib/sequel/extensions/pg_inet.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_interval.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_json.rb	Tue, 17 Mar 2015 08:10:34 -0700
-lib/sequel/extensions/pg_json_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/pg_json_ops.rb	Mon, 11 May 2015 08:18:18 -0700
 lib/sequel/extensions/pg_loose_count.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_range.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_range_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -72,9 +72,10 @@ lib/sequel/plugins/column_conflicts.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/column_select.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/composition.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/plugins/constraint_validations.rb	Wed, 01 Apr 2015 14:26:05 -0700
-lib/sequel/plugins/csv_serializer.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/plugins/csv_serializer.rb	Tue, 12 May 2015 13:51:08 -0700
 lib/sequel/plugins/dataset_associations.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/defaults_setter.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/plugins/delay_add_association.rb	Tue, 12 May 2015 15:56:27 -0700
 lib/sequel/plugins/dirty.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/plugins/eager_each.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/error_splitter.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -86,12 +87,12 @@ lib/sequel/plugins/instance_filters.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_hooks.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/plugins/json_serializer.rb	Thu, 12 Mar 2015 08:21:51 -0700
 lib/sequel/plugins/lazy_attributes.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/list.rb	Wed, 07 Jan 2015 13:10:26 -0800
+lib/sequel/plugins/list.rb	Mon, 04 May 2015 09:15:48 -0700
 lib/sequel/plugins/many_through_many.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/plugins/many_to_one_pk_lookup.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/modification_detection.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/mssql_optimistic_locking.rb	Wed, 07 Jan 2015 13:10:26 -0800
-lib/sequel/plugins/nested_attributes.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/plugins/nested_attributes.rb	Tue, 12 May 2015 15:56:27 -0700
 lib/sequel/plugins/optimistic_locking.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/pg_array_associations.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/plugins/pg_row.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -121,6 +122,8 @@ lib/sequel/plugins/typecast_on_load.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/unlimited_update.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/update_or_create.rb	Mon, 24 Nov 2014 12:16:46 -0800
 lib/sequel/plugins/update_primary_key.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/plugins/update_refresh.rb	Wed, 13 May 2015 14:38:41 -0700
+lib/sequel/plugins/validate_associated.rb	Tue, 12 May 2015 15:56:27 -0700
 lib/sequel/plugins/validation_class_methods.rb	Wed, 01 Apr 2015 15:54:55 -0700
 lib/sequel/plugins/validation_helpers.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/plugins/xml_serializer.rb	Wed, 01 Apr 2015 14:26:05 -0700

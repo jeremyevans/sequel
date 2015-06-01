@@ -31,12 +31,44 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-05-01 08:43:44 -0700</span>
+          <span class='datetime'>2015-06-01 07:48:19 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.23.0+-282015-06-01-29">4.23.0 (2015-06-01)<span><a href="#label-4.23.0+-282015-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make dataset.call_sproc(:insert) work in the jdbc adapter (flash-gordon)
+            (#1013)</p>
+            </li><li>
+            <p>Add update_refresh plugin, for refreshing a model instance when updating
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add delay_add_association plugin, for delaying add_* method calls on new
+            objects until after saving the object (jeremyevans)</p>
+            </li><li>
+            <p>Add validate_associated plugin, for validating associated objects when
+            validating the current object (jeremyevans)</p>
+            </li><li>
+            <p>Make Postgres::JSONBOp#[] and get_text return JSONBOp instances
+            (jeremyevans) (#1005)</p>
+            </li><li>
+            <p>Remove the fdbsql, jdbc/fdbsql, and openbase adapters (jeremyevans)</p>
+            </li><li>
+            <p>Database#transaction now returns block return value if
+            :rollback=&gt;:always is used (jeremyevans)</p>
+            </li><li>
+            <p>Allow postgresql:// connection strings as aliases to postgres://, for
+            compatibility with libpq (jeremyevans) (#1004)</p>
+            </li><li>
+            <p>Make Model#move_to in the list plugin handle out-of-range targets without
+            raising an exception (jeremyevans) (#1003)</p>
+            </li><li>
+            <p>Make Database#add_named_conversion_proc on PostgreSQL handle conversion
+            procs for enum types (celsworth) (#1002)</p>
+            </li></ul>
             
             <h3 id="label-4.22.0+-282015-05-01-29">4.22.0 (2015-05-01)<span><a href="#label-4.22.0+-282015-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

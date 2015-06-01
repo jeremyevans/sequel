@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::Fdbsql::Dataset::PreparedStatementMethods</title>
+    <title>Sequel::Plugins::UpdateRefresh::InstanceMethods</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -27,55 +27,43 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>module</span>
-          Sequel::Fdbsql::Dataset::PreparedStatementMethods
+          Sequel::Plugins::UpdateRefresh::InstanceMethods
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../../files/lib/sequel/adapters/fdbsql_rb.html">lib/sequel/adapters/fdbsql.rb</a>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/update_refresh_rb.html">lib/sequel/plugins/update_refresh.rb</a>
           </li>
         </ol>
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>Allow use of server side prepared statements for FDBSQL using the pg
-            driver.</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-call">call</a></li>
+              <li><a target="docwin" href="#method-i-after_update">after_update</a></li>
             </ol>
           </div>
           <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li><a target="docwin" href="BindArgumentMethods.html">BindArgumentMethods</a></li>
-              </ol>
-            </div>
           </div>
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-call'>
-                <a name='method-i-call'></a>
+              <div class='method public-instance' id='method-method-i-after_update'>
+                <a name='method-i-after_update'></a>
                 <div class='synopsis'>
-                  <span class='name'>call</span>
-                  <span class='arguments'>(*)</span>
+                  <span class='name'>after_update</span>
+                  <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Raise a more obvious error if you attempt to call a unnamed prepared
-                  statement.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_update-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/fdbsql.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot call prepared statement without a name&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">prepared_statement_name</span>.<span class="ruby-identifier">nil?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">this</span>.<span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:update</span>)&#x000A;    <span class="ruby-identifier">refresh</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
