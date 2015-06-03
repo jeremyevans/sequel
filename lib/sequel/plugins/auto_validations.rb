@@ -44,6 +44,12 @@ module Sequel
     #   # Make the Album class use auto validations
     #   Album.plugin :auto_validations
     module AutoValidations
+      NOT_NULL_OPTIONS = {:from=>:values}.freeze
+      EXPLICIT_NOT_NULL_OPTIONS = {:from=>:values, :allow_missing=>true}.freeze
+      MAX_LENGTH_OPTIONS = {:from=>:values, :allow_nil=>true}.freeze
+      SCHEMA_TYPES_OPTIONS = NOT_NULL_OPTIONS
+      UNIQUE_OPTIONS = NOT_NULL_OPTIONS
+
       def self.apply(model, opts=OPTS)
         model.instance_eval do
           plugin :validation_helpers
@@ -129,27 +135,27 @@ module Sequel
           super
           unless (not_null_columns = model.auto_validate_not_null_columns).empty?
             if model.auto_validate_presence?
-              validates_presence(not_null_columns)
+              validates_presence(not_null_columns, NOT_NULL_OPTIONS)
             else
-              validates_not_null(not_null_columns)
+              validates_not_null(not_null_columns, NOT_NULL_OPTIONS)
             end
           end
           unless (not_null_columns = model.auto_validate_explicit_not_null_columns).empty?
             if model.auto_validate_presence?
-              validates_presence(not_null_columns, :allow_missing=>true)
+              validates_presence(not_null_columns, EXPLICIT_NOT_NULL_OPTIONS)
             else
-              validates_not_null(not_null_columns, :allow_missing=>true)
+              validates_not_null(not_null_columns, EXPLICIT_NOT_NULL_OPTIONS)
             end
           end
           unless (max_length_columns = model.auto_validate_max_length_columns).empty?
             max_length_columns.each do |col, len|
-              validates_max_length(len, col, :allow_nil=>true)
+              validates_max_length(len, col, MAX_LENGTH_OPTIONS)
             end
           end
 
-          validates_schema_types if model.auto_validate_types?
+          validates_schema_types(keys, SCHEMA_TYPES_OPTIONS) if model.auto_validate_types?
 
-          unique_opts = {}
+          unique_opts = Hash[UNIQUE_OPTIONS]
           if model.respond_to?(:sti_dataset)
             unique_opts[:dataset] = model.sti_dataset
           end

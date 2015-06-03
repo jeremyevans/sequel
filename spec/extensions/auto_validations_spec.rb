@@ -48,6 +48,13 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
+  it "should validate using the underlying column values" do
+    @c.send(:define_method, :name){super() * 2}
+    @c.db.fetch = {:v=>0}
+    @m.set(:d=>Date.today, :num=>1, :name=>'b'*26)
+    @m.valid?.must_equal true
+  end
+
   it "should handle databases that don't support index parsing" do
     def (@m.db).supports_index_parsing?() false end
     @m.model.send(:setup_auto_validations)
