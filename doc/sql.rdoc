@@ -237,6 +237,15 @@ If the database supports schema qualified functions, Sequel can handle them by c
   DB[:albums].select{schema__function.function(col, 2, "a")}
   # SELECT schema.function(col, 2, 'a') FROM albums
 
+=== Portable/Emulated Functions
+
+Sequel offers some support for portable SQL functions, allowing you to call standard SQL functions, where Sequel will emulate support on databases that lack native support.
+Some examples are:
+
+  Sequel.char_length(:column)    # char_length(column)
+  Sequel.extract(:year, :column) # extract(year FROM column)
+  Sequel.trim(:column)           # trim(column)
+
 === Equality Operator (=)
 
 Sequel uses hashes to specify equality:
