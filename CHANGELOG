@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove the deprecated db2 and dbi adapters (jeremyevans)
+
 * Make auto_validation plugin use :from=>:values option to setup validations on the underlying columns (jeremyevans)
 
 * Add :from=>:values option to validation_helpers methods, for getting values from the values hash instead of a method call (jeremyevans)

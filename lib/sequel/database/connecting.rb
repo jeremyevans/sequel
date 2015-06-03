@@ -6,7 +6,7 @@ module Sequel
     # ---------------------
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado amalgalite cubrid db2 dbi do firebird ibmdb informix jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite swift tinytds'.collect(&:to_sym)
+    ADAPTERS = %w'ado amalgalite cubrid do firebird ibmdb informix jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite swift tinytds'.collect(&:to_sym)
 
     @single_threaded = false
 
@@ -42,7 +42,6 @@ module Sequel
         else
           uri = URI.parse(conn_string)
           scheme = uri.scheme
-          scheme = :dbi if scheme =~ /\Adbi-/
           c = adapter_class(scheme)
           uri_options = c.send(:uri_to_options, uri)
           uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
