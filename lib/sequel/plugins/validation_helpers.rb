@@ -30,6 +30,9 @@ module Sequel
     #                   Sequel will attempt to insert a NULL value into the database, instead of using the
     #                   database's default.
     # :allow_nil :: Whether to skip the validation if the value is nil.
+    # :from :: Set to :values to pull column values from the values hash instead of calling the related method.
+    #          Allows for setting up methods on the underlying column values, in the cases where the model
+    #          transforms the underlying value before returning it, such as when using serialization.
     # :message :: The message to use.  Can be a string which is used directly, or a
     #             proc which is called.  If the validation method takes a argument before the array of attributes,
     #             that argument is passed as an argument to the proc.
@@ -227,6 +230,7 @@ module Sequel
             opts = Hash[opts].merge!(atts.pop)
           end
           message = validation_error_message(opts[:message])
+          from_values = opts[:from] == :values
           where = opts[:where]
           atts.each do |a|
             arr = Array(a)
@@ -236,7 +240,7 @@ module Sequel
             ds = if where
               where.call(ds, self, arr)
             else
-              vals = arr.map{|x| get_column_value(x)}
+              vals = arr.map{|x| from_values ? values[x] : get_column_value(x)}
               next if vals.any?(&:nil?)
               ds.where(arr.zip(vals))
             end
@@ -265,9 +269,10 @@ module Sequel
         # an error message for that attributes.
         def validatable_attributes(atts, opts)
           am, an, ab, m = opts.values_at(:allow_missing, :allow_nil, :allow_blank, :message)
+          from_values = opts[:from] == :values
           Array(atts).each do |a|
             next if am && !values.has_key?(a)
-            v = get_column_value(a)
+            v = from_values ? values[a] : get_column_value(a)
             next if an && v.nil?
             next if ab && v.respond_to?(:blank?) && v.blank?
             if message = yield(a, v, m)

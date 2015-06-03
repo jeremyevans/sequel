@@ -56,6 +56,13 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.must_be :valid?
   end
   
+  it "should take a :from=>:values option to lookup in values hash" do
+    @c.set_validations{validates_max_length(50, :value, :from=>:values)}
+    @c.send(:define_method, :value){super() * 2}
+    @m.value = ' ' * 26
+    @m.must_be :valid?
+  end
+  
   it "should allow a proc for the :message option" do
     @c.set_validations{validates_format(/.+_.+/, :value, :message=>proc{|f| "doesn't match #{f.inspect}"})}
     @m.value = 'abc_'
