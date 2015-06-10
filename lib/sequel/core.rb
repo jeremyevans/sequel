@@ -84,11 +84,22 @@ module Sequel
   #   DB = Sequel.connect('postgres://user:password@host:port/database_name')
   #   DB = Sequel.connect('sqlite:///blog.db', :max_connections=>10)
   #
+  # You can also pass a single options hash:
+  #
+  #   DB = Sequel.connect(:adapter=>'sqlite', :database=>'./blog.db')
+  #
   # If a block is given, it is passed the opened +Database+ object, which is
   # closed when the block exits.  For example:
   #
   #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
-  # 
+  #
+  # If a block is not given, a reference to this database will be held in
+  # <tt>Sequel::DATABASES</tt> until it is removed manually.  This is by
+  # design, and used by <tt>Sequel::Model</tt> to pick the default
+  # database.  It is recommended to pass a block if you do not want the
+  # resulting Database object to remain in memory until the process
+  # terminates.
+  #
   # For details, see the {"Connecting to a Database" guide}[rdoc-ref:doc/opening_databases.rdoc].
   # To set up a master/slave or sharded database connection, see the {"Master/Slave Databases and Sharding" guide}[rdoc-ref:doc/sharding.rdoc].
   def self.connect(*args, &block)
