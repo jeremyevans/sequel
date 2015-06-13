@@ -22,7 +22,7 @@ module Sequel
             sql = opts[:prepared] ? ATAT_IDENTITY : SCOPE_IDENTITY
             rs = log_yield(sql){stmt.executeQuery(sql)}
             rs.next
-            rs.getInt(1)
+            rs.getLong(1)
           end
         end
         
