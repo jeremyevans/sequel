@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle 64-bit auto incrementing primary keys in jdbc subadapters (DougEverly) (#1018, #1019)
+
 * Remove the deprecated db2 and dbi adapters (jeremyevans)
 
 * Make auto_validation plugin use :from=>:values option to setup validations on the underlying columns (jeremyevans)
