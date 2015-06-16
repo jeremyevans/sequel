@@ -37,7 +37,7 @@ module Sequel
       # Execute the given stored procedure with the given name.
       #
       # Options:
-      # :args :: Arguments to stored procedure.  For named argumetns, this should be a
+      # :args :: Arguments to stored procedure.  For named arguments, this should be a
       #          hash keyed by argument named.  For unnamed arguments, this should be an
       #          array.  Output parameters to the function are specified using :output.
       #          You can also name output parameters and provide a type by using an
