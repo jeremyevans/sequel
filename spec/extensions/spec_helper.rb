@@ -1,5 +1,10 @@
 require 'rubygems'
 
+gem 'minitest'
+require 'minitest/autorun'
+require 'minitest/hooks/default'
+require 'minitest/shared_description'
+
 if ENV['COVERAGE']
   require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
   SimpleCov.sequel_coverage(:filter=>%r{lib/sequel/(extensions|plugins)/\w+\.rb\z})
@@ -28,11 +33,6 @@ Sequel.extension :core_refinements if RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 
 def skip_warn(s)
   warn "Skipping test of #{s}" if ENV["SKIPPED_TEST_WARN"]
 end
-
-gem 'minitest'
-require 'minitest/autorun'
-require 'minitest/hooks/default'
-require 'minitest/shared_description'
 
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil
