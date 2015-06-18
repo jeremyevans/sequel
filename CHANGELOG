@@ -1,5 +1,7 @@
 === HEAD
 
+* Make jdbc subadapters work if they issue queries while the subadapter is being loaded (#1022)
+
 * Handle 64-bit auto incrementing primary keys in jdbc subadapters (DougEverly) (#1018, #1019)
 
 * Remove the deprecated db2 and dbi adapters (jeremyevans)

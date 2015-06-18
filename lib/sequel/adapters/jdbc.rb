@@ -354,6 +354,7 @@ module Sequel
         raise(Error, "No connection string specified") unless uri
         
         resolved_uri = jndi? ? get_uri_from_jndi : uri
+        setup_type_convertor_map_early
 
         @driver = if (match = /\Ajdbc:([^:]+)/.match(resolved_uri)) && (prok = Sequel::Database.load_adapter(match[1].to_sym, :map=>DATABASE_SETUP, :subdir=>'jdbc'))
           prok.call(self)
@@ -640,7 +641,13 @@ module Sequel
         h[:table_schem] == 'INFORMATION_SCHEMA'
       end
 
+      # Called after loading subadapter-specific code, overridable by subadapters.
       def setup_type_convertor_map
+      end
+
+      # Called before loading subadapter-specific code, necessary so that subadapter initialization code
+      # that runs queries works correctly.  This cannot be overriding in subadapters,
+      def setup_type_convertor_map_early
         @type_convertor_map = TypeConvertor::MAP.merge(Java::JavaSQL::Types::TIMESTAMP=>timestamp_convertor)
         @basic_type_convertor_map = TypeConvertor::BASIC_MAP
       end
