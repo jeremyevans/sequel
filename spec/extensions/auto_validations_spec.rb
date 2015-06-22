@@ -165,7 +165,7 @@ describe "Sequel::Plugins::AutoValidations" do
 
   it "should support setting validator options" do
     sc = Class.new(@c)
-    sc.plugin :auto_validations, max_length_opts: {message: 'ml_message'}, schema_types_opts: {message: 'st_message'}, explicit_not_null_opts: {message: 'enn_message'}, unique_opts: {message: 'u_message'}
+    sc.plugin :auto_validations, :max_length_opts=> {:message=> 'ml_message'}, :schema_types_opts=> {:message=> 'st_message'}, :explicit_not_null_opts=> {:message=> 'enn_message'}, :unique_opts=> {:message=> 'u_message'}
 
     @m = sc.new
     @m.set(:name=>'a'*51, :d => '/', :nnd => nil, :num=>1)
