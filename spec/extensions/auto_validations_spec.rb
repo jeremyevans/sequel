@@ -162,4 +162,19 @@ describe "Sequel::Plugins::AutoValidations" do
     @c.set_dataset(@c.db[:foo])
     @c.new.valid?.must_equal true
   end
+
+  it "should support setting validator options" do
+    sc = Class.new(@c)
+    sc.plugin :auto_validations, max_length_opts: {message: 'ml_message'}, schema_types_opts: {message: 'st_message'}, explicit_not_null_opts: {message: 'enn_message'}, unique_opts: {message: 'u_message'}
+
+    @m = sc.new
+    @m.set(:name=>'a'*51, :d => '/', :nnd => nil, :num=>1)
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["ml_message"], :d=>["st_message"], :nnd=>["enn_message"])
+
+    @m = sc.new
+    @m.set(:name=>1, :num=>1, :d=>Date.today)
+    @m.valid?.must_equal false
+    @m.errors.must_equal([:name, :num]=>["u_message"])
+  end
 end
