@@ -9,11 +9,6 @@
 #
 #   r = Sequel.pg_inet_op(:inet)
 #
-# If you have also loaded the pg_inet extension, you can use
-# Sequel.pg_inet as well:
-#
-#   r = Sequel.pg_inet(:inet)
-#
 # Also, on most Sequel expression objects, you can call the pg_inet
 # method:
 #
@@ -28,17 +23,17 @@
 # This creates a Sequel::Postgres::InetOp object that can be used
 # for easier querying:
 #
-#   r.less_than(:other)                        # inet < other
-#   r.less_than_or_equal(:other)               # inet <= other
-#   r.equals(:other)                           # inet = other
-#   r.greater_than_or_equal(:other)            # inet >= other
-#   r.greater_than(:other)                     # inet > other
-#   r.not_equal(:other)                        # inet <> other
-#   r.contained_by(:other)                     # inet << other
-#   r.contained_by_or_equals(:other)           # inet <<= other
-#   r.contains(:other)                         # inet >> other
-#   r.contains_or_equals(:other)               # inet >>= other
-#   r.contains_or_contained_by(:other)         # inet && other
+#   ~r                                 # ~inet
+#   r & other                          # inet & other
+#   r | other                          # inet | other
+#   r << :other                        # inet << other
+#   r >> :other                        # inet >> other
+#
+#   r.contained_by(:other)             # inet << other
+#   r.contained_by_or_equals(:other)   # inet <<= other
+#   r.contains(:other)                 # inet >> other
+#   r.contains_or_equals(:other)       # inet >>= other
+#   r.contains_or_contained_by(:other) # inet && other
 #
 #   r.abbrev           # abbrev(inet)
 #   r.broadcast        # broadcast(inet)
@@ -48,11 +43,20 @@
 #   r.masklen          # masklen(inet)
 #   r.netmask          # netmask(inet)
 #   r.network          # network(inet)
+#   r.set_masklen      # set_masklen(inet)
 #   r.text             # text(inet)
+#
+# If a String or IPAddr instance is passed to Sequel.pg_inet_op, it will automatically
+# be cast to +inet+.  To treat the object as a +cidr+, you must cast it before passing
+# it to Sequel.pg_inet_op:
+#
+#   r = Sequel.pg_inet_op(Sequel.cast('1.2.3.4', :cidr))
 #
 # See the PostgreSQL network function and operator documentation for more
 # details on what these functions and operators do.
-#
+
+require 'ipaddr'
+
 module Sequel
   module Postgres
     # The InetOp class is a simple container for a single object that
@@ -62,26 +66,48 @@ module Sequel
     # Most methods in this class are defined via metaprogramming, see
     # the pg_inet_ops extension documentation for details on the API.
     class InetOp < Sequel::SQL::Wrapper
+      include Sequel::SQL::BitwiseMethods
+
+      # For String and IPAddr instances, wrap them in a cast to inet,
+      # to avoid ambiguity issues when calling operator methods.
+      def initialize(v)
+        case v
+        when ::Sequel::LiteralString
+          # nothing
+        when String, IPAddr
+          v = Sequel.cast(v, :inet)
+        end
+        super
+      end
+
       OPERATORS = {
-        :less_than => ["(".freeze, " < ".freeze, ")".freeze].freeze,
-        :less_than_or_equal => ["(".freeze, " <= ".freeze, ")".freeze].freeze,
-        :equals => ["(".freeze, " = ".freeze, ")".freeze].freeze,
-        :greater_than_or_equal => ["(".freeze, " >= ".freeze, ")".freeze].freeze,
-        :greater_than => ["(".freeze, " > ".freeze, ")".freeze].freeze,
-        :not_equal => ["(".freeze, " <> ".freeze, ")".freeze].freeze,
-        :contained_by => ["(".freeze, " << ".freeze, ")".freeze].freeze,
         :contained_by_or_equals => ["(".freeze, " <<= ".freeze, ")".freeze].freeze,
-        :contains => ["(".freeze, " >> ".freeze, ")".freeze].freeze,
         :contains_or_equals => ["(".freeze, " >>= ".freeze, ")".freeze].freeze,
         :contains_or_contained_by => ["(".freeze, " && ".freeze, ")".freeze].freeze,
-      }
-      FUNCTIONS = %w'abbrev broadcast family host hostmask netmask network text'
+      }.freeze
 
-      FUNCTIONS.each do |f|
-        class_eval("def #{f}; function(:#{f}) end", __FILE__, __LINE__)
-      end
       OPERATORS.keys.each do |f|
-        class_eval("def #{f}(v); operator(:#{f}, v) end", __FILE__, __LINE__)
+        class_eval("def #{f}(v) Sequel::SQL::BooleanExpression.new(:NOOP, operator(:#{f}, v)) end", __FILE__, __LINE__)
+      end
+
+      %w'<< >>'.each do |f|
+        class_eval("def #{f}(v) Sequel::SQL::BooleanExpression.new(:NOOP, super) end", __FILE__, __LINE__)
+      end
+
+      %w'& | +'.each do |f|
+        class_eval("def #{f}(v) self.class.new(super) end", __FILE__, __LINE__)
+      end
+
+      %w'abbrev host text'.each do |f|
+        class_eval("def #{f}() Sequel::SQL::StringExpression.new(:NOOP, function(:#{f})) end", __FILE__, __LINE__)
+      end
+
+      %w'family masklen'.each do |f|
+        class_eval("def #{f}() Sequel::SQL::NumericExpression.new(:NOOP, function(:#{f})) end", __FILE__, __LINE__)
+      end
+
+      %w'broadcast hostmask netmask network'.each do |f|
+        class_eval("def #{f}() self.class.new(function(:#{f})) end", __FILE__, __LINE__)
       end
 
       # Return the receiver.
@@ -89,11 +115,36 @@ module Sequel
         self
       end
 
+      # Return an expression for the bitwise NOT of the receiver 
+      def ~
+        self.class.new(super)
+      end
+
+      # Return an expression for the subtraction of the argument from the receiver
+      def -(v)
+        case v
+        when Integer
+          self.class.new(super)
+        else
+          Sequel::SQL::NumericExpression.new(:NOOP, super)
+        end
+      end
+
+      # Return an expression for the calling of the set_masklen function with the receiver and the given argument
+      def set_masklen(v)
+        self.class.new(Sequel::SQL::Function.new(:set_masklen, self, v))
+      end
+
+      alias contained_by <<
+      alias contains >> 
+
+      undef_method :*, :/
+
       private
 
-      # Create a boolen expression for the given type and argument.
+      # Handle PostgreSQL specific operator types
       def operator(type, other)
-        Sequel::SQL::BooleanExpression.new(:NOOP, Sequel::SQL::PlaceholderLiteralString.new(OPERATORS[type], [value, other]))
+        Sequel::SQL::PlaceholderLiteralString.new(OPERATORS[type], [value, other])
       end
 
       # Return a function called with the receiver.
@@ -109,26 +160,26 @@ module Sequel
         InetOp.new(self)
       end
     end
+  end
 
-    module SQL::Builders
-      # Return the expression wrapped in the Postgres::InetOp.
-      def pg_inet_op(v)
-        case v
-        when Postgres::InetOp
-          v
-        else
-          Postgres::InetOp.new(v)
-        end
+  module SQL::Builders
+    # Return the expression wrapped in the Postgres::InetOp.
+    def pg_inet_op(v)
+      case v
+      when Postgres::InetOp
+        v
+      else
+        Postgres::InetOp.new(v)
       end
     end
+  end
 
-    class SQL::GenericExpression
-      include Sequel::Postgres::InetOpMethods
-    end
+  class SQL::GenericExpression
+    include Sequel::Postgres::InetOpMethods
+  end
 
-    class LiteralString
-      include Sequel::Postgres::InetOpMethods
-    end
+  class LiteralString
+    include Sequel::Postgres::InetOpMethods
   end
 end
 

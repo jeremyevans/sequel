@@ -630,7 +630,7 @@ end
 describe "Postgres extensions integration" do
   before do
     @db = Sequel.mock
-    Sequel.extension(:pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops, :pg_json, :pg_json_ops, :pg_range, :pg_range_ops, :pg_row, :pg_row_ops)
+    Sequel.extension(:pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops, :pg_json, :pg_json_ops, :pg_range, :pg_range_ops, :pg_row, :pg_row_ops, :pg_inet_ops)
   end
 
   it "Symbol#pg_array should return an ArrayOp" do
@@ -643,6 +643,10 @@ describe "Postgres extensions integration" do
 
   it "Symbol#hstore should return an HStoreOp" do
     @db.literal(:a.hstore['a']).must_equal "(a -> 'a')"
+  end
+
+  it "Symbol#pg_inet should return an InetOp" do
+    @db.literal(:a.pg_inet.contains(:b)).must_equal "(a >> b)"
   end
 
   it "Symbol#pg_json should return an JSONOp" do

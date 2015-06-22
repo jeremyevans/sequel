@@ -2940,6 +2940,54 @@ describe 'PostgreSQL inet/cidr types' do
       c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).must_equal [@ipv6, @ipv6nm]
     end
   end
+
+  it 'operations/functions with pg_inet_ops' do
+    Sequel.extension :pg_inet_ops
+
+    @db.get(Sequel.pg_inet_op('1.2.3.4') << '1.2.3.0/24').must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4') << '1.2.3.4/32').must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.4') << '1.2.2.0/24').must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.3.0/24')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.3.4/32')).must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.2.0/24')).must_equal false
+
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.3.0/24')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.3.4/32')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.2.0/24')).must_equal false
+
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24') >> '1.2.3.4').must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24') >> '1.2.2.4').must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains('1.2.3.4')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains('1.2.2.4')).must_equal false
+
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.3.4')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.2.4')).must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.3.0/24')).must_equal true
+
+    @db.get(Sequel.pg_inet_op('1.2.3.0/32') + 1).must_equal IPAddr.new('1.2.3.1/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.1/32') - 1).must_equal IPAddr.new('1.2.3.0/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.1/32') - '1.2.3.0/32').must_equal 1
+    @db.get(Sequel.pg_inet_op('1.2.3.0/32') & '1.2.0.4/32').must_equal IPAddr.new('1.2.0.0/32')
+    @db.get(Sequel.pg_inet_op('1.2.0.0/32') | '0.0.3.4/32').must_equal IPAddr.new('1.2.3.4/32')
+    @db.get(~Sequel.pg_inet_op('0.0.0.0/32')).must_equal IPAddr.new('255.255.255.255/32')
+
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').abbrev).must_equal '1.2.3.4/24'
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').broadcast).must_equal IPAddr.new('1.2.3.255/24')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').family).must_equal 4
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').host).must_equal '1.2.3.4'
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').hostmask).must_equal IPAddr.new('0.0.0.255/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').masklen).must_equal 24
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').netmask).must_equal IPAddr.new('255.255.255.0/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').network).must_equal IPAddr.new('1.2.3.0/24')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').set_masklen(16)).must_equal IPAddr.new('1.2.3.4/16')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/32').text).must_equal '1.2.3.4/32'
+
+    if @db.server_version >= 90400
+      @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_contained_by('1.2.0.0/16')).must_equal true
+      @db.get(Sequel.pg_inet_op('1.2.0.0/16').contains_or_contained_by('1.2.3.0/24')).must_equal true
+      @db.get(Sequel.pg_inet_op('1.3.0.0/16').contains_or_contained_by('1.2.3.0/24')).must_equal false
+    end
+  end
 end
 
 describe 'PostgreSQL range types' do
@@ -3042,59 +3090,6 @@ describe 'PostgreSQL range types' do
     v = c.create(@ra).values
     v.delete(:id)
     v.each{|k,v1| v1.must_be :==, @ra[k].to_a}
-  end
-
-  it 'operations/functions with pg_inet_ops' do
-    Sequel.extension :pg_inet_ops
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').less_than('1.2.3.5')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').less_than('1.2.3.3')).must_equal false
-    @db.get(Sequel.pg_inet_op('1.2.3.4').less_than('1.2.3.4')).must_equal false
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').less_than_or_equal('1.2.3.5')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').less_than_or_equal('1.2.3.3')).must_equal false
-    @db.get(Sequel.pg_inet_op('1.2.3.4').less_than_or_equal('1.2.3.4')).must_equal true
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').equals('1.2.3.4')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').equals('1.2.3.5')).must_equal false
-
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').greater_than_or_equal('1.2.3.5')).must_equal false
-    @db.get(Sequel.pg_inet_op('1.2.3.4').greater_than_or_equal('1.2.3.3')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').greater_than_or_equal('1.2.3.4')).must_equal true
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').greater_than('1.2.3.5')).must_equal false
-    @db.get(Sequel.pg_inet_op('1.2.3.4').greater_than('1.2.3.3')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').greater_than('1.2.3.4')).must_equal false
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').not_equal('1.2.3.3')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').not_equal('1.2.3.4')).must_equal false
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.3.0/24')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.3.4/32')).must_equal false
-    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.2.0/24')).must_equal false
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.3.0/24')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.3.4/32')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.2.0/24')).must_equal false
-
-
-    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains('1.2.3.4')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains('1.2.2.4')).must_equal false
-
-    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.3.4')).must_equal true
-    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.2.4')).must_equal false
-    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.3.0/24')).must_equal true
-
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').abbrev).must_equal '1.2.3.4/24'
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').broadcast).must_equal IPAddr.new('1.2.3.255/255.255.255.0')
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').family).must_equal 4
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').host).must_equal '1.2.3.4'
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').hostmask).must_equal IPAddr.new('0.0.0.255/255.255.255.255')
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').masklen).must_equal 24
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').netmask).must_equal IPAddr.new('255.255.255.255/255.255.255.255')
-    @db.get(Sequel.pg_inet_op('1.2.3.4/24').network).must_equal IPAddr.new('1.2.3.0/255.255.255.0')
-    @db.get(Sequel.pg_inet_op('1.2.3.4/32').text).must_equal '1.2.3.4/32'
   end
 
   it 'operations/functions with pg_range_ops' do
