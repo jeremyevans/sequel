@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :delay_pks association option in association_pks to delay setting of associated_pks until after saving (jeremyevans)
+
 * Make jdbc subadapters work if they issue queries while the subadapter is being loaded (#1022)
 
 * Handle 64-bit auto incrementing primary keys in jdbc subadapters (DougEverly) (#1018, #1019)

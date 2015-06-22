@@ -1280,20 +1280,42 @@ describe "AssociationPks plugin" do
     Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [@h2], []]
   end
 
+  it "should handle :delay association option for new instances" do
+    album_class = Class.new(Album)
+    album_class.many_to_many :tags, :clone=>:tags, :delay_pks=>true, :join_table=>:albums_tags, :left_key=>:album_id
+    album = album_class.new
+    album.tag_pks.must_equal []
+    album.tag_pks = [@t1, @t2]
+    album.tag_pks.must_equal [@t1, @t2]
+    album.save
+    album_class.with_pk!(album.pk).tag_pks.sort.must_equal [@t1, @t2]
+  end
+
+  it "should handle :delay=>:all association option for existing instances" do
+    album_class = Class.new(Album)
+    album_class.many_to_many :tags, :clone=>:tags, :delay_pks=>:always, :join_table=>:albums_tags, :left_key=>:album_id
+    album = album_class.with_pk!(@al1)
+    album.tag_pks.sort.must_equal [@t1, @t2, @t3]
+    album.tag_pks = [@t1, @t2]
+    album.tag_pks.must_equal [@t1, @t2]
+    album.save_changes
+    album_class.with_pk!(album.pk).tag_pks.sort.must_equal [@t1, @t2]
+  end
+
   it "should set associated pks correctly for a one_to_many association" do
     Artist.use_transactions = true
     Album.order(:id).select_map(:artist_id).must_equal [@ar1, @ar1, @ar1]
 
-    Artist[@ar2].album_pks = [@t1, @t3]
-    Artist[@ar1].album_pks.must_equal [@t2]
+    Artist[@ar2].album_pks = [@al1, @al3]
+    Artist[@ar1].album_pks.must_equal [@al2]
     Album.order(:id).select_map(:artist_id).must_equal [@ar2, @ar1, @ar2]
 
-    Artist[@ar1].album_pks = [@t1]
-    Artist[@ar2].album_pks.must_equal [@t3]
+    Artist[@ar1].album_pks = [@al1]
+    Artist[@ar2].album_pks.must_equal [@al3]
     Album.order(:id).select_map(:artist_id).must_equal [@ar1, nil, @ar2]
 
-    Artist[@ar1].album_pks = [@t1, @t2]
-    Artist[@ar2].album_pks.must_equal [@t3]
+    Artist[@ar1].album_pks = [@al1, @al2]
+    Artist[@ar2].album_pks.must_equal [@al3]
     Album.order(:id).select_map(:artist_id).must_equal [@ar1, @ar1, @ar2]
   end
 
