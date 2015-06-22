@@ -67,11 +67,13 @@ module Sequel
           @auto_validate_unique_columns = []
           @auto_validate_types = true
 
-          @not_null_opts = NOT_NULL_OPTIONS
-          @explicit_not_null_opts = EXPLICIT_NOT_NULL_OPTIONS
-          @max_length_opts = MAX_LENGTH_OPTIONS
-          @schema_types_opts = SCHEMA_TYPES_OPTIONS
-          @unique_opts = UNIQUE_OPTIONS
+          @auto_validate_options = {
+              not_null: NOT_NULL_OPTIONS,
+              explicit_not_null: EXPLICIT_NOT_NULL_OPTIONS,
+              max_length: MAX_LENGTH_OPTIONS,
+              schema_types: SCHEMA_TYPES_OPTIONS,
+              unique: UNIQUE_OPTIONS
+          }
         end
       end
 
@@ -84,19 +86,19 @@ module Sequel
           end
 
           if opts[:not_null_opts]
-            @not_null_opts = @not_null_opts.merge(opts[:not_null_opts])
+            @auto_validate_options[:not_null] = @auto_validate_options[:not_null].merge(opts[:not_null_opts])
           end
           if opts[:explicit_not_null_opts]
-            @explicit_not_null_opts = @explicit_not_null_opts.merge(opts[:explicit_not_null_opts])
+            @auto_validate_options[:explicit_not_null] = @auto_validate_options[:explicit_not_null].merge(opts[:explicit_not_null_opts])
           end
           if opts[:max_length_opts]
-            @max_length_opts = @max_length_opts.merge(opts[:max_length_opts])
+            @auto_validate_options[:max_length] = @auto_validate_options[:max_length].merge(opts[:max_length_opts])
           end
           if opts[:schema_types_opts]
-            @schema_types_opts = @schema_types_opts.merge(opts[:schema_types_opts])
+            @auto_validate_options[:schema_types] = @auto_validate_options[:schema_types].merge(opts[:schema_types_opts])
           end
           if opts[:unique_opts]
-            @unique_opts = @unique_opts.merge(opts[:unique_opts])
+            @auto_validate_options[:unique] = @auto_validate_options[:unique].merge(opts[:unique_opts])
           end
         end
       end
@@ -115,22 +117,10 @@ module Sequel
         # The columns or sets of columns with automatic unique validations
         attr_reader :auto_validate_unique_columns
 
-        # Inherited not_null options
-        attr_reader :not_null_opts
+        # Inherited options
+        attr_reader :auto_validate_options
 
-        # Inherited explicit_not_null options
-        attr_reader :explicit_not_null_opts
-
-        # Inherited schema_types options
-        attr_reader :schema_types_opts
-
-        # Inherited max_length options
-        attr_reader :max_length_opts
-
-        # Inherited unique options
-        attr_reader :unique_opts
-
-        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_explicit_not_null_columns=>:dup, :@auto_validate_max_length_columns=>:dup, :@auto_validate_unique_columns=>:dup, :@unique_opts => :dup, :@schema_types_opts => :dup, :@max_length_opts => :dup, :@not_null_opts => :dup, :@explicit_not_null_opts => :dup)
+        Plugins.inherited_instance_variables(self, :@auto_validate_presence=>nil, :@auto_validate_types=>nil, :@auto_validate_not_null_columns=>:dup, :@auto_validate_explicit_not_null_columns=>:dup, :@auto_validate_max_length_columns=>:dup, :@auto_validate_unique_columns=>:dup, :@auto_validate_options => :dup)
         Plugins.after_set_dataset(self, :setup_auto_validations)
 
         # Whether to use a presence validation for not null columns
@@ -179,27 +169,27 @@ module Sequel
           super
           unless (not_null_columns = model.auto_validate_not_null_columns).empty?
             if model.auto_validate_presence?
-              validates_presence(not_null_columns, model.not_null_opts)
+              validates_presence(not_null_columns, model.auto_validate_options[:not_null])
             else
-              validates_not_null(not_null_columns, model.not_null_opts)
+              validates_not_null(not_null_columns, model.auto_validate_options[:not_null])
             end
           end
           unless (not_null_columns = model.auto_validate_explicit_not_null_columns).empty?
             if model.auto_validate_presence?
-              validates_presence(not_null_columns, model.explicit_not_null_opts)
+              validates_presence(not_null_columns, model.auto_validate_options[:explicit_not_null])
             else
-              validates_not_null(not_null_columns, model.explicit_not_null_opts)
+              validates_not_null(not_null_columns, model.auto_validate_options[:explicit_not_null])
             end
           end
           unless (max_length_columns = model.auto_validate_max_length_columns).empty?
             max_length_columns.each do |col, len|
-              validates_max_length(len, col, model.max_length_opts)
+              validates_max_length(len, col, model.auto_validate_options[:max_length])
             end
           end
 
-          validates_schema_types(keys, model.schema_types_opts) if model.auto_validate_types?
+          validates_schema_types(keys, model.auto_validate_options[:schema_types]) if model.auto_validate_types?
 
-          unique_opts = Hash[model.unique_opts]
+          unique_opts = Hash[model.auto_validate_options[:unique]]
           if model.respond_to?(:sti_dataset)
             unique_opts[:dataset] = model.sti_dataset
           end
