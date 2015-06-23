@@ -1916,7 +1916,7 @@ if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_versio
 
       called = false
       i = 0
-      @db.listen('foo2', :timeout=>proc{i+=1}){|ev, pid, payload| called = true}.must_equal nil
+      @db.listen('foo2', :timeout=>proc{i+=1; 0.001}){|ev, pid, payload| called = true}.must_equal nil
       called.must_equal false
       i.must_equal 1
 
