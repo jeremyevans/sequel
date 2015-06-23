@@ -515,7 +515,7 @@ Note that using +ilike+ with a regular expression will always make the regexp ca
 
 === Order Specifications (ASC, DESC)
 
-Sequel supports specifying ascending or descending order using the asc+ and +desc+ method on most Sequel-specific expression objects:
+Sequel supports specifying ascending or descending order using the +asc+ and +desc+ method on most Sequel-specific expression objects:
 
   Sequel.expr(:column).asc # "column" ASC
   Sequel.expr(:column).qualify(:table).desc # "table"."column" DESC
