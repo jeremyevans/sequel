@@ -1,12 +1,16 @@
 === HEAD
 
+* Use column symbol key for auto validation unique errors if the unique index is on a single column (jeremyevans)
+
+* Allow :timeout option to Database#listen in the postgres adapter to be a callable object (celsworth) (#1028)
+
 * Add pg_inet_ops extension, for DSL support for PostgreSQL inet/cidr operators and functions (celsworth, jeremyevans) (#1024)
 
 * Support :*_opts options in auto_validations plugin, for setting options for the underlying validation methods (celsworth, jeremyevans) (#1026)
 
 * Support :delay_pks association option in association_pks to delay setting of associated_pks until after saving (jeremyevans)
 
-* Make jdbc subadapters work if they issue queries while the subadapter is being loaded (#1022)
+* Make jdbc subadapters work if they issue queries while the subadapter is being loaded (jeremyevans) (#1022)
 
 * Handle 64-bit auto incrementing primary keys in jdbc subadapters (DougEverly) (#1018, #1019)
 

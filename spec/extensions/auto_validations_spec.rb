@@ -48,6 +48,18 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
+  it "should handle simple unique indexes correctly" do
+    def (@c.db).indexes(t, *)
+      raise if t.is_a?(Sequel::Dataset)
+      return [] if t != :test
+      {:a=>{:columns=>[:name], :unique=>true}}
+    end
+    @c.plugin :auto_validations
+    @m.set(:name=>'foo', :d=>Date.today)
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["is already taken"])
+  end
+
   it "should validate using the underlying column values" do
     @c.send(:define_method, :name){super() * 2}
     @c.db.fetch = {:v=>0}

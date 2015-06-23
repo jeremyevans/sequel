@@ -148,7 +148,7 @@ module Sequel
           @auto_validate_max_length_columns = db_schema.select{|col, sch| sch[:type] == :string && sch[:max_length].is_a?(Integer)}.map{|col, sch| [col, sch[:max_length]]}
           table = dataset.first_source_table
           @auto_validate_unique_columns = if db.supports_index_parsing? && [Symbol, SQL::QualifiedIdentifier, SQL::Identifier, String].any?{|c| table.is_a?(c)}
-            db.indexes(table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns]}
+            db.indexes(table).select{|name, idx| idx[:unique] == true}.map{|name, idx| idx[:columns].length == 1 ? idx[:columns].first : idx[:columns]}
           else
             []
           end
