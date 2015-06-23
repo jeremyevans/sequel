@@ -1913,6 +1913,19 @@ if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_versio
       i = 0
       @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_equal nil
       i.must_equal 4
+
+      called = false
+      i = 0
+      @db.listen('foo2', :timeout=>proc{i+=1}){|ev, pid, payload| called = true}.must_equal nil
+      called.must_equal false
+      i.must_equal 1
+
+	  i = 0
+      t = 0
+      @db.listen('foo2', :timeout=>proc{t+=1; 0.001}, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_equal nil
+      called.must_equal false
+      t.must_equal 4
+
     end unless RUBY_PLATFORM =~ /mingw/ # Ruby freezes on this spec on this platform/version
   end
 end
