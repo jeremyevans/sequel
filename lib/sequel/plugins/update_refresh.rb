@@ -19,6 +19,18 @@ module Sequel
     #
     #   # Make the Album class refresh after update
     #   Album.plugin :update_refresh
+    #
+    # As a performance optimisation, if you know only specific
+    # columns will have changed, you can specify them to the
+    # +columns+ option. This can be a performance gain if it
+    # would avoid pointlessly comparing many other columns.
+    #
+    #   # Only include the artist column in RETURNING
+    #   Album.plugin :update_refresh, :columns => :artist
+    #
+    #   # Only include the artist and title columns in RETURNING
+    #   Album.plugin :update_refresh, :columns => [ :artist, :title ]
+    #
     module UpdateRefresh
       module InstanceMethods
         def after_update
@@ -33,7 +45,7 @@ module Sequel
         def _update_without_checking(columns)
           ds = _update_dataset
           if ds.supports_returning?(:update)
-            ds = ds.opts[:returning] ? ds : ds.returning
+            ds = ds.opts[:returning] ? ds : ds.returning(*self.class.update_refresh_columns)
             rows = ds.update(columns)
             n = rows.length
             if n == 1
@@ -45,6 +57,17 @@ module Sequel
           end
         end
       end
+
+      module ClassMethods
+        attr_reader :update_refresh_columns
+      end
+
+      def self.configure(model, opts=OPTS)
+        model.instance_eval do
+          @update_refresh_columns = Array(opts[:columns]) || []
+        end
+      end
+
     end
   end
 end

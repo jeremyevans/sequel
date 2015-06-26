@@ -27,6 +27,18 @@ describe "Sequel::Plugins::UpdateRefresh" do
     o.name.must_equal 'b'
   end
 
+  it "should support specifying columns to return" do
+    @db.extend_datasets{def supports_returning?(x) true end; def update_sql(*); sql = super; update_returning_sql(sql); sql end}
+    @c.plugin :update_refresh, :columns => [ :a ]
+    @c.dataset = @db[:test]
+    @db.sqls
+    o = @c.load(:id=>1, :name=>'a')
+    o.save
+    @db.sqls.must_equal ["UPDATE test SET name = 'a' WHERE (id = 1) RETURNING a"]
+    o.name.must_equal 'b'
+  end
+
+
   it "should refresh the instance after updating when returning specific columns" do
     @db.extend_datasets{def supports_returning?(x) true end; def update_sql(*); sql = super; update_returning_sql(sql); sql end}
     @c.plugin :insert_returning_select
