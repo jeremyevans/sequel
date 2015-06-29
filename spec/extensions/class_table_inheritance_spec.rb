@@ -49,7 +49,6 @@ describe "class_table_inheritance plugin" do
   end
 
   it "should have simple_table = nil for all classes" do
-    Employee.simple_table.must_equal nil
     Manager.simple_table.must_equal nil
     Executive.simple_table.must_equal nil
     Staff.simple_table.must_equal nil
@@ -62,7 +61,7 @@ describe "class_table_inheritance plugin" do
     end
 
   it "should use a joined dataset in subclasses" do
-    Employee.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind FROM employees'
+    Employee.dataset.sql.must_equal 'SELECT * FROM employees'
     Manager.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)'
     Executive.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)'
     Staff.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)'
@@ -85,7 +84,7 @@ describe "class_table_inheritance plugin" do
     a.class.must_equal Executive
     a.values.must_equal(:id=>1, :name=>'A', :kind=>'Executive')
     a.refresh.values.must_equal(:id=>1, :name=>'A', :kind=>'Executive', :num_staff=>3, :num_managers=>2)
-    @db.sqls.must_equal ["SELECT employees.id, employees.name, employees.kind FROM employees LIMIT 1",
+    @db.sqls.must_equal ["SELECT * FROM employees LIMIT 1",
       "SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (executives.id = 1) LIMIT 1"]
   end
   
@@ -163,10 +162,6 @@ describe "class_table_inheritance plugin" do
     @db.sqls.must_equal ["INSERT INTO employees (kind) VALUES ('Employee')"]
   end
 
-  it "should raise an error if attempting to create an anonymous subclass" do
-    proc{Class.new(Manager)}.must_raise(Sequel::Error)
-  end
-
   it "should allow specifying a map of names to tables to override implicit mapping" do
     Manager.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)'
     Staff.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)'
@@ -187,7 +182,7 @@ describe "class_table_inheritance plugin" do
     Manager.dataset._fetch = {:num_staff=>2}
     e = Employee[1]
     e.must_be_kind_of(Executive)
-    @db.sqls.must_equal ["SELECT employees.id, employees.name, employees.kind FROM employees WHERE (id = 1) LIMIT 1"]
+    @db.sqls.must_equal ["SELECT * FROM employees WHERE (id = 1) LIMIT 1"]
     e.num_staff.must_equal 2
     @db.sqls.must_equal ["SELECT managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 1) LIMIT 1"]
   end
@@ -198,7 +193,7 @@ describe "class_table_inheritance plugin" do
     Executive.dataset._fetch = {:id=>1, :num_managers=>3}
     e = Employee.all.first
     e.must_be_kind_of(Executive)
-    @db.sqls.must_equal ["SELECT employees.id, employees.name, employees.kind FROM employees"]
+    @db.sqls.must_equal ["SELECT * FROM employees"]
     e.num_staff#.must_equal 2
     @db.sqls.must_equal ["SELECT managers.id, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id IN (1))"]
     e.num_managers#.must_equal 3
