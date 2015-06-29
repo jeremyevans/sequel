@@ -43,7 +43,7 @@
 #   r.masklen          # masklen(inet)
 #   r.netmask          # netmask(inet)
 #   r.network          # network(inet)
-#   r.set_masklen      # set_masklen(inet)
+#   r.set_masklen(16)  # set_masklen(inet, 16)
 #   r.text             # text(inet)
 #
 # If a String or IPAddr instance is passed to Sequel.pg_inet_op, it will automatically
