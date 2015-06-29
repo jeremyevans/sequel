@@ -24,6 +24,8 @@ module Sequel
     # columns will have changed, you can specify them to the
     # +columns+ option. This can be a performance gain if it
     # would avoid pointlessly comparing many other columns.
+    # Note that this option currently only has an effect if the
+    # dataset # supports RETURNING.
     #
     #   # Only include the artist column in RETURNING
     #   Album.plugin :update_refresh, :columns => :artist
