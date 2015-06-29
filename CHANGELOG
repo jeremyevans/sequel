@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow class_table_inheritance plugin to support subclasses that don't add additional columns (QuinnHarris, jeremyevans) (#1030)
+
+* Add :columns option to update_refresh plugin, specifying the columns to include in the RETURNING clause (celsworth) (#1029)
+
 * Use column symbol key for auto validation unique errors if the unique index is on a single column (jeremyevans)
 
 * Allow :timeout option to Database#listen in the postgres adapter to be a callable object (celsworth) (#1028)

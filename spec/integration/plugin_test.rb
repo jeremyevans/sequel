@@ -33,21 +33,27 @@ describe "Class Table Inheritance Plugin" do
     end 
     class ::Executive < Manager
     end 
+    class ::Ceo < Executive
+    end 
     class ::Staff < Employee
       many_to_one :manager
     end 
     
-    @i1 =@db[:employees].insert(:name=>'E', :kind=>'Employee')
+    
+    @i1 = @db[:employees].insert(:name=>'E', :kind=>'Employee')
     @i2 = @db[:employees].insert(:name=>'S', :kind=>'Staff')
     @i3 = @db[:employees].insert(:name=>'M', :kind=>'Manager')
-    @i4 = @db[:employees].insert(:name=>'Ex', :kind=>'Executive')
     @db[:managers].insert(:id=>@i3, :num_staff=>7)
+    @i4 = @db[:employees].insert(:name=>'Ex', :kind=>'Executive')
     @db[:managers].insert(:id=>@i4, :num_staff=>5)
     @db[:executives].insert(:id=>@i4, :num_managers=>6)
+    @i5 = @db[:employees].insert(:name=>'C', :kind=>'Ceo')
+    @db[:managers].insert(:id=>@i5, :num_staff=>2)
+    @db[:executives].insert(:id=>@i5, :num_managers=>1)
     @db[:staff].insert(:id=>@i2, :manager_id=>@i4)
   end
   after do
-    [:Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
+    [:Ceo, :Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
   end
   after(:all) do
     @db.drop_table? :staff, :executives, :managers, :employees
@@ -58,7 +64,8 @@ describe "Class Table Inheritance Plugin" do
       Employee.load(:id=>@i1, :name=>'E', :kind=>'Employee'),
       Staff.load(:id=>@i2, :name=>'S', :kind=>'Staff'),
       Manager.load(:id=>@i3, :name=>'M', :kind=>'Manager'),
-      Executive.load(:id=>@i4, :name=>'Ex', :kind=>'Executive')
+      Executive.load(:id=>@i4, :name=>'Ex', :kind=>'Executive'),
+      Ceo.load(:id=>@i5, :name=>'C', :kind=>'Ceo')
     ]
   end
   
@@ -71,6 +78,8 @@ describe "Class Table Inheritance Plugin" do
     Employee[@i4].num_staff.must_equal 5
     Employee[@i4][:num_managers].must_equal nil
     Employee[@i4].num_managers.must_equal 6
+    Employee[@i5][:num_managers].must_equal nil
+    Employee[@i5].num_managers.must_equal 1
   end
   
   it "should eagerly load columns in subclass tables when retrieving multiple objects" do
@@ -83,6 +92,8 @@ describe "Class Table Inheritance Plugin" do
     a[3].num_staff.must_equal 5
     a[3][:num_managers].must_equal nil
     a[3].num_managers.must_equal 6
+    a[4][:num_managers].must_equal 1
+    a[4].num_managers.must_equal 1
   end
   
   it "should include schema for columns for tables for ancestor classes" do
@@ -90,6 +101,7 @@ describe "Class Table Inheritance Plugin" do
     Staff.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :manager_id, :name]
     Manager.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_staff]
     Executive.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_managers, :num_staff]
+    Ceo.db_schema.keys.sort_by{|x| x.to_s}.must_equal [:id, :kind, :name, :num_managers, :num_staff]
   end
   
   it "should include columns for tables for ancestor classes" do
@@ -97,10 +109,11 @@ describe "Class Table Inheritance Plugin" do
     Staff.columns.must_equal [:id, :name, :kind, :manager_id]
     Manager.columns.must_equal [:id, :name, :kind, :num_staff]
     Executive.columns.must_equal [:id, :name, :kind, :num_staff, :num_managers]
+    Ceo.columns.must_equal [:id, :name, :kind, :num_staff, :num_managers]
   end
   
   it "should delete rows from all tables" do
-    e = Executive.first
+    e = Ceo.first
     i = e.id
     e.staff_members_dataset.destroy
     e.destroy
@@ -114,9 +127,9 @@ describe "Class Table Inheritance Plugin" do
   end
 
   it "should insert rows into all tables" do
-    e = Executive.create(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
+    e = Ceo.create(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
     i = e.id
-    @db[:employees][:id=>i].must_equal(:id=>i, :name=>'Ex2', :kind=>'Executive')
+    @db[:employees][:id=>i].must_equal(:id=>i, :name=>'Ex2', :kind=>'Ceo')
     @db[:managers][:id=>i].must_equal(:id=>i, :num_staff=>9)
     @db[:executives][:id=>i].must_equal(:id=>i, :num_managers=>8)
   end
