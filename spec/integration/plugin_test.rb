@@ -1296,7 +1296,7 @@ describe "AssociationPks plugin" do
   it "should handle :delay association option for new instances" do
     album_class = Class.new(Album)
     album_class.many_to_many :tags, :clone=>:tags, :delay_pks=>true, :join_table=>:albums_tags, :left_key=>:album_id
-    album = album_class.new
+    album = album_class.new(:name=>'test album')
     album.tag_pks.must_equal []
     album.tag_pks = [@t1, @t2]
     album.tag_pks.must_equal [@t1, @t2]
