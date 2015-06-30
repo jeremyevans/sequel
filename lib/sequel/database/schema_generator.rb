@@ -49,7 +49,9 @@ module Sequel
       # arbitrary code execution.
       def self.add_type_method(*types)
         types.each do |type|
-          class_eval("def #{type}(name, opts={}); column(name, #{type}, opts); end", __FILE__, __LINE__)
+          type_name = type.name
+          type_name = type_name.split('::').last if /::/ =~ type_name
+          class_eval("def #{type_name}(name, opts={}); column(name, #{type_name}, opts); end", __FILE__, __LINE__)
         end
       end
       
