@@ -1,0 +1,121 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.24.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.24.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.24.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2015-07-01 08:05:45 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>A pg_inet_ops extension has been added, for DSL support for calling
+            PostgreSQL inet functions and operators.  Example:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_inet_op</span>(:<span class="ruby-identifier">inet</span>)&#x000A;&#x000A;<span class="ruby-operator">~</span><span class="ruby-identifier">r</span>                                 <span class="ruby-comment"># ~inet</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">other</span>                         <span class="ruby-comment"># inet &amp; other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">other</span>                         <span class="ruby-comment"># inet | other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&lt;&lt;</span> :<span class="ruby-identifier">other</span>                        <span class="ruby-comment"># inet &lt;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&gt;&gt;</span> :<span class="ruby-identifier">other</span>                        <span class="ruby-comment"># inet &gt;&gt; other</span>&#x000A;&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">other</span>)             <span class="ruby-comment"># inet &lt;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contained_by_or_equals</span>(:<span class="ruby-identifier">other</span>)   <span class="ruby-comment"># inet &lt;&lt;= other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">other</span>)                 <span class="ruby-comment"># inet &gt;&gt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains_or_equals</span>(:<span class="ruby-identifier">other</span>)       <span class="ruby-comment"># inet &gt;&gt;= other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains_or_contained_by</span>(:<span class="ruby-identifier">other</span>) <span class="ruby-comment"># inet &amp;&amp; other</span>&#x000A;&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">abbrev</span>           <span class="ruby-comment"># abbrev(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">broadcast</span>        <span class="ruby-comment"># broadcast(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">family</span>           <span class="ruby-comment"># family(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">host</span>             <span class="ruby-comment"># host(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">hostmask</span>         <span class="ruby-comment"># hostmask(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">masklen</span>          <span class="ruby-comment"># masklen(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">netmask</span>          <span class="ruby-comment"># netmask(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">network</span>          <span class="ruby-comment"># network(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">set_masklen</span>(<span class="ruby-value">16</span>)  <span class="ruby-comment"># set_masklen(inet, 16)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">text</span>             <span class="ruby-comment"># text(inet)</span></pre>
+            </li><li>
+            <p>The association_pks plugin now supports a :delay_pks association option. 
+            When set to true, this makes the methods created by the plugin usable on
+            new objects, by delaying the saving of the associated pks until after the
+            new object has been saved.  When set to :always, this also changes the
+            behavior of the methods for existing objects, so that nothing is persisted
+            until the object has been saved.  Example:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_pks</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_many</span> :<span class="ruby-identifier">tags</span>, :<span class="ruby-identifier">delay_pks=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">tag_pks=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>,<span class="ruby-value">3</span>]) <span class="ruby-comment"># No database query</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">save</span> <span class="ruby-comment"># Queries to insert album, and then update albums_tags</span></pre>
+            </li><li>
+            <p>The class_table_inheritance plugin now supports subclasses that don&#39;t
+            require additional columns, and therefore do not need to join to additional
+            tables.  It now loads the single_table_inheritance plugin and supports
+            options that were previously only supported by single_table_inheritance,
+            such as the :key_map and :key_chooser options.</p>
+            </li><li>
+            <p>The validation_helpers plugin now supports a :from=&gt;:values option in
+            the validation methods, which will take the value directly from the values
+            hash instead of calling the related method.  This allows validation_helpers
+            to differentiate between validations on underlying database column and
+            validations on the model.</p>
+            
+            <p>The auto_validations plugin has been modified to use this feature, since
+            all validations it generates are for validations on the underlying database
+            columns.</p>
+            </li><li>
+            <p>The auto_validations plugin now supports options to pass to each of the
+            underlying validation methods:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">auto_validations</span>,&#x000A;  :<span class="ruby-identifier">unique_opts=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">only_if_modified=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}</pre>
+            
+            <p>In addition to :unique_opts, there is support for :not_null_opts (for NOT
+            NULL columns without a default), :explicit_not_null_opts (for NOT NULL
+            columns with a default), :max_length_opts, and :schema_types_opts.</p>
+            </li><li>
+            <p>The update_refresh plugin now accepts a :columns option, which specifies
+            the columns to refresh.  This option is currently only respected if the
+            related dataset supports RETURNING.</p>
+            </li><li>
+            <p>The :timeout option to Database#listen in the postgres adapter can now be a
+            callable object, previously it had to be Numeric.  This allows you to
+            dynamically change the timeout based on current application state.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>The uniqueness validations added by the auto_validations plugin now use a
+            symbol key in the related Errors instance if the underlying index was on a
+            single column.  Previously, the uniqueness validations for a single column
+            would use an array key in the related Errors instance.</p>
+            </li><li>
+            <p>The jdbc subadapters now correctly handle 64-bit autoincrementing primary
+            keys.</p>
+            </li><li>
+            <p>The jdbc subadapters now work correctly if they issue queries while the
+            subadapter is being loaded.  This can happen in the jdbc/postgresql adapter
+            if the pg_hstore extension is used.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>The deprecated db2 and dbi adapters have been removed.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

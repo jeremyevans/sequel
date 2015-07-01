@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-03-23 10:16:45 -0700</span>
+          <span class='datetime'>2015-06-23 07:26:33 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -307,6 +307,15 @@
             function method on a QuailfiedIdentifier:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema__function</span>.<span class="ruby-identifier">function</span>}&#x000A;<span class="ruby-comment"># SELECT schema.function() FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema__function</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">col</span>, <span class="ruby-value">2</span>, <span class="ruby-string">&quot;a&quot;</span>)}&#x000A;<span class="ruby-comment"># SELECT schema.function(col, 2, &#39;a&#39;) FROM albums</span></pre>
+            
+            <h3 id="label-Portable-2FEmulated+Functions">Portable/Emulated Functions<span><a href="#label-Portable-2FEmulated+Functions">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> offers some support for
+            portable SQL functions, allowing you to call standard SQL functions, where
+            <a href="../../classes/Sequel.html">Sequel</a> will emulate support on
+            databases that lack native support. Some examples are:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">char_length</span>(:<span class="ruby-identifier">column</span>)    <span class="ruby-comment"># char_length(column)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extract</span>(:<span class="ruby-identifier">year</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-comment"># extract(year FROM column)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">trim</span>(:<span class="ruby-identifier">column</span>)           <span class="ruby-comment"># trim(column)</span></pre>
             
             <h3 id="label-Equality+Operator+-28-3D-29">Equality Operator (=)<span><a href="#label-Equality+Operator+-28-3D-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -607,8 +616,8 @@
             <h3 id="label-Order+Specifications+-28ASC-2C+DESC-29">Order Specifications (ASC, DESC)<span><a href="#label-Order+Specifications+-28ASC-2C+DESC-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> supports specifying
-            ascending or descending order using the asc+ and <code>desc</code> method
-            on most Sequel-specific expression objects:</p>
+            ascending or descending order using the <code>asc</code> and
+            <code>desc</code> method on most Sequel-specific expression objects:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column</span>).<span class="ruby-identifier">asc</span> <span class="ruby-comment"># &quot;column&quot; ASC</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-identifier">desc</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; DESC</span></pre>
             

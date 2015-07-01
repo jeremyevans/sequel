@@ -31,12 +31,6 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../files/lib/sequel/adapters/db2_rb.html">lib/sequel/adapters/db2.rb</a>
-          </li>
-          <li class='other'>
-            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/db2_rb.html">lib/sequel/adapters/jdbc/db2.rb</a>
-          </li>
-          <li class='other'>
             <a target="docwin" href="../../files/lib/sequel/adapters/odbc/db2_rb.html">lib/sequel/adapters/odbc/db2.rb</a>
           </li>
           <li class='other'>
@@ -54,14 +48,7 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a target="docwin" href="#attribute-c-convert_smallint_to_bool">convert_smallint_to_bool</a></li>
               <li><a target="docwin" href="#attribute-c-use_clob_as_blob">use_clob_as_blob</a></li>
-            </ol>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a target="docwin" href="#method-i-boolean">boolean</a></li>
-              <li><a target="docwin" href="#method-i-date">date</a></li>
-              <li><a target="docwin" href="#method-i-time">time</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -71,53 +58,13 @@
             <ol>
               <li><a target="docwin" href="DB2/DatabaseMethods.html">Sequel::DB2::DatabaseMethods</a></li>
               <li><a target="docwin" href="DB2/DatasetMethods.html">Sequel::DB2::DatasetMethods</a></li>
-              <li><a target="docwin" href="DB2/DB2Error.html">Sequel::DB2::DB2Error</a></li>
-              <li><a target="docwin" href="DB2/Database.html">Sequel::DB2::Database</a></li>
-              <li><a target="docwin" href="DB2/Dataset.html">Sequel::DB2::Dataset</a></li>
             </ol>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>DB2_TYPES</td>
-                    <td>=</td>
-                    <td class='context-item-value'>
-                      {
-                      :boolean  => tt.method(:boolean),
-                      DB2CLI::SQL_BLOB => ::Sequel::SQL::Blob.method(:new),
-                      DB2CLI::SQL_TYPE_DATE => tt.method(:date),
-                      DB2CLI::SQL_TYPE_TIME => tt.method(:time),
-                      DB2CLI::SQL_DECIMAL => ::BigDecimal.method(:new)
-                      }
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Hash holding type translation methods, used by <a
-                      href="DB2/Dataset.html#method-i-fetch_rows">Sequel::DB2::Dataset#fetch_rows</a>.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='attribute-list'>
               <h2 class='section-bar'>Attributes</h2>
               <div class='name-list'>
                 <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-c-convert_smallint_to_bool'>convert_smallint_to_bool</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Whether to convert smallint values to bool, true by default. Can also be
-                      overridden per dataset.</p>
-                    </td>
-                  </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>
                       <a name='attribute-c-use_clob_as_blob'>use_clob_as_blob</a>
@@ -129,57 +76,6 @@
                     </td>
                   </tr>
                 </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-boolean'>
-                <a name='method-i-boolean'></a>
-                <div class='synopsis'>
-                  <span class='name'>boolean</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-boolean-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-boolean-source'><span class="ruby-comment"># File lib/sequel/adapters/db2.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">boolean</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">!</span><span class="ruby-identifier">s</span>.<span class="ruby-identifier">to_i</span>.<span class="ruby-identifier">zero?</span> <span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-date'>
-                <a name='method-i-date'></a>
-                <div class='synopsis'>
-                  <span class='name'>date</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-date-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-date-source'><span class="ruby-comment"># File lib/sequel/adapters/db2.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">date</span>(<span class="ruby-identifier">s</span>) <span class="ruby-constant">Date</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>.<span class="ruby-identifier">year</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">month</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">day</span>) <span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-time'>
-                <a name='method-i-time'></a>
-                <div class='synopsis'>
-                  <span class='name'>time</span>
-                  <span class='arguments'>(s)</span>
-                </div>
-                <div class='description'>
-                  
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-time-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-time-source'><span class="ruby-comment"># File lib/sequel/adapters/db2.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">time</span>(<span class="ruby-identifier">s</span>) <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQLTime</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">s</span>.<span class="ruby-identifier">hour</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">minute</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">second</span>) <span class="ruby-keyword">end</span></pre>
-                </div>
               </div>
             </div>
           </div>

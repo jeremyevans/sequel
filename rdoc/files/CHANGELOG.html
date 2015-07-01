@@ -31,12 +31,50 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-06-01 07:48:19 -0700</span>
+          <span class='datetime'>2015-07-01 08:05:45 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.24.0+-282015-07-01-29">4.24.0 (2015-07-01)<span><a href="#label-4.24.0+-282015-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Allow class_table_inheritance plugin to support subclasses that don&#39;t
+            add additional columns (QuinnHarris, jeremyevans) (#1030)</p>
+            </li><li>
+            <p>Add :columns option to update_refresh plugin, specifying the columns to
+            include in the RETURNING clause (celsworth) (#1029)</p>
+            </li><li>
+            <p>Use column symbol key for auto validation unique errors if the unique index
+            is on a single column (jeremyevans)</p>
+            </li><li>
+            <p>Allow :timeout option to Database#listen in the postgres adapter to be a
+            callable object (celsworth) (#1028)</p>
+            </li><li>
+            <p>Add pg_inet_ops extension, for DSL support for PostgreSQL inet/cidr
+            operators and functions (celsworth, jeremyevans) (#1024)</p>
+            </li><li>
+            <p>Support :*_opts options in auto_validations plugin, for setting options for
+            the underlying validation methods (celsworth, jeremyevans) (#1026)</p>
+            </li><li>
+            <p>Support :delay_pks association option in association_pks to delay setting
+            of associated_pks until after saving (jeremyevans)</p>
+            </li><li>
+            <p>Make jdbc subadapters work if they issue queries while the subadapter is
+            being loaded (jeremyevans) (#1022)</p>
+            </li><li>
+            <p>Handle 64-bit auto incrementing primary keys in jdbc subadapters
+            (DougEverly) (#1018, #1019)</p>
+            </li><li>
+            <p>Remove the deprecated db2 and dbi adapters (jeremyevans)</p>
+            </li><li>
+            <p>Make auto_validation plugin use :from=&gt;:values option to setup
+            validations on the underlying columns (jeremyevans)</p>
+            </li><li>
+            <p>Add :from=&gt;:values option to validation_helpers methods, for getting
+            values from the values hash instead of a method call (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.23.0+-282015-06-01-29">4.23.0 (2015-06-01)<span><a href="#label-4.23.0+-282015-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

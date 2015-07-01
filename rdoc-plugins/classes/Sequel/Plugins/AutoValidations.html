@@ -81,6 +81,14 @@
             <p>This is useful if you want to enforce that NOT NULL string columns do not
             allow empty values.</p>
             
+            <p>You can also supply hashes to pass options through to the underlying
+            validators:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">auto_validations</span>, <span class="ruby-identifier">unique_opts</span><span class="ruby-operator">:</span> {<span class="ruby-identifier">only_if_modified</span><span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>}</pre>
+            
+            <p>This works for unique_opts, max_length_opts, schema_types_opts,
+            explicit_not_null_opts, and not_null_opts.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclass use auto validations (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">auto_validations</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class use auto validations</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">auto_validations</span></pre>
@@ -103,6 +111,48 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>EXPLICIT_NOT_NULL_OPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{:from=>:values, :allow_missing=>true}.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>MAX_LENGTH_OPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{:from=>:values, :allow_nil=>true}.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NOT_NULL_OPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>{:from=>:values}.freeze</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>SCHEMA_TYPES_OPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>NOT_NULL_OPTIONS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>UNIQUE_OPTIONS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>NOT_NULL_OPTIONS</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
               <div class='method public-class' id='method-method-c-apply'>
@@ -118,7 +168,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;    <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@auto_validate_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_explicit_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_max_length_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_unique_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">plugin</span> <span class="ruby-value">:validation_helpers</span>&#x000A;    <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@auto_validate_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_explicit_not_null_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_max_length_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_unique_columns</span> = []&#x000A;    <span class="ruby-ivar">@auto_validate_types</span> = <span class="ruby-keyword">true</span>&#x000A;&#x000A;    <span class="ruby-ivar">@auto_validate_options</span> = {&#x000A;        <span class="ruby-value">:not_null=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">NOT_NULL_OPTIONS</span>,&#x000A;        <span class="ruby-value">:explicit_not_null=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">EXPLICIT_NOT_NULL_OPTIONS</span>,&#x000A;        <span class="ruby-value">:max_length=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">MAX_LENGTH_OPTIONS</span>,&#x000A;        <span class="ruby-value">:schema_types=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">SCHEMA_TYPES_OPTIONS</span>,&#x000A;        <span class="ruby-value">:unique=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">UNIQUE_OPTIONS</span>&#x000A;    }.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -135,7 +185,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">setup_auto_validations</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:not_null</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:presence</span>&#x000A;      <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/auto_validations.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">setup_auto_validations</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@dataset</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:not_null</span>] <span class="ruby-operator">==</span> <span class="ruby-value">:presence</span>&#x000A;      <span class="ruby-ivar">@auto_validate_presence</span> = <span class="ruby-keyword">true</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;&#x000A;    <span class="ruby-identifier">h</span> = <span class="ruby-ivar">@auto_validate_options</span>.<span class="ruby-identifier">dup</span>&#x000A;    [<span class="ruby-value">:not_null</span>, <span class="ruby-value">:explicit_not_null</span>, <span class="ruby-value">:max_length</span>, <span class="ruby-value">:schema_types</span>, <span class="ruby-value">:unique</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">type</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-keyword">if</span> <span class="ruby-identifier">type_opts</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:&quot;#{type}_opts&quot;</span>]&#x000A;        <span class="ruby-identifier">h</span>[<span class="ruby-identifier">type</span>] = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">type</span>].<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">type_opts</span>).<span class="ruby-identifier">freeze</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-ivar">@auto_validate_options</span> = <span class="ruby-identifier">h</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

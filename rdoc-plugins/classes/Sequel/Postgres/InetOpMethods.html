@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::Plugins::UpdateRefresh::InstanceMethods</title>
+    <title>Sequel::Postgres::InetOpMethods</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
         function popupCode(url) {
@@ -27,11 +27,11 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>module</span>
-          Sequel::Plugins::UpdateRefresh::InstanceMethods
+          Sequel::Postgres::InetOpMethods
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../../files/lib/sequel/plugins/update_refresh_rb.html">lib/sequel/plugins/update_refresh.rb</a>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_inet_ops_rb.html">lib/sequel/extensions/pg_inet_ops.rb</a>
           </li>
         </ol>
       </div>
@@ -42,7 +42,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-after_update">after_update</a></li>
+              <li><a target="docwin" href="#method-i-pg_inet">pg_inet</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -50,20 +50,22 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-after_update'>
-                <a name='method-i-after_update'></a>
+              <div class='method public-instance' id='method-method-i-pg_inet'>
+                <a name='method-i-pg_inet'></a>
                 <div class='synopsis'>
-                  <span class='name'>after_update</span>
+                  <span class='name'>pg_inet</span>
                   <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   
+                  <p>Wrap the receiver in an <a href="InetOp.html">InetOp</a> so you can easily
+                  use the PostgreSQL inet functions and operators with it.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_update-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_inet-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">this</span>.<span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:update</span>)&#x000A;    <span class="ruby-identifier">refresh</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-pg_inet-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 159</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_inet</span>&#x000A;  <span class="ruby-constant">InetOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

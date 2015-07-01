@@ -1,11 +1,11 @@
-Mon, 01 Jun 2015 07:56:28 -0700
+Wed, 01 Jul 2015 08:11:48 -0700
 README.rdoc	Sun, 03 May 2015 08:59:30 -0700
-CHANGELOG	Mon, 01 Jun 2015 07:48:19 -0700
+CHANGELOG	Wed, 01 Jul 2015 08:05:45 -0700
 MIT-LICENSE	Wed, 14 Jan 2015 18:47:41 -0800
 lib/sequel.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/ast_transformer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/connection_pool.rb	Tue, 25 Nov 2014 10:11:48 -0800
-lib/sequel/core.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/core.rb	Wed, 10 Jun 2015 08:09:07 -0700
 lib/sequel/database.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/deprecated.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -14,12 +14,12 @@ lib/sequel/model.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/no_core_ext.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/sql.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/timezones.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/version.rb	Mon, 01 Jun 2015 07:48:19 -0700
+lib/sequel/version.rb	Wed, 01 Jul 2015 08:05:45 -0700
 lib/sequel/connection_pool/sharded_single.rb	Tue, 25 Nov 2014 10:11:48 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Tue, 12 May 2015 13:51:08 -0700
 lib/sequel/connection_pool/single.rb	Tue, 25 Nov 2014 10:11:48 -0800
 lib/sequel/connection_pool/threaded.rb	Tue, 12 May 2015 13:51:08 -0700
-lib/sequel/database/connecting.rb	Fri, 08 May 2015 15:48:36 -0700
+lib/sequel/database/connecting.rb	Wed, 03 Jun 2015 12:44:46 -0700
 lib/sequel/database/dataset.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/database/dataset_defaults.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/database/features.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -70,7 +70,7 @@ doc/reflection.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
 doc/schema_modification.rdoc	Tue, 24 Feb 2015 08:28:23 -0800
 doc/security.rdoc	Tue, 22 Apr 2014 10:09:17 -0700
 doc/sharding.rdoc	Fri, 22 May 2015 08:18:52 -0700
-doc/sql.rdoc	Mon, 23 Mar 2015 10:16:45 -0700
+doc/sql.rdoc	Tue, 23 Jun 2015 07:26:33 -0700
 doc/testing.rdoc	Fri, 08 May 2015 15:48:36 -0700
 doc/thread_safety.rdoc	Sat, 26 Oct 2013 06:54:00 -0700
 doc/transactions.rdoc	Wed, 09 Apr 2014 15:04:48 -0700
@@ -160,6 +160,7 @@ doc/release_notes/4.20.0.txt	Tue, 03 Mar 2015 08:32:28 -0800
 doc/release_notes/4.21.0.txt	Wed, 01 Apr 2015 08:28:35 -0700
 doc/release_notes/4.22.0.txt	Fri, 01 May 2015 08:43:44 -0700
 doc/release_notes/4.23.0.txt	Mon, 01 Jun 2015 07:48:19 -0700
+doc/release_notes/4.24.0.txt	Wed, 01 Jul 2015 08:05:45 -0700
 doc/release_notes/4.3.0.txt	Wed, 02 Oct 2013 14:34:47 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
 doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800

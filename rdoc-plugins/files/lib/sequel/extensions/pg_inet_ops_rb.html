@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>pg_inet_ops.rb</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>pg_inet_ops.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/pg_inet_ops.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2015-07-01 08:05:45 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The pg_inet_ops extension adds support to Sequel&#39;s DSL to make it
+            easier to call PostgreSQL inet functions and operators.</p>
+            
+            <p>To load the extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_inet_ops</span></pre>
+            
+            <p>The most common usage is passing an expression to Sequel.pg_inet_op:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_inet_op</span>(:<span class="ruby-identifier">inet</span>)</pre>
+            
+            <p>Also, on most <a href="../../../../classes/Sequel.html">Sequel</a>
+            expression objects, you can call the pg_inet method:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">ip</span>).<span class="ruby-identifier">pg_inet</span></pre>
+            
+            <p>If you have loaded the <a
+            href="../../../doc/core_extensions_rdoc.html">core_extensions
+            extension</a>, or you have loaded the core_refinements extension and have
+            activated refinements for the file, you can also use <a
+            href="../../../../classes/Sequel/Postgres/InetOpMethods.html#method-i-pg_inet">Sequel::Postgres::InetOpMethods#pg_inet</a>:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">r</span> = :<span class="ruby-identifier">inet</span>.<span class="ruby-identifier">pg_inet</span></pre>
+            
+            <p>This creates a <a
+            href="../../../../classes/Sequel/Postgres/InetOp.html">Sequel::Postgres::InetOp</a>
+            object that can be used for easier querying:</p>
+            
+            <pre class="ruby"><span class="ruby-operator">~</span><span class="ruby-identifier">r</span>                                 <span class="ruby-comment"># ~inet</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&amp;</span> <span class="ruby-identifier">other</span>                          <span class="ruby-comment"># inet &amp; other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">|</span> <span class="ruby-identifier">other</span>                          <span class="ruby-comment"># inet | other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&lt;&lt;</span> :<span class="ruby-identifier">other</span>                        <span class="ruby-comment"># inet &lt;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span> <span class="ruby-operator">&gt;&gt;</span> :<span class="ruby-identifier">other</span>                        <span class="ruby-comment"># inet &gt;&gt; other</span>&#x000A;&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contained_by</span>(:<span class="ruby-identifier">other</span>)             <span class="ruby-comment"># inet &lt;&lt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contained_by_or_equals</span>(:<span class="ruby-identifier">other</span>)   <span class="ruby-comment"># inet &lt;&lt;= other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains</span>(:<span class="ruby-identifier">other</span>)                 <span class="ruby-comment"># inet &gt;&gt; other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains_or_equals</span>(:<span class="ruby-identifier">other</span>)       <span class="ruby-comment"># inet &gt;&gt;= other</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">contains_or_contained_by</span>(:<span class="ruby-identifier">other</span>) <span class="ruby-comment"># inet &amp;&amp; other</span>&#x000A;&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">abbrev</span>           <span class="ruby-comment"># abbrev(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">broadcast</span>        <span class="ruby-comment"># broadcast(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">family</span>           <span class="ruby-comment"># family(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">host</span>             <span class="ruby-comment"># host(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">hostmask</span>         <span class="ruby-comment"># hostmask(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">masklen</span>          <span class="ruby-comment"># masklen(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">netmask</span>          <span class="ruby-comment"># netmask(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">network</span>          <span class="ruby-comment"># network(inet)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">set_masklen</span>(<span class="ruby-value">16</span>)  <span class="ruby-comment"># set_masklen(inet, 16)</span>&#x000A;<span class="ruby-identifier">r</span>.<span class="ruby-identifier">text</span>             <span class="ruby-comment"># text(inet)</span></pre>
+            
+            <p>If a <a href="../../../../classes/String.html">String</a> or IPAddr
+            instance is passed to Sequel.pg_inet_op, it will automatically be cast to
+            <code>inet</code>.  To treat the object as a <code>cidr</code>, you must
+            cast it before passing it to Sequel.pg_inet_op:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">r</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_inet_op</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-string">&#39;1.2.3.4&#39;</span>, :<span class="ruby-identifier">cidr</span>))</pre>
+            
+            <p>See the PostgreSQL network function and operator documentation for more
+            details on what these functions and operators do.</p>
+          </div>
+          <div id='context'>
+            <div id='requires'>
+              <h2>Required files</h2>
+              <ol>
+                <li>ipaddr</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

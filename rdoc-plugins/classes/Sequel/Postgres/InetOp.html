@@ -1,0 +1,198 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Postgres::InetOp</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>class</span>
+          Sequel::Postgres::InetOp
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_inet_ops_rb.html">lib/sequel/extensions/pg_inet_ops.rb</a>
+          </li>
+        </ol>
+        <div class='parent'>
+          Superclass:
+          <strong>Sequel::SQL::Wrapper</strong>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The <a href="InetOp.html">InetOp</a> class is a simple container for a
+            single object that defines methods that yield <a
+            href="../../Sequel.html">Sequel</a> expression objects representing
+            PostgreSQL inet operators and functions.</p>
+            
+            <p>Most methods in this class are defined via metaprogramming, see the
+            pg_inet_ops extension documentation for details on the API.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-new">new</a></li>
+            </ol>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-2D">-</a></li>
+              <li><a target="docwin" href="#method-i-pg_inet">pg_inet</a></li>
+              <li><a target="docwin" href="#method-i-set_masklen">set_masklen</a></li>
+              <li><a target="docwin" href="#method-i-7E">~</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li>Sequel::SQL::BitwiseMethods</li>
+              </ol>
+            </div>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>OPERATORS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      :contained_by_or_equals => ["(".freeze, " <<= ".freeze, ")".freeze].freeze,
+                      :contains_or_equals => ["(".freeze, " >>= ".freeze, ")".freeze].freeze,
+                      :contains_or_contained_by => ["(".freeze, " && ".freeze, ")".freeze].freeze,
+                      }.freeze
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-new'>
+                <a name='method-c-new'></a>
+                <div class='synopsis'>
+                  <span class='name'>new</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>For <a href="../../String.html">String</a> and IPAddr instances, wrap them
+                  in a cast to inet, to avoid ambiguity issues when calling operator methods.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>&#x000A;    <span class="ruby-comment"># nothing</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>, <span class="ruby-constant">IPAddr</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-identifier">v</span>, <span class="ruby-value">:inet</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-2D'>
+                <a name='method-i-2D'></a>
+                <div class='synopsis'>
+                  <span class='name'>-</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an expression for the subtraction of the argument from the receiver</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-2D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-2D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">-</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">v</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-keyword">super</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-pg_inet'>
+                <a name='method-i-pg_inet'></a>
+                <div class='synopsis'>
+                  <span class='name'>pg_inet</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return the receiver.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_inet-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-pg_inet-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_inet</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-set_masklen'>
+                <a name='method-i-set_masklen'></a>
+                <div class='synopsis'>
+                  <span class='name'>set_masklen</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an expression for the calling of the <a
+                  href="InetOp.html#method-i-set_masklen">#set_masklen</a> function with the
+                  receiver and the given argument</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_masklen-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-set_masklen-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_masklen</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:set_masklen</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">v</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-7E'>
+                <a name='method-i-7E'></a>
+                <div class='synopsis'>
+                  <span class='name'>~</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return an expression for the bitwise NOT of the receiver</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-7E-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-7E-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_inet_ops.rb, line 119</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">~</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

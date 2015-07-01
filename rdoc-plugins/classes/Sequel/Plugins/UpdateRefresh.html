@@ -51,16 +51,51 @@
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclasses refresh after update</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_refresh</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class refresh after update</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_refresh</span></pre>
+            
+            <p>As a performance optimisation, if you know only specific columns will have
+            changed, you can specify them to the <code>columns</code> option. This can
+            be a performance gain if it would avoid pointlessly comparing many other
+            columns. Note that this option currently only has an effect if the dataset
+            # supports RETURNING.</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Only include the artist column in RETURNING</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_refresh</span>, :<span class="ruby-identifier">columns</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">artist</span>&#x000A;&#x000A;<span class="ruby-comment"># Only include the artist and title columns in RETURNING</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">update_refresh</span>, :<span class="ruby-identifier">columns</span> =<span class="ruby-operator">&gt;</span> [ :<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">title</span> ]</pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
           </div>
           <div id='context'>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
             <ol>
+              <li><a target="docwin" href="UpdateRefresh/ClassMethods.html">Sequel::Plugins::UpdateRefresh::ClassMethods</a></li>
               <li><a target="docwin" href="UpdateRefresh/InstanceMethods.html">Sequel::Plugins::UpdateRefresh::InstanceMethods</a></li>
             </ol>
           </div>
           <div id='section'>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, opts=OPTS)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@update_refresh_columns</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:columns</span>]) <span class="ruby-operator">||</span> []&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

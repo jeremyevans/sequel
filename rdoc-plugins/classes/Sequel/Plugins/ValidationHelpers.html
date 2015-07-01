@@ -76,6 +76,11 @@
             default.</p>
             </td></tr><tr><td class='label'>:allow_nil </td><td>
             <p>Whether to skip the validation if the value is nil.</p>
+            </td></tr><tr><td class='label'>:from </td><td>
+            <p>Set to :values to pull column values from the values hash instead of
+            calling the related method. Allows for setting up methods on the underlying
+            column values, in the cases where the model transforms the underlying value
+            before returning it, such as when using serialization.</p>
             </td></tr><tr><td class='label'>:message </td><td>
             <p>The message to use.  Can be a string which is used directly, or a proc
             which is called.  If the validation method takes a argument before the
