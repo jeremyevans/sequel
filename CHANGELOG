@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.24.0 (2015-07-01)
 
 * Allow class_table_inheritance plugin to support subclasses that don't add additional columns (QuinnHarris, jeremyevans) (#1030)
 
