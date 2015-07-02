@@ -35,6 +35,23 @@ module Sequel
     #   # Cache the AlbumType class statically, but return unfrozen instances
     #   # that can be modified.
     #   AlbumType.plugin :static_cache, :frozen=>false
+    #
+    # If you would like the speed benefits of keeping :frozen=>true but still need
+    # to occasionally update objects, you can side-step the before_ hooks by
+    # overriding the class method +static_cache_allow_modifications?+ to return true:
+    #
+    #   class Model
+    #     plugin :static_cache
+    #
+    #     def self.static_cache_allow_modifications?
+    #       true
+    #     end
+    #   end
+    #
+    # Now if you +#dup+ a Model object (the resulting object is not frozen), you
+    # will be able to update and save the duplicate.
+    # Note the caveats around your responsibility to update the cache still applies.
+    #
     module StaticCache
       # Populate the static caches when loading the plugin. Options:
       # :frozen :: Whether retrieved model objects are frozen.  The default is true,
