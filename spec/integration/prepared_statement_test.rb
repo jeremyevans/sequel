@@ -123,6 +123,23 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.order(:id).map(:numb).must_equal [10, 20]
   end if DB.dataset.supports_insert_select?
 
+  it "should support bound variables with insert returning" do
+    @ds.returning.call(:insert, {:n=>20}, :numb=>:$n).must_equal([{:id=>2, :numb=>20}])
+    @ds.count.must_equal 2
+    @ds.order(:id).map(:numb).must_equal [10, 20]
+  end if DB.dataset.supports_returning?(:insert)
+
+  it "should support bound variables with update returning" do
+    @ds.returning.call(:update, {:n=>20}, :numb=>:$n).must_equal([{:id=>1, :numb=>20}])
+    @ds.count.must_equal 1
+    @ds.order(:id).map(:numb).must_equal [20]
+  end if DB.dataset.supports_returning?(:update)
+
+  it "should support bound variables with delete returning" do
+    @ds.where(:id=>:$id).returning.call(:delete, :id=>1).must_equal([{:id=>1, :numb=>10}])
+    @ds.count.must_equal 0
+  end if DB.dataset.supports_returning?(:delete)
+
   it "should support bound variables with delete" do
     @ds.filter(:numb=>:$n).call(:delete, :n=>10).must_equal 1
     @ds.count.must_equal 0
@@ -239,6 +256,23 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.count.must_equal 2
     @ds.order(:id).map(:numb).must_equal [10, 20]
   end if DB.dataset.supports_insert_select?
+
+  it "should support bound variables with insert returning" do
+    @ds.returning.prepare(:insert, :insert_rn, :numb=>:$n).call(:n=>20).must_equal([{:id=>2, :numb=>20}])
+    @ds.count.must_equal 2
+    @ds.order(:id).map(:numb).must_equal [10, 20]
+  end if DB.dataset.supports_returning?(:insert)
+
+  it "should support bound variables with update returning" do
+    @ds.returning.prepare(:update, :update_rn, :numb=>:$n).call(:n=>20).must_equal([{:id=>1, :numb=>20}])
+    @ds.count.must_equal 1
+    @ds.order(:id).map(:numb).must_equal [20]
+  end if DB.dataset.supports_returning?(:update)
+
+  it "should support bound variables with delete returning" do
+    @ds.where(:id=>:$id).returning.prepare(:delete, :delete_rn).call(:id=>1).must_equal([{:id=>1, :numb=>10}])
+    @ds.count.must_equal 0
+  end if DB.dataset.supports_returning?(:delete)
 
   it "should support prepared statements with delete" do
     @ds.filter(:numb=>:$n).prepare(:delete, :delete_n)

@@ -3542,6 +3542,25 @@ describe "Dataset prepared statements and bound variables " do
       'INSERT INTO items (num) VALUES (1) RETURNING *']
   end
     
+  it "#call and #prepare should handle returning" do
+    meta_def(@ds, :supports_returning?){|_| true}
+    meta_def(@ds, :insert_sql){|*v| "#{super(*v)} RETURNING *" }
+    meta_def(@ds, :update_sql){|*v| "#{super(*v)} RETURNING *" }
+    meta_def(@ds, :delete_sql){"#{super()} RETURNING *" }
+    @ds = @ds.returning
+    @ds.call(:insert, {:n=>1}, :num=>:$n)
+    @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
+    @ds.filter(:num=>:$n).call(:delete, :n=>1)
+    @ds.prepare(:insert, :insert_rn, :num=>:$n).call(:n=>1)
+    @ds.filter(:num=>:$n).prepare(:update, :update_rn, :num=>:$n2).call(:n=>1, :n2=>2)
+    @ds.filter(:num=>:$n).prepare(:delete, :delete_rn).call(:n=>1)
+    @db.sqls.must_equal([
+      'INSERT INTO items (num) VALUES (1) RETURNING *',
+      'UPDATE items SET num = 2 WHERE (num = 1) RETURNING *',
+      'DELETE FROM items WHERE (num = 1) RETURNING *',
+    ]*2)
+  end
+
   it "#call should default to using :all if an invalid type is given" do
     @ds.filter(:num=>:$n).call(:select_all, :n=>1)
     @db.sqls.must_equal ['SELECT * FROM items WHERE (num = 1)']

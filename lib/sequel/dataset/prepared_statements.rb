@@ -164,12 +164,14 @@ module Sequel
           with_sql(prepared_sql).first
         when :first
           first
-        when :insert
-          insert(*@prepared_modify_values)
-        when :update
-          update(*@prepared_modify_values)
-        when :delete
-          delete
+        when :insert, :update, :delete
+          if opts[:returning] && supports_returning?(@prepared_type)
+            returning_fetch_rows(prepared_sql)
+          elsif @prepared_type == :delete
+            delete
+          else
+            send(@prepared_type, *@prepared_modify_values)
+          end
         when Array
           case @prepared_type.at(0)
           when :map, :to_hash, :to_hash_groups
