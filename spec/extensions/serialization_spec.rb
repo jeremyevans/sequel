@@ -338,4 +338,25 @@ describe "Serialization plugin" do
     o.def = 'hello2'
     o.changed_columns.must_equal [:abc, :def]
   end
+
+  it "should update column_changes if the dirty plugin is used" do
+    @c.plugin :serialization, :yaml, :abc, :def
+    @c.plugin :dirty
+    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    o = @c.first
+    o.column_changes.must_equal({})
+    o.abc = 1
+    o.column_changes.must_equal({})
+    o.abc = 1
+    o.column_changes.must_equal({})
+    o.abc = 2
+    o.column_changes.must_equal(:abc=>[1, 2])
+    o.def = 'hello'
+    o.column_changes.must_equal(:abc=>[1, 2])
+    o.def = 'hello'
+    o.column_changes.must_equal(:abc=>[1, 2])
+    o.def = 'hello2'
+    o.column_changes.must_equal(:abc=>[1, 2], :def=>["hello", "hello2"])
+  end
+
 end

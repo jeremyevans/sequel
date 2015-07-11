@@ -165,6 +165,10 @@ module Sequel
               define_method("#{column}=") do |v| 
                 if !changed_columns.include?(column) && (new? || get_column_value(column) != v)
                   changed_columns << column
+
+                  if respond_to? :will_change_column
+                    will_change_column(column)
+                  end
                 end
 
                 deserialized_values[column] = v
