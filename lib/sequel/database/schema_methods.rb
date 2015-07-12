@@ -524,7 +524,7 @@ module Sequel
 
     # Add collate SQL fragment to column creation SQL.
     def column_definition_collate_sql(sql, column)
-      sql << " COLLATE #{column[:collate]}" if column[:collate]
+      sql << " COLLATE #{quote_identifier(column[:collate])}" if column[:collate]
     end
 
     # Add default SQL fragment to column creation SQL.
