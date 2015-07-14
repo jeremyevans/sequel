@@ -34,7 +34,7 @@
 #   jb = :jsonb_column.pg_jsonb
 #
 # This creates a Sequel::Postgres::JSONOp or Sequel::Postgres::JSONBOp object that can be used
-# for easier querying:
+# for easier querying.  The following methods are available for both JSONOp and JSONBOp instances:
 #
 #   j[1]                     # (json_column -> 1)
 #   j[%w'a b']               # (json_column #> ARRAY['a','b'])
@@ -55,6 +55,14 @@
 #   j.populate_set(:a)       # json_populate_recordset(:a, json_column)
 #   j.to_record              # json_to_record(json_column)
 #   j.to_recordset           # json_to_recordset(json_column)
+#
+# There are additional methods are are only supported on JSONBOp instances:
+#
+#   j.contain_all(:a)  # (jsonb_column ?& a)
+#   j.contain_any(:a)  # (jsonb_column ?| a)
+#   j.contains(:h)     # (jsonb_column @> h)
+#   j.contained_by(:h) # (jsonb_column <@ h)
+#   j.has_key?('a')    # (jsonb_column ? 'a')
 #
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
