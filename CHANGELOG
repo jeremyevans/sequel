@@ -1,5 +1,7 @@
 === HEAD
 
+* Add singular_table_names plugin, for changing Sequel to not pluralize table names by default (jeremyevans)
+
 * PreparedStatement#prepare now raises an Error (jeremyevans)
 
 * Clear delayed association pks when refreshing an object (jeremyevans)
