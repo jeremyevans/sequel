@@ -44,7 +44,6 @@ module Sequel
     # after changing it is not correctly detected and will leave an entry
     # in changed_columns.
     #
-    #
     # Usage:
     #
     #   # Make all model subclass instances record previous values (called before loading subclasses)
