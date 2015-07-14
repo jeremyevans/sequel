@@ -349,7 +349,7 @@ describe "DB#create_table" do
     @db.create_table(:cats) do
       String :name, :collate => :utf8_bin
     end
-    @db.sqls.must_equal ['CREATE TABLE "cats" ("name" varchar(255) COLLATE "utf8_bin")']
+    @db.sqls.must_equal ['CREATE TABLE "cats" ("name" varchar(255) COLLATE utf8_bin)']
   end
 
   it "should accept collation as a String, treated literally" do

@@ -525,7 +525,6 @@ module Sequel
     # Add collate SQL fragment to column creation SQL.
     def column_definition_collate_sql(sql, column)
       if collate = column[:collate]
-        collate = literal(collate) unless collate.is_a?(String)
         sql << " COLLATE #{collate}"
       end
     end

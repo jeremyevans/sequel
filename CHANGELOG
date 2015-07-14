@@ -2,7 +2,7 @@
 
 * Remove the deprecated firebird and informix adapters (jeremyevans)
 
-* Make :collate option when creating columns literalize non-String values (jeremyevans) (#1040)
+* Make :collate option when creating columns literalize non-String values on PostgreSQL (jeremyevans) (#1040)
 
 * Make dirty plugin notice when serialized column is changed (celsworth) (#1039)
 
