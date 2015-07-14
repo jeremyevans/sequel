@@ -475,10 +475,10 @@ describe "Dataset#where" do
   end
   
   it "should handle all types of IN/NOT IN queries with empty arrays" do
-    @dataset.filter(:id => []).sql.must_equal "SELECT * FROM test WHERE (id != id)"
-    @dataset.filter([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
-    @dataset.exclude(:id => []).sql.must_equal "SELECT * FROM test WHERE (id = id)"
-    @dataset.exclude([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
+    @dataset.filter(:id => []).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
+    @dataset.filter([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
+    @dataset.exclude(:id => []).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
+    @dataset.exclude([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
   end
 
   it "should handle all types of IN/NOT IN queries" do
@@ -517,9 +517,9 @@ describe "Dataset#where" do
     meta_def(@dataset, :supports_multiple_column_in?){false}
     db = Sequel.mock
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
-    @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
+    @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
     db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
-    @dataset.exclude([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
+    @dataset.exclude([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
     db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
   end
   

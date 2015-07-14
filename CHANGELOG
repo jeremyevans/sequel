@@ -1,5 +1,9 @@
 === HEAD
 
+* Add empty_array_consider_nulls extension to make Sequel consider NULL values when using IN/NOT IN with an empty array (jeremyevans)
+
+* Make Sequel default to ignoring NULL values when using IN/NOT IN with an empty array (jeremyevans)
+
 * Remove the deprecated firebird and informix adapters (jeremyevans)
 
 * Make :collate option when creating columns literalize non-String values on PostgreSQL (jeremyevans) (#1040)

@@ -1408,6 +1408,7 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work empty arrays with nulls" do
+    @ds = @ds.extension(:empty_array_consider_nulls)
     @ds.insert(nil, nil)
     @ds.filter(:a=>[]).all.must_equal []
     @ds.exclude(:a=>[]).all.must_equal []
@@ -1425,7 +1426,7 @@ describe "Sequel::Dataset DSL support" do
   end
   
   it "should work empty arrays with nulls and the empty_array_ignore_nulls extension" do
-    ds = @ds.extension(:empty_array_ignore_nulls)
+    ds = @ds
     ds.insert(nil, nil)
     ds.filter(:a=>[]).all.must_equal []
     ds.exclude(:a=>[]).all.must_equal [{:a=>nil, :b=>nil}]
