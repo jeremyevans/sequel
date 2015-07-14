@@ -345,10 +345,18 @@ describe "DB#create_table" do
   end
 
   it "should accept collation" do
+    @db.quote_identifiers = true
     @db.create_table(:cats) do
-      varchar :name, :collate => :utf8_bin
+      String :name, :collate => :utf8_bin
     end
-    @db.sqls.must_equal ["CREATE TABLE cats (name varchar(255) COLLATE utf8_bin)"]
+    @db.sqls.must_equal ['CREATE TABLE "cats" ("name" varchar(255) COLLATE "utf8_bin")']
+  end
+
+  it "should accept collation as a String, treated literally" do
+    @db.create_table(:cats) do
+      String :name, :collate => '"utf8_bin"'
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (name varchar(255) COLLATE "utf8_bin")']
   end
 
   it "should accept inline index definition" do

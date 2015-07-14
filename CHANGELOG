@@ -1,5 +1,7 @@
 === HEAD
 
+* Make :collate option when creating columns literalize non-String values (jeremyevans) (#1040)
+
 * Make dirty plugin notice when serialized column is changed (celsworth) (#1039)
 
 * Allow prepared statements to use RETURNING (jeremyevans) (#1036)
