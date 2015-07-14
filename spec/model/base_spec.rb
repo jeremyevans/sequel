@@ -91,18 +91,23 @@ describe Sequel::Model, "dataset" do
   it "should raise if no dataset is explicitly set and the class is anonymous" do
     proc {@b.dataset}.must_raise(Sequel::Error)
   end
+end
   
+describe Sequel::Model, "implicit table names" do
+  after do
+    Object.send(:remove_const, :BlahBlah)
+  end
   it "should disregard namespaces for the table name" do
-    begin
-      module ::BlahBlah
-        class MwaHaHa < Sequel::Model
-        end
+    module ::BlahBlah
+      class MwaHaHa < Sequel::Model
       end
-    
-      BlahBlah::MwaHaHa.dataset.sql.must_equal 'SELECT * FROM mwa_ha_has'
-    ensure
-      Object.send(:remove_const, :BlahBlah)
     end
+    BlahBlah::MwaHaHa.dataset.sql.must_equal 'SELECT * FROM mwa_ha_has'
+  end
+
+  it "should automatically set datasets when anonymous class of Sequel::Model is used as superclass" do
+    class BlahBlah < Class.new(Sequel::Model); end
+    BlahBlah.dataset.sql.must_equal 'SELECT * FROM blah_blahs'
   end
 end
 
