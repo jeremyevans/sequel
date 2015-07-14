@@ -350,4 +350,16 @@ describe "Sequel::Plugins::AssociationPks" do
       "COMMIT",
     ]
   end
+
+  it "should clear delayed associated pks if refreshing, if :delay plugin option is used" do
+    @Artist.one_to_many :albums, :clone=>:albums, :delay_pks=>:always
+    @Album.many_to_many :tags, :clone=>:tags, :delay_pks=>:always
+
+    ar = @Artist.load(:id=>1)
+    ar.album_pks.must_equal [1,2,3]
+    ar.album_pks = [2,4]
+    ar.album_pks.must_equal [2,4]
+    ar.refresh
+    ar.album_pks.must_equal [1,2,3]
+  end
 end

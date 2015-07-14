@@ -154,6 +154,12 @@ module Sequel
           super
         end
 
+        # Clear the associated pks if explicitly refreshing.
+        def refresh
+          @_association_pks = nil
+          super
+        end
+
         private
 
         # Return the primary keys of the associated objects.

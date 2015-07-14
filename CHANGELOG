@@ -1,5 +1,7 @@
 === HEAD
 
+* Clear delayed associated_pks when refreshing an object (jeremyevans)
+
 * Add empty_array_consider_nulls extension to make Sequel consider NULL values when using IN/NOT IN with an empty array (jeremyevans)
 
 * Make Sequel default to ignoring NULL values when using IN/NOT IN with an empty array (jeremyevans)
