@@ -1,6 +1,8 @@
 === HEAD
 
-* Clear delayed associated_pks when refreshing an object (jeremyevans)
+* PreparedStatement#prepare now raises an Error (jeremyevans)
+
+* Clear delayed association pks when refreshing an object (jeremyevans)
 
 * Add empty_array_consider_nulls extension to make Sequel consider NULL values when using IN/NOT IN with an empty array (jeremyevans)
 

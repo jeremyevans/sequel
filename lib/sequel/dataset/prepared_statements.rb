@@ -90,11 +90,17 @@ module Sequel
       # The argument to supply to insert and update, which may use
       # placeholders specified by prepared_args
       attr_accessor :prepared_modify_values
-      
+
       # Sets the prepared_args to the given hash and runs the
       # prepared statement.
       def call(bind_vars={}, &block)
         bind(bind_vars).run(&block)
+      end
+
+      # Raise an error if attempting to call prepare on an already
+      # prepared statement.
+      def prepare(*)
+        raise Error, "cannot prepare an already prepared statement"
       end
 
       # Send the columns to the original dataset, as calling it
