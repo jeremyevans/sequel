@@ -28,6 +28,8 @@ module Sequel
     module InvertedSubsets
       module ClassMethods
 
+        Plugins.inherited_instance_variables(self, :@inverted_subsets_name_block => :dup)
+
         # Define a not_ prefixed subset which inverts the subset condition.
         def subset(name, *args, &block)
           super
