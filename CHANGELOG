@@ -1,5 +1,7 @@
 === HEAD
 
+* Add inverted_subsets plugin, for creating an inverted subset method for each subset (celsworth) (#1042)
+
 * Make Dataset#for_update not use the :read_only database when the dataset is executed (jeremyevans) (#1041)
 
 * Add singular_table_names plugin, for changing Sequel to not pluralize table names by default (jeremyevans)
