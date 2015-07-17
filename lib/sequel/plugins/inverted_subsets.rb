@@ -16,7 +16,7 @@ module Sequel
     #   Album.plugin :inverted_subsets
     #
     #   # This will now create two methods, published and not_published
-    #   Album.subset :published, published: true
+    #   Album.subset :published, :published => true
     #
     #   Album.published.sql
     #   # SELECT * FROM albums WHERE (published IS TRUE)
