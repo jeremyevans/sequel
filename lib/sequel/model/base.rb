@@ -752,7 +752,7 @@ module Sequel
       # dataset methods that accept arguments, you should use define a
       # method directly inside a #dataset_module block.
       def subset(name, *args, &block)
-        dataset_module.subset(name, *args, &block)
+        def_dataset_method(name){filter(*args, &block)}
       end
       
       # Returns name of primary table for the dataset. If the table for the dataset
