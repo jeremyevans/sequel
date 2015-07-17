@@ -915,7 +915,7 @@ module Sequel
       db = @db
       if db.sharded?
         opts = Hash[opts]
-        opts[:server] = @opts[:server] || :read_only
+        opts[:server] = @opts[:server] || (@opts[:lock] ? :default : :read_only)
         opts
       end
       db.execute(sql, opts, &block)

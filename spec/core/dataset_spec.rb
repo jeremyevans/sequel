@@ -3405,9 +3405,14 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
     proc{@ds.having(:a=>1).truncate}.must_raise(Sequel::InvalidOperation)
   end
   
-  it "#execute should execute the SQL on the database" do
+  it "#execute should execute the SQL on the read_only database" do
     @ds.send(:execute, 'SELECT 1')
     @db.sqls.must_equal ["SELECT 1 -- read_only"]
+  end
+  
+  it "#execute should execute the SQL on the default database if locking is used" do
+    @ds.for_update.send(:execute, 'SELECT 1')
+    @db.sqls.must_equal ["SELECT 1"]
   end
 end
 
