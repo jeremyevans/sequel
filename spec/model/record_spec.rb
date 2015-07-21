@@ -1290,6 +1290,11 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
     proc{@c.new.set_only({:x => 1, :y => 2, :z=>3}, :x, :y)}.must_raise(Sequel::MassAssignmentRestriction)
     (o = @c.new).set_only({:x => 1, :y => 2}, :x, :y)
     o.values.must_equal(:x => 1, :y => 2)
+
+    proc{@c.new.set_extra({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{@c.new.set_extra({:x => 1, :y => 2, :z=>3}, :x, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+    (o = @c.new).set_extra({:x => 1, :y => 2}, :y)
+    o.values.must_equal(:x => 1, :y => 2)
   end
 
   it "#set_all should set all attributes including the primary key" do
@@ -1311,6 +1316,15 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
     @o1.set_only({:x => 9, :y => 8, :z=>6, :id=>7}, :x, :y, :id)
     @o1.values.must_equal(:x => 9, :y => 8, :id=>7)
   end
+  
+  it "#set_extra should only set allowed columns and given attributes" do
+    @o1.set_extra({:x => 1, :y => 2, :z=>3, :id=>4}, [:y])
+    @o1.values.must_equal(:x => 1, :y => 2)
+    @o1.set_extra({:x => 4, :y => 5, :z=>6, :id=>7}, :y)
+    @o1.values.must_equal(:x => 4, :y => 5)
+    @o1.set_extra({:x => 9, :y => 8, :z=>6, :id=>7}, :y, :id)
+    @o1.values.must_equal(:x => 9, :y => 8, :id=>7)
+  end
 
   it "#update_all should update all attributes" do
     @c.new.update_all(:x => 1)
@@ -1326,6 +1340,13 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
     DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
     @c.new.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x)
     DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+  end
+  
+  it "#update_extra should only update allowed columns and given attributes" do
+    @o1.update_extra({:x => 1, :y => 2, :z=>3, :id=>4}, [:y])
+    DB.sqls.must_equal ["INSERT INTO items (x, y) VALUES (1, 2)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    @c.new.update_extra({:x => 1, :y => 2, :z=>3, :id=>4}, :y)
+    DB.sqls.must_equal ["INSERT INTO items (x, y) VALUES (1, 2)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
   end
 end
 

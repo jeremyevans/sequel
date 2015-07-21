@@ -36,7 +36,13 @@ By default, if an invalid setter method call is attempted, Sequel raises a <tt>S
   # Instance level
   post.strict_param_setting = false
 
-In addition to +set_only+ and +update_only+, Sequel also has +set_fields+ and +update_fields+ methods, and these may be a better mass assignment choice for most users.
+Note that +set_only+ and +update_only+ will ignore your previously defined +allowed_columns+ and raise an error for any columns not explicitly provided by your call. If you'd like to extend your model's allowed columns instead, you can use +set_extra+ and +update_extra+. These methods allow you to modify the fields that you explicity provided *plus* any of your +allowed_columns+.
+
+  post.set_extra(params[:post], :date)
+
+In this case, the <tt>date=</tt> method will be allowed in the mass assignment in addition to the previously defined allowed columns of <tt>title=</tt>, <tt>body=</tt>, and <tt>category=</tt>.
+
+In addition to +set_only+, +set_extra+, +update_only+, and +update_extra+, Sequel also has +set_fields+ and +update_fields+ methods, and these may be a better mass assignment choice for most users.
 These methods take two arguments, the attributes hash as the first argument, and a single array of valid field names as the second argument:
 
   post.set_fields(params[:post], [:title, :body])

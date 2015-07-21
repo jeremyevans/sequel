@@ -56,7 +56,7 @@ module Sequel
         end
 
         # Set all values using the entries in the hash, except for the keys
-        # given in except.  You should probably use +set_fields+ or +set_only+
+        # given in except.  You should probably use +set_fields+, +set_only+, or +set_extra+
         # instead of this method, as blacklist approaches to security are a bad idea.
         #
         #   artist.set_except({:name=>'Jim'}, :hometown)
@@ -66,7 +66,7 @@ module Sequel
         end
     
         # Update all values using the entries in the hash, except for the keys
-        # given in except.  You should probably use +update_fields+ or +update_only+
+        # given in except.  You should probably use +update_fields+, +update_only+, or +update_extra+
         # instead of this method, as blacklist approaches to security are a bad idea.
         #
         #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
