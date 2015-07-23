@@ -3336,8 +3336,8 @@ describe "Filtering by associations" do
   end
 
   it "should not affect non-association IN/NOT IN filtering with an empty array" do
-    @Album.filter(:tag_id=>[]).sql.must_equal 'SELECT * FROM albums WHERE (tag_id != tag_id)'
-    @Album.exclude(:tag_id=>[]).sql.must_equal 'SELECT * FROM albums WHERE (tag_id = tag_id)'
+    @Album.filter(:tag_id=>[]).sql.must_equal 'SELECT * FROM albums WHERE (1 = 0)'
+    @Album.exclude(:tag_id=>[]).sql.must_equal 'SELECT * FROM albums WHERE (1 = 1)'
   end
 
   it "should work correctly in subclasses" do

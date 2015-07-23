@@ -508,16 +508,12 @@ module Sequel
           end
           subclass.instance_variable_set(iv, sup_class_value)
         end
-        unless ivs.include?("@dataset")
-          if self == Model || !@dataset
-            n = subclass.name
-            unless n.nil? || n.empty?
-              db
-              subclass.set_dataset(subclass.implicit_table_name) rescue nil
-            end
-          elsif @dataset
-            subclass.set_dataset(@dataset.clone, :inherited=>true) rescue nil
-          end
+
+        if @dataset && self != Model
+          subclass.set_dataset(@dataset.clone, :inherited=>true) rescue nil
+        elsif (n = subclass.name) && !n.to_s.empty?
+          db
+          subclass.set_dataset(subclass.implicit_table_name) rescue nil
         end
       end
 
@@ -756,7 +752,7 @@ module Sequel
       # dataset methods that accept arguments, you should use define a
       # method directly inside a #dataset_module block.
       def subset(name, *args, &block)
-        dataset_module.subset(name, *args, &block)
+        def_dataset_method(name){filter(*args, &block)}
       end
       
       # Returns name of primary table for the dataset. If the table for the dataset

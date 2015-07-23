@@ -90,11 +90,17 @@ module Sequel
       # The argument to supply to insert and update, which may use
       # placeholders specified by prepared_args
       attr_accessor :prepared_modify_values
-      
+
       # Sets the prepared_args to the given hash and runs the
       # prepared statement.
       def call(bind_vars={}, &block)
         bind(bind_vars).run(&block)
+      end
+
+      # Raise an error if attempting to call prepare on an already
+      # prepared statement.
+      def prepare(*)
+        raise Error, "cannot prepare an already prepared statement"
       end
 
       # Send the columns to the original dataset, as calling it
@@ -164,12 +170,14 @@ module Sequel
           with_sql(prepared_sql).first
         when :first
           first
-        when :insert
-          insert(*@prepared_modify_values)
-        when :update
-          update(*@prepared_modify_values)
-        when :delete
-          delete
+        when :insert, :update, :delete
+          if opts[:returning] && supports_returning?(@prepared_type)
+            returning_fetch_rows(prepared_sql)
+          elsif @prepared_type == :delete
+            delete
+          else
+            send(@prepared_type, *@prepared_modify_values)
+          end
         when Array
           case @prepared_type.at(0)
           when :map, :to_hash, :to_hash_groups

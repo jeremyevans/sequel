@@ -625,6 +625,15 @@ module Sequel
         end
       end
 
+      # Literalize non-String collate options. This is because unquoted collatations
+      # are folded to lowercase, and PostgreSQL used mixed case or capitalized collations.
+      def column_definition_collate_sql(sql, column)
+        if collate = column[:collate]
+          collate = literal(collate) unless collate.is_a?(String)
+          sql << " COLLATE #{collate}"
+        end
+      end
+
       # Handle PostgreSQL specific default format.
       def column_schema_normalize_default(default, type)
         if m = POSTGRES_DEFAULT_RE.match(default)
@@ -1208,7 +1217,7 @@ module Sequel
       module PreparedStatementMethods
         # Override insert action to use RETURNING if the server supports it.
         def run
-          if @prepared_type == :insert
+          if @prepared_type == :insert && (opts[:returning_pk] || !opts[:returning])
             fetch_rows(prepared_sql){|r| return r.values.first}
           else
             super
@@ -1217,7 +1226,10 @@ module Sequel
 
         def prepared_sql
           return @prepared_sql if @prepared_sql
-          @opts[:returning] = insert_pk if @prepared_type == :insert
+          if @prepared_type == :insert && !opts[:returning]
+            @opts[:returning] = insert_pk
+            @opts[:returning_pk] = true
+          end
           super
           @prepared_sql
         end

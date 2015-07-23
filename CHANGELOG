@@ -1,5 +1,49 @@
 === HEAD
 
+* Add Dataset#group_append, for appending to the existing GROUP BY clause (YorickPeterse) (#1047)
+
+* Add inverted_subsets plugin, for creating an inverted subset method for each subset (celsworth) (#1042)
+
+* Make Dataset#for_update not use the :read_only database when the dataset is executed (jeremyevans) (#1041)
+
+* Add singular_table_names plugin, for changing Sequel to not pluralize table names by default (jeremyevans)
+
+* PreparedStatement#prepare now raises an Error (jeremyevans)
+
+* Clear delayed association pks when refreshing an object (jeremyevans)
+
+* Add empty_array_consider_nulls extension to make Sequel consider NULL values when using IN/NOT IN with an empty array (jeremyevans)
+
+* Make Sequel default to ignoring NULL values when using IN/NOT IN with an empty array (jeremyevans)
+
+* Remove the deprecated firebird and informix adapters (jeremyevans)
+
+* Make :collate option when creating columns literalize non-String values on PostgreSQL (jeremyevans) (#1040)
+
+* Make dirty plugin notice when serialized column is changed (celsworth) (#1039)
+
+* Allow prepared statements to use RETURNING (jeremyevans) (#1036)
+
+=== 4.24.0 (2015-07-01)
+
+* Allow class_table_inheritance plugin to support subclasses that don't add additional columns (QuinnHarris, jeremyevans) (#1030)
+
+* Add :columns option to update_refresh plugin, specifying the columns to include in the RETURNING clause (celsworth) (#1029)
+
+* Use column symbol key for auto validation unique errors if the unique index is on a single column (jeremyevans)
+
+* Allow :timeout option to Database#listen in the postgres adapter to be a callable object (celsworth) (#1028)
+
+* Add pg_inet_ops extension, for DSL support for PostgreSQL inet/cidr operators and functions (celsworth, jeremyevans) (#1024)
+
+* Support :*_opts options in auto_validations plugin, for setting options for the underlying validation methods (celsworth, jeremyevans) (#1026)
+
+* Support :delay_pks association option in association_pks to delay setting of associated_pks until after saving (jeremyevans)
+
+* Make jdbc subadapters work if they issue queries while the subadapter is being loaded (jeremyevans) (#1022)
+
+* Handle 64-bit auto incrementing primary keys in jdbc subadapters (DougEverly) (#1018, #1019)
+
 * Remove the deprecated db2 and dbi adapters (jeremyevans)
 
 * Make auto_validation plugin use :from=>:values option to setup validations on the underlying columns (jeremyevans)

@@ -51,7 +51,7 @@ module Sequel
           statement(conn) do |stmt|
             rs = stmt.executeQuery(LAST_INSERT_ROWID)
             rs.next
-            rs.getInt(1)
+            rs.getLong(1)
           end
         end
         

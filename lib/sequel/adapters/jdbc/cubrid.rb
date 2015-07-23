@@ -30,7 +30,7 @@ module Sequel
             rs = stmt.getGeneratedKeys
             begin
               if rs.next
-                rs.getInt(1)
+                rs.getLong(1)
               end
             rescue NativeException
               nil

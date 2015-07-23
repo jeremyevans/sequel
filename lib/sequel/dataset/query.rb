@@ -34,7 +34,7 @@ module Sequel
     # Methods that return modified datasets
     QUERY_METHODS = (<<-METHS).split.map(&:to_sym) + JOIN_METHODS
       add_graph_aliases and distinct except exclude exclude_having exclude_where
-      filter for_update from from_self graph grep group group_and_count group_by having intersect invert
+      filter for_update from from_self graph grep group group_and_count group_append group_by having intersect invert
       limit lock_style naked offset or order order_append order_by order_more order_prepend qualify
       reverse reverse_order select select_all select_append select_group select_more server
       set_graph_aliases unfiltered ungraphed ungrouped union
@@ -312,6 +312,17 @@ module Sequel
     #   # => [{:initial=>'a', :count=>1}, ...]
     def group_and_count(*columns, &block)
       select_group(*columns, &block).select_more(COUNT_OF_ALL_AS_COUNT)
+    end
+
+    # Returns a copy of the dataset with the given columns added to the list of
+    # existing columns to group on. If no existing columns are present this
+    # method simply sets the columns as the initial ones to group on.
+    #
+    #   DB[:items].group_append(:b) # SELECT * FROM items GROUP BY b
+    #   DB[:items].group(:a).group_append(:b) # SELECT * FROM items GROUP BY a, b
+    def group_append(*columns, &block)
+      columns = @opts[:group] + columns if @opts[:group]
+      group(*columns, &block)
     end
 
     # Adds the appropriate CUBE syntax to GROUP BY.

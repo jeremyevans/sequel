@@ -15,7 +15,7 @@ module Sequel
       # Define a named filter for this dataset, see
       # Model.subset for details.
       def subset(name, *args, &block)
-        define_method(name){filter(*args, &block)}
+        @model.subset(name, *args, &block)
       end
 
       private

@@ -439,14 +439,16 @@ module Sequel
         # :after_listen :: An object that responds to +call+ that is called with the underlying connection after the LISTEN
         #                  statement is sent, but before the connection starts waiting for notifications.
         # :loop :: Whether to continually wait for notifications, instead of just waiting for a single
-        #          notification. If this option is given, a block must be provided.  If this object responds to call, it is
+        #          notification. If this option is given, a block must be provided.  If this object responds to +call+, it is
         #          called with the underlying connection after each notification is received (after the block is called).
         #          If a :timeout option is used, and a callable object is given, the object will also be called if the
         #          timeout expires.  If :loop is used and you want to stop listening, you can either break from inside the
         #          block given to #listen, or you can throw :stop from inside the :loop object's call method or the block.
         # :server :: The server on which to listen, if the sharding support is being used.
-        # :timeout :: How long to wait for a notification, in seconds (can provide a float value for
-        #             fractional seconds).  If not given or nil, waits indefinitely.
+        # :timeout :: How long to wait for a notification, in seconds (can provide a float value for fractional seconds).
+        #             If this object responds to +call+, it will be called and should return the number of seconds to wait.
+        #             If the loop option is also specified, the object will be called on each iteration to obtain a new
+        #             timeout value.  If not given or nil, waits indefinitely.
         #
         # This method is only supported if pg is used as the underlying ruby driver.  It returns the
         # channel the notification was sent to (as a string), unless :loop was used, in which case it returns nil.
@@ -465,19 +467,25 @@ module Sequel
                   conn.execute(sql)
                 end
                 opts[:after_listen].call(conn) if opts[:after_listen]
-                timeout = opts[:timeout] ? [opts[:timeout]] : []
+                timeout = opts[:timeout]
+                if timeout
+                  timeout_block = timeout.respond_to?(:call) ? timeout : proc{timeout}
+                end
+
                 if l = opts[:loop]
                   raise Error, 'calling #listen with :loop requires a block' unless block
                   loop_call = l.respond_to?(:call)
                   catch(:stop) do
                     loop do
-                      conn.wait_for_notify(*timeout, &block)
+                      t = timeout_block ? [timeout_block.call] : []
+                      conn.wait_for_notify(*t, &block)
                       l.call(conn) if loop_call
                     end
                   end
                   nil
                 else
-                  conn.wait_for_notify(*timeout, &block)
+                  t = timeout_block ? [timeout_block.call] : []
+                  conn.wait_for_notify(*t, &block)
                 end
               ensure
                 conn.execute("UNLISTEN *")

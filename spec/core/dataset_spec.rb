@@ -475,10 +475,10 @@ describe "Dataset#where" do
   end
   
   it "should handle all types of IN/NOT IN queries with empty arrays" do
-    @dataset.filter(:id => []).sql.must_equal "SELECT * FROM test WHERE (id != id)"
-    @dataset.filter([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
-    @dataset.exclude(:id => []).sql.must_equal "SELECT * FROM test WHERE (id = id)"
-    @dataset.exclude([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
+    @dataset.filter(:id => []).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
+    @dataset.filter([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
+    @dataset.exclude(:id => []).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
+    @dataset.exclude([:id1, :id2] => []).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
   end
 
   it "should handle all types of IN/NOT IN queries" do
@@ -517,9 +517,9 @@ describe "Dataset#where" do
     meta_def(@dataset, :supports_multiple_column_in?){false}
     db = Sequel.mock
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
-    @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
+    @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
     db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
-    @dataset.exclude([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE ((id1 = id1) AND (id2 = id2))"
+    @dataset.exclude([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
     db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
   end
   
@@ -872,6 +872,25 @@ describe "Dataset#group_by" do
   it "should have #group_cube and #group_rollup methods raise an Error if not supported it" do
     proc{@dataset.group(:type_id).group_rollup}.must_raise(Sequel::Error)
     proc{@dataset.group(:type_id).group_cube}.must_raise(Sequel::Error)
+  end
+end
+
+describe "Dataset#group_append" do
+  before do
+    @d = Sequel.mock.dataset.from(:test)
+  end
+
+  it "should group by the given columns if no existing columns are present" do
+    @d.group_append(:a).sql.must_equal 'SELECT * FROM test GROUP BY a'
+  end
+
+  it "should add to the currently grouped columns" do
+    @d.group(:a).group_append(:b).sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+  end
+
+  it "should accept a block that yields a virtual row" do
+    @d.group(:a).group_append{:b}.sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+    @d.group(:a).group_append(:c){b}.sql.must_equal 'SELECT * FROM test GROUP BY a, c, b'
   end
 end
 
@@ -3405,9 +3424,14 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
     proc{@ds.having(:a=>1).truncate}.must_raise(Sequel::InvalidOperation)
   end
   
-  it "#execute should execute the SQL on the database" do
+  it "#execute should execute the SQL on the read_only database" do
     @ds.send(:execute, 'SELECT 1')
     @db.sqls.must_equal ["SELECT 1 -- read_only"]
+  end
+  
+  it "#execute should execute the SQL on the default database if locking is used" do
+    @ds.for_update.send(:execute, 'SELECT 1')
+    @db.sqls.must_equal ["SELECT 1"]
   end
 end
 
@@ -3542,6 +3566,30 @@ describe "Dataset prepared statements and bound variables " do
       'INSERT INTO items (num) VALUES (1) RETURNING *']
   end
     
+  it "#call and #prepare should handle returning" do
+    meta_def(@ds, :supports_returning?){|_| true}
+    meta_def(@ds, :insert_sql){|*v| "#{super(*v)} RETURNING *" }
+    meta_def(@ds, :update_sql){|*v| "#{super(*v)} RETURNING *" }
+    meta_def(@ds, :delete_sql){"#{super()} RETURNING *" }
+    @ds = @ds.returning
+    @ds.call(:insert, {:n=>1}, :num=>:$n)
+    @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
+    @ds.filter(:num=>:$n).call(:delete, :n=>1)
+    @ds.prepare(:insert, :insert_rn, :num=>:$n).call(:n=>1)
+    @ds.filter(:num=>:$n).prepare(:update, :update_rn, :num=>:$n2).call(:n=>1, :n2=>2)
+    @ds.filter(:num=>:$n).prepare(:delete, :delete_rn).call(:n=>1)
+    @db.sqls.must_equal([
+      'INSERT INTO items (num) VALUES (1) RETURNING *',
+      'UPDATE items SET num = 2 WHERE (num = 1) RETURNING *',
+      'DELETE FROM items WHERE (num = 1) RETURNING *',
+    ]*2)
+  end
+
+  it "PreparedStatement#prepare should raise an error" do
+    ps = @ds.prepare(:select, :select_n)
+    proc{ps.prepare(:select, :select_n2)}.must_raise Sequel::Error
+  end
+
   it "#call should default to using :all if an invalid type is given" do
     @ds.filter(:num=>:$n).call(:select_all, :n=>1)
     @db.sqls.must_equal ['SELECT * FROM items WHERE (num = 1)']

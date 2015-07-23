@@ -1913,6 +1913,19 @@ if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_versio
       i = 0
       @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_equal nil
       i.must_equal 4
+
+      called = false
+      i = 0
+      @db.listen('foo2', :timeout=>proc{i+=1; 0.001}){|ev, pid, payload| called = true}.must_equal nil
+      called.must_equal false
+      i.must_equal 1
+
+	  i = 0
+      t = 0
+      @db.listen('foo2', :timeout=>proc{t+=1; 0.001}, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_equal nil
+      called.must_equal false
+      t.must_equal 4
+
     end unless RUBY_PLATFORM =~ /mingw/ # Ruby freezes on this spec on this platform/version
   end
 end
@@ -2938,6 +2951,54 @@ describe 'PostgreSQL inet/cidr types' do
     c.create(:i=>@v4, :c=>@v4nm).values.values_at(:i, :c).must_equal [@ipv4, @ipv4nm]
     unless ipv6_broken
       c.create(:i=>@ipv6, :c=>@ipv6nm).values.values_at(:i, :c).must_equal [@ipv6, @ipv6nm]
+    end
+  end
+
+  it 'operations/functions with pg_inet_ops' do
+    Sequel.extension :pg_inet_ops
+
+    @db.get(Sequel.pg_inet_op('1.2.3.4') << '1.2.3.0/24').must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4') << '1.2.3.4/32').must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.4') << '1.2.2.0/24').must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.3.0/24')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.3.4/32')).must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by('1.2.2.0/24')).must_equal false
+
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.3.0/24')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.3.4/32')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.4').contained_by_or_equals('1.2.2.0/24')).must_equal false
+
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24') >> '1.2.3.4').must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24') >> '1.2.2.4').must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains('1.2.3.4')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains('1.2.2.4')).must_equal false
+
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.3.4')).must_equal true
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.2.4')).must_equal false
+    @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_equals('1.2.3.0/24')).must_equal true
+
+    @db.get(Sequel.pg_inet_op('1.2.3.0/32') + 1).must_equal IPAddr.new('1.2.3.1/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.1/32') - 1).must_equal IPAddr.new('1.2.3.0/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.1/32') - '1.2.3.0/32').must_equal 1
+    @db.get(Sequel.pg_inet_op('1.2.3.0/32') & '1.2.0.4/32').must_equal IPAddr.new('1.2.0.0/32')
+    @db.get(Sequel.pg_inet_op('1.2.0.0/32') | '0.0.3.4/32').must_equal IPAddr.new('1.2.3.4/32')
+    @db.get(~Sequel.pg_inet_op('0.0.0.0/32')).must_equal IPAddr.new('255.255.255.255/32')
+
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').abbrev).must_equal '1.2.3.4/24'
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').broadcast).must_equal IPAddr.new('1.2.3.255/24')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').family).must_equal 4
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').host).must_equal '1.2.3.4'
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').hostmask).must_equal IPAddr.new('0.0.0.255/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').masklen).must_equal 24
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').netmask).must_equal IPAddr.new('255.255.255.0/32')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').network).must_equal IPAddr.new('1.2.3.0/24')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/24').set_masklen(16)).must_equal IPAddr.new('1.2.3.4/16')
+    @db.get(Sequel.pg_inet_op('1.2.3.4/32').text).must_equal '1.2.3.4/32'
+
+    if @db.server_version >= 90400
+      @db.get(Sequel.pg_inet_op('1.2.3.0/24').contains_or_contained_by('1.2.0.0/16')).must_equal true
+      @db.get(Sequel.pg_inet_op('1.2.0.0/16').contains_or_contained_by('1.2.3.0/24')).must_equal true
+      @db.get(Sequel.pg_inet_op('1.3.0.0/16').contains_or_contained_by('1.2.3.0/24')).must_equal false
     end
   end
 end

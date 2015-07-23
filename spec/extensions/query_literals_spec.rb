@@ -111,6 +111,22 @@ describe "query_literals extension" do
     @ds.group_and_count(:a, 1).sql.must_equal 'SELECT a, 1, count(*) AS count FROM t GROUP BY a, 1'
   end
 
+  it "should have #group_append use literal string if given a single string" do
+    @ds.group(:d).group_append('a, b, c').sql.must_equal 'SELECT * FROM t GROUP BY d, a, b, c'
+  end
+
+  it "should have #group_append use placeholder literal string if given a string and additional arguments" do
+    @ds.group(:d).group_append('a, b, ?', 1).sql.must_equal 'SELECT * FROM t GROUP BY d, a, b, 1'
+  end
+
+  it "should have #group_append work the standard way if initial string is a literal string already" do
+    @ds.group(:d).group_append(Sequel.lit('a, b, ?'), 1).sql.must_equal 'SELECT * FROM t GROUP BY d, a, b, ?, 1'
+  end
+
+  it "should have #group_append work regularly if not given a string as the first argument" do
+    @ds.group(:d).group_append(:a, 1).sql.must_equal 'SELECT * FROM t GROUP BY d, a, 1'
+  end
+
   it "should have #order use literal string if given a single string" do
     @ds.order('a, b, c').sql.must_equal 'SELECT * FROM t ORDER BY a, b, c'
   end

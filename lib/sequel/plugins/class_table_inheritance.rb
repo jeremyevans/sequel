@@ -1,15 +1,23 @@
 module Sequel
   module Plugins
-    # The class_table_inheritance plugin allows you to model inheritance in the
-    # database using a table per model class in the hierarchy, with only columns
-    # unique to that model class (or subclass hierarchy) being stored in the related
-    # table.  For example, with this hierarchy:
+    # = Overview
+    #
+    # The class_table_inheritance plugin uses the single_table_inheritance
+    # plugin, so it supports all of the single_table_inheritance features, but it
+    # additionally supports subclasses that have additional columns,
+    # which are stored in a separate table with a key referencing the primary table.
+    #
+    # = Detail
+    #
+    # For example, with this hierarchy:
     #
     #       Employee
-    #      /        \ 
+    #      /        \
     #   Staff     Manager
+    #     |          |
+    #   Cook      Executive
     #                |
-    #            Executive
+    #               CEO
     #
     # the following database schema may be used (table - columns):
     #
@@ -18,46 +26,50 @@ module Sequel
     # managers :: id, num_staff
     # executives :: id, num_managers
     #
-    # The class_table_inheritance plugin assumes that the main table
-    # (e.g. employees) has a primary key field (usually autoincrementing),
+    # The class_table_inheritance plugin assumes that the root table
+    # (e.g. employees) has a primary key column (usually autoincrementing),
     # and all other tables have a foreign key of the same name that points
-    # to the same key in their superclass's table.  For example:
+    # to the same column in their superclass's table.  In this example,
+    # the employees id column is a primary key and the id column in every
+    # other table is a foreign key referencing the employees id.
     #
-    # employees.id :: primary key, autoincrementing
-    # staff.id :: foreign key referencing employees(id)
-    # managers.id :: foreign key referencing employees(id)
-    # executives.id :: foreign key referencing managers(id)
+    # In this example the staff table also stores Cook model objects and the
+    # executives table also stores CEO model objects.
     #
-    # When using the class_table_inheritance plugin, subclasses use joined 
-    # datasets:
+    # When using the class_table_inheritance plugin, subclasses that have additional
+    # columns use joined datasets:
     #
     #   Employee.dataset.sql
-    #   # SELECT employees.id, employees.name, employees.kind
-    #   # FROM employees
+    #   # SELECT * FROM employees
     #
     #   Manager.dataset.sql
-    #   # SELECT employees.id, employees.name, employees.kind, managers.num_staff
+    #   # SELECT employees.id, employees.name, employees.kind,
+    #   #        managers.num_staff
     #   # FROM employees
     #   # JOIN managers ON (managers.id = employees.id)
     #
-    #   Executive.dataset.sql
-    #   # SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers
+    #   CEO.dataset.sql
+    #   # SELECT employees.id, employees.name, employees.kind,
+    #   #        managers.num_staff, executives.num_managers
     #   # FROM employees
     #   # JOIN managers ON (managers.id = employees.id)
     #   # JOIN executives ON (executives.id = managers.id)
+    #   # WHERE (employees.kind IN ('CEO'))
     #
-    # This allows Executive.all to return instances with all attributes
+    # This allows CEO.all to return instances with all attributes
     # loaded.  The plugin overrides the deleting, inserting, and updating
     # in the model to work with multiple tables, by handling each table
     # individually.
     #
-    # This plugin allows the use of a :key option when loading to mark
-    # a column holding a class name.  This allows methods on the
-    # superclass to return instances of specific subclasses.
-    # This plugin also requires the lazy_attributes plugin and uses it to
-    # return subclass specific attributes that would not be loaded
-    # when calling superclass methods (since those wouldn't join
-    # to the subclass tables).  For example:
+    # = Subclass loading
+    #
+    # When model objects are retrieved for a superclass the result can contain
+    # subclass instances that only have column entries for the columns in the
+    # superclass table.  Calling the column method on the subclass instance for
+    # a column not in the superclass table will cause a query to the database
+    # to get the value for that column.  If the subclass instance was retreived
+    # using Dataset#all, the query to the database will attempt to load the column
+    # values for all subclass instances that were retrieved.  For example:
     #
     #   a = Employee.all # [<#Staff>, <#Manager>, <#Executive>]
     #   a.first.values # {:id=>1, name=>'S', :kind=>'Staff'}
@@ -67,171 +79,208 @@ module Sequel
     # via the superclass, call Model#refresh.
     #
     #   a = Employee.first
-    #   a.values # {:id=>1, name=>'S', :kind=>'Executive'}
+    #   a.values # {:id=>1, name=>'S', :kind=>'CEO'}
     #   a.refresh.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
-    # 
-    # Usage:
     #
-    #   # Set up class table inheritance in the parent class
-    #   # (Not in the subclasses)
+    # = Usage
+    #
+    #   # Use the default of storing the class name in the sti_key
+    #   # column (:kind in this case)
     #   class Employee < Sequel::Model
-    #     plugin :class_table_inheritance
+    #     plugin :class_table_inheritance, :key=>:kind
     #   end
     #
     #   # Have subclasses inherit from the appropriate class
-    #   class Staff < Employee; end
-    #   class Manager < Employee; end
-    #   class Executive < Manager; end
+    #   class Staff < Employee; end    # uses staff table
+    #   class Cook < Staff; end        # cooks table doesn't exist so uses staff table
+    #   class Manager < Employee; end  # uses managers table
+    #   class Executive < Manager; end # uses executives table
+    #   class CEO < Executive; end     # ceos table doesn't exist so uses executives table
     #
-    #   # You can also set options when loading the plugin:
-    #   # :kind :: column to hold the class name
-    #   # :table_map :: map of class name symbols to table name symbols
-    #   # :model_map :: map of column values to class name symbols
-    #   Employee.plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff},
-    #     :model_map=>{1=>:Employee, 2=>:Manager, 3=>:Executive, 4=>:Staff}
+    #   # Some examples of using these options:
+    #
+    #   # Specifying the tables with a :table_map hash
+    #   Employee.plugin :class_table_inheritance,
+    #     :table_map=>{:Employee  => :employees,
+    #                  :Staff     => :staff,
+    #                  :Cook      => :staff,
+    #                  :Manager   => :managers,
+    #                  :Executive => :executives,
+    #                  :CEO       => :executives }
+    #
+    #   # Using integers to store the class type, with a :model_map hash
+    #   # and an sti_key of :type
+    #   Employee.plugin :class_table_inheritance, :type,
+    #     :model_map=>{1=>:Staff, 2=>:Cook, 3=>:Manager, 4=>:Executive, 5=>:CEO}
+    #
+    #   # Using non-class name strings
+    #   Employee.plugin :class_table_inheritance, :key=>:type,
+    #     :model_map=>{'staff'=>:Staff, 'cook staff'=>:Cook, 'supervisor'=>:Manager}
+    #
+    #   # By default the plugin sets the respective column value
+    #   # when a new instance is created.
+    #   Cook.create.type == 'cook staff'
+    #   Manager.create.type == 'supervisor'
+    #
+    #   # You can customize this behavior with the :key_chooser option.
+    #   # This is most useful when using a non-bijective mapping.
+    #   Employee.plugin :class_table_inheritance, :key=>:type,
+    #     :model_map=>{'cook staff'=>:Cook, 'supervisor'=>:Manager},
+    #     :key_chooser=>proc{|instance| instance.model.sti_key_map[instance.model.to_s].first || 'stranger' }
+    #
+    #   # Using custom procs, with :model_map taking column values
+    #   # and yielding either a class, string, symbol, or nil,
+    #   # and :key_map taking a class object and returning the column
+    #   # value to use
+    #   Employee.plugin :single_table_inheritance, :key=>:type,
+    #     :model_map=>proc{|v| v.reverse},
+    #     :key_map=>proc{|klass| klass.name.reverse}
+    #
+    #   # You can use the same class for multiple values.
+    #   # This is mainly useful when the sti_key column contains multiple values
+    #   # which are different but do not require different code.
+    #   Employee.plugin :single_table_inheritance, :key=>:type,
+    #     :model_map=>{'staff' => "Staff",
+    #                  'manager' => "Manager",
+    #                  'overpayed staff' => "Staff",
+    #                  'underpayed staff' => "Staff"}
+    #
+    # One minor issue to note is that if you specify the <tt>:key_map</tt>
+    # option as a hash, instead of having it inferred from the <tt>:model_map</tt>,
+    # you should only use class name strings as keys, you should not use symbols
+    # as keys.
     module ClassTableInheritance
-      # The class_table_inheritance plugin requires the lazy_attributes plugin
-      # to handle lazily-loaded attributes for subclass instances returned
-      # by superclass methods.
-      def self.apply(model, opts=OPTS)
+      # The class_table_inheritance plugin requires the single_table_inheritance
+      # plugin and the lazy_attributes plugin to handle lazily-loaded attributes
+      # for subclass instances returned by superclass methods.
+      def self.apply(model, opts = OPTS)
+        model.plugin :single_table_inheritance, nil
         model.plugin :lazy_attributes
       end
-      
-      # Initialize the per-model data structures and set the dataset's row_proc
-      # to check for the :key option column for the type of class when loading objects.
-      # Options:
-      # :key :: The column symbol holding the name of the model class this
-      #         is an instance of.  Necessary if you want to call model methods
-      #         using the superclass, but have them return subclass instances.
-      # :table_map :: Hash with class name symbol keys and table name symbol
-      #               values.  Necessary if the implicit table name for the model class
-      #               does not match the database table name
-      # :model_map :: Hash with keys being values of the cti_key column, and values
-      #               being class name strings or symbols.  Used if you don't want to
-      #               store class names in the database.  If you use this option, you
-      #               are responsible for setting the values of the cti_key column
-      #               manually (usually in a before_create hook).
-      def self.configure(model, opts=OPTS)
+
+      # Initialize the plugin using the following options:
+      # :key :: Column symbol that holds the key that identifies the class to use.
+      #         Necessary if you want to call model methods on a superclass
+      #         that return subclass instances
+      # :model_map :: Hash or proc mapping the key column values to model class names.
+      # :key_map :: Hash or proc mapping model class names to key column values.
+      #             Each value or return is an array of possible key column values.
+      # :key_chooser :: proc returning key for the provided model instance
+      # :table_map :: Hash with class name symbols keys mapping to table name symbol values
+      #               Overrides implicit table names
+      def self.configure(model, opts = OPTS)
+        SingleTableInheritance.configure model, opts[:key], opts
+
         model.instance_eval do
-          @cti_base_model = self
-          @cti_key = opts[:key] 
+          @cti_models = [self]
           @cti_tables = [table_name]
-          @cti_columns = {table_name=>columns}
+          @cti_instance_dataset = @instance_dataset
+          @cti_table_columns = columns
           @cti_table_map = opts[:table_map] || {}
-          @cti_model_map = opts[:model_map]
-          set_dataset_cti_row_proc
-          set_dataset(dataset.select(*columns.map{|c| Sequel.qualify(table_name, Sequel.identifier(c))}))
         end
       end
 
       module ClassMethods
+        # An array of each model in the inheritance hierarchy that uses an
+        # backed by a new table.
+        attr_reader :cti_models
+
         # The parent/root/base model for this class table inheritance hierarchy.
-        # This is the only model in the hierarchy that load the
-        # class_table_inheritance plugin.
-        attr_reader :cti_base_model
-        
-        # Hash with table name symbol keys and arrays of column symbol values,
+        # This is the only model in the hierarchy that loads the
+        # class_table_inheritance plugin. For backwards compatibility.
+        def cti_base_model
+          @cti_models.first
+        end
+
+        # An array of column symbols for the backing database table,
         # giving the columns to update in each backing database table.
-        attr_reader :cti_columns
-        
-        # The column containing the class name as a string.  Used to
-        # return instances of subclasses when calling the superclass's
-        # load method.
-        attr_reader :cti_key
-        
-        # A hash with keys being values of the cti_key column, and values
-        # being class name strings or symbols.  Used if you don't want to
-        # store class names in the database.
-        attr_reader :cti_model_map
-        
+        attr_reader :cti_table_columns
+
+        # The dataset that table instance datasets are based on.
+        # Used for database modifications
+        attr_reader :cti_instance_dataset
+
         # An array of table symbols that back this model.  The first is
         # cti_base_model table symbol, and the last is the current model
         # table symbol.
         attr_reader :cti_tables
-        
+
         # A hash with class name symbol keys and table name symbol values.
         # Specified with the :table_map option to the plugin, and used if
         # the implicit naming is incorrect.
         attr_reader :cti_table_map
 
-        Plugins.inherited_instance_variables(self, :@cti_key=>nil, :@cti_model_map=>nil, :@cti_table_map=>nil)
+        # Hash with table name symbol keys and arrays of column symbol values,
+        # giving the columns to update in each backing database table.
+        # For backwards compatibility.
+        def cti_columns
+          h = {}
+          cti_models.each { |m| h[m.table_name] = m.cti_table_columns }
+          h
+        end
 
-        # Add the appropriate data structures to the subclass.  Does not
-        # allow anonymous subclasses to be created, since they would not
-        # be mappable to a table.
+        # Alias to sti_key, for backwards compatibility.
+        def cti_key; sti_key; end
+
+        # Alias to sti_model_map, for backwards compatibility.
+        def cti_model_map; sti_model_map; end
+
+        Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil)
+
         def inherited(subclass)
-          cc = cti_columns
-          ct = cti_tables.dup
-          ctm = cti_table_map
-          cbm = cti_base_model
-          pk = primary_key
-          ds = dataset
+          ds = sti_dataset
+
+          # Prevent inherited in model/base.rb from setting the dataset
+          subclass.instance_eval { @dataset = nil }
+
+          super
+
+          # Set table if this is a class table inheritance
           table = nil
           columns = nil
-          subclass.instance_eval do
-            raise(Error, "cannot create anonymous subclass for model class using class_table_inheritance") if !(n = name) || n.empty?
-            table = ctm[n.to_sym] || implicit_table_name
-            columns = db.from(table).columns
-            @cti_tables = ct + [table]
-            @cti_columns = cc.merge(table=>columns)
-            @cti_base_model = cbm
-            # Need to set dataset and columns before calling super so that
-            # the main column accessor module is included in the class before any
-            # plugin accessor modules (such as the lazy attributes accessor module).
-            set_dataset(ds.join(table, pk=>pk).select_append(*(columns - [primary_key]).map{|c| Sequel.qualify(table, Sequel.identifier(c))}))
-            set_columns(self.columns)
-          end
-          super
-          subclass.instance_eval do
-            set_dataset_cti_row_proc
-            (columns - [cbm.primary_key]).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
-            cti_tables.reverse.each do |t|
-              db.schema(t).each{|k,v| db_schema[k] = v}
-            end
-          end
-        end
-        
-        # The primary key in the parent/base/root model, which should have a
-        # foreign key with the same name referencing it in each model subclass.
-        def primary_key
-          return super if self == cti_base_model
-          cti_base_model.primary_key
-        end
-        
-        # The table name for the current model class's main table (not used
-        # by any superclasses).
-        def table_name
-          self == cti_base_model ? super : cti_tables.last
-        end
-
-        private
-
-        # If calling set_dataset manually, make sure to set the dataset
-        # row proc to one that handles inheritance correctly.
-        def set_dataset_row_proc(ds)
-          ds.row_proc = @dataset.row_proc if @dataset
-        end
-
-        # Set the row_proc for the model's dataset appropriately
-        # based on the cti key and model map.
-        def set_dataset_cti_row_proc
-          m = method(:constantize)
-          dataset.row_proc = if ck = cti_key
-            if model_map = cti_model_map
-              lambda do |r|
-                mod = if name = model_map[r[ck]]
-                  m.call(name)
-                else
-                  self
-                end
-                mod.call(r)
-              end
+          if (n = subclass.name) && !n.empty?
+            if table = cti_table_map[n.to_sym]
+              columns = db.from(table).columns
             else
-              lambda{|r| (m.call(r[ck]) rescue self).call(r)}
+              table = subclass.implicit_table_name
+              columns = db.from(table).columns rescue nil
+              table = nil if !columns || columns.empty?
             end
-          else
-            self
           end
+          table = nil if table && (table == table_name)
+
+          return unless table
+
+          pk = primary_key
+          subclass.instance_eval do
+            if cti_tables.length == 1
+              ds = ds.select(*self.columns.map{|cc| Sequel.qualify(table_name, Sequel.identifier(cc))})
+            end
+            sel_app = (columns - [pk]).map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
+            @sti_dataset = ds.join(table, pk=>pk).select_append(*sel_app)
+            set_dataset(@sti_dataset)
+            set_columns(self.columns)
+            dataset.row_proc = lambda{|r| subclass.sti_load(r)}
+            (columns - [pk]).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
+
+            @cti_models += [self]
+            @cti_tables += [table]
+            @cti_table_columns = columns
+            @cti_instance_dataset = db.from(table)
+
+            cti_tables.reverse_each do |ct|
+              db.schema(ct).each{|sk,v| db_schema[sk] = v}
+            end
+          end
+        end
+
+        # The table name for the current model class's main table.
+        def table_name
+          cti_tables ? cti_tables.last : super
+        end
+
+        def sti_class_from_key(key)
+          sti_class(sti_model_map[key])
         end
       end
 
@@ -240,47 +289,55 @@ module Sequel
         # most recent table and going through all superclasses.
         def delete
           raise Sequel::Error, "can't delete frozen object" if frozen?
-          m = model
-          m.cti_tables.reverse.each do |table|
-            m.db.from(table).filter(m.primary_key=>pk).delete
+          model.cti_models.reverse_each do |m|
+            cti_this(m).delete
           end
           self
         end
-        
+
         private
-        
-        # Set the cti_key column to the name of the model.
+
+        def cti_this(model)
+          use_server(model.cti_instance_dataset.filter(model.primary_key_hash(pk)))
+        end
+
+        # Set the sti_key column based on the sti_key_map.
         def _before_validation
-          if new? && model.cti_key && !model.cti_model_map
-            set_column_value("#{model.cti_key}=", model.name.to_s)
+          if new? && (set = self[model.sti_key])
+            exp = model.sti_key_chooser.call(self)
+            if set != exp
+              set_table = model.sti_class_from_key(set).table_name
+              exp_table = model.sti_class_from_key(exp).table_name
+              set_column_value("#{model.sti_key}=", exp) if set_table != exp_table
+            end
           end
           super
         end
-        
+
         # Insert rows into all backing tables, using the columns
-        # in each table.  
+        # in each table.
         def _insert
-          return super if model == model.cti_base_model
-          iid = @values[primary_key] 
-          m = model
-          m.cti_tables.each do |table|
-            h = {}
-            h[m.primary_key] ||= iid if iid
-            m.cti_columns[table].each{|c| h[c] = @values[c] if @values.include?(c)}
-            nid = m.db.from(table).insert(h)
-            iid ||= nid
+          return super if model.cti_tables.length == 1
+          model.cti_models.each do |m|
+            v = {}
+            m.cti_table_columns.each{|c| v[c] = @values[c] if @values.include?(c)}
+            ds = use_server(m.cti_instance_dataset)
+            if ds.supports_insert_select? && (h = ds.insert_select(v))
+              @values.merge!(h)
+            else
+              nid = ds.insert(v)
+              @values[primary_key] ||= nid
+            end
           end
-          @values[primary_key] = iid
+          db.dataset.supports_insert_select? ? nil : @values[primary_key]
         end
-        
+
         # Update rows in all backing tables, using the columns in each table.
         def _update(columns)
-          pkh = pk_hash
-          m = model
-          m.cti_tables.each do |table|
+          model.cti_models.each do |m|
             h = {}
-            m.cti_columns[table].each{|c| h[c] = columns[c] if columns.include?(c)}
-            m.db.from(table).filter(pkh).update(h) unless h.empty?
+            m.cti_table_columns.each{|c| h[c] = columns[c] if columns.include?(c)}
+            cti_this(m).update(h) unless h.empty?
           end
         end
       end

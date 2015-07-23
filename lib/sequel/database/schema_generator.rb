@@ -81,6 +81,10 @@ module Sequel
       #
       # The following options are supported:
       #
+      # :collate :: The collation to use for the column.  For backwards compatibility,
+      #             only symbols and string values are supported, and they are used verbatim.
+      #             However, on PostgreSQL, symbols are literalized as regular identifiers,
+      #             since unquoted collations are unlikely to be valid.
       # :default :: The default value for the column.
       # :deferrable :: For foreign key columns, this ensures referential integrity will work even if
       #                referencing table uses a foreign key value that does not

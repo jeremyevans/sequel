@@ -46,7 +46,7 @@ module Sequel
             rs = stmt.getGeneratedKeys
             begin
               if rs.next
-                rs.getInt(1)
+                rs.getLong(1)
               else
                 0
               end
@@ -57,7 +57,7 @@ module Sequel
             statement(conn) do |st|
               rs = st.executeQuery(LAST_INSERT_ID)
               rs.next
-              rs.getInt(1)
+              rs.getLong(1)
             end
           end
         end

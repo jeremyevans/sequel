@@ -1683,6 +1683,7 @@ end
 
 describe "Database#each_server with do/jdbc adapter connection string without :adapter option" do
   it "should yield a separate database object for each server" do
+    require 'sequel/adapters/mock'
     klass = Class.new(Sequel::Database)
     def klass.adapter_class(v)
       raise unless v == :jdbc

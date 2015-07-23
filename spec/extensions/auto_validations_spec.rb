@@ -48,6 +48,18 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.errors.must_equal(:name=>["is longer than 50 characters"])
   end
 
+  it "should handle simple unique indexes correctly" do
+    def (@c.db).indexes(t, *)
+      raise if t.is_a?(Sequel::Dataset)
+      return [] if t != :test
+      {:a=>{:columns=>[:name], :unique=>true}}
+    end
+    @c.plugin :auto_validations
+    @m.set(:name=>'foo', :d=>Date.today)
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["is already taken"])
+  end
+
   it "should validate using the underlying column values" do
     @c.send(:define_method, :name){super() * 2}
     @c.db.fetch = {:v=>0}
@@ -161,5 +173,20 @@ describe "Sequel::Plugins::AutoValidations" do
   it "should work correctly when changing the dataset" do
     @c.set_dataset(@c.db[:foo])
     @c.new.valid?.must_equal true
+  end
+
+  it "should support setting validator options" do
+    sc = Class.new(@c)
+    sc.plugin :auto_validations, :max_length_opts=> {:message=> 'ml_message'}, :schema_types_opts=> {:message=> 'st_message'}, :explicit_not_null_opts=> {:message=> 'enn_message'}, :unique_opts=> {:message=> 'u_message'}
+
+    @m = sc.new
+    @m.set(:name=>'a'*51, :d => '/', :nnd => nil, :num=>1)
+    @m.valid?.must_equal false
+    @m.errors.must_equal(:name=>["ml_message"], :d=>["st_message"], :nnd=>["enn_message"])
+
+    @m = sc.new
+    @m.set(:name=>1, :num=>1, :d=>Date.today)
+    @m.valid?.must_equal false
+    @m.errors.must_equal([:name, :num]=>["u_message"])
   end
 end

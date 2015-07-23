@@ -2,8 +2,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::AssociationPks" do
   before do
-    @db = Sequel.mock(:fetch=>proc do |sql|
+    @db = Sequel.mock(:autoid=>1, :fetch=>proc do |sql|
       case sql
+      when /SELECT \* FROM (?:artists|albums) WHERE \(id = (\d+)\) LIMIT 1/
+        {:id=>$1.to_i}
       when "SELECT id FROM albums WHERE (albums.artist_id = 1)"
         [{:id=>1}, {:id=>2}, {:id=>3}]
       when /SELECT tag_id FROM albums_tags WHERE \(album_id = (\d)\)/
@@ -277,5 +279,87 @@ describe "Sequel::Plugins::AssociationPks" do
     match = sqls[4].match(/INSERT INTO albums_vocalists \((.*)\) VALUES \((.*)\)/)
     Hash[match[1].split(', ').zip(match[2].split(', '))].must_equal("first"=>"12", "last"=>"12", "album_id"=>"2")
     sqls.length.must_equal 6
+  end
+
+  it "should handle delaying setting of association pks until after saving for new objects, if :delay plugin option is used" do
+    @Artist.one_to_many :albums, :clone=>:albums, :delay_pks=>true
+    @Album.many_to_many :tags, :clone=>:tags, :delay_pks=>true
+
+    ar = @Artist.new
+    ar.album_pks.must_equal []
+    ar.album_pks = [1,2,3]
+    ar.album_pks.must_equal [1,2,3]
+    @db.sqls.must_equal []
+
+    ar.save
+    @db.sqls.must_equal [
+      "INSERT INTO artists DEFAULT VALUES",
+      "UPDATE albums SET artist_id = 1 WHERE (id IN (1, 2, 3))",
+      "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN (1, 2, 3)))",
+      "SELECT * FROM artists WHERE (id = 1) LIMIT 1",
+    ]
+
+    al = @Album.new
+    al.tag_pks.must_equal []
+    al.tag_pks = [1,2]
+    al.tag_pks.must_equal [1, 2]
+    @db.sqls.must_equal []
+
+    al.save
+    @db.sqls.must_equal [
+      "INSERT INTO albums DEFAULT VALUES",
+      "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 2)))",
+      "SELECT tag_id FROM albums_tags WHERE (album_id = 2)",
+      "BEGIN",
+      "INSERT INTO albums_tags (album_id, tag_id) VALUES (2, 1)",
+      "COMMIT",
+      "SELECT * FROM albums WHERE (id = 2) LIMIT 1"
+    ]
+  end
+
+  it "should handle delaying setting of association pks until after saving for existing objects, if :delay=>:all plugin option is used" do
+    @Artist.one_to_many :albums, :clone=>:albums, :delay_pks=>:always
+    @Album.many_to_many :tags, :clone=>:tags, :delay_pks=>:always
+
+    ar = @Artist.load(:id=>1)
+    ar.album_pks.must_equal [1,2,3]
+    @db.sqls
+    ar.album_pks = [2,4]
+    ar.album_pks.must_equal [2,4]
+    @db.sqls.must_equal []
+
+    ar.save_changes
+    @db.sqls.must_equal [
+      "UPDATE albums SET artist_id = 1 WHERE (id IN (2, 4))",
+      "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN (2, 4)))"
+    ]
+
+    al = @Album.load(:id=>1)
+    al.tag_pks.must_equal [1,2]
+    @db.sqls
+    al.tag_pks = [2,3]
+    al.tag_pks.must_equal [2,3]
+    @db.sqls.must_equal []
+
+    al.save_changes
+    @db.sqls.must_equal [
+      "DELETE FROM albums_tags WHERE ((album_id = 1) AND (tag_id NOT IN (2, 3)))",
+      "SELECT tag_id FROM albums_tags WHERE (album_id = 1)",
+      "BEGIN",
+      "INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3)",
+      "COMMIT",
+    ]
+  end
+
+  it "should clear delayed associated pks if refreshing, if :delay plugin option is used" do
+    @Artist.one_to_many :albums, :clone=>:albums, :delay_pks=>:always
+    @Album.many_to_many :tags, :clone=>:tags, :delay_pks=>:always
+
+    ar = @Artist.load(:id=>1)
+    ar.album_pks.must_equal [1,2,3]
+    ar.album_pks = [2,4]
+    ar.album_pks.must_equal [2,4]
+    ar.refresh
+    ar.album_pks.must_equal [1,2,3]
   end
 end

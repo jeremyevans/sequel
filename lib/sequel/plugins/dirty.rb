@@ -38,7 +38,12 @@ module Sequel
     #   artist.update(:name=>'Bar')
     #   artist.column_changes        # => {}
     #   artist.previous_changes      # => {:name=>['Foo', 'Bar']}
-    # 
+    #
+    # There is one caveat; when used with a column that also uses the
+    # serialization plugin, setting the column back to its original value
+    # after changing it is not correctly detected and will leave an entry
+    # in changed_columns.
+    #
     # Usage:
     #
     #   # Make all model subclass instances record previous values (called before loading subclasses)

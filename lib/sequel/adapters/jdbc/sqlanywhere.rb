@@ -51,7 +51,7 @@ module Sequel
             sql = LAST_INSERT_ID
             rs = log_yield(sql){stmt.executeQuery(sql)}
             rs.next
-            rs.getInt(1)
+            rs.getLong(1)
           end
         end
 

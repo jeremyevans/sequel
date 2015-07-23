@@ -150,7 +150,7 @@ describe "An Oracle database" do
       {:date_created=>nil, :name => 'abc', :value => 123} 
     ]
 
-    @d.filter(:name => 'abc').limit(1).to_a.must_equal [
+    @d.filter(:name => 'abc').order(:value).limit(1).to_a.must_equal [
       {:date_created=>nil, :name => 'abc', :value => 123}                                        
     ]
         

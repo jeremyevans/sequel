@@ -78,7 +78,7 @@ SELECT:: select, select_all, select_append, select_group, select_more
 FROM:: from, from_self
 JOIN:: join, left_join, right_join, full_join, natural_join, natural_left_join, natural_right_join, natural_full_join, cross_join, inner_join, left_outer_join, right_outer_join, full_outer_join, join_table
 WHERE:: where, filter, exclude, exclude_where, and, or, grep, invert, unfiltered
-GROUP:: group, group_by, group_and_count, select_group, ungrouped
+GROUP:: group, group_by, group_and_count, group_append, select_group, ungrouped
 HAVING:: having, exclude_having, invert, unfiltered
 ORDER:: order, order_by, order_append, order_prepend, order_more, reverse, reverse_order, unordered
 LIMIT/OFFSET:: limit, offset, unlimited
