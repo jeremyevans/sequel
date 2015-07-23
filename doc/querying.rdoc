@@ -677,6 +677,11 @@ You can remove an existing grouping using +ungrouped+:
 
   Album.group(:artist_id).ungrouped
   # SELECT * FROM albums
+
+If you want to add a column to the end of the existing grouping columns:
+
+  Album.group(:artist_id).group_append(:name)
+  # SELECT * FROM albums GROUP BY artist_id, name
  
 A common use of grouping is to count based on the number of grouped rows,
 and Sequel provides a +group_and_count+ method to make this easier:
