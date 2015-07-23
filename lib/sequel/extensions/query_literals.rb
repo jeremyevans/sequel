@@ -45,7 +45,7 @@ module Sequel
   # Note that if you pass a block to these methods, it will use the default
   # implementation without the special literal handling.
   module QueryLiterals
-    %w'select select_append select_group select_more group group_and_count order order_append order_more'.each do |m|
+    %w'select select_append select_group select_more group group_and_count group_append order order_append order_more'.each do |m|
       class_eval(<<-END, __FILE__, __LINE__ + 1)
         def #{m}(*args)
           if !block_given? && (l = query_literal(args))

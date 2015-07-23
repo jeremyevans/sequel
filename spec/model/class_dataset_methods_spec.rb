@@ -50,6 +50,7 @@ describe Sequel::Model, "class dataset methods"  do
     @db.sqls
     @c.grep(:id, 'a%').sql.must_equal "SELECT * FROM items WHERE ((id LIKE 'a%' ESCAPE '\\'))"
     @c.group(:a).sql.must_equal "SELECT * FROM items GROUP BY a"
+    @c.group_append(:a).sql.must_equal "SELECT * FROM items GROUP BY a"
     @c.group_and_count(:a).sql.must_equal "SELECT a, count(*) AS count FROM items GROUP BY a"
     @c.group_by(:a).sql.must_equal "SELECT * FROM items GROUP BY a"
     @c.having(:a).sql.must_equal "SELECT * FROM items HAVING a"

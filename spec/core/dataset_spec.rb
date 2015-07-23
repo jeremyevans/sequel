@@ -884,17 +884,13 @@ describe "Dataset#group_append" do
     @d.group_append(:a).sql.must_equal 'SELECT * FROM test GROUP BY a'
   end
 
-  it "should be aliased as group_more" do
-    @d.group(:a).group_more(:b).sql.must_equal 'SELECT * FROM test GROUP BY a, b'
-  end
-
   it "should add to the currently grouped columns" do
     @d.group(:a).group_append(:b).sql.must_equal 'SELECT * FROM test GROUP BY a, b'
   end
 
   it "should accept a block that yields a virtual row" do
-    @d.group(:a).group_append { :b }.sql.must_equal 'SELECT * FROM test GROUP BY a, b'
-    @d.group(:a).group_append { b }.sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+    @d.group(:a).group_append{:b}.sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+    @d.group(:a).group_append(:c){b}.sql.must_equal 'SELECT * FROM test GROUP BY a, c, b'
   end
 end
 
