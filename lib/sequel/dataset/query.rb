@@ -326,6 +326,22 @@ module Sequel
       clone(:group_options=>:rollup)
     end
 
+    # Returns a copy of the dataset with the given columns added to the list of
+    # existing columsn to group on. If no existing columns were given this
+    # method simply sets the columns as the initial ones to group on.
+    #
+    #   DB[:items].group_append(:b) # SELECT * FROM items GROUP BY b
+    #   DB[:items].group(:a).group_append(:b) # SELECT * FROM items GROUP BY a, b
+    def group_append(*columns, &block)
+      columns = @opts[:group] + columns if @opts[:group]
+      group(*columns, &block)
+    end
+
+    # Alias of group_append
+    def group_more(*columns, &block)
+      group_append(*columns, &block)
+    end
+
     # Returns a copy of the dataset with the HAVING conditions changed. See #where for argument types.
     #
     #   DB[:items].group(:sum).having(:sum=>10)

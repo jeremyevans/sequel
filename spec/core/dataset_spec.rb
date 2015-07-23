@@ -875,6 +875,29 @@ describe "Dataset#group_by" do
   end
 end
 
+describe "Dataset#group_append" do
+  before do
+    @d = Sequel.mock.dataset.from(:test)
+  end
+
+  it "should group by the given columns if no existing columns are present" do
+    @d.group_append(:a).sql.must_equal 'SELECT * FROM test GROUP BY a'
+  end
+
+  it "should be aliased as group_more" do
+    @d.group(:a).group_more(:b).sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+  end
+
+  it "should add to the currently grouped columns" do
+    @d.group(:a).group_append(:b).sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+  end
+
+  it "should accept a block that yields a virtual row" do
+    @d.group(:a).group_append { :b }.sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+    @d.group(:a).group_append { b }.sql.must_equal 'SELECT * FROM test GROUP BY a, b'
+  end
+end
+
 describe "Dataset#as" do
   it "should set up an alias" do
     dataset = Sequel.mock.dataset.from(:test)
