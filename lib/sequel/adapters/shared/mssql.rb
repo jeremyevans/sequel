@@ -131,10 +131,10 @@ module Sequel
         schema, table = schema_and_table(table)
         current_schema = m.call(get(Sequel.function('schema_name')))
         fk_action_map = FOREIGN_KEY_ACTION_MAP
-        ds = metadata_dataset.from(Sequel.as(Sequel.lit('[sys].[foreign_keys]'), 'fk')).
-          join(Sequel.as(Sequel.lit('[sys].[foreign_key_columns]'), 'fkc'), :constraint_object_id => :object_id).
-          join(Sequel.as(Sequel.lit('[sys].[all_columns]'),'pc'), :object_id => :fkc__parent_object_id,     :column_id => :fkc__parent_column_id).
-          join(Sequel.as(Sequel.lit('[sys].[all_columns]'),'rc'), :object_id => :fkc__referenced_object_id, :column_id => :fkc__referenced_column_id).
+        ds = metadata_dataset.from(Sequel.lit('[sys].[foreign_keys]').as(:fk)).
+          join(Sequel.lit('[sys].[foreign_key_columns]').as(:fkc), :constraint_object_id => :object_id).
+          join(Sequel.lit('[sys].[all_columns]').as(:pc), :object_id => :fkc__parent_object_id,     :column_id => :fkc__parent_column_id).
+          join(Sequel.lit('[sys].[all_columns]').as(:rc), :object_id => :fkc__referenced_object_id, :column_id => :fkc__referenced_column_id).
           where{{object_schema_name(:fk__parent_object_id) => im.call(schema || current_schema)}}.
           where{{object_name(:fk__parent_object_id) => im.call(table)}}.
           select{[:fk__name, 
@@ -169,10 +169,10 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}
-        ds = metadata_dataset.from(Sequel.as(Sequel.lit('[sys].[tables]'),'t')).
-         join(Sequel.as(Sequel.lit('[sys].[indexes]'),'i'), :object_id=>:object_id).
-         join(Sequel.as(Sequel.lit('[sys].[index_columns]'),'ic'), :object_id=>:object_id, :index_id=>:index_id).
-         join(Sequel.as(Sequel.lit('[sys].[columns]'), 'c'), :object_id=>:object_id, :column_id=>:column_id).
+        ds = metadata_dataset.from(Sequel.lit('[sys].[tables]').as(:t)).
+         join(Sequel.lit('[sys].[indexes]').as(:i), :object_id=>:object_id).
+         join(Sequel.lit('[sys].[index_columns]').as(:ic), :object_id=>:object_id, :index_id=>:index_id).
+         join(Sequel.lit('[sys].[columns]').as(:c), :object_id=>:object_id, :column_id=>:column_id).
          select(:i__name, :i__is_unique, :c__name___column).
          where{{t__name=>im.call(table)}}.
          where(:i__is_primary_key=>0, :i__is_disabled=>0).
@@ -433,8 +433,8 @@ module Sequel
         inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel.expr(s)}
         sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel.expr(s)}
 
-       identity_cols = metadata_dataset.from(Sequel.lit('[sys].[columns]')).
-             where(:object_id=>table_id, :is_identity=>true).
+        identity_cols = metadata_dataset.from(Sequel.lit('[sys].[columns]')).
+          where(:object_id=>table_id, :is_identity=>true).
           select_map(:name)
 
         pk_index_id = metadata_dataset.from(sys_qual.call(Sequel.lit('sysindexes'))).
