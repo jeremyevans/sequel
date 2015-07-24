@@ -131,10 +131,6 @@ module Sequel
         schema, table = schema_and_table(table)
         current_schema = m.call(get(Sequel.function('schema_name')))
         fk_action_map = FOREIGN_KEY_ACTION_MAP
-        #~ ds = metadata_dataset.from(:sys__foreign_keys___fk).
-          #~ join(:sys__foreign_key_columns___fkc, :constraint_object_id => :object_id).
-          #~ join(:sys__all_columns___pc, :object_id => :fkc__parent_object_id,     :column_id => :fkc__parent_column_id).
-          #~ join(:sys__all_columns___rc, :object_id => :fkc__referenced_object_id, :column_id => :fkc__referenced_column_id).
         ds = metadata_dataset.from(Sequel.as(Sequel.lit('[sys].[foreign_keys]'), 'fk')).
           join(Sequel.as(Sequel.lit('[sys].[foreign_key_columns]'), 'fkc'), :constraint_object_id => :object_id).
           join(Sequel.as(Sequel.lit('[sys].[all_columns]'),'pc'), :object_id => :fkc__parent_object_id,     :column_id => :fkc__parent_column_id).
