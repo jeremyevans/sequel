@@ -433,15 +433,15 @@ module Sequel
         inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel.expr(s)}
         sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel.expr(s)}
 
-        identity_cols = metadata_dataset.from(:sys__columns).
+       identity_cols = metadata_dataset.from(Sequel.lit('[sys].[columns]')).
           where(:object_id=>table_id, :is_identity=>true).
           select_map(:name)
 
-        pk_index_id = metadata_dataset.from(sys_qual.call(:sysindexes)).
+        pk_index_id = metadata_dataset.from(sys_qual.call(Sequel.lit('sysindexes'))).
           where(:id=>table_id, :indid=>1..254){{(status & 2048)=>2048}}.
           get(:indid)
-        pk_cols = metadata_dataset.from(sys_qual.call(:sysindexkeys).as(:sik)).
-          join(sys_qual.call(:syscolumns).as(:sc), :id=>:id, :colid=>:colid).
+        pk_cols = metadata_dataset.from(sys_qual.call(Sequel.lit('sysindexkeys')).as(:sik)).
+          join(sys_qual.call(Sequel.lit('syscolumns')).as(:sc), :id=>:id, :colid=>:colid).
           where(:sik__id=>table_id, :sik__indid=>pk_index_id).
           select_order_map(:sc__name)
 
