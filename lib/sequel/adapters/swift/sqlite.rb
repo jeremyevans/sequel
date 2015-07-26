@@ -11,6 +11,18 @@ module Sequel
         extend Sequel::Database::ResetIdentifierMangling
         include Sequel::SQLite::DatabaseMethods
 
+        DATABASE_ERROR_REGEXPS = {
+          /\AUNIQUE constraint failed: / => UniqueConstraintViolation,
+          /\AFOREIGN KEY constraint failed/ => ForeignKeyConstraintViolation,
+          /\ACHECK constraint failed/ => CheckConstraintViolation,
+          /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed/ => ConstraintViolation,
+          /may not be NULL\z|NOT NULL constraint failed: .+/ => NotNullConstraintViolation,
+          /\ASQLITE ERROR \d+ \(\) : CHECK constraint failed: / => CheckConstraintViolation
+        }.freeze
+        def database_error_regexps
+          DATABASE_ERROR_REGEXPS
+        end
+
         # Set the correct pragmas on the connection.
         def connect(opts)
           c = super

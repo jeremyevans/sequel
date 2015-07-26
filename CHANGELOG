@@ -1,6 +1,8 @@
 === HEAD
 
-* Recognize another check constraint failure message on SQLite (jeremyevans)
+* Recognize constraint violation exceptions on swift/sqlite (jeremyevans)
+
+* Recognize another check constraint violation exception message on SQLite (jeremyevans)
 
 * Allow =~ and !~ to be used on ComplexExpressions (janko-m) (#1050)
 
