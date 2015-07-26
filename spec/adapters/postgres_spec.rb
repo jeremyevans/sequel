@@ -11,7 +11,11 @@ def logger.method_missing(m, msg)
 end
 DB.loggers << logger
 
-DB.extension :pg_array, :pg_hstore, :pg_range, :pg_interval, :pg_row, :pg_inet, :pg_json, :pg_enum
+DB.extension :pg_array, :pg_hstore, :pg_range, :pg_row, :pg_inet, :pg_json, :pg_enum
+begin
+  DB.extension :pg_interval
+rescue LoadError
+end
 
 describe "PostgreSQL", '#create_table' do
   before do
