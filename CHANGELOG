@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow =~ and !~ to be used on ComplexExpressions (janko-m) (#1050)
+
 * Support case sensitive SQL Server 2012 in MSSQL metadata queries (knut2) (#1049)
 
 * Add Dataset#group_append, for appending to the existing GROUP BY clause (YorickPeterse) (#1047)
