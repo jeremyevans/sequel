@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize another check constraint failure message on SQLite (jeremyevans)
+
 * Allow =~ and !~ to be used on ComplexExpressions (janko-m) (#1050)
 
 * Support case sensitive SQL Server 2012 in MSSQL metadata queries (knut2) (#1049)

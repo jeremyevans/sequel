@@ -335,6 +335,7 @@ module Sequel
         /\ACHECK constraint failed/ => CheckConstraintViolation,
         /\A(SQLITE ERROR 19 \(CONSTRAINT\) : )?constraint failed\z/ => ConstraintViolation,
         /may not be NULL\z|NOT NULL constraint failed: .+\z/ => NotNullConstraintViolation,
+        /\ASQLITE ERROR \d+ \(\) : CHECK constraint failed: / => CheckConstraintViolation
       }.freeze
       def database_error_regexps
         DATABASE_ERROR_REGEXPS
