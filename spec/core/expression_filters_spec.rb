@@ -68,8 +68,17 @@ describe "Blockless Ruby Filters" do
     @d.l{x =~ (1...5)}.must_equal '((x >= 1) AND (x < 5))'
     @d.l{x =~ [1,2,3]}.must_equal '(x IN (1, 2, 3))'
 
+    @d.l{(x + y) =~ 100}.must_equal '((x + y) = 100)'
+    @d.l{(x + y) =~ 'a'}.must_equal '((x + y) = \'a\')'
+    @d.l{(x + y) =~ true}.must_equal '((x + y) IS TRUE)'
+    @d.l{(x + y) =~ false}.must_equal '((x + y) IS FALSE)'
+    @d.l{(x + y) =~ nil}.must_equal '((x + y) IS NULL)'
+    @d.l{(x + y) =~ (1...5)}.must_equal '(((x + y) >= 1) AND ((x + y) < 5))'
+    @d.l{(x + y) =~ [1,2,3]}.must_equal '((x + y) IN (1, 2, 3))'
+
     def @d.supports_regexp?; true end
     @d.l{x =~ /blah/}.must_equal '(x ~ \'blah\')'
+    @d.l{(x + y) =~ /blah/}.must_equal '((x + y) ~ \'blah\')'
   end
 
   if RUBY_VERSION >= '1.9'
@@ -82,8 +91,17 @@ describe "Blockless Ruby Filters" do
       @d.l{x !~ (1...5)}.must_equal '((x < 1) OR (x >= 5))'
       @d.l{x !~ [1,2,3]}.must_equal '(x NOT IN (1, 2, 3))'
 
+      @d.l{(x + y) !~ 100}.must_equal '((x + y) != 100)'
+      @d.l{(x + y) !~ 'a'}.must_equal '((x + y) != \'a\')'
+      @d.l{(x + y) !~ true}.must_equal '((x + y) IS NOT TRUE)'
+      @d.l{(x + y) !~ false}.must_equal '((x + y) IS NOT FALSE)'
+      @d.l{(x + y) !~ nil}.must_equal '((x + y) IS NOT NULL)'
+      @d.l{(x + y) !~ (1...5)}.must_equal '(((x + y) < 1) OR ((x + y) >= 5))'
+      @d.l{(x + y) !~ [1,2,3]}.must_equal '((x + y) NOT IN (1, 2, 3))'
+
       def @d.supports_regexp?; true end
       @d.l{x !~ /blah/}.must_equal '(x !~ \'blah\')'
+      @d.l{(x + y) !~ /blah/}.must_equal '((x + y) !~ \'blah\')'
     end
   end
   

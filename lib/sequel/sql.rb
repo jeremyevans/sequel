@@ -1235,6 +1235,8 @@ module Sequel
     end
 
     class ComplexExpression
+      include PatternMatchMethods
+
       # A hash of the opposite for each constant, used for inverting constants.
       CONSTANT_INVERSIONS = {Constants::TRUE=>Constants::FALSE, Constants::FALSE=>Constants::TRUE,
                              Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}
