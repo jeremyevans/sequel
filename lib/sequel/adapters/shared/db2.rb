@@ -16,6 +16,15 @@ module Sequel
       NOT_NULL      = ' NOT NULL'.freeze
       NULL          = ''.freeze
 
+      # REORG the related table whenever it is altered.  This is not always
+      # required, but it is necessary for compatibilty with other Sequel
+      # code in many cases.
+      def alter_table(name, generator=nil)
+        res = super
+        reorg(name)
+        res
+      end
+
       # DB2 always uses :db2 as it's database type
       def database_type
         :db2
@@ -81,6 +90,25 @@ module Sequel
       # DB2 supports transaction isolation levels.
       def supports_transaction_isolation_levels?
         true
+      end
+
+      # On DB2, a table might need to be REORGed if you are testing existence
+      # of it.  This REORGs automatically if the database raises a specific
+      # error that indicates it should be REORGed.
+      def table_exists?(name)
+        v ||= false # only retry once
+        sch, table_name = schema_and_table(name)
+        name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
+        from(name).first
+        true
+      rescue DatabaseError => e
+        if e.to_s =~ /Operation not allowed for reason code "7" on table/ && v == false
+          # table probably needs reorg
+          reorg(name)
+          v = true
+          retry 
+        end
+        false
       end
 
       private
@@ -190,12 +218,12 @@ module Sequel
       # Run the REORG TABLE command for the table, necessary when
       # the table has been altered.
       def reorg(table)
-        synchronize(opts[:server]){|c| c.execute(reorg_sql(table))}
+        execute_ddl(reorg_sql(table))
       end
 
       # The SQL to use for REORGing a table.
       def reorg_sql(table)
-        "CALL ADMIN_CMD(#{literal("REORG TABLE #{table}")})"
+        "CALL SYSPROC.ADMIN_CMD(#{literal("REORG TABLE #{quote_schema_table(table)}")})"
       end
 
       # Treat clob as blob if use_clob_as_blob is true

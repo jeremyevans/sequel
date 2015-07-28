@@ -185,15 +185,6 @@ module Sequel
 
       # Hash of connection procs for converting
       attr_reader :conversion_procs
-
-      # REORG the related table whenever it is altered.  This is not always
-      # required, but it is necessary for compatibilty with other Sequel
-      # code in many cases.
-      def alter_table(name, generator=nil)
-        res = super
-        reorg(name)
-        res
-      end
     
       # Create a new connection object for the given server.
       def connect(server)
@@ -269,25 +260,6 @@ module Sequel
             stmt.free_result if stmt
           end
         end
-      end
-
-      # On DB2, a table might need to be REORGed if you are testing existence
-      # of it.  This REORGs automatically if the database raises a specific
-      # error that indicates it should be REORGed.
-      def table_exists?(name)
-        v ||= false # only retry once
-        sch, table_name = schema_and_table(name)
-        name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
-        from(name).first
-        true
-      rescue DatabaseError => e
-        if e.to_s =~ /Operation not allowed for reason code "7" on table/ && v == false
-          # table probably needs reorg
-          reorg(name)
-          v = true
-          retry 
-        end
-        false
       end
 
       private
