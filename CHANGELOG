@@ -1,5 +1,7 @@
 === HEAD
 
+* Automatically REORG tables when altering when using jdbc/db2 (karlhe) (#1054)
+
 * Recognize constraint violation exceptions on swift/sqlite (jeremyevans)
 
 * Recognize another check constraint violation exception message on SQLite (jeremyevans)
