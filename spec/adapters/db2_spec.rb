@@ -66,6 +66,7 @@ describe Sequel::Database do
   after do
     @db.drop_table(:items)
   end
+
   it "should parse primary keys from the schema properly" do
     @db.create_table!(:items){Integer :number}
     @db.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.must_equal []
@@ -73,6 +74,17 @@ describe Sequel::Database do
     @db.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.must_equal [:number]
     @db.create_table!(:items){Integer :number1, :null => false; Integer :number2, :null => false; primary_key [:number1, :number2]}
     @db.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.must_equal [:number1, :number2]
+  end
+
+  it "should not error on alter_table operations that need REORG" do
+    @db.create_table!(:items) do
+      varchar :a
+    end
+    @db.alter_table(:items) do
+      add_column :b, :varchar, :null => true
+      set_column_allow_null :a, false
+      add_index :a, :unique => true
+    end
   end
 end
 

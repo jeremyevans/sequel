@@ -16,15 +16,6 @@ module Sequel
       NOT_NULL      = ' NOT NULL'.freeze
       NULL          = ''.freeze
 
-      # REORG the related table whenever it is altered.  This is not always
-      # required, but it is necessary for compatibilty with other Sequel
-      # code in many cases.
-      def alter_table(name, generator=nil)
-        res = super
-        reorg(name)
-        res
-      end
-
       # DB2 always uses :db2 as it's database type
       def database_type
         :db2
@@ -144,6 +135,16 @@ module Sequel
           end
         else
           super
+        end
+      end
+
+      # REORG the related table whenever it is altered.  This is not always
+      # required, but it is necessary for compatibilty with other Sequel
+      # code in many cases.
+      def apply_alter_table(name, ops)
+        alter_table_sql_list(name, ops).each do |sql|
+          execute_ddl(sql)
+          reorg(name)
         end
       end
 
