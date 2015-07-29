@@ -1,5 +1,7 @@
 === HEAD
 
+* Support Dataset#group_rollup and #group_cube on PostgreSQL 9.5+ (jeremyevans)
+
 * Automatically REORG tables when altering when using jdbc/db2 (karlhe) (#1054)
 
 * Recognize constraint violation exceptions on swift/sqlite (jeremyevans)

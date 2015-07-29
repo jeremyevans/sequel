@@ -1408,6 +1408,16 @@ module Sequel
         true
       end
 
+      # Whether the dataset supports CUBE with GROUP BY.
+      def supports_group_cube?
+        server_version >= 90500
+      end
+
+      # Whether the dataset supports ROLLUP with GROUP BY.
+      def supports_group_rollup?
+        server_version >= 90500
+      end
+
       # True unless insert returning has been disabled for this dataset.
       def supports_insert_select?
         !@opts[:disable_insert_returning]
