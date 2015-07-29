@@ -587,7 +587,10 @@ module Sequel
     # A symbol may be used for database independent locking behavior, but
     # all supported symbols have separate methods (e.g. for_update).
     #
-    #   DB[:items].lock_style('FOR SHARE NOWAIT') # SELECT * FROM items FOR SHARE NOWAIT
+    #   DB[:items].lock_style('FOR SHARE NOWAIT')
+    #   # SELECT * FROM items FOR SHARE NOWAIT
+    #   DB[:items].lock_style('FOR UPDATE OF table1 SKIP LOCKED')
+    #   # SELECT * FROM items FOR UPDATE OF table1 SKIP LOCKED
     def lock_style(style)
       clone(:lock => style)
     end
