@@ -754,11 +754,8 @@ all associated objects to NULL in a single query.  For +many_to_many+
 associations, this deletes all matching rows in the join table.
 Unlike the add_<i>association</i> and remove_<i>association</i> method, the
 plural form of the association name is used in this method.
-The remove_all_<i>association</i> method returns the number of rows updated
-for +one_to_many+ associations and the number of rows deleted for
-+many_to_many+ associations:
-
-  @rows_modified = @artist.remove_all_albums
+The remove_all_<i>association</i> method returns the previously cached associated
+records, or nil if there were no cached associated records.
 
 === <i>association</i>_dataset (e.g. albums_dataset)
 
