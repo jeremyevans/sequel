@@ -1209,7 +1209,7 @@ module Sequel
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
-      Dataset.def_sql_method(self, :insert, [['if server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
+      Dataset.def_sql_method(self, :insert, [['if server_version >= 90500', %w'with insert into columns values conflict returning'], ['elsif server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'values order limit'], ['elsif server_version >= 80400', %w'with select distinct columns from join where group having window compounds order limit lock'], ['else', %w'select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if server_version >= 90100', %w'with update table set from where returning'], ['else', %w'update table set from where returning']])
 
@@ -1354,6 +1354,50 @@ module Sequel
         end
       end
 
+      # Handle uniqueness violations when inserting, by updating the conflicting row, using
+      # ON CONFLICT. With no options, uses ON CONFLICT DO NOTHING.  Options:
+      # :constraint :: An explicit constraint name, has precendence over :target.
+      # :target :: The column name or expression to handle uniqueness violations on.
+      # :update :: A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.
+      # :update_where :: A WHERE condition to use for the update.
+      #
+      # Examples:
+      #
+      #   DB[:table].insert_conflict.insert(:a=>1, :b=>2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT DO NOTHING
+      #   
+      #   DB[:table].insert_conflict(:constraint=>:table_a_uidx).insert(:a=>1, :b=>2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT ON CONSTRAINT table_a_uidx DO NOTHING
+      #   
+      #   DB[:table].insert_conflict(:target=>:a).insert(:a=>1, :b=>2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT (a) DO NOTHING
+      #   
+      #   DB[:table].insert_conflict(:target=>:a, :update=>{:b=>:excluded__b}).insert(:a=>1, :b=>2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT (a) DO UPDATE SET b = excluded.b
+      #   
+      #   DB[:table].insert_conflict(:constraint=>:table_a_uidx,
+      #     :update=>{:b=>:excluded__b}, :update_where=>{:table__status_id=>1}).insert(:a=>1, :b=>2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT ON CONSTRAINT table_a_uidx
+      #   # DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
+      def insert_conflict(opts=OPTS)
+        clone(:insert_conflict => opts)
+      end
+
+      # Ignore uniqueness/exclusion violations when inserting, using ON CONFLICT DO NOTHING.
+      # Exists mostly for compatibility to MySQL's insert_ignore. Example:
+      #
+      #   DB[:table].insert_ignore.insert(:a=>1, :b=>2)
+      #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
+      #   # ON CONFLICT DO NOTHING
+      def insert_ignore
+        insert_conflict
+      end
+
       # Insert a record returning the record inserted.  Always returns nil without
       # inserting a query if disable_insert_returning is used.
       def insert_select(*values)
@@ -1408,12 +1452,12 @@ module Sequel
         true
       end
 
-      # Whether the dataset supports CUBE with GROUP BY.
+      # PostgreSQL 9.5+ supports GROUP CUBE
       def supports_group_cube?
         server_version >= 90500
       end
 
-      # Whether the dataset supports ROLLUP with GROUP BY.
+      # PostgreSQL 9.5+ supports GROUP ROLLUP
       def supports_group_rollup?
         server_version >= 90500
       end
@@ -1421,6 +1465,11 @@ module Sequel
       # True unless insert returning has been disabled for this dataset.
       def supports_insert_select?
         !@opts[:disable_insert_returning]
+      end
+
+      # PostgreSQL 9.5+ supports the ON CONFLICT clause to INSERT.
+      def supports_insert_conflict?
+        server_version >= 90500
       end
 
       # PostgreSQL 9.3rc1+ supports lateral subqueries
@@ -1523,6 +1572,34 @@ module Sequel
       # Use USING to specify additional tables in a delete query
       def delete_using_sql(sql)
         join_from_sql(:USING, sql)
+      end
+
+      # Add ON CONFLICT clause if it should be used
+      def insert_conflict_sql(sql)
+        if opts = @opts[:insert_conflict]
+          sql << " ON CONFLICT"
+
+          if target = opts[:constraint] 
+            sql << " ON CONSTRAINT "
+            identifier_append(sql, target)
+          elsif target = opts[:target]
+            sql << ' ('
+            identifier_append(sql, target)
+            sql << ')'
+          end
+
+          if values = opts[:update]
+            sql << " DO UPDATE SET "
+            update_sql_values_hash(sql, values)
+            if where = opts[:update_where]
+              sql << " WHERE "
+              literal_append(sql, where)
+            end
+          else
+            sql << " DO NOTHING"
+          end
+
+        end
       end
 
       # Return the primary key to use for RETURNING in an INSERT statement

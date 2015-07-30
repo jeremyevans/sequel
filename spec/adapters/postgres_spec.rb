@@ -172,6 +172,42 @@ describe "PostgreSQL views" do
   end
 end 
     
+describe "PostgreSQL", 'INSERT ON CONFLICT' do
+  before(:all) do
+    @db = DB
+    @db.create_table!(:ic_test){Integer :a; Integer :b; unique :a, :name=>:ic_test_a_uidx}
+    @ds = @db[:ic_test]
+  end
+  before do
+    @ds.delete
+  end
+  after(:all) do
+    @db.drop_table?(:ic_test)
+  end
+
+  it "Dataset#insert_ignore and insert_constraint should ignore uniqueness violations" do
+    @ds.insert(1, 2)
+    proc{@ds.insert(1, 3)}.must_raise Sequel::UniqueConstraintViolation
+    @ds.insert_ignore.insert(1, 3).must_equal nil
+    @ds.insert_conflict.insert(1, 3).must_equal nil
+    @ds.insert_conflict(:target=>:a).insert(1, 3).must_equal nil
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx).insert(1, 3).must_equal nil
+    @ds.all.must_equal [{:a=>1, :b=>2}]
+  end
+
+  it "Dataset#insert_constraint should handle upserts" do
+    @ds.insert(1, 2)
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).insert(1, 3).must_equal nil
+    @ds.all.must_equal [{:a=>1, :b=>3}]
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>4}).insert(1, 3).must_equal nil
+    @ds.all.must_equal [{:a=>1, :b=>4}]
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>5}, :update_where=>{:ic_test__b=>4}).insert(1, 3).must_equal nil
+    @ds.all.must_equal [{:a=>1, :b=>5}]
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{:ic_test__b=>4}).insert(1, 3).must_equal nil
+    @ds.all.must_equal [{:a=>1, :b=>5}]
+  end
+end if DB.server_version >= 90500
+
 describe "A PostgreSQL database" do
   before(:all) do
     @db = DB

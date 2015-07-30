@@ -1526,24 +1526,28 @@ module Sequel
     end
 
     def update_set_sql(sql)
-      values = opts[:values]
       sql << SET
+      values = @opts[:values]
       if values.is_a?(Hash)
-        c = false
-        eq = EQUAL
-        values.each do |k, v|
-          sql << COMMA if c
-          if k.is_a?(String) && !k.is_a?(LiteralString)
-            quote_identifier_append(sql, k)
-          else
-            literal_append(sql, k)
-          end
-          sql << eq
-          literal_append(sql, v)
-          c ||= true
-        end
+        update_sql_values_hash(sql, values)
       else
         sql << values
+      end
+    end
+
+    def update_sql_values_hash(sql, values)
+      c = false
+      eq = EQUAL
+      values.each do |k, v|
+        sql << COMMA if c
+        if k.is_a?(String) && !k.is_a?(LiteralString)
+          quote_identifier_append(sql, k)
+        else
+          literal_append(sql, k)
+        end
+        sql << eq
+        literal_append(sql, v)
+        c ||= true
       end
     end
 

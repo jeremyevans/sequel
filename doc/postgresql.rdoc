@@ -185,6 +185,53 @@ When returning is used, instead of returning the number of rows affected (for up
 or the serial primary key value (for insert), it will return an array of hashes with the
 returned results.
 
+=== INSERT ON CONFLICT Support
+
+Starting with PostgreSQL 9.5, you can do an upsert or ignore unique or exclusion constraint
+violations when inserting using <tt>Dataset#insert_conflict</tt>:
+
+  DB[:table].insert_conflict.insert(:a=>1, :b=>2)
+  # INSERT INTO TABLE (a, b) VALUES (1, 2)
+  # ON CONFLICT DO NOTHING
+
+For compatibility with Sequel's MySQL support, you can also use +insert_ignore+:
+
+  DB[:table].insert_ignore.insert(:a=>1, :b=>2)
+  # INSERT INTO TABLE (a, b) VALUES (1, 2)
+  # ON CONFLICT DO NOTHING
+ 
+You can pass a specific constraint name using +:constraint+, to only ignore a specific
+constraint violation:
+
+  DB[:table].insert_conflict(:constraint=>:table_a_uidx).insert(:a=>1, :b=>2)
+  # INSERT INTO TABLE (a, b) VALUES (1, 2)
+  # ON CONFLICT ON CONSTRAINT table_a_uidx DO NOTHING
+ 
+If the unique or exclusion constraint covers the whole table (e.g. it isn't a partial unique
+index), then you can just specify the column using the +:target+ option:
+
+  DB[:table].insert_conflict(:target=>:a).insert(:a=>1, :b=>2)
+  # INSERT INTO TABLE (a, b) VALUES (1, 2)
+  # ON CONFLICT (a) DO NOTHING
+ 
+If you want to update the existing row instead of ignoring the constraint violation, you
+can pass an +:update+ option with a hash of values to update.  You must pass either the
++:target+ or +:constraint+ options when passing the +:update+ option:
+
+  DB[:table].insert_conflict(:target=>:a, :update=>{:b=>:excluded__b}).insert(:a=>1, :b=>2)
+  # INSERT INTO TABLE (a, b) VALUES (1, 2)
+  # ON CONFLICT (a) DO UPDATE SET b = excluded.b
+ 
+Additionally, if you only want to do the update in certain cases, you can specify an
++:update_where+ option, which will be used as a filter.  If the row doesn't match the
+conditions, the constraint violation will be ignored, but the row will not be updated:
+
+  DB[:table].insert_conflict(:constraint=>:table_a_uidx,
+    :update=>{:b=>:excluded__b}, :update_where=>{:table__status_id=>1}).insert(:a=>1, :b=>2)
+  # INSERT INTO TABLE (a, b) VALUES (1, 2)
+  # ON CONFLICT ON CONSTRAINT table_a_uidx
+  # DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)
+
 === Distinct On Specific Columns
 
 Sequel allows passing columns to <tt>Dataset#distinct</tt>, which will make the dataset return
