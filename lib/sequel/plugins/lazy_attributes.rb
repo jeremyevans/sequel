@@ -18,6 +18,21 @@ module Sequel
     #   # You can specify multiple columns to lazily load:
     #   Album.plugin :lazy_attributes, :review, :tracklist
     #
+    # You may also specify groups of lazy attributes that will be retrieved together
+    # when any one of them are accessed.  For instance:
+    #
+    #   Album.plugin :lazy_attributes, [:review, :acknowledgements], :cover_art
+    #   Album.filter{id<100}.all do |a|
+    #     # retrieves the "review" and "acknowledgements" for all albums in this dataset
+    #     data = {:review => a.review}
+    #
+    #     # no additional query done here
+    #     data[:acknowledgements] = a.acknowledgements
+    #
+    #     # this will lazy load the "cover_art" for all albums in the dataset
+    #     data[:cover_art] = a.cover_art
+    #   end
+    #
     # Note that by default on databases that supporting RETURNING,
     # using explicit column selections will cause instance creations
     # to use two queries (insert and refresh) instead of a single
@@ -42,42 +57,52 @@ module Sequel
 
         # Remove the given attributes from the list of columns selected by default.
         # For each attribute given, create an accessor method that allows a lazy
-        # lookup of the attribute.  Each attribute should be given as a symbol.
+        # lookup of the attribute.  Attributes may be given either as a symbol or as an array
+        # of symbols that will be fetched together as a group.
         def lazy_attributes(*attrs)
           unless select = dataset.opts[:select]
             select = dataset.columns.map{|c| Sequel.qualify(dataset.first_source, c)}
           end
-          set_dataset(dataset.select(*select.reject{|c| attrs.include?(dataset.send(:_hash_key_symbol, c))}))
-          attrs.each{|a| define_lazy_attribute_getter(a)}
+          set_dataset(dataset.select(*select.reject{|c| attrs.flatten.include?(dataset.send(:_hash_key_symbol, c))}))
+          attrs.each{|a| define_lazy_attribute_getters(a)}
         end
         
         private
 
-        # Add a lazy attribute getter method to the lazy_attributes_module. Options:
+        # Add lazy attribute getter methods to the lazy_attributes_module. Options:
         # :dataset :: The base dataset to use for the lazy attribute lookup
         # :table :: The table name to use to qualify the attribute and primary key columns.
-        def define_lazy_attribute_getter(a, opts=OPTS)
+        def define_lazy_attribute_getters(group, opts=OPTS)
+          group = [group] unless group.is_a?(Array)
           include(self.lazy_attributes_module ||= Module.new) unless lazy_attributes_module
-          lazy_attributes_module.class_eval do
-            define_method(a) do
-              if !values.has_key?(a) && !new?
-                lazy_attribute_lookup(a, opts)
-              else
-                super()
+          group.each do |a|
+            lazy_attributes_module.class_eval do
+              define_method(a) do
+                if !values.has_key?(a) && !new?
+                  # no point in retrieving all the values in the group if the object is frozen
+                  # since they won't be persisted anywhere
+                  lazy_lookups = frozen? ? [a] : group.reject { |col| values.has_key?(col) }
+                  lazy_values_hash = lazy_attribute_lookup(lazy_lookups, opts)
+                  lazy_values_hash[a]
+                else
+                  super()
+                end
               end
             end
           end
         end
+        # for back compat...
+        alias_method :define_lazy_attribute_getter, :define_lazy_attribute_getters
       end
 
       module InstanceMethods
         private
 
         # If the model was selected with other model objects, eagerly load the
-        # attribute for all of those objects.  If not, query the database for
-        # the attribute for just the current object.  Return the value of
-        # the attribute for the current object.
-        def lazy_attribute_lookup(a, opts=OPTS)
+        # group of attributes for all of those objects.  If not, query the database for
+        # the group of attributes for just the current object.  Return a hash of values for
+        # the group of attributes for the current object keyed by the column names.
+        def lazy_attribute_lookup(group, opts=OPTS)
           unless table = opts[:table]
             table = model.table_name
           end
@@ -89,27 +114,39 @@ module Sequel
             ds = this
           end
 
-          selection = Sequel.qualify(table, a)
+          selection = group.map { |a| Sequel.qualify(table, a) }
 
           if frozen?
-            return ds.dup.get(selection)
+            lazy_values = ds.dup.get(selection)
+            return Hash[group.zip(lazy_values)]
           end
 
           if retrieved_with
             raise(Error, "Invalid primary key column for #{model}: #{pkc.inspect}") unless primary_key = model.primary_key
             composite_pk = true if primary_key.is_a?(Array)
             id_map = {}
-            retrieved_with.each{|o| id_map[o.pk] = o unless o.values.has_key?(a) || o.frozen?}
+            retrieved_with.each{|o| id_map[o.pk] = o unless group.all? { |a| o.values.has_key?(a) } || o.frozen?}
             predicate_key = composite_pk ? primary_key.map{|k| Sequel.qualify(table, k)} : Sequel.qualify(table, primary_key)
-            base_ds.select(*(Array(primary_key).map{|k| Sequel.qualify(table, k)} + [selection])).where(predicate_key=>id_map.keys).naked.each do |row|
+            base_ds.select(*(Array(primary_key).map{|k| Sequel.qualify(table, k)} + selection)).where(predicate_key=>id_map.keys).naked.each do |row|
               obj = id_map[composite_pk ? row.values_at(*primary_key) : row[primary_key]]
-              if obj && !obj.values.has_key?(a)
-                obj.values[a] = row[a]
+              if obj
+                group.each do |a|
+                  if !obj.values.has_key?(a)
+                    obj.values[a] = row[a]
+                  end
+                end
               end
             end
           end
-          values[a] = ds.get(selection) unless values.has_key?(a)
-          values[a]
+          if group.all? { |a| values.has_key?(a) }
+            lazy_values = values.values_at(*group)
+            lazy_values_hash = Hash[group.zip(lazy_values)]
+          else
+            lazy_values = ds.get(selection)
+            lazy_values_hash = Hash[group.zip(lazy_values)]
+            values.merge!(lazy_values_hash) { |k, old, new| old }
+          end
+          lazy_values_hash
         end
       end
     end

@@ -7,7 +7,7 @@ describe "class_table_inheritance plugin" do
     def @db.schema(table, opts={})
       {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
        :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}]],
-       :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
+       :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}], [:assistant_name, {:type=>:string}]],
        :staff=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
        }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
     end
@@ -15,10 +15,10 @@ describe "class_table_inheritance plugin" do
       def columns
         {[:employees]=>[:id, :name, :kind],
          [:managers]=>[:id, :num_staff],
-         [:executives]=>[:id, :num_managers],
+         [:executives]=>[:id, :num_managers, :assistant_name],
          [:staff]=>[:id, :manager_id],
          [:employees, :managers]=>[:id, :name, :kind, :num_staff],
-         [:employees, :managers, :executives]=>[:id, :name, :kind, :num_staff, :num_managers],
+         [:employees, :managers, :executives]=>[:id, :name, :kind, :num_staff, :num_managers, :assistant_name],
          [:employees, :staff]=>[:id, :name, :kind, :manager_id],
         }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
       end
@@ -67,8 +67,8 @@ describe "class_table_inheritance plugin" do
   it "should use a joined dataset in subclasses" do
     Employee.dataset.sql.must_equal 'SELECT * FROM employees'
     Manager.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)'
-    Executive.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)'
-    Ceo.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (employees.kind IN (\'Ceo\'))'
+    Executive.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers, executives.assistant_name FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)'
+    Ceo.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers, executives.assistant_name FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (employees.kind IN (\'Ceo\'))'
     Staff.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)'
   end
   
@@ -90,7 +90,7 @@ describe "class_table_inheritance plugin" do
     a.values.must_equal(:id=>1, :name=>'A', :kind=>'Ceo')
     a.refresh.values.must_equal(:id=>1, :name=>'A', :kind=>'Ceo', :num_staff=>3, :num_managers=>2)
     @db.sqls.must_equal ["SELECT * FROM employees LIMIT 1",
-      "SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE ((employees.kind IN ('Ceo')) AND (executives.id = 1)) LIMIT 1"]
+      "SELECT employees.id, employees.name, employees.kind, managers.num_staff, executives.num_managers, executives.assistant_name FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE ((employees.kind IN ('Ceo')) AND (executives.id = 1)) LIMIT 1"]
   end
   
   it "should return rows with the current class if cti_key is nil" do
@@ -178,11 +178,11 @@ describe "class_table_inheritance plugin" do
     Manager.instance_dataset._fetch = Manager.dataset._fetch = {:id=>1, :name=>'J', :kind=>'Ceo', :num_staff=>2}
     m = Manager[1]
     @db.sqls.must_equal ['SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 1) LIMIT 1']
-    @db.fetch = {:num_managers=>3}
+    @db.fetch = {:num_managers=>3,:assistant_name=>'Alex'}
     m.must_be_kind_of Ceo
     m.num_managers.must_equal 3
-    @db.sqls.must_equal ['SELECT executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (executives.id = 1) LIMIT 1']
-    m.values.must_equal(:id=>1, :name=>'J', :kind=>'Ceo', :num_staff=>2, :num_managers=>3)
+    @db.sqls.must_equal ['SELECT executives.num_managers, executives.assistant_name FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (executives.id = 1) LIMIT 1']
+    m.values.must_equal(:id=>1, :name=>'J', :kind=>'Ceo', :num_staff=>2, :num_managers=>3, :assistant_name=>'Alex')
   end
 
   it "should lazily load columns in middle classes correctly when loaded from parent class" do
@@ -198,20 +198,20 @@ describe "class_table_inheritance plugin" do
   it "should eagerly load lazily columns in subclasses when loaded from parent class" do
     Employee.dataset._fetch = {:id=>1, :kind=>'Ceo'}
     Manager.dataset._fetch = {:id=>1, :num_staff=>2}
-    @db.fetch = {:id=>1, :num_managers=>3}
+    @db.fetch = {:id=>1, :num_managers=>3, :assistant_name=>'alex'}
     e = Employee.all.first
     e.must_be_kind_of(Ceo)
     @db.sqls.must_equal ["SELECT * FROM employees"]
     e.num_staff.must_equal 2
     @db.sqls.must_equal ["SELECT managers.id, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id IN (1))"]
     e.num_managers.must_equal 3
-    @db.sqls.must_equal ['SELECT executives.id, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (executives.id IN (1))']
+    @db.sqls.must_equal ['SELECT executives.id, executives.num_managers, executives.assistant_name FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id) WHERE (executives.id IN (1))']
   end
   
   it "should include schema for columns for tables for ancestor classes" do
     Employee.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string})
     Manager.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer})
-    Executive.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer}, :num_managers=>{:type=>:integer})
+    Executive.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :num_staff=>{:type=>:integer}, :num_managers=>{:type=>:integer}, :assistant_name=>{:type=>:string})
     Staff.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :kind=>{:type=>:string}, :manager_id=>{:type=>:integer})
   end
 
