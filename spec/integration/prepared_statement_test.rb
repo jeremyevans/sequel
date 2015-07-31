@@ -447,7 +447,7 @@ describe "Dataset#unbind" do
     @u[@ds.filter{items__c > 1}].must_equal(:c=>10)
   end
 
-  it "should handle deep nesting" do
+  cspecify "should handle deep nesting", :h2 do
     DB.create_table!(:items) do
       Integer :a
       Integer :b
