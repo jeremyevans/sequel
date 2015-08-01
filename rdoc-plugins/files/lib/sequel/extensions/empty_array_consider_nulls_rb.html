@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>empty_array_consider_nulls.rb</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>empty_array_consider_nulls.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/empty_array_consider_nulls.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2015-07-14 16:01:53 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>This changes Sequel&#39;s literalization of IN/NOT IN with an empty array
+            value to consider NULL values if one of the referenced columns is NULL:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">test</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (name != name)</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">test</span>].<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (name = name)</span></pre>
+            
+            <p>The default <a href="../../../../classes/Sequel.html">Sequel</a> behavior
+            is to ignore NULLs, as the above query is not generally optimized well by
+            databases.</p>
+            
+            <p>You can load this extension into specific datasets:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">empty_array_consider_nulls</span>)</pre>
+            
+            <p>Or you can load it into all of a database&#39;s datasets, which is probably
+            the desired behavior if you are using this extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">empty_array_consider_nulls</span>)</pre>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

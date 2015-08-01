@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::InvertedSubsets</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::InvertedSubsets
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../files/lib/sequel/plugins/inverted_subsets_rb.html">lib/sequel/plugins/inverted_subsets.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The inverted_subsets plugin adds another method for each defined subset,
+            which inverts the condition supplied. By default, inverted subset method
+            names are prefixed with not_.</p>
+            
+            <p>You can change the prefix, or indeed entirely customise the inverted names,
+            by passing a block to the plugin configuration:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Use an exclude_ prefix for inverted subsets instead of not_</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span>(:<span class="ruby-identifier">inverted_subsets</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">name</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;exclude_#{name}&quot;</span>}</pre>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Add inverted subsets in the Album class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">inverted_subsets</span>&#x000A;&#x000A;<span class="ruby-comment"># This will now create two methods, published and not_published</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">subset</span> :<span class="ruby-identifier">published</span>, :<span class="ruby-identifier">published</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">published</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS TRUE)</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">not_published</span>.<span class="ruby-identifier">sql</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (published IS NOT TRUE)</span></pre>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Class</h3>
+            <ol>
+              <li><a target="docwin" href="#method-c-configure">configure</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a target="docwin" href="InvertedSubsets/ClassMethods.html">Sequel::Plugins::InvertedSubsets::ClassMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEFAULT_NAME_BLOCK</td>
+                    <td>=</td>
+                    <td class='context-item-value'>lambda{|name| "not_#{name}"}</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Default naming for inverted subsets</p>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-configure'>
+                <a name='method-c-configure'></a>
+                <div class='synopsis'>
+                  <span class='name'>configure</span>
+                  <span class='arguments'>(model, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Store the supplied block for calling later when subsets are defined, or
+                  create a default one if we need to.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@inverted_subsets_name_block</span>, <span class="ruby-identifier">block</span> <span class="ruby-operator">||</span> <span class="ruby-constant">DEFAULT_NAME_BLOCK</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

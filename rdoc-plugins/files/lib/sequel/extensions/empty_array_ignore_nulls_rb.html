@@ -31,30 +31,16 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-11-20 12:20:00 -0800</span>
+          <span class='datetime'>2015-07-14 16:01:53 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
             
-            <p>This changes Sequel&#39;s literalization of IN/NOT IN with an empty array
-            value to not return NULL even if one of the referenced columns is NULL:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">test</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (1 = 0)</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">test</span>].<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span>[])&#x000A;<span class="ruby-comment"># SELECT * FROM test WHERE (1 = 1)</span></pre>
-            
-            <p>The default <a href="../../../../classes/Sequel.html">Sequel</a> behavior
-            is to respect NULLs, so that when name is NULL, the expression returns
-            NULL.</p>
-            
-            <p>You can load this extension into specific datasets:</p>
-            
-            <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">table</span>]&#x000A;<span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">empty_array_ignore_nulls</span>)</pre>
-            
-            <p>Or you can load it into all of a database&#39;s datasets, which is probably
-            the desired behavior if you are using this extension:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">empty_array_ignore_nulls</span>)</pre>
+            <p>This only exists for backwards compatibility, as the behavior added by this
+            extension is now the default <a
+            href="../../../../classes/Sequel.html">Sequel</a> behavior.</p>
           </div>
           <div id='context'>
           </div>

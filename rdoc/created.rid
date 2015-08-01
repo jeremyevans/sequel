@@ -1,6 +1,6 @@
-Wed, 01 Jul 2015 08:11:48 -0700
+Sat, 01 Aug 2015 10:41:13 -0700
 README.rdoc	Sun, 03 May 2015 08:59:30 -0700
-CHANGELOG	Wed, 01 Jul 2015 08:05:45 -0700
+CHANGELOG	Fri, 31 Jul 2015 10:10:08 -0700
 MIT-LICENSE	Wed, 14 Jan 2015 18:47:41 -0800
 lib/sequel.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/ast_transformer.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -12,9 +12,9 @@ lib/sequel/deprecated.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/exceptions.rb	Fri, 17 Apr 2015 16:43:09 -0700
 lib/sequel/model.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/no_core_ext.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/sql.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/sql.rb	Sun, 26 Jul 2015 11:54:34 -0700
 lib/sequel/timezones.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/version.rb	Wed, 01 Jul 2015 08:05:45 -0700
+lib/sequel/version.rb	Fri, 31 Jul 2015 10:10:08 -0700
 lib/sequel/connection_pool/sharded_single.rb	Tue, 25 Nov 2014 10:11:48 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Tue, 12 May 2015 13:51:08 -0700
 lib/sequel/connection_pool/single.rb	Tue, 25 Nov 2014 10:11:48 -0800
@@ -26,21 +26,21 @@ lib/sequel/database/features.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/database/logging.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/database/misc.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/database/query.rb	Mon, 13 Apr 2015 14:37:29 -0700
-lib/sequel/database/schema_generator.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/database/schema_methods.rb	Wed, 01 Apr 2015 14:26:05 -0700
+lib/sequel/database/schema_generator.rb	Tue, 14 Jul 2015 16:01:53 -0700
+lib/sequel/database/schema_methods.rb	Tue, 14 Jul 2015 16:01:53 -0700
 lib/sequel/database/transactions.rb	Fri, 08 May 2015 15:48:36 -0700
-lib/sequel/dataset/actions.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/dataset/actions.rb	Fri, 17 Jul 2015 09:02:18 -0700
 lib/sequel/dataset/features.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/graph.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/dataset/misc.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/dataset/mutation.rb	Thu, 12 Mar 2015 08:21:51 -0700
 lib/sequel/dataset/placeholder_literalizer.rb	Tue, 17 Mar 2015 08:34:10 -0700
-lib/sequel/dataset/prepared_statements.rb	Tue, 12 May 2015 11:32:09 -0700
-lib/sequel/dataset/query.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/dataset/sql.rb	Mon, 19 Jan 2015 08:45:05 -0800
+lib/sequel/dataset/prepared_statements.rb	Tue, 14 Jul 2015 16:01:53 -0700
+lib/sequel/dataset/query.rb	Thu, 30 Jul 2015 14:00:00 -0700
+lib/sequel/dataset/sql.rb	Thu, 30 Jul 2015 14:00:00 -0700
 lib/sequel/model/associations.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/model/base.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/model/dataset_module.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/model/base.rb	Fri, 17 Jul 2015 16:02:15 -0700
+lib/sequel/model/dataset_module.rb	Fri, 17 Jul 2015 16:02:15 -0700
 lib/sequel/model/default_inflections.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/errors.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/exceptions.rb	Fri, 17 Apr 2015 16:44:07 -0700
@@ -48,12 +48,12 @@ lib/sequel/model/inflections.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/model/plugins.rb	Thu, 20 Nov 2014 12:20:00 -0800
 doc/active_record.rdoc	Mon, 10 Nov 2014 21:51:27 -0800
 doc/advanced_associations.rdoc	Thu, 29 Jan 2015 16:13:26 -0800
-doc/association_basics.rdoc	Wed, 25 Feb 2015 08:50:11 -0800
+doc/association_basics.rdoc	Thu, 30 Jul 2015 14:00:00 -0700
 doc/bin_sequel.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
 doc/cheat_sheet.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/code_order.rdoc	Thu, 06 Jun 2013 17:24:35 -0700
 doc/core_extensions.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
-doc/dataset_basics.rdoc	Wed, 09 Oct 2013 09:30:40 -0700
+doc/dataset_basics.rdoc	Thu, 23 Jul 2015 07:47:00 -0700
 doc/dataset_filtering.rdoc	Mon, 23 Mar 2015 10:16:45 -0700
 doc/extensions.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/mass_assignment.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
@@ -63,9 +63,9 @@ doc/model_plugins.rdoc	Fri, 06 Sep 2013 13:38:06 -0700
 doc/mssql_stored_procedures.rdoc	Thu, 02 Jan 2014 10:46:37 -0800
 doc/object_model.rdoc	Fri, 23 May 2014 13:28:32 -0700
 doc/opening_databases.rdoc	Wed, 29 Apr 2015 09:26:32 -0700
-doc/postgresql.rdoc	Mon, 11 Aug 2014 08:23:34 -0700
+doc/postgresql.rdoc	Thu, 30 Jul 2015 14:00:00 -0700
 doc/prepared_statements.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
-doc/querying.rdoc	Mon, 23 Mar 2015 10:16:45 -0700
+doc/querying.rdoc	Thu, 23 Jul 2015 07:47:01 -0700
 doc/reflection.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
 doc/schema_modification.rdoc	Tue, 24 Feb 2015 08:28:23 -0800
 doc/security.rdoc	Tue, 22 Apr 2014 10:09:17 -0700
@@ -161,6 +161,7 @@ doc/release_notes/4.21.0.txt	Wed, 01 Apr 2015 08:28:35 -0700
 doc/release_notes/4.22.0.txt	Fri, 01 May 2015 08:43:44 -0700
 doc/release_notes/4.23.0.txt	Mon, 01 Jun 2015 07:48:19 -0700
 doc/release_notes/4.24.0.txt	Wed, 01 Jul 2015 08:05:45 -0700
+doc/release_notes/4.25.0.txt	Fri, 31 Jul 2015 10:10:08 -0700
 doc/release_notes/4.3.0.txt	Wed, 02 Oct 2013 14:34:47 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
 doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800

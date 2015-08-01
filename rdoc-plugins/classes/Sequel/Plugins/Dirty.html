@@ -58,6 +58,11 @@
             
             <pre class="ruby"><span class="ruby-identifier">artist</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Bar&#39;</span>)&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">column_changes</span>        <span class="ruby-comment"># =&gt; {}</span>&#x000A;<span class="ruby-identifier">artist</span>.<span class="ruby-identifier">previous_changes</span>      <span class="ruby-comment"># =&gt; {:name=&gt;[&#39;Foo&#39;, &#39;Bar&#39;]}</span></pre>
             
+            <p>There is one caveat; when used with a column that also uses the
+            serialization plugin, setting the column back to its original value after
+            changing it is not correctly detected and will leave an entry in
+            changed_columns.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclass instances record previous values (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">dirty</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class record previous values</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">dirty</span></pre>

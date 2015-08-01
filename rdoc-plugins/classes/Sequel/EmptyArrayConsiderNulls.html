@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::EmptyArrayIgnoreNulls</title>
+    <title>Sequel::EmptyArrayConsiderNulls</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
@@ -27,11 +27,11 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>module</span>
-          Sequel::EmptyArrayIgnoreNulls
+          Sequel::EmptyArrayConsiderNulls
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../files/lib/sequel/extensions/empty_array_ignore_nulls_rb.html">lib/sequel/extensions/empty_array_ignore_nulls.rb</a>
+            <a target="docwin" href="../../files/lib/sequel/extensions/empty_array_consider_nulls_rb.html">lib/sequel/extensions/empty_array_consider_nulls.rb</a>
           </li>
         </ol>
       </div>
@@ -64,7 +64,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-empty_array_value-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-empty_array_value-source'><span class="ruby-comment"># File lib/sequel/extensions/empty_array_ignore_nulls.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">empty_array_value</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">cols</span>)&#x000A;  {<span class="ruby-value">1</span> =<span class="ruby-operator">&gt;</span> ((<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>) <span class="ruby-operator">?</span> <span class="ruby-value">0</span> <span class="ruby-operator">:</span> <span class="ruby-value">1</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-empty_array_value-source'><span class="ruby-comment"># File lib/sequel/extensions/empty_array_consider_nulls.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">empty_array_value</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">c</span>), <span class="ruby-value">:AND</span>, <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

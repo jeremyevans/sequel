@@ -31,12 +31,68 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-07-01 08:05:45 -0700</span>
+          <span class='datetime'>2015-07-31 10:10:08 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.25.0+-282015-08-01-29">4.25.0 (2015-08-01)<span><a href="#label-4.25.0+-282015-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Add Dataset#insert_conflict on PostgreSQL 9.5+, for upsert/insert ignore
+            support using INSERT ON CONFLICT (jeremyevans)</p>
+            </li><li>
+            <p>Support Dataset#group_rollup and group_cube on PostgreSQL 9.5+
+            (jeremyevans)</p>
+            </li><li>
+            <p>Automatically REORG tables when altering when using jdbc/db2 (karlhe)
+            (#1054)</p>
+            </li><li>
+            <p>Recognize constraint violation exceptions on swift/sqlite (jeremyevans)</p>
+            </li><li>
+            <p>Recognize another check constraint violation exception message on SQLite
+            (jeremyevans)</p>
+            </li><li>
+            <p>Allow =~ and !~ to be used on ComplexExpressions (janko-m) (#1050)</p>
+            </li><li>
+            <p>Support case sensitive SQL Server 2012 in MSSQL metadata queries (knut2)
+            (#1049)</p>
+            </li><li>
+            <p>Add Dataset#group_append, for appending to the existing GROUP BY clause
+            (YorickPeterse) (#1047)</p>
+            </li><li>
+            <p>Add inverted_subsets plugin, for creating an inverted subset method for
+            each subset (celsworth) (#1042)</p>
+            </li><li>
+            <p>Make Dataset#for_update not use the :read_only database when the dataset is
+            executed (jeremyevans) (#1041)</p>
+            </li><li>
+            <p>Add singular_table_names plugin, for changing <a
+            href="../classes/Sequel.html">Sequel</a> to not pluralize table names by
+            default (jeremyevans)</p>
+            </li><li>
+            <p>PreparedStatement#prepare now raises an Error (jeremyevans)</p>
+            </li><li>
+            <p>Clear delayed association pks when refreshing an object (jeremyevans)</p>
+            </li><li>
+            <p>Add empty_array_consider_nulls extension to make <a
+            href="../classes/Sequel.html">Sequel</a> consider NULL values when using
+            IN/NOT IN with an empty array (jeremyevans)</p>
+            </li><li>
+            <p>Make <a href="../classes/Sequel.html">Sequel</a> default to ignoring NULL
+            values when using IN/NOT IN with an empty array (jeremyevans)</p>
+            </li><li>
+            <p>Remove the deprecated firebird and informix adapters (jeremyevans)</p>
+            </li><li>
+            <p>Make :collate option when creating columns literalize non-String values on
+            PostgreSQL (jeremyevans) (#1040)</p>
+            </li><li>
+            <p>Make dirty plugin notice when serialized column is changed (celsworth)
+            (#1039)</p>
+            </li><li>
+            <p>Allow prepared statements to use RETURNING (jeremyevans) (#1036)</p>
+            </li></ul>
             
             <h3 id="label-4.24.0+-282015-07-01-29">4.24.0 (2015-07-01)<span><a href="#label-4.24.0+-282015-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-02-25 08:50:11 -0800</span>
+          <span class='datetime'>2015-07-30 14:00:00 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -572,10 +572,8 @@
             the join table. Unlike the add_<em>association</em> and
             remove_<em>association</em> method, the plural form of the association name
             is used in this method. The remove_all_<em>association</em> method returns
-            the number of rows updated for <code>one_to_many</code> associations and
-            the number of rows deleted for <code>many_to_many</code> associations:</p>
-            
-            <pre class="ruby"><span class="ruby-ivar">@rows_modified</span> = <span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_all_albums</span></pre>
+            the previously cached associated records, or nil if there were no cached
+            associated records.</p>
             
             <h3 id="label-association_dataset+-28e.g.+albums_dataset-29"><em>association</em>_dataset (e.g. albums_dataset)<span><a href="#label-association_dataset+-28e.g.+albums_dataset-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

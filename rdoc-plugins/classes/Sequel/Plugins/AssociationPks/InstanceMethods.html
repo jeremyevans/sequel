@@ -43,6 +43,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#method-i-after_save">after_save</a></li>
+              <li><a target="docwin" href="#method-i-refresh">refresh</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -66,6 +67,23 @@
                     [show source]
                   </a>
                   <pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb, line 147</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">assoc_pks</span> = <span class="ruby-ivar">@_association_pks</span>&#x000A;    <span class="ruby-identifier">assoc_pks</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-identifier">pks</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">instance_exec</span>(<span class="ruby-identifier">pks</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">model</span>.<span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">name</span>)[<span class="ruby-value">:pks_setter</span>]) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pks</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-refresh'>
+                <a name='method-i-refresh'></a>
+                <div class='synopsis'>
+                  <span class='name'>refresh</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Clear the associated pks if explicitly refreshing.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-refresh-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-refresh-source'><span class="ruby-comment"># File lib/sequel/plugins/association_pks.rb, line 158</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">refresh</span>&#x000A;  <span class="ruby-ivar">@_association_pks</span> = <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-03-23 10:16:45 -0700</span>
+          <span class='datetime'>2015-07-23 07:47:01 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -644,6 +644,10 @@
             <p>You can remove an existing grouping using <code>ungrouped</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">ungrouped</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span></pre>
+            
+            <p>If you want to add a column to the end of the existing grouping columns:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">group</span>(:<span class="ruby-identifier">artist_id</span>).<span class="ruby-identifier">group_append</span>(:<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums GROUP BY artist_id, name</span></pre>
             
             <p>A common use of grouping is to count based on the number of grouped rows,
             and <a href="../../classes/Sequel.html">Sequel</a> provides a

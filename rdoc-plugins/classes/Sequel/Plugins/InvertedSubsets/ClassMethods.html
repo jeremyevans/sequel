@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::Postgres::JSONOp</title>
+    <title>Sequel::Plugins::InvertedSubsets::ClassMethods</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
         function popupCode(url) {
@@ -26,30 +26,23 @@
     <div class='class' id='wrapper'>
       <div class='header'>
         <h1 class='name'>
-          <span class='type'>class</span>
-          Sequel::Postgres::JSONOp
+          <span class='type'>module</span>
+          Sequel::Plugins::InvertedSubsets::ClassMethods
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../files/lib/sequel/extensions/pg_json_ops_rb.html">lib/sequel/extensions/pg_json_ops.rb</a>
+            <a target="docwin" href="../../../../files/lib/sequel/plugins/inverted_subsets_rb.html">lib/sequel/plugins/inverted_subsets.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a target="docwin" href="JSONBaseOp.html">JSONBaseOp</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p><a href="JSONBaseOp.html">JSONBaseOp</a> subclass for the json type</p>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-pg_json">pg_json</a></li>
+              <li><a target="docwin" href="#method-i-subset">subset</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -57,22 +50,21 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-pg_json'>
-                <a name='method-i-pg_json'></a>
+              <div class='method public-instance' id='method-method-i-subset'>
+                <a name='method-i-subset'></a>
                 <div class='synopsis'>
-                  <span class='name'>pg_json</span>
-                  <span class='arguments'>()</span>
+                  <span class='name'>subset</span>
+                  <span class='arguments'>(name, *args, &block)</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Return the receiver, since it is already a <a
-                  href="JSONOp.html">JSONOp</a>.</p>
+                  <p>Define a not_ prefixed subset which inverts the subset condition.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_json-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-subset-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_json-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_json_ops.rb, line 251</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_json</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-subset-source'><span class="ruby-comment"># File lib/sequel/plugins/inverted_subsets.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-ivar">@inverted_subsets_name_block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">name</span>)){<span class="ruby-identifier">exclude</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
