@@ -1,3 +1,7 @@
+=== HEAD
+
+* Have Sequel::NoMatchingRow exceptions record the dataset related to the exception (pedro, jeremyevans) (#1060)
+
 === 4.25.0 (2015-08-01)
 
 * Add Dataset#insert_conflict on PostgreSQL 9.5+, for upsert/insert ignore support using INSERT ON CONFLICT (jeremyevans)

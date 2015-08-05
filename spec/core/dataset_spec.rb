@@ -2588,6 +2588,8 @@ describe "Dataset #first!" do
     rescue Sequel::NoMatchingRow => e
       e.dataset.must_equal(dataset)
     end
+    proc{raise Sequel::NoMatchingRow, 'test'}.must_raise Sequel::NoMatchingRow
+    proc{raise Sequel::NoMatchingRow.new('test')}.must_raise Sequel::NoMatchingRow
   end
 end
   

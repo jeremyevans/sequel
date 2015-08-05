@@ -53,10 +53,17 @@ module Sequel
   # Error raised when the user requests a record via the first! or similar
   # method, and the dataset does not yield any rows.
   class NoMatchingRow < Error
+    # The dataset that raised this NoMatchingRow exception.
     attr_accessor :dataset
 
-    def initialize(dataset)
-      @dataset = dataset
+    # If the first argument is a Sequel::Dataset, set the dataset related to
+    # the exception to that argument, instead of assuming it is the exception message.
+    def initialize(msg=nil)
+      if msg.is_a?(Sequel::Dataset)
+        @dataset = msg
+        msg = nil
+      end
+      super
     end
   end
 
