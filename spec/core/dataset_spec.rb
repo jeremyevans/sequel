@@ -2580,6 +2580,15 @@ describe "Dataset #first!" do
   it "should raise NoMatchingRow exception if no rows match" do
     proc{Sequel.mock[:t].first!}.must_raise(Sequel::NoMatchingRow)
   end
+
+  it "saves a reference to the dataset with the exception to allow further processing" do
+    dataset = Sequel.mock[:t]
+    begin
+      dataset.first!
+    rescue Sequel::NoMatchingRow => e
+      e.dataset.must_equal(dataset)
+    end
+  end
 end
   
 describe "Dataset compound operations" do

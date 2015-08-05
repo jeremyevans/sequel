@@ -52,7 +52,13 @@ module Sequel
 
   # Error raised when the user requests a record via the first! or similar
   # method, and the dataset does not yield any rows.
-  NoMatchingRow = Class.new(Error)
+  class NoMatchingRow < Error
+    attr_accessor :dataset
+
+    def initialize(dataset)
+      @dataset = dataset
+    end
+  end
 
   # Error raised when the connection pool cannot acquire a database connection
   # before the timeout.

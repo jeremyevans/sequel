@@ -468,7 +468,7 @@ module Sequel
       # An alias for calling first! on the model's dataset, but with
       # optimized handling of the single argument case.
       def first!(*args, &block)
-        first(*args, &block) || raise(Sequel::NoMatchingRow)
+        first(*args, &block) || raise(Sequel::NoMatchingRow.new(dataset))
       end
 
       # Clear the setter_methods cache when a module is included, as it
@@ -783,7 +783,7 @@ module Sequel
 
       # Return the model instance with the primary key, or raise NoMatchingRow if there is no matching record.
       def with_pk!(pk)
-        with_pk(pk) || raise(NoMatchingRow)
+        with_pk(pk) || raise(NoMatchingRow.new(dataset))
       end
   
       # Add model methods that call dataset methods
@@ -2346,7 +2346,7 @@ module Sequel
       # Same as with_pk, but raises NoMatchingRow instead of returning nil if no
       # row matches.
       def with_pk!(pk)
-        with_pk(pk) || raise(NoMatchingRow)
+        with_pk(pk) || raise(NoMatchingRow.new(self))
       end
     end
 

@@ -203,7 +203,7 @@ module Sequel
     # Calls first.  If first returns nil (signaling that no
     # row matches), raise a Sequel::NoMatchingRow exception.
     def first!(*args, &block)
-      first(*args, &block) || raise(Sequel::NoMatchingRow)
+      first(*args, &block) || raise(Sequel::NoMatchingRow.new(self))
     end
 
     # Return the column value for the first matching record in the dataset.
