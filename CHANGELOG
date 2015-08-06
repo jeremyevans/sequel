@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow preparing already prepared statements when emulating offsets (jeremyevans)
+
 * Have Sequel::NoMatchingRow exceptions record the dataset related to the exception (pedro, jeremyevans) (#1060)
 
 === 4.25.0 (2015-08-01)

@@ -100,7 +100,8 @@ module Sequel
       # Raise an error if attempting to call prepare on an already
       # prepared statement.
       def prepare(*)
-        raise Error, "cannot prepare an already prepared statement"
+        raise Error, "cannot prepare an already prepared statement" unless allow_preparing_prepared_statements?
+        super
       end
 
       # Send the columns to the original dataset, as calling it
@@ -309,6 +310,11 @@ module Sequel
 
     private
     
+    # Don't allow preparing prepared statements by default.
+    def allow_preparing_prepared_statements?
+      false
+    end
+
     # The argument placeholder.  Most databases used unnumbered
     # arguments with question marks, so that is the default.
     def prepared_arg_placeholder

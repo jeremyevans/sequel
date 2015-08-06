@@ -51,6 +51,12 @@ module Sequel
 
     private
 
+    # Allow preparing prepared statements, since determining the prepared sql to use for
+    # a prepared statement requires calling prepare on that statement.
+    def allow_preparing_prepared_statements?
+      true
+    end
+
     # The default order to use for datasets with offsets, if no order is defined.
     # By default, orders by all of the columns in the dataset.
     def default_offset_order
