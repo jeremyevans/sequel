@@ -239,6 +239,10 @@ describe "Simple Dataset operations" do
   
   it "should fetch correctly with a limit and offset without an order" do
     @ds.limit(2, 1).all.must_equal []
+    @ds.join(:items___i, :id=>:id).select(:items__id___s, :i__id___id2).limit(2, 1).all.must_equal []
+    @ds.join(:items___i, :id=>:id).select(:items__id).limit(2, 1).all.must_equal []
+    @ds.join(:items___i, :id=>:id).select(Sequel.qualify(:items, :id)).limit(2, 1).all.must_equal []
+    @ds.join(:items___i, :id=>:id).select(Sequel.qualify(:items, :id).as(:s)).limit(2, 1).all.must_equal []
   end
 
   it "should be orderable by column number" do

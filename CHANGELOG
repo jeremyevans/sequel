@@ -1,5 +1,7 @@
 === HEAD
 
+* Make offset emulation without order but with explicit selection handle ambiguous column names (jeremyevans)
+
 * Allow preparing already prepared statements when emulating offsets (jeremyevans)
 
 * Have Sequel::NoMatchingRow exceptions record the dataset related to the exception (pedro, jeremyevans) (#1060)

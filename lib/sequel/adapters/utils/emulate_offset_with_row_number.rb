@@ -60,6 +60,21 @@ module Sequel
     # The default order to use for datasets with offsets, if no order is defined.
     # By default, orders by all of the columns in the dataset.
     def default_offset_order
+      if (cols = opts[:select])
+        cols.each do |c|
+          case c
+          when Symbol
+            return [split_alias(c).first]
+          when SQL::Identifier, SQL::QualifiedIdentifier
+            return [c]
+          when SQL::AliasedExpression
+            case c.expression
+            when Symbol, SQL::Identifier, SQL::QualifiedIdentifier
+              return [c.expression]
+            end
+          end
+        end
+      end
       clone(:append_sql=>'').columns
     end
 
