@@ -20,10 +20,10 @@ module Sequel
     # not call any callbacks.  If you have any association callbacks,
     # you probably should not use the setter methods.
     #
-    # If an association uses the :delay option, you can set the associated
+    # If an association uses the :delay_pks option, you can set the associated
     # pks for new objects, and the setting will not be persisted until after the
     # object has been created in the database.  Additionally, if an association
-    # uses the :delay=>:all option, you can set the associated pks for existing
+    # uses the :delay_pks=>:all option, you can set the associated pks for existing
     # objects, and the setting will not be persisted until after the object has
     # been saved.
     #
