@@ -1,5 +1,7 @@
 === HEAD
 
+* Detect additional disconnect errors when using the tinytds adapter (jeremyevans)
+
 * Make offset emulation without order but with explicit selection handle ambiguous column names (jeremyevans)
 
 * Allow preparing already prepared statements when emulating offsets (jeremyevans)

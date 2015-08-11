@@ -129,9 +129,10 @@ module Sequel
         end
       end
 
+      TINYTDS_DISCONNECT_ERRORS = /\A(Attempt to initiate a new Adaptive Server operation with results pending|The request failed to run because the batch is aborted, this can be caused by abort signal sent from client)/
       # Return true if the :conn argument is present and not active.
       def disconnect_error?(e, opts)
-        super || (opts[:conn] && !opts[:conn].active?)
+        super || (opts[:conn] && !opts[:conn].active?) || ((e.is_a?(::TinyTds::Error) && TINYTDS_DISCONNECT_ERRORS.match(e.message)))
       end
 
       # Dispose of any possible results of execution.
