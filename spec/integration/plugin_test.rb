@@ -1971,6 +1971,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
   before(:all) do
     @db = DB
     @db.extension(:constraint_validations)
+    @db.drop_table?(:sequel_constraint_validations)
     @db.create_constraint_validations_table
     @ds = @db[:cv_test]
     @regexp = regexp = @db.dataset.supports_regexp?
