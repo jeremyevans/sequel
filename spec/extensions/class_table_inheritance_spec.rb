@@ -58,11 +58,11 @@ describe "class_table_inheritance plugin" do
     Staff.simple_table.must_equal nil
   end
   
-    it "should have working row_proc if using set_dataset in subclass to remove columns" do
-      Manager.set_dataset(Manager.dataset.select(*(Manager.columns - [:blah])))
-      Manager.dataset._fetch = {:id=>1, :kind=>'Ceo'}
-      Manager[1].must_equal Ceo.load(:id=>1, :kind=>'Ceo')
-    end
+  it "should have working row_proc if using set_dataset in subclass to remove columns" do
+    Manager.set_dataset(Manager.dataset.select(*(Manager.columns - [:blah])))
+    Manager.dataset._fetch = {:id=>1, :kind=>'Ceo'}
+    Manager[1].must_equal Ceo.load(:id=>1, :kind=>'Ceo')
+  end
 
   it "should use a joined dataset in subclasses" do
     Employee.dataset.sql.must_equal 'SELECT * FROM employees'
@@ -274,5 +274,147 @@ describe "class_table_inheritance plugin" do
     Staff.dataset._fetch = {:id=>1, :name=>'S', :kind=>'Staff', :manager_id=>3}
     Ceo.load(:id=>3).staff_members.must_equal [Staff.load(:id=>1, :name=>'S', :kind=>'Staff', :manager_id=>3)]
     @db.sqls.must_equal ['SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id) WHERE (staff.manager_id = 3)']
+  end
+end
+
+describe "class_table_inheritance plugin without sti_key" do
+  before do
+    @db = Sequel.mock(:autoid=>proc{|sql| 1})
+    def @db.supports_schema_parsing?() true end
+    def @db.schema(table, opts={})
+      {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}]],
+       :managers=>[[:id, {:type=>:integer}], [:num_staff, {:type=>:integer}]],
+       :executives=>[[:id, {:type=>:integer}], [:num_managers, {:type=>:integer}]],
+       :staff=>[[:id, {:type=>:integer}], [:manager_id, {:type=>:integer}]],
+       }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
+    end
+    @db.extend_datasets do
+      def columns
+        {[:employees]=>[:id, :name],
+         [:managers]=>[:id, :num_staff],
+         [:executives]=>[:id, :num_managers],
+         [:staff]=>[:id, :manager_id],
+         [:employees, :managers]=>[:id, :name, :num_staff],
+         [:employees, :managers, :executives]=>[:id, :name, :num_staff, :num_managers],
+         [:employees, :staff]=>[:id, :name, :manager_id],
+        }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
+      end
+    end
+    class ::Employee < Sequel::Model(@db)
+      def _save_refresh; @values[:id] = 1 end
+      def self.columns
+        dataset.columns
+      end
+      plugin :class_table_inheritance, :table_map=>{:Staff=>:staff}
+    end 
+    class ::Manager < Employee
+      one_to_many :staff_members, :class=>:Staff
+    end 
+    class ::Executive < Manager
+    end 
+    class ::Staff < Employee
+      many_to_one :manager
+    end 
+    @ds = Employee.dataset
+    @db.sqls
+  end
+  after do
+    Object.send(:remove_const, :Executive)
+    Object.send(:remove_const, :Manager)
+    Object.send(:remove_const, :Staff)
+    Object.send(:remove_const, :Employee)
+  end
+
+  it "should have simple_table = nil for all subclasses" do
+    Manager.simple_table.must_equal nil
+    Executive.simple_table.must_equal nil
+    Staff.simple_table.must_equal nil
+  end
+  
+  it "should have working row_proc if using set_dataset in subclass to remove columns" do
+    Manager.set_dataset(Manager.dataset.select(*(Manager.columns - [:blah])))
+    Manager.dataset._fetch = {:id=>1}
+    Manager[1].must_equal Manager.load(:id=>1)
+  end
+
+  it "should use a joined dataset in subclasses" do
+    Employee.dataset.sql.must_equal 'SELECT * FROM employees'
+    Manager.dataset.sql.must_equal 'SELECT employees.id, employees.name, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id)'
+    Executive.dataset.sql.must_equal 'SELECT employees.id, employees.name, managers.num_staff, executives.num_managers FROM employees INNER JOIN managers ON (managers.id = employees.id) INNER JOIN executives ON (executives.id = managers.id)'
+    Staff.dataset.sql.must_equal 'SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id)'
+  end
+  
+  it "should return rows with the current class if cti_key is nil" do
+    Employee.plugin(:class_table_inheritance)
+    Employee.dataset._fetch = [{}]
+    Employee.first.class.must_equal Employee
+  end
+  
+  
+  it "should include schema for columns for tables for ancestor classes" do
+    Employee.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string})
+    Manager.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :num_staff=>{:type=>:integer})
+    Executive.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :num_staff=>{:type=>:integer}, :num_managers=>{:type=>:integer})
+    Staff.db_schema.must_equal(:id=>{:primary_key=>true, :type=>:integer}, :name=>{:type=>:string}, :manager_id=>{:type=>:integer})
+  end
+
+  it "should use the correct primary key (which should have the same name in all subclasses)" do
+    [Employee, Manager, Executive, Staff].each{|c| c.primary_key.must_equal :id}
+  end
+
+  it "should have table_name return the table name of the most specific table" do
+    Employee.table_name.must_equal :employees
+    Manager.table_name.must_equal :managers
+    Executive.table_name.must_equal :executives
+    Staff.table_name.must_equal :staff
+  end
+
+  it "should delete the correct rows from all tables when deleting" do
+    Executive.load(:id=>1).delete
+    @db.sqls.must_equal ["DELETE FROM executives WHERE (id = 1)", "DELETE FROM managers WHERE (id = 1)", "DELETE FROM employees WHERE (id = 1)"]
+  end
+
+  it "should not allow deletion of frozen object" do
+    o = Executive.load(:id=>1)
+    o.freeze
+    proc{o.delete}.must_raise(Sequel::Error)
+    @db.sqls.must_equal []
+  end
+
+  it "should insert the correct rows into all tables when inserting" do
+    Executive.create(:num_managers=>3, :num_staff=>2, :name=>'E')
+    sqls = @db.sqls
+    sqls.length.must_equal 3
+    sqls[0].must_match(/INSERT INTO employees \(name\) VALUES \('E'\)/)
+    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/)
+    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/)
+    end
+    
+  it "should insert the correct rows into all tables with a given primary key" do
+    e = Executive.new(:num_managers=>3, :num_staff=>2, :name=>'E')
+    e.id = 2
+    e.save
+    sqls = @db.sqls
+    sqls.length.must_equal 3
+    sqls[0].must_match(/INSERT INTO employees \((name|id), (name|id)\) VALUES \(('E'|2), ('E'|2)\)/)
+    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \(2, 2\)/)
+    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([23], [23]\)/)
+  end
+
+  it "should update the correct rows in all tables when updating" do
+    Executive.load(:id=>2).update(:num_managers=>3, :num_staff=>2, :name=>'E')
+    @db.sqls.must_equal ["UPDATE employees SET name = 'E' WHERE (id = 2)", "UPDATE managers SET num_staff = 2 WHERE (id = 2)", "UPDATE executives SET num_managers = 3 WHERE (id = 2)"]
+  end
+
+  it "should handle many_to_one relationships correctly" do
+    Manager.dataset._fetch = {:id=>3, :name=>'E',  :num_staff=>3}
+    Staff.load(:manager_id=>3).manager.must_equal Manager.load(:id=>3, :name=>'E', :num_staff=>3)
+    @db.sqls.must_equal ['SELECT employees.id, employees.name, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 3) LIMIT 1']
+  end
+  
+  it "should handle one_to_many relationships correctly" do
+    Staff.dataset._fetch = {:id=>1, :name=>'S', :manager_id=>3}
+    Executive.load(:id=>3).staff_members.must_equal [Staff.load(:id=>1, :name=>'S', :manager_id=>3)]
+    @db.sqls.must_equal ['SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id) WHERE (staff.manager_id = 3)']
   end
 end

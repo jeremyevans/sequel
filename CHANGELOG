@@ -1,5 +1,7 @@
 === HEAD
 
+* Make class_table_inheritance plugin work without sti_key (jeremyevans)
+
 * Detect additional disconnect errors when using the tinytds adapter (jeremyevans)
 
 * Make offset emulation without order but with explicit selection handle ambiguous column names (jeremyevans)
