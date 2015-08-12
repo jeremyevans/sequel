@@ -268,7 +268,7 @@ module Sequel
     # :commit_every :: Open a new transaction for every given number of records.
     #                  For example, if you provide a value of 50, will commit
     #                  after every 50 records.
-    # :return :: When the :value is :primary_key, returns an array of
+    # :return :: When this is set to :primary_key, returns an array of
     #            autoincremented primary key values for the rows inserted.
     # :server :: Set the server/shard to use for the transaction and insert
     #            queries.
