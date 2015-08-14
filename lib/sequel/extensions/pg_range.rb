@@ -92,8 +92,8 @@ module Sequel
       # :oid :: The PostgreSQL OID for the range type.  This is used by the Sequel postgres adapter
       #         to set up automatic type conversion on retrieval from the database.
       # :subtype_oid :: Should be the PostgreSQL OID for the range's subtype. If given,
-      #                automatically sets the :converter option by looking for scalar conversion
-      #                proc.
+      #                 automatically sets the :converter option by looking for scalar conversion
+      #                 proc.
       #
       # If a block is given, it is treated as the :converter option.
       def self.register(db_type, opts=OPTS, &block)
