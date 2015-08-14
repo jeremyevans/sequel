@@ -3145,6 +3145,15 @@ describe 'PostgreSQL range types' do
     v.each{|k,v1| v1.must_be :==, @ra[k].to_a}
   end
 
+  it 'works with current_datetime_timestamp extension' do
+    ds = @db.dataset.extension(:current_datetime_timestamp)
+    tsr = ds.get(Sequel.pg_range(ds.current_datetime..ds.current_datetime, :tstzrange))
+    if @native
+      tsr.begin.must_be_kind_of Time
+      tsr.end.must_be_kind_of Time
+    end
+  end
+
   it 'operations/functions with pg_range_ops' do
     Sequel.extension :pg_range_ops
 

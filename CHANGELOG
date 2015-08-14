@@ -1,5 +1,7 @@
 === HEAD
 
+* Use range function constructors instead of casts for known range types in pg_range (jeremyevans) (#1066)
+
 * Make class_table_inheritance plugin work without sti_key (jeremyevans)
 
 * Detect additional disconnect errors when using the tinytds adapter (jeremyevans)

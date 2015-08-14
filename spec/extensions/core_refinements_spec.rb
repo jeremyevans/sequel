@@ -511,7 +511,7 @@ describe "Postgres extensions integration" do
 
   it "Range#pg_range should return an PGRange" do
     @db.literal((1..2).pg_range).must_equal "'[1,2]'"
-    @db.literal((1..2).pg_range(:int4range)).must_equal "'[1,2]'::int4range"
+    @db.literal((1..2).pg_range(:int4range)).must_equal "int4range(1,2,'[]')"
   end
 end
 else

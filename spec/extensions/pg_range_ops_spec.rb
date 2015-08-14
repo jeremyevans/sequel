@@ -26,7 +26,7 @@ describe "Sequel::Postgres::RangeOp" do
   end
 
   it "PGRange#op should return a RangeOp" do
-    @ds.literal(Sequel.pg_range(1..2, :numrange).op.lower).must_equal "lower('[1,2]'::numrange)"
+    @ds.literal(Sequel.pg_range(1..2, :numrange).op.lower).must_equal "lower(numrange(1,2,'[]'))"
   end
 
   it "should define methods for all of the PostgreSQL range operators" do

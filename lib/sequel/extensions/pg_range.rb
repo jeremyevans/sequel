@@ -71,6 +71,7 @@ module Sequel
 
       EMPTY = 'empty'.freeze
       EMPTY_STRING = ''.freeze
+      COMMA = ','.freeze
       QUOTED_EMPTY_STRING = '""'.freeze
       OPEN_PAREN = "(".freeze
       CLOSE_PAREN = ")".freeze
@@ -414,9 +415,19 @@ module Sequel
 
       # Append a literalize version of the receiver to the sql.
       def sql_literal_append(ds, sql)
-        ds.literal_append(sql, unquoted_literal(ds))
-        if s = @db_type
-          sql << CAST << s.to_s
+        if (s = @db_type) && !empty?
+          sql << s.to_s << OPEN_PAREN
+          ds.literal_append(sql, self.begin)
+          sql << COMMA
+          ds.literal_append(sql, self.end)
+          sql << COMMA
+          ds.literal_append(sql, "#{exclude_begin? ? OPEN_PAREN : OPEN_BRACKET}#{exclude_end? ? CLOSE_PAREN : CLOSE_BRACKET}")
+          sql << CLOSE_PAREN
+        else
+          ds.literal_append(sql, unquoted_literal(ds))
+          if s
+            sql << CAST << s.to_s
+          end
         end
       end
 
