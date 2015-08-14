@@ -2,9 +2,9 @@ module Sequel
   class Dataset
     # ---------------------
     # :section: 5 - Methods related to dataset graphing
-    # Dataset graphing changes the dataset to yield hashes where keys are table
-    # name symbols and values are hashes representing the columns related to
-    # that table.  All of these methods return modified copies of the receiver.
+    # Dataset graphing automatically creates unique aliases columns in join
+    # tables that overlap with already selected column aliases. 
+    # All of these methods return modified copies of the receiver.
     # ---------------------
     
     # Adds the given graph aliases to the list of graph aliases to use,
