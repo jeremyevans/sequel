@@ -91,6 +91,13 @@ describe Sequel::Model, "dataset" do
   it "should raise if no dataset is explicitly set and the class is anonymous" do
     proc {@b.dataset}.must_raise(Sequel::Error)
   end
+  
+  it "should not override dataset explicitly set when subclassing" do
+    sc = Class.new(::Elephant) do
+      set_dataset :foo
+    end
+    sc.table_name.must_equal :foo
+  end
 end
   
 describe Sequel::Model, "implicit table names" do
