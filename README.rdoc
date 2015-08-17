@@ -17,15 +17,15 @@ toolkit for Ruby.
 
 == Resources
 
-* Website: http://sequel.jeremyevans.net
-* Documentation: http://sequel.jeremyevans.net/rdoc
-* GitHub repo: https://github.com/jeremyevans/sequel
-* Bug tracking: {GitHub Issues}[http://github.com/jeremyevans/sequel/issues]
-* {sequel-talk}[http://groups.google.com/group/sequel-talk] google group
-* {#sequel}[irc://irc.freenode.net/sequel] IRC channel on freenode
+Website :: http://sequel.jeremyevans.net
+RDoc Documentation :: http://sequel.jeremyevans.net/rdoc
+Source Code :: https://github.com/jeremyevans/sequel
+Bug tracking (GitHub Issues) :: http://github.com/jeremyevans/sequel/issues
+Discussion Forum (sequel-talk Google Group) :: http://groups.google.com/group/sequel-talk
+IRC Channel (#sequel) :: irc://irc.freenode.net/sequel
 
 If you have questions about how to use Sequel, please ask on the
-Google Group or IRC.  Only use the the bug tracker to report
+sequel-talk Google Group or IRC.  Only use the the bug tracker to report
 bugs in Sequel, not to ask for help on using Sequel.
 
 To check out the source code:
