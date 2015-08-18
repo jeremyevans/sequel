@@ -105,8 +105,6 @@ module Sequel
 
     instance_eval(&DEFAULT_INFLECTIONS_PROC)
 
-    private
-
     # Convert the given string to CamelCase.  Will also convert '/' to '::' which is useful for converting paths to namespaces.
     def camelize(s)
       s = s.to_s
