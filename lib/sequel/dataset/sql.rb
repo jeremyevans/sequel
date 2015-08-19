@@ -271,6 +271,7 @@ module Sequel
     DOUBLE_APOS = "''".freeze
     DOUBLE_QUOTE = '""'.freeze
     EQUAL = ' = '.freeze
+    EMPTY_PARENS = '()'.freeze
     ESCAPE = " ESCAPE ".freeze
     EXTRACT = 'extract('.freeze
     EXISTS = ['EXISTS '.freeze].freeze
@@ -1008,6 +1009,21 @@ module Sequel
       end
     end
 
+    # Append literalization of array of grouping elements to SQL string.
+    def grouping_element_list_append(sql, columns)
+      c = false
+      co = COMMA
+      columns.each do |col|
+        sql << co if c
+        if col.is_a?(Array) && col.empty?
+          sql << EMPTY_PARENS
+        else
+          literal_append(sql, Array(col))
+        end
+        c ||= true
+      end
+    end
+
     # An expression for how to handle an empty array lookup.
     def empty_array_value(op, cols)
       {1 => ((op == :IN) ? 0 : 1)}
@@ -1352,7 +1368,11 @@ module Sequel
       if group = @opts[:group]
         sql << GROUP_BY
         if go = @opts[:group_options]
-          if uses_with_rollup?
+          if go == :"grouping sets"
+            sql << go.to_s.upcase << PAREN_OPEN
+            grouping_element_list_append(sql, group)
+            sql << PAREN_CLOSE
+          elsif uses_with_rollup?
             expression_list_append(sql, group)
             sql << SPACE_WITH << go.to_s.upcase
           else

@@ -337,6 +337,12 @@ module Sequel
       clone(:group_options=>:rollup)
     end
 
+    # Adds the appropriate GROUPING SETS syntax to GROUP BY.
+    def grouping_sets
+      raise Error, "GROUP BY GROUPING SETS not supported on #{db.database_type}" unless supports_grouping_sets?
+      clone(:group_options=>:"grouping sets")
+    end
+
     # Returns a copy of the dataset with the HAVING conditions changed. See #where for argument types.
     #
     #   DB[:items].group(:sum).having(:sum=>10)

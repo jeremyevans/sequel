@@ -869,9 +869,16 @@ describe "Dataset#group_by" do
     @dataset.group(:type_id, :b).group_cube.select_sql.must_equal "SELECT * FROM test GROUP BY type_id, b WITH CUBE"
   end
 
-  it "should have #group_cube and #group_rollup methods raise an Error if not supported it" do
+  it "should support a #grouping_sets method if the database supports it" do
+    meta_def(@dataset, :supports_grouping_sets?){true}
+    @dataset.group(:type_id).grouping_sets.select_sql.must_equal "SELECT * FROM test GROUP BY GROUPING SETS((type_id))"
+    @dataset.group([:type_id, :b], :type_id, []).grouping_sets.select_sql.must_equal "SELECT * FROM test GROUP BY GROUPING SETS((type_id, b), (type_id), ())"
+  end
+
+  it "should have #group_* methods raise an Error if not supported it" do
     proc{@dataset.group(:type_id).group_rollup}.must_raise(Sequel::Error)
     proc{@dataset.group(:type_id).group_cube}.must_raise(Sequel::Error)
+    proc{@dataset.group(:type_id).grouping_sets}.must_raise(Sequel::Error)
   end
 end
 

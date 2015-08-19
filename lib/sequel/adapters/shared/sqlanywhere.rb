@@ -283,6 +283,11 @@ module Sequel
         type == :select || type == :insert
       end
 
+      # SQLAnywhere supports GROUPING SETS
+      def supports_grouping_sets?
+        true
+      end
+
       def supports_multiple_column_in?
         false
       end

@@ -729,6 +729,11 @@ module Sequel
         is_2005_or_later?
       end
 
+      # MSSQL 2005+ supports GROUPING SETS
+      def supports_grouping_sets?
+        is_2008_or_later?
+      end
+
       # MSSQL supports insert_select via the OUTPUT clause.
       def supports_insert_select?
         supports_output_clause? && !opts[:disable_insert_output]

@@ -961,14 +961,19 @@ describe "Sequel::Dataset convenience methods" do
   end
   
   it "#group_rollup should include hierarchy of groupings" do
-    @ds.group_by(:a).group_rollup.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.must_equal [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
-    @ds.group_by(:a, :b).group_rollup.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.must_equal [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, nil, 27]]
+    @ds.group_by(:a).group_rollup.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.map(&:to_i)}.must_equal [[nil, 17, 27], [1, 10, 16], [2, 7, 11]]
+    @ds.group_by(:a, :b).group_rollup.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.map(&:to_i)}.must_equal [[nil, nil, 27], [1, nil, 16], [1, 3, 11], [1, 4, 5], [2, nil, 11], [2, 3, 5], [2, 4, 6]]
   end if DB.dataset.supports_group_rollup?
 
   it "#group_cube should include all combinations of groupings" do
-    @ds.group_by(:a).group_cube.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.must_equal [[1, 10, 16], [2, 7, 11], [nil, 17, 27]]
-    @ds.group_by(:a, :b).group_cube.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.inspect}.must_equal [[1, 3, 11], [1, 4, 5], [1, nil, 16], [2, 3, 5], [2, 4, 6], [2, nil, 11], [nil, 3, 16], [nil, 4, 11], [nil, nil, 27]]
+    @ds.group_by(:a).group_cube.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.map(&:to_i)}.must_equal [[nil, 17, 27], [1, 10, 16], [2, 7, 11]]
+    @ds.group_by(:a, :b).group_cube.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.map(&:to_i)}.must_equal [[nil, nil, 27], [nil, 3, 16], [nil, 4, 11], [1, nil, 16], [1, 3, 11], [1, 4, 5], [2, nil, 11], [2, 3, 5], [2, 4, 6]]
   end if DB.dataset.supports_group_cube?
+
+  it "#grouping_sets should include sets specified in group" do
+    @ds.group_by(:a, []).grouping_sets.select_map([:a, Sequel.function(:sum, :b).cast(Integer).as(:b), Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.map(&:to_i)}.must_equal [[nil, 17, 27], [1, 10, 16], [2, 7, 11]]
+    @ds.group_by([:a, :b], :a, :b, []).grouping_sets.select_map([:a, :b, Sequel.function(:sum, :c).cast(Integer).as(:c)]).sort_by{|x| x.map(&:to_i)}.must_equal [[nil, nil, 27], [nil, 3, 16], [nil, 4, 11], [1, nil, 16], [1, 3, 11], [1, 4, 5], [2, nil, 11], [2, 3, 5], [2, 4, 6]]
+  end if DB.dataset.supports_grouping_sets?
 end
 
 describe "Sequel::Dataset convenience methods" do

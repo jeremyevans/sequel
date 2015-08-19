@@ -322,6 +322,11 @@ module Sequel
         true
       end
 
+      # DB2 supports GROUPING SETS
+      def supports_grouping_sets?
+        true
+      end
+
       # DB2 does not support IS TRUE.
       def supports_is_true?
         false

@@ -1462,6 +1462,11 @@ module Sequel
         server_version >= 90500
       end
 
+      # PostgreSQL 9.5+ supports GROUPING SETS
+      def supports_grouping_sets?
+        server_version >= 90500
+      end
+
       # True unless insert returning has been disabled for this dataset.
       def supports_insert_select?
         !@opts[:disable_insert_returning]

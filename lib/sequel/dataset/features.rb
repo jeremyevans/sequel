@@ -76,6 +76,11 @@ module Sequel
       false
     end
 
+    # Whether the dataset supports GROUPING SETS with GROUP BY.
+    def supports_grouping_sets?
+      false
+    end
+
     # Whether this dataset supports the +insert_select+ method for returning all columns values
     # directly from an insert query.
     def supports_insert_select?

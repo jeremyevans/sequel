@@ -393,6 +393,11 @@ module Sequel
         true
       end
 
+      # Oracle supports GROUPING SETS
+      def supports_grouping_sets?
+        true
+      end
+
       # Oracle does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false
