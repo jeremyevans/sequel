@@ -435,6 +435,12 @@ module Sequel
 
       private
 
+      # Allow preparing prepared statements, since determining the prepared sql to use for
+      # a prepared statement requires calling prepare on that statement.
+      def allow_preparing_prepared_statements?
+        true
+      end
+
       # Oracle doesn't support the use of AS when aliasing a dataset.  It doesn't require
       # the use of AS anywhere, so this disables it in all cases.
       def as_sql_append(sql, aliaz, column_aliases=nil)
