@@ -122,7 +122,7 @@ module Sequel
           when BigDecimal
             arg = arg.to_f
           when ::Sequel::SQL::Blob
-            raise Error, "Sequel's oracle adapter does not currently support using a blob in a bound variable"
+            arg = ::OCI8::BLOB.new(conn, arg)
           end
           if t = PS_TYPES[type]
             cursor.bind_param(i, arg, t)

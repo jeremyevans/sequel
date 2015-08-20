@@ -1,5 +1,7 @@
 === HEAD
 
+* Support blobs as bound variables in the oracle adapter (jeremyevans) (#1104)
+
 * Order by best results first when using the Database#full_text_search :rank option on PostgreSQL (chanks) (#1101)
 
 * Run Database#table_exists? inside a savepoint if currently in a transaction and the database supports savepoints (jeremyevans) (#1100)

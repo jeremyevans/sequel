@@ -355,13 +355,13 @@ describe "Bound Argument Types" do
     @ds.literal(@ds.filter(:t=>:$x).prepare(:first, :ps_time).call(:x=>fract_time)[:t]).must_equal @ds.literal(fract_time)
   end
 
-  cspecify "should handle blob type", [:odbc], [:oracle] do
+  cspecify "should handle blob type", [:odbc] do
     @ds.delete
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>@vs[:file])
     @ds.get(:file).must_equal @vs[:file]
   end
 
-  cspecify "should handle blob type with special characters", [:odbc], [:oracle] do
+  cspecify "should handle blob type with special characters", [:odbc] do
     @ds.delete
     blob = Sequel.blob("\"'[]`a0 ")
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>blob)
@@ -374,7 +374,7 @@ describe "Bound Argument Types" do
     @ds.get(:file).must_equal nil
   end
 
-  cspecify "should handle blob type with embedded zeros", [:odbc], [:oracle] do
+  cspecify "should handle blob type with embedded zeros", [:odbc] do
     zero_blob = Sequel::SQL::Blob.new("a\0"*100)
     @ds.delete
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>zero_blob)
