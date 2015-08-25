@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :if_exists option to drop_column on PostgreSQL (jeremyevans)
+
 * Add Dataset#grouping_sets to support GROUP BY GROUPING SETS on PostgreSQL 9.5+, MSSQL 2008+, Oracle, DB2, and SQLAnywhere (jeremyevans)
 
 * Fix handling of Class.new(ModelClass){set_dataset :table} on ruby 1.8 (jeremyevans)

@@ -407,6 +407,15 @@ module Sequel
       #
       #   drop_column(:artist_id) # DROP COLUMN artist_id
       #   drop_column(:artist_id, :cascade=>true) # DROP COLUMN artist_id CASCADE
+      #
+      # Options:
+      #
+      # :cascade :: CASCADE the operation, dropping other objects that depend on
+      #             the dropped column.
+      # 
+      # PostgreSQL specific options:
+      # :if_exists :: Use IF EXISTS, so no error is raised if the column does not
+      #               exist.
       def drop_column(name, opts=OPTS)
         @operations << {:op => :drop_column, :name => name}.merge!(opts)
       end

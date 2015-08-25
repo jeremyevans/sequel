@@ -589,6 +589,10 @@ module Sequel
         s
       end
 
+      def alter_table_drop_column_sql(table, op)
+        "DROP COLUMN #{'IF EXISTS ' if op[:if_exists]}#{quote_identifier(op[:name])}#{' CASCADE' if op[:cascade]}"
+      end
+
       def alter_table_validate_constraint_sql(table, op)
         "VALIDATE CONSTRAINT #{quote_identifier(op[:name])}"
       end

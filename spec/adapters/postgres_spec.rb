@@ -107,6 +107,14 @@ describe "PostgreSQL", '#create_table' do
     end.must_raise(Sequel::Error, "can't provide both :temp and :unlogged to create_table")
   end
 
+  it "should support :if_exists option to drop_column" do
+    @db.create_table(:tmp_dolls){Integer :a; Integer :b}
+    2.times do
+      @db.drop_column :tmp_dolls, :b, :if_exists=>true
+      @db[:tmp_dolls].columns.must_equal [:a]
+    end
+  end if DB.server_version >= 90000
+
   it "should support pg_loose_count extension" do
     @db.extension :pg_loose_count
     @db.create_table(:tmp_dolls){text :name}
