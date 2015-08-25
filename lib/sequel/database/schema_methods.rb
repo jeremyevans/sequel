@@ -430,30 +430,48 @@ module Sequel
     
     # SQL fragment for given alter table operation.
     def alter_table_op_sql(table, op)
-      quoted_name = quote_identifier(op[:name]) if op[:name]
-      case op[:op]
-      when :add_column
-        "ADD COLUMN #{column_definition_sql(op)}"
-      when :drop_column
-        "DROP COLUMN #{quoted_name}#{' CASCADE' if op[:cascade]}"
-      when :rename_column
-        "RENAME COLUMN #{quoted_name} TO #{quote_identifier(op[:new_name])}"
-      when :set_column_type
-        "ALTER COLUMN #{quoted_name} TYPE #{type_literal(op)}"
-      when :set_column_default
-        "ALTER COLUMN #{quoted_name} SET DEFAULT #{literal(op[:default])}"
-      when :set_column_null
-        "ALTER COLUMN #{quoted_name} #{op[:null] ? 'DROP' : 'SET'} NOT NULL"
-      when :add_constraint
-        "ADD #{constraint_definition_sql(op)}"
-      when :drop_constraint
-        if op[:type] == :foreign_key
-          quoted_name ||= quote_identifier(foreign_key_name(table, op[:columns]))
-        end
-        "DROP CONSTRAINT #{quoted_name}#{' CASCADE' if op[:cascade]}"
+      meth = "alter_table_#{op[:op]}_sql"
+      if respond_to?(meth, true)
+        send(meth, table, op)
       else
         raise Error, "Unsupported ALTER TABLE operation: #{op[:op]}"
       end
+    end
+
+    def alter_table_add_column_sql(table, op)
+      "ADD COLUMN #{column_definition_sql(op)}"
+    end
+
+    def alter_table_drop_column_sql(table, op)
+      "DROP COLUMN #{quote_identifier(op[:name])}#{' CASCADE' if op[:cascade]}"
+    end
+
+    def alter_table_rename_column_sql(table, op)
+      "RENAME COLUMN #{quote_identifier(op[:name])} TO #{quote_identifier(op[:new_name])}"
+    end
+
+    def alter_table_set_column_type_sql(table, op)
+      "ALTER COLUMN #{quote_identifier(op[:name])} TYPE #{type_literal(op)}"
+    end
+
+    def alter_table_set_column_default_sql(table, op)
+      "ALTER COLUMN #{quote_identifier(op[:name])} SET DEFAULT #{literal(op[:default])}"
+    end
+
+    def alter_table_set_column_null_sql(table, op)
+      "ALTER COLUMN #{quote_identifier(op[:name])} #{op[:null] ? 'DROP' : 'SET'} NOT NULL"
+    end
+
+    def alter_table_add_constraint_sql(table, op)
+      "ADD #{constraint_definition_sql(op)}"
+    end
+
+    def alter_table_drop_constraint_sql(table, op)
+      quoted_name = quote_identifier(op[:name]) if op[:name]
+      if op[:type] == :foreign_key
+        quoted_name ||= quote_identifier(foreign_key_name(table, op[:columns]))
+      end
+      "DROP CONSTRAINT #{quoted_name}#{' CASCADE' if op[:cascade]}"
     end
 
     # The SQL to execute to modify the DDL for the given table name.  op

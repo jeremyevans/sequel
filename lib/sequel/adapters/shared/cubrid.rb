@@ -81,24 +81,24 @@ module Sequel
           map{|c| m.call(c)}
       end
 
-      def alter_table_op_sql(table, op)
-        case op[:op]
-        when :rename_column
-          "RENAME COLUMN #{quote_identifier(op[:name])} AS #{quote_identifier(op[:new_name])}"
-        when :set_column_type, :set_column_null, :set_column_default
-          o = op[:op]
-          opts = schema(table).find{|x| x.first == op[:name]}
-          opts = opts ? opts.last.dup : {}
-          opts[:name] = o == :rename_column ? op[:new_name] : op[:name]
-          opts[:type] = o == :set_column_type ? op[:type] : opts[:db_type]
-          opts[:null] = o == :set_column_null ? op[:null] : opts[:allow_null]
-          opts[:default] = o == :set_column_default ? op[:default] : opts[:ruby_default]
-          opts.delete(:default) if opts[:default] == nil
-          "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
-        else
-          super
-        end
+      def alter_table_rename_column_sql(table, op)
+        "RENAME COLUMN #{quote_identifier(op[:name])} AS #{quote_identifier(op[:new_name])}"
       end
+
+      def alter_table_change_column_sql(table, op)
+        o = op[:op]
+        opts = schema(table).find{|x| x.first == op[:name]}
+        opts = opts ? opts.last.dup : {}
+        opts[:name] = o == :rename_column ? op[:new_name] : op[:name]
+        opts[:type] = o == :set_column_type ? op[:type] : opts[:db_type]
+        opts[:null] = o == :set_column_null ? op[:null] : opts[:allow_null]
+        opts[:default] = o == :set_column_default ? op[:default] : opts[:ruby_default]
+        opts.delete(:default) if opts[:default] == nil
+        "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
+      end
+      alias alter_table_set_column_type_sql alter_table_change_column_sql
+      alias alter_table_set_column_null_sql alter_table_change_column_sql
+      alias alter_table_set_column_default_sql alter_table_change_column_sql
 
       def alter_table_sql(table, op)
         case op[:op]

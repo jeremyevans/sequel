@@ -579,22 +579,18 @@ module Sequel
         Postgres::AlterTableGenerator
       end
     
-      # Handle :using option for set_column_type op, and the :validate_constraint op.
-      def alter_table_op_sql(table, op)
-        case op[:op]
-        when :set_column_type
-          s = super
-          if using = op[:using]
-            using = Sequel::LiteralString.new(using) if using.is_a?(String)
-            s << ' USING '
-            s << literal(using)
-          end
-          s
-        when :validate_constraint
-          "VALIDATE CONSTRAINT #{quote_identifier(op[:name])}"
-        else
-          super
+      def alter_table_set_column_type_sql(table, op)
+        s = super
+        if using = op[:using]
+          using = Sequel::LiteralString.new(using) if using.is_a?(String)
+          s << ' USING '
+          s << literal(using)
         end
+        s
+      end
+
+      def alter_table_validate_constraint_sql(table, op)
+        "VALIDATE CONSTRAINT #{quote_identifier(op[:name])}"
       end
 
       # If the :synchronous option is given and non-nil, set synchronous_commit

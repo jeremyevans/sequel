@@ -185,57 +185,61 @@ module Sequel
       
       private
       
-      # Use MySQL specific syntax for some alter table operations.
-      def alter_table_op_sql(table, op)
-        case op[:op]
-        when :add_column
-          if related = op.delete(:table)
-            sql = super
-            op[:table] = related
-            op[:key] ||= primary_key_from_schema(related)
-            sql << ", ADD "
-            if constraint_name = op.delete(:foreign_key_constraint_name)
-              sql << "CONSTRAINT #{quote_identifier(constraint_name)} "
-            end
-            sql << "FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"
-          else
-            super
+      def alter_table_add_column_sql(table, op)
+        if related = op.delete(:table)
+          sql = super
+          op[:table] = related
+          op[:key] ||= primary_key_from_schema(related)
+          sql << ", ADD "
+          if constraint_name = op.delete(:foreign_key_constraint_name)
+            sql << "CONSTRAINT #{quote_identifier(constraint_name)} "
           end
-        when :rename_column, :set_column_type, :set_column_null, :set_column_default
-          o = op[:op]
-          opts = schema(table).find{|x| x.first == op[:name]}
-          opts = opts ? opts.last.dup : {}
-          opts[:name] = o == :rename_column ? op[:new_name] : op[:name]
-          opts[:type] = o == :set_column_type ? op[:type] : opts[:db_type]
-          opts[:null] = o == :set_column_null ? op[:null] : opts[:allow_null]
-          opts[:default] = o == :set_column_default ? op[:default] : opts[:ruby_default]
-          opts.delete(:default) if opts[:default] == nil
-          opts.delete(:primary_key)
-          unless op[:type] || opts[:type]
-            raise Error, "cannot determine database type to use for CHANGE COLUMN operation"
-          end
-          opts = op.merge(opts)
-          if op.has_key?(:auto_increment)
-            opts[:auto_increment] = op[:auto_increment]
-          end
-          "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(opts)}"
-        when :drop_constraint
-          case op[:type]
-          when :primary_key
-            "DROP PRIMARY KEY"
-          when :foreign_key
-            name = op[:name] || foreign_key_name(table, op[:columns])
-            "DROP FOREIGN KEY #{quote_identifier(name)}"
-          when :unique
-            "DROP INDEX #{quote_identifier(op[:name])}"
-          end
-        when :add_constraint
-          if op[:type] == :foreign_key
-            op[:key] ||= primary_key_from_schema(op[:table])
-          end
-          super
+          sql << "FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"
         else
           super
+        end
+      end
+
+      def alter_table_change_column_sql(table, op)
+        o = op[:op]
+        opts = schema(table).find{|x| x.first == op[:name]}
+        opts = opts ? opts.last.dup : {}
+        opts[:name] = o == :rename_column ? op[:new_name] : op[:name]
+        opts[:type] = o == :set_column_type ? op[:type] : opts[:db_type]
+        opts[:null] = o == :set_column_null ? op[:null] : opts[:allow_null]
+        opts[:default] = o == :set_column_default ? op[:default] : opts[:ruby_default]
+        opts.delete(:default) if opts[:default] == nil
+        opts.delete(:primary_key)
+        unless op[:type] || opts[:type]
+          raise Error, "cannot determine database type to use for CHANGE COLUMN operation"
+        end
+        opts = op.merge(opts)
+        if op.has_key?(:auto_increment)
+          opts[:auto_increment] = op[:auto_increment]
+        end
+        "CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(opts)}"
+      end
+      alias alter_table_rename_column_sql alter_table_change_column_sql
+      alias alter_table_set_column_type_sql alter_table_change_column_sql
+      alias alter_table_set_column_null_sql alter_table_change_column_sql
+      alias alter_table_set_column_default_sql alter_table_change_column_sql
+
+      def alter_table_add_constraint_sql(table, op)
+        if op[:type] == :foreign_key
+          op[:key] ||= primary_key_from_schema(op[:table])
+        end
+        super
+      end
+
+      def alter_table_drop_constraint_sql(table, op)
+        case op[:type]
+        when :primary_key
+          "DROP PRIMARY KEY"
+        when :foreign_key
+          name = op[:name] || foreign_key_name(table, op[:columns])
+          "DROP FOREIGN KEY #{quote_identifier(name)}"
+        when :unique
+          "DROP INDEX #{quote_identifier(op[:name])}"
         end
       end
 
