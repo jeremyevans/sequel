@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#== not consider frozen status in determining equality (jeremyevans)
+
 * Support :if_exists option to drop_column on PostgreSQL (jeremyevans)
 
 * Add Dataset#grouping_sets to support GROUP BY GROUPING SETS on PostgreSQL 9.5+, MSSQL 2008+, Oracle, DB2, and SQLAnywhere (jeremyevans)

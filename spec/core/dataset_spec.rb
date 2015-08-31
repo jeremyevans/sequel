@@ -4895,6 +4895,10 @@ describe "Frozen Datasets" do
     @ds.clone.must_be :frozen?
   end
 
+  it "should be equal to unfrozen ones" do
+    @ds.must_equal @ds.db[:test]
+  end
+
   it "should have dups not be frozen" do
     @ds.dup.wont_be :frozen?
   end

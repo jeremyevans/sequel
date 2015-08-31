@@ -50,7 +50,7 @@ module Sequel
     # Similar to #clone, but returns an unfrozen clone if the receiver is frozen.
     def dup
       o = clone
-      o.opts.delete(:frozen)
+      o.instance_variable_set(:@frozen, false) if frozen?
       o
     end
     
@@ -74,13 +74,13 @@ module Sequel
 
     # Sets the frozen flag on the dataset, so you can't modify it. Returns the receiver.
     def freeze
-      @opts[:frozen] = true
+      @frozen = true
       self
     end
 
     # Whether the object is frozen.
     def frozen?
-      @opts[:frozen]
+      @frozen == true
     end
    
     # Alias of +first_source_alias+
