@@ -253,6 +253,7 @@
               <li><a target="docwin" href="Sequel/MigrationReverser.html">Sequel::MigrationReverser</a></li>
               <li><a target="docwin" href="Sequel/Migrator.html">Sequel::Migrator</a></li>
               <li><a target="docwin" href="Sequel/Model.html">Sequel::Model</a></li>
+              <li><a target="docwin" href="Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a></li>
               <li><a target="docwin" href="Sequel/Qualifier.html">Sequel::Qualifier</a></li>
               <li><a target="docwin" href="Sequel/SQLTime.html">Sequel::SQLTime</a></li>
               <li><a target="docwin" href="Sequel/ShardedSingleConnectionPool.html">Sequel::ShardedSingleConnectionPool</a></li>
@@ -499,7 +500,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MINOR</td>
                     <td>=</td>
-                    <td class='context-item-value'>25</td>
+                    <td class='context-item-value'>26</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -528,18 +529,6 @@
                       <p>Exception class raised when <code>require_modification</code> is set and an
                       UPDATE or DELETE statement to modify the dataset doesn&#39;t modify a
                       single row.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>NoMatchingRow</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Class.new(Error)</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p><a href="Sequel/Error.html">Error</a> raised when the user requests a
-                      record via the first! or similar method, and the dataset does not yield any
-                      rows.</p>
                     </td>
                   </tr>
                   <tr class='top-aligned-row context-row'>

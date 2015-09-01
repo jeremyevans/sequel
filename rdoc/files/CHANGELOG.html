@@ -31,12 +31,45 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-07-31 10:10:08 -0700</span>
+          <span class='datetime'>2015-09-01 08:04:35 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.26.0+-282015-09-01-29">4.26.0 (2015-09-01)<span><a href="#label-4.26.0+-282015-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make Dataset#== not consider frozen status in determining equality
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support :if_exists option to drop_column on PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#grouping_sets to support GROUP BY GROUPING SETS on PostgreSQL
+            9.5+, MSSQL 2008+, Oracle, DB2, and SQLAnywhere (jeremyevans)</p>
+            </li><li>
+            <p>Fix handling of Class.new(ModelClass){set_dataset :table} on ruby 1.8
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use range function constructors instead of casts for known range types in
+            pg_range (jeremyevans) (#1066)</p>
+            </li><li>
+            <p>Make class_table_inheritance plugin work without sti_key (jeremyevans)</p>
+            </li><li>
+            <p>Detect additional disconnect errors when using the tinytds adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make offset emulation without order but with explicit selection handle
+            ambiguous column names (jeremyevans)</p>
+            </li><li>
+            <p>Allow preparing already prepared statements when emulating limits and/or
+            offsets (jeremyevans)</p>
+            </li><li>
+            <p>Have <a
+            href="../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
+            exceptions record the dataset related to the exception (pedro, jeremyevans)
+            (#1060)</p>
+            </li></ul>
             
             <h3 id="label-4.25.0+-282015-08-01-29">4.25.0 (2015-08-01)<span><a href="#label-4.25.0+-282015-08-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
@@ -1834,7 +1867,8 @@
             <p>Add Dataset#with_pk! for model datasets, like with_pk, but raising instead
             of returning nil (jeremyevans)</p>
             </li><li>
-            <p>Add Dataset#first!, like first, but raising a Sequel::NoMatchingRow
+            <p>Add Dataset#first!, like first, but raising a <a
+            href="../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
             exception instead of returning nil (jeremyevans)</p>
             </li><li>
             <p>Dataset select_map, select_order_map, and get no longer support a plain

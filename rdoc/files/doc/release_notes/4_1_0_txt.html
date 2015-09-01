@@ -95,9 +95,11 @@
             indexes.</p>
             </li><li>
             <p>Calling Model#add_association methods with a primary key value now raises a
-            Sequel::NoMatchingRow if there is no object in the associated table with
-            that primary key.  Previously, this situation was not handled and resulted
-            in a NoMethodError being raised later.</p>
+            <a
+            href="../../../classes/Sequel/NoMatchingRow.html">Sequel::NoMatchingRow</a>
+            if there is no object in the associated table with that primary key. 
+            Previously, this situation was not handled and resulted in a NoMethodError
+            being raised later.</p>
             </li><li>
             <p>When an invalid virtual row block function call is detected, an error is
             now properly raised.  Previously, the error was not raised until the SQL

@@ -1,4 +1,4 @@
-Sat, 01 Aug 2015 10:42:46 -0700
+Tue, 01 Sep 2015 08:41:13 -0700
 lib/sequel/extensions/_pretty_table.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -37,7 +37,7 @@ lib/sequel/extensions/pg_interval.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_json.rb	Tue, 17 Mar 2015 08:10:34 -0700
 lib/sequel/extensions/pg_json_ops.rb	Tue, 14 Jul 2015 16:01:53 -0700
 lib/sequel/extensions/pg_loose_count.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/pg_range.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/extensions/pg_range.rb	Fri, 14 Aug 2015 12:00:10 -0700
 lib/sequel/extensions/pg_range_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_row.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/extensions/pg_row_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -63,7 +63,7 @@ lib/sequel/plugins/active_model.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/after_initialize.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/association_autoreloading.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/association_dependencies.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/association_pks.rb	Tue, 14 Jul 2015 16:01:53 -0700
+lib/sequel/plugins/association_pks.rb	Fri, 07 Aug 2015 10:49:26 -0700
 lib/sequel/plugins/association_proxies.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/auto_validations.rb	Tue, 23 Jun 2015 15:01:25 -0700
 lib/sequel/plugins/blacklist_security.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -110,7 +110,7 @@ lib/sequel/plugins/scissors.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/serialization.rb	Tue, 14 Jul 2015 09:39:33 -0700
 lib/sequel/plugins/serialization_modification_detection.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/plugins/sharding.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/plugins/single_table_inheritance.rb	Tue, 28 Apr 2015 15:29:46 -0700
+lib/sequel/plugins/single_table_inheritance.rb	Tue, 11 Aug 2015 14:10:24 -0700
 lib/sequel/plugins/singular_table_names.rb	Tue, 14 Jul 2015 16:01:53 -0700
 lib/sequel/plugins/skip_create_refresh.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/split_values.rb	Thu, 20 Nov 2014 12:20:00 -0800
