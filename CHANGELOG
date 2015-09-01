@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.26.0 (2015-09-01)
 
 * Make Dataset#== not consider frozen status in determining equality (jeremyevans)
 
