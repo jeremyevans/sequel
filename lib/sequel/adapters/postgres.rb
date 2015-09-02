@@ -2,6 +2,10 @@ Sequel.require 'adapters/shared/postgres'
 
 begin 
   require 'pg' 
+
+  # Work around postgres-pr 0.7.0+ which ships with a pg.rb file
+  raise LoadError unless defined?(PGconn::CONNECTION_OK)
+
   SEQUEL_POSTGRES_USES_PG = true
 rescue LoadError => e 
   SEQUEL_POSTGRES_USES_PG = false

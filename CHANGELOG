@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make postgres adapter work with postgres-pr 0.7.0 (jeremyevans) (#1074)
+
 === 4.26.0 (2015-09-01)
 
 * Make Dataset#== not consider frozen status in determining equality (jeremyevans)
