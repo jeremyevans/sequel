@@ -1,12 +1,16 @@
 module Sequel
   module Plugins
-    # DefaultsSetter is a simple plugin that sets non-nil/NULL default values upon
-    # initialize:
+    # The defaults_setter plugin makes the column getter methods return the default
+    # values for new objects, if the values have not already been set.  Example:
     #
     #   # column a default NULL
     #   # column b default 2
-    #   album = Album.new.values # {:b => 2}
-    #   album = Album.new(:a=>1, :b=>3).values # {:a => 1, :b => 3}
+    #   album = Album.new
+    #   album.a # => nil
+    #   album.b # => 2
+    #   album = Album.new(:a=>1, :b=>3)
+    #   album.a # => 1
+    #   album.b # => 3
     # 
     # Usage:
     #
