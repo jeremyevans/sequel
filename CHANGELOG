@@ -1,5 +1,11 @@
 === HEAD
 
+* Add Dataset#single_record! and #single_value! which don't require cloning the receiver (jeremyevans)
+
+* Dataset#with_sql_single_value now works correctly for model datasets (jeremyevans)
+
+* Optimize Dataset#single_value and #with_sql_single_value to not create an unnecessary array (jeremyevans)
+
 * Make postgres adapter work with postgres-pr 0.7.0 (jeremyevans) (#1074)
 
 === 4.26.0 (2015-09-01)

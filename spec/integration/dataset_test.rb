@@ -173,6 +173,20 @@ describe "Simple Dataset operations" do
 
   it "should fetch a single row correctly" do
     @ds.first.must_equal(:id=>1, :number=>10)
+    @ds.single_record.must_equal(:id=>1, :number=>10)
+    @ds.single_record!.must_equal(:id=>1, :number=>10)
+  end
+  
+  it "should work correctly when returning from each without iterating over the whole result set" do
+    @ds.insert(:id=>2, :number=>20)
+    @ds.order(:id).each{|v| break v}.must_equal(:id=>1, :number=>10)
+    @ds.reverse(:id).each{|v| break v}.must_equal(:id=>2, :number=>20)
+  end
+  
+  it "should fetch a single value correctly" do
+    @ds.get(:id).must_equal 1
+    @ds.select(:id).single_value.must_equal 1
+    @ds.select(:id).single_value!.must_equal 1
   end
   
   it "should have distinct work with limit" do

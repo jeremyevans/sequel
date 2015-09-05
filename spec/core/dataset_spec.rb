@@ -2728,6 +2728,23 @@ describe "Dataset#single_record" do
   end
 end
 
+describe "Dataset#single_record!" do
+  before do
+    @db = Sequel.mock
+  end
+  
+  it "should call each and return the first record" do
+    @db.fetch = [{:a=>1}, {:a=>2}]
+    @db[:test].single_record!.must_equal(:a=>1)
+    @db.sqls.must_equal ['SELECT * FROM test']
+  end
+  
+  it "should return nil if no record is present" do
+    @db[:test].single_record!.must_equal nil
+    @db.sqls.must_equal ['SELECT * FROM test']
+  end
+end
+
 describe "Dataset#single_value" do
   before do
     @db = Sequel.mock
@@ -2749,6 +2766,23 @@ describe "Dataset#single_value" do
     ds = @db[:test].columns(:a)
     ds.graph(ds, [:a], :table_alias=>:test2).single_value.must_equal 1
     @db.sqls.must_equal ['SELECT test.a, test2.a AS test2_a FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1']
+  end
+end
+
+describe "Dataset#single_value!" do
+  before do
+    @db = Sequel.mock
+  end
+  
+  it "should call each and return the first value of the first record" do
+    @db.fetch = [{:a=>1, :b=>2}, {:a=>3, :b=>4}]
+    @db[:test].single_value!.to_s.must_match /\A(1|2)\z/
+    @db.sqls.must_equal ['SELECT * FROM test']
+  end
+  
+  it "should return nil if no records" do
+    @db[:test].single_value!.must_equal nil
+    @db.sqls.must_equal ['SELECT * FROM test']
   end
 end
 

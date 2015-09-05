@@ -12,7 +12,7 @@ module Sequel
       << [] all avg count columns columns! delete each
       empty? fetch_rows first first! get import insert interval last
       map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map
-      single_record single_value sum to_hash to_hash_groups truncate update
+      single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
     METHS
 
     # Inserts the given argument into the database.  Returns self so it
@@ -637,21 +637,50 @@ module Sequel
       _select_map(column, true, &block)
     end
 
-    # Returns the first record in the dataset, or nil if the dataset
-    # has no records. Users should probably use +first+ instead of
-    # this method.
+    # Limits the dataset to one record, and returns the first record in the dataset,
+    # or nil if the dataset has no records. Users should probably use +first+ instead of
+    # this method. Example:
+    #
+    #   DB[:test].single_record # SELECT * FROM test LIMIT 1
+    #   # => {:column_name=>'value'}
     def single_record
-      clone(:limit=>1).each{|r| return r}
-      nil
+      clone(:limit=>1).single_record!
+    end
+
+    # Returns the first record in dataset, without limiting the dataset. Returns nil if
+    # the dataset has no records. Users should probably use +first+ instead of this method.
+    # This should only be used if you know the dataset is already limited to a single record.
+    # This method may be desirable to use for performance reasons, as it does not clone the
+    # receiver. Example:
+    #
+    #   DB[:test].single_record! # SELECT * FROM test
+    #   # => {:column_name=>'value'}
+    def single_record!
+      with_sql_first(select_sql)
     end
 
     # Returns the first value of the first record in the dataset.
     # Returns nil if dataset is empty.  Users should generally use
-    # +get+ instead of this method.
+    # +get+ instead of this method. Example:
+    #
+    #   DB[:test].single_value # SELECT * FROM test LIMIT 1
+    #   # => 'value'
     def single_value
       if r = ungraphed.naked.single_record
-        r.values.first
+        r.each{|_, v| return v}
       end
+    end
+
+    # Returns the first value of the first record in the dataset, without limiting the dataset.
+    # Returns nil if the dataset is empty. Users should generally use +get+ instead of this
+    # method.  Should not be used on graphed datasets or datasets that have row_procs that
+    # don't return hashes.  This method may be desirable to use for performance reasons, as
+    # it does not clone the receiver.
+    #
+    #   DB[:test].single_value! # SELECT * FROM test
+    #   # => 'value'
+    def single_value!
+      with_sql_single_value(select_sql)
     end
     
     # Returns the sum for the given column/expression.
@@ -818,7 +847,7 @@ module Sequel
     # only a single value.  See with_sql_each.
     def with_sql_single_value(sql)
       if r = with_sql_first(sql)
-        r.values.first
+        r.each{|_, v| return v}
       end
     end
 

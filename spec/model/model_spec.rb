@@ -474,7 +474,7 @@ describe Sequel::Model, ".finder" do
     @c.each_foo(3, 4){|r| a << r}
     a.must_equal [@o]
 
-    @c.get_foo(5, 6).must_equal [:id, 1]
+    @c.get_foo(5, 6).must_equal 1
 
     @db.sqls.must_equal ["SELECT * FROM items WHERE (bar = 1) ORDER BY 2", "SELECT * FROM items WHERE (bar = 3) ORDER BY 4", "SELECT * FROM items WHERE (bar = 5) ORDER BY 6 LIMIT 1"]
   end

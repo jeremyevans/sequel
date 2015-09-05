@@ -110,8 +110,12 @@ describe Sequel::Model, "class dataset methods"  do
     @c.set_graph_aliases(:a=>:b).opts[:graph_aliases].must_equal(:a=>[:b, :a])
     @c.single_record.must_equal @c.load(:id=>1)
     @db.sqls.must_equal ["SELECT * FROM items LIMIT 1"]
+    @c.single_record!.must_equal @c.load(:id=>1)
+    @db.sqls.must_equal ["SELECT * FROM items"]
     @c.single_value.must_equal 1
     @db.sqls.must_equal ["SELECT * FROM items LIMIT 1"]
+    @c.single_value!.must_equal 1
+    @db.sqls.must_equal ["SELECT * FROM items"]
     @c.sum(:id).must_equal 1
     @db.sqls.must_equal ["SELECT sum(id) AS sum FROM items LIMIT 1"]
     @c.to_hash(:id, :id).must_equal(1=>1)
