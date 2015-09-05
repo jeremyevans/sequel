@@ -1743,6 +1743,32 @@ module Sequel
 
       private
       
+      # Run code directly after the INSERT query, before after_create.
+      # This is only a temporary API, it should not be overridden by external code.
+      def _after_create(pk)
+        @this = nil
+        @new = false
+        @was_new = true
+      end
+
+      # Run code after around_save returns, before calling after_commit.
+      # This is only a temporary API, it should not be overridden by external code.
+      def _after_save(pk)
+        if @was_new
+          @was_new = nil
+          pk ? _save_refresh : changed_columns.clear
+        else
+          @columns_updated = nil
+        end
+        @modified = false
+      end
+
+      # Run code directly after the UPDATE query, before after_update.
+      # This is only a temporary API, it should not be overridden by external code.
+      def _after_update
+        @this = nil
+      end
+
       # Run code before any validation is done, but also run it before saving
       # even if validation is skipped.  This is a private hook.  It exists so that
       # plugins can set values automatically before validation (as the values
@@ -1860,7 +1886,6 @@ module Sequel
       def _save(opts)
         sh = {:server=>this_server}
         db.after_rollback(sh){after_rollback} if uacr = use_after_commit_rollback
-        was_new = false
         pk = nil
         called_save = false
         called_cu = false
@@ -1868,14 +1893,11 @@ module Sequel
           called_save = true
           raise_hook_failure(:before_save) if before_save == false
           if new?
-            was_new = true
             around_create do
               called_cu = true
               raise_hook_failure(:before_create) if before_create == false
               pk = _insert
-              @this = nil
-              @new = false
-              @was_new = true
+              _after_create(pk)
               after_create
               true
             end
@@ -1898,7 +1920,7 @@ module Sequel
                 changed_columns.reject!{|c| columns.include?(c)}
               end
               _update_columns(@columns_updated)
-              @this = nil
+              _after_update
               after_update
               true
             end
@@ -1908,17 +1930,11 @@ module Sequel
           true
         end
         raise_hook_failure(:around_save) unless called_save
-        if was_new
-          @was_new = nil
-          pk ? _save_refresh : changed_columns.clear
-        else
-          @columns_updated = nil
-        end
-        @modified = false
+        _after_save(pk)
         db.after_commit(sh){after_commit} if uacr
         self
       end
-
+      
       # Refresh the object after saving it, used to get
       # default values of all columns.  Separated from _save so it
       # can be overridden to avoid the refresh.

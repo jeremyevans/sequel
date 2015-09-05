@@ -1,5 +1,7 @@
 === HEAD
 
+* Add before_after_save plugin, for refreshing created objects and resetting modified flag before calling after_create/update/save hooks (jeremyevans)
+
 * Add Dataset#single_record! and #single_value! which don't require cloning the receiver (jeremyevans)
 
 * Dataset#with_sql_single_value now works correctly for model datasets (jeremyevans)
