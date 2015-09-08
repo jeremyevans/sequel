@@ -178,7 +178,7 @@ describe "Simple Dataset operations" do
   end
   
   it "should work correctly when returning from each without iterating over the whole result set" do
-    @ds.insert(:id=>2, :number=>20)
+    @ds.insert(:number=>20)
     @ds.order(:id).each{|v| break v}.must_equal(:id=>1, :number=>10)
     @ds.reverse(:id).each{|v| break v}.must_equal(:id=>2, :number=>20)
   end
