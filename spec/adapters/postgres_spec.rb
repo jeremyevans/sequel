@@ -20,6 +20,7 @@ end
 describe "PostgreSQL", '#create_table' do
   before do
     @db = DB
+    @db.test_connection
     DB.sqls.clear
   end
   after do
