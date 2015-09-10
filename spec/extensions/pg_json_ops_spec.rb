@@ -108,6 +108,11 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.array_elements_text].must_equal "jsonb_array_elements_text(j)"
   end
 
+  it "should have #strip_nulls use the json_strip_nulls function" do
+    @l[@j.strip_nulls].must_equal "json_strip_nulls(j)"
+    @l[@jb.strip_nulls].must_equal "jsonb_strip_nulls(j)"
+  end
+
   it "should have #typeof use the json_typeof function" do
     @l[@j.typeof].must_equal "json_typeof(j)"
     @l[@jb.typeof].must_equal "jsonb_typeof(j)"
@@ -171,6 +176,47 @@ describe "Sequel::Postgres::JSONOp" do
 
   it "#contained_by should handle arrays" do
     @l[@jb.contained_by([1, 2])].must_equal "(j <@ '[1,2]'::jsonb)"
+  end
+
+  it "#concat should use the || operator" do
+    @l[@jb.concat(:h1)].must_equal "(j || h1)"
+  end
+
+  it "#concat should handle hashes" do
+    @l[@jb.concat('a'=>'b')].must_equal "(j || '{\"a\":\"b\"}'::jsonb)"
+  end
+
+  it "#concat should handle arrays" do
+    @l[@jb.concat([1, 2])].must_equal "(j || '[1,2]'::jsonb)"
+  end
+
+  it "#set should use the jsonb_set function" do
+    @l[@jb.set(:a, :h)].must_equal "jsonb_set(j, a, h, true)"
+    @l[@jb.set(:a, :h, false)].must_equal "jsonb_set(j, a, h, false)"
+  end
+
+  it "#set should handle hashes" do
+    @l[@jb.set(:a, 'a'=>'b')].must_equal "jsonb_set(j, a, '{\"a\":\"b\"}'::jsonb, true)"
+  end
+
+  it "#set should handle arrays" do
+    @l[@jb.set(%w'a b', [1, 2])].must_equal "jsonb_set(j, ARRAY['a','b'], '[1,2]'::jsonb, true)"
+  end
+
+  it "#pretty should use the jsonb_pretty function" do
+    @l[@jb.pretty].must_equal "jsonb_pretty(j)"
+  end
+
+  it "#- should use the - operator" do
+    @l[@jb - 1].must_equal "(j - 1)"
+  end
+
+  it "#delete_path should use the #- operator" do
+    @l[@jb.delete_path(:a)].must_equal "(j #- a)"
+  end
+
+  it "#delete_path should handle arrays" do
+    @l[@jb.delete_path(['a'])].must_equal "(j #- ARRAY['a'])"
   end
 
   it "#has_key? and aliases should use the ? operator" do

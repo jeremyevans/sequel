@@ -2869,6 +2869,15 @@ describe 'PostgreSQL json type' do
         end
       end
 
+      if DB.server_version >= 90500  && json_type == :jsonb
+        @db.get(pg_json.call([nil, 2]).op.strip_nulls[1]).must_equal 2
+        @db.get(pg_json.call([nil, 2]).op.pretty).must_equal "[\n    null,\n    2\n]"
+        @db.from((jo - 'b').keys.as(:k)).select_order_map(:k).must_equal %w'a'
+        @db.from(jo.delete_path(['b','c'])['b'].keys.as(:k)).select_order_map(:k).must_equal %w'd'
+        @db.from(jo.concat('c'=>'d').keys.as(:k)).select_order_map(:k).must_equal %w'a b c'
+        @db.get(jo.set(%w'a', 'f'=>'g')['a']['f']).must_equal 'g'
+      end
+
       @db.from(jo.keys.as(:k)).select_order_map(:k).must_equal %w'a b'
       @db.from(jo.each).select_order_map(:key).must_equal %w'a b'
       @db.from(jo.each).order(:key).select_map(:value).must_equal [1, {'c'=>2, 'd'=>{'e'=>3}}]

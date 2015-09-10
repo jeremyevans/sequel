@@ -50,6 +50,7 @@
 #   j.each_text              # json_each_text(json_column)
 #   j.keys                   # json_object_keys(json_column)
 #   j.typeof                 # json_typeof(json_column)
+#   j.strip_nulls            # json_strip_nulls(json_column)
 #
 #   j.populate(:a)           # json_populate_record(:a, json_column)
 #   j.populate_set(:a)       # json_populate_recordset(:a, json_column)
@@ -58,11 +59,16 @@
 #
 # There are additional methods are are only supported on JSONBOp instances:
 #
-#   j.contain_all(:a)  # (jsonb_column ?& a)
-#   j.contain_any(:a)  # (jsonb_column ?| a)
-#   j.contains(:h)     # (jsonb_column @> h)
-#   j.contained_by(:h) # (jsonb_column <@ h)
-#   j.has_key?('a')    # (jsonb_column ? 'a')
+#   j - 1                  # (jsonb_column - 1)
+#   j.concat(:h)           # (jsonb_column || h)
+#   j.contain_all(:a)      # (jsonb_column ?& a)
+#   j.contain_any(:a)      # (jsonb_column ?| a)
+#   j.contains(:h)         # (jsonb_column @> h)
+#   j.contained_by(:h)     # (jsonb_column <@ h)
+#   j.delete_path(%w'0 a') # (jsonb_column #- ARRAY['0','a'])
+#   j.has_key?('a')        # (jsonb_column ? 'a')
+#   j.pretty               # jsonb_pretty(jsonb_column)
+#   j.set(%w'0 a', :h)     # jsonb_set(jsonb_column, ARRAY['0','a'], h, true)
 #
 # If you are also using the pg_json extension, you should load it before
 # loading this extension.  Doing so will allow you to use the #op method on
@@ -192,6 +198,13 @@ module Sequel
         SQL::Function.new(function_name(:populate_recordset), arg, self)
       end
 
+      # Returns a json value stripped of all internal null values.
+      #
+      #   json_op.strip_nulls # json_strip_nulls(json)
+      def strip_nulls
+        self.class.new(function(:strip_nulls))
+      end
+
       # Builds arbitrary record from json object.  You need to define the
       # structure of the record using #as on the resulting object:
       #
@@ -266,11 +279,29 @@ module Sequel
     #
     #   jsonb_op = Sequel.pg_jsonb(:jsonb)
     class JSONBOp < JSONBaseOp
+      CONCAT = ["(".freeze, " || ".freeze, ")".freeze].freeze
       CONTAIN_ALL = ["(".freeze, " ?& ".freeze, ")".freeze].freeze
       CONTAIN_ANY = ["(".freeze, " ?| ".freeze, ")".freeze].freeze
       CONTAINS = ["(".freeze, " @> ".freeze, ")".freeze].freeze
       CONTAINED_BY = ["(".freeze, " <@ ".freeze, ")".freeze].freeze
+      DELETE_PATH = ["(".freeze, " #- ".freeze, ")".freeze].freeze
       HAS_KEY = ["(".freeze, " ? ".freeze, ")".freeze].freeze
+
+      # jsonb expression for deletion of the given argument from the
+      # current jsonb.
+      #
+      #   jsonb_op - "a" # (jsonb - 'a')
+      def -(other)
+        self.class.new(super)
+      end
+
+      # jsonb expression for concatenation of the given jsonb into
+      # the current jsonb.
+      #
+      #   jsonb_op.concat(:h) # (jsonb || h)
+      def concat(other)
+        json_op(CONCAT, wrap_input_jsonb(other))
+      end
 
       # Check if the receiver contains all of the keys in the given array:
       #
@@ -300,6 +331,13 @@ module Sequel
         bool_op(CONTAINED_BY, wrap_input_jsonb(other))
       end
 
+      # Check if the other jsonb contains all entries in the receiver:
+      #
+      #   jsonb_op.delete_path(:h) # (jsonb #- h)
+      def delete_path(other)
+        json_op(DELETE_PATH, wrap_input_array(other))
+      end
+
       # Check if the receiver contains the given key:
       #
       #   jsonb_op.has_key?('a') # (jsonb ? 'a')
@@ -311,6 +349,21 @@ module Sequel
       # Return the receiver, since it is already a JSONBOp.
       def pg_jsonb
         self
+      end
+
+      # Returns a json value for the object at the given path.
+      #
+      #   jsonb_op.pretty # jsonb_pretty(jsonb)
+      def pretty
+        Sequel::SQL::StringExpression.new(:NOOP, function(:pretty))
+      end
+
+      # Returns a json value for the object at the given path.
+      #
+      #   jsonb_op.set(['a', 'b'], h) # jsonb_set(jsonb, ARRAY['a', 'b'], h, true)
+      #   jsonb_op.set(['a', 'b'], h, false) # jsonb_set(jsonb, ARRAY['a', 'b'], h, false)
+      def set(path, other, create_missing=true)
+        self.class.new(function(:set, wrap_input_array(path), wrap_input_jsonb(other), create_missing))
       end
 
       private
