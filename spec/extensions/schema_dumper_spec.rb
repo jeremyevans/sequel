@@ -36,6 +36,17 @@ describe "Sequel::Schema::Generator dump methods" do
     g.indexes.must_equal g2.indexes
   end
 
+  it "should respect :keep_order option to primary_key" do
+    g = @g.new(@d) do
+      Integer :a
+      primary_key :c, :keep_order=>true
+    end
+    g2 = @g.new(@d) do
+      instance_eval(g.dump_columns, __FILE__, __LINE__)
+    end
+    g.columns.must_equal g2.columns
+  end
+
   it "should allow dumping indexes as separate add_index and drop_index methods" do
     g = @g.new(@d) do
       index :a
@@ -73,6 +84,9 @@ describe "Sequel::Database dump methods" do
       when :t2
         [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>false}],
          [:c2, {:db_type=>'numeric', :primary_key=>true, :allow_null=>false}]]
+      when :t3
+        [[:c2, {:db_type=>'varchar(20)', :allow_null=>true}],
+         [:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true, :allow_null=>false}]]
       when :t5
         [[:c1, {:db_type=>'blahblah', :allow_null=>true}]]
       end
@@ -94,6 +108,10 @@ describe "Sequel::Database dump methods" do
   it "should dump non-Integer primary key columns with explicit :type" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true, :auto_increment=>true}]]}
     @d.dump_table_schema(:t6).must_equal "create_table(:t6) do\n  primary_key :c1, :type=>Bignum\nend"
+  end
+
+  it "should dump auto incrementing primary keys with :keep_order option if they are not first" do
+    @d.dump_table_schema(:t3).must_equal "create_table(:t3) do\n  String :c2, :size=>20\n  primary_key :c1, :keep_order=>true\nend"
   end
 
   it "should handle foreign keys" do

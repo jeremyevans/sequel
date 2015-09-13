@@ -166,6 +166,14 @@ END_MIG
         type_hash = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
         [:table, :key, :on_delete, :on_update, :deferrable].each{|f| type_hash[f] = schema[f] if schema[f]}
         if type_hash == {:type=>Integer} || type_hash == {:type=>"integer"}
+          type_hash.delete(:type)
+        end
+
+        unless gen.columns.empty?
+          type_hash[:keep_order] = true
+        end
+
+        if type_hash.empty?
           gen.primary_key(name)
         else
           gen.primary_key(name, type_hash)
@@ -378,7 +386,7 @@ END_MIG
           x.delete(:on_delete) if x[:on_delete] == :no_action
           x.delete(:on_update) if x[:on_update] == :no_action
         end
-        if pkn = primary_key_name
+        if (pkn = primary_key_name) && !@primary_key[:keep_order]
           cols.delete_if{|x| x[:name] == pkn}
           pk = @primary_key.dup
           pkname = pk.delete(:name)
@@ -391,6 +399,9 @@ END_MIG
           strings << if table = c.delete(:table)
             c.delete(:type) if c[:type] == Integer || c[:type] == 'integer'
             "foreign_key #{name.inspect}, #{table.inspect}#{opts_inspect(c)}"
+          elsif pkn == name
+            @db.serial_primary_key_options.each{|k,v| c.delete(k) if v == c[k]}
+            "primary_key #{name.inspect}#{opts_inspect(c)}"
           else
             type = c.delete(:type)
             opts = opts_inspect(c)
