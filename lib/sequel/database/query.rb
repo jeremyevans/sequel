@@ -161,7 +161,7 @@ module Sequel
 
       primary_keys = 0
       auto_increment_set = false
-      cols.all? do |_,c|
+      cols.each do |_,c|
         auto_increment_set = true if c.has_key?(:auto_increment)
         primary_keys += 1 if c[:primary_key]
       end

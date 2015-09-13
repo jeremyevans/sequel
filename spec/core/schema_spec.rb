@@ -1583,6 +1583,11 @@ describe "Schema Parser" do
     @db.schema(:x).last.last[:auto_increment].must_equal false
   end
 
+  it "should set :auto_increment to true by default if set and not the first column" do
+    meta_def(@db, :schema_parse_table){|*| [[:b, {}], [:a, {:primary_key=>true, :db_type=>'integer'}]]}
+    @db.schema(:x).last.last[:auto_increment].must_equal true
+  end
+
   it "should convert various types of table name arguments" do
     meta_def(@db, :schema_parse_table) do |t, opts|
       [[t, opts]]

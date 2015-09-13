@@ -1,5 +1,7 @@
 === HEAD
 
+* Set :auto_increment option correctly in the schema parser when the auto incrementing column is not the first column in the table (jeremyevans)
+
 * Support :keep_order option to primary_key in schema generator, to not automatically make the primary key the first column (jeremyevans)
 
 * Add new jsonb/json functions and operators supported in PostgreSQL 9.5+ (jeremyevans)
