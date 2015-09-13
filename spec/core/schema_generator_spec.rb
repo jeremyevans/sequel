@@ -30,6 +30,19 @@ describe Sequel::Schema::Generator do
     @columns[3][:primary_key].must_equal nil
   end
   
+  it "should respect existing column order if primary_key :keep_order is used" do
+    generator = Sequel::Schema::Generator.new(Sequel.mock) do
+      string :title
+      primary_key :id, :keep_order=>true
+    end
+
+    columns = generator.columns
+    columns.last[:name].must_equal :id
+    columns.last[:primary_key].must_equal true
+    columns.first[:name].must_equal :title
+    columns.first[:primary_key].must_equal nil
+  end
+  
   it "counts definitions correctly" do
     @columns.size.must_equal 6
     @indexes.size.must_equal 2

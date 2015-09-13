@@ -236,22 +236,35 @@ module Sequel
       #
       # If an array of column symbols is used, you can specify the :name option
       # to name the constraint.
+      #
+      # Options:
+      # :keep_order :: For non-composite primary keys, respects the existing order of
+      #                columns, overriding the default behavior of making the primary
+      #                key the first column.
       # 
       # Examples:
       #   primary_key(:id)
+      #   primary_key(:id, Bigint)
+      #   primary_key(:id, Bigint, :keep_order=>true)
       #   primary_key([:street_number, :house_number], :name=>:some constraint_name)
       def primary_key(name, *args)
         return composite_primary_key(name, *args) if name.is_a?(Array)
-        @primary_key = @db.serial_primary_key_options.merge({:name => name})
+        column = @db.serial_primary_key_options.merge({:name => name})
         
         if opts = args.pop
           opts = {:type => opts} unless opts.is_a?(Hash)
           if type = args.pop
-            opts.merge!(:type => type)
+            opts = opts.merge(:type => type)
           end
-          @primary_key.merge!(opts)
+          column.merge!(opts)
         end
-        @primary_key
+
+        @primary_key = column
+        if column[:keep_order]
+          columns << column
+        else
+          columns.unshift(column)
+        end
       end
 
       # The name of the primary key for this generator, if it has a primary key.

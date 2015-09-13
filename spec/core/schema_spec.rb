@@ -111,6 +111,18 @@ describe "DB#create_table" do
       primary_key :id, :type => :serial, :auto_increment => false
     end
     @db.sqls.must_equal ['CREATE TABLE cats (id serial PRIMARY KEY)']
+
+    @db.create_table(:cats) do
+      Integer :a
+      primary_key :id
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (id integer PRIMARY KEY AUTOINCREMENT, a integer)']
+
+    @db.create_table(:cats) do
+      Integer :a
+      primary_key :id, :keep_order=>true
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (a integer, id integer PRIMARY KEY AUTOINCREMENT)']
   end
 
   it "should allow naming primary key constraint with :primary_key_constraint_name option" do
