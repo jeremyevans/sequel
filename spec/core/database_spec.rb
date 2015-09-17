@@ -2067,6 +2067,14 @@ describe "Database#typecast_value" do
     end
   end
 
+  it "should strip out invalid characters before typecasting String values to BigDecimal" do
+    [10, '1,0', Sequel.blob('1,0')].each do |i|
+      v = @db.typecast_value(:decimal, i)
+      v.must_be_instance_of(BigDecimal)
+      v.must_equal 10.0
+    end
+  end
+
   it "should raise errors when typecasting hash and array values to String" do
     [[], {}].each do |i|
       proc{@db.typecast_value(:string, i)}.must_raise(Sequel::InvalidValue)
