@@ -72,6 +72,11 @@ describe "ActiveModel plugin" do
     @o.persisted?.must_equal false
   end
 
+  it "#persisted? should return false if the object is created and the transaction is rolled back" do
+    DB.transaction(:rollback=>:always){@m.save}
+    @m.persisted?.must_equal false
+  end
+
   it "#to_partial_path should return a path string" do
     @m.to_partial_path.must_equal 'am_lint_tests/am_lint_test'
     Blog::Post.new.to_partial_path.must_equal 'blog/posts/post'

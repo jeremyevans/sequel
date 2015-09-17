@@ -44,6 +44,13 @@ module Sequel
           @destroyed = true
         end
 
+        # Mark current instance as destroyed if the transaction in which this
+        # instance is created is rolled back.
+        def before_create
+          db.after_rollback{@destroyed = true}
+          super
+        end
+
         # Return ::ActiveModel::Name instance for the class.
         def model_name
           model.model_name
