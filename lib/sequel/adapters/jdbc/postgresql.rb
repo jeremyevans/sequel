@@ -135,7 +135,7 @@ module Sequel
         end
 
         def disconnect_error?(exception, opts)
-          super || exception.message =~ /\AThis connection has been closed\.\z|\AFATAL: terminating connection due to administrator command\z/
+          super || exception.message =~ /\A(This connection has been closed\.|FATAL: terminating connection due to administrator command|An I\/O error occurred while sending to the backend\.)\z/
         end
 
         # Use setNull for nil arguments as the default behavior of setString

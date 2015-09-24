@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize another disconnect error in the jdbc/postgresql adapter (jeremyevans)
+
 * In the active model plugin, make Model#persisted? return false if the transaction used for creation is rolled back (jeremyevans) (#1076)
 
 * Use primary_key :keep_order option in the schema dumper if the auto incrementing column is not the first column in the table (jeremyevans)
