@@ -185,6 +185,19 @@ When returning is used, instead of returning the number of rows affected (for up
 or the serial primary key value (for insert), it will return an array of hashes with the
 returned results.
 
+=== VALUES Support
+
+Sequel offers support for the +VALUES+ statement using <tt>Database#values</tt>:
+
+  DB.values([[1,2],[2,3],[3,4]])
+  # VALUES (1, 2), (2, 3), (3, 4)
+
+  DB.values([[1,2],[2,3],[3,4]]).order(2, 1)
+  # VALUES (1, 2), (2, 3), (3, 4) ORDER BY 2, 1
+
+  DB.values([[1,2],[2,3],[3,4]]).order(2, 1).limit(1,2)
+  # VALUES (1, 2), (2, 3), (3, 4) ORDER BY 2, 1 LIMIT 1 OFFSET 2
+
 === INSERT ON CONFLICT Support
 
 Starting with PostgreSQL 9.5, you can do an upsert or ignore unique or exclusion constraint
