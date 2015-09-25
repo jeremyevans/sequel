@@ -308,7 +308,7 @@ module Sequel
         ref_ds = base_ds.
           join(:pg_class___cl2, :oid=>:co__confrelid).
           join(:pg_attribute___att2, :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, :co__confkey)).
-          order(:co__conname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}, 32, :att2__attnum)).
+          order(:co__conname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:co__confkey, [x]), x]}, 32, :att2__attnum)).
           select(:co__conname___name, :cl2__relname___table, :att2__attname___refcolumn)
 
         # If a schema is given, we only search in that schema, and the returned :table

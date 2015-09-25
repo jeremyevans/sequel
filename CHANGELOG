@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix the order of referenced composite keys returned by Database#foreign_key_list on PostgreSQL (jeremyevans) (#1081)
+
 * Recognize another disconnect error in the jdbc/postgresql adapter (jeremyevans)
 
 * In the active model plugin, make Model#persisted? return false if the transaction used for creation is rolled back (jeremyevans) (#1076)

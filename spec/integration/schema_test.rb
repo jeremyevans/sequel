@@ -259,6 +259,12 @@ describe "Database foreign key parsing" do
     @db.create_table!(:b, :engine=>:InnoDB){Integer :e, :null=>false; Integer :f, :null=>false; Integer :g, :null=>false; foreign_key [:e, :f], :a; foreign_key [:g, :f], :a, :key=>[:d, :c]}
     @pr[:b, [[:e, :f], :a, [:pk, :b, :c]], [[:g, :f], :a, [:d, :c]]]
   end
+
+  it "should handle self-referential composite foreign and primary keys" do
+    @db.create_table!(:a, :engine=>:InnoDB){Integer :b, :null=>false; Integer :c, :null=>false; Integer :d, :null=>false; primary_key [:b, :c]; unique [:d, :b]}
+    @db.alter_table(:a){add_foreign_key [:b, :d], :a; add_foreign_key [:d, :c], :a; add_foreign_key [:c, :b], :a, :key=>[:d, :b]}
+    @pr[:a, [[:b, :d], :a, [:pk, :b, :c]], [[:c, :b], :a, [:d, :b]], [[:d, :c], :a, [:pk, :b, :c]]]
+  end
 end if DB.supports_foreign_key_parsing?
 
 describe "Database schema modifiers" do
