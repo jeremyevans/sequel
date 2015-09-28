@@ -1,5 +1,7 @@
 === HEAD
 
+* Make bin/sequel warn if given arguments that it doesn't use (jeremyevans)
+
 * Fix the order of referenced composite keys returned by Database#foreign_key_list on PostgreSQL (jeremyevans) (#1081)
 
 * Recognize another disconnect error in the jdbc/postgresql adapter (jeremyevans)

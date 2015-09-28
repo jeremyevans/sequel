@@ -116,6 +116,9 @@ error_proc = lambda do |msg|
   $stderr.puts(msg)
   exit 1
 end
+extra_proc = lambda do
+  $stderr.puts("Warning: last #{ARGV.length} arguments ignored") unless ARGV.empty?
+end
 
 error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
 error_proc["Error: Cannot specify #{exclusive_options.map{|v| "-#{v}"}.join(' and ')} together"] if exclusive_options.length > 1
@@ -151,16 +154,19 @@ begin
   DB = connect_proc[db]
   load_dirs.each{|d| d.is_a?(Array) ? require(d.first) : Dir["#{d}/**/*.rb"].each{|f| load(f)}}
   if migrate_dir
+    extra_proc.call
     Sequel.extension :migration, :core_extensions
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
     exit
   end
   if dump_migration
+    extra_proc.call
     DB.extension :schema_dumper
     puts DB.dump_schema_migration(:same_db=>dump_migration==:same_db)
     exit
   end
   if dump_schema
+    extra_proc.call
     DB.extension :schema_caching
     DB.tables.each{|t| DB.schema(Sequel::SQL::Identifier.new(t))}
     DB.dump_schema_cache(dump_schema)
@@ -172,6 +178,7 @@ begin
 
     db2 = ARGV.shift
     error_proc["Error: Must specify database connection string or path to yaml file as second argument for database you want to copy to"] if db2.nil? || db2.empty?
+    extra_proc.call
     start_time = Time.now
     TO_DB = connect_proc[db2]
     same_db = DB.database_type==TO_DB.database_type
@@ -225,6 +232,7 @@ begin
     exit
   end
   if code
+    extra_proc.call
     eval(code)
     exit
   end

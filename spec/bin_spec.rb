@@ -203,6 +203,10 @@ END
     bin(:args=>'-S foo -C', :stderr=>true).must_equal "Error: Cannot specify -S and -C together\n"
   end
 
+  it "should warn if providing too many arguments" do
+    bin(:args=>'-c "" "" 1 2 3 4', :stderr=>true).must_equal "Warning: last 5 arguments ignored\n"
+  end
+
   it "should use a mock database if no database is given" do
     bin(:args=>'-c "print DB.adapter_scheme"', :no_conn=>true).must_equal "mock"
   end
