@@ -293,24 +293,14 @@ module Sequel
     end
   end
 
-  if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'ruby'
-  # :nocov:
-    # Mutex used to protect mutable data structures
-    @data_mutex = Mutex.new
+  # Mutex used to protect mutable data structures
+  @data_mutex = Mutex.new
 
-    # Unless in single threaded mode, protects access to any mutable
-    # global data structure in Sequel.
-    # Uses a non-reentrant mutex, so calling code should be careful.
-    def self.synchronize(&block)
-      @single_threaded ? yield : @data_mutex.synchronize(&block)
-    end
-  # :nocov:
-  else
-    # Yield directly to the block.  You don't need to synchronize
-    # access on MRI because the GVL makes certain methods atomic.
-    def self.synchronize
-      yield
-    end
+  # Unless in single threaded mode, protects access to any mutable
+  # global data structure in Sequel.
+  # Uses a non-reentrant mutex, so calling code should be careful.
+  def self.synchronize(&block)
+    @single_threaded ? yield : @data_mutex.synchronize(&block)
   end
 
   # Uses a transaction on all given databases with the given options. This:
