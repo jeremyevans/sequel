@@ -388,7 +388,7 @@ module Sequel
 
   private_class_method :adapter_method, :def_adapter_method
 
-  require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version")
+  require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version synchronized_hash")
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)
