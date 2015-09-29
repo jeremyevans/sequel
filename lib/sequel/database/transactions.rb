@@ -159,10 +159,9 @@ module Sequel
       end
     end
 
-    # Synchronize access to the current transactions, returning the hash
-    # of options for the current transaction (if any)
+    # Returns the hash of options for the current transaction (if any)
     def _trans(conn)
-      Sequel.synchronize{@transactions[conn]}
+      @transactions[conn]
     end
 
     # Add the current thread to the list of active transactions

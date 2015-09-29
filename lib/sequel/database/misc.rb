@@ -125,7 +125,7 @@ module Sequel
       @schemas = {}
       @default_string_column_size = @opts[:default_string_column_size] || DEFAULT_STRING_COLUMN_SIZE
       @prepared_statements = {}
-      @transactions = {}
+      @transactions = SynchronizedHash.new
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil
