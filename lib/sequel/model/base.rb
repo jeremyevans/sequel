@@ -1867,7 +1867,7 @@ module Sequel
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
-        _refresh_set_values(_refresh_get(dataset) || raise(Error, "Record not found"))
+        _refresh_set_values(_refresh_get(dataset) || raise(NoExistingObject, "Record not found"))
         changed_columns.clear
       end
 
@@ -1939,7 +1939,7 @@ module Sequel
       # default values of all columns.  Separated from _save so it
       # can be overridden to avoid the refresh.
       def _save_refresh
-        _save_set_values(_refresh_get(this.server?(:default)) || raise(Error, "Record not found"))
+        _save_set_values(_refresh_get(this.server?(:default)) || raise(NoExistingObject, "Record not found"))
         changed_columns.clear
       end
 

@@ -67,6 +67,12 @@ describe "Model#save" do
     DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
   end
 
+  it "should raise if the object can't be refreshed after save" do
+    o = @c.new(:x => 1)
+    @c.instance_dataset._fetch =@c.dataset._fetch = []
+    proc{o.save}.must_raise(Sequel::NoExistingObject)
+  end
+
   it "should use dataset's insert_select method if present" do
     ds = @c.instance_dataset
     ds._fetch = {:y=>2}
@@ -1738,7 +1744,7 @@ describe Sequel::Model, "#refresh" do
   it "should raise if the instance is not found" do
     @m = @c.new(:id => 555)
     @c.instance_dataset._fetch =@c.dataset._fetch = []
-    proc {@m.refresh}.must_raise(Sequel::Error)
+    proc {@m.refresh}.must_raise(Sequel::NoExistingObject)
     DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
   
