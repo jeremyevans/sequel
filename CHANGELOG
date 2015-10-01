@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.27.0 (2015-10-01)
 
 * Don't stub Sequel.synchronize on MRI (YorickPeterse) (#1083)
 
