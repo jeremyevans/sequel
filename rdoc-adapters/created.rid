@@ -1,4 +1,4 @@
-Tue, 01 Sep 2015 08:40:59 -0700
+Thu, 01 Oct 2015 08:00:05 -0700
 lib/sequel/adapters/ado.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ado/access.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/adapters/ado/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -23,7 +23,7 @@ lib/sequel/adapters/jdbc/jtds.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/mssql.rb	Mon, 15 Jun 2015 10:43:10 -0700
 lib/sequel/adapters/jdbc/mysql.rb	Mon, 15 Jun 2015 10:43:10 -0700
 lib/sequel/adapters/jdbc/oracle.rb	Mon, 15 Jun 2015 10:43:10 -0700
-lib/sequel/adapters/jdbc/postgresql.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/adapters/jdbc/postgresql.rb	Thu, 24 Sep 2015 10:32:40 -0700
 lib/sequel/adapters/jdbc/sqlanywhere.rb	Mon, 15 Jun 2015 10:43:10 -0700
 lib/sequel/adapters/jdbc/sqlite.rb	Mon, 15 Jun 2015 10:43:10 -0700
 lib/sequel/adapters/jdbc/sqlserver.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -36,7 +36,7 @@ lib/sequel/adapters/odbc/db2.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/progress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/oracle.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/adapters/postgres.rb	Tue, 23 Jun 2015 15:01:25 -0700
+lib/sequel/adapters/postgres.rb	Wed, 02 Sep 2015 08:24:36 -0700
 lib/sequel/adapters/postgresql.rb	Mon, 04 May 2015 09:15:48 -0700
 lib/sequel/adapters/shared/access.rb	Wed, 26 Aug 2015 08:46:11 -0700
 lib/sequel/adapters/shared/cubrid.rb	Wed, 26 Aug 2015 08:46:11 -0700
@@ -47,7 +47,7 @@ lib/sequel/adapters/shared/mssql.rb	Thu, 20 Aug 2015 09:12:37 -0700
 lib/sequel/adapters/shared/mysql.rb	Wed, 26 Aug 2015 08:46:11 -0700
 lib/sequel/adapters/shared/mysql_prepared_statements.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/adapters/shared/oracle.rb	Thu, 20 Aug 2015 09:12:37 -0700
-lib/sequel/adapters/shared/postgres.rb	Wed, 26 Aug 2015 08:46:11 -0700
+lib/sequel/adapters/shared/postgres.rb	Fri, 25 Sep 2015 09:11:48 -0700
 lib/sequel/adapters/shared/progress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/sqlanywhere.rb	Thu, 20 Aug 2015 09:12:37 -0700
 lib/sequel/adapters/shared/sqlite.rb	Sun, 26 Jul 2015 12:20:17 -0700

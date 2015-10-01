@@ -1,4 +1,4 @@
-Tue, 01 Sep 2015 08:41:13 -0700
+Thu, 01 Oct 2015 08:00:20 -0700
 lib/sequel/extensions/_pretty_table.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -35,7 +35,7 @@ lib/sequel/extensions/pg_inet.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_inet_ops.rb	Wed, 01 Jul 2015 08:05:45 -0700
 lib/sequel/extensions/pg_interval.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_json.rb	Tue, 17 Mar 2015 08:10:34 -0700
-lib/sequel/extensions/pg_json_ops.rb	Tue, 14 Jul 2015 16:01:53 -0700
+lib/sequel/extensions/pg_json_ops.rb	Thu, 10 Sep 2015 07:57:19 -0700
 lib/sequel/extensions/pg_loose_count.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_range.rb	Fri, 14 Aug 2015 12:00:10 -0700
 lib/sequel/extensions/pg_range_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -48,7 +48,7 @@ lib/sequel/extensions/query_literals.rb	Thu, 23 Jul 2015 07:47:01 -0700
 lib/sequel/extensions/round_timestamps.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/ruby18_symbol_extensions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/schema_caching.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/schema_dumper.rb	Wed, 01 Apr 2015 14:26:05 -0700
+lib/sequel/extensions/schema_dumper.rb	Sun, 13 Sep 2015 10:17:00 -0700
 lib/sequel/extensions/select_remove.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/sequel_3_dataset_methods.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/server_block.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -59,13 +59,14 @@ lib/sequel/extensions/string_date_time.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/thread_local_timezones.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/to_dot.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/accessed_columns.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/plugins/active_model.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/plugins/active_model.rb	Thu, 17 Sep 2015 10:09:07 -0700
 lib/sequel/plugins/after_initialize.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/association_autoreloading.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/association_dependencies.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/association_pks.rb	Fri, 07 Aug 2015 10:49:26 -0700
 lib/sequel/plugins/association_proxies.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/auto_validations.rb	Tue, 23 Jun 2015 15:01:25 -0700
+lib/sequel/plugins/before_after_save.rb	Fri, 04 Sep 2015 22:12:17 -0700
 lib/sequel/plugins/blacklist_security.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/boolean_readers.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/plugins/caching.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -76,7 +77,7 @@ lib/sequel/plugins/composition.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/plugins/constraint_validations.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/plugins/csv_serializer.rb	Tue, 12 May 2015 13:51:08 -0700
 lib/sequel/plugins/dataset_associations.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/defaults_setter.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/plugins/defaults_setter.rb	Wed, 02 Sep 2015 15:35:37 -0700
 lib/sequel/plugins/delay_add_association.rb	Tue, 12 May 2015 15:56:27 -0700
 lib/sequel/plugins/dirty.rb	Tue, 14 Jul 2015 09:39:33 -0700
 lib/sequel/plugins/eager_each.rb	Thu, 20 Nov 2014 12:20:00 -0800

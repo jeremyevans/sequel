@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-07-30 14:00:00 -0700</span>
+          <span class='datetime'>2015-09-23 17:04:24 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -200,6 +200,13 @@
             <p>When returning is used, instead of returning the number of rows affected
             (for updated/delete) or the serial primary key value (for insert), it will
             return an array of hashes with the returned results.</p>
+            
+            <h3 id="label-VALUES+Support">VALUES Support<span><a href="#label-VALUES+Support">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> offers support for the
+            <code>VALUES</code> statement using <code>Database#values</code>:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>],[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>],[<span class="ruby-value">3</span>,<span class="ruby-value">4</span>]])&#x000A;<span class="ruby-comment"># VALUES (1, 2), (2, 3), (3, 4)</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>],[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>],[<span class="ruby-value">3</span>,<span class="ruby-value">4</span>]]).<span class="ruby-identifier">order</span>(<span class="ruby-value">2</span>, <span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># VALUES (1, 2), (2, 3), (3, 4) ORDER BY 2, 1</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">values</span>([[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>],[<span class="ruby-value">2</span>,<span class="ruby-value">3</span>],[<span class="ruby-value">3</span>,<span class="ruby-value">4</span>]]).<span class="ruby-identifier">order</span>(<span class="ruby-value">2</span>, <span class="ruby-value">1</span>).<span class="ruby-identifier">limit</span>(<span class="ruby-value">1</span>,<span class="ruby-value">2</span>)&#x000A;<span class="ruby-comment"># VALUES (1, 2), (2, 3), (3, 4) ORDER BY 2, 1 LIMIT 1 OFFSET 2</span></pre>
             
             <h3 id="label-INSERT+ON+CONFLICT+Support">INSERT ON CONFLICT Support<span><a href="#label-INSERT+ON+CONFLICT+Support">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

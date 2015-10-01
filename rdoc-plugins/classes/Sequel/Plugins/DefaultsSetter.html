@@ -39,10 +39,11 @@
         <div id='text'>
           <div id='description'>
             
-            <p><a href="DefaultsSetter.html">DefaultsSetter</a> is a simple plugin that
-            sets non-nil/NULL default values upon initialize:</p>
+            <p>The defaults_setter plugin makes the column getter methods return the
+            default values for new objects, if the values have not already been set. 
+            Example:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># column a default NULL</span>&#x000A;<span class="ruby-comment"># column b default 2</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:b =&gt; 2}</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>).<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:a =&gt; 1, :b =&gt; 3}</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># column a default NULL</span>&#x000A;<span class="ruby-comment"># column b default 2</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; nil</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">b</span> <span class="ruby-comment"># =&gt; 2</span>&#x000A;<span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>, :<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">3</span>)&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">a</span> <span class="ruby-comment"># =&gt; 1</span>&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">b</span> <span class="ruby-comment"># =&gt; 3</span></pre>
             
             <p>Usage:</p>
             
@@ -81,7 +82,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:set_default_values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:set_default_values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

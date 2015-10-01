@@ -31,12 +31,57 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-09-01 08:04:35 -0700</span>
+          <span class='datetime'>2015-10-01 07:50:30 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.27.0+-282015-10-01-29">4.27.0 (2015-10-01)<span><a href="#label-4.27.0+-282015-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Don&#39;t stub <a
+            href="../classes/Sequel.html#method-c-synchronize">Sequel.synchronize</a>
+            on MRI (YorickPeterse) (#1083)</p>
+            </li><li>
+            <p>Make bin/sequel warn if given arguments that it doesn&#39;t use
+            (jeremyevans)</p>
+            </li><li>
+            <p>Fix the order of referenced composite keys returned by
+            Database#foreign_key_list on PostgreSQL (jeremyevans) (#1081)</p>
+            </li><li>
+            <p>Recognize another disconnect error in the jdbc/postgresql adapter
+            (jeremyevans)</p>
+            </li><li>
+            <p>In the active model plugin, make Model#persisted? return false if the
+            transaction used for creation is rolled back (jeremyevans) (#1076)</p>
+            </li><li>
+            <p>Use primary_key :keep_order option in the schema dumper if the auto
+            incrementing column is not the first column in the table (jeremyevans)</p>
+            </li><li>
+            <p>Set :auto_increment option correctly in the schema parser when the auto
+            incrementing column is not the first column in the table (jeremyevans)</p>
+            </li><li>
+            <p>Support :keep_order option to primary_key in schema generator, to not
+            automatically make the primary key the first column (jeremyevans)</p>
+            </li><li>
+            <p>Add new jsonb/json functions and operators supported in PostgreSQL 9.5+
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add before_after_save plugin, for refreshing created objects and resetting
+            modified flag before calling after_create/update/save hooks (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#single_record! and single_value! which don&#39;t require
+            cloning the receiver (jeremyevans)</p>
+            </li><li>
+            <p>Dataset#with_sql_single_value now works correctly for model datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Optimize Dataset#single_value and with_sql_single_value to not create an
+            unnecessary array (jeremyevans)</p>
+            </li><li>
+            <p>Make postgres adapter work with postgres-pr 0.7.0 (jeremyevans) (#1074)</p>
+            </li></ul>
             
             <h3 id="label-4.26.0+-282015-09-01-29">4.26.0 (2015-09-01)<span><a href="#label-4.26.0+-282015-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

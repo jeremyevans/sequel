@@ -43,6 +43,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#method-i-after_destroy">after_destroy</a></li>
+              <li><a target="docwin" href="#method-i-before_create">before_create</a></li>
               <li><a target="docwin" href="#method-i-model_name">model_name</a></li>
               <li><a target="docwin" href="#method-i-persisted-3F">persisted?</a></li>
               <li><a target="docwin" href="#method-i-to_key">to_key</a></li>
@@ -90,6 +91,24 @@
                   <pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@destroyed</span> = <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-before_create'>
+                <a name='method-i-before_create'></a>
+                <div class='synopsis'>
+                  <span class='name'>before_create</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Mark current instance as destroyed if the transaction in which this
+                  instance is created is rolled back.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_create-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-before_create-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_create</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">after_rollback</span>{<span class="ruby-ivar">@destroyed</span> = <span class="ruby-keyword">true</span>}&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-model_name'>
                 <a name='method-i-model_name'></a>
                 <div class='synopsis'>
@@ -104,7 +123,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-model_name-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-model_name-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">model_name</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">model_name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-model_name-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 55</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">model_name</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">model_name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-persisted-3F'>
@@ -121,7 +140,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-persisted-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-persisted-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">persisted?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@destroyed</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-persisted-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">persisted?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-ivar">@destroyed</span> <span class="ruby-operator">!=</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_key'>
@@ -138,7 +157,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_key-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_key</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">primary_key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    [<span class="ruby-identifier">pk</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">pk</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_key-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 65</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_key</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">primary_key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    [<span class="ruby-identifier">pk</span>] <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">pk</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_model'>
@@ -157,7 +176,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_model-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_model-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_model</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_model-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_model</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_param'>
@@ -175,7 +194,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_param-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_param-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_param</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">persisted?</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">k</span> = <span class="ruby-identifier">to_key</span>&#x000A;    <span class="ruby-identifier">k</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">to_param_joiner</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_param-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_param</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">persisted?</span> <span class="ruby-keyword">and</span> <span class="ruby-identifier">k</span> = <span class="ruby-identifier">to_key</span>&#x000A;    <span class="ruby-identifier">k</span>.<span class="ruby-identifier">join</span>(<span class="ruby-identifier">to_param_joiner</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_partial_path'>
@@ -192,7 +211,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_partial_path-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_partial_path-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_partial_path</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">_to_partial_path</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_partial_path-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_partial_path</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">_to_partial_path</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

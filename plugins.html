@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.26.0</h2>
+    <h2>Sequel::Model Plugins for v4.27.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -96,6 +96,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatementsWithPk.html">prepared_statements_with_pk</a>: Makes model datasets's #with_pk method use prepared statements.</li>
 </ul></li>
 <li>Saving:<ul>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/BeforeAfterSave.html">before_after_save</a>: Refreshes created objects and resets modified flag before calling after_create/update/save hooks.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters</a>: Allows you to add per instance filters that are used when updating or destroying the instance.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/MssqlOptimisticLocking.html">mssql_optimistic_locking</a>: Uses a timestamp/rowversion column on Microsoft SQL Server to prevent concurrent updates overwriting changes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
@@ -256,6 +257,7 @@
 <li><a href='http://github.com/pk/merb_sequel'>merb_sequel</a>: Merb plugin that provides support for Sequel models.</li>
 <li><a href='http://github.com/pusewicz/rails_sequel/'>rails_sequel</a>: Rails 2 plugin that allows you to use Sequel instead of ActiveRecord.</li>
 <li><a href='http://github.com/openhood/rspec_sequel_matchers'>rspec_sequel_matchers</a>: RSpec matchers for Sequel validations, associations, and columns.</li>
+<li><a href='https://github.com/jeremyevans/sequel-annotate'>sequel-annotate</a>: Generates model annotations for Sequel models, including constraint and trigger information on PostgreSQL.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
 <li><a href='https://github.com/nickgartmann/sequel-location'>sequel-location</a>: Easy setup and syntax for doing geolocation search on PostgreSQL.</li>
 <li><a href='http://github.com/jeremyevans/sequel_pg'>sequel_pg</a>: Faster SELECTs when using Sequel with pg.</li>
