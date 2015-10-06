@@ -1,5 +1,7 @@
 === HEAD
 
+* Make to_csv for model datasets call instance methods, just like Model#to_csv, in the csv_serializer plugin (skrobul) (#1088)
+
 * Raise Sequel::NoExistingObject instead of generic error if Model#refresh can't find the related row (jeremyevans)
 
 === 4.27.0 (2015-10-01)
