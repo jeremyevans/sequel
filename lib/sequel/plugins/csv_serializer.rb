@@ -163,7 +163,7 @@ module Sequel
 
           CSV.generate(opts) do |csv|
             items.each do |object|
-              csv << opts[:headers].map{|header| object[header]}
+              csv << opts[:headers].map{|header| object.send(header) }
             end
           end
         end
