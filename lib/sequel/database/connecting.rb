@@ -28,9 +28,9 @@ module Sequel
 
     # Returns the scheme symbol for the Database class.
     def self.adapter_scheme
-      @scheme
+      @scheme ||= nil
     end
-    
+
     # Connects to a database.  See Sequel.connect.
     def self.connect(conn_string, opts = OPTS)
       case conn_string
@@ -75,7 +75,7 @@ module Sequel
       end
       db
     end
-    
+
     # Load the adapter from the file system.  Raises Sequel::AdapterNotFound
     # if the adapter cannot be loaded, or if the adapter isn't registered
     # correctly after being loaded. Options:
@@ -89,18 +89,18 @@ module Sequel
       else
         file = scheme
       end
-      
+
       unless obj = Sequel.synchronize{map[scheme]}
         # attempt to load the adapter file
         begin
           require "sequel/adapters/#{file}"
         rescue LoadError => e
-          # If subadapter file doesn't exist, just return, 
+          # If subadapter file doesn't exist, just return,
           # using the main adapter class without database customizations.
           return if subdir
           raise Sequel.convert_exception_class(e, AdapterNotFound)
         end
-        
+
         # make sure we actually loaded the adapter
         unless obj = Sequel.synchronize{map[scheme]}
           raise AdapterNotFound, "Could not load #{file} adapter: adapter class not registered in ADAPTER_MAP"
@@ -127,7 +127,7 @@ module Sequel
       Sequel.synchronize{ADAPTER_MAP[scheme] = self}
     end
     private_class_method :set_adapter_scheme
-    
+
     # The connection pool for this Database instance.  All Database instances have
     # their own connection pools.
     attr_reader :pool
@@ -170,7 +170,7 @@ module Sequel
     def database_type
       adapter_scheme
     end
-    
+
     # Disconnects all available connections from the connection pool.  Any
     # connections currently in use will not be disconnected. Options:
     # :servers :: Should be a symbol specifing the server to disconnect from,
@@ -218,7 +218,7 @@ module Sequel
         @pool.remove_servers(servers)
       end
     end
-    
+
     # An array of servers/shards for this Database object.
     #
     #   DB.servers # Unsharded: => [:default]
@@ -231,7 +231,7 @@ module Sequel
     def single_threaded?
       @single_threaded
     end
-    
+
     if !defined?(RUBY_ENGINE) || RUBY_ENGINE == 'ruby'
       # Acquires a database connection, yielding it to the passed block. This is
       # useful if you want to make sure the same connection is used for all
@@ -255,7 +255,7 @@ module Sequel
       end
     # :nocov:
     end
-    
+
     # Attempts to acquire a database connection.  Returns true if successful.
     # Will probably raise an Error if unsuccessful.  If a server argument
     # is given, attempts to acquire a database connection to the given
@@ -281,12 +281,12 @@ module Sequel
     end
 
     private
-    
+
     # The default options for the connection pool.
     def connection_pool_default_options
       {}
     end
-    
+
     # Return the options for the given server by merging the generic
     # options for all server with the specific options for the given
     # server specified in the :servers option.
