@@ -18,7 +18,11 @@ require 'minitest/shared_description'
 
 class Minitest::HooksSpec
   def meta_def(obj, name, &block)
-    (class << obj; self end).send(:define_method, name, &block)
+    singleton_class = (class << obj; self end)
+    if singleton_class.method_defined?(name)
+      singleton_class.send(:undef_method, name)
+    end
+    singleton_class.send(:define_method, name, &block)
   end
 end
 
