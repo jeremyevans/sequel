@@ -1,5 +1,7 @@
 === HEAD
 
+* Add subset_conditions plugin, which adds a method for each subset returning the filter conditions for the subset (jeremyevans)
+
 * Make the list plugin work better with the auto_validations plugin when there is a validation on the position column (jeremyevans)
 
 * Make to_csv for model datasets call instance methods, just like Model#to_csv, in the csv_serializer plugin (skrobul) (#1088)
