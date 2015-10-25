@@ -87,15 +87,6 @@ module Sequel
           list_dataset.first(position_field => p)
         end
 
-        # Set the value of the position_field to the maximum value plus 1 unless the
-        # position field already has a value.
-        def before_create
-          unless get_column_value(position_field)
-            set_column_value("#{position_field}=", list_dataset.max(position_field).to_i+1)
-          end
-          super
-        end
-
         # When destroying an instance, move all entries after the instance down
         # one position, so that there aren't any gaps
         def after_destroy
@@ -178,6 +169,15 @@ module Sequel
         end
 
         private
+
+        # Set the value of the position_field to the maximum value plus 1 unless the
+        # position field already has a value.
+        def _before_validation
+          unless get_column_value(position_field)
+            set_column_value("#{position_field}=", list_dataset.max(position_field).to_i+1)
+          end
+          super
+        end
 
         # The model's position field, an instance method for ease of use.
         def position_field

@@ -264,4 +264,15 @@ describe "List plugin" do
     @o.prev(-1).must_equal @c.load(:id=>9, :position=>4)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 4) ORDER BY position LIMIT 1"]
   end
+
+  it "should work correctly with validation on position" do
+    @c.class_eval do
+      def validate
+        super
+        errors.add(:position, "not set") unless position
+      end
+    end
+    @c.create
+    @db.sqls.must_equal ["SELECT max(position) AS max FROM items LIMIT 1", "INSERT INTO items (position) VALUES (2)", "SELECT * FROM items WHERE (id = 10) ORDER BY position LIMIT 1"]
+  end
 end
