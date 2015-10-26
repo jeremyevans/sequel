@@ -1,6 +1,6 @@
 = Model Validations
 
-This guide is based on http://guides.rubyonrails.org/activerecord_validations_callbacks.html
+This guide is based on http://guides.rubyonrails.org/active_record_validations.html
 
 == Overview
 
