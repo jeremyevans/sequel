@@ -80,6 +80,11 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SerializationModificationDetection.html">serialization_modification_detection</a>: Allows you to detect changes to serialized columns.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/XmlSerializer.html">xml_serializer</a>: Allows you to serialize/deserialize model objects to/from XML.</li>
 </ul></li>
+<li>Subsets:<ul>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/BooleanSubsets.html">boolean_subsets</a>: Automatically creates a subset method for each boolean column.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/InvertedSubsets.html">inverted_subsets</a>: Creates an additional method for each subset, that inverts the subset's conditions.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/SubsetConditions.html">subset_conditions</a>: Creates an additional method for each subset, returning the filter conditions used for the subset.</li>
+</ul></li>
 <li>Validations:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations</a>: Automatically add presence, not_string, and unique validations.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations</a>: Setup automatic validations for constraints added via the <a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>.</li>
@@ -90,14 +95,12 @@
 <li>Other:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ActiveModel.html">active_model</a>: Makes Sequel::Model objects compliant to the ActiveModel::Lint specs, so they should work correctly in Rails 3+.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/List.html">list</a>: Allows you to treat model objects as being part of a list, so you can move them up/down and get next/previous entries.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/InvertedSubsets.html">inverted_subsets</a>: Creates an additional method for each subset, that inverts the subset's conditions.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/PgRow.html">pg_row</a>: Allows Sequel::Model classes to implement PostgreSQL row-valued/composite types.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/PgTypecastOnLoad.html'>pg_typecast_on_load</a>: Handles typecasting of PostgreSQL array/hstore/composite types when loading model objects via jdbc, do, or swift adapters.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Schema.html">schema</a>: Adds backwards compatibility for Model.set_schema and Model.create_table.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Scissors.html">scissors</a>: Adds class methods for delete, destroy, and update.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SingularTableNames.html">singular_table_names</a>: Makes Sequel default to not pluralizing table names.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Subclasses.html">subclasses</a>: Allows easy access all model subclasses and descendent classes, without using ObjectSpace.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/SubsetConditions.html">subset_conditions</a>: Creates an additional method for each subset, returning the filter conditions used for the subset.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
 </ul></li>
 </ul>
