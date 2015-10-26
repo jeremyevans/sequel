@@ -6,8 +6,10 @@ Sequel uses autocommit mode by default for all of its database adapters, so in g
 * Model#save
 * Model#destroy
 * Migrations if the database supports transactional schema
-* Postgres cursor usage
-* A few model plugins
+* Database#use_cursor in the postgres adapter
+* Dataset#lock on PostgreSQL if given a block
+* setter methods created by the association_pks plugin
+* move* methods in the list plugin
 
 Everywhere else, it is up to you to use a database transaction if you want to.
 
