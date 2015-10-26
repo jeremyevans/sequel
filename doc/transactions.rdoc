@@ -6,6 +6,7 @@ Sequel uses autocommit mode by default for all of its database adapters, so in g
 * Model#save
 * Model#destroy
 * Migrations if the database supports transactional schema
+* Postgres cursor usage
 * A few model plugins
 
 Everywhere else, it is up to you to use a database transaction if you want to.

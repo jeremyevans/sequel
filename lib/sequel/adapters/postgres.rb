@@ -674,9 +674,11 @@ module Sequel
       end
 
       # Uses a cursor for fetching records, instead of fetching the entire result
-      # set at once.  Can be used to process large datasets without holding
-      # all rows in memory (which is what the underlying drivers may do
-      # by default). Options:
+      # set at once.  Note this uses a transaction around the cursor usage by
+      # default and can be changed using `hold: true` as described below.
+      # Cursors can be used to process large datasets without holding all rows
+      # in memory (which is what the underlying drivers may do by default).
+      # Options:
       #
       # :cursor_name :: The name assigned to the cursor (default 'sequel_cursor').
       #                 Nested cursors require different names.
