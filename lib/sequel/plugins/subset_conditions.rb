@@ -20,7 +20,7 @@ module Sequel
     #   # SELECT * FROM albums WHERE (published IS NOT TRUE)
     #
     #   Album.where(Sequel.|(Album.published_conditions, :ready=>true)).sql
-    #   # SELECT * FROM albums WHERE ((published IS NOT TRUE) OR (ready IS TRUE))
+    #   # SELECT * FROM albums WHERE ((published IS TRUE) OR (ready IS TRUE))
     module SubsetConditions
       module ClassMethods
         # Also create a method that returns the conditions the filter uses.
