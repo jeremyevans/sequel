@@ -213,7 +213,7 @@ module Sequel
             props = java.util.Properties.new
             if opts && opts[:user] && opts[:password]
               props.setProperty("user", opts[:user])
-              props.setProperty("password", opts[:password])
+              props.setProperty("password", opts[:password].value)
             end
             opts[:jdbc_properties].each{|k,v| props.setProperty(k.to_s, v)} if opts[:jdbc_properties]
             begin
