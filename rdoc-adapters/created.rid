@@ -1,4 +1,4 @@
-Thu, 01 Oct 2015 08:00:05 -0700
+Mon, 02 Nov 2015 11:10:27 -0800
 lib/sequel/adapters/ado.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ado/access.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/adapters/ado/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -36,7 +36,7 @@ lib/sequel/adapters/odbc/db2.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/odbc/progress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/oracle.rb	Tue, 28 Apr 2015 15:29:46 -0700
-lib/sequel/adapters/postgres.rb	Wed, 02 Sep 2015 08:24:36 -0700
+lib/sequel/adapters/postgres.rb	Mon, 26 Oct 2015 15:36:51 -0700
 lib/sequel/adapters/postgresql.rb	Mon, 04 May 2015 09:15:48 -0700
 lib/sequel/adapters/shared/access.rb	Wed, 26 Aug 2015 08:46:11 -0700
 lib/sequel/adapters/shared/cubrid.rb	Wed, 26 Aug 2015 08:46:11 -0700

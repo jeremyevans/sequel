@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.28.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.28.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.28.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2015-11-02 10:22:13 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>A subset_conditions plugin has been added, which adds a method for each
+            subset that returns the filter conditions for the subset.  This makes it
+            easier to reuse the subset conditions:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Foo</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">subset_conditions</span>&#x000A;  <span class="ruby-identifier">subset</span> :<span class="ruby-identifier">active</span>, :<span class="ruby-identifier">active=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">exclude</span>(<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active_conditions</span>)&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">or</span>(<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active_conditions</span>)</pre>
+            </li><li>
+            <p>A boolean_subsets plugin has been added, which adds a subset for each
+            boolean column:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># Assume boolean column :active</span>&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">boolean_subsets</span>&#x000A;&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">active</span>&#x000A;<span class="ruby-comment"># SELECT * FROM foos WHERE (active IS TRUE)</span></pre>
+            
+            <p>You can provide a block to the plugin to change the arguments passed to
+            subset:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Foo</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">boolean_subsets</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">column</span><span class="ruby-operator">|</span>&#x000A;  [:<span class="ruby-node">&quot;where_#{column}&quot;</span>, <span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Foo</span>.<span class="ruby-identifier">where_active</span>&#x000A;<span class="ruby-comment"># SELECT * FROM foos WHERE active</span></pre>
+            
+            <p>As with similar plugins, you can add the boolean_subsets plugin to <a
+            href="../../../classes/Sequel/Model.html">Sequel::Model</a> itself, and all
+            subclasses created afterward will have the boolean subset methods
+            automatically created.</p>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>If Model#refresh can&#39;t find the related row, <a
+            href="../../../classes/Sequel.html">Sequel</a> now raises a
+            Sequel::NoExistingObject exception instead of a generic <a
+            href="../../../classes/Sequel/Error.html">Sequel::Error</a> exception.</p>
+            </li><li>
+            <p>In the csv_serializer plugin, when calling to_csv on a model class or
+            dataset, instead of using [] to access data, send is used to call methods. 
+            This is more similar to other plugins as well as Model#to_csv.</p>
+            </li><li>
+            <p>The list plugin now works better with the auto_validations plugin, or any
+            other time there is a validation on the position column.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>The change to the csv_serializer plugin can change results if you are
+            overriding any of the column accessor methods.  It can also break existing
+            code if one of the columns being used isn&#39;t defined as a method or the
+            method requires more than one argument.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

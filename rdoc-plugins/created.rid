@@ -1,4 +1,4 @@
-Thu, 01 Oct 2015 08:00:20 -0700
+Mon, 02 Nov 2015 11:10:43 -0800
 lib/sequel/extensions/_pretty_table.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -69,13 +69,14 @@ lib/sequel/plugins/auto_validations.rb	Tue, 23 Jun 2015 15:01:25 -0700
 lib/sequel/plugins/before_after_save.rb	Fri, 04 Sep 2015 22:12:17 -0700
 lib/sequel/plugins/blacklist_security.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/boolean_readers.rb	Wed, 01 Apr 2015 14:26:05 -0700
+lib/sequel/plugins/boolean_subsets.rb	Mon, 26 Oct 2015 09:37:02 -0700
 lib/sequel/plugins/caching.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/class_table_inheritance.rb	Mon, 29 Jun 2015 11:23:39 -0700
 lib/sequel/plugins/column_conflicts.rb	Wed, 07 Jan 2015 13:10:26 -0800
 lib/sequel/plugins/column_select.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/composition.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/plugins/constraint_validations.rb	Wed, 01 Apr 2015 14:26:05 -0700
-lib/sequel/plugins/csv_serializer.rb	Tue, 12 May 2015 13:51:08 -0700
+lib/sequel/plugins/csv_serializer.rb	Tue, 06 Oct 2015 12:18:31 -0700
 lib/sequel/plugins/dataset_associations.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/defaults_setter.rb	Wed, 02 Sep 2015 15:35:37 -0700
 lib/sequel/plugins/delay_add_association.rb	Tue, 12 May 2015 15:56:27 -0700
@@ -91,7 +92,7 @@ lib/sequel/plugins/instance_hooks.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/plugins/inverted_subsets.rb	Fri, 17 Jul 2015 16:51:50 -0700
 lib/sequel/plugins/json_serializer.rb	Thu, 12 Mar 2015 08:21:51 -0700
 lib/sequel/plugins/lazy_attributes.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/plugins/list.rb	Mon, 04 May 2015 09:15:48 -0700
+lib/sequel/plugins/list.rb	Mon, 26 Oct 2015 07:33:17 -0700
 lib/sequel/plugins/many_through_many.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/plugins/many_to_one_pk_lookup.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/modification_detection.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -118,6 +119,7 @@ lib/sequel/plugins/split_values.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/static_cache.rb	Thu, 02 Jul 2015 07:18:55 -0700
 lib/sequel/plugins/string_stripper.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/subclasses.rb	Thu, 20 Nov 2014 12:20:00 -0800
+lib/sequel/plugins/subset_conditions.rb	Mon, 26 Oct 2015 09:37:02 -0700
 lib/sequel/plugins/table_select.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/tactical_eager_loading.rb	Wed, 01 Apr 2015 15:54:55 -0700
 lib/sequel/plugins/timestamps.rb	Wed, 07 Jan 2015 13:10:26 -0800
