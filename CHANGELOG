@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.28.0 (2015-11-02)
 
 * Add boolean_subsets plugin, which adds a subset for each boolean column (jeremyevans)
 
