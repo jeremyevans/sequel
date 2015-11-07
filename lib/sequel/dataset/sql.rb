@@ -46,12 +46,11 @@ module Sequel
       end
 
       if values.is_a?(Array) && values.empty? && !insert_supports_empty_values? 
-        columns = [columns().last]
-        values = [DEFAULT]
+        columns, values = insert_empty_columns_values
       end
       clone(:columns=>columns, :values=>values).send(:_insert_sql)
     end
-    
+
     # Append a literal representation of a value to the given SQL string.
     # 
     # If an unsupported object is given, an +Error+ is raised.
@@ -1116,6 +1115,12 @@ module Sequel
       end 
     end
 
+    # The columns and values to use for an empty insert if the database doesn't support
+    # INSERT with DEFAULT VALUES.
+    def insert_empty_columns_values
+      [[columns.last], [DEFAULT]]
+    end
+    
     def insert_insert_sql(sql)
       sql << INSERT
     end
