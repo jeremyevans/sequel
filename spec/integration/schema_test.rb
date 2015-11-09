@@ -582,7 +582,7 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.must_equal [:id]
     @ds.columns!.must_equal [:id]
     @ds.insert(:id=>'20')
-    @ds.all.must_equal [{:id=>"10"}, {:id=>"20"}]
+    @ds.order(:id).all.must_equal [{:id=>"10"}, {:id=>"20"}]
   end
 
   cspecify "should set column types without modifying NULL/NOT NULL", [:jdbc, :db2], [:db2], :oracle, :derby do
