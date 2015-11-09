@@ -964,6 +964,30 @@ describe "Database#transaction with savepoint support" do
 
   include DatabaseTransactionSpecs
 
+  it "should support :retry_on option for automatically retrying transactions when using :savepoint option" do
+    a = []
+    @db.transaction do
+      @db.transaction(:retry_on=>Sequel::SerializationFailure, :savepoint=>true) do
+        a << 1
+        raise Sequel::SerializationFailure if a.length == 1
+      end
+    end
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "ROLLBACK TO SAVEPOINT autopoint_1", "SAVEPOINT autopoint_1", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
+    a.must_equal [1, 1]
+  end
+  
+  it "should support :retry_on option for automatically retrying transactions inside an :auto_savepoint transaction" do
+    a = []
+    @db.transaction(:auto_savepoint=>true) do
+      @db.transaction(:retry_on=>Sequel::SerializationFailure) do
+        a << 1
+        raise Sequel::SerializationFailure if a.length == 1
+      end
+    end
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "ROLLBACK TO SAVEPOINT autopoint_1", "SAVEPOINT autopoint_1", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
+    a.must_equal [1, 1]
+  end
+  
   it "should support after_commit inside savepoints" do
     @db.transaction do
       @db.after_commit{@db.execute('foo')}

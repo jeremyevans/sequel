@@ -96,12 +96,12 @@ module Sequel
       else
         synchronize(opts[:server]) do |conn|
           if already_in_transaction?(conn, opts)
-            if opts[:retrying]
-              raise Sequel::Error, "cannot set :retry_on options if you are already inside a transaction"
-            end
             if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last
               _transaction(conn, Hash[opts].merge!(:savepoint=>true), &block)
             else
+              if opts[:retrying]
+                raise Sequel::Error, "cannot set :retry_on options if you are already inside a transaction"
+              end
               return yield(conn)
             end
           else
