@@ -65,6 +65,23 @@ describe "date_arithmetic extension" do
     end
   end
 
+  it "should use existing method" do
+    db = Sequel.mock
+    db.extend_datasets do
+      def date_add_sql_append(sql, da)
+        interval = ''
+        each_valid_interval_unit(da.interval, Sequel::SQL::DateAdd::DatasetMethods::DEF_DURATION_UNITS) do |value, sql_unit|
+          interval << "#{value} #{sql_unit} "
+        end
+        literal_append(sql, Sequel.function(:da, da.expr, interval))
+      end
+    end
+    db.extension :date_arithmetic
+    db.literal(Sequel.date_add(:a, @h0)).must_equal "da(a, '')"
+    db.literal(Sequel.date_add(:a, @h1)).must_equal "da(a, '1 days ')"
+    db.literal(Sequel.date_add(:a, @h2)).must_equal "da(a, '1 years 1 months 1 days 1 hours 1 minutes 1 seconds ')"
+  end
+
   it "should correctly literalize on Postgres" do
     db = dbf.call(:postgres)
     db.literal(Sequel.date_add(:a, @h0)).must_equal "CAST(a AS timestamp)"

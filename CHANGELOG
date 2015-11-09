@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow for external adapters to implement Dataset#date_add_sql_append to integrate with the date_arithmetic extension (jeremyevans)
+
 * Add Dataset#insert_empty_columns_values private method for easy overriding for databases that don't support INSERT with DEFAULT VALUES (jeremyevans)
 
 === 4.28.0 (2015-11-02)

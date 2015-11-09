@@ -66,6 +66,9 @@ module Sequel
 
         # Append the SQL fragment for the DateAdd expression to the SQL query.
         def date_add_sql_append(sql, da)
+          if defined?(super)
+            return super
+          end
           h = da.interval
           expr = da.expr
           cast = case db_type = db.database_type
