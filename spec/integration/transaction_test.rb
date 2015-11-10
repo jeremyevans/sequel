@@ -84,6 +84,28 @@ describe "Database transactions" do
   end 
   
   if DB.supports_savepoints?
+    it "should handle table_exists? failures inside transactions" do
+      @db.transaction do
+        @d << {:name => '1'}
+        @db.table_exists?(:asadf098asd9asd98sa).must_equal false
+        @d << {:name => '2'}
+      end
+      @d.select_order_map(:name).must_equal %w'1 2'
+    end
+
+    it "should handle table_exists? failures inside savepoints" do
+      @db.transaction do
+        @d << {:name => '1'}
+        @db.transaction(:savepoint=>true) do
+          @d << {:name => '2'}
+          @db.table_exists?(:asadf098asd9asd98sa).must_equal false
+          @d << {:name => '3'}
+        end
+        @d << {:name => '4'}
+      end
+      @d.select_order_map(:name).must_equal %w'1 2 3 4'
+    end
+
     it "should support nested transactions through savepoints using the savepoint option" do
       @db.transaction do
         @d << {:name => '1'}

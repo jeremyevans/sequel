@@ -191,7 +191,12 @@ module Sequel
     def table_exists?(name)
       sch, table_name = schema_and_table(name)
       name = SQL::QualifiedIdentifier.new(sch, table_name) if sch
-      _table_exists?(from(name))
+      ds = from(name)
+      if in_transaction? && supports_savepoints?
+        transaction(:savepoint=>true){_table_exists?(ds)}
+      else
+        _table_exists?(ds)
+      end
       true
     rescue DatabaseError
       false

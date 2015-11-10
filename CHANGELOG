@@ -1,5 +1,7 @@
 === HEAD
 
+* Run Database#table_exists? inside a savepoint if currently in a transaction and the database supports savepoints (jeremyevans) (#1100)
+
 * Allow Database#transaction :retry_on option to work when using savepoints (jeremyevans)
 
 * Allow for external adapters to implement Dataset#date_add_sql_append to integrate with the date_arithmetic extension (jeremyevans)

@@ -614,6 +614,17 @@ describe "Database#table_exists?" do
     db.table_exists?(:b).must_equal true
     db.table_exists?(:c).must_equal true
   end
+
+  it "should use a savepoint if inside a transaction" do
+    db = Sequel.mock(:fetch=>[Sequel::Error, [], [{:a=>1}]])
+    def db.supports_savepoints?; true end
+    db.transaction do
+      db.table_exists?(:a).must_equal false
+    end
+    db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SELECT NULL AS nil FROM a LIMIT 1", "ROLLBACK TO SAVEPOINT autopoint_1", "COMMIT"]
+    db.table_exists?(:b).must_equal true
+    db.table_exists?(:c).must_equal true
+  end
 end
 
 DatabaseTransactionSpecs = shared_description do
