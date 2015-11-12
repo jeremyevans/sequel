@@ -987,7 +987,7 @@ describe "A PostgreSQL database" do
     t2 = "ruby sequel " * 1000
     @db[:posts].insert(:title=>t1)
     @db[:posts].insert(:title=>t2)
-    @db[:posts].full_text_search(:title, 'ruby & sequel', :rank=>true).select_map(:title).must_equal [t1, t2]
+    @db[:posts].full_text_search(:title, 'ruby & sequel', :rank=>true).select_map(:title).must_equal [t2, t1]
   end
 
   it "should support spatial indexes" do
