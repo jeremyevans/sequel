@@ -1331,7 +1331,7 @@ module Sequel
         end
 
         if opts[:rank]
-          ds = ds.order{Sequel.desc(ts_rank_cd(cols, terms))}
+          ds = ds.reverse{ts_rank_cd(cols, terms)}
         end
 
         ds
