@@ -267,7 +267,7 @@ issues that you should be aware of when using Sequel.
 
 Counting records is easy using +count+:
 
-  posts.where(:category.like('%ruby%')).count
+  posts.where(Sequel.like(:category, '%ruby%')).count
   # SELECT COUNT(*) FROM posts WHERE category LIKE '%ruby%'
 
 And you can also query maximum/minimum values via +max+ and +min+:
