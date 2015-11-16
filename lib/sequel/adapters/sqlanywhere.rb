@@ -79,19 +79,19 @@ module Sequel
 
       # Returns number of rows affected
       def execute_dui(sql, opts=OPTS)
-        synchronize do |conn|
+        synchronize(opts[:server]) do |conn|
           _execute(conn, :rows, sql, opts)
         end
       end
 
       def execute(sql, opts=OPTS, &block)
-        synchronize do |conn|
+        synchronize(opts[:server]) do |conn|
           _execute(conn, :select, sql, opts, &block)
         end
       end
 
       def execute_insert(sql, opts=OPTS)
-        synchronize do |conn|
+        synchronize(opts[:server]) do |conn|
           _execute(conn, :insert, sql, opts)
         end
       end

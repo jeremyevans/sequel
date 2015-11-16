@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow the sqlanywhere adapter to work with sharding (jeremyevans)
+
 * Support blobs as bound variables in the oracle adapter (jeremyevans) (#1104)
 
 * Order by best results first when using the Database#full_text_search :rank option on PostgreSQL (chanks) (#1101)
