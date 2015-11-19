@@ -1,28 +1,21 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-module SecureRandom
-  def self.uuid
-    '57308544-4e83-47b8-b87f-6f68b987f4f9'
-  end
-end
-
 describe "Sequel::Plugins::Uuid" do
-  let(:uuid) { '57308544-4e83-47b8-b87f-6f68b987f4f9' }
-  let(:alt_uuid) { 'd5d1ec46-5e8e-4a7b-adc9-50e76b819e19' }
-
   before do
+    uuid = @uuid = '57308544-4e83-47b8-b87f-6f68b987f4f9'
+    @alt_uuid = 'd5d1ec46-5e8e-4a7b-adc9-50e76b819e19'
     dc = Object.new
     @c = Class.new(Sequel::Model(:t))
     @c.class_eval do
       columns :id, :uuid
       plugin :uuid
       def _save_refresh(*) end
+      define_method(:create_uuid) do
+        uuid
+      end
       db.reset
     end
     @c.dataset.autoid = nil
-    SecureRandom.stub :uuid, _ do
-      
-    end
   end
   
   it "should handle validations on the uuid field for new objects" do
@@ -37,51 +30,48 @@ describe "Sequel::Plugins::Uuid" do
   it "should set uuid field when skipping validations" do
     @c.plugin :uuid
     @c.new.save(:validate=>false)
-    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{uuid}')"]
+    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{@uuid}')"]
   end
 
   it "should set the uuid field on creation" do
     o = @c.create
-    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{uuid}')"]
-    o.uuid.must_equal uuid
+    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{@uuid}')"]
+    o.uuid.must_equal @uuid
   end
 
-  it "should allow specifying the uuid field via the :field option" do
-    c = Class.new(Sequel::Model(:t))
-    c.class_eval do
-      columns :id, :u
-      plugin :uuid, :field=>:u
-      def _save_refresh(*) end
+  if RUBY_VERSION >= '1.9'
+    it "should allow specifying the uuid field via the :field option" do
+      c = Class.new(Sequel::Model(:t))
+      c.class_eval do
+        columns :id, :u
+        plugin :uuid, :field=>:u
+        def _save_refresh(*) end
+      end
+      o = c.create
+      c.db.sqls.first.must_match(/INSERT INTO t \(u\) VALUES \('[-0-9a-f]+'\)/)
+      o.u.must_match /[-0-9a-f]+/
     end
-    o = c.create
-    c.db.sqls.must_equal ["INSERT INTO t (u) VALUES ('#{uuid}')"]
-    o.u.must_equal uuid
   end
 
   it "should not raise an error if the model doesn't have the uuid column" do
-    c = Class.new(Sequel::Model(:t))
-    c.class_eval do
-      columns :id, :x
-      plugin :uuid
-      db.reset
-      def _save_refresh; self end
-    end
-    c.create(:x=>2)
-    c.load(:id=>1, :x=>2).save
-    c.db.sqls.must_equal ["INSERT INTO t (x) VALUES (2)", "UPDATE t SET x = 2 WHERE (id = 1)"]
+    @c.columns :id, :x
+    @c.send(:undef_method, :uuid)
+    @c.create(:x=>2)
+    @c.load(:id=>1, :x=>2).save
+    @c.db.sqls.must_equal ["INSERT INTO t (x) VALUES (2)", "UPDATE t SET x = 2 WHERE (id = 1)"]
   end
 
   it "should not overwrite an existing uuid value" do
-    o = @c.create(:uuid=>alt_uuid)
-    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{alt_uuid}')"]
-    o.uuid.must_equal alt_uuid
+    o = @c.create(:uuid=>@alt_uuid)
+    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{@alt_uuid}')"]
+    o.uuid.must_equal @alt_uuid
   end
 
   it "should overwrite an existing uuid if the :force option is used" do
     @c.plugin :uuid, :force=>true
-    o = @c.create(:uuid=>alt_uuid)
-    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{uuid}')"]
-    o.uuid.must_equal uuid
+    o = @c.create(:uuid=>@alt_uuid)
+    @c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{@uuid}')"]
+    o.uuid.must_equal @uuid
   end
 
   it "should have uuid_field give the uuid field" do
@@ -99,9 +89,9 @@ describe "Sequel::Plugins::Uuid" do
   it "should work with subclasses" do
     c = Class.new(@c)
     o = c.create
-    o.uuid.must_equal uuid
-    c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{uuid}')"]
-    c.create(:uuid=>alt_uuid).uuid.must_equal alt_uuid
+    o.uuid.must_equal @uuid
+    c.db.sqls.must_equal ["INSERT INTO t (uuid) VALUES ('#{@uuid}')"]
+    c.create(:uuid=>@alt_uuid).uuid.must_equal @alt_uuid
 
     c.class_eval do
       columns :id, :u
@@ -110,7 +100,7 @@ describe "Sequel::Plugins::Uuid" do
     c2 = Class.new(c)
     c2.db.reset
     o = c2.create
-    o.u.must_equal uuid
-    c2.db.sqls.first.must_match(/INSERT INTO t \([u]\) VALUES \('#{uuid}'\)/)
+    o.u.must_equal @uuid
+    c2.db.sqls.first.must_match(/INSERT INTO t \([u]\) VALUES \('#{@uuid}'\)/)
   end
 end

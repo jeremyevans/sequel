@@ -3,7 +3,10 @@ require 'securerandom'
 module Sequel
   module Plugins
     # The uuid plugin creates hooks that automatically create a uuid for every
-    # instance.
+    # instance.  Note that this uses SecureRandom.uuid to create UUIDs, and
+    # that method is not defined on ruby 1.8.7.  If you would like to use this
+    # on ruby 1.8.7, you need to override the Model#create_uuid private method
+    # to return a valid uuid.
     # 
     # Usage:
     #
@@ -46,14 +49,21 @@ module Sequel
           set_uuid if new?
           super
         end
+
+        # Create a new UUID.  This method can be overridden to use a separate
+        # method for creating UUIDs.  Note that this method does not work on
+        # ruby 1.8.7, you will have to override it if you are using ruby 1.8.7.
+        def create_uuid
+          SecureRandom.uuid
+        end
         
         # If the object has accessor methods for the uuid field, and the uuid
         # value is nil or overwriting it is allowed, set the uuid.
-        def set_uuid(uuid=nil)
+        def set_uuid(uuid=create_uuid)
           field = model.uuid_field
           meth = :"#{field}="
           if respond_to?(field) && respond_to?(meth) && (model.uuid_overwrite? || get_column_value(field).nil?)
-            set_column_value(meth, uuid||SecureRandom.uuid)
+            set_column_value(meth, uuid)
           end
         end
       end
