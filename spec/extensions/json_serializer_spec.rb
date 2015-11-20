@@ -43,6 +43,13 @@ describe "Sequel::Plugins::JsonSerializer" do
     Artist.from_json(Artist.load(:name=>Date.today).to_json).must_equal Artist.load(:name=>Date.today)
   end
 
+  it "should support setting json_serializer_opts on models" do
+    @artist.json_serializer_opts(:only=>:name)
+    Sequel.parse_json([@artist].to_json).must_equal [{'name'=>@artist.name}]
+    @artist.json_serializer_opts(:include=>{:albums=>{:only=>:name}})
+    Sequel.parse_json([@artist].to_json).must_equal [{'name'=>@artist.name, 'albums'=>[{'name'=>@album.name}]}]
+  end
+
   it "should handle the :only option" do
     Artist.from_json(@artist.to_json(:only=>:name)).must_equal Artist.load(:name=>@artist.name)
     Album.from_json(@album.to_json(:only=>[:id, :name])).must_equal Album.load(:id=>@album.id, :name=>@album.name)

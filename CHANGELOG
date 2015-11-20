@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#json_serializer_opts method to json_serializer plugin, allowing for setting to_json defaults on per-instance basis (jeremyevans)
+
 * Add uuid plugin for automatically setting UUID column when creating a model object (pdrakeweb, jeremyevans) (#1106)
 
 * Allow the sqlanywhere adapter to work with sharding (jeremyevans)

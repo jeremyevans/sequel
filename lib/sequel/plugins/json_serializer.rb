@@ -36,6 +36,12 @@ module Sequel
     #   album.to_json(:root => true)
     #   # => '{"album":{"id":1,"name":"RF","artist_id":2}}'
     #
+    # You can specify JSON serialization options to use later:
+    #
+    #   album.json_serializer_opts(:root => true)
+    #   [album].to_json
+    #   # => '[{"album":{"id":1,"name":"RF","artist_id":2}}]'
+    #
     # Additionally, +to_json+ also exists as a class and dataset method, both
     # of which return all objects in the dataset:
     #
@@ -239,6 +245,20 @@ module Sequel
           self
         end
 
+        # Set the json serialization options that will be used by default
+        # in future calls to +to_json+.  This is designed for cases where
+        # the model object will be used inside another data structure
+        # which to_json is called on, and as such will not allow passing
+        # of arguments to +to_json+.
+        #
+        # Example:
+        #
+        #   obj.json_serializer_opts(:only=>:name)
+        #   [obj].to_json # => '[{"name":"..."}]'
+        def json_serializer_opts(opts=OPTS)
+          @json_serializer_opts = Hash[@json_serializer_opts||OPTS].merge!(opts)
+        end
+
         # Return a string in JSON format.  Accepts the following
         # options:
         #
@@ -257,12 +277,13 @@ module Sequel
         #          string is given, use the string as the key, otherwise
         #          use an underscored version of the model's name.
         def to_json(*a)
-          if opts = a.first.is_a?(Hash)
-            opts = model.json_serializer_opts.merge(a.first)
+          opts = model.json_serializer_opts
+          opts = Hash[opts].merge!(@json_serializer_opts) if @json_serializer_opts
+          if (arg_opts = a.first).is_a?(Hash)
+            opts = Hash[opts].merge!(arg_opts)
             a = []
-          else
-            opts = model.json_serializer_opts
           end
+
           vals = values
           cols = if only = opts[:only]
             Array(only)
