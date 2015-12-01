@@ -31,12 +31,42 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-11-02 10:22:13 -0800</span>
+          <span class='datetime'>2015-12-01 07:48:59 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.29.0+-282015-12-01-29">4.29.0 (2015-12-01)<span><a href="#label-4.29.0+-282015-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Add Model#json_serializer_opts method to json_serializer plugin, allowing
+            for setting to_json defaults on per-instance basis (jeremyevans)</p>
+            </li><li>
+            <p>Add uuid plugin for automatically setting UUID column when creating a model
+            object (pdrakeweb, jeremyevans) (#1106)</p>
+            </li><li>
+            <p>Allow the sqlanywhere adapter to work with sharding (jeremyevans)</p>
+            </li><li>
+            <p>Support blobs as bound variables in the oracle adapter (jeremyevans)
+            (#1104)</p>
+            </li><li>
+            <p>Order by best results first when using the Database#full_text_search :rank
+            option on PostgreSQL (chanks) (#1101)</p>
+            </li><li>
+            <p>Run Database#table_exists? inside a savepoint if currently in a transaction
+            and the database supports savepoints (jeremyevans) (#1100)</p>
+            </li><li>
+            <p>Allow Database#transaction :retry_on option to work when using savepoints
+            (jeremyevans)</p>
+            </li><li>
+            <p>Allow for external adapters to implement Dataset#date_add_sql_append to
+            integrate with the date_arithmetic extension (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#insert_empty_columns_values private method for easy overriding
+            for databases that don&#39;t support INSERT with DEFAULT VALUES
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.28.0+-282015-11-02-29">4.28.0 (2015-11-02)<span><a href="#label-4.28.0+-282015-11-02-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

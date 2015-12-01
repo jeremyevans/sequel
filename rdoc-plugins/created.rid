@@ -1,4 +1,4 @@
-Mon, 02 Nov 2015 11:10:43 -0800
+Tue, 01 Dec 2015 07:56:26 -0800
 lib/sequel/extensions/_pretty_table.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -9,7 +9,7 @@ lib/sequel/extensions/core_extensions.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/core_refinements.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/current_datetime_timestamp.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/dataset_source_alias.rb	Mon, 09 Mar 2015 19:27:17 -0700
-lib/sequel/extensions/date_arithmetic.rb	Fri, 08 May 2015 15:48:36 -0700
+lib/sequel/extensions/date_arithmetic.rb	Sun, 08 Nov 2015 18:37:00 -0800
 lib/sequel/extensions/empty_array_consider_nulls.rb	Tue, 14 Jul 2015 16:01:53 -0700
 lib/sequel/extensions/empty_array_ignore_nulls.rb	Tue, 14 Jul 2015 16:01:53 -0700
 lib/sequel/extensions/error_sql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -90,7 +90,7 @@ lib/sequel/plugins/insert_returning_select.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_filters.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_hooks.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/plugins/inverted_subsets.rb	Fri, 17 Jul 2015 16:51:50 -0700
-lib/sequel/plugins/json_serializer.rb	Thu, 12 Mar 2015 08:21:51 -0700
+lib/sequel/plugins/json_serializer.rb	Thu, 19 Nov 2015 17:12:57 -0800
 lib/sequel/plugins/lazy_attributes.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/list.rb	Mon, 26 Oct 2015 07:33:17 -0700
 lib/sequel/plugins/many_through_many.rb	Wed, 01 Apr 2015 14:26:05 -0700
@@ -130,6 +130,7 @@ lib/sequel/plugins/unlimited_update.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/update_or_create.rb	Mon, 24 Nov 2014 12:16:46 -0800
 lib/sequel/plugins/update_primary_key.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/update_refresh.rb	Mon, 29 Jun 2015 11:11:14 -0700
+lib/sequel/plugins/uuid.rb	Wed, 18 Nov 2015 16:38:07 -0800
 lib/sequel/plugins/validate_associated.rb	Tue, 12 May 2015 15:56:27 -0700
 lib/sequel/plugins/validation_class_methods.rb	Wed, 01 Apr 2015 15:54:55 -0700
 lib/sequel/plugins/validation_helpers.rb	Wed, 03 Jun 2015 12:44:46 -0700

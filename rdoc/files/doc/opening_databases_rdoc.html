@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-09-02 08:24:36 -0700</span>
+          <span class='datetime'>2015-11-16 15:34:16 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -356,15 +356,9 @@
             <h3 id="label-mysql2">mysql2<span><a href="#label-mysql2">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>This is a newer MySQL adapter that does typecasting in C, so it is often
-            faster than the mysql adapter.  Supports the same additional options as the
-            mysql adapter, except for :compress, and uses :timeout instead of
-            :read_timeout and :connect_timeout.</p>
-            
-            <p>The following additional options are supported:</p>
-            <table class="rdoc-list note-list"><tbody><tr><td class='label'>:flags </td><td>
-            <p>Override the flags to use for the connection (e.g.
-            ::Mysql2::Client::MULTI_STATEMENTS)</p>
-            </td></tr></tbody></table>
+            faster than the mysql adapter.  The options given are passed to
+            Mysql2::Client.new, see the mysql2 documentation for details on what
+            options are supported.</p>
             
             <h3 id="label-odbc+">odbc <span><a href="#label-odbc+">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
