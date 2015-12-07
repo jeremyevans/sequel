@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#schema :db_type entries include sizes for string types on DB2 (jeremyevans)
+
 * Make Database#schema :db_type entries include sizes for string and decimal types in the jdbc adapter's schema parsing (jeremyevans)
 
 * Recognize another disconnect error in the tinytds adapter (jeremyevans)

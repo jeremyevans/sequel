@@ -35,11 +35,14 @@ module Sequel
         im = input_identifier_meth(opts[:dataset])
         metadata_dataset.with_sql("SELECT * FROM SYSIBM.SYSCOLUMNS WHERE TBNAME = #{literal(im.call(table))} ORDER BY COLNO").
           collect do |column| 
-            column[:db_type]     = column.delete(:typename)
-            if column[:db_type]  == "DECIMAL"
+            column[:db_type] = column.delete(:typename)
+            if column[:db_type] =~ /\A(VAR)?CHAR\z/
+              column[:db_type] << "(#{column[:length]})"
+            end
+            if column[:db_type] == "DECIMAL"
               column[:db_type] << "(#{column[:longlength]},#{column[:scale]})"
             end
-            column[:allow_null]  = column.delete(:nulls) == 'Y'
+            column[:allow_null] = column.delete(:nulls) == 'Y'
             identity = column.delete(:identity) == 'Y'
             if column[:primary_key] = identity || !column[:keyseq].nil?
               column[:auto_increment] = identity
