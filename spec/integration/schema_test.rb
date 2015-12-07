@@ -159,6 +159,18 @@ describe "Database schema parser" do
     DB.schema(:items).first.last[:type].must_equal :boolean
   end
 
+  it "should round trip database types from the schema properly" do
+    DB.create_table!(:items){String :number, :size=>50}
+    db_type = DB.schema(:items).first.last[:db_type]
+    DB.create_table!(:items){column :number, db_type}
+    DB.schema(:items).first.last[:db_type].must_equal db_type
+
+    DB.create_table!(:items){Numeric :number, :size=>[11,3]}
+    db_type = DB.schema(:items).first.last[:db_type]
+    DB.create_table!(:items){column :number, db_type}
+    DB.schema(:items).first.last[:db_type].must_equal db_type
+  end
+
   it "should parse maximum length for string columns" do
     DB.create_table!(:items){String :a, :size=>4}
     DB.schema(:items).first.last[:max_length].must_equal 4

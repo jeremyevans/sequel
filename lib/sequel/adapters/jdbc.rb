@@ -597,6 +597,19 @@ module Sequel
       def setup_connection(conn)
         conn
       end
+
+      def schema_column_set_db_type(schema)
+        case schema[:type]
+        when :string
+          if schema[:db_type] =~ /\A(character( varying)?|n?(var)?char2?)\z/io && schema[:column_size] > 0
+            schema[:db_type] += "(#{schema[:column_size]})"
+          end
+        when :decimal
+          if schema[:db_type] =~ /\A(decimal|numeric)\z/io && schema[:column_size] > 0 && schema[:scale] >= 0
+            schema[:db_type] += "(#{schema[:column_size]}, #{schema[:scale]})"
+          end
+        end
+      end
       
       # Parse the table schema for the given table.
       def schema_parse_table(table, opts=OPTS)
@@ -626,6 +639,7 @@ module Sequel
           if s[:db_type] =~ DECIMAL_TYPE_RE && s[:scale] == 0
             s[:type] = :integer
           end
+          schema_column_set_db_type(s)
           schemas << h[:table_schem] unless schemas.include?(h[:table_schem])
           ts << [m.call(h[:column_name]), s]
         end
