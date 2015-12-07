@@ -1,3 +1,7 @@
+=== HEAD
+
+* Recognize another disconnect error in the tinytds adapter (jeremyevans)
+
 === 4.29.0 (2015-12-01)
 
 * Add Model#json_serializer_opts method to json_serializer plugin, allowing for setting to_json defaults on per-instance basis (jeremyevans)
