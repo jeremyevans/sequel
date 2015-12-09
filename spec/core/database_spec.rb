@@ -222,6 +222,10 @@ describe "A new Database" do
     db = Sequel.connect('mock:///?keep_reference=f')
     Sequel::DATABASES.wont_include(db)
   end
+
+  it 'should strip square brackets for ipv6 hosts' do
+    Sequel.connect('mock://[::1]').opts[:host].must_equal "::1"
+  end
 end
 
 describe "Database#disconnect" do

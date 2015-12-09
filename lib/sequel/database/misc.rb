@@ -80,7 +80,7 @@ module Sequel
     def self.uri_to_options(uri)
       { :user => uri.user,
         :password => uri.password,
-        :host => uri.host,
+        :host => uri.hostname,
         :port => uri.port,
         :database => (m = /\/(.*)/.match(uri.path)) && (m[1]) }
     end
