@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow IPv6 addresses in database URLs on ruby 1.9+ (hellvinz, jeremyevans) (#1113)
+
 * Make Database#schema :db_type entries include sizes for string types on DB2 (jeremyevans)
 
 * Make Database#schema :db_type entries include sizes for string and decimal types in the jdbc adapter's schema parsing (jeremyevans)

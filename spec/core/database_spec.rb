@@ -225,7 +225,7 @@ describe "A new Database" do
 
   it 'should strip square brackets for ipv6 hosts' do
     Sequel.connect('mock://[::1]').opts[:host].must_equal "::1"
-  end
+  end if RUBY_VERSION >= '1.9'
 end
 
 describe "Database#disconnect" do
