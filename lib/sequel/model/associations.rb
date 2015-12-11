@@ -105,12 +105,12 @@ module Sequel
 
         # Apply an eager limit strategy to the dataset, or return the dataset
         # unmodified if it doesn't need an eager limit strategy.
-        def apply_eager_limit_strategy(ds, strategy=eager_limit_strategy)
+        def apply_eager_limit_strategy(ds, strategy=eager_limit_strategy, limit_and_offset=limit_and_offset())
           case strategy
           when :distinct_on
             apply_distinct_on_eager_limit_strategy(ds)
           when :window_function
-            apply_window_function_eager_limit_strategy(ds)
+            apply_window_function_eager_limit_strategy(ds, limit_and_offset)
           else
             ds
           end
@@ -123,7 +123,7 @@ module Sequel
         end
 
         # Use a window function to limit the results of the eager loading dataset.
-        def apply_window_function_eager_limit_strategy(ds)
+        def apply_window_function_eager_limit_strategy(ds, limit_and_offset=limit_and_offset())
           rn = ds.row_number_column 
           limit, offset = limit_and_offset
           ds = ds.unordered.select_append{|o| o.row_number{}.over(:partition=>predicate_key, :order=>ds.opts[:order]).as(rn)}.from_self
@@ -143,13 +143,13 @@ module Sequel
 
         # If the ruby eager limit strategy is being used, slice the array using the slice
         # range to return the object(s) at the correct offset/limit.
-        def apply_ruby_eager_limit_strategy(rows)
+        def apply_ruby_eager_limit_strategy(rows, limit_and_offset = limit_and_offset())
           name = self[:name]
           if returns_array?
-            range = slice_range
+            range = slice_range(limit_and_offset)
             rows.each{|o| o.associations[name] = o.associations[name][range] || []}
-          elsif slice_range
-            offset = slice_range.begin
+          elsif sr = slice_range(limit_and_offset)
+            offset = sr.begin
             rows.each{|o| o.associations[name] = o.associations[name][offset]}
           end
         end
@@ -245,12 +245,29 @@ module Sequel
           end
           strategy = eager_limit_strategy
           cascade = eo[:associations]
+          eager_limit = nil
 
           if eo[:eager_block] || eo[:loader] == false
+            ds = eager_loading_dataset(eo)
+
+            strategy = ds.opts[:eager_limit_strategy] || strategy
+
+            eager_limit =
+              if el = ds.opts[:eager_limit]
+                strategy ||= true_eager_graph_limit_strategy
+                if el.is_a?(Array)
+                  el
+                else
+                  [el, nil]
+                end
+              else
+                limit_and_offset
+              end
+
             strategy = true_eager_graph_limit_strategy if strategy == :union
             # Correlated subqueries are not supported for regular eager loading
             strategy = :ruby if strategy == :correlated_subquery
-            objects = apply_eager_limit_strategy(eager_loading_dataset(eo), strategy).all
+            objects = apply_eager_limit_strategy(ds, strategy, eager_limit).all
           elsif strategy == :union
             objects = []
             ds = associated_dataset
@@ -269,7 +286,7 @@ module Sequel
 
           objects.each(&block)
           if strategy == :ruby
-            apply_ruby_eager_limit_strategy(rows)
+            apply_ruby_eager_limit_strategy(rows, eager_limit || limit_and_offset)
           end
         end
 
@@ -461,7 +478,7 @@ module Sequel
         end
         
         # The range used for slicing when using the :ruby eager limit strategy.
-        def slice_range
+        def slice_range(limit_and_offset = limit_and_offset())
           limit, offset = limit_and_offset
           if limit || offset
             (offset||0)..(limit ? (offset||0)+limit-1 : -1)
