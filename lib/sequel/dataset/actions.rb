@@ -298,7 +298,7 @@ module Sequel
     #
     # +insert+ handles a number of different argument formats:
     # no arguments or single empty hash :: Uses DEFAULT VALUES
-    # single hash :: Most common format, treats keys as columns an values as values
+    # single hash :: Most common format, treats keys as columns and values as values
     # single array :: Treats entries as values, with no columns
     # two arrays :: Treats first array as columns, second array as values
     # single Dataset :: Treats as an insert based on a selection from the dataset given,
