@@ -287,15 +287,35 @@ the window function strategy:
     :eager_limit_strategy=>:window_function
   Artist.where(:id=>[1,2]).eager(:first_10_albums).all
   # SELECT * FROM (
-  #   SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY release_date) AS x_sequel_row_number_x
-  #   FROM tracks
-  #   WHERE (tracks.album_id IN (1, 2))
+  #   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x
+  #   FROM albums
+  #   WHERE (albums.artist_id IN (1, 2))
   # ) AS t1
   # WHERE (x_sequel_row_number_x <= 10)
   
 Alternatively, you can use the :ruby strategy, which will fall back to
 retrieving all records, and then will slice the resulting array to get
 the first 10 after retrieval.
+
+=== Dynamic Eager Loading Limits
+
+If you need to eager load variable numbers of records (with limits that aren't
+known at the time of the association definition), Sequel supports an
+:eager_limit dataset option that can be defined in an eager loading callback:
+
+  Artist.one_to_many :albums
+  Artist.where(:id => [1, 2]).eager(:albums => proc{|ds| ds.order(:release_date).clone(:eager_limit => 3)}).all
+  # SELECT * FROM (
+  #   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x
+  #   FROM albums
+  #   WHERE (albums.artist_id IN (1, 2))
+  # ) AS t1
+  # WHERE (x_sequel_row_number_x <= 3)
+
+You can also customize the :eager_limit_strategy on a case-by-case basis by passing in that option in the same way:
+
+  Artist.where(:id => [1, 2]).eager(:albums => proc{|ds| ds.order(:release_date).clone(:eager_limit => 3, :eager_limit_strategy => :ruby)}).all
+  # SELECT * FROM albums WHERE (albums.artist_id IN (1, 2)) ORDER BY release_date
 
 === Eager Loading via eager_graph_with_options
 
