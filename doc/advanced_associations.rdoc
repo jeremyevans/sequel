@@ -317,6 +317,9 @@ You can also customize the :eager_limit_strategy on a case-by-case basis by pass
   Artist.where(:id => [1, 2]).eager(:albums => proc{|ds| ds.order(:release_date).clone(:eager_limit => 3, :eager_limit_strategy => :ruby)}).all
   # SELECT * FROM albums WHERE (albums.artist_id IN (1, 2)) ORDER BY release_date
 
+The :eager_limit and :eager_limit_strategy options currently only work when
+eager loading via #eager, not with #eager_graph.
+
 === Eager Loading via eager_graph_with_options
 
 When eager loading an association via eager_graph (which uses JOINs), the
