@@ -1113,6 +1113,50 @@ describe Sequel::Model, "#eager" do
     EagerBand.eager(:good_albums => proc {|ds| ds.select(:name)}).all
     DB.sqls.must_equal ['SELECT * FROM bands', "SELECT name FROM albums WHERE ((name = 'good') AND (albums.band_id IN (2)))"]
   end
+
+  it "should respect an :eager_limit option passed in a custom callback" do
+    # Should default to a window function on its own.
+    def (EagerTrack.dataset).supports_window_functions?() true end
+    a = EagerAlbum.eager(:tracks=> proc{|ds| ds.clone(:eager_limit=>5)}).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id=> 2)]
+    sqls = DB.sqls
+    sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x <= 5)']
+    a = a.first
+    a.tracks.must_equal [EagerTrack.load(:id => 3, :album_id => 1)]
+    DB.sqls.must_equal []
+  end
+
+  it "should respect an :eager_limit option that includes an offset" do
+    def (EagerTrack.dataset).supports_window_functions?() true end
+    EagerAlbum.eager(:tracks=> proc{|ds| ds.clone(:eager_limit=>[5, 5])}).all
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE ((x_sequel_row_number_x >= 6) AND (x_sequel_row_number_x < 11))']
+  end
+
+  it "should have an :eager_limit option passed in a custom callback override a :limit defined in the association" do
+    def (EagerTrack.dataset).supports_window_functions?() true end
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>2
+    EagerAlbum.eager(:first_two_tracks=> proc{|ds| ds.clone(:eager_limit=>5)}).all
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x <= 5)']
+  end
+
+  it "should respect an :eager_limit_strategy option passed in a custom callback" do
+    def (EagerTrack.dataset).supports_window_functions?() true end
+    EagerTrack.dataset._fetch = (1..4).map{|i| {:album_id=>1, :id=>i}}
+    a = EagerAlbum.eager(:tracks=> proc{|ds| ds.clone(:eager_limit=>2, :eager_limit_strategy=>:ruby)}).all
+    a.must_equal [EagerAlbum.load(:id => 1, :band_id=> 2)]
+    sqls = DB.sqls
+    sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a = a.first
+    a.tracks.must_equal [EagerTrack.load(:id => 1, :album_id => 1), EagerTrack.load(:id => 2, :album_id => 1)]
+    DB.sqls.must_equal []
+  end
+
+  it "should have an :eager_limit_strategy option passed in a custom callback override a :eager_limit_strategy defined in the association" do
+    def (EagerTrack.dataset).supports_window_functions?() true end
+    EagerAlbum.one_to_many :first_two_tracks, :class=>:EagerTrack, :key=>:album_id, :limit=>2, :eager_limit_strategy=>:ruby
+    EagerAlbum.eager(:first_two_tracks=> proc{|ds| ds.clone(:eager_limit_strategy=>:window_function)}).all
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
+  end
 end
 
 describe Sequel::Model, "#eager_graph" do

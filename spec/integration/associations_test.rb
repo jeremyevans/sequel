@@ -1914,6 +1914,28 @@ describe "Sequel::Model Simple Associations" do
     artists.each{|a| a.first_two_albums.length.must_equal 1}
   end
 
+  it "should handle the :eager_limit option in eager-loading callbacks" do
+    @db[:artists].import([:name], (1..4).map{|i| ['test']})
+    artist_ids = @db[:artists].where(name: 'test').select_map(:id)
+    @db[:albums].import([:artist_id], artist_ids * 3)
+
+    artists = Artist.where(id: artist_ids).eager(:albums => proc{|ds| ds.clone(:eager_limit => 1)}).all
+    artists.length.must_equal 4
+    artists.each{|a| a.albums.length.must_equal 1}
+
+    artists = Artist.where(id: artist_ids).eager(:albums => proc{|ds| ds.clone(:eager_limit => 2)}).all
+    artists.length.must_equal 4
+    artists.each{|a| a.albums.length.must_equal 2}
+
+    artists = Artist.where(id: artist_ids).eager(:albums => proc{|ds| ds.clone(:eager_limit => 3)}).all
+    artists.length.must_equal 4
+    artists.each{|a| a.albums.length.must_equal 3}
+
+    artists = Artist.where(id: artist_ids).eager(:albums => proc{|ds| ds.clone(:eager_limit => 4)}).all
+    artists.length.must_equal 4
+    artists.each{|a| a.albums.length.must_equal 3}
+  end
+
   it "should handle many_to_one associations with same name as :key" do
     Album.def_column_alias(:artist_id_id, :artist_id)
     Album.many_to_one :artist_id, :key_column =>:artist_id, :class=>Artist
