@@ -1856,13 +1856,16 @@ module Sequel
   
       # Insert into the given dataset and return the primary key created (if any).
       def _insert_raw(ds)
-        ds.insert(@values)
+        ds.insert(_insert_values)
       end
 
       # Insert into the given dataset and return the hash of column values.
       def _insert_select_raw(ds)
-        ds.insert_select(@values)
+        ds.insert_select(_insert_values)
       end
+
+      # The values hash to use when inserting a new record.
+      alias _insert_values values
       
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database

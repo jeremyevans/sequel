@@ -1,5 +1,9 @@
 === HEAD
 
+* Add identifier_columns plugin for handling column names containing 2 or more consecutive underscores when saving (jeremyevans) (#1117)
+
+* Support :eager_limit and :eager_limit_strategy dataset options in model eager loaders for per-call limits and strategies (chanks) (#1115)
+
 * Allow IPv6 addresses in database URLs on ruby 1.9+ (hellvinz, jeremyevans) (#1113)
 
 * Make Database#schema :db_type entries include sizes for string types on DB2 (jeremyevans)
