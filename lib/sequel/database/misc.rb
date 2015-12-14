@@ -82,7 +82,7 @@ module Sequel
         :user => uri.user,
         :password => uri.password,
         :port => uri.port,
-        :host => RUBY_VERSION < '1.9' ? uri.host : uri.hostname,
+        :host => RUBY_VERSION < '1.9.3' ? uri.host : uri.hostname,
         :database => (m = /\/(.*)/.match(uri.path)) && (m[1])
       }
     end
