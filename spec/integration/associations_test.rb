@@ -1916,7 +1916,7 @@ describe "Sequel::Model Simple Associations" do
 
   it "should handle the :eager_limit option in eager-loading callbacks" do
     @db[:artists].import([:name], (1..4).map{|i| ['test']})
-    artist_ids = @db[:artists].where(:name => 'test').select_map(:id)
+    artist_ids = @db[:artists].where(:name => 'test').select_map([:id])
     @db[:albums].import([:artist_id], artist_ids * 3)
     ads = Artist.where(:id => artist_ids)
 
