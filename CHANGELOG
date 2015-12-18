@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#row_type in pg_row extension handle different formats of schema-qualified types (jeremyevans) (#1119)
+
 * Add identifier_columns plugin for handling column names containing 2 or more consecutive underscores when saving (jeremyevans) (#1117)
 
 * Support :eager_limit and :eager_limit_strategy dataset options in model eager loaders for per-call limits and strategies (chanks) (#1115)

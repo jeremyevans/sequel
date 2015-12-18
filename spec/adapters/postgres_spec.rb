@@ -3406,6 +3406,9 @@ describe 'PostgreSQL row-valued/composite types' do
       end
       @db.register_row_type(:domain_check)
       @db.get(@db.row_type(:domain_check, [1])).must_equal(:id=>1)
+      @db.register_row_type(:public__domain_check)
+      @db.get(@db.row_type(:public__domain_check, [1])).must_equal(:id=>1)
+      @db.get(@db.row_type(Sequel.qualify(:public, :domain_check), [1])).must_equal(:id=>1)
     ensure
       @db.drop_table(:domain_check)
       @db << "DROP DOMAIN positive_integer"

@@ -488,7 +488,7 @@ module Sequel
             PGArray.register(array_type_name, :oid=>array_oid, :converter=>parser, :type_procs=>@conversion_procs, :scalar_typecast=>schema_type_symbol)
           end
 
-          @row_types[db_type] = opts.merge(:parser=>parser)
+          @row_types[literal(db_type)] = opts.merge(:parser=>parser)
           @row_schema_types[schema_type_string] = schema_type_symbol 
           @schema_type_classes[schema_type_symbol] = ROW_TYPE_CLASSES
           @row_type_method_module.class_eval do
@@ -519,7 +519,7 @@ module Sequel
         # In general, the given database type should already be registered,
         # but if obj is an array, this will handled unregistered types.
         def row_type(db_type, obj)
-          (type_hash = @row_types[db_type]) &&
+          (type_hash = @row_types[literal(db_type)]) &&
             (parser = type_hash[:parser])
 
           case obj
