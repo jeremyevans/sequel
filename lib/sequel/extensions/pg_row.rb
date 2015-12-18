@@ -488,7 +488,7 @@ module Sequel
             PGArray.register(array_type_name, :oid=>array_oid, :converter=>parser, :type_procs=>@conversion_procs, :scalar_typecast=>schema_type_symbol)
           end
 
-          @row_types[literal(db_type)] = opts.merge(:parser=>parser)
+          @row_types[literal(db_type)] = opts.merge(:parser=>parser, :type=>db_type)
           @row_schema_types[schema_type_string] = schema_type_symbol 
           @schema_type_classes[schema_type_symbol] = ROW_TYPE_CLASSES
           @row_type_method_module.class_eval do
@@ -508,8 +508,8 @@ module Sequel
         def reset_conversion_procs
           procs = super
 
-          row_types.each do |db_type, opts|
-            register_row_type(db_type, opts)
+          row_types.values.each do |opts|
+            register_row_type(opts[:type], opts)
           end
 
           procs
