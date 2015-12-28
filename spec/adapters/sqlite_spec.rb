@@ -371,6 +371,41 @@ describe "SQLite::Dataset#update" do
   end
 end
 
+describe "SQLite::Dataset#insert_conflict" do
+  before(:all) do
+    DB.create_table! :ic_test do
+      primary_key :id
+      String :name
+    end
+  end
+
+  after(:each) do
+    DB[:ic_test].delete
+  end
+
+  after(:all) do
+    DB.drop_table?(:ic_test)
+  end
+
+  it "Dataset#insert_ignore and insert_constraint should ignore uniqueness violations" do
+    DB[:ic_test].insert(:id => 1, :name => "one")
+    proc {DB[:ic_test].insert(:id => 1, :name => "one")}.must_raise Sequel::UniqueConstraintViolation
+
+    DB[:ic_test].insert_ignore.insert(:id => 1, :name => "one")
+    DB[:ic_test].all.must_equal([{:id => 1, :name => "one"}])
+
+    DB[:ic_test].insert_conflict(:ignore).insert(:id => 1, :name => "one")
+    DB[:ic_test].all.must_equal([{:id => 1, :name => "one"}])
+  end
+
+  it "Dataset#insert_constraint should handle replacement" do
+    DB[:ic_test].insert(:id => 1, :name => "one")
+
+    DB[:ic_test].insert_conflict(:replace).insert(:id => 1, :name => "two")
+    DB[:ic_test].all.must_equal([{:id => 1, :name => "two"}])
+  end
+end
+
 describe "SQLite dataset" do
   before do
     DB.create_table! :test do

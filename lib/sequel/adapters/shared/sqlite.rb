@@ -516,7 +516,7 @@ module Sequel
       ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
 
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
-      Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert into columns values'], ["else", %w'insert into columns values']])
+      Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values'], ["else", %w'insert conflict into columns values']])
       Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
 
       def cast_sql_append(sql, expr, type)
@@ -604,7 +604,39 @@ module Sequel
           super
         end
       end
-      
+
+      # Handle uniqueness violations when inserting, by using a specified
+      # resolution algorithm. With no options, uses INSERT OR REPLACE. SQLite
+      # supports the following conflict resolution algoriths: ROLLBACK, ABORT,
+      # FAIL, IGNORE and REPLACE.
+      #
+      # Examples:
+      #
+      #   DB[:table].insert_conflict.insert(:a=>1, :b=>2)
+      #   # INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)
+      #
+      #   DB[:table].insert_conflict(:replace).insert(:a=>1, :b=>2)
+      #   # INSERT OR REPLACE INTO TABLE (a, b) VALUES (1, 2)
+      def insert_conflict(resolution = :ignore)
+        clone(:insert_conflict => resolution)
+      end
+
+      # Ignore uniqueness/exclusion violations when inserting, using INSERT OR IGNORE.
+      # Exists mostly for compatibility to MySQL's insert_ignore. Example:
+      #
+      #   DB[:table].insert_ignore.insert(:a=>1, :b=>2)
+      #   # INSERT OR IGNORE INTO TABLE (a, b) VALUES (1, 2)
+      def insert_ignore
+        insert_conflict(:ignore)
+      end
+
+      # Add OR clauses to SQLite INSERT statements
+      def insert_conflict_sql(sql)
+        if resolution = @opts[:insert_conflict]
+          sql << " OR #{resolution.to_s.upcase}"
+        end
+      end
+
       # SQLite 3.8.3+ supports common table expressions.
       def supports_cte?(type=:select)
         db.sqlite_version >= 30803
