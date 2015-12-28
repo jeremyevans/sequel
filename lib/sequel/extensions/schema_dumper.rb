@@ -213,7 +213,8 @@ END_MIG
     # For the table and foreign key metadata array, return an alter_table
     # string that would add the foreign keys if run in a migration.
     def dump_add_fk_constraints(table, fks)
-      sfks = "alter_table(#{table.inspect}) do\n"
+      sfks = String.new
+      sfks << "alter_table(#{table.inspect}) do\n"
       sfks << create_table_generator do
         fks.sort_by{|fk| fk[:columns].map(&:to_s)}.each do |fk|
           foreign_key fk[:columns], fk

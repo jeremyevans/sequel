@@ -137,7 +137,7 @@ module Sequel
       
       # Alias of +to_s+
       def sql_literal(ds)
-        s = ''
+        s = String.new
         to_s_append(ds, s)
         s
       end

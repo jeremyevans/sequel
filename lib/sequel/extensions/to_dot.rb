@@ -123,7 +123,7 @@ module Sequel
         dot "PlaceholderLiteralString: #{str.inspect}"
         v(e.args, :args)
       when SQL::JoinClause
-        str = "#{e.join_type.to_s.upcase} JOIN"
+        str = "#{e.join_type.to_s.upcase} JOIN".dup
         if e.is_a?(SQL::JoinOnClause)
           str << " ON"
         elsif e.is_a?(SQL::JoinUsingClause)

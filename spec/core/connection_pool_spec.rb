@@ -169,7 +169,7 @@ describe "A connection pool with a max size of 1" do
   before do
     @invoked_count = 0
     icp = proc{@invoked_count += 1}
-    @pool = Sequel::ConnectionPool.get_pool(mock_db.call{icp.call; 'herro'}, CONNECTION_POOL_DEFAULTS.merge(:max_connections=>1))
+    @pool = Sequel::ConnectionPool.get_pool(mock_db.call{icp.call; 'herro'.dup}, CONNECTION_POOL_DEFAULTS.merge(:max_connections=>1))
   end
   
   it "should let only one thread access the connection at any time" do

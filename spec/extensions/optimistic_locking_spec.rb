@@ -5,7 +5,7 @@ describe "optimistic_locking plugin" do
     @c = Class.new(Sequel::Model(:people)) do
     end
     h = {1=>{:id=>1, :name=>'John', :lock_version=>2}}
-    lv = @lv = "lock_version"
+    lv = @lv = "lock_version".dup
     @c.instance_dataset.numrows = @c.dataset.numrows = proc do |sql|
       case sql
       when /UPDATE people SET (name|#{lv}) = ('Jim'|'Bob'|\d+), (?:name|#{lv}) = ('Jim'|'Bob'|\d+) WHERE \(\(id = (\d+)\) AND \(#{lv} = (\d+)\)\)/

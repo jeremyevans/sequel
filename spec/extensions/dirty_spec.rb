@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::Dirty" do
   before do
-    @db = Sequel.mock(:fetch=>{:initial=>'i', :initial_changed=>'ic'}, :numrows=>1)
+    @db = Sequel.mock(:fetch=>{:initial=>'i'.dup, :initial_changed=>'ic'.dup}, :numrows=>1)
     @c = Class.new(Sequel::Model(@db[:c]))
     @c.plugin :dirty
     @c.columns :initial, :initial_changed, :missing, :missing_changed
@@ -135,9 +135,9 @@ describe "Sequel::Plugins::Dirty" do
 
   describe "with new instance" do
     before do
-      @o = @c.new(:initial=>'i', :initial_changed=>'ic')
-      @o.initial_changed = 'ic2'
-      @o.missing_changed = 'mc2'
+      @o = @c.new(:initial=>'i'.dup, :initial_changed=>'ic'.dup)
+      @o.initial_changed = 'ic2'.dup
+      @o.missing_changed = 'mc2'.dup
     end
 
     include dirty_plugin_specs
@@ -158,8 +158,8 @@ describe "Sequel::Plugins::Dirty" do
   describe "with existing instance" do
     before do
       @o = @c[1]
-      @o.initial_changed = 'ic2'
-      @o.missing_changed = 'mc2'
+      @o.initial_changed = 'ic2'.dup
+      @o.missing_changed = 'mc2'.dup
     end
 
     include dirty_plugin_specs

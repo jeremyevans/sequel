@@ -53,7 +53,7 @@ module Sequel
     
     # String for each data line
     def self.data_line(columns, sizes, record) # :nodoc:
-      '|' << columns.map {|c| format_cell(sizes[c], record[c])}.join('|') << '|'
+      String.new << '|' << columns.map {|c| format_cell(sizes[c], record[c])}.join('|') << '|'
     end
     
     # Format the value so it takes up exactly size characters
@@ -70,12 +70,12 @@ module Sequel
     
     # String for header line
     def self.header_line(columns, sizes) # :nodoc:
-      '|' << columns.map {|c| "%-#{sizes[c]}s" % c.to_s}.join('|') << '|'
+      String.new << '|' << columns.map {|c| "%-#{sizes[c]}s" % c.to_s}.join('|') << '|'
     end
 
     # String for separtor line
     def self.separator_line(columns, sizes) # :nodoc:
-      '+' << columns.map {|c| '-' * sizes[c]}.join('+') << '+'
+      String.new << '+' << columns.map {|c| '-' * sizes[c]}.join('+') << '+'
     end
 
     private_class_method :column_sizes, :data_line, :format_cell, :header_line, :separator_line

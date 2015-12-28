@@ -329,7 +329,7 @@ module Sequel
           sql << Sequel::Dataset::PAREN_OPEN
           literal_append(sql, args.at(0))
           sql << Sequel::Dataset::SPACE << (op == :LIKE ? REGEXP : NOT_REGEXP) << Sequel::Dataset::SPACE
-          pattern = ''
+          pattern = String.new
           last_c = ''
           args.at(1).each_char do |c|
             if  c == '_' and not pattern.end_with?('\\') and last_c != '\\'

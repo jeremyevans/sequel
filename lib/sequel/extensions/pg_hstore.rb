@@ -265,7 +265,7 @@ module Sequel
       # literal version of the hstore.  Separated out for use by
       # the bound argument code.
       def unquoted_literal
-        str = ''
+        str = String.new
         comma = false
         commas = COMMA
         quote = QUOTE

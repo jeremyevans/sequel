@@ -530,7 +530,8 @@ module Sequel
 
     # SQL DDL fragment containing the column creation SQL for the given column.
     def column_definition_sql(column)
-      sql = "#{quote_identifier(column[:name])} #{type_literal(column)}"
+      sql = String.new
+      sql << "#{quote_identifier(column[:name])} #{type_literal(column)}"
       column_definition_order.each{|m| send(:"column_definition_#{m}_sql", sql, column)}
       sql
     end
@@ -601,7 +602,8 @@ module Sequel
 
     # SQL DDL fragment for column foreign key references
     def column_references_sql(column)
-      sql = " REFERENCES #{quote_schema_table(column[:table])}"
+      sql = String.new
+      sql << " REFERENCES #{quote_schema_table(column[:table])}"
       sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
       sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
       sql << " ON UPDATE #{on_update_clause(column[:on_update])}" if column[:on_update]
@@ -622,7 +624,8 @@ module Sequel
 
     # SQL DDL fragment specifying a constraint on a table.
     def constraint_definition_sql(constraint)
-      sql = constraint[:name] ? "CONSTRAINT #{quote_identifier(constraint[:name])} " : ""
+      sql = String.new
+      sql << "CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name] 
       case constraint[:type]
       when :check
         check = constraint[:check]
@@ -726,7 +729,8 @@ module Sequel
     # DDL statement for creating a view.
     def create_view_sql(name, source, options)
       source = source.sql if source.is_a?(Dataset)
-      sql = "#{create_view_prefix_sql(name, options)} AS #{source}"
+      sql = String.new
+      sql << "#{create_view_prefix_sql(name, options)} AS #{source}"
       if check = options[:check]
         sql << " WITH#{' LOCAL' if check == :local} CHECK OPTION"
       end
@@ -735,6 +739,7 @@ module Sequel
 
     # Append the column list to the SQL, if a column list is given.
     def create_view_sql_append_columns(sql, columns)
+      sql = sql.dup
       if columns
         sql << ' ('
         schema_utility_dataset.send(:identifier_list_append, sql, columns)

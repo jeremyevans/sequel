@@ -342,7 +342,7 @@ module Sequel
       def select_sql
         return super if @opts[:sql]
         if o = @opts[:offset]
-          columns = clone(:append_sql=>'', :placeholder_literal_null=>true).columns
+          columns = clone(:append_sql=>String.new, :placeholder_literal_null=>true).columns
           dsa1 = dataset_alias(1)
           rn = row_number_column
           limit = @opts[:limit]
@@ -353,7 +353,7 @@ module Sequel
             select(*columns).
             where(SQL::Identifier.new(rn) > o)
           ds = ds.where(SQL::Identifier.new(rn) <= Sequel.+(o, limit)) if limit
-          sql = @opts[:append_sql] || ''
+          sql = @opts[:append_sql] || String.new
           subselect_sql_append(sql, ds)
           sql
         elsif limit = @opts[:limit]
@@ -361,7 +361,7 @@ module Sequel
           # Lock doesn't work in subselects, so don't use a subselect when locking.
           # Don't use a subselect if custom SQL is used, as it breaks somethings.
           ds = ds.from_self unless @opts[:lock]
-          sql = @opts[:append_sql] || ''
+          sql = @opts[:append_sql] || String.new
           subselect_sql_append(sql, ds.where(SQL::ComplexExpression.new(:<=, ROW_NUMBER_EXPRESSION, limit)))
           sql
         else

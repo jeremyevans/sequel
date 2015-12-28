@@ -44,7 +44,7 @@ describe Sequel::Model, "caching" do
     end
    
     @dataset = @c.dataset = @c3.dataset = @c4.dataset
-    @dataset._fetch = {:name => 'sharon', :id => 1}
+    @dataset._fetch = {:name => 'sharon'.dup, :id => 1}
     @dataset.numrows = 1
     
     @c2 = Class.new(@c) do

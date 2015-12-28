@@ -61,7 +61,7 @@ module Sequel
           literal_symbol_append(sql, v)
         else 
           unless l = db.literal_symbol(v)
-            l = ''
+            l = String.new
             literal_symbol_append(l, v)
             db.literal_symbol_set(v, l)
           end
@@ -121,7 +121,7 @@ module Sequel
         [insert_sql(columns, sql)]
       when :union
         c = false
-        sql = LiteralString.new('')
+        sql = LiteralString.new
         u = UNION_ALL_SELECT
         f = empty_from_sql
         values.each do |v|
@@ -154,7 +154,7 @@ module Sequel
       else
         check_truncation_allowed!
         raise(InvalidOperation, "Can't truncate filtered datasets") if opts[:where] || opts[:having]
-        t = ''
+        t = String.new
         source_list_append(t, opts[:from])
         _truncate_sql(t)
       end
@@ -339,7 +339,7 @@ module Sequel
     [:literal, :quote_identifier, :quote_schema_table].each do |meth|
       class_eval(<<-END, __FILE__, __LINE__ + 1)
         def #{meth}(*args, &block)
-          s = ''
+          s = ''.dup
           #{meth}_append(s, *args, &block)
           s
         end
@@ -1511,7 +1511,7 @@ module Sequel
     # The string that is appended to to create the SQL query, the empty
     # string by default
     def sql_string_origin
-      ''
+      String.new
     end
     
     # SQL to use if this dataset uses static SQL.  Since static SQL

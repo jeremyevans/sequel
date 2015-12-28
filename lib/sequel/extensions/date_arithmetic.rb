@@ -73,7 +73,7 @@ module Sequel
           expr = da.expr
           cast = case db_type = db.database_type
           when :postgres
-            interval = ""
+            interval = String.new
             each_valid_interval_unit(h, DEF_DURATION_UNITS) do |value, sql_unit|
               interval << "#{value} #{sql_unit} "
             end

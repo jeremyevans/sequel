@@ -48,7 +48,7 @@ describe "Sequel::Plugins::InputTransformer" do
   it "should apply multiple input transformers in reverse order of their call" do
     @c.add_input_transformer(:add_bar){|v| v << 'bar'}
     @c.add_input_transformer(:add_foo){|v| v << 'foo'}
-    @o.name = ' name '
+    @o.name = ' name '.dup
     @o.name.must_equal 'raboof eman '
   end
 end

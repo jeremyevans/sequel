@@ -187,7 +187,7 @@ module Sequel
       
       def alter_table_add_column_sql(table, op)
         if related = op.delete(:table)
-          sql = super
+          sql = super.dup
           op[:table] = related
           op[:key] ||= primary_key_from_schema(related)
           sql << ", ADD "

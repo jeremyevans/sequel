@@ -68,7 +68,8 @@ module Sequel
       # :before :: Add the new value before this existing value.
       # :if_not_exists :: Do not raise an error if the value already exists in the enum.
       def add_enum_value(enum, value, opts=OPTS)
-        sql = "ALTER TYPE #{quote_schema_table(enum)} ADD VALUE#{' IF NOT EXISTS' if opts[:if_not_exists]} #{literal(value.to_s)}"
+        sql = String.new
+        sql << "ALTER TYPE #{quote_schema_table(enum)} ADD VALUE#{' IF NOT EXISTS' if opts[:if_not_exists]} #{literal(value.to_s)}"
         if v = opts[:before]
           sql << " BEFORE #{literal(v.to_s)}"
         elsif v = opts[:after]

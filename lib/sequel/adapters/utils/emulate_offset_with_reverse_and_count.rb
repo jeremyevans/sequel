@@ -27,7 +27,7 @@ module Sequel
       end
 
       ds = unlimited
-      row_count = @opts[:offset_total_count] || ds.clone(:append_sql=>'', :placeholder_literal_null=>true).count
+      row_count = @opts[:offset_total_count] || ds.clone(:append_sql=>String.new, :placeholder_literal_null=>true).count
       dsa1 = dataset_alias(1)
 
       if o.is_a?(Symbol) && @opts[:bind_vars] && (match = Sequel::Dataset::PreparedStatementMethods::PLACEHOLDER_RE.match(o.to_s))
@@ -53,7 +53,7 @@ module Sequel
         # shuld be returned, so use a condition that is always false.
         ds.where(1=>0)
       end
-      sql = @opts[:append_sql] || ''
+      sql = @opts[:append_sql] || String.new
       subselect_sql_append(sql, ds)
       sql
     end
@@ -69,7 +69,7 @@ module Sequel
     # The default order to use for datasets with offsets, if no order is defined.
     # By default, orders by all of the columns in the dataset.
     def default_offset_order
-      clone(:append_sql=>'', :offset=>nil).columns
+      clone(:append_sql=>String.new, :offset=>nil).columns
     end
   end
 end

@@ -352,7 +352,7 @@ module Sequel
           super(source)
           @converter = converter 
           @stack = [[]]
-          @recorded = ""
+          @recorded = String.new
         end
 
         # Take the buffer of recorded characters and add it to the array
@@ -366,7 +366,7 @@ module Sequel
               entry = @converter.call(entry)
             end
             @stack.last.push(entry)
-            @recorded = ""
+            @recorded = String.new
           end
         end
 

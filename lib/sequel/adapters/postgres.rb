@@ -375,7 +375,7 @@ module Sequel
                 end
                 nil
               else
-                b = ''
+                b = String.new
                 b << buf while buf = conn.get_copy_data
                 b
               end
@@ -466,7 +466,7 @@ module Sequel
               begin
                 channels = Array(channels)
                 channels.each do |channel|
-                  sql = "LISTEN "
+                  sql = "LISTEN ".dup
                   dataset.send(:identifier_append, sql, channel)
                   conn.execute(sql)
                 end
@@ -589,7 +589,7 @@ module Sequel
 
         log_sql = "EXECUTE #{ps_name}"
         if ps.log_sql
-          log_sql << " ("
+          log_sql += " ("
           log_sql << sql
           log_sql << ")"
         end

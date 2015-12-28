@@ -242,7 +242,8 @@ module Sequel
           cps = log_yield("PREPARE #{name}: #{sql}"){conn.prepare(sql)}
           conn.prepared_statements[name] = [cps, sql]
         end
-        log_sql = "EXECUTE #{name}"
+        log_sql = String.new
+        log_sql << "EXECUTE #{name}"
         if ps.log_sql
           log_sql << " ("
           log_sql << sql

@@ -587,7 +587,7 @@ describe "NestedAttributes plugin" do
   it "should accept a :transform block that returns a changed attributes hash" do
     @Album.nested_attributes :tags, :transform=>proc{|parent, hash| hash[:name] << parent.name; hash }
     a = @Album.new(:name => 'Al')
-    a.set(:tags_attributes=>[{:name=>'T'}, {:name=>'T2'}])
+    a.set(:tags_attributes=>[{:name=>'T'.dup}, {:name=>'T2'.dup}])
     @db.sqls.must_equal []
     a.save
     check_sql_array("INSERT INTO albums (name) VALUES ('Al')",

@@ -49,7 +49,7 @@ module Sequel
       def self.literal_duration(duration)
         h = Hash.new(0)
         duration.parts.each{|unit, value| h[unit] += value}
-        s = ''
+        s = String.new
 
         DURATION_UNITS.each do |unit|
           if (v = h[unit]) != 0

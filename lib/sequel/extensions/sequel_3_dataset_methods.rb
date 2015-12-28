@@ -107,7 +107,7 @@ module Sequel
     def to_csv(include_column_titles = true)
       n = naked
       cols = n.columns
-      csv = ''
+      csv = String.new
       csv << "#{cols.join(COMMA)}\r\n" if include_column_titles
       n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(COMMA)}\r\n"}
       csv

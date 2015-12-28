@@ -373,7 +373,8 @@ module Sequel
       # :server :: The server to which to send the NOTIFY statement, if the sharding support
       #            is being used.
       def notify(channel, opts=OPTS)
-        sql = "NOTIFY "
+        sql = String.new
+        sql << "NOTIFY "
         dataset.send(:identifier_append, sql, channel)
         if payload = opts[:payload]
           sql << ", "
@@ -583,7 +584,7 @@ module Sequel
         s = super
         if using = op[:using]
           using = Sequel::LiteralString.new(using) if using.is_a?(String)
-          s << ' USING '
+          s += ' USING '
           s << literal(using)
         end
         s
@@ -693,7 +694,8 @@ module Sequel
         case constraint[:type]
         when :exclude
           elements = constraint[:elements].map{|c, op| "#{literal(c)} WITH #{op}"}.join(', ')
-          sql = "#{"CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]}EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})#{" WHERE #{filter_expr(constraint[:where])}" if constraint[:where]}"
+          sql = String.new
+          sql << "#{"CONSTRAINT #{quote_identifier(constraint[:name])} " if constraint[:name]}EXCLUDE USING #{constraint[:using]||'gist'} (#{elements})#{" WHERE #{filter_expr(constraint[:where])}" if constraint[:where]}"
           constraint_deferrable_sql_append(sql, constraint[:deferrable])
           sql
         when :foreign_key, :check
@@ -760,7 +762,8 @@ module Sequel
 
       # SQL for doing fast table insert from stdin.
       def copy_into_sql(table, opts)
-        sql = "COPY #{literal(table)}"
+        sql = String.new
+        sql << "COPY #{literal(table)}"
         if cols = opts[:columns]
           sql << literal(Array(cols))
         end
@@ -780,7 +783,8 @@ module Sequel
           table
         else
           if opts[:options] || opts[:format]
-            options = " ("
+            options = String.new
+            options << " ("
             options << "FORMAT #{opts[:format]}" if opts[:format]
             options << "#{', ' if opts[:format]}#{opts[:options]}" if opts[:options]
             options << ')'
@@ -845,17 +849,17 @@ module Sequel
         sql = super
 
         if inherits = options[:inherits]
-          sql << " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
+          sql += " INHERITS (#{Array(inherits).map{|t| quote_schema_table(t)}.join(', ')})"
         end
 
         if on_commit = options[:on_commit]
           raise(Error, "can't provide :on_commit without :temp to create_table") unless options[:temp]
           raise(Error, "unsupported on_commit option: #{on_commit.inspect}") unless ON_COMMIT.has_key?(on_commit)
-          sql << " ON COMMIT #{ON_COMMIT[on_commit]}"
+          sql += " ON COMMIT #{ON_COMMIT[on_commit]}"
         end
 
         if server = options[:foreign]
-          sql << " SERVER #{quote_identifier(server)}"
+          sql += " SERVER #{quote_identifier(server)}"
           if foreign_opts = options[:options]
             sql << " OPTIONS (#{foreign_opts.map{|k, v| "#{k} #{literal(v.to_s)}"}.join(', ')})"
           end
@@ -867,9 +871,9 @@ module Sequel
       def create_table_as_sql(name, sql, options)
         result = create_table_prefix_sql name, options
         if on_commit = options[:on_commit]
-          result << " ON COMMIT #{ON_COMMIT[on_commit]}"
+          result += " ON COMMIT #{ON_COMMIT[on_commit]}"
         end
-        result << " AS #{sql}"
+        result += " AS #{sql}"
       end
 
       # Use a PostgreSQL-specific create table generator
@@ -1111,7 +1115,8 @@ module Sequel
         read_only = opts[:read_only]
         deferrable = opts[:deferrable]
         if level || !read_only.nil? || !deferrable.nil?
-          sql = "SET TRANSACTION"
+          sql = String.new
+          sql << "SET TRANSACTION"
           sql << " ISOLATION LEVEL #{Sequel::Database::TRANSACTION_ISOLATION_LEVELS[level]}" if level
           sql << " READ #{read_only ? 'ONLY' : 'WRITE'}" unless read_only.nil?
           sql << " #{'NOT ' unless deferrable}DEFERRABLE" unless deferrable.nil?
@@ -1421,7 +1426,7 @@ module Sequel
         if block_given? # perform locking inside a transaction and yield to block
           @db.transaction(opts){lock(mode, opts); yield}
         else
-          sql = 'LOCK TABLE '
+          sql = 'LOCK TABLE '.dup
           source_list_append(sql, @opts[:from])
           mode = mode.to_s.upcase.strip
           unless LOCK_MODES.include?(mode)

@@ -69,7 +69,7 @@ describe "date_arithmetic extension" do
     db = Sequel.mock
     db.extend_datasets do
       def date_add_sql_append(sql, da)
-        interval = ''
+        interval = String.new
         each_valid_interval_unit(da.interval, Sequel::SQL::DateAdd::DatasetMethods::DEF_DURATION_UNITS) do |value, sql_unit|
           interval << "#{value} #{sql_unit} "
         end

@@ -157,7 +157,7 @@ module Sequel
       # Return the SQL query to use for the given arguments.
       def sql(*args)
         raise Error, "wrong number of arguments (#{args.length} for #{@arity})" unless args.length == @arity
-        s = ''
+        s = String.new
         ds = @dataset
         @fragments.each do |sql, i, transformer|
           s << sql

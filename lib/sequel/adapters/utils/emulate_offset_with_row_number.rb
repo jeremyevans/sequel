@@ -28,10 +28,10 @@ module Sequel
         end
       end
 
-      columns = clone(:append_sql=>'', :placeholder_literal_null=>true).columns
+      columns = clone(:append_sql=>String.new, :placeholder_literal_null=>true).columns
       dsa1 = dataset_alias(1)
       rn = row_number_column
-      sql = @opts[:append_sql] || ''
+      sql = @opts[:append_sql] || String.new
       subselect_sql_append(sql, unlimited.
         unordered.
         select_append{ROW_NUMBER{}.over(:order=>order).as(rn)}.
@@ -75,7 +75,7 @@ module Sequel
           end
         end
       end
-      clone(:append_sql=>'').columns
+      clone(:append_sql=>String.new).columns
     end
 
     # Whether an order is required when using offset emulation via ROW_NUMBER, true by default.

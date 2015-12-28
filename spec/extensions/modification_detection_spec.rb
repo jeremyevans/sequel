@@ -3,7 +3,7 @@ require 'yaml'
 
 describe "serialization_modification_detection plugin" do
   before do
-    @ds = Sequel.mock(:fetch=>{:id=>1, :a=>'a', :b=>1, :c=>['a'], :d=>{'b'=>'c'}}, :numrows=>1, :autoid=>1)[:items]
+    @ds = Sequel.mock(:fetch=>{:id=>1, :a=>'a'.dup, :b=>1, :c=>['a'.dup], :d=>{'b'=>'c'.dup}}, :numrows=>1, :autoid=>1)[:items]
     @c = Class.new(Sequel::Model(@ds))
     @c.plugin :modification_detection
     @c.columns :a, :b, :c, :d
@@ -33,7 +33,7 @@ describe "serialization_modification_detection plugin" do
   end
   
   it "should not list a column twice" do
-    @o.a = 'b'
+    @o.a = 'b'.dup
     @o.a << 'a'
     @o.changed_columns.must_equal [:a]
   end
