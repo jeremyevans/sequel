@@ -514,6 +514,7 @@ module Sequel
       DATE_OPEN = "date(".freeze
       DATETIME_OPEN = "datetime(".freeze
       ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
+      OR = " OR ".freeze
 
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
       Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values'], ["else", %w'insert conflict into columns values']])
@@ -630,13 +631,6 @@ module Sequel
         insert_conflict(:ignore)
       end
 
-      # Add OR clauses to SQLite INSERT statements
-      def insert_conflict_sql(sql)
-        if resolution = @opts[:insert_conflict]
-          sql << " OR #{resolution.to_s.upcase}"
-        end
-      end
-
       # SQLite 3.8.3+ supports common table expressions.
       def supports_cte?(type=:select)
         db.sqlite_version >= 30803
@@ -711,6 +705,13 @@ module Sequel
         columns.map{|i| quote_identifier(i)}.join(COMMA)
       end
     
+      # Add OR clauses to SQLite INSERT statements
+      def insert_conflict_sql(sql)
+        if resolution = @opts[:insert_conflict]
+          sql << OR << resolution.to_s.upcase
+        end
+      end
+
       # SQLite uses a preceding X for hex escaping strings
       def literal_blob_append(sql, v)
         sql << BLOB_START << v.unpack(HSTAR).first << APOS

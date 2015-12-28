@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#insert_conflict and #insert_ignore on SQLite for handling uniqueness violations (Sharpie) (#1121)
+
 * Make Database#row_type in pg_row extension handle different formats of schema-qualified types (jeremyevans) (#1119)
 
 * Add identifier_columns plugin for handling column names containing 2 or more consecutive underscores when saving (jeremyevans) (#1117)
