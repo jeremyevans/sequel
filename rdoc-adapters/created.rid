@@ -1,4 +1,4 @@
-Tue, 01 Dec 2015 07:56:11 -0800
+Mon, 04 Jan 2016 13:16:41 -0800
 lib/sequel/adapters/ado.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ado/access.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/adapters/ado/mssql.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -9,7 +9,7 @@ lib/sequel/adapters/do/mysql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/do/postgres.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/do/sqlite3.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/ibmdb.rb	Tue, 28 Jul 2015 14:36:07 -0700
-lib/sequel/adapters/jdbc.rb	Thu, 18 Jun 2015 13:09:05 -0700
+lib/sequel/adapters/jdbc.rb	Mon, 07 Dec 2015 09:49:38 -0800
 lib/sequel/adapters/jdbc/as400.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/jdbc/cubrid.rb	Mon, 15 Jun 2015 10:43:10 -0700
 lib/sequel/adapters/jdbc/db2.rb	Mon, 15 Jun 2015 10:43:10 -0700
@@ -40,7 +40,7 @@ lib/sequel/adapters/postgres.rb	Mon, 26 Oct 2015 15:36:51 -0700
 lib/sequel/adapters/postgresql.rb	Mon, 04 May 2015 09:15:48 -0700
 lib/sequel/adapters/shared/access.rb	Wed, 26 Aug 2015 08:46:11 -0700
 lib/sequel/adapters/shared/cubrid.rb	Wed, 26 Aug 2015 08:46:11 -0700
-lib/sequel/adapters/shared/db2.rb	Thu, 20 Aug 2015 09:12:37 -0700
+lib/sequel/adapters/shared/db2.rb	Mon, 07 Dec 2015 09:49:38 -0800
 lib/sequel/adapters/shared/firebird.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/informix.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/mssql.rb	Thu, 20 Aug 2015 09:12:37 -0700
@@ -50,14 +50,14 @@ lib/sequel/adapters/shared/oracle.rb	Thu, 20 Aug 2015 09:12:37 -0700
 lib/sequel/adapters/shared/postgres.rb	Thu, 12 Nov 2015 16:46:28 -0800
 lib/sequel/adapters/shared/progress.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/shared/sqlanywhere.rb	Thu, 20 Aug 2015 09:12:37 -0700
-lib/sequel/adapters/shared/sqlite.rb	Sun, 26 Jul 2015 12:20:17 -0700
+lib/sequel/adapters/shared/sqlite.rb	Mon, 28 Dec 2015 14:41:54 -0800
 lib/sequel/adapters/sqlanywhere.rb	Sun, 15 Nov 2015 10:00:29 -0800
 lib/sequel/adapters/sqlite.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/adapters/swift.rb	Tue, 17 Feb 2015 14:54:23 -0800
 lib/sequel/adapters/swift/mysql.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/swift/postgres.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/swift/sqlite.rb	Sun, 26 Jul 2015 12:20:17 -0700
-lib/sequel/adapters/tinytds.rb	Tue, 11 Aug 2015 08:32:43 -0700
+lib/sequel/adapters/tinytds.rb	Mon, 07 Dec 2015 09:49:38 -0800
 lib/sequel/adapters/utils/emulate_offset_with_reverse_and_count.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/adapters/utils/emulate_offset_with_row_number.rb	Thu, 06 Aug 2015 16:28:37 -0700
 lib/sequel/adapters/utils/pg_types.rb	Wed, 01 Apr 2015 14:26:05 -0700

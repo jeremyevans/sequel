@@ -1,4 +1,4 @@
-Tue, 01 Dec 2015 07:56:26 -0800
+Mon, 04 Jan 2016 13:16:49 -0800
 lib/sequel/extensions/_pretty_table.rb	Wed, 01 Apr 2015 14:26:05 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/blank.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -39,7 +39,7 @@ lib/sequel/extensions/pg_json_ops.rb	Thu, 10 Sep 2015 07:57:19 -0700
 lib/sequel/extensions/pg_loose_count.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_range.rb	Fri, 14 Aug 2015 12:00:10 -0700
 lib/sequel/extensions/pg_range_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
-lib/sequel/extensions/pg_row.rb	Wed, 01 Apr 2015 14:26:05 -0700
+lib/sequel/extensions/pg_row.rb	Fri, 18 Dec 2015 11:23:25 -0800
 lib/sequel/extensions/pg_row_ops.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/extensions/pg_static_cache_updater.rb	Tue, 28 Apr 2015 15:29:46 -0700
 lib/sequel/extensions/pretty_table.rb	Thu, 20 Nov 2014 12:20:00 -0800
@@ -85,6 +85,7 @@ lib/sequel/plugins/eager_each.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/error_splitter.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/force_encoding.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/hook_class_methods.rb	Wed, 01 Apr 2015 15:54:55 -0700
+lib/sequel/plugins/identifier_columns.rb	Sun, 13 Dec 2015 15:08:42 -0800
 lib/sequel/plugins/input_transformer.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/insert_returning_select.rb	Thu, 20 Nov 2014 12:20:00 -0800
 lib/sequel/plugins/instance_filters.rb	Thu, 20 Nov 2014 12:20:00 -0800

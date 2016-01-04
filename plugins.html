@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.29.0</h2>
+    <h2>Sequel::Model Plugins for v4.30.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -98,6 +98,7 @@
 </ul></li>
 <li>Saving:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/BeforeAfterSave.html">before_after_save</a>: Refreshes created objects and resets modified flag before calling after_create/update/save hooks.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/IdentifierColumns.html">identifier_columns</a>: Automatically handles column names with 2 or more consecutive underscores when saving.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters</a>: Allows you to add per instance filters that are used when updating or destroying the instance.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/MssqlOptimisticLocking.html">mssql_optimistic_locking</a>: Uses a timestamp/rowversion column on Microsoft SQL Server to prevent concurrent updates overwriting changes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
@@ -285,6 +286,7 @@
 <ul>
 <li><a href='https://github.com/djanowski/sequel-fusiontables'>fusiontables</a>: Fusion Tables adapter using <a href="https://github.com/djanowski/ft">ft</a> driver</li>
 <li><a href='https://github.com/hrp/sequel-hive-adapter'>hive</a>: Hadoop Hive adapter using <a href="https://github.com/forward3d/rbhive">rbhive</a> driver</li>
+<li><a href='https://github.com/jeremyevans/sequel-impala'>impala</a>: Impala adapter, including jdbc/hive2 adapter</li>
 <li><a href='https://github.com/ahto/sequel-jdbc-crate'>jdbc-crate</a>: JDBC subadapter for Crate database</li>
 <li><a href='https://github.com/colincasey/sequel-jdbc-hxtt-adapter'>jdbc-hxtt</a>: JDBC subadapter for MS Access databases</li>
 <li><a href='https://github.com/gimoh/sequel-openedge-adapter'>openedge</a>: ODBC and JDBC subadapters for OpenEdge database</li>

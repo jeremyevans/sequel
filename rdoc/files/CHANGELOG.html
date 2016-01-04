@@ -31,12 +31,38 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-12-01 07:48:59 -0800</span>
+          <span class='datetime'>2016-01-04 13:11:10 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.30.0+-282016-01-04-29">4.30.0 (2016-01-04)<span><a href="#label-4.30.0+-282016-01-04-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Add Dataset#insert_conflict and insert_ignore on SQLite for handling
+            uniqueness violations (Sharpie) (#1121)</p>
+            </li><li>
+            <p>Make Database#row_type in pg_row extension handle different formats of
+            schema-qualified types (jeremyevans) (#1119)</p>
+            </li><li>
+            <p>Add identifier_columns plugin for handling column names containing 2 or
+            more consecutive underscores when saving (jeremyevans) (#1117)</p>
+            </li><li>
+            <p>Support :eager_limit and :eager_limit_strategy dataset options in model
+            eager loaders for per-call limits and strategies (chanks) (#1115)</p>
+            </li><li>
+            <p>Allow IPv6 addresses in database URLs on ruby 1.9+ (hellvinz, jeremyevans)
+            (#1113)</p>
+            </li><li>
+            <p>Make Database#schema :db_type entries include sizes for string types on DB2
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#schema :db_type entries include sizes for string and decimal
+            types in the jdbc adapter&#39;s schema parsing (jeremyevans)</p>
+            </li><li>
+            <p>Recognize another disconnect error in the tinytds adapter (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.29.0+-282015-12-01-29">4.29.0 (2015-12-01)<span><a href="#label-4.29.0+-282015-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

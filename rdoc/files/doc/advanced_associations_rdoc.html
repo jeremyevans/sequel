@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-01-29 16:13:26 -0800</span>
+          <span class='datetime'>2015-12-13 14:21:47 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -274,11 +274,28 @@
             <p>Otherwise, if the database supports window functions, you can choose to use
             the window function strategy:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">first_10_albums</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Album</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">limit=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10</span>,&#x000A;  :<span class="ruby-identifier">eager_limit_strategy=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">window_function</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">first_10_albums</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM (</span>&#x000A;<span class="ruby-comment">#   SELECT *, row_number() OVER (PARTITION BY tracks.album_id ORDER BY release_date) AS x_sequel_row_number_x</span>&#x000A;<span class="ruby-comment">#   FROM tracks</span>&#x000A;<span class="ruby-comment">#   WHERE (tracks.album_id IN (1, 2))</span>&#x000A;<span class="ruby-comment"># ) AS t1</span>&#x000A;<span class="ruby-comment"># WHERE (x_sequel_row_number_x &lt;= 10)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">first_10_albums</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Album</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">release_date</span>, :<span class="ruby-identifier">limit=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10</span>,&#x000A;  :<span class="ruby-identifier">eager_limit_strategy=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">window_function</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">1</span>,<span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">first_10_albums</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM (</span>&#x000A;<span class="ruby-comment">#   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x</span>&#x000A;<span class="ruby-comment">#   FROM albums</span>&#x000A;<span class="ruby-comment">#   WHERE (albums.artist_id IN (1, 2))</span>&#x000A;<span class="ruby-comment"># ) AS t1</span>&#x000A;<span class="ruby-comment"># WHERE (x_sequel_row_number_x &lt;= 10)</span></pre>
             
             <p>Alternatively, you can use the :ruby strategy, which will fall back to
             retrieving all records, and then will slice the resulting array to get the
             first 10 after retrieval.</p>
+            
+            <h3 id="label-Dynamic+Eager+Loading+Limits">Dynamic Eager Loading Limits<span><a href="#label-Dynamic+Eager+Loading+Limits">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            
+            <p>If you need to eager load variable numbers of records (with limits that
+            aren&#39;t known at the time of the association definition), <a
+            href="../../classes/Sequel.html">Sequel</a> supports an :eager_limit
+            dataset option that can be defined in an eager loading callback:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">release_date</span>).<span class="ruby-identifier">clone</span>(:<span class="ruby-identifier">eager_limit</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>)}).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM (</span>&#x000A;<span class="ruby-comment">#   SELECT *, row_number() OVER (PARTITION BY albums.artist_id ORDER BY release_date) AS x_sequel_row_number_x</span>&#x000A;<span class="ruby-comment">#   FROM albums</span>&#x000A;<span class="ruby-comment">#   WHERE (albums.artist_id IN (1, 2))</span>&#x000A;<span class="ruby-comment"># ) AS t1</span>&#x000A;<span class="ruby-comment"># WHERE (x_sequel_row_number_x &lt;= 3)</span></pre>
+            
+            <p>You can also customize the :eager_limit_strategy on a case-by-case basis by
+            passing in that option in the same way:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>]).<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">albums</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">release_date</span>).<span class="ruby-identifier">clone</span>(:<span class="ruby-identifier">eager_limit</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>, :<span class="ruby-identifier">eager_limit_strategy</span> =<span class="ruby-operator">&gt;</span> :<span class="ruby-identifier">ruby</span>)}).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE (albums.artist_id IN (1, 2)) ORDER BY release_date</span></pre>
+            
+            <p>The :eager_limit and :eager_limit_strategy options currently only work when
+            eager loading via eager, not with eager_graph.</p>
             
             <h3 id="label-Eager+Loading+via+eager_graph_with_options">Eager Loading via eager_graph_with_options<span><a href="#label-Eager+Loading+via+eager_graph_with_options">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
