@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.30.0 (2016-01-04)
 
 * Add Dataset#insert_conflict and #insert_ignore on SQLite for handling uniqueness violations (Sharpie) (#1121)
 
