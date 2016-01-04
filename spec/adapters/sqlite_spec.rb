@@ -389,7 +389,7 @@ describe "SQLite::Dataset#insert_conflict" do
 
   it "Dataset#insert_ignore and insert_constraint should ignore uniqueness violations" do
     DB[:ic_test].insert(:id => 1, :name => "one")
-    proc {DB[:ic_test].insert(:id => 1, :name => "one")}.must_raise Sequel::UniqueConstraintViolation
+    proc {DB[:ic_test].insert(:id => 1, :name => "one")}.must_raise Sequel::ConstraintViolation
 
     DB[:ic_test].insert_ignore.insert(:id => 1, :name => "one")
     DB[:ic_test].all.must_equal([{:id => 1, :name => "one"}])
