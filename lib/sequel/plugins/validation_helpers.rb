@@ -214,7 +214,7 @@ module Sequel
         #           a modified dataset that is filtered to include only rows with
         #           the same values as the current object for each column in the array.
         #
-        # If you want to to a case insensitive uniqueness validation on a database that
+        # If you want to do a case insensitive uniqueness validation on a database that
         # is case sensitive by default, you can use:
         #
         #   validates_unique :column, :where=>(proc do |ds, obj, cols|
