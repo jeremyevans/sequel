@@ -23,7 +23,7 @@ module Sequel
     # If an association uses the :delay_pks option, you can set the associated
     # pks for new objects, and the setting will not be persisted until after the
     # object has been created in the database.  Additionally, if an association
-    # uses the :delay_pks=>:all option, you can set the associated pks for existing
+    # uses the :delay_pks=>:always option, you can set the associated pks for existing
     # objects, and the setting will not be persisted until after the object has
     # been saved.
     #
