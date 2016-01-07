@@ -288,6 +288,14 @@ describe "Sequel::IntegerMigrator" do
     proc{Sequel::Migrator.apply(@db, "spec/files/duplicate_integer_migrations")}.must_raise(Sequel::Migrator::Error)
   end
 
+  it "should raise an error if there is an empty migration file" do
+    proc{Sequel::Migrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
+  end
+
+  it "should raise an error if there is a migration file with multiple migrations" do
+    proc{Sequel::Migrator.apply(@db, "spec/files/double_migration")}.must_raise(Sequel::Migrator::Error)
+  end
+
   it "should add a column name if it doesn't already exist in the schema_info table" do
     @db.create_table(:schema_info){Integer :v}
     def @db.alter_table(*); end
@@ -474,6 +482,14 @@ describe "Sequel::TimestampMigrator" do
     Object.send(:remove_const, "CreateAlbums") if Object.const_defined?("CreateAlbums")
   end
   
+  it "should raise an error if there is an empty migration file" do
+    proc{Sequel::TimestampMigrator.apply(@db, "spec/files/empty_migration")}.must_raise(Sequel::Migrator::Error)
+  end
+
+  it "should raise an error if there is a migration file with multiple migrations" do
+    proc{Sequel::TimestampMigrator.apply(@db, "spec/files/double_migration")}.must_raise(Sequel::Migrator::Error)
+  end
+
   it "should handle migrating up or down all the way" do
     @dir = 'spec/files/timestamped_migrations'
     @m.apply(@db, @dir)

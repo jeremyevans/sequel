@@ -467,6 +467,14 @@ module Sequel
       end
     end
 
+    # Load the migration file, raising an exception if the file does not define
+    # a single migration.
+    def load_migration_file(file)
+      n = Migration.descendants.length
+      load(file)
+      raise Error, "Migration file not containing a single migration detected" unless n + 1 == Migration.descendants.length
+    end
+
     # Remove all migration classes.  Done by the migrator to ensure that
     # the correct migration classes are picked up.
     def remove_migration_classes
@@ -564,7 +572,7 @@ module Sequel
       remove_migration_classes
 
       # load migration files
-      version_numbers.each{|n| load(files[n])}
+      version_numbers.each{|n| load_migration_file(files[n])}
       
       # get migration classes
       Migration.descendants
@@ -705,15 +713,15 @@ module Sequel
         if target
           if migration_version_from_file(f) > target
             if applied_migrations.include?(fi)
-              load(path)
+              load_migration_file(path)
               down_mts << [ms.last, f, :down]
             end
           elsif !applied_migrations.include?(fi)
-            load(path)
+            load_migration_file(path)
             up_mts << [ms.last, f, :up]
           end
         elsif !applied_migrations.include?(fi)
-          load(path)
+          load_migration_file(path)
           up_mts << [ms.last, f, :up]
         end
       end
