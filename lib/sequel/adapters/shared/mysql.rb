@@ -356,6 +356,8 @@ module Sequel
               [pk]
             elsif !(pkc = generator.constraints.select{|con| con[:type] == :primary_key}).empty?
               pkc.first[:columns]
+            elsif !(pkc = generator.columns.select{|con| con[:primary_key] == true}).empty?
+              pkc.map{|c| c[:name]}
             end
           else
             primary_key_from_schema(t)

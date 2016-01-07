@@ -640,6 +640,10 @@ describe "MySQL foreign key support" do
     DB.create_table!(:testfk){primary_key :id; foreign_key :fk, :testfk}
   end
 
+  it "should create table with self referential with non-autoincrementing key without :key" do
+    DB.create_table!(:testfk){Integer :id, :primary_key=>true; foreign_key :fk, :testfk}
+  end
+
   it "should create table with self referential with composite keys without :key" do
     DB.create_table!(:testfk){Integer :id; Integer :id2; Integer :fk; Integer :fk2; primary_key([:id, :id2]); foreign_key([:fk, :fk2], :testfk)}
   end
