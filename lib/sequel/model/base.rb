@@ -1134,8 +1134,9 @@ module Sequel
       attr_writer(*BOOLEAN_SETTINGS)
 
       # The hash of attribute values.  Keys are symbols with the names of the
-      # underlying database columns. Values are references to the instance
-      # attributes. Modifying them will also modify the original object.
+      # underlying database columns. The returned hash is a reference to the
+      # receiver's values hash, and modifying it will also modify the receiver's
+      # values.
       #
       #   Artist.new(:name=>'Bob').values # => {:name=>'Bob'}
       #   Artist[1].values # => {:id=>1, :name=>'Jim', ...}
