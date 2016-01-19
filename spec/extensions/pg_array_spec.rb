@@ -316,14 +316,9 @@ describe "pg_array extension" do
     Sequel::Postgres::PG_TYPES[1].call('{1}').class.must_equal(Sequel::Postgres::PGArray)
   end
 
-  it "should support registering custom types with :parser=>:json option" do
-    Sequel::Postgres::PGArray.register('foo', :oid=>2, :parser=>:json)
-    Sequel::Postgres::PG_TYPES[2].must_be_kind_of(Sequel::Postgres::PGArray::JSONCreator)
-  end
-
-  it "should support registering converters with :parser=>:json option and blocks" do
-    Sequel::Postgres::PGArray.register('foo', :oid=>4, :parser=>:json){|s| s * 2}
-    Sequel::Postgres::PG_TYPES[4].call('{{1, 2}, {3, 4}}').must_equal [[2, 4], [6, 8]]
+  it "should support registering converters with blocks" do
+    Sequel::Postgres::PGArray.register('foo', :oid=>4){|s| s.to_i * 2}
+    Sequel::Postgres::PG_TYPES[4].call('{{1,2},{3,4}}').must_equal [[2, 4], [6, 8]]
   end
 
   it "should support registering custom types with :array_type option" do
