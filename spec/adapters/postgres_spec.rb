@@ -2289,6 +2289,30 @@ describe 'PostgreSQL array handling' do
     end
   end
 
+  it 'retrieve arrays with explicit bounds' do
+    @db.create_table!(:items) do
+      column :n, 'integer[]'
+    end
+    @ds.insert(:n=>"[0:1]={2,3}")
+    rs = @ds.all
+    rs.must_equal [{:n=>[2,3]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
+
+    @ds.delete
+    @ds.insert(:n=>"[0:1][0:0]={{2},{3}}")
+    rs = @ds.all
+    rs.must_equal [{:n=>[[2], [3]]}]
+    rs.first.values.each{|v| v.class.must_equal(Sequel::Postgres::PGArray)}
+    rs.first.values.each{|v| v.to_a.must_be_kind_of(Array)}
+    @ds.delete
+    @ds.insert(rs.first)
+    @ds.all.must_equal rs
+  end if DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+
   it 'use arrays in bound variables' do
     @db.create_table!(:items) do
       column :i, 'int4[]'

@@ -74,14 +74,17 @@
 # customize the array type handling.  See the Sequel::Postgres::PGArray.register
 # method documentation.
 #
+# While this extension can parse PostgreSQL arrays with explicit bounds, it
+# currently ignores explicit bounds, so such values do not round
+# trip.
+#
 # If you want an easy way to call PostgreSQL array functions and
 # operators, look into the pg_array_ops extension.
 #
-# This extension requires the json, strscan, and delegate libraries.
+# This extension requires the strscan and delegate libraries.
 
 require 'delegate'
 require 'strscan'
-require 'json'
 Sequel.require 'adapters/utils/pg_types'
 
 module Sequel
@@ -121,10 +124,6 @@ module Sequel
       #               (usually a string), and should return the appropriate typecasted object.
       # :oid :: The PostgreSQL OID for the array type.  This is used by the Sequel postgres adapter
       #         to set up automatic type conversion on retrieval from the database.
-      # :parser :: Can be set to :json to use the faster JSON-based parser.  Note that the JSON-based
-      #            parser can only correctly handle integers values correctly.  It doesn't handle
-      #            full precision for numeric types, and doesn't handle NaN/Infinity values for
-      #            floating point types.
       # :scalar_oid :: Should be the PostgreSQL OID for the scalar version of this array type. If given,
       #                automatically sets the :converter option by looking for scalar conversion
       #                proc.
@@ -163,7 +162,7 @@ module Sequel
         end
 
         array_type = (opts[:array_type] || db_type).to_s.dup.freeze
-        creator = (opts[:parser] == :json ? JSONCreator : Creator).new(array_type, converter)
+        creator = Creator.new(array_type, converter)
 
         typecast_method_map[db_type] = :"#{type}_array"
 
@@ -343,7 +342,7 @@ module Sequel
         UNQUOTED_RE = /[{}",]|[^{}",]+/
         QUOTED_RE = /["\\]|[^"\\]+/
         NULL_RE = /NULL",/
-        OPEN_RE = /\{/
+        OPEN_RE = /((\[\d+:\d+\])+=)?\{/
 
         # Set the source for the input, and any converter callable
         # to call with objects to be created.  For nested parsers
@@ -460,27 +459,6 @@ module Sequel
         end
       end
 
-      # Callable object that takes the input string and parses it using.
-      # a JSON parser.  This should be faster than the standard Creator,
-      # but only handles integer types correctly.
-      class JSONCreator < Creator
-        # Character conversion map mapping input strings to JSON replacements
-        SUBST = {'{'.freeze=>'['.freeze, '}'.freeze=>']'.freeze, 'NULL'.freeze=>'null'.freeze}
-
-        # Regular expression matching input strings to convert
-        SUBST_RE = %r[\{|\}|NULL].freeze
-
-        # Parse the input string by using a gsub to convert non-JSON characters to
-        # JSON, running it through a regular JSON parser. If a converter is used, a
-        # recursive map of the output is done to make sure that the entires in the
-        # correct type.
-        def call(string)
-          array = Sequel.parse_json(string.gsub(SUBST_RE){|m| SUBST[m]})
-          array = Sequel.recursive_map(array, @converter) if @converter
-          PGArray.new(array, @type)
-        end
-      end
-
       # The type of this array.  May be nil if no type was given. If a type
       # is provided, the array is automatically casted to this type when
       # literalizing.  This type is the underlying type, not the array type
@@ -532,9 +510,9 @@ module Sequel
 
       # Register all array types that this extension handles by default.
 
-      register('text', :oid=>1009, :type_symbol=>:string)
-      register('integer', :oid=>1007, :parser=>:json)
-      register('bigint', :oid=>1016, :parser=>:json, :scalar_typecast=>:integer)
+      register('text', :oid=>1009, :scalar_oid=>25, :type_symbol=>:string)
+      register('integer', :oid=>1007, :scalar_oid=>23)
+      register('bigint', :oid=>1016, :scalar_oid=>20, :scalar_typecast=>:integer)
       register('numeric', :oid=>1231, :scalar_oid=>1700, :type_symbol=>:decimal)
       register('double precision', :oid=>1022, :scalar_oid=>701, :type_symbol=>:float)
 
@@ -546,8 +524,8 @@ module Sequel
       register('time with time zone', :oid=>1270, :scalar_oid=>1083, :type_symbol=>:time_timezone, :scalar_typecast=>:time)
       register('timestamp with time zone', :oid=>1185, :scalar_oid=>1184, :type_symbol=>:datetime_timezone, :scalar_typecast=>:datetime)
 
-      register('smallint', :oid=>1005, :parser=>:json, :scalar_typecast=>:integer)
-      register('oid', :oid=>1028, :parser=>:json, :scalar_typecast=>:integer)
+      register('smallint', :oid=>1005, :scalar_oid=>21, :scalar_typecast=>:integer)
+      register('oid', :oid=>1028, :scalar_oid=>26, :scalar_typecast=>:integer)
       register('real', :oid=>1021, :scalar_oid=>700, :scalar_typecast=>:float)
       register('character', :oid=>1014, :array_type=>:text, :scalar_typecast=>:string)
       register('character varying', :oid=>1015, :scalar_typecast=>:string, :type_symbol=>:varchar)
