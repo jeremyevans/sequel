@@ -247,7 +247,7 @@ module Sequel
           args = args.map{|v| v.nil? ? nil : prepared_statement_arg(v)}
           log_sql = "EXECUTE #{ps_name}"
           if ps.log_sql
-            log_sql << " ("
+            log_sql += " ("
             log_sql << sql
             log_sql << ")"
           end

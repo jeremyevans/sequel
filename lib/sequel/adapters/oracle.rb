@@ -178,7 +178,7 @@ module Sequel
         args = cursor_bind_params(conn, cursor, opts[:arguments])
         log_sql = "EXECUTE #{name}"
         if ps.log_sql
-          log_sql << " ("
+          log_sql += " ("
           log_sql << sql
           log_sql << ")"
         end
