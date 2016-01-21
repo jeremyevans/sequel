@@ -1,5 +1,7 @@
 === HEAD
 
+* Support using PostgreSQL-specific types in bound variables in the jdbc/postgresql adapter (jeremyevans)
+
 * Add support for running with --enable-frozen-string-literal on ruby 2.3 (jeremyevans)
 
 * Make Database#disconnect in the oracle adapter work correctly on newer versions of oci8 (jeremyevans)

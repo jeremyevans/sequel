@@ -140,6 +140,27 @@ module Sequel
           super || exception.message =~ /\A(This connection has been closed\.|FATAL: terminating connection due to administrator command|An I\/O error occurred while sending to the backend\.)\z/
         end
 
+        # For PostgreSQL-specific types, return the string that should be used
+        # as the PGObject value. Returns nil by default, loading pg_* extensions
+        # will override this to add support for specific types.
+        def bound_variable_arg(arg, conn)
+          nil
+        end
+
+        # If the given argument is a recognized PostgreSQL-specific type, create
+        # a PGObject instance with unknown type and the bound argument string value,
+        # and set that as the prepared statement argument.
+        def set_ps_arg(cps, arg, i)
+          if v = bound_variable_arg(arg, nil)
+            obj = org.postgresql.util.PGobject.new
+            obj.setType("unknown")
+            obj.setValue(v)
+            cps.setObject(i, obj)
+          else
+            super
+          end
+        end
+
         # Use setNull for nil arguments as the default behavior of setString
         # with nil doesn't appear to work correctly on PostgreSQL.
         def set_ps_arg_nil(cps, i)

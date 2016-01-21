@@ -2371,7 +2371,7 @@ describe 'PostgreSQL array handling' do
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.blob("b\0")], 'bytea')).must_equal nil
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'with models' do
     @db.create_table!(:items) do
@@ -2559,7 +2559,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(:i).must_equal @h
     @ds.filter(:i=>:$i).call(:first, :i=>@h).must_equal(:i=>@h)
     @ds.filter(:i=>:$i).call(:first, :i=>{}).must_equal nil
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'with models and associations' do
     @db.create_table!(:items) do
@@ -2832,7 +2832,7 @@ describe 'PostgreSQL json type' do
       j = Sequel.pg_array([pg_json.call('a'=>1), pg_json.call(['b', 2])], json_type)
       @ds.call(:insert, {:i=>j}, {:i=>:$i})
       @ds.get(:i).must_equal j
-    end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+    end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
     it 'operations/functions with pg_json_ops' do
       Sequel.extension :pg_json_ops
@@ -3020,7 +3020,7 @@ describe 'PostgreSQL inet/cidr types' do
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).must_equal(:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab'])
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[], :c=>[], :m=>[]).must_equal nil
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:delete, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).must_equal 1
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'with models' do
     @db.create_table!(:items) do
@@ -3169,7 +3169,7 @@ describe 'PostgreSQL range types' do
     @ds.filter(h).call(:first, @pgra).each{|k, v| v.must_be :==, @ra[k].to_a}
     @ds.filter(h).call(:first, r2).must_equal nil
     @ds.filter(h).call(:delete, @ra).must_equal 1
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'with models' do
     @db.create_table!(:items){primary_key :id; int4range :i4; int8range :i8; numrange :n; daterange :d; tsrange :t; tstzrange :tz}
@@ -3342,7 +3342,7 @@ describe 'PostgreSQL interval types' do
     @ds.call(:insert, {:i=>d}, {:i=>:$i})
     @ds.get(:i).must_equal d
     @ds.filter(:i=>:$i).call(:first, :i=>d).must_equal(:i=>d)
-    @ds.filter(:i=>:$i).call(:first, :i=>'0').must_equal nil
+    @ds.filter(:i=>Sequel.cast(:$i, :interval)).call(:first, :i=>'0').must_equal nil
     @ds.filter(:i=>:$i).call(:delete, :i=>d).must_equal 1
 
     @db.create_table!(:items){column :i, 'interval[]'}
@@ -3350,7 +3350,7 @@ describe 'PostgreSQL interval types' do
     @ds.filter(:i=>:$i).call(:first, :i=>[d]).must_equal(:i=>[d])
     @ds.filter(:i=>:$i).call(:first, :i=>[]).must_equal nil
     @ds.filter(:i=>:$i).call(:delete, :i=>[d]).must_equal 1
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'with models' do
     @db.create_table!(:items) do
@@ -3467,7 +3467,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.delete
     @ds.call(:insert, {:address=>Sequel.pg_row([nil, nil, nil])}, {:address=>:$address, :id=>1})
     @ds.get(:address).must_equal(:street=>nil, :city=>nil, :zip=>nil)
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'use arrays of row types in bound variables' do
     @ds = @db[:company]
@@ -3479,7 +3479,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.delete
     @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row([nil, nil, nil])])])}, {:employees=>:$employees, :id=>1})
     @ds.get(:employees).must_equal [{:address=>{:city=>nil, :zip=>nil, :street=>nil}, :id=>1}]
-  end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+  end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'operations/functions with pg_row_ops' do
     @ds.insert(:id=>1, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))
@@ -3605,7 +3605,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @ds.get(:address).must_equal @a
       @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>@a)[:id].must_equal 1
       @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12356')).must_equal nil
-    end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+    end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
     it 'use arrays of model objects in bound variables' do
       @ds = @db[:company]
@@ -3613,7 +3613,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @ds.get(:company).must_equal Company.new(:id=>1, :employees=>@es)
       @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>@es)[:id].must_equal 1
       @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).must_equal nil
-    end if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG
+    end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
     it 'model typecasting' do
       Person.plugin :pg_typecast_on_load, :address unless @native
