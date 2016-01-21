@@ -57,7 +57,7 @@ module Sequel
 
       def disconnect_connection(c)
         c.logoff
-      rescue OCIInvalidHandle
+      rescue OCIException
         nil
       end
 

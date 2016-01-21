@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#disconnect in the oracle adapter work correctly on newer versions of oci8 (jeremyevans)
+
 * Support parsing PostgreSQL arrays with explicit bounds (jeremyevans) (#1131)
 
 * Raise an error if attempting to use a migration file not containing a single migration (jeremyevans) (#1127)
