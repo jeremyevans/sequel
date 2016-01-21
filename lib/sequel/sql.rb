@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   if RUBY_VERSION < '1.9.0'
   # :nocov:

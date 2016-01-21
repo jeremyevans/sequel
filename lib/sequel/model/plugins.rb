@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # Empty namespace that plugins should use to store themselves,
   # so they can be loaded via Model.plugin.

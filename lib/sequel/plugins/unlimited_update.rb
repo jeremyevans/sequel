@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The unlimited_update plugin is designed to work around a

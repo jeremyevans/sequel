@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module EmulateOffsetWithReverseAndCount
     # Make empty? work with an offset with an order.

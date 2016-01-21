@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The pg_array_ops extension adds support to Sequel's DSL to make
 # it easier to call PostgreSQL array functions and operators.
 #

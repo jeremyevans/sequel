@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen-string-literal: true
 
 require 'rubygems'
 require 'optparse'

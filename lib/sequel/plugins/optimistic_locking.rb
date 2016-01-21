@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # This plugin implements a simple database-independent locking mechanism

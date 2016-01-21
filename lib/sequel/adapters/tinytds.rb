@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'tiny_tds'
 Sequel.require 'adapters/shared/mssql'
 

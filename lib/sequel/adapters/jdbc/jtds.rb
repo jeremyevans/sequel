@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('Java::net.sourceforge.jtds.jdbc.Driver', :JTDS)
 Sequel.require 'adapters/jdbc/mssql'
 

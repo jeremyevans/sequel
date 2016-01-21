@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # Proc that is instance evaled to create the default inflections for both the
   # model inflector and the inflector extension.

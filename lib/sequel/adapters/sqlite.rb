@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'sqlite3'
 Sequel.require 'adapters/shared/sqlite'
 

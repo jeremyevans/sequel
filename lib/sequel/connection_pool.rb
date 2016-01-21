@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The base connection pool class, which all other connection pools are based
 # on.  This class is not instantiated directly, but subclasses should at
 # the very least implement the following API:

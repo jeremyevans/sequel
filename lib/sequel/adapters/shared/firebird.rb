@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Firebird
     module DatabaseMethods

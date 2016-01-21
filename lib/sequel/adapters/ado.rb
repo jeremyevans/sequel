@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'win32ole'
 
 module Sequel

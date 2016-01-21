@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The nested_attributes plugin allows you to create, update, and delete

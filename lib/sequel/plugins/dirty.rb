@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The dirty plugin makes Sequel save the initial value of

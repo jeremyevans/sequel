@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The pg_row extension adds support for Sequel to handle
 # PostgreSQL's row-valued/composite types.
 #

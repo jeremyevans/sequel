@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The boolean_subsets plugin allows for the automatic creation of subsets for

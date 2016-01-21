@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The AssociationDependencies plugin allows you do easily set up before and/or after destroy hooks

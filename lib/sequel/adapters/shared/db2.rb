@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel.require 'adapters/utils/emulate_offset_with_row_number'
 
 module Sequel

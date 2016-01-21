@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'data_objects'
 
 module Sequel

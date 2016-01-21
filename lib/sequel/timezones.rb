@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   @application_timezone = nil
   @database_timezone = nil

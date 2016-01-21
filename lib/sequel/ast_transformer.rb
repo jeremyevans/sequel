@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # The +ASTTransformer+ class is designed to handle the abstract syntax trees
   # that Sequel uses internally and produce modified copies of them.  By itself

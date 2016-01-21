@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   extension :pg_array, :pg_array_ops
 

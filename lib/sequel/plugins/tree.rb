@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The Tree plugin adds additional associations and methods that allow you to 

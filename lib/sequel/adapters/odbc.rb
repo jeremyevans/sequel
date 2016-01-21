@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'odbc'
 
 module Sequel

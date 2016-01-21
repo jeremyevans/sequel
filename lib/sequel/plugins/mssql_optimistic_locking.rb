@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # This plugin implements optimistic locking mechanism on Microsoft SQL Server

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # Yield the Inflections module if a block is given, and return
   # the Inflections module.

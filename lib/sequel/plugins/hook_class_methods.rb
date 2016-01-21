@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # Sequel's built-in hook class methods plugin is designed for backwards

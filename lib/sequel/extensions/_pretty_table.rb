@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # This _pretty_table extension is only for internal use.
 # It adds the Sequel::PrettyTable class without modifying 
 # Sequel::Dataset.

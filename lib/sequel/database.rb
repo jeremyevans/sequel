@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # Hash of adapters that have been used. The key is the adapter scheme
   # symbol, and the value is the Database subclass.

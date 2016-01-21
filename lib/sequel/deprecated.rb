@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # This module makes it easy to print deprecation warnings with optional backtraces to a given stream.
   # There are a two accessors you can use to change how/where the deprecation methods are printed

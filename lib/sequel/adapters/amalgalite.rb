@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'amalgalite'
 Sequel.require 'adapters/shared/sqlite'
 

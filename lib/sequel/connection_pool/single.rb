@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # This is the fastest connection pool, since it isn't a connection pool at all.
 # It is just a wrapper around a single connection that uses the connection pool
 # API.

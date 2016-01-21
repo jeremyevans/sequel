@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The PgTypecastOnLoad plugin exists because when you connect to PostgreSQL

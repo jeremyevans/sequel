@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The pg_row plugin allows you to use Sequel::Model classes as composite type

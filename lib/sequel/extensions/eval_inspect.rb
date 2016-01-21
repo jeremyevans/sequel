@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The eval_inspect extension changes #inspect for Sequel::SQL::Expression
 # subclasses to return a string suitable for ruby's eval, such that
 #

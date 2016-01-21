@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('org.h2.Driver', :H2)
 
 module Sequel

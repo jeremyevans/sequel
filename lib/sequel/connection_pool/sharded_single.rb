@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # A ShardedSingleConnectionPool is a single threaded connection pool that
 # works with multiple shards/servers.
 class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool

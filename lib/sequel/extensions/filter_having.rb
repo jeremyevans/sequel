@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The filter_having extension allows Dataset#filter, #and, #or
 # and #exclude to operate on the HAVING clause if the dataset
 # already has a HAVING clause, which was the historical behavior

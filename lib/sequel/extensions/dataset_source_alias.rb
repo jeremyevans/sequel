@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The dataset_source_alias extension changes Sequel's
 # default behavior of automatically aliasing datasets
 # from using t1, t2, etc. to using an alias based on

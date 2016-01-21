@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::DataObjects.load_driver 'do_sqlite3'
 Sequel.require 'adapters/shared/sqlite'
 

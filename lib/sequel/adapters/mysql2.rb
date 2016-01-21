@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'mysql2'
 Sequel.require %w'shared/mysql_prepared_statements', 'adapters'
 

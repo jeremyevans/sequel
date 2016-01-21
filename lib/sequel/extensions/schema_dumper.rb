@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The schema_dumper extension supports dumping tables and indexes
 # in a Sequel::Migration format, so they can be restored on another
 # database (which can be the same type or a different type than

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel.require %w'shared/mysql utils/stored_procedures', 'adapters'
 
 module Sequel

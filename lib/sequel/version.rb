@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # The major version of Sequel.  Only bumped for major changes.
   MAJOR = 4

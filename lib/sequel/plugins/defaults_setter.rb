@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The defaults_setter plugin makes the column getter methods return the default

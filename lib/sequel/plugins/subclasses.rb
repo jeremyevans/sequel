@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The Subclasses plugin keeps track of all subclasses of the

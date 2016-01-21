@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The scissors plugin adds class methods for update, delete, and destroy.

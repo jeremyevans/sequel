@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   class Dataset
     # PlaceholderLiteralizer allows you to record the application of arbitrary changes

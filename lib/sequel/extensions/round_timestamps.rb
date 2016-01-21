@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The round_timestamps extension will automatically round timestamp
 # values to the database's supported level of precision before literalizing
 # them.

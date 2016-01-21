@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The hash_aliases extension allows Dataset#select and Dataset#from
 # to treat a hash argument as an alias specification, with keys
 # being the expressions and values being the aliases, 

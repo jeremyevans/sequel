@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The prepared_statements_safe plugin modifies the model to reduce the number of

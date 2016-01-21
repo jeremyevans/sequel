@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'swift/db/mysql'
 Sequel.require 'adapters/shared/mysql'
 

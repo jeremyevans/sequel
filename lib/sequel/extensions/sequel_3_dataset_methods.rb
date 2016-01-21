@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # This adds the following dataset methods:
 #
 # []= :: filter with the first argument, update with the second

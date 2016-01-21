@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The auto_validations plugin automatically sets up the following types of validations

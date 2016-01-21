@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # Sequel's built-in caching plugin supports caching to any object that

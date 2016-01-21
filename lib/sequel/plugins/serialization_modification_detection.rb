@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # This plugin extends the serialization plugin and enables it to detect

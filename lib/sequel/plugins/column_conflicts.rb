@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The column_conflicts plugin overrides Model#get_column_value and #set_column_value

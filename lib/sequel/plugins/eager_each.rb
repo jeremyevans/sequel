@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The eager_each plugin makes calling each on an eager loaded dataset do eager loading.

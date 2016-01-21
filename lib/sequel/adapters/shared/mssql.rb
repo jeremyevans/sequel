@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel.require %w'emulate_offset_with_row_number split_alter_table', 'adapters/utils'
 
 module Sequel

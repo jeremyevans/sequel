@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 if RUBY_VERSION >= '1.9.0'
 module Sequel
   module Plugins

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel.require 'adapters/shared/access'
 Sequel.require 'adapters/utils/split_alter_table'
 

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The list plugin allows for model instances to be part of an ordered list,

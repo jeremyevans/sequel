@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # This changes Sequel's literalization of IN/NOT IN with an empty
 # array value to consider NULL values if one of the referenced
 # columns is NULL:

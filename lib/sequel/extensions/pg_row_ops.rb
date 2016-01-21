@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The pg_row_ops extension adds support to Sequel's DSL to make
 # it easier to deal with PostgreSQL row-valued/composite types.
 #

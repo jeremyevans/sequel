@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # SkipCreateRefresh is a simple plugin that make Sequel not

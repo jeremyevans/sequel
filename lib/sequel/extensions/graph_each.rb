@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The graph_each extension adds Dataset#graph_each and
 # makes Dataset#each call #graph_each if the dataset has been graphed.
 # Dataset#graph_each splits result hashes into subhashes per table:

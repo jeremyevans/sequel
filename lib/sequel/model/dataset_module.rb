@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   class Model
     # This Module subclass is used by Model.dataset_module

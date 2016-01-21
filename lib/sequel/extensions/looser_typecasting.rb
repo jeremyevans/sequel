@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The LooserTypecasting extension loosens the default database typecasting
 # for the following types:
 #

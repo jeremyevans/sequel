@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The meta_def extension is designed for backwards compatibility
 # with older Sequel code that uses the meta_def method on
 # Database, Dataset, and Model classes and/or instances.  It is

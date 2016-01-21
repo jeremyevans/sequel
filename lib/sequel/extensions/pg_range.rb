@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The pg_range extension adds support for the PostgreSQL 9.2+ range
 # types to Sequel.  PostgreSQL range types are similar to ruby's
 # Range class, representating an array of values.  However, they

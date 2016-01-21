@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('com.progress.sql.jdbc.JdbcProgressDriver')
 Sequel.require 'adapters/shared/progress'
 Sequel.require 'adapters/jdbc/transactions'

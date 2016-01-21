@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # A dataset represents an SQL query, or more generally, an abstract
   # set of rows in the database.  Datasets

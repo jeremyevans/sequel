@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The pg_inet_ops extension adds support to Sequel's DSL to make
 # it easier to call PostgreSQL inet functions and operators.
 #

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 begin
   require "mysqlplus"
 rescue LoadError

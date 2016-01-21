@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   # Exception class raised when +raise_on_save_failure+ is set and a before hook returns false
   # or an around hook doesn't call super or yield.

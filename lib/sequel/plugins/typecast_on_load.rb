@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The TypecastOnLoad plugin exists because most of Sequel's database adapters don't

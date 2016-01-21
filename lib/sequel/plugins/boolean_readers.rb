@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The BooleanReaders plugin allows for the creation of attribute? methods

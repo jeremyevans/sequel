@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'swift/db/postgres'
 Sequel.require 'adapters/shared/postgres'
 

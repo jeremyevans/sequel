@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   class Model
     module InstanceMethods

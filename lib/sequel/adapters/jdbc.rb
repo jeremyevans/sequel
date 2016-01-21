@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'java'
 Sequel.require 'adapters/utils/stored_procedures'
 

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # Sequel's built in schema plugin allows you to define your schema

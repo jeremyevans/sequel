@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'active_model'
 module Sequel
   module Plugins

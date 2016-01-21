@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The blank extension adds the blank? method to all objects (e.g. Object#blank?).
 #
 # To load the extension:

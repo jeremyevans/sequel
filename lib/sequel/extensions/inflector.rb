@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The inflector extension adds inflection instance methods to String, which allows the easy transformation of
 # words from singular to plural, class names to table names, modularized class
 # names to ones without, and class names to foreign keys.  It exists for 

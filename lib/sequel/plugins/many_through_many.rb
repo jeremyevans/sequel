@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The many_through_many plugin allow you to create an association using multiple join tables.

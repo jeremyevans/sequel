@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('com.ibm.db2.jcc.DB2Driver')
 Sequel.require 'adapters/shared/db2'
 Sequel.require 'adapters/jdbc/transactions'

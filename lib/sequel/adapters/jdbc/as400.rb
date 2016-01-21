@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('com.ibm.as400.access.AS400JDBCDriver')
 Sequel.require 'adapters/jdbc/transactions'
 Sequel.require 'adapters/utils/emulate_offset_with_row_number'

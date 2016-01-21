@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'oci8'
 Sequel.require 'adapters/shared/oracle'
 

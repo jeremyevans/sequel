@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Postgres
     NAN             = 0.0/0.0

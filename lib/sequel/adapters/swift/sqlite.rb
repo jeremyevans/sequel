@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'swift/db/sqlite3'
 Sequel.require 'adapters/shared/sqlite'
 

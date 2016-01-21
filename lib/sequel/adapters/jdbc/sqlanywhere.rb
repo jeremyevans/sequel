@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel.require 'adapters/shared/sqlanywhere'
 Sequel.require 'adapters/jdbc/transactions'
 

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The prepared_statements_with_pk plugin allows Dataset#with_pk for model datasets

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The validation_helpers plugin contains instance method equivalents for most of the legacy

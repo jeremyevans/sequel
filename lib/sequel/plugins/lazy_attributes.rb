@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The lazy_attributes plugin allows users to easily set that some attributes

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module EmulateOffsetWithRowNumber
     # If the offset must be emulated with ROW_NUMBER, don't remove any ordering,

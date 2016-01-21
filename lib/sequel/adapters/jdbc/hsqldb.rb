@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('org.hsqldb.jdbcDriver', :HSQLDB)
 Sequel.require 'adapters/jdbc/transactions'
 

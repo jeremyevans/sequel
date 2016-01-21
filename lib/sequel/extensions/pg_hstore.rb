@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The pg_hstore extension adds support for the PostgreSQL hstore type
 # to Sequel.  hstore is an extension that ships with PostgreSQL, and
 # the hstore type stores an arbitrary key-value table, where the keys

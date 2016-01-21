@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # Allows the use of named timezones via TZInfo (requires tzinfo).
 # Forces the use of DateTime as Sequel's datetime_class, since
 # ruby's Time class doesn't support timezones other than local

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel.require 'adapters/shared/db2'
 
 Sequel.synchronize do

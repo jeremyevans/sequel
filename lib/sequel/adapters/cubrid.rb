@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 require 'cubrid'
 Sequel.require 'adapters/shared/cubrid'
 

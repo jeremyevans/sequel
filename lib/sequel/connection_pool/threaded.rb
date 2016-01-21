@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # A connection pool allowing multi-threaded access to a pool of connections.
 # This is the default connection pool used by Sequel.
 class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # The connection_validator extension modifies a database's
 # connection pool to validate that connections checked out
 # from the pool are still valid, before yielding them for

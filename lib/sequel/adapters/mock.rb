@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Mock
     # Connection class for Sequel's mock adapter.

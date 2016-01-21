@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::DataObjects.load_driver 'do_postgres'
 Sequel.require 'adapters/shared/postgres'
 

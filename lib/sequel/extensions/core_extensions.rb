@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 # These are extensions to core classes that Sequel enables by default.
 # They make using Sequel's DSL easier by adding methods to Array,
 # Hash, String, and Symbol to add methods that return Sequel

@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('org.firebirdsql.jdbc.FBDriver')
 Sequel.require 'adapters/shared/firebird'
 Sequel.require 'adapters/jdbc/transactions'

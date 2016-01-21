@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   module Plugins
     # The update_or_create plugin adds a couple of methods that make it easier

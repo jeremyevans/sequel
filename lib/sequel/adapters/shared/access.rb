@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 module Sequel
   require 'adapters/utils/emulate_offset_with_reverse_and_count'
 

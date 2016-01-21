@@ -1,3 +1,5 @@
+# frozen-string-literal: true
+
 Sequel::JDBC.load_driver('Java::oracle.jdbc.driver.OracleDriver')
 Sequel.require 'adapters/shared/oracle'
 Sequel.require 'adapters/jdbc/transactions'
