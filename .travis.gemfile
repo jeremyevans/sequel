@@ -36,7 +36,7 @@ end
 platforms :jruby do
   gem 'jdbc-sqlite3'
   gem 'jdbc-mysql'
-  gem 'jdbc-postgres'
+  gem 'jdbc-postgres', '9.4.1200'
 end
 
 platforms :rbx do
