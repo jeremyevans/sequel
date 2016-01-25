@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pagination extension adds the Sequel::Dataset#paginate and #each_page methods,
 # which return paginated (limited and offset) datasets with the following methods
 # added that make creating a paginated display easier:

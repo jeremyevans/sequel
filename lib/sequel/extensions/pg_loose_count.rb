@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_loose_count extension looks at the table statistics
 # in the PostgreSQL system tables to get a fast approximate
 # count of the number of rows in a given table:

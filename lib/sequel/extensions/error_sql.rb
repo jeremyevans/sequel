@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The error_sql extension adds a DatabaseError#sql method
 # that you can use to get the sql that caused the error
 # to be raised.

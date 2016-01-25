@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The mssql_emulate_lateral_with_apply extension converts
 # queries that use LATERAL into queries that use CROSS/OUTER
 # APPLY, allowing code that works on databases that support

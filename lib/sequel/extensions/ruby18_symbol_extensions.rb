@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The ruby18_symbol_extensions adds the <, <=, >, >= to Symbol
 # to reflect the mathmatical operators.  It also adds the [] method
 # to Symbol for creating SQL functions.

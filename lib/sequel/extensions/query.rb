@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The query extension adds a query method which allows
 # a different way to construct queries instead of the usual
 # method chaining:

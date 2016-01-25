@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_static_cache_updater extension is designed to
 # automatically update the caches in the models using the
 # static_cache plugin when changes to the underlying tables

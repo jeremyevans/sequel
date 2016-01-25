@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The query_literals extension changes Sequel's default behavior of
 # the select, order and group methods so that if the first argument
 # is a regular string, it is treated as a literal string, with the

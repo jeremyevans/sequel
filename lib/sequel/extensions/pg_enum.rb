@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_enum extension adds support for Sequel to handle PostgreSQL's enum
 # types.  To use this extension, first load it into your Database instance:
 #

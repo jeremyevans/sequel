@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The current_datetime_timestamp extension makes Dataset#current_datetime
 # return an object that operates like Sequel.datetime_class.now, but will
 # be literalized as CURRENT_TIMESTAMP.

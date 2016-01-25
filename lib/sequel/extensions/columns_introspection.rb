@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The columns_introspection extension attempts to introspect the
 # selected columns for a dataset before issuing a query.  If it
 # thinks it can guess correctly at the columns the query will use,

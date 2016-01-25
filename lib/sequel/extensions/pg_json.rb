@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_json extension adds support for Sequel to handle
 # PostgreSQL's json and jsonb types.  It is slightly more strict than the
 # PostgreSQL json types in that the object returned should be an

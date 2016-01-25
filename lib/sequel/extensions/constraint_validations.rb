@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The constraint_validations extension is designed to easily create database
 # constraints inside create_table and alter_table blocks.  It also adds
 # relevant metadata about the constraints to a separate table, which the

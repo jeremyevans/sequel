@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The set_overrides extension adds the Dataset#set_overrides and
 # Dataset#set_defaults methods which provide a crude way to
 # control the values used in INSERT/UPDATE statements if a hash

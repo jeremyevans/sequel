@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The arbitrary_servers extension allows you to connect to arbitrary
 # servers/shards that were not defined when you created the database.
 # To use it, you first load the extension into the Database object:

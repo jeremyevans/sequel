@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_array extension adds support for Sequel to handle
 # PostgreSQL's array types.
 #

@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The null_dataset extension adds the Dataset#nullify method, which
 # returns a cloned dataset that will never issue a query to the
 # database.  It implements the null object pattern for datasets.

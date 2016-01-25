@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The from_block extension changes Database#from so that blocks given
 # to it are treated as virtual rows applying to the FROM clause,
 # instead of virtual rows applying to the WHERE clause.  This will

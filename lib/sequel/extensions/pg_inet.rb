@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_inet extension adds support for Sequel to handle
 # PostgreSQL's inet and cidr types using ruby's IPAddr class.
 #

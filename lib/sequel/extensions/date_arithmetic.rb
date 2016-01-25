@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The date_arithmetic extension adds the ability to perform database-independent
 # addition/substraction of intervals to/from dates and timestamps.
 #

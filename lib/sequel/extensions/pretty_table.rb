@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pretty_table extension adds Sequel::Dataset#print and the
 # Sequel::PrettyTable class for creating nice-looking plain-text
 # tables.  Example:

@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # These are refinements to core classes that allow the Sequel
 # DSL to be used without modifying the core classes directly.
 # After loading the extension via:

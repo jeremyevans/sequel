@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The thread_local_timezones extension allows you to set a per-thread timezone that
 # will override the default global timezone while the thread is executing.  The
 # main use case is for web applications that execute each request in its own thread,

@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # Adds the Sequel::Migration and Sequel::Migrator classes, which allow
 # the user to easily group schema changes and migrate the database
 # to a newer version or revert to a previous version.

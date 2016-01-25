@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The sql_expr extension adds the sql_expr method to every object, which
 # returns an wrapped object that works nicely with Sequel's DSL by calling
 # Sequel.expr:

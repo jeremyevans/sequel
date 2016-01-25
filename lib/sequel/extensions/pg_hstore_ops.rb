@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_hstore_ops extension adds support to Sequel's DSL to make
 # it easier to call PostgreSQL hstore functions and operators.
 #

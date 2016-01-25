@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The pg_interval extension adds support for PostgreSQL's interval type.
 #
 # This extension integrates with Sequel's native postgres and jdbc/postgresql

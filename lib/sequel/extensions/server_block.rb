@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The server_block extension adds the Database#with_server method, which takes a shard
 # argument and a block, and makes it so that access inside the block will use the
 # specified shard by default.

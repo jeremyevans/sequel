@@ -1,5 +1,5 @@
 # frozen-string-literal: true
-
+#
 # The schema_caching extension adds a few methods to Sequel::Database
 # that make it easy to dump the parsed schema information to a file,
 # and load it from that file.  Loading the schema information from a
