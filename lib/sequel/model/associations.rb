@@ -2555,7 +2555,7 @@ END
         # create large cartesian products.  If you must graph multiple one_to_many and many_to_many associations,
         # make sure your filters are narrow if you have a large database.
         # 
-        # Each association's order, if definied, is respected. +eager_graph+ probably
+        # Each association's order, if defined, is respected. +eager_graph+ probably
         # won't work correctly on a limited dataset, unless you are
         # only graphing many_to_one, one_to_one, and one_through_one associations.
         # 
