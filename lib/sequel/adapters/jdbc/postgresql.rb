@@ -216,7 +216,7 @@ module Sequel
         def type_convertor(map, meta, type, i)
           case type
           when *PG_SPECIFIC_TYPES
-            oid = meta.field(i).oid
+            oid = meta.getField(i).getOID
             if pr = db.oid_convertor_proc(oid)
               pr
             elsif type == ARRAY_TYPE

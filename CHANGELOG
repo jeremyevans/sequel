@@ -1,5 +1,7 @@
 === HEAD
 
+* Use getField and getOID instead of field and oid in the jdbc/postgresql adapter to work around JRuby 9.0.5.0 regression (jeremyevans) (#1137)
+
 * Support using PostgreSQL-specific types in bound variables in the jdbc/postgresql adapter (jeremyevans)
 
 * Add support for running with --enable-frozen-string-literal on ruby 2.3 (jeremyevans)
