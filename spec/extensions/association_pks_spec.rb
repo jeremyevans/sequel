@@ -284,10 +284,11 @@ describe "Sequel::Plugins::AssociationPks" do
   it "should handle delaying setting of association pks until after saving for new objects, if :delay plugin option is used" do
     @Artist.one_to_many :albums, :clone=>:albums, :delay_pks=>true
     @Album.many_to_many :tags, :clone=>:tags, :delay_pks=>true
+    @Album.db_schema[:id][:type] = :integer
 
     ar = @Artist.new
     ar.album_pks.must_equal []
-    ar.album_pks = [1,2,3]
+    ar.album_pks = ["1","2","3"]
     ar.album_pks.must_equal [1,2,3]
     @db.sqls.must_equal []
 
@@ -320,11 +321,12 @@ describe "Sequel::Plugins::AssociationPks" do
   it "should handle delaying setting of association pks until after saving for existing objects, if :delay=>:all plugin option is used" do
     @Artist.one_to_many :albums, :clone=>:albums, :delay_pks=>:always
     @Album.many_to_many :tags, :clone=>:tags, :delay_pks=>:always
+    @Album.db_schema[:id][:type] = :integer
 
     ar = @Artist.load(:id=>1)
     ar.album_pks.must_equal [1,2,3]
     @db.sqls
-    ar.album_pks = [2,4]
+    ar.album_pks = ["2","4"]
     ar.album_pks.must_equal [2,4]
     @db.sqls.must_equal []
 

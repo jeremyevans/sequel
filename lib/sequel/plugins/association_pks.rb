@@ -74,7 +74,6 @@ module Sequel
           end
 
           opts[:pks_setter] = lambda do |pks|
-            pks = send(crk ? :convert_cpk_array : :convert_pk_array, opts, pks)
             checked_transaction do
               if clpk
                 lpkv = lpk.map{|k| get_column_value(k)}
@@ -111,13 +110,6 @@ module Sequel
 
           opts[:pks_setter] = lambda do |pks|
             primary_key = opts.associated_class.primary_key
-
-            pks = if primary_key.is_a?(Array)
-              convert_cpk_array(opts, pks)
-            else
-              convert_pk_array(opts, pks)
-            end
-
             pkh = {primary_key=>pks}
 
             if key.is_a?(Array)
@@ -182,6 +174,7 @@ module Sequel
         # If the receiver is a new object, save the pks
         # so the update can happen after the received has been saved.
         def _association_pks_setter(opts, pks)
+          pks = convert_pk_array(opts, pks)
           delay = opts[:delay_pks]
           if (new? && delay) || (delay == :always)
             modified!
@@ -191,24 +184,25 @@ module Sequel
           end
         end
 
-        # If any of associated class's composite primary key column types is integer,
-        # typecast the appropriate values to integer before using them.
-        def convert_cpk_array(opts, cpks)
-          if klass = opts.associated_class and sch = klass.db_schema and (cols = sch.values_at(*klass.primary_key)).all? and (convs = cols.map{|c| c[:type] == :integer}).any?
-            cpks.map do |cpk|
-              cpk.zip(convs).map do |pk, conv|
-                conv ? model.db.typecast_value(:integer, pk) : pk
-              end
-            end
-          else
-            cpks
-          end
-        end
-
         # If the associated class's primary key column type is integer,
         # typecast all provided values to integer before using them.
         def convert_pk_array(opts, pks)
-          if klass = opts.associated_class and sch = klass.db_schema and col = sch[klass.primary_key] and col[:type] == :integer
+          klass = opts.associated_class
+          primary_key = klass.primary_key
+          sch = klass.db_schema
+          pks = Array(pks)
+
+          if primary_key.is_a?(Array)
+            if (cols = sch.values_at(*klass.primary_key)).all? && (convs = cols.map{|c| c[:type] == :integer}).all?
+              pks.map do |cpk|
+                cpk.zip(convs).map do |pk, conv|
+                  conv ? model.db.typecast_value(:integer, pk) : pk
+                end
+              end
+            else
+              pks
+            end
+          elsif (col = sch[klass.primary_key]) && (col[:type] == :integer)
             pks.map{|pk| model.db.typecast_value(:integer, pk)}
           else
             pks
