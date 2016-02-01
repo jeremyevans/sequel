@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.31.0 (2016-02-01)
 
 * Convert types in association_pks setters before saving them, instead of just before running queries (jeremyevans)
 
