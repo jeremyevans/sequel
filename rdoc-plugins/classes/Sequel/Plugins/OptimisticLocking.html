@@ -102,7 +102,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_filters</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:instance_filters</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -120,7 +120,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:lock_version</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/optimistic_locking.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">lock_column</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:lock_column</span>] <span class="ruby-operator">||</span> <span class="ruby-value">:lock_version</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

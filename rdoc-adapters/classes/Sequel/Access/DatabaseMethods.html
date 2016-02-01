@@ -88,7 +88,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 9</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:access</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 11</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:access</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-rename_table'>
@@ -107,7 +107,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-rename_table-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-rename_table-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 20</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rename_table</span>(<span class="ruby-identifier">from_table</span>, <span class="ruby-identifier">to_table</span>)&#x000A;  <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">to_table</span>, <span class="ruby-value">:as=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">from</span>(<span class="ruby-identifier">from_table</span>))&#x000A;  <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">from_table</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-rename_table-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">rename_table</span>(<span class="ruby-identifier">from_table</span>, <span class="ruby-identifier">to_table</span>)&#x000A;  <span class="ruby-identifier">create_table</span>(<span class="ruby-identifier">to_table</span>, <span class="ruby-value">:as=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">from</span>(<span class="ruby-identifier">from_table</span>))&#x000A;  <span class="ruby-identifier">drop_table</span>(<span class="ruby-identifier">from_table</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-serial_primary_key_options'>
@@ -125,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-serial_primary_key_options-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-serial_primary_key_options-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serial_primary_key_options</span>&#x000A;  {<span class="ruby-value">:primary_key</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:Counter</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-serial_primary_key_options-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/access.rb, line 28</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serial_primary_key_options</span>&#x000A;  {<span class="ruby-value">:primary_key</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:Counter</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

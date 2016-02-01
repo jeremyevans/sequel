@@ -99,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">s</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">s</span>)}}&#x000A;  <span class="ruby-identifier">c</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">s</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">s</span>)}}&#x000A;  <span class="ruby-identifier">c</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-database_error_regexps'>
@@ -115,7 +115,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_error_regexps-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-database_error_regexps-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_error_regexps</span>&#x000A;  <span class="ruby-constant">DATABASE_ERROR_REGEXPS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-database_error_regexps-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_error_regexps</span>&#x000A;  <span class="ruby-constant">DATABASE_ERROR_REGEXPS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

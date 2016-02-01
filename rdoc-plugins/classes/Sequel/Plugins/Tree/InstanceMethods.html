@@ -71,7 +71,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-ancestors-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-ancestors-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 85</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">ancestors</span>&#x000A;  <span class="ruby-identifier">node</span>, <span class="ruby-identifier">nodes</span> = <span class="ruby-keyword">self</span>, []&#x000A;  <span class="ruby-identifier">nodes</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">node</span> = <span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent</span> <span class="ruby-keyword">while</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent</span>&#x000A;  <span class="ruby-identifier">nodes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-ancestors-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">ancestors</span>&#x000A;  <span class="ruby-identifier">node</span>, <span class="ruby-identifier">nodes</span> = <span class="ruby-keyword">self</span>, []&#x000A;  <span class="ruby-identifier">nodes</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">node</span> = <span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent</span> <span class="ruby-keyword">while</span> <span class="ruby-identifier">node</span>.<span class="ruby-identifier">parent</span>&#x000A;  <span class="ruby-identifier">nodes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-descendants'>
@@ -90,7 +90,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-descendants-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-descendants-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">descendants</span>&#x000A;  <span class="ruby-identifier">nodes</span> = <span class="ruby-identifier">children</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">children</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">child</span><span class="ruby-operator">|</span> <span class="ruby-identifier">nodes</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">child</span>.<span class="ruby-identifier">descendants</span>)}&#x000A;  <span class="ruby-identifier">nodes</span> &#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-descendants-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">descendants</span>&#x000A;  <span class="ruby-identifier">nodes</span> = <span class="ruby-identifier">children</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-identifier">children</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">child</span><span class="ruby-operator">|</span> <span class="ruby-identifier">nodes</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">child</span>.<span class="ruby-identifier">descendants</span>)}&#x000A;  <span class="ruby-identifier">nodes</span> &#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-root'>
@@ -108,7 +108,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-root-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-root-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">root</span>&#x000A;  <span class="ruby-identifier">ancestors</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-root-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 104</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">root</span>&#x000A;  <span class="ruby-identifier">ancestors</span>.<span class="ruby-identifier">last</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-root-3F'>
@@ -125,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-root-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-root-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 107</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">root?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">possible_root?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-root-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">root?</span>&#x000A;  <span class="ruby-operator">!</span><span class="ruby-identifier">new?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">possible_root?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-self_and_siblings'>
@@ -144,7 +144,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-self_and_siblings-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-self_and_siblings-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">self_and_siblings</span>&#x000A;  <span class="ruby-identifier">parent</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">roots</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-self_and_siblings-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">self_and_siblings</span>&#x000A;  <span class="ruby-identifier">parent</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">children</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">model</span>.<span class="ruby-identifier">roots</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-siblings'>
@@ -163,7 +163,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-siblings-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-siblings-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">siblings</span>&#x000A;  <span class="ruby-identifier">self_and_siblings</span> <span class="ruby-operator">-</span> [<span class="ruby-keyword">self</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-siblings-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">siblings</span>&#x000A;  <span class="ruby-identifier">self_and_siblings</span> <span class="ruby-operator">-</span> [<span class="ruby-keyword">self</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

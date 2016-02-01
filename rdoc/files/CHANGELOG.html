@@ -31,12 +31,40 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-04 13:11:10 -0800</span>
+          <span class='datetime'>2016-02-01 08:16:09 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.31.0+-282016-02-01-29">4.31.0 (2016-02-01)<span><a href="#label-4.31.0+-282016-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Convert types in association_pks setters before saving them, instead of
+            just before running queries (jeremyevans)</p>
+            </li><li>
+            <p>Use getField and getOID instead of field and oid in the jdbc/postgresql
+            adapter to work around JRuby 9.0.5.0 regression (jeremyevans) (#1137)</p>
+            </li><li>
+            <p>Support using PostgreSQL-specific types in bound variables in the
+            jdbc/postgresql adapter (jeremyevans)</p>
+            </li><li>
+            <p>Add support for running with –enable-frozen-string-literal on ruby 2.3
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#disconnect in the oracle adapter work correctly on newer
+            versions of oci8 (jeremyevans)</p>
+            </li><li>
+            <p>Support parsing PostgreSQL arrays with explicit bounds (jeremyevans)
+            (#1131)</p>
+            </li><li>
+            <p>Raise an error if attempting to use a migration file not containing a
+            single migration (jeremyevans) (#1127)</p>
+            </li><li>
+            <p>Automatically set referenced key for self referential foriegn key
+            constraint for simple non-autoincrementing primary key on MySQL
+            (jeremyevans) (#1126)</p>
+            </li></ul>
             
             <h3 id="label-4.30.0+-282016-01-04-29">4.30.0 (2016-01-04)<span><a href="#label-4.30.0+-282016-01-04-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

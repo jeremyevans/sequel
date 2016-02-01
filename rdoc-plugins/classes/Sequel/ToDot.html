@@ -97,7 +97,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-ivar">@i</span> = <span class="ruby-value">0</span>&#x000A;  <span class="ruby-ivar">@stack</span> = [<span class="ruby-ivar">@i</span>]&#x000A;  <span class="ruby-ivar">@dot</span> = [<span class="ruby-string">&quot;digraph G {&quot;</span>, <span class="ruby-string">&quot;0 [label=\&quot;self\&quot;];&quot;</span>]&#x000A;  <span class="ruby-identifier">v</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-string">&quot;&quot;</span>)&#x000A;  <span class="ruby-ivar">@dot</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-ivar">@i</span> = <span class="ruby-value">0</span>&#x000A;  <span class="ruby-ivar">@stack</span> = [<span class="ruby-ivar">@i</span>]&#x000A;  <span class="ruby-ivar">@dot</span> = [<span class="ruby-string">&quot;digraph G {&quot;</span>, <span class="ruby-string">&quot;0 [label=\&quot;self\&quot;];&quot;</span>]&#x000A;  <span class="ruby-identifier">v</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-string">&quot;&quot;</span>)&#x000A;  <span class="ruby-ivar">@dot</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-output'>
@@ -115,7 +115,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-output-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-output-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 27</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">output</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">ds</span>).<span class="ruby-identifier">output</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-output-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">output</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">ds</span>).<span class="ruby-identifier">output</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -133,7 +133,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-output-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-output-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">output</span>&#x000A;  <span class="ruby-ivar">@dot</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-output-source'><span class="ruby-comment"># File lib/sequel/extensions/to_dot.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">output</span>&#x000A;  <span class="ruby-ivar">@dot</span>.<span class="ruby-identifier">join</span>(<span class="ruby-string">&quot;\n&quot;</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

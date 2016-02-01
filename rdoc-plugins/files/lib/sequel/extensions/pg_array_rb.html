@@ -31,12 +31,14 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-04-28 15:29:46 -0700</span>
+          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <p>frozen-string-literal: true</p>
             
             <p>The pg_array extension adds support for <a
             href="../../../../classes/Sequel.html">Sequel</a> to handle
@@ -124,10 +126,13 @@
             href="../../../../classes/Sequel/Postgres/PGArray.html#method-c-register">Sequel::Postgres::PGArray.register</a>
             method documentation.</p>
             
+            <p>While this extension can parse PostgreSQL arrays with explicit bounds, it
+            currently ignores explicit bounds, so such values do not round trip.</p>
+            
             <p>If you want an easy way to call PostgreSQL array functions and operators,
             look into the pg_array_ops extension.</p>
             
-            <p>This extension requires the json, strscan, and delegate libraries.</p>
+            <p>This extension requires the strscan and delegate libraries.</p>
           </div>
           <div id='context'>
             <div id='requires'>
@@ -135,7 +140,6 @@
               <ol>
                 <li>delegate</li>
                 <li>strscan</li>
-                <li>json</li>
                 <li>adapters/utils/pg_types</li>
               </ol>
             </div>

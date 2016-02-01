@@ -205,7 +205,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-2D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-2D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">-</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-2D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">-</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>)&#x000A;    <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast_string</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-5B-5D'>
@@ -224,7 +224,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 112</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">LOOKUP</span>, [<span class="ruby-identifier">value</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">key</span>)])&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">||</span> (<span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>)) <span class="ruby-operator">||</span> (<span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayOp</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayOp</span>))&#x000A;    <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">LOOKUP</span>, [<span class="ruby-identifier">value</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">key</span>)])&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">||</span> (<span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGArray</span>)) <span class="ruby-operator">||</span> (<span class="ruby-keyword">defined?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayOp</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">key</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">ArrayOp</span>))&#x000A;    <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-contain_all'>
@@ -243,7 +243,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contain_all-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contain_all-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_all</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contain_all-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 126</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_all</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ALL</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-contain_any'>
@@ -262,7 +262,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contain_any-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contain_any-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 131</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_any</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contain_any-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contain_any</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAIN_ANY</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-contained_by'>
@@ -281,7 +281,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contained_by-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contained_by-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 145</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contained_by</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contained_by-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 147</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contained_by</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINED_BY</span>, <span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-contains'>
@@ -300,7 +300,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-contains-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-contains-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 138</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contains</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-contains-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 140</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">contains</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">CONTAINS</span>, <span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-defined'>
@@ -319,7 +319,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-defined-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-defined-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">defined</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:defined</span>, <span class="ruby-identifier">key</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-defined-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">defined</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOOP</span>, <span class="ruby-identifier">function</span>(<span class="ruby-value">:defined</span>, <span class="ruby-identifier">key</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-delete'>
@@ -338,7 +338,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-delete-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-delete-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 159</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:delete</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">key</span>))))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-delete-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 161</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:delete</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">key</span>))))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-each'>
@@ -357,7 +357,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-each-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 166</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 168</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:each</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-has_key-3F'>
@@ -376,7 +376,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-has_key-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-has_key-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 173</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-has_key-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 175</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">key</span>)&#x000A;  <span class="ruby-identifier">bool_op</span>(<span class="ruby-constant">HAS_KEY</span>, <span class="ruby-identifier">key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hstore'>
@@ -393,7 +393,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-hstore-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-hstore-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 182</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hstore</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-hstore-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 184</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hstore</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-keys'>
@@ -412,7 +412,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-keys-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-keys-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 189</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">keys</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:akeys</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-keys-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 191</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">keys</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:akeys</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-merge'>
@@ -431,7 +431,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-merge-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-merge-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 197</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CONCAT</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>)]))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-merge-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 199</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">CONCAT</span>, [<span class="ruby-keyword">self</span>, <span class="ruby-identifier">wrap_input_hash</span>(<span class="ruby-identifier">other</span>)]))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-populate'>
@@ -450,7 +450,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-populate-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-populate-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 205</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">populate</span>(<span class="ruby-identifier">record</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:populate_record</span>, <span class="ruby-identifier">record</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-populate-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 207</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">populate</span>(<span class="ruby-identifier">record</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:populate_record</span>, <span class="ruby-identifier">record</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-record_set'>
@@ -469,7 +469,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-record_set-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-record_set-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 212</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">record_set</span>(<span class="ruby-identifier">record</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">RECORD_SET</span>, [<span class="ruby-identifier">record</span>, <span class="ruby-identifier">value</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-record_set-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 214</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">record_set</span>(<span class="ruby-identifier">record</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">RECORD_SET</span>, [<span class="ruby-identifier">record</span>, <span class="ruby-identifier">value</span>])&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-skeys'>
@@ -488,7 +488,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-skeys-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-skeys-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 219</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skeys</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:skeys</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-skeys-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 221</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skeys</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:skeys</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-slice'>
@@ -507,7 +507,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-slice-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-slice-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 226</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">slice</span>(<span class="ruby-identifier">keys</span>)&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:slice</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">keys</span>)))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-slice-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 228</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">slice</span>(<span class="ruby-identifier">keys</span>)&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:slice</span>, <span class="ruby-identifier">wrap_input_array</span>(<span class="ruby-identifier">keys</span>)))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-svals'>
@@ -526,7 +526,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-svals-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-svals-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 233</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">svals</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:svals</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-svals-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 235</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">svals</span>&#x000A;  <span class="ruby-identifier">function</span>(<span class="ruby-value">:svals</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_array'>
@@ -545,7 +545,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_array-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 241</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_array</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore_to_array</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_array-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 243</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_array</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore_to_array</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_matrix'>
@@ -565,7 +565,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_matrix-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_matrix-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 249</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_matrix</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore_to_matrix</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_matrix-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 251</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_matrix</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:hstore_to_matrix</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-values'>
@@ -584,7 +584,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-values-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-values-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 256</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">values</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:avals</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-values-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 258</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">values</span>&#x000A;  <span class="ruby-identifier">wrap_output_array</span>(<span class="ruby-identifier">function</span>(<span class="ruby-value">:avals</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

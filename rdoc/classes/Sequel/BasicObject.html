@@ -95,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-const_missing-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-const_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">const_missing</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Object</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-const_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">const_missing</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-operator">::</span><span class="ruby-constant">Object</span>.<span class="ruby-identifier">const_get</span>(<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-remove_methods-21'>
@@ -115,7 +115,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-remove_methods-21-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-remove_methods-21-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 15</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">remove_methods!</span>&#x000A;  ((<span class="ruby-identifier">private_instance_methods</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">instance_methods</span>) <span class="ruby-operator">-</span> <span class="ruby-constant">KEEP_METHODS</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">undef_method</span>(<span class="ruby-identifier">m</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-remove_methods-21-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 17</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">remove_methods!</span>&#x000A;  ((<span class="ruby-identifier">private_instance_methods</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">instance_methods</span>) <span class="ruby-operator">-</span> <span class="ruby-constant">KEEP_METHODS</span>).<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span> <span class="ruby-identifier">undef_method</span>(<span class="ruby-identifier">m</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

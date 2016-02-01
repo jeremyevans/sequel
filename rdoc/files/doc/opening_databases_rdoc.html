@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-11-16 15:34:16 -0800</span>
+          <span class='datetime'>2016-01-28 15:50:12 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -309,6 +309,15 @@
             connection.</p>
             </td></tr><tr><td class='label'>:login_timeout </td><td>
             <p>Set the login timeout on the JDBC connection (in seconds).</p>
+            </td></tr></tbody></table>
+            
+            <p>There are a few issues with specific jdbc drivers:</p>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>jdbc-h2 </td><td>
+            <p>jdbc-h2 versions greater than 1.3.175 have issues with ORDER BY not working
+            correctly in some cases.</p>
+            </td></tr><tr><td class='label'>jdbc-postgres </td><td>
+            <p>jdbc-postgres 9.4.1204 has issues using PostgreSQL-specific types in bound
+            variables. Use jdbc-postgres 9.4.1200 or below.</p>
             </td></tr></tbody></table>
             
             <h3 id="label-mysql+">mysql <span><a href="#label-mysql+">&para;</a> <a href="#top">&uarr;</a></span></h3>

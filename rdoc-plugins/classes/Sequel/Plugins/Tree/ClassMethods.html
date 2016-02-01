@@ -97,7 +97,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-roots-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-roots-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">roots</span>&#x000A;  <span class="ruby-identifier">roots_dataset</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-roots-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">roots</span>&#x000A;  <span class="ruby-identifier">roots_dataset</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-roots_dataset'>
@@ -116,7 +116,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-roots_dataset-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-roots_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">roots_dataset</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">tree_order</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-roots_dataset-source'><span class="ruby-comment"># File lib/sequel/plugins/tree.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">roots_dataset</span>&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">or</span>(<span class="ruby-constant">Array</span>(<span class="ruby-identifier">parent_column</span>).<span class="ruby-identifier">zip</span>([])))&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">tree_order</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">tree_order</span>&#x000A;  <span class="ruby-identifier">ds</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
