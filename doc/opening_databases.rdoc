@@ -15,8 +15,6 @@ If you are only connecting to a single database, it is recommended that you stor
 database object in a constant named DB.  This is not required, but it is the
 convention that most Sequel code uses.
 
-(Under any circumstances, it is critical that you save the result of the Sequel.connect in a variable. Sequel caches the connecting in an internal data structure, so if you just do Sequel.connect many times - like once for every incoming http request - your application will leak huge amounts of memory. Another way to avoid this is to use the block form as described further down in this guide.)
-
 == Using the Sequel.connect method
 
 The connect method usually takes a well-formed URI, which is parsed into connection options needed to open
@@ -64,6 +62,13 @@ For example:
 
   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
 
+Note that if you do not pass a block to Sequel.connect, Sequel will automatically retain a
+reference to the object in the <tt>Sequel::DATABASES</tt> array.  So calling +Sequel.connect+
+multiple times (say once per request), can result in a memory leak.  For any application where
+database access is needed for a long period of time, it's best to store the result of
+Sequel.connection in a constant, as recommended above.
+
+== Using the Sequel.connect method
 == General connection options
 
 These options are shared by all adapters unless otherwise noted.
