@@ -15,6 +15,8 @@ If you are only connecting to a single database, it is recommended that you stor
 database object in a constant named DB.  This is not required, but it is the
 convention that most Sequel code uses.
 
+(Under any circumstances, it is critical that you save the result of the Sequel.connect in a variable. Sequel caches the connecting in an internal data structure, so if you just do Sequel.connect many times - like once for every incoming http request - your application will leak huge amounts of memory. Another way to avoid this is to use the block form as described further down in this guide.)
+
 == Using the Sequel.connect method
 
 The connect method usually takes a well-formed URI, which is parsed into connection options needed to open
