@@ -15,6 +15,11 @@ module Sequel
     # and setting a new flag in the cloned dataset, so that each can check with the flag to
     # determine whether it should call all.
     #
+    # This plugin also makes #first and related methods that load single records work with
+    # eager loading.  Note that when using eager_graph, calling #first or a similar method
+    # will result in two queries, one to load the main object, and one to eagerly load all associated
+    # objects to that main object.
+    #
     # Usage:
     #
     #   # Make all model subclass instances eagerly load for each (called before loading subclasses)
@@ -48,6 +53,23 @@ module Sequel
         def all(&block)
           if use_eager_all?
             clone(:all_called=>true).all(&block)
+          else
+            super
+          end
+        end
+
+        # Handle eager loading when calling first and related methods.  For eager_graph,
+        # this does an additional query after retrieving a single record, because otherwise
+        # the associated records won't get eager loaded correctly.
+        def single_record!
+          if use_eager_all?
+            obj = clone(:all_called=>true).all.first
+
+            if opts[:eager_graph]
+              obj = clone(:all_called=>true).where(obj.qualified_pk_hash).unlimited.all.first
+            end
+
+            obj
           else
             super
           end

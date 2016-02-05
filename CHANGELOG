@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make eager_each plugin handle eager loading for Dataset#first and similar methods (jeremyevans)
+
 === 4.31.0 (2016-02-01)
 
 * Convert types in association_pks setters before saving them, instead of just before running queries (jeremyevans)
