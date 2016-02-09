@@ -2242,13 +2242,20 @@ module Sequel
           self
         end
 
+        # Handle parsing of options when loading associations.  For historical
+        # reasons, you can pass true/false/nil or a callable argument to
+        # associations.  That will be going away in Sequel 5, but we'll still
+        # support it until then.
         def load_association_objects_options(dynamic_opts, &block)
-          dynamic_opts = if dynamic_opts == true || dynamic_opts == false || dynamic_opts == nil
+          dynamic_opts = case dynamic_opts
+          when true, false, nil
             {:reload=>dynamic_opts}
-          elsif dynamic_opts.is_a?(Hash)
+          when Hash
             Hash[dynamic_opts]
-          elsif dynamic_opts.respond_to?(:call)
-            {:callback=>dynamic_opts}
+          else
+            if dynamic_opts.respond_to?(:call)
+              {:callback=>dynamic_opts}
+            end
           end
 
           if block_given?
