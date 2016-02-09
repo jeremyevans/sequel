@@ -2242,18 +2242,27 @@ module Sequel
           self
         end
 
-        # Load the associated objects using the dataset, handling callbacks, reciprocals, and caching.
-        def load_associated_objects(opts, dynamic_opts=nil)
-          if dynamic_opts == true or dynamic_opts == false or dynamic_opts == nil
-            dynamic_opts = {:reload=>dynamic_opts}
+        def load_association_objects_options(dynamic_opts, &block)
+          dynamic_opts = if dynamic_opts == true || dynamic_opts == false || dynamic_opts == nil
+            {:reload=>dynamic_opts}
+          elsif dynamic_opts.is_a?(Hash)
+            Hash[dynamic_opts]
           elsif dynamic_opts.respond_to?(:call)
-            dynamic_opts = {:callback=>dynamic_opts}
+            {:callback=>dynamic_opts}
           end
+
           if block_given?
-            dynamic_opts = Hash[dynamic_opts].merge!(:callback=>Proc.new)
+            dynamic_opts[:callback] = block
           end
+
+          dynamic_opts
+        end
+
+        # Load the associated objects using the dataset, handling callbacks, reciprocals, and caching.
+        def load_associated_objects(opts, dynamic_opts=nil, &block)
+          dynamic_opts = load_association_objects_options(dynamic_opts, &block)
           name = opts[:name]
-          if associations.include?(name) and !dynamic_opts[:callback] and !dynamic_opts[:reload]
+          if associations.include?(name) && !dynamic_opts[:callback] && !dynamic_opts[:reload]
             associations[name]
           else
             objs = _load_associated_objects(opts, dynamic_opts)

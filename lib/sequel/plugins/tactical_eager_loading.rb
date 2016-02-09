@@ -19,7 +19,47 @@ module Sequel
     #   Album.filter{id<100}.all do |a|
     #     a.artists
     #   end
+    #   # SELECT * FROM albums WHERE (id < 100)
+    #   # SELECT * FROM artists WHERE id IN (...)
+    #
+    # Note that if you are passing a callback to the association method via
+    # a block or :callback option, or using the :reload option to reload
+    # the association, eager loading will not be done.
+    #
+    # You can use the :eager_reload option to reload the association for all
+    # objects that the current object was retrieved with:
+    #
+    #   # SELECT * FROM albums WHERE (id < 100)
+    #   albums = Album.filter{id<100}.all
+    #
+    #   # Eagerly load all artists for these albums
+    #   # SELECT * FROM artists WHERE id IN (...)
+    #   albums.first.artists
+    #
+    #   # Do something that may affect which artists are associated to the albums
+    #
+    #   # Eagerly reload all artists for these albums
+    #   # SELECT * FROM artists WHERE id IN (...)
+    #   albums.first.artists(:eager_reload=>true)
     # 
+    # You can also use the :eager option to specify dependent associations
+    # to eager load:
+    #
+    #  albums = Album.filter{id<100}.all
+    #
+    #   # Eager load all artists for these albums, and all albums for those artists
+    #   # SELECT * FROM artists WHERE id IN (...)
+    #   # SELECT * FROM albums WHERE artist_id IN (...)
+    #   albums.first.artists(:eager=>:albums)
+    #
+    # You can also use :eager to specify an eager callback. For example:
+    #
+    #   albums = Album.filter{id<100}.all
+    #
+    #   # Eagerly load all artists whose name starts with A-M for these albums
+    #   # SELECT * FROM artists WHERE name > 'N' AND id IN (...)
+    #   albums.first.artists(:eager=>proc{|ds| ds.where(:name > 'N')})
+    #
     # Usage:
     #
     #   # Make all model subclass instances use tactical eager loading (called before loading subclasses)
@@ -51,11 +91,12 @@ module Sequel
         # If there the association is not in the associations cache and the object
         # was reteived via Dataset#all, eagerly load the association for all model
         # objects retrieved with the current object.
-        def load_associated_objects(opts, reload=false)
+        def load_associated_objects(opts, dynamic_opts=nil, &block)
+          dynamic_opts = load_association_objects_options(dynamic_opts, &block)
           name = opts[:name]
-          if !associations.include?(name) && retrieved_by && !frozen?
+          if (!associations.include?(name) || dynamic_opts[:eager_reload]) && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]
             begin
-              retrieved_by.send(:eager_load, retrieved_with.reject(&:frozen?), name=>{})
+              retrieved_by.send(:eager_load, retrieved_with.reject(&:frozen?), name=>dynamic_opts[:eager] || {})
             rescue Sequel::UndefinedAssociation
               # This can happen if class table inheritance is used and the association
               # is only defined in a subclass.  This particular instance can use the

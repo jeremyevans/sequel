@@ -1,5 +1,9 @@
 === HEAD
 
+* Support :eager_reload and :eager options to associations in tactical_eager_loading plugin (jeremyevans)
+
+* Make tactical_eager_loading not eager load if passing proc or block to association method (jeremyevans)
+
 * Make eager_each plugin handle eager loading for Dataset#first and similar methods (jeremyevans)
 
 === 4.31.0 (2016-02-01)
