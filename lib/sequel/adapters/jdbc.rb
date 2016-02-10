@@ -632,7 +632,8 @@ module Sequel
             :allow_null=>(h[:nullable] != 0),
             :primary_key=>pks.include?(h[:column_name]),
             :column_size=>h[:column_size],
-            :scale=>h[:decimal_digits]
+            :scale=>h[:decimal_digits],
+            :remarks=>h[:remarks]
           }
           if s[:primary_key]
             s[:auto_increment] = h[:is_autoincrement] == "YES"
