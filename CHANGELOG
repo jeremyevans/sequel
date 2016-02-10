@@ -1,5 +1,7 @@
 === HEAD
 
+* Include :remarks entry in JDBC schema parsing output, containing comments on the column (olleolleolle) (#1143)
+
 * Support :eager_reload and :eager options to associations in tactical_eager_loading plugin (jeremyevans)
 
 * Make tactical_eager_loading not eager load if passing proc or block to association method (jeremyevans)
