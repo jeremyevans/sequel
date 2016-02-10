@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a setter method for one_through_one associations (jeremyevans)
+
 * Include :remarks entry in JDBC schema parsing output, containing comments on the column (olleolleolle) (#1143)
 
 * Support :eager_reload and :eager options to associations in tactical_eager_loading plugin (jeremyevans)

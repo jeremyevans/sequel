@@ -1818,7 +1818,6 @@ module Sequel
         # Configures many_to_many and one_through_one association reflection and adds the related association methods
         def def_many_to_many(opts)
           one_through_one = opts[:type] == :one_through_one
-          opts[:read_only] = true if one_through_one
           left = (opts[:left_key] ||= opts.default_left_key)
           lcks = opts[:left_keys] = Array(left)
           right = (opts[:right_key] ||= opts.default_right_key)
@@ -1872,21 +1871,54 @@ module Sequel
             end
           end
       
-          return if opts[:read_only] || one_through_one
+          return if opts[:read_only]
       
-          opts[:adder] ||= proc do |o|
-            h = {}
-            lcks.zip(lcpks).each{|k, pk| h[k] = get_column_value(pk)}
-            rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.get_column_value(pk)}
-            _join_table_dataset(opts).insert(h)
-          end
+          if one_through_one
+            opts[:setter] ||= proc do |o|
+              h = {}
+              lh = lcks.zip(lcpks.map{|k| get_column_value(k)})
+              jtds = _join_table_dataset(opts).where(lh)
 
-          opts[:remover] ||= proc do |o|
-            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.get_column_value(k)})).delete
-          end
+              checked_transaction do
+                current = jtds.first
 
-          opts[:clearer] ||= proc do
-            _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)})).delete
+                if o
+                  new_values = []
+                  rcks.zip(opts.right_primary_key_methods).each{|k, pk| new_values << (h[k] = o.get_column_value(pk))}
+                end
+
+                if current
+                  current_values = rcks.map{|k| current[k]}
+                  jtds = jtds.where(rcks.zip(current_values))
+                  if o
+                    if current_values != new_values
+                      jtds.update(h)
+                    end
+                  else
+                    jtds.delete
+                  end
+                elsif o
+                  lh.each{|k,v| h[k] = v}
+                  jtds.insert(h)
+                end
+              end
+            end
+            opts[:_setter] = proc{|o| set_one_through_one_associated_object(opts, o)}
+          else 
+            opts[:adder] ||= proc do |o|
+              h = {}
+              lcks.zip(lcpks).each{|k, pk| h[k] = get_column_value(pk)}
+              rcks.zip(opts.right_primary_key_methods).each{|k, pk| h[k] = o.get_column_value(pk)}
+              _join_table_dataset(opts).insert(h)
+            end
+
+            opts[:remover] ||= proc do |o|
+              _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)}) + rcks.zip(opts.right_primary_key_methods.map{|k| o.get_column_value(k)})).delete
+            end
+
+            opts[:clearer] ||= proc do
+              _join_table_dataset(opts).where(lcks.zip(lcpks.map{|k| get_column_value(k)})).delete
+            end
           end
         end
 
@@ -2398,6 +2430,13 @@ module Sequel
         
         # Set the given object as the associated object for the given many_to_one association reflection
         def set_associated_object(opts, o)
+          raise(Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
+          _set_associated_object(opts, o)
+        end
+
+        # Set the given object as the associated object for the given one_through_one association reflection
+        def set_one_through_one_associated_object(opts, o)
+          raise(Error, "object #{inspect} does not have a primary key") unless pk
           raise(Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
           _set_associated_object(opts, o)
         end

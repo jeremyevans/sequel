@@ -302,8 +302,6 @@ Examples:
   @artist.remove_album(@album)
   @artist.remove_all_albums
 
-one_through_one associations do not have any modification methods added.
-
 Note that the remove_all_* method does not call remove hooks defined on
 the association, it just issues a single query to the database.  If you
 want to remove all associated objects and call remove hooks, iterate

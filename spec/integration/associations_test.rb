@@ -1501,22 +1501,83 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
     @album.tags.must_equal []
     @album.alias_tags.must_equal []
     @tag.albums.must_equal []
+    unless @no_many_through_many
+      @album.first_tag.must_equal nil
+    end
   end
 
-  it "should have add and set methods work any associated objects" do
+  it "should have set methods work" do
+    # many to one
     @album.update(:artist => @artist)
+    @album.reload.artist.must_equal @artist
+    @album.update(:artist => nil)
+    @album.reload.artist.must_equal nil
+
+    # one to one
+    @artist.update(:first_album => @album)
+    @artist.reload.first_album.must_equal @album
+    @artist.update(:first_album => nil)
+    @artist.reload.first_album.must_equal nil
+
+    unless @no_many_through_many
+      tag = @pr.call.last
+      # one through one
+      @album.update(:first_tag => @tag)
+      @album.reload.first_tag.must_equal @tag
+      @album.update(:first_tag => @tag)
+      @album.reload.first_tag.must_equal @tag
+      @album.update(:first_tag => tag)
+      @album.reload.first_tag.must_equal tag
+      @album.update(:first_tag => nil)
+      @album.reload.first_tag.must_equal nil
+      @album.update(:first_tag => nil)
+      @album.reload.first_tag.must_equal nil
+
+      # one through one with alias
+      @album.update(:alias_t_tag => @tag)
+      @album.reload.alias_t_tag.must_equal @tag
+      @album.update(:alias_t_tag => nil)
+      @album.reload.alias_t_tag.must_equal nil
+    end
+  end
+
+  it "should have add and remove methods work" do
+    # one to many
+    @artist.add_album(@album)
+    @artist.reload.albums.must_equal [@album]
+    @artist.remove_album(@album)
+    @artist.reload.albums.must_equal []
+
+    # many to many 
     @album.add_tag(@tag)
-    
-    @album.reload
-    @artist.reload
-    @tag.reload
-    
-    @album.artist.must_equal @artist
-    @artist.first_album.must_equal @album
-    @artist.albums.must_equal [@album]
-    @album.tags.must_equal [@tag]
+    @album.reload.tags.must_equal [@tag]
+    @tag.reload.albums.must_equal [@album]
     @album.alias_tags.must_equal [@tag]
-    @tag.albums.must_equal [@album]
+    @album.remove_tag(@tag)
+    @album.reload.tags.must_equal []
+
+    # many to many with alias
+    @album.add_alias_tag(@tag)
+    @album.reload.alias_tags.must_equal [@tag]
+    @album.remove_alias_tag(@tag)
+    @album.reload.alias_tags.must_equal []
+  end
+  
+  it "should have remove_all methods work" do
+    # one to many
+    @artist.add_album(@album)
+    @artist.remove_all_albums
+    @artist.reload.albums.must_equal []
+
+    # many to many 
+    @album.add_tag(@tag)
+    @album.remove_all_tags
+    @album.reload.tags.must_equal []
+
+    # many to many with alias
+    @album.add_alias_tag(@tag)
+    @album.remove_all_alias_tags
+    @album.reload.alias_tags.must_equal []
   end
   
   it "should work correctly with prepared_statements_association plugin" do
@@ -1534,6 +1595,9 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
     @album.tags.must_equal [@tag]
     @album.alias_tags.must_equal [@tag]
     @tag.albums.must_equal [@album]
+    unless @no_many_through_many
+      @album.first_tag.must_equal @tag
+    end
   end
 
   it "should have working dataset associations" do
@@ -1599,55 +1663,6 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
     Artist.filter(Artist.qualified_primary_key_hash(artist.pk)).albums.filter(Album.qualified_primary_key_hash(@album.pk)).tags.all.must_equal []
   end
 
-  it "should have remove methods work" do
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    
-    @album.update(:artist => nil)
-    @album.remove_tag(@tag)
-
-    @album.add_alias_tag(@tag)
-    @album.remove_alias_tag(@tag)
-    
-    @album.reload
-    @artist.reload
-    @tag.reload
-    
-    @album.artist.must_equal nil
-    @artist.albums.must_equal []
-    @album.tags.must_equal []
-    @tag.albums.must_equal []
-
-    @album.add_alias_tag(@tag)
-    @album.remove_alias_tag(@tag)
-
-    @album.reload
-    @album.alias_tags.must_equal []
-  end
-  
-  it "should have remove_all methods work" do
-    @artist.add_album(@album)
-    @album.add_tag(@tag)
-    
-    @album.remove_all_tags
-    @artist.remove_all_albums
-    
-    @album.reload
-    @artist.reload
-    @tag.reload
-    
-    @album.artist.must_equal nil
-    @artist.albums.must_equal []
-    @album.tags.must_equal []
-    @tag.albums.must_equal []
-
-    @album.add_alias_tag(@tag)
-    @album.remove_all_alias_tags
-
-    @album.reload
-    @album.alias_tags.must_equal []
-  end
-  
   it "should eager load via eager correctly" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -1684,8 +1699,6 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
 end
 
 RegularAndCompositeKeyAssociations = shared_description do
-  include BasicRegularAndCompositeKeyAssociations
-
   describe "when filtering/excluding by associations when joining" do
     def self_join(c)
       c.join(Sequel.as(c.table_name, :b), Array(c.primary_key).zip(Array(c.primary_key))).select_all(c.table_name)
@@ -1884,6 +1897,7 @@ describe "Sequel::Model Simple Associations" do
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
   end
   
+  include BasicRegularAndCompositeKeyAssociations
   include RegularAndCompositeKeyAssociations
 
   describe "with :correlated_subquery limit strategy" do
@@ -2160,6 +2174,7 @@ describe "Sequel::Model Composite Key Associations" do
     @db.drop_table?(:albums_tags, :tags, :albums, :artists)
   end
 
+  include BasicRegularAndCompositeKeyAssociations
   include RegularAndCompositeKeyAssociations
 
   describe "with :correlated_subquery limit strategy" do

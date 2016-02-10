@@ -728,7 +728,7 @@ describe Sequel::Model, "one_to_one" do
     DB.reset
   end
   
-  it "should have the getter method return a single object if the :one_to_one option is true" do
+  it "should have the getter method return a single object" do
     @c2.one_to_one :attribute, :class => @c1
     att = @c2.new(:id => 1234).attribute
     DB.sqls.must_equal ['SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1']
@@ -1113,21 +1113,6 @@ describe Sequel::Model, "one_to_one" do
     p.raise_on_save_failure = false
     @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
     def p.bs(x) false end
-    def p._parent=; raise; end
-    proc{p.parent = c}.must_raise(Sequel::HookFailed)
-    
-    p.associations[:parent].must_equal nil
-    p.associations[:parent] = c
-    p.parent.must_equal c
-    proc{p.parent = nil}.must_raise(Sequel::HookFailed)
-  end
-
-  it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
-    p = @c2.load(:id=>321)
-    c = @c2.load(:id=>123)
-    p.raise_on_save_failure = false
-    @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
-    def p.bs(x) cancel_action end
     def p._parent=; raise; end
     proc{p.parent = c}.must_raise(Sequel::HookFailed)
     
@@ -2814,6 +2799,9 @@ describe Sequel::Model, "one_through_one" do
     [@c1, @c2].each{|c| c.dataset._fetch = {}}
     DB.reset
   end
+  after do
+    DB.fetch = {:id => 1, :x => 1}
+  end
 
   it "should use implicit key values and join table if omitted" do
     @c2.one_through_one :attribute, :class => @c1 
@@ -3020,6 +3008,177 @@ describe Sequel::Model, "one_through_one" do
   it "should support a :distinct option that uses the DISTINCT clause" do
     @c2.one_through_one :attribute, :class => @c1, :distinct=>true
     @c2.load(:id=>10).attribute_dataset.sql.must_equal "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 10) LIMIT 1"
+  end
+
+  it "should not add a setter method if the :read_only option is true" do
+    @c2.one_through_one :attribute, :class => @c1, :read_only=>true
+    im = @c2.instance_methods.collect{|x| x.to_s}
+    im.must_include('attribute')
+    im.wont_include('attribute=')
+  end
+
+  it "should add a setter method" do
+    @c2.one_through_one :attribute, :class => @c1
+    attrib = @c1.new(:id=>3)
+    DB.fetch = []
+    o = @c2.load(:id => 1234)
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1"]
+
+    o.attribute = attrib
+    sqls = DB.sqls
+    ["INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (3, 1234)",
+      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 3)"].must_include(sqls.slice! 1)
+    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1"]
+
+    DB.fetch = {:node_id=>1234, :attribute_id=>5}
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1",
+      "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 5))"]
+
+    o.attribute = attrib
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1",
+      "UPDATE attributes_nodes SET attribute_id = 3 WHERE ((node_id = 1234) AND (attribute_id = 5))"]
+
+    @c2.load(:id => 1234).attribute = @c1.new(:id=>5)
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1"]
+  end
+
+  it "should use a transaction in the setter method" do
+    @c2.one_through_one :attribute, :class => @c1
+    @c2.use_transactions = true
+    attrib = @c1.load(:id=>3)
+    DB.fetch = []
+    @c2.new(:id => 1234).attribute = nil
+    DB.sqls.must_equal ['BEGIN',
+      "SELECT * FROM attributes_nodes WHERE (node_id = 1234) LIMIT 1",
+      'COMMIT']
+  end
+    
+  it "should have setter method respect :join_table_block option" do
+    @c2.one_through_one :attribute, :class => @c1, :join_table_block=>proc{|ds| ds.where(:a)}
+    attrib = @c1.new(:id=>3)
+    DB.fetch = []
+    o = @c2.new(:id => 1234)
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (a AND (node_id = 1234)) LIMIT 1"]
+
+    o.attribute = attrib
+    sqls = DB.sqls
+    ["INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (3, 1234)",
+      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 3)"].must_include(sqls.slice! 1)
+    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (a AND (node_id = 1234)) LIMIT 1"]
+
+    DB.fetch = {:node_id=>1234, :attribute_id=>5}
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (a AND (node_id = 1234)) LIMIT 1",
+      "DELETE FROM attributes_nodes WHERE (a AND (node_id = 1234) AND (attribute_id = 5))"]
+
+    o.attribute = attrib
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (a AND (node_id = 1234)) LIMIT 1",
+      "UPDATE attributes_nodes SET attribute_id = 3 WHERE (a AND (node_id = 1234) AND (attribute_id = 5))"]
+  end
+
+  it "should have the setter method respect the :left_primary_key and :right_primary_key option" do
+    @c2.one_through_one :attribute, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
+    attrib = @c1.new(:id=>3, :yyy=>7)
+    DB.fetch = []
+    o = @c2.new(:id => 1234, :xxx=>5)
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 5) LIMIT 1"]
+
+    o.attribute = attrib
+    sqls = DB.sqls
+    ["INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (7, 5)",
+      "INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (5, 7)"].must_include(sqls.slice! 1)
+    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 5) LIMIT 1"]
+
+    DB.fetch = {:node_id=>1234, :attribute_id=>9}
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 5) LIMIT 1",
+      "DELETE FROM attributes_nodes WHERE ((node_id = 5) AND (attribute_id = 9))"]
+
+    o.attribute = attrib
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE (node_id = 5) LIMIT 1",
+      "UPDATE attributes_nodes SET attribute_id = 7 WHERE ((node_id = 5) AND (attribute_id = 9))"]
+  end
+    
+  it "should have the setter method respect composite keys" do
+    @c2.one_through_one :attribute, :class => @c1, :left_key=>[:node_id, :y], :left_primary_key=>[:id, :x], :right_key=>[:attribute_id, :z], :right_primary_key=>[:id, :w]
+    attrib = @c1.load(:id=>3, :w=>7)
+    @c1.def_column_alias :w, :w
+    DB.fetch = []
+    o = @c2.new(:id => 1234, :x=>5)
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1"]
+
+    o.attribute = attrib
+    sqls = DB.sqls
+    sqls.slice!(1).must_match(/\AINSERT INTO attributes_nodes \((attribute_id|z|node_id|y), (attribute_id|z|node_id|y), (attribute_id|z|node_id|y), (attribute_id|z|node_id|y)\) VALUES \((3|7|1234|5), (3|7|1234|5), (3|7|1234|5), (3|7|1234|5)\)\z/)
+    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1"]
+
+    DB.fetch = {:node_id=>1234, :attribute_id=>10, :y=>6, :z=>8}
+    o.attribute = nil
+    DB.sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1",
+      "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5) AND (attribute_id = 10) AND (z = 8))"]
+
+    o.attribute = attrib
+    sqls = DB.sqls
+    ["UPDATE attributes_nodes SET attribute_id = 3, z = 7 WHERE ((node_id = 1234) AND (y = 5) AND (attribute_id = 10) AND (z = 8))",
+     "UPDATE attributes_nodes SET z = 7, attribute_id = 3 WHERE ((node_id = 1234) AND (y = 5) AND (attribute_id = 10) AND (z = 8))"].must_include(sqls.slice!(1))
+    sqls.must_equal ["SELECT * FROM attributes_nodes WHERE ((node_id = 1234) AND (y = 5)) LIMIT 1"]
+  end
+
+  it "should raise an error if the current model object that doesn't have a valid primary key" do
+    @c2.one_through_one :attribute, :class => @c1
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    proc{c.attribute = p}.must_raise(Sequel::Error)
+  end
+
+  it "should raise an error if the associated object that doesn't have a valid primary key" do
+    @c2.one_through_one :attribute, :class => @c1
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    proc{p.attribute = c}.must_raise(Sequel::Error)
+  end
+
+  it "should make the change to the foreign_key value inside a _association= method" do
+    @c2.one_through_one :attribute, :class => @c1
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.must_include("_attribute=")
+    attrib = @c1.new(:id=>3)
+    o = @c2.new(:id => 1234)
+    def o._attribute=(x)
+      @x = x
+    end
+    o.attribute = attrib
+    o.instance_variable_get(:@x).must_equal attrib
+  end
+
+  it "should have a :setter option define the _association= method" do
+    @c2.one_through_one :attribute, :class => @c1, :setter=>proc{|x| @x = x}
+    attrib = @c1.new(:id=>3)
+    o = @c2.new(:id => 1234)
+    o.attribute = attrib
+    o.instance_variable_get(:@x).must_equal attrib
+  end
+
+  it "should support (before|after)_set callbacks" do
+    h = []
+    @c2.one_through_one :attribute, :class => @c1, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << :l}
+    @c2.class_eval do
+      self::Foo = h
+      def blah(x)
+        model::Foo << (x ? x.pk : :x)
+      end
+    end
+    attrib = @c1.new(:id=>3)
+    o = @c2.new(:id => 1234)
+    h.must_equal []
+    o.attribute = attrib
+    h.must_equal [1234, -3, 3, :l]
+    o.attribute = nil
+    h.must_equal [1234, -3, 3, :l, 1234, :y, :x, :l]
   end
 end
 
