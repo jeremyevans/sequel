@@ -32,6 +32,8 @@
 # To use this extension for all of a database's datasets:
 #
 #   DB.extension(:split_array_nil)
+#
+# Related module: Sequel::Dataset::SplitArrayNil
 
 #
 module Sequel

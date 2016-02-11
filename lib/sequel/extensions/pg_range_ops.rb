@@ -53,6 +53,8 @@
 # If you are also using the pg_range extension, you should load it before
 # loading this extension.  Doing so will allow you to use PGArray#op to get
 # an RangeOp, allowing you to perform range operations on range literals.
+#
+# Related module: Sequel::Postgres::RangeOp
 
 #
 module Sequel

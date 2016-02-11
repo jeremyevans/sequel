@@ -29,6 +29,8 @@
 # To load the extension into the database:
 #
 #   DB.extension :error_sql
+#
+# Related module: Sequel::ErrorSQL
 
 #
 module Sequel

@@ -123,6 +123,8 @@
 #   <tt>drop_constraint_validations_for(:table=>'table')</tt>, and then
 #   readd all constraints you want to use inside the alter table block,
 #   making no other changes inside the alter_table block.
+#
+# Related module: Sequel::ConstraintValidations
 
 #
 module Sequel

@@ -56,6 +56,8 @@
 #
 # See the PostgreSQL network function and operator documentation for more
 # details on what these functions and operators do.
+#
+# Related module: Sequel::Postgres::InetOp
 
 require 'ipaddr'
 

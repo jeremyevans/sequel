@@ -8,6 +8,8 @@
 # To load the extension:
 #
 #   Sequel.extension :inflector
+#
+# Related module: String::Inflections
 
 class String
   # This module acts as a singleton returned/yielded by String.inflections,

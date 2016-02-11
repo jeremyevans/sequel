@@ -43,6 +43,8 @@
 # The cached schema is dumped in Marshal format, since it is the fastest
 # and it handles all ruby objects used in the schema hash.  Because of this,
 # you should not attempt to load the schema from a untrusted file.
+#
+# Related module: Sequel::SchemaCaching
 
 #
 module Sequel

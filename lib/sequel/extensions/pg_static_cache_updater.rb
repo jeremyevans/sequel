@@ -63,6 +63,8 @@
 #   with the pg driver (the model classes do not have to
 #   use the same Database).
 # * Must be using a thread-safe connection pool (the default).
+#
+# Related module: Sequel::Postgres::StaticCacheUpdater
 
 #
 module Sequel

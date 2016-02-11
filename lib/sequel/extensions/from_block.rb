@@ -13,6 +13,8 @@
 # To load the extension into the database:
 #
 #   DB.extension :from_block
+#
+# Related module: Sequel::Database::FromBlock
 
 #
 module Sequel

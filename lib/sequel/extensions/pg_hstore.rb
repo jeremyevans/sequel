@@ -85,6 +85,8 @@
 # pg_typecast_on_load plugin if the column values are returned as a string.
 #
 # This extension requires the delegate and strscan libraries.
+#
+# Related module: Sequel::Postgres::HStore
 
 require 'delegate'
 require 'strscan'

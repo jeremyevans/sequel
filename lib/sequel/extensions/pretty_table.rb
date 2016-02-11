@@ -20,6 +20,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:pretty_table)
+#
+# Related module: Sequel::DatasetPrinter
 
 #
 module Sequel

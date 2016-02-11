@@ -7,6 +7,10 @@
 # To load the extension:
 #
 #   Sequel.extension :migration
+#
+# Related modules: Sequel::Migration, Sequel::SimpleMigration,
+# Sequel::MigrationDSL, Sequel::MigrationReverser, Sequel::MigrationAlterTableReverser,
+# Sequel::Migrator, Sequel::IntegerMigrator, Sequel::TimestampMigrator
 
 #
 module Sequel

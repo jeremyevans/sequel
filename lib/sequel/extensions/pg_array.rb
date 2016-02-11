@@ -84,6 +84,8 @@
 # operators, look into the pg_array_ops extension.
 #
 # This extension requires the strscan and delegate libraries.
+#
+# Related module: Sequel::Postgres::PGArray
 
 require 'delegate'
 require 'strscan'

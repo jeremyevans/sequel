@@ -21,11 +21,13 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:empty_array_consider_nulls)
+#
+# Related module: Sequel::EmptyArrayConsiderNulls
 
 #
 module Sequel
   module EmptyArrayConsiderNulls
-    # Use a simple expression that is always true or false, never NULL.
+    # Use an expression that returns NULL if the column value is NULL.
     def empty_array_value(op, cols)
       c = Array(cols)
       SQL::BooleanExpression.from_value_pairs(c.zip(c), :AND, op == :IN)

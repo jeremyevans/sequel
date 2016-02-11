@@ -32,6 +32,8 @@
 # To add the nullify method to all datasets on a single database:
 #
 #   DB.extension(:null_dataset)
+#
+# Related modules: Sequel::Dataset::Nullifiable, Sequel::Dataset::NullDataset
 
 #
 module Sequel

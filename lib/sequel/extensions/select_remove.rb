@@ -13,6 +13,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:select_remove)
+#
+# Related module: Sequel::SelectRemove
 
 #
 module Sequel

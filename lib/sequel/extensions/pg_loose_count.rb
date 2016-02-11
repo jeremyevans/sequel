@@ -17,6 +17,8 @@
 # To load the extension into the database:
 #
 #   DB.extension :pg_loose_count
+#
+# Related module: Sequel::Postgres::LooseCount
 
 #
 module Sequel

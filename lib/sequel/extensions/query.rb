@@ -19,6 +19,9 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:query)
+#
+# Related modules: Sequel::DatabaseQuery, Sequel::DatasetQuery,
+# Sequel::Dataset::Query
 
 #
 module Sequel

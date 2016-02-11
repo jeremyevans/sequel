@@ -19,10 +19,6 @@
 # This extension makes select, group, and order methods operate
 # like filter methods, which support the same interface.
 #
-# There are very few places where Sequel's default behavior is
-# desirable in this area, but for backwards compatibility, the
-# defaults won't be changed until the next major release.
-#
 # You can load this extension into specific datasets:
 #
 #   ds = DB[:table]
@@ -32,6 +28,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:query_literals)
+#
+# Related module: Sequel::QueryLiterals
 
 #
 module Sequel

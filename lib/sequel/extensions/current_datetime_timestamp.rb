@@ -22,6 +22,8 @@
 # datasets of a given database.
 #
 #   DB.extension(:current_datetime_timestamp)
+#
+# Related module: Sequel::CurrentDateTimeTimestamp
 
 #
 module Sequel

@@ -15,6 +15,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:set_overrides)
+#
+# Related module: Sequel::SetOverrides
 
 #
 module Sequel

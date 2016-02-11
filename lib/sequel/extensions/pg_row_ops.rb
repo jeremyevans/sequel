@@ -80,6 +80,8 @@
 #                                      Sequel.pg_row_op(:b).splat(:b))
 #   # SELECT (a.*)::a, (b.*)::b FROM a INNER JOIN b ON (b.id = a.b_id)
 #   # => {:a=>{:id=>1, :b_id=>2}, :b=>{:id=>2}}
+#
+# Related module: Sequel::Postgres::PGRowOp
 
 #
 module Sequel

@@ -36,6 +36,8 @@
 #
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using interval columns in CREATE/ALTER TABLE statements.
+#
+# Related module: Sequel::Postgres::IntervalDatabaseMethods
 
 require 'active_support/duration'
 Sequel.require 'adapters/utils/pg_types'

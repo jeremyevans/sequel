@@ -3,11 +3,7 @@
 # These are extensions to core classes that Sequel enables by default.
 # They make using Sequel's DSL easier by adding methods to Array,
 # Hash, String, and Symbol to add methods that return Sequel
-# expression objects.
-#
-# This extension is currently loaded by default, but that will no
-# longer be true in Sequel 4.  Starting in Sequel 4, you will
-# need to load it manually via:
+# expression objects.  To load the extension:
 #
 #   Sequel.extension :core_extensions
 

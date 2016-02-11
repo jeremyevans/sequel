@@ -37,6 +37,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:dataset_source_alias)
+#
+# Related module: Sequel::Dataset::DatasetSourceAlias
 
 #
 module Sequel

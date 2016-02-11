@@ -6,6 +6,8 @@
 # not recommended for usage in new code.  To load this extension:
 #
 #   Sequel.extension :meta_def
+#
+# Related module: Sequel::Metaprogramming
 
 #
 module Sequel

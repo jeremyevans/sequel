@@ -15,6 +15,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:filter_having)
+#
+# Related module: Sequel::FilterHaving
 
 #
 module Sequel

@@ -38,6 +38,8 @@
 # timezone when fetching rows is dependent on the database adapter,
 # and only works on adapters where Sequel itself does the conversion.
 # It should work on mysql, postgres, sqlite, ibmdb, and jdbc.
+#
+# Related module: Sequel::NamedTimezones
 
 require 'tzinfo'
 

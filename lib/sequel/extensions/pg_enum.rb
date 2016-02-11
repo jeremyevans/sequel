@@ -52,6 +52,8 @@
 # allows you to use symbols in your model code.  Similar, you can provide
 # the enum values as symbols when creating enums using create_enum or
 # add_enum_value.
+#
+# Related module: Sequel::Postgres::EnumDatabaseMethods
 
 #
 module Sequel

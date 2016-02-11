@@ -84,6 +84,8 @@
 # for details on using row type columns in CREATE/ALTER TABLE statements.
 #
 # This extension requires both the strscan and delegate libraries.
+#
+# Related module: Sequel::Postgres::PGRow
 
 require 'delegate'
 require 'strscan'

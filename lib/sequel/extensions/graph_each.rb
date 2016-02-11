@@ -16,6 +16,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:graph_each)
+#
+# Related module: Sequel::GraphEach
 
 #
 module Sequel

@@ -11,6 +11,8 @@
 # To load the extension into the database:
 #
 #   DB.extension :looser_typecasting
+#
+# Related module: Sequel::LooserTypecasting
 
 #
 module Sequel
@@ -25,7 +27,7 @@ module Sequel
       value.to_i
     end
 
-    # Typecast the value to an Integer using to_i instead of Kernel.Integer
+    # Typecast the value to an String using to_s instead of Kernel.String
     def typecast_value_string(value)
       value.to_s
     end

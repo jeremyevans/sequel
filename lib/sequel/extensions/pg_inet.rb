@@ -29,6 +29,8 @@
 #
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using inet/cidr columns in CREATE/ALTER TABLE statements.
+#
+# Related module: Sequel::Postgres::InetDatabaseMethods
 
 require 'ipaddr'
 Sequel.require 'adapters/utils/pg_types'

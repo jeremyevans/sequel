@@ -59,6 +59,8 @@
 # pg_range extension:
 #
 #   DB.extension :pg_array, :pg_range
+#
+# Related module: Sequel::Postgres::PGRange
 
 Sequel.require 'adapters/utils/pg_types'
 

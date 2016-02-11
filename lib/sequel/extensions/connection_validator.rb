@@ -44,6 +44,8 @@
 # threaded pools work fine even in single threaded code, so if
 # you are currently using a single threaded pool and want to
 # use this extension, switch to using a threaded pool.
+#
+# Related module: Sequel::ConnectionValidator
 
 #
 module Sequel

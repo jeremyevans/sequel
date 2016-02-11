@@ -7,6 +7,8 @@
 # To load the extension:
 #
 #   Sequel.extension :_pretty_table
+#
+# Related module: Sequel::PrettyTable
 
 #
 module Sequel

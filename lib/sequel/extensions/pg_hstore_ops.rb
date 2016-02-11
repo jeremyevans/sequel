@@ -75,6 +75,8 @@
 # pg_hstore extension is loaded.  Methods representing expressions that return
 # PostgreSQL arrays will have the returned expression automatically wrapped in a
 # Postgres::ArrayOp if the pg_array_ops extension is loaded.
+#
+# Related module: Sequel::Postgres::HStoreOp
 
 #
 module Sequel

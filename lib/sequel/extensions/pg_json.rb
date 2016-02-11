@@ -62,6 +62,10 @@
 # Attempting to use other values (such as symbols) will not work correctly.
 #
 # This extension requires both the json and delegate libraries.
+#
+# Related modules: Sequel::Postgres::JSONArrayBase, Sequel::Postgres::JSONArray,
+# Sequel::Postgres::JSONArray, Sequel::Postgres::JSONBArray, Sequel::Postgres::JSONHashBase,
+# Sequel::Postgres::JSONHash, Sequel::Postgres::JSONBHash, Sequel::Postgres::JSONDatabaseMethods
 
 require 'delegate'
 require 'json'

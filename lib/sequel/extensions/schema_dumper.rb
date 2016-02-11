@@ -9,6 +9,8 @@
 # To load the extension:
 #
 #   DB.extension :schema_dumper
+#
+# Related module: Sequel::SchemaDumper
 
 Sequel.extension :eval_inspect
 

@@ -4,9 +4,8 @@
 # values to the database's supported level of precision before literalizing
 # them.
 #
-# For example, if the database supports microsecond precision, and you give
-# it a Time value with greater than microsecond precision, it will round it
-# appropriately:
+# For example, if the database supports millisecond precision, and you give
+# it a Time value with microsecond precision, it will round it appropriately:
 #
 #   Time.at(1405341161.917999982833862)
 #   # default: 2014-07-14 14:32:41.917999
@@ -23,6 +22,8 @@
 # To round timestamps for all datasets on a single database:
 #
 #   DB.extension(:round_timestamps)
+#
+# Related module: Sequel::Dataset::RoundTimestamps
 
 unless RUBY_VERSION >= '1.9'
   # :nocov:

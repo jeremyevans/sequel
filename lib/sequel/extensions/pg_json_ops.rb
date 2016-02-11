@@ -80,6 +80,9 @@
 # In order to get the automatic conversion from a ruby array to a PostgreSQL array
 # (as shown in the #[] and #get_text examples above), you need to load the pg_array
 # extension.
+#
+# Related modules: Sequel::Postgres::JSONBaseOp,  Sequel::Postgres::JSONOp,
+# Sequel::Postgres::JSONBOp
 
 #
 module Sequel

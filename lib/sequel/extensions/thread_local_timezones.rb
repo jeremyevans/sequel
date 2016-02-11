@@ -35,6 +35,8 @@
 #   Sequel.application_timezone # => :utc
 #   Sequel.thread_application_timezone = :nil
 #   Sequel.application_timezone # => nil
+#
+# Related module: Sequel::ThreadLocalTimezones
 
 #
 module Sequel

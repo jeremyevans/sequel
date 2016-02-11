@@ -16,6 +16,8 @@
 # To attempt to introspect columns for all datasets on a single database:
 #
 #   DB.extension(:columns_introspection)
+#
+# Related module: Sequel::ColumnsIntrospection
 
 #
 module Sequel

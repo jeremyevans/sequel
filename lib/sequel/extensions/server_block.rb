@@ -38,6 +38,9 @@
 #     DB[:a].server(:default).all # Uses shard1
 #     DB[:a].server(:read_only).all # Uses shard1
 #   end
+#
+# Related modules: Sequel::ServerBlock, Sequel::UnthreadedServerBlock,
+# Sequel::ThreadedServerBlock
 
 #
 module Sequel

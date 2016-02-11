@@ -25,6 +25,8 @@
 # Sequel expressions are allowed:
 #
 #   DB[:table].select(add.as(:d)).where(sub > Sequel::CURRENT_TIMESTAMP)
+#
+# Related module: Sequel::SQL::DateAdd
 
 #
 module Sequel

@@ -8,6 +8,8 @@
 # To load the extension:
 #
 #   Sequel.extension :to_dot
+#
+# Related module: Sequel::ToDot
 
 #
 module Sequel

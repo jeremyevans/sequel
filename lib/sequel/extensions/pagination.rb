@@ -27,6 +27,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:pagination)
+#
+# Related modules: Sequel::DatasetPagination, Sequel::Dataset::Pagination
 
 #
 module Sequel

@@ -54,6 +54,8 @@
 # pool.  If you are using the sharded single connection pool, you need
 # to switch to the sharded threaded connection pool before using this
 # extension.
+#
+# Related module: Sequel::ArbitraryServers
 
 #
 module Sequel

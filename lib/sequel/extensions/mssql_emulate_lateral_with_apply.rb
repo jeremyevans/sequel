@@ -23,6 +23,8 @@
 # Or you can load it into all of a database's datasets:
 #
 #   DB.extension(:mssql_emulate_lateral_with_apply)
+#
+# Related module: Sequel::MSSQL::EmulateLateralWithApply
 
 #
 module Sequel

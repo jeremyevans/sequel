@@ -20,6 +20,8 @@
 # is probably the desired behavior if you are using this extension:
 #
 #   DB.extension(:sequel_3_dataset_methods)
+#
+# Related module: Sequel::Sequel3DatasetMethods
 
 #
 module Sequel

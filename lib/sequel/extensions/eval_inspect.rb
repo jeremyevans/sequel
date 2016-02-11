@@ -13,6 +13,8 @@
 # To load the extension:
 #
 #   Sequel.extension :eval_inspect
+#
+# Related module: Sequel::EvalInspect
 
 #
 module Sequel

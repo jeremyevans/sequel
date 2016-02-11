@@ -66,6 +66,8 @@
 #
 # In order for #hstore to automatically wrap the returned value correctly in
 # an HStoreOp, you need to load the pg_hstore_ops extension.
+#
+# Related module: Sequel::Postgres::ArrayOp
 
 #
 module Sequel
