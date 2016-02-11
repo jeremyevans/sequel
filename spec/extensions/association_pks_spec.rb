@@ -336,6 +336,14 @@ describe "Sequel::Plugins::AssociationPks" do
       "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN (2, 4)))"
     ]
 
+    ar.album_pks = []
+    @db.sqls.must_equal []
+
+    ar.save_changes
+    @db.sqls.must_equal [
+      "UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)"
+    ]
+
     al = @Album.load(:id=>1)
     al.tag_pks.must_equal [1,2]
     @db.sqls
@@ -350,6 +358,14 @@ describe "Sequel::Plugins::AssociationPks" do
       "BEGIN",
       "INSERT INTO albums_tags (album_id, tag_id) VALUES (1, 3)",
       "COMMIT",
+    ]
+
+    al.tag_pks = []
+    @db.sqls.must_equal []
+
+    al.save_changes
+    @db.sqls.must_equal [
+      "DELETE FROM albums_tags WHERE (album_id = 1)",
     ]
   end
 

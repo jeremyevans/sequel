@@ -1,5 +1,7 @@
 === HEAD
 
+* Make association_pks setter handle empty array correctly when :delay_pks is set (jeremyevans)
+
 * Add a setter method for one_through_one associations (jeremyevans)
 
 * Include :remarks entry in JDBC schema parsing output, containing comments on the column (olleolleolle) (#1143)

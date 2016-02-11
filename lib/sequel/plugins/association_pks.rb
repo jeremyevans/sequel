@@ -74,21 +74,25 @@ module Sequel
           end
 
           opts[:pks_setter] = lambda do |pks|
-            checked_transaction do
-              if clpk
-                lpkv = lpk.map{|k| get_column_value(k)}
-                cond = lk.zip(lpkv)
-              else
-                lpkv = get_column_value(lpk)
-                cond = {lk=>lpkv}
+            if pks.empty?
+              send(opts.remove_all_method)
+            else
+              checked_transaction do
+                if clpk
+                  lpkv = lpk.map{|k| get_column_value(k)}
+                  cond = lk.zip(lpkv)
+                else
+                  lpkv = get_column_value(lpk)
+                  cond = {lk=>lpkv}
+                end
+                ds = _join_table_dataset(opts).filter(cond)
+                ds.exclude(rk=>pks).delete
+                pks -= ds.select_map(rk)
+                lpkv = Array(lpkv)
+                key_array = crk ? pks.map{|pk| lpkv + pk} : pks.map{|pk| lpkv + [pk]}
+                key_columns = Array(lk) + Array(rk)
+                ds.import(key_columns, key_array)
               end
-              ds = _join_table_dataset(opts).filter(cond)
-              ds.exclude(rk=>pks).delete
-              pks -= ds.select_map(rk)
-              lpkv = Array(lpkv)
-              key_array = crk ? pks.map{|pk| lpkv + pk} : pks.map{|pk| lpkv + [pk]}
-              key_columns = Array(lk) + Array(rk)
-              ds.import(key_columns, key_array)
             end
           end
 
@@ -109,25 +113,29 @@ module Sequel
           end
 
           opts[:pks_setter] = lambda do |pks|
-            primary_key = opts.associated_class.primary_key
-            pkh = {primary_key=>pks}
-
-            if key.is_a?(Array)
-              h = {}
-              nh = {}
-              key.zip(pk).each do|k, v|
-                h[k] = v
-                nh[k] = nil
-              end
+            if pks.empty?
+              send(opts.remove_all_method)
             else
-              h = {key=>pk}
-              nh = {key=>nil}
-            end
+              primary_key = opts.associated_class.primary_key
+              pkh = {primary_key=>pks}
 
-            checked_transaction do
-              ds = send(opts.dataset_method)
-              ds.unfiltered.filter(pkh).update(h)
-              ds.exclude(pkh).update(nh)
+              if key.is_a?(Array)
+                h = {}
+                nh = {}
+                key.zip(pk).each do|k, v|
+                  h[k] = v
+                  nh[k] = nil
+                end
+              else
+                h = {key=>pk}
+                nh = {key=>nil}
+              end
+
+              checked_transaction do
+                ds = send(opts.dataset_method)
+                ds.unfiltered.filter(pkh).update(h)
+                ds.exclude(pkh).update(nh)
+              end
             end
           end
 
@@ -141,7 +149,7 @@ module Sequel
         def after_save
           if assoc_pks = @_association_pks
             assoc_pks.each do |name, pks|
-              instance_exec(pks, &model.association_reflection(name)[:pks_setter]) unless pks.empty?
+              instance_exec(pks, &model.association_reflection(name)[:pks_setter])
             end
             @_association_pks = nil
           end
@@ -190,7 +198,6 @@ module Sequel
           klass = opts.associated_class
           primary_key = klass.primary_key
           sch = klass.db_schema
-          pks = Array(pks)
 
           if primary_key.is_a?(Array)
             if (cols = sch.values_at(*klass.primary_key)).all? && (convs = cols.map{|c| c[:type] == :integer}).all?

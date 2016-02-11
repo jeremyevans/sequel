@@ -1302,6 +1302,11 @@ describe "AssociationPks plugin" do
     album.tag_pks.must_equal [@t1, @t2]
     album.save
     album_class.with_pk!(album.pk).tag_pks.sort.must_equal [@t1, @t2]
+
+    album.tag_pks = []
+    album.tag_pks.must_equal []
+    album.save
+    album_class.with_pk!(album.pk).tag_pks.sort.must_equal []
   end
 
   it "should handle :delay=>:all association option for existing instances" do
@@ -1313,6 +1318,11 @@ describe "AssociationPks plugin" do
     album.tag_pks.must_equal [@t1, @t2]
     album.save_changes
     album_class.with_pk!(album.pk).tag_pks.sort.must_equal [@t1, @t2]
+
+    album.tag_pks = []
+    album.tag_pks.must_equal []
+    album.save_changes
+    album_class.with_pk!(album.pk).tag_pks.sort.must_equal []
   end
 
   it "should set associated pks correctly for a one_to_many association" do
@@ -1330,6 +1340,9 @@ describe "AssociationPks plugin" do
     Artist[@ar1].album_pks = [@al1, @al2]
     Artist[@ar2].album_pks.must_equal [@al3]
     Album.order(:id).select_map(:artist_id).must_equal [@ar1, @ar1, @ar2]
+
+    Artist[@ar1].album_pks = []
+    Album.order(:id).select_map(:artist_id).must_equal [nil, nil, @ar2]
   end
 
   it "should set associated pks correctly for a many_to_many association" do
@@ -1369,6 +1382,9 @@ describe "AssociationPks plugin" do
     Album[@al1].vocalist_pks = [@v1, @v2]
     Album[@al2].vocalist_pks.must_equal [@v3]
     Vocalist.order(:first, :last).select_map(:album_id).must_equal [@al1, @al1, @al2]
+
+    Album[@al1].vocalist_pks = []
+    Vocalist.order(:first, :last).select_map(:album_id).must_equal [nil, nil, @al2]
   end
 
   it "should set associated right-side cpks correctly for a many_to_many association" do
@@ -1410,6 +1426,9 @@ describe "AssociationPks plugin" do
     Vocalist[@v1].instrument_pks = [@i1, @i2]
     Vocalist[@v2].instrument_pks.must_equal [@i3]
     Instrument.order(:id).select_map([:first, :last]).must_equal [@v1, @v1, @v2]
+
+    Vocalist[@v1].instrument_pks = []
+    Instrument.order(:id).select_map([:first, :last]).must_equal [[nil, nil], [nil, nil], @v2]
   end
 
   it "should set associated pks correctly with left-side cpks for a many_to_many association" do
@@ -1451,6 +1470,9 @@ describe "AssociationPks plugin" do
     Vocalist[@v1].hit_pks = [@h1, @h2]
     Vocalist[@v2].hit_pks.must_equal [@h3]
     Hit.order(:year, :week).select_map([:first, :last]).must_equal [@v1, @v1, @v2]
+
+    Vocalist[@v1].hit_pks = []
+    Hit.order(:year, :week).select_map([:first, :last]).must_equal [[nil, nil], [nil, nil], @v2]
   end
 
   it "should set associated right-side cpks correctly with left-side cpks for a many_to_many association" do
