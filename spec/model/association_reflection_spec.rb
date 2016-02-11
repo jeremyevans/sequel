@@ -523,3 +523,33 @@ describe Sequel::Model::Associations::AssociationReflection, "with caching disab
   end
 end
 
+describe Sequel::Model::Associations::AssociationReflection, "with default association options" do
+  before do
+    @db = Sequel.mock
+    @c = Class.new(Sequel::Model)
+    @c.dataset = @db[:foo]
+  end
+
+  it "should use default_association_options as defaults" do
+    @c.default_association_options = {:foo=>1, :bar=>2}
+    @c.many_to_one :c, :class=>@c, :foo=>3
+    r = @c.association_reflection(:c)
+    r[:foo].must_equal 3
+    r[:bar].must_equal 2
+  end
+
+  it "should inherit default_association_options" do
+    @c.default_association_options = {:foo=>1, :bar=>2}
+    c = Class.new(@c)
+    c.many_to_one :c, :class=>c, :foo=>3
+    r = c.association_reflection(:c)
+    r[:foo].must_equal 3
+    r[:bar].must_equal 2
+
+    @c.default_association_options[:bar] = 4
+    c.many_to_one :d, :class=>c, :foo=>3
+    r = c.association_reflection(:d)
+    r[:foo].must_equal 3
+    r[:bar].must_equal 2
+  end
+end

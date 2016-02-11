@@ -865,7 +865,13 @@ you also wanted to handle the Artist#remove_all_albums method:
 == Association Options
 
 Sequel's associations mostly share the same options.  For ease of understanding,
-they are grouped here by section
+they are grouped here by section.
+
+The defaults for any of these options can be set at the class level using
+<tt>Sequel::Model.default_association_options</tt>.  Many of these options
+are specific to particular associations and probably should not be set as
+defaults, but there certainly are options where a class level default makes
+sense.
 
 === Association Dataset Modification Options
 

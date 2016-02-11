@@ -14,6 +14,7 @@ module Sequel
           @association_reflections = {}
           @autoreloading_associations = {}
           @cache_associations = true
+          @default_association_options = {}
         end
       end
 
@@ -1436,10 +1437,13 @@ module Sequel
         attr_reader :autoreloading_associations
 
         # Whether association metadata should be cached in the association reflection.  If not cached, it will be computed
-        # on demand.  In general you only want to set this to default when using code reloading.  When using code reloading,
+        # on demand.  In general you only want to set this to false when using code reloading.  When using code reloading,
         # setting this will make sure that if an associated class is removed or modified, this class will not hang on to
         # the previous class.
         attr_accessor :cache_associations
+
+        # The default options to use for all associations.
+        attr_accessor :default_association_options
 
         # The default :eager_limit_strategy option to use for limited or offset associations (default: true, causing Sequel
         # to use what it considers the most appropriate strategy).
@@ -1674,7 +1678,7 @@ module Sequel
             orig_opts = cloned_assoc[:orig_opts].merge(orig_opts)
           end
 
-          opts = orig_opts.merge(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
+          opts = default_association_options.merge(orig_opts).merge(:type => type, :name => name, :cache=>({} if cache_associations), :model => self)
           opts[:block] = block if block
           if !opts.has_key?(:instance_specific) && (block || orig_opts[:block] || orig_opts[:dataset])
             # It's possible the association is instance specific, in that it depends on
@@ -1757,7 +1761,7 @@ module Sequel
           associate(:one_to_one, name, opts, &block)
         end
 
-        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@cache_associations=>nil, :@default_eager_limit_strategy=>nil)
+        Plugins.inherited_instance_variables(self, :@association_reflections=>:dup, :@autoreloading_associations=>:hash_dup, :@default_association_options=>:dup, :@cache_associations=>nil, :@default_eager_limit_strategy=>nil)
         Plugins.def_dataset_methods(self, [:eager, :eager_graph, :eager_graph_with_options, :association_join, :association_full_join, :association_inner_join, :association_left_join, :association_right_join])
         
         private

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.default_association_options, for setting option defaults for all future associations (jeremyevans)
+
 * Support :association_pks_nil association option in association_pks setter for determining how to handle nil (jeremyevans)
 
 * Make association_pks setter handle empty array correctly when :delay_pks is set (jeremyevans)
