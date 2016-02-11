@@ -29,6 +29,12 @@ module Sequel
     # objects, and the setting will not be persisted until after the object has
     # been saved.
     #
+    # By default, if you pass a nil value to the setter, an exception will be raised.
+    # You can change this behavior by using the :association_pks_nil association option.
+    # If set to :ignore, the setter will take no action if nil is given.
+    # If set to :remove, the setter will treat the nil as an empty array, removing
+    # the association all currently associated values.
+    #
     # Usage:
     #
     #   # Make all model subclass *_to_many associations have association_pks
@@ -182,7 +188,19 @@ module Sequel
         # If the receiver is a new object, save the pks
         # so the update can happen after the received has been saved.
         def _association_pks_setter(opts, pks)
+          if pks.nil?
+            case opts[:association_pks_nil]
+            when :remove
+              pks = []
+            when :ignore
+              return
+            else
+              raise Error, "nil value given to association_pks setter"
+            end
+          end
+
           pks = convert_pk_array(opts, pks)
+
           delay = opts[:delay_pks]
           if (new? && delay) || (delay == :always)
             modified!

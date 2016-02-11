@@ -380,4 +380,26 @@ describe "Sequel::Plugins::AssociationPks" do
     ar.refresh
     ar.album_pks.must_equal [1,2,3]
   end
+
+  it "should remove all values if nil given to setter and :association_pks_nil=>:remove" do
+    @Artist.one_to_many :albums, :clone=>:albums, :association_pks_nil=>:remove
+
+    ar = @Artist.load(:id=>1)
+    ar.album_pks = nil
+    @db.sqls.must_equal ["UPDATE albums SET artist_id = NULL WHERE (artist_id = 1)"]
+  end
+
+  it "should take no action if nil given to setter and :association_pks_nil=>:ignore" do
+    @Artist.one_to_many :albums, :clone=>:albums, :association_pks_nil=>:ignore
+
+    ar = @Artist.load(:id=>1)
+    ar = @Artist.new
+    ar.album_pks = nil
+    @db.sqls.must_equal []
+  end
+
+  it "should raise error if nil given to setter by default" do
+    ar = @Artist.load(:id=>1)
+    proc{ar.album_pks = nil}.must_raise Sequel::Error
+  end
 end
