@@ -17,7 +17,11 @@
 #   SELECT a, b, 2, FROM table GROUP BY a, b ORDER BY c
 #
 # This extension makes select, group, and order methods operate
-# like filter methods, which support the same interface.
+# like filter methods, which support the same interface.  Note
+# that this extension can add SQL injection vulnerabilities to existing
+# code if any of the strings passed to one of the supported
+# methods is derived from user input.  For that reason, it should
+# be used with caution.
 #
 # You can load this extension into specific datasets:
 #
