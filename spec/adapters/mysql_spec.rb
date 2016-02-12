@@ -325,12 +325,6 @@ describe "Joined MySQL dataset" do
     @ds.join(:attributes, :node_id => :id).sql.must_equal "SELECT * FROM `nodes` INNER JOIN `attributes` ON (`attributes`.`node_id` = `nodes`.`id`)"
   end
 
-  it "should allow a having clause on ungrouped datasets" do
-    @ds.having('blah')
-
-    @ds.having('blah').sql.must_equal "SELECT * FROM `nodes` HAVING (blah)"
-  end
-
   it "should put a having clause before an order by clause" do
     @ds.order(:aaa).having(:bbb => :ccc).sql.must_equal "SELECT * FROM `nodes` HAVING (`bbb` = `ccc`) ORDER BY `aaa`"
   end
