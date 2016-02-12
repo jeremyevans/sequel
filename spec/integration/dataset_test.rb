@@ -1090,9 +1090,9 @@ describe "Sequel::Dataset main SQL methods" do
   
   it "#filter and #exclude should work with placeholder strings" do
     @ds.insert(20, 30)
-    @ds.filter("a > ?", 15).all.must_equal [{:a=>20, :b=>30}]
-    @ds.exclude("b < ?", 15).all.must_equal [{:a=>20, :b=>30}]
-    @ds.filter("b < ?", 15).invert.all.must_equal [{:a=>20, :b=>30}]
+    @ds.filter(Sequel.lit("a > ?", 15)).all.must_equal [{:a=>20, :b=>30}]
+    @ds.exclude(Sequel.lit("b < ?", 15)).all.must_equal [{:a=>20, :b=>30}]
+    @ds.filter(Sequel.lit("b < ?", 15)).invert.all.must_equal [{:a=>20, :b=>30}]
   end
   
   it "#and and #or should work correctly" do

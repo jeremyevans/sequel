@@ -55,14 +55,14 @@ describe "Prepared Statements and Bound Arguments" do
   end
 
   it "should support placeholder literal strings with call" do
-    @ds.filter("numb = ?", :$n).call(:select, :n=>10).must_equal [{:id=>1, :numb=>10}]
+    @ds.filter(Sequel.lit("numb = ?", :$n)).call(:select, :n=>10).must_equal [{:id=>1, :numb=>10}]
   end
 
   it "should support named placeholder literal strings and handle multiple named placeholders correctly with call" do
-    @ds.filter("numb = :n", :n=>:$n).call(:select, :n=>10).must_equal [{:id=>1, :numb=>10}]
+    @ds.filter(Sequel.lit("numb = :n", :n=>:$n)).call(:select, :n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.insert(:numb=>20)
     @ds.insert(:numb=>30)
-    @ds.filter("numb > :n1 AND numb < :n2 AND numb = :n3", :n3=>:$n3, :n2=>:$n2, :n1=>:$n1).call(:select, :n3=>20, :n2=>30, :n1=>10).must_equal [{:id=>2, :numb=>20}]
+    @ds.filter(Sequel.lit("numb > :n1 AND numb < :n2 AND numb = :n3", :n3=>:$n3, :n2=>:$n2, :n1=>:$n1)).call(:select, :n3=>20, :n2=>30, :n1=>10).must_equal [{:id=>2, :numb=>20}]
   end
 
   it "should support datasets with static sql and placeholders with call" do
@@ -78,7 +78,7 @@ describe "Prepared Statements and Bound Arguments" do
   end
 
   it "should support subselects with literal strings with call" do
-    @ds.filter(:id=>:$i, :numb=>@ds.select(:numb).filter("numb = ?", :$n)).call(:select, :n=>10, :i=>1).must_equal [{:id=>1, :numb=>10}]
+    @ds.filter(:id=>:$i, :numb=>@ds.select(:numb).filter(Sequel.lit("numb = ?", :$n))).call(:select, :n=>10, :i=>1).must_equal [{:id=>1, :numb=>10}]
   end
 
   it "should support subselects with static sql and placeholders with call" do
@@ -186,14 +186,14 @@ describe "Prepared Statements and Bound Arguments" do
   end
 
   it "should support placeholder literal strings with prepare" do
-    @ds.filter("numb = ?", :$n).prepare(:select, :seq_select).call(:n=>10).must_equal [{:id=>1, :numb=>10}]
+    @ds.filter(Sequel.lit("numb = ?", :$n)).prepare(:select, :seq_select).call(:n=>10).must_equal [{:id=>1, :numb=>10}]
   end
 
   it "should support named placeholder literal strings and handle multiple named placeholders correctly with prepare" do
-    @ds.filter("numb = :n", :n=>:$n).prepare(:select, :seq_select).call(:n=>10).must_equal [{:id=>1, :numb=>10}]
+    @ds.filter(Sequel.lit("numb = :n", :n=>:$n)).prepare(:select, :seq_select).call(:n=>10).must_equal [{:id=>1, :numb=>10}]
     @ds.insert(:numb=>20)
     @ds.insert(:numb=>30)
-    @ds.filter("numb > :n1 AND numb < :n2 AND numb = :n3", :n3=>:$n3, :n2=>:$n2, :n1=>:$n1).call(:select, :n3=>20, :n2=>30, :n1=>10).must_equal [{:id=>2, :numb=>20}]
+    @ds.filter(Sequel.lit("numb > :n1 AND numb < :n2 AND numb = :n3", :n3=>:$n3, :n2=>:$n2, :n1=>:$n1)).call(:select, :n3=>20, :n2=>30, :n1=>10).must_equal [{:id=>2, :numb=>20}]
   end
 
   it "should support datasets with static sql and placeholders with prepare" do
@@ -209,7 +209,7 @@ describe "Prepared Statements and Bound Arguments" do
   end
 
   it "should support subselects with literal strings with prepare" do
-    @ds.filter(:id=>:$i, :numb=>@ds.select(:numb).filter("numb = ?", :$n)).prepare(:select, :seq_select).call(:n=>10, :i=>1).must_equal [{:id=>1, :numb=>10}]
+    @ds.filter(:id=>:$i, :numb=>@ds.select(:numb).filter(Sequel.lit("numb = ?", :$n))).prepare(:select, :seq_select).call(:n=>10, :i=>1).must_equal [{:id=>1, :numb=>10}]
   end
 
   it "should support subselects with static sql and placeholders with prepare" do
