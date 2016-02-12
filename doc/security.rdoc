@@ -166,10 +166,12 @@ following methods pass their arguments to a filter method:
 * Sequel::Dataset#first
 * Sequel::Dataset#last
 * Sequel::Dataset#[]
-* Sequel::Dataset#[]=
 
 The Model.find[rdoc-ref:Sequel::Model::ClassMethods#find] and Model.find_or_create[rdoc-ref:Sequel::Model::ClassMethods#find_or_create]
 class methods also call down to the filter methods.
+
+The no_auto_string_literals extension can be used to remove the default support 
+for plain strings as literal strings in filter methods.
 
 ==== SQL Fragment passed to Dataset#update
 
@@ -185,6 +187,9 @@ So you should not do:
 Instead, you should do:
 
   DB[:table].update(:column => params[:value].to_s) # Safe
+
+The no_auto_string_literals extension can also be used to remove the default support
+for plain strings as literal strings in update methods.
 
 ==== SQL Fragment passed to Dataset#lock_style
 

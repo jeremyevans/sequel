@@ -1,5 +1,7 @@
 === HEAD
 
+* Add no_auto_literal_strings extension, which makes SQL injection vulnerabilities less likely (jeremyevans)
+
 * Add Model.default_association_options, for setting option defaults for all future associations (jeremyevans)
 
 * Support :association_pks_nil association option in association_pks setter for determining how to handle nil (jeremyevans)
