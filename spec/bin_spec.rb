@@ -139,7 +139,7 @@ END
   end
 
   it "-E should echo SQL statements to stdout" do
-    bin(:args=>'-E -c DB.tables').must_match %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
+    bin(:args=>'-E -c DB.tables').must_include "SELECT * FROM `sqlite_master` WHERE ((`name` != 'sqlite_sequence') AND (`type` = 'table'))"
   end
 
   it "-I should include directory in load path" do
@@ -148,7 +148,7 @@ END
 
   it "-l should log SQL statements to file" do
     bin(:args=>"-l #{TMP_FILE} -c DB.tables").must_equal ''
-    File.read(TMP_FILE).must_match %r{SELECT \* FROM `sqlite_master` WHERE \(type = 'table' AND NOT name = 'sqlite_sequence'\)\n}
+    File.read(TMP_FILE).must_include "SELECT * FROM `sqlite_master` WHERE ((`name` != 'sqlite_sequence') AND (`type` = 'table'))"
   end
 
   it "-L should load all *.rb files in given directory" do
