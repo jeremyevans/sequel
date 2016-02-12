@@ -222,7 +222,7 @@ describe "An Oracle database" do
   it "should translate values correctly" do
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
-    @d.filter('value > 500').update(:date_created => Sequel.lit("to_timestamp('2009-09-09', 'YYYY-MM-DD')"))
+    @d.filter{value > 500}.update(:date_created => Sequel.lit("to_timestamp('2009-09-09', 'YYYY-MM-DD')"))
     
     @d[:name => 'def'][:date_created].strftime('%F').must_equal '2009-09-09'
   end
