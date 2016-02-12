@@ -13,9 +13,9 @@ module Sequel
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze
-      TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'".freeze
+      TABLES_FILTER = Sequel.~(:name=>'sqlite_sequence'.freeze) & {:type => 'table'.freeze}
       TEMP_STORE = [:default, :file, :memory].freeze
-      VIEWS_FILTER = "type = 'view'".freeze
+      VIEWS_FILTER = {:type => 'view'.freeze}.freeze
       TRANSACTION_MODE = {
         :deferred => "BEGIN DEFERRED TRANSACTION".freeze,
         :immediate => "BEGIN IMMEDIATE TRANSACTION".freeze,
