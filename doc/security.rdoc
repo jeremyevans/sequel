@@ -44,34 +44,56 @@ There are basically two kinds of possible SQL injections in Sequel:
 
 ==== Full SQL Strings
 
-Some Sequel methods are designed to execute raw SQL, including:
+Some Sequel methods are designed to execute raw SQL strings, including:
 
 * Sequel::Database#execute
 * Sequel::Database#run
 * Sequel::Database#<<
-* Sequel::Database#[]
-* Sequel::Database#fetch
-* Sequel::Dataset#with_sql
+* Sequel::Dataset#fetch_rows
+* Sequel::Dataset#with_sql_all
+* Sequel::Dataset#with_sql_delete
+* Sequel::Dataset#with_sql_each
+* Sequel::Dataset#with_sql_first
+* Sequel::Dataset#with_sql_insert
+* Sequel::Dataset#with_sql_single_value
+* Sequel::Dataset#with_sql_update
 
 Here are some examples of use:
 
   DB.run 'SQL'
   DB << 'SQL'
   DB.execute 'SQL'
+  DB.fetch_rows('SQL'){|row| }
+  DB.dataset.with_sql_all('SQL')
+  DB.dataset.with_sql_delete('SQL')
+  DB.dataset.with_sql_each('SQL'){|row| }
+  DB.dataset.with_sql_first('SQL')
+  DB.dataset.with_sql_insert('SQL')
+  DB.dataset.with_sql_single_value('SQL')
+  DB.dataset.with_sql_update('SQL')
+
+If you pass a string to these methods that is derived from user input, you open
+yourself up to SQL injection.  These methods are not designed to work at all
+with user input.  If you must call them with user input, you should escape the
+user input manually via Sequel::Database#literal. Example:
+
+  DB.run "SOME SQL #{DB.literal(params[:user].to_s)}"
+
+==== Full SQL Strings, With Possible Placeholders
+
+Other Sequel methods are designed to support execution of raw SQL strings that may contain placeholders:
+
+* Sequel::Database#[]
+* Sequel::Database#fetch
+* Sequel::Dataset#with_sql
+
+Here are some examples of use:
+
   DB['SQL'].all
   DB.fetch('SQL').all
   DB.dataset.with_sql('SQL').all
 
-If you pass a string to these methods that is derived from user input, you open
-yourself up to SQL injection.  The Sequel::Database#run, Sequel::Database#<<, and
-Sequel::Database#execute methods are not designed to work at all with user input.
-If you must use them with user input, you should escape the user input manually
-via Sequel::Database#literal. Example:
-
-  DB.run "SOME SQL #{DB.literal(params[:user].to_s)}"
-
-With Sequel::Database#[], Sequel::Database#fetch and Sequel::Dataset#with_sql, you should use placeholders,
-in which case Sequel automatically literalizes the input:
+With these methods you should use placeholders, in which case Sequel automatically escapes the input:
 
   DB['SELECT * FROM foo WHERE bar = ?', params[:user].to_s]
 
@@ -222,12 +244,12 @@ pass any of those values derived from user input, you are dealing with the same 
 Note that the issues with SQL identifiers do not just apply to places where
 strings are used as identifiers, they also apply to all places where Sequel
 uses symbols as identifiers.  However, if you are creating symbols from user input,
-you at least have a denial of service vulnerability, and possibly a more serious
-vulnerability.
+you at least have a denial of service vulnerability in ruby <2.2, and possibly a
+more serious vulnerability.
 
 == Denial of Service
 
-Sequel converts some strings to symbols.  Because symbols in ruby are not
+Sequel converts some strings to symbols.  Because symbols in ruby <2.2 are not
 garbage collected, if the strings that are converted to symbols are
 derived from user input, you have a denial of service vulnerability due to
 memory exhaustion.
@@ -302,17 +324,34 @@ they also allow mass assignment:
   Album.new(params[:album]) # Mass Assignment
   Album.create(params[:album]) # Mass Assignment
 
-Instead of these methods, it is encouraged to either use the
-Model#set_only[rdoc-ref:Sequel::Model::InstanceMethods#set_only],
+When the argument is derived from user input, instead of these methods, it is encouraged to either use 
+Model#set_fields[rdoc-ref:Sequel::Model::InstanceMethods#set_fields] or
+Model#update_fields[rdoc-ref:Sequel::Model::InstanceMethods#update_fields],
+which allow you to specify which fields to allow on a per-call basis.  This
+pretty much eliminates the chance that the user will be able to set a column
+you did not intend to allow:
+
+  album.set_fields(params[:album], [:name, :copies_sold])
+  album.update_fields(params[:album], [:name, :copies_sold])
+
+These two methods iterate over the second argument (+:name+ and +:copies_sold+ in
+this example) instead of iterating over the entries in the first argument
+(<tt>params[:album]</tt> in this example).
+
+In addition to these two methods, you can also use 
+Model#set_only[rdoc-ref:Sequel::Model::InstanceMethods#set_only] or
 Model#update_only[rdoc-ref:Sequel::Model::InstanceMethods#update_only],
-Model#set_fields[rdoc-ref:Sequel::Model::InstanceMethods#set_fields], or
-Model#update_fields[rdoc-ref:Sequel::Model::InstanceMethods#update_fields]
-methods, which allow you to specify which fields
-to allow on a per-call basis.  This pretty much eliminates the chance that the
-user will be able to set a column you did not intend to allow:
+which are similar but iterate over the entries in the first argument, checking
+the second argument to see if setting the entries is allowed.
 
   album.set_only(params[:album], [:name, :copies_sold])
-  album.set_fields(params[:album], [:name, :copies_sold])
+  album.update_only(params[:album], [:name, :copies_sold])
+
+If you expect all entries in the second argument to be present in the first
+argument, use +set_fields+ or +update_fields+.  If you are not sure if all
+arguments in the second argument will be present in the first argument, but
+do not want to allow setting any column other than the ones listed in the
+second argument, use +set_only+ or +update_only+.
 
 You can override the columns to allow by default during mass assignment via
 the Model.set_allowed_columns[rdoc-ref:Sequel::Model::ClassMethods#set_allowed_columns] class method.  This is a good
@@ -331,7 +370,7 @@ their type.  For example:
 
   Album.where(:id=>params[:id])
 
-is probably a bad idea.  Assuming you are using a web framework, params\[:id\] could
+is probably a bad idea.  Assuming you are using a web framework, <tt>params[:id]</tt> could
 be a string, an array, a hash, or nil.
 
 Assuming that +id+ is an integer field, you probably want to do:
