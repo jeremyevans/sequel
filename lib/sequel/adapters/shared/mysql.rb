@@ -682,6 +682,18 @@ module Sequel
       def calc_found_rows
         clone(:calc_found_rows => true)
       end
+
+      # Sets up the select methods to delete from if deleting from a
+      # joined dataset:
+      #
+      #   DB[:a].join(:b, :a_id=>:id).delete
+      #   DELETE a FROM a INNER JOIN b ON (b.a_id = a.id)
+      #
+      #   DB[:a].join(:b, :a_id=>:id).delete_from(:a, :b).delete
+      #   DELETE a, b FROM a INNER JOIN b ON (b.a_id = a.id)
+      def delete_from(*tables)
+        clone(:delete_from=>tables)
+      end
       
       # Return the results of an EXPLAIN query as a string. Options:
       # :extended :: Use EXPLAIN EXPTENDED instead of EXPLAIN if true.
@@ -847,7 +859,8 @@ module Sequel
       def delete_from_sql(sql)
         if joined_dataset?
           sql << SPACE
-          source_list_append(sql, @opts[:from][0..0])
+          tables = @opts[:delete_from] || @opts[:from][0..0]
+          source_list_append(sql, tables)
           sql << FROM
           source_list_append(sql, @opts[:from])
           select_join_sql(sql)

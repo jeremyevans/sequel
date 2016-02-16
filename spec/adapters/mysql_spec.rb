@@ -1283,3 +1283,37 @@ if DB.adapter_scheme == :mysql2
     end
   end
 end
+
+describe "MySQL joined datasets" do
+  before do
+    @db = DB
+    @db.create_table!(:a) do
+      Integer :id
+    end
+    @db.create_table!(:b) do
+      Integer :id
+      Integer :a_id
+    end
+    @db[:a].insert(1)
+    @db[:a].insert(2)
+    @db[:b].insert(3, 1)
+    @db[:b].insert(4, 1)
+    @db[:b].insert(5, 2)
+    @ds = @db[:a].join(:b, :a_id=>:id)
+  end
+  after do
+    @db.drop_table?(:a, :b)
+  end
+
+  it "should support deletions from a single table" do
+    @ds.where(:a__id=>1).delete
+    @db[:a].select_order_map(:id).must_equal [2]
+    @db[:b].select_order_map(:id).must_equal [3, 4, 5]
+  end
+
+  it "should support deletions from multiple tables" do
+    @ds.delete_from(:a, :b).where(:a__id=>1).delete
+    @db[:a].select_order_map(:id).must_equal [2]
+    @db[:b].select_order_map(:id).must_equal [5]
+  end
+end

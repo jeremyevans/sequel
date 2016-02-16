@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#delete_from on MySQL, allowing deletions from multiple tables in a single query (jeremyevans) (#1146)
+
 * Add no_auto_literal_strings extension, which makes SQL injection vulnerabilities less likely (jeremyevans)
 
 * Add Model.default_association_options, for setting option defaults for all future associations (jeremyevans)
