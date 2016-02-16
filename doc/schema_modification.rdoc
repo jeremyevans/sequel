@@ -132,7 +132,7 @@ If provided with an array, +primary_key+ does not create a column, it just sets 
 
 +foreign_key+ is used to create a foreign key column that references a column in another table (or the same table).
 It takes the column name as the first argument, the table it references as the second argument, and an options hash
-as it's third argument.  A simple example is:
+as its third argument.  A simple example is:
 
   create_table(:albums) do
     primary_key :id
