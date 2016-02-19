@@ -18,6 +18,10 @@ describe "no_auto_literal_strings extension" do
     proc{@ds["a"]}.must_raise Sequel::Error
   end
   
+  it "should raise exception for plain strings arrays in filter methods" do
+    proc{@ds.where(["a"])}.must_raise Sequel::Error
+  end
+
   it "should handle explicit literal strings in filter methods" do
     @ds.where(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t WHERE (a)'
     @ds.having(Sequel.lit("a")).sql.must_equal 'SELECT * FROM t HAVING (a)'
@@ -34,6 +38,10 @@ describe "no_auto_literal_strings extension" do
                             "SELECT * FROM t WHERE (a) LIMIT 1"]
   end
   
+  it "should handle literal strings in arrays in filter methods" do
+    @ds.where([Sequel.lit("a")]).sql.must_equal 'SELECT * FROM t WHERE (a)'
+  end
+
   it "should handle other objects in filter methods" do
     @ds.where(:a).sql.must_equal 'SELECT * FROM t WHERE a'
   end

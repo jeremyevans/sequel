@@ -51,6 +51,14 @@ describe "class_table_inheritance plugin" do
     Object.send(:remove_const, :Employee)
   end
 
+  it "#cti_base_model should be the model that loaded the plugin" do
+    Executive.cti_base_model.must_equal Employee
+  end
+
+  it "#cti_columns should be a mapping of table names to columns" do
+    Executive.cti_columns.must_equal(:employees=>[:id, :name, :kind], :managers=>[:id, :num_staff], :executives=>[:id, :num_managers])
+  end
+
   it "should have simple_table = nil for all subclasses" do
     Manager.simple_table.must_equal nil
     Executive.simple_table.must_equal nil
@@ -246,7 +254,23 @@ describe "class_table_inheritance plugin" do
     sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Ceo)', '(E|Ceo)'\)/)
     sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\)/)
     sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/)
+  end
+    
+  it "should insert the correct rows into all tables when inserting when insert select is important" do
+    [Ceo, Manager, Employee].each do |klass|
+      def (klass.cti_instance_dataset).supports_insert_select?; true; end
+      def (klass.cti_instance_dataset).insert_select(v)
+        db.run(insert_sql(v) + " RETURNING *")
+        v.merge(:id=>1)
+      end
     end
+    Ceo.create(:num_managers=>3, :num_staff=>2, :name=>'E')
+    sqls = @db.sqls
+    sqls.length.must_equal 3
+    sqls[0].must_match(/INSERT INTO employees \((name|kind), (name|kind)\) VALUES \('(E|Ceo)', '(E|Ceo)'\) RETURNING \*/)
+    sqls[1].must_match(/INSERT INTO managers \((num_staff|id), (num_staff|id)\) VALUES \([12], [12]\) RETURNING \*/)
+    sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\) RETURNING \*/)
+  end
     
   it "should insert the correct rows into all tables with a given primary key" do
     e = Ceo.new(:num_managers=>3, :num_staff=>2, :name=>'E')

@@ -3642,6 +3642,13 @@ describe "Dataset prepared statements and bound variables " do
     proc{ps.prepare(:select, :select_n2)}.must_raise Sequel::Error
   end
 
+  it "PreparedStatement#prepare should not raise an error if preparing prepared statements is allowed" do
+    ps = @ds.prepare(:select, :select_n)
+    def ps.allow_preparing_prepared_statements?; true end
+    ps.prepare(:select, :select_n2).call
+    @db.sqls.must_equal ["SELECT * FROM items"]
+  end
+
   it "#call should default to using :all if an invalid type is given" do
     @ds.filter(:num=>:$n).call(:select_all, :n=>1)
     @db.sqls.must_equal ['SELECT * FROM items WHERE (num = 1)']

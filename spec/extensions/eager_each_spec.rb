@@ -53,6 +53,11 @@ describe "Sequel::Plugins::EagerEach" do
       'SELECT items.id, items.parent_id, children.id AS children_id, children.parent_id AS children_parent_id FROM items LEFT OUTER JOIN items AS children ON (children.parent_id = items.id) WHERE (items.id = 1)']
   end
 
+  it "should make #first on a non-eager dataset work correctly" do
+    @c.dataset._fetch = [{:id=>1, :parent_id=>nil}]
+    @c.first.must_equal @c.load(:id=>1, :parent_id=>nil)
+  end
+
   it "should not attempt to eager load when getting the columns" do
     ds = @c.eager(:children)
     def ds.all; raise; end

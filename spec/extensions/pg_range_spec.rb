@@ -38,6 +38,7 @@ describe "pg_range extension" do
     @db.literal(@R.new(1, nil)).must_equal "'[1,]'"
     @db.literal(@R.new(1, 2, :db_type=>'int8range')).must_equal "int8range(1,2,'[]')"
     @db.literal(@R.new(nil, nil, :empty=>true)).must_equal "'empty'"
+    @db.literal(@R.new(nil, nil, :empty=>true, :db_type=>'int8range')).must_equal "'empty'::int8range"
     @db.literal(@R.new("", 2)).must_equal "'[\"\",2]'"
   end
 
