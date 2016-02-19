@@ -93,7 +93,7 @@ run_spec = proc do |patterns|
   ENV['RUBYLIB'] = rubylib
 end
 
-spec_task = proc do |description, name, files|
+spec_task = proc do |description, name, files, coverage|
   desc description
   task name do
     run_spec.call(files)
@@ -106,11 +106,13 @@ spec_task = proc do |description, name, files|
     sh "#{rake} #{name} 2>&1 | egrep -v \"(: warning: instance variable @.* not initialized|: warning: method redefined; discarding old|: warning: previous definition of)\""
   end
 
-  desc "#{description} with coverage"
-  task :"#{name}_cov" do
-    ENV['COVERAGE'] = '1'
-    run_spec.call(files)
-    ENV.delete('COVERAGE')
+  if coverage
+    desc "#{description} with coverage"
+    task :"#{name}_cov" do
+      ENV['COVERAGE'] = '1'
+      run_spec.call(files)
+      ENV.delete('COVERAGE')
+    end
   end
 end
 
@@ -119,19 +121,19 @@ task :default => :spec
 desc "Run the core, model, and extension/plugin specs"
 task :spec => [:spec_core, :spec_model, :spec_plugin]
 
-spec_task.call("Run core and model specs together", :spec_core_model, './spec/core/*_spec.rb ./spec/model/*_spec.rb')
-spec_task.call("Run core specs", :spec_core, './spec/core/*_spec.rb')
-spec_task.call("Run model specs", :spec_model, './spec/model/*_spec.rb')
-spec_task.call("Run plugin/extension specs", :spec_plugin, './spec/extensions/*_spec.rb')
-spec_task.call("Run bin/sequel specs", :spec_bin, './spec/bin_spec.rb')
-spec_task.call("Run core extensions specs", :spec_core_ext, './spec/core_extensions_spec.rb')
-spec_task.call("Run integration tests", :spec_integration, './spec/integration/*_test.rb')
+spec_task.call("Run core and model specs together", :spec_core_model, './spec/core/*_spec.rb ./spec/model/*_spec.rb', true)
+spec_task.call("Run core specs", :spec_core, './spec/core/*_spec.rb', false)
+spec_task.call("Run model specs", :spec_model, './spec/model/*_spec.rb', false)
+spec_task.call("Run plugin/extension specs", :spec_plugin, './spec/extensions/*_spec.rb', true)
+spec_task.call("Run bin/sequel specs", :spec_bin, './spec/bin_spec.rb', false)
+spec_task.call("Run core extensions specs", :spec_core_ext, './spec/core_extensions_spec.rb', true)
+spec_task.call("Run integration tests", :spec_integration, './spec/integration/*_test.rb', true)
 
 %w'postgres sqlite mysql informix oracle firebird mssql db2 sqlanywhere'.each do |adapter|
-  spec_task.call("Run #{adapter} tests", :"spec_#{adapter}", "./spec/adapters/#{adapter}_spec.rb ./spec/integration/*_test.rb")
+  spec_task.call("Run #{adapter} tests", :"spec_#{adapter}", "./spec/adapters/#{adapter}_spec.rb ./spec/integration/*_test.rb", true)
 end
 
-spec_task.call("Run model specs without the associations code", :_spec_model_no_assoc, Dir["./spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}.join(' '))
+spec_task.call("Run model specs without the associations code", :_spec_model_no_assoc, Dir["./spec/model/*_spec.rb"].delete_if{|f| f =~ /association|eager_loading/}.join(' '), false)
 desc "Run model specs without the associations code"
 task :spec_model_no_assoc do
   ENV['SEQUEL_NO_ASSOCIATIONS'] = '1'
