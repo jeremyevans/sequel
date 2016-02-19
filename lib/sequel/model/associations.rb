@@ -490,40 +490,21 @@ module Sequel
         
         private
 
-        if defined?(RUBY_ENGINE) && RUBY_ENGINE != 'ruby'
-        # :nocov:
-          # On non-GVL rubies, assume the need to synchronize access.  Store the key
-          # in a special sub-hash that always uses this method to synchronize access.
-          def cached_fetch(key)
-            fetch(key) do
-              return yield unless h = self[:cache]
-              Sequel.synchronize{return h[key] if h.has_key?(key)}
-              value = yield
-              Sequel.synchronize{h[key] = value}
-            end
-          end
-
-          # Cache the value at the given key, synchronizing access.
-          def cached_set(key, value)
-            return unless h = self[:cache]
+        # On non-GVL rubies, assume the need to synchronize access.  Store the key
+        # in a special sub-hash that always uses this method to synchronize access.
+        def cached_fetch(key)
+          fetch(key) do
+            return yield unless h = self[:cache]
+            Sequel.synchronize{return h[key] if h.has_key?(key)}
+            value = yield
             Sequel.synchronize{h[key] = value}
           end
-        # :nocov:
-        else
-          # On MRI, use a plain fetch, since the GVL will synchronize access.
-          def cached_fetch(key)
-            fetch(key) do 
-              return yield unless h = self[:cache]
-              h.fetch(key){h[key] = yield}
-            end
-          end
+        end
 
-          # On MRI, just set the value at the key in the cache, since the GVL
-          # will synchronize access.
-          def cached_set(key, value)
-            return unless h = self[:cache]
-            h[key] = value
-          end
+        # Cache the value at the given key, synchronizing access.
+        def cached_set(key, value)
+          return unless h = self[:cache]
+          Sequel.synchronize{h[key] = value}
         end
 
         # The base dataset used for the association, before any order/conditions
