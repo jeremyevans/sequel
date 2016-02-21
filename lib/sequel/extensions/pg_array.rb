@@ -41,10 +41,6 @@
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using postgres array columns in CREATE/ALTER TABLE statements.
 #
-# If you are not using the native postgres or jdbc/postgresql adapter and are using array
-# types as model column values you probably should use the the pg_typecast_on_load plugin
-# if the column values are returned as a string.
-#
 # This extension by default includes handlers for array types for
 # all scalar types that the native postgres adapter handles. It
 # also makes it easy to add support for other array types.  In

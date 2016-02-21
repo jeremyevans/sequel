@@ -3,11 +3,12 @@
 module Sequel
   module Plugins
     # The PgTypecastOnLoad plugin exists because when you connect to PostgreSQL
-    # using the do, swift, or jdbc adapter, Sequel doesn't have complete
+    # using the do and swift adapters, Sequel doesn't have complete
     # control over typecasting, and may return columns as strings instead of how
     # the native postgres adapter would typecast them.  This is mostly needed for
     # the additional support that the pg_* extensions add for advanced PostgreSQL
-    # types such as arrays.
+    # types such as arrays. This plugin is not needed if using the postgres or
+    # jdbc/postgresql adapters.
     #
     # This plugin makes model loading to do the same conversion that the
     # native postgres adapter would do for all columns given.  You can either

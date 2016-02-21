@@ -45,10 +45,6 @@
 #
 #   DB.extension :pg_json
 #
-# If you are not using the native postgres adapter and are using json
-# types as model column values you probably should use the
-# pg_typecast_on_load plugin if the column values are returned as a string.
-#
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using json columns in CREATE/ALTER TABLE statements.
 #

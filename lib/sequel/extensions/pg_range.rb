@@ -47,10 +47,6 @@
 #
 #   DB.extension :pg_range
 #
-# If you are not using the native postgres or jdbc/postgresql adapters and are using range
-# types as model column values you probably should use the
-# pg_typecast_on_load plugin if the column values are returned as a string.
-#
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using range type columns in CREATE/ALTER TABLE statements.
 #

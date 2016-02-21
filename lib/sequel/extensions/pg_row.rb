@@ -76,10 +76,6 @@
 #   DB.conversion_procs.select{|k,v| v.is_a?(Sequel::Postgres::PGRow::Parser) && \
 #     v.converter && (v.converter.name.nil? || v.converter.name == '') }.map{|k,v| v}
 # 
-# If you are not using the native postgres or jdbc/postgresql adapters and are using composite types
-# types as model column values you probably should use the
-# pg_typecast_on_load plugin if the column values are returned as a string.
-#
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using row type columns in CREATE/ALTER TABLE statements.
 #

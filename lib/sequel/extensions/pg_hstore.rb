@@ -80,10 +80,6 @@
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using hstore columns in CREATE/ALTER TABLE statements.
 #
-# If you are not using the native postgres or jdbc/postgresql adapters and are using hstore
-# types as model column values you probably should use the
-# pg_typecast_on_load plugin if the column values are returned as a string.
-#
 # This extension requires the delegate and strscan libraries.
 #
 # Related module: Sequel::Postgres::HStore
