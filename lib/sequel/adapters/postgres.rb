@@ -306,10 +306,9 @@ module Sequel
 
       # Disconnect given connection
       def disconnect_connection(conn)
-        begin
-          conn.finish
-        rescue PGError, IOError
-        end
+        conn.finish
+      rescue PGError, IOError
+        nil
       end
 
       if SEQUEL_POSTGRES_USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
