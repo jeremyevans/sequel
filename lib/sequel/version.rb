@@ -11,7 +11,7 @@ module Sequel
   TINY  = 0
   
   # The version of Sequel you are using, as a string (e.g. "2.11.0")
-  VERSION = [MAJOR, MINOR, TINY].join('.')
+  VERSION = [MAJOR, MINOR, TINY].join('.').freeze
   
   # The version of Sequel you are using, as a string (e.g. "2.11.0")
   def self.version
