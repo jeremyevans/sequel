@@ -687,10 +687,10 @@ module Sequel
       # joined dataset:
       #
       #   DB[:a].join(:b, :a_id=>:id).delete
-      #   DELETE a FROM a INNER JOIN b ON (b.a_id = a.id)
+      #   # DELETE a FROM a INNER JOIN b ON (b.a_id = a.id)
       #
       #   DB[:a].join(:b, :a_id=>:id).delete_from(:a, :b).delete
-      #   DELETE a, b FROM a INNER JOIN b ON (b.a_id = a.id)
+      #   # DELETE a, b FROM a INNER JOIN b ON (b.a_id = a.id)
       def delete_from(*tables)
         clone(:delete_from=>tables)
       end
