@@ -62,6 +62,12 @@
             existing objects, and the setting will not be persisted until after the
             object has been saved.</p>
             
+            <p>By default, if you pass a nil value to the setter, an exception will be
+            raised. You can change this behavior by using the :association_pks_nil
+            association option. If set to :ignore, the setter will take no action if
+            nil is given. If set to :remove, the setter will treat the nil as an empty
+            array, removing the association all currently associated values.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclass *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_pks</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album *_to_many associations have association_pks</span>&#x000A;<span class="ruby-comment"># methods (called before the association methods)</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">association_pks</span></pre>

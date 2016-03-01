@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-02-24 08:28:23 -0800</span>
+          <span class='datetime'>2016-02-16 18:30:50 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -159,8 +159,7 @@
             <p><code>foreign_key</code> is used to create a foreign key column that
             references a column in another table (or the same table). It takes the
             column name as the first argument, the table it references as the second
-            argument, and an options hash as it&#39;s third argument.  A simple example
-            is:</p>
+            argument, and an options hash as its third argument.  A simple example is:</p>
             
             <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-identifier">foreign_key</span> :<span class="ruby-identifier">artist_id</span>, :<span class="ruby-identifier">artists</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">name</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             

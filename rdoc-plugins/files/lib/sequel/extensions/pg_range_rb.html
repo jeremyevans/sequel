@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-21 12:32:05 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -95,10 +95,6 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_range</span></pre>
             
-            <p>If you are not using the native postgres or jdbc/postgresql adapters and
-            are using range types as model column values you probably should use the
-            pg_typecast_on_load plugin if the column values are returned as a string.</p>
-            
             <p>See the schema modification guide for details on using range type columns
             in CREATE/ALTER TABLE statements.</p>
             
@@ -107,6 +103,9 @@
             extension:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_array</span>, :<span class="ruby-identifier">pg_range</span></pre>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/Postgres/PGRange.html">Sequel::Postgres::PGRange</a></p>
           </div>
           <div id='context'>
             <div id='requires'>

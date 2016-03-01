@@ -1,6 +1,6 @@
-Mon, 01 Feb 2016 08:32:59 -0800
+Tue, 01 Mar 2016 09:44:26 -0800
 README.rdoc	Fri, 27 Nov 2015 11:00:03 -0800
-CHANGELOG	Mon, 01 Feb 2016 08:16:09 -0800
+CHANGELOG	Tue, 01 Mar 2016 09:39:30 -0800
 MIT-LICENSE	Sat, 09 Jan 2016 12:54:32 -0800
 lib/sequel.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/ast_transformer.rb	Thu, 21 Jan 2016 12:21:52 -0800
@@ -14,7 +14,7 @@ lib/sequel/model.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/no_core_ext.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/sql.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/timezones.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/version.rb	Mon, 01 Feb 2016 08:16:09 -0800
+lib/sequel/version.rb	Tue, 01 Mar 2016 09:39:30 -0800
 lib/sequel/connection_pool/sharded_single.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/connection_pool/sharded_threaded.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/connection_pool/single.rb	Thu, 21 Jan 2016 12:21:52 -0800
@@ -38,7 +38,7 @@ lib/sequel/dataset/placeholder_literalizer.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/prepared_statements.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/query.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/sql.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/model/associations.rb	Tue, 26 Jan 2016 09:56:51 -0800
+lib/sequel/model/associations.rb	Fri, 19 Feb 2016 14:25:50 -0800
 lib/sequel/model/base.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/model/dataset_module.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/model/default_inflections.rb	Thu, 21 Jan 2016 12:21:53 -0800
@@ -48,7 +48,7 @@ lib/sequel/model/inflections.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/model/plugins.rb	Thu, 21 Jan 2016 12:21:53 -0800
 doc/active_record.rdoc	Mon, 10 Nov 2014 21:51:27 -0800
 doc/advanced_associations.rdoc	Sun, 13 Dec 2015 14:21:47 -0800
-doc/association_basics.rdoc	Thu, 30 Jul 2015 14:00:00 -0700
+doc/association_basics.rdoc	Thu, 11 Feb 2016 13:31:12 -0800
 doc/bin_sequel.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
 doc/cheat_sheet.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/code_order.rdoc	Thu, 06 Jun 2013 17:24:35 -0700
@@ -62,16 +62,16 @@ doc/model_hooks.rdoc	Thu, 29 Jan 2015 16:13:26 -0800
 doc/model_plugins.rdoc	Fri, 06 Sep 2013 13:38:06 -0700
 doc/mssql_stored_procedures.rdoc	Thu, 02 Jan 2014 10:46:37 -0800
 doc/object_model.rdoc	Fri, 23 May 2014 13:28:32 -0700
-doc/opening_databases.rdoc	Thu, 28 Jan 2016 15:50:12 -0800
+doc/opening_databases.rdoc	Thu, 04 Feb 2016 15:56:57 -0800
 doc/postgresql.rdoc	Wed, 23 Sep 2015 17:04:24 -0700
 doc/prepared_statements.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/querying.rdoc	Thu, 23 Jul 2015 07:47:01 -0700
 doc/reflection.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
-doc/schema_modification.rdoc	Tue, 24 Feb 2015 08:28:23 -0800
-doc/security.rdoc	Tue, 22 Apr 2014 10:09:17 -0700
+doc/schema_modification.rdoc	Tue, 16 Feb 2016 18:30:50 -0800
+doc/security.rdoc	Fri, 12 Feb 2016 14:45:49 -0800
 doc/sharding.rdoc	Fri, 22 May 2015 08:18:52 -0700
 doc/sql.rdoc	Tue, 23 Jun 2015 07:26:33 -0700
-doc/testing.rdoc	Fri, 08 May 2015 15:48:36 -0700
+doc/testing.rdoc	Fri, 12 Feb 2016 14:45:49 -0800
 doc/thread_safety.rdoc	Tue, 29 Sep 2015 15:34:03 -0700
 doc/transactions.rdoc	Mon, 26 Oct 2015 15:36:51 -0700
 doc/validations.rdoc	Mon, 26 Oct 2015 07:33:10 -0700
@@ -169,10 +169,11 @@ doc/release_notes/4.29.0.txt	Tue, 01 Dec 2015 07:48:59 -0800
 doc/release_notes/4.3.0.txt	Wed, 02 Oct 2013 14:34:47 -0700
 doc/release_notes/4.30.0.txt	Sat, 09 Jan 2016 12:54:32 -0800
 doc/release_notes/4.31.0.txt	Mon, 01 Feb 2016 08:16:09 -0800
+doc/release_notes/4.32.0.txt	Tue, 01 Mar 2016 09:39:30 -0800
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
 doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800
 doc/release_notes/4.6.0.txt	Thu, 02 Jan 2014 12:13:25 -0800
 doc/release_notes/4.7.0.txt	Fri, 31 Jan 2014 11:26:01 -0800
 doc/release_notes/4.8.0.txt	Fri, 28 Feb 2014 09:33:59 -0800
 doc/release_notes/4.9.0.txt	Tue, 01 Apr 2014 10:01:57 -0700
-lib/sequel/extensions/migration.rb	Mon, 25 Jan 2016 14:10:57 -0800
+lib/sequel/extensions/migration.rb	Thu, 11 Feb 2016 15:50:14 -0800

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-21 12:32:13 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -126,15 +126,13 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">conversion_procs</span>.<span class="ruby-identifier">select</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRow</span><span class="ruby-operator">::</span><span class="ruby-constant">Parser</span>) <span class="ruby-operator">&amp;&amp;</span>    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">converter</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;&#39;</span>) }.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>}</pre>
             
-            <p>If you are not using the native postgres or jdbc/postgresql adapters and
-            are using composite types types as model column values you probably should
-            use the pg_typecast_on_load plugin if the column values are returned as a
-            string.</p>
-            
             <p>See the schema modification guide for details on using row type columns in
             CREATE/ALTER TABLE statements.</p>
             
             <p>This extension requires both the strscan and delegate libraries.</p>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/Postgres/PGRow.html">Sequel::Postgres::PGRow</a></p>
           </div>
           <div id='context'>
             <div id='requires'>

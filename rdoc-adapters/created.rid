@@ -1,4 +1,4 @@
-Mon, 01 Feb 2016 08:33:33 -0800
+Tue, 01 Mar 2016 09:45:01 -0800
 lib/sequel/adapters/ado.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/ado/access.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/ado/mssql.rb	Thu, 21 Jan 2016 12:21:52 -0800
@@ -9,7 +9,7 @@ lib/sequel/adapters/do/mysql.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/do/postgres.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/do/sqlite3.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/ibmdb.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/adapters/jdbc.rb	Thu, 21 Jan 2016 12:21:52 -0800
+lib/sequel/adapters/jdbc.rb	Wed, 10 Feb 2016 08:03:42 -0800
 lib/sequel/adapters/jdbc/as400.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/jdbc/cubrid.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/jdbc/db2.rb	Thu, 21 Jan 2016 12:21:52 -0800
@@ -36,7 +36,7 @@ lib/sequel/adapters/odbc/db2.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/odbc/mssql.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/odbc/progress.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/oracle.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/adapters/postgres.rb	Thu, 21 Jan 2016 12:21:52 -0800
+lib/sequel/adapters/postgres.rb	Fri, 26 Feb 2016 12:36:12 -0800
 lib/sequel/adapters/postgresql.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/access.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/cubrid.rb	Thu, 21 Jan 2016 12:21:52 -0800
@@ -44,13 +44,13 @@ lib/sequel/adapters/shared/db2.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/firebird.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/informix.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/mssql.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/adapters/shared/mysql.rb	Thu, 21 Jan 2016 12:21:52 -0800
+lib/sequel/adapters/shared/mysql.rb	Fri, 26 Feb 2016 12:36:12 -0800
 lib/sequel/adapters/shared/mysql_prepared_statements.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/oracle.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/postgres.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/progress.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/sqlanywhere.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/adapters/shared/sqlite.rb	Thu, 21 Jan 2016 12:21:52 -0800
+lib/sequel/adapters/shared/sqlite.rb	Fri, 12 Feb 2016 14:45:49 -0800
 lib/sequel/adapters/sqlanywhere.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/sqlite.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/swift.rb	Thu, 21 Jan 2016 12:21:52 -0800

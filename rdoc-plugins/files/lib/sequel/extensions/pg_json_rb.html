@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-21 12:31:57 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -93,10 +93,6 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">pg_json</span></pre>
             
-            <p>If you are not using the native postgres adapter and are using json types
-            as model column values you probably should use the pg_typecast_on_load
-            plugin if the column values are returned as a string.</p>
-            
             <p>See the schema modification guide for details on using json columns in
             CREATE/ALTER TABLE statements.</p>
             
@@ -110,6 +106,23 @@
             correctly.</p>
             
             <p>This extension requires both the json and delegate libraries.</p>
+            
+            <p>Related modules: <a
+            href="../../../../classes/Sequel/Postgres/JSONArrayBase.html">Sequel::Postgres::JSONArrayBase</a>,
+            <a
+            href="../../../../classes/Sequel/Postgres/JSONArray.html">Sequel::Postgres::JSONArray</a>,
+            <a
+            href="../../../../classes/Sequel/Postgres/JSONArray.html">Sequel::Postgres::JSONArray</a>,
+            <a
+            href="../../../../classes/Sequel/Postgres/JSONBArray.html">Sequel::Postgres::JSONBArray</a>,
+            <a
+            href="../../../../classes/Sequel/Postgres/JSONHashBase.html">Sequel::Postgres::JSONHashBase</a>,
+            <a
+            href="../../../../classes/Sequel/Postgres/JSONHash.html">Sequel::Postgres::JSONHash</a>,
+            <a
+            href="../../../../classes/Sequel/Postgres/JSONBHash.html">Sequel::Postgres::JSONBHash</a>,
+            <a
+            href="../../../../classes/Sequel/Postgres/JSONDatabaseMethods.html">Sequel::Postgres::JSONDatabaseMethods</a></p>
           </div>
           <div id='context'>
             <div id='requires'>

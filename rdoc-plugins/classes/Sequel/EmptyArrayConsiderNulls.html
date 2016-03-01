@@ -58,13 +58,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Use a simple expression that is always true or false, never NULL.</p>
+                  <p>Use an expression that returns NULL if the column value is NULL.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-empty_array_value-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-empty_array_value-source'><span class="ruby-comment"># File lib/sequel/extensions/empty_array_consider_nulls.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">empty_array_value</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">c</span>), <span class="ruby-value">:AND</span>, <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-empty_array_value-source'><span class="ruby-comment"># File lib/sequel/extensions/empty_array_consider_nulls.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">empty_array_value</span>(<span class="ruby-identifier">op</span>, <span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-constant">Array</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">c</span>), <span class="ruby-value">:AND</span>, <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

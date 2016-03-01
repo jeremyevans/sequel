@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-28 15:50:12 -0800</span>
+          <span class='datetime'>2016-02-04 15:56:57 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -117,6 +117,17 @@
             database connection. For example:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;sqlite://blog.db&#39;</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">db</span><span class="ruby-operator">|</span> <span class="ruby-identifier">puts</span> <span class="ruby-identifier">db</span>[:<span class="ruby-identifier">users</span>].<span class="ruby-identifier">count</span>}</pre>
+            
+            <p>Note that if you do not pass a block to <a
+            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>, <a
+            href="../../classes/Sequel.html">Sequel</a> will automatically retain a
+            reference to the object in the <code>Sequel::DATABASES</code> array.  So
+            calling <code>Sequel.connect</code> multiple times (say once per request),
+            can result in a memory leak.  For any application where database access is
+            needed for a long period of time, it&#39;s best to store the result of
+            Sequel.connection in a constant, as recommended above.</p>
+            
+            <h2 id="label-Using+the+Sequel.connect+method">Using the <a href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a> method<span><a href="#label-Using+the+Sequel.connect+method">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <h2 id="label-General+connection+options">General connection options<span><a href="#label-General+connection+options">&para;</a> <a href="#top">&uarr;</a></span></h2>
             

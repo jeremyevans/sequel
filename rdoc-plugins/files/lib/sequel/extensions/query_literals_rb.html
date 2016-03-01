@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-12 14:45:49 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -58,11 +58,10 @@
             <pre>SELECT a, b, 2, FROM table GROUP BY a, b ORDER BY c</pre>
             
             <p>This extension makes select, group, and order methods operate like filter
-            methods, which support the same interface.</p>
-            
-            <p>There are very few places where Sequel&#39;s default behavior is desirable
-            in this area, but for backwards compatibility, the defaults won&#39;t be
-            changed until the next major release.</p>
+            methods, which support the same interface.  Note that this extension can
+            add SQL injection vulnerabilities to existing code if any of the strings
+            passed to one of the supported methods is derived from user input.  For
+            that reason, it should be used with caution.</p>
             
             <p>You can load this extension into specific datasets:</p>
             
@@ -72,6 +71,9 @@
             the desired behavior if you are using this extension:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">query_literals</span>)</pre>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/QueryLiterals.html">Sequel::QueryLiterals</a></p>
           </div>
           <div id='context'>
           </div>

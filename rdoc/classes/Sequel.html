@@ -168,8 +168,6 @@
         <div id='text'>
           <div id='description'>
             
-            <p>frozen-string-literal: true</p>
-            
             <p>Top level module for <a href="Sequel.html">Sequel</a></p>
             
             <p>There are some module methods that are added via metaprogramming, one for
@@ -187,74 +185,6 @@
             <p>For a more expanded introduction, see the <a
             href="../files/README_rdoc.html">README</a>. For a quicker introduction,
             see the <a href="../files/doc/cheat_sheet_rdoc.html">cheat sheet</a>.</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
-            
-            <p>frozen-string-literal: true</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -570,7 +500,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MINOR</td>
                     <td>=</td>
-                    <td class='context-item-value'>31</td>
+                    <td class='context-item-value'>32</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -713,7 +643,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>VERSION</td>
                     <td>=</td>
-                    <td class='context-item-value'>[MAJOR, MINOR, TINY].join('.')</td>
+                    <td class='context-item-value'>[MAJOR, MINOR, TINY].join('.').freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -1074,7 +1004,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-migration-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-migration-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 283</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-migration-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 287</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">migration</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-constant">MigrationDSL</span>.<span class="ruby-identifier">create</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-object_to_json'>

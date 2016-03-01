@@ -40,12 +40,13 @@
           <div id='description'>
             
             <p>The <a href="PgTypecastOnLoad.html">PgTypecastOnLoad</a> plugin exists
-            because when you connect to PostgreSQL using the do, swift, or jdbc
-            adapter, <a href="../../Sequel.html">Sequel</a> doesn&#39;t have complete
-            control over typecasting, and may return columns as strings instead of how
-            the native postgres adapter would typecast them.  This is mostly needed for
-            the additional support that the pg_* extensions add for advanced PostgreSQL
-            types such as arrays.</p>
+            because when you connect to PostgreSQL using the do and swift adapters, <a
+            href="../../Sequel.html">Sequel</a> doesn&#39;t have complete control over
+            typecasting, and may return columns as strings instead of how the native
+            postgres adapter would typecast them.  This is mostly needed for the
+            additional support that the pg_* extensions add for advanced PostgreSQL
+            types such as arrays. This plugin is not needed if using the postgres or
+            jdbc/postgresql adapters.</p>
             
             <p>This plugin makes model loading to do the same conversion that the native
             postgres adapter would do for all columns given.  You can either specify
@@ -92,7 +93,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_typecast_on_load.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@pg_typecast_on_load_columns</span> <span class="ruby-operator">||=</span> []&#x000A;    <span class="ruby-identifier">add_pg_typecast_on_load_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_typecast_on_load.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@pg_typecast_on_load_columns</span> <span class="ruby-operator">||=</span> []&#x000A;    <span class="ruby-identifier">add_pg_typecast_on_load_columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

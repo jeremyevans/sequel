@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -71,6 +71,9 @@
             thread local value to :nil instead of nil:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> = :<span class="ruby-identifier">utc</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">thread_application_timezone</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> <span class="ruby-comment"># =&gt; :utc</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">thread_application_timezone</span> = :<span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">application_timezone</span> <span class="ruby-comment"># =&gt; nil</span></pre>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/ThreadLocalTimezones.html">Sequel::ThreadLocalTimezones</a></p>
           </div>
           <div id='context'>
           </div>

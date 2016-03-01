@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-07-30 14:00:00 -0700</span>
+          <span class='datetime'>2016-02-11 13:31:12 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -226,8 +226,6 @@
             <p>Examples:</p>
             
             <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">add_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_album</span>(<span class="ruby-ivar">@album</span>)&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">remove_all_albums</span></pre>
-            
-            <p>one_through_one associations do not have any modification methods added.</p>
             
             <p>Note that the remove_all_* method does not call remove hooks defined on the
             association, it just issues a single query to the database.  If you want to
@@ -650,7 +648,13 @@
             <h2 id="label-Association+Options">Association Options<span><a href="#label-Association+Options">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
             <p>Sequel&#39;s associations mostly share the same options.  For ease of
-            understanding, they are grouped here by section</p>
+            understanding, they are grouped here by section.</p>
+            
+            <p>The defaults for any of these options can be set at the class level using
+            <code>Sequel::Model.default_association_options</code>.  Many of these
+            options are specific to particular associations and probably should not be
+            set as defaults, but there certainly are options where a class level
+            default makes sense.</p>
             
             <h3 id="label-Association+Dataset+Modification+Options">Association Dataset Modification Options<span><a href="#label-Association+Dataset+Modification+Options">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-21 12:31:22 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -91,10 +91,6 @@
             <p>See the schema modification guide for details on using postgres array
             columns in CREATE/ALTER TABLE statements.</p>
             
-            <p>If you are not using the native postgres or jdbc/postgresql adapter and are
-            using array types as model column values you probably should use the the
-            pg_typecast_on_load plugin if the column values are returned as a string.</p>
-            
             <p>This extension by default includes handlers for array types for all scalar
             types that the native postgres adapter handles. It also makes it easy to
             add support for other array types.  In general, you just need to make sure
@@ -133,6 +129,9 @@
             look into the pg_array_ops extension.</p>
             
             <p>This extension requires the strscan and delegate libraries.</p>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/Postgres/PGArray.html">Sequel::Postgres::PGArray</a></p>
           </div>
           <div id='context'>
             <div id='requires'>

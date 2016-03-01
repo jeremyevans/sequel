@@ -66,7 +66,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-literal_datetime-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-literal_datetime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_datetime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Rational</span>(<span class="ruby-value">5</span>, <span class="ruby-value">10</span><span class="ruby-operator">**</span><span class="ruby-identifier">timestamp_precision</span>)<span class="ruby-operator">/</span><span class="ruby-value">864000</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-literal_datetime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_datetime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Rational</span>(<span class="ruby-value">5</span>, <span class="ruby-value">10</span><span class="ruby-operator">**</span><span class="ruby-identifier">timestamp_precision</span>)<span class="ruby-operator">/</span><span class="ruby-value">864000</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-literal_sqltime'>
@@ -83,7 +83,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-literal_sqltime-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-literal_sqltime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_sqltime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-literal_sqltime-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_sqltime</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-literal_time'>
@@ -100,7 +100,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-literal_time-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-literal_time-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_time</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-literal_time-source'><span class="ruby-comment"># File lib/sequel/extensions/round_timestamps.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">literal_time</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">v</span>.<span class="ruby-identifier">round</span>(<span class="ruby-identifier">timestamp_precision</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

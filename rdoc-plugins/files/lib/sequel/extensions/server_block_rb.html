@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -61,6 +61,13 @@
             server/shard given to with_server will be used:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">with_server</span>(:<span class="ruby-identifier">shard1</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">shard2</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard2</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(<span class="ruby-keyword">nil</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">default</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;  <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">a</span>].<span class="ruby-identifier">server</span>(:<span class="ruby-identifier">read_only</span>).<span class="ruby-identifier">all</span> <span class="ruby-comment"># Uses shard1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <p>Related modules: <a
+            href="../../../../classes/Sequel/ServerBlock.html">Sequel::ServerBlock</a>,
+            <a
+            href="../../../../classes/Sequel/UnthreadedServerBlock.html">Sequel::UnthreadedServerBlock</a>,
+            <a
+            href="../../../../classes/Sequel/ThreadedServerBlock.html">Sequel::ThreadedServerBlock</a></p>
           </div>
           <div id='context'>
           </div>

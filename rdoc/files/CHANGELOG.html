@@ -31,12 +31,47 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-01 08:16:09 -0800</span>
+          <span class='datetime'>2016-03-01 09:39:30 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.32.0+-282016-03-01-29">4.32.0 (2016-03-01)<span><a href="#label-4.32.0+-282016-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Use mutex for synchronizing access to association reflection cache on MRI
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#delete_from on MySQL, allowing deletions from multiple tables
+            in a single query (jeremyevans) (#1146)</p>
+            </li><li>
+            <p>Add no_auto_literal_strings extension, which makes SQL injection
+            vulnerabilities less likely (jeremyevans)</p>
+            </li><li>
+            <p>Add Model.default_association_options, for setting option defaults for all
+            future associations (jeremyevans)</p>
+            </li><li>
+            <p>Support :association_pks_nil association option in association_pks setter
+            for determining how to handle nil (jeremyevans)</p>
+            </li><li>
+            <p>Make association_pks setter handle empty array correctly when :delay_pks is
+            set (jeremyevans)</p>
+            </li><li>
+            <p>Add a setter method for one_through_one associations (jeremyevans)</p>
+            </li><li>
+            <p>Include :remarks entry in JDBC schema parsing output, containing comments
+            on the column (olleolleolle) (#1143)</p>
+            </li><li>
+            <p>Support :eager_reload and :eager options to associations in
+            tactical_eager_loading plugin (jeremyevans)</p>
+            </li><li>
+            <p>Make tactical_eager_loading not eager load if passing proc or block to
+            association method (jeremyevans)</p>
+            </li><li>
+            <p>Make eager_each plugin handle eager loading for Dataset#first and similar
+            methods (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.31.0+-282016-02-01-29">4.31.0 (2016-02-01)<span><a href="#label-4.31.0+-282016-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

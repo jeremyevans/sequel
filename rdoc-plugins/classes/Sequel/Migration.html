@@ -87,7 +87,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;Invalid migration direction specified (#{direction.inspect})&quot;</span>) <span class="ruby-keyword">unless</span> [<span class="ruby-value">:up</span>, <span class="ruby-value">:down</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">direction</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>).<span class="ruby-identifier">send</span>(<span class="ruby-identifier">direction</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">direction</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">ArgumentError</span>, <span class="ruby-node">&quot;Invalid migration direction specified (#{direction.inspect})&quot;</span>) <span class="ruby-keyword">unless</span> [<span class="ruby-value">:up</span>, <span class="ruby-value">:down</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">direction</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-identifier">db</span>).<span class="ruby-identifier">send</span>(<span class="ruby-identifier">direction</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-descendants'>
@@ -104,7 +104,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-descendants-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-descendants-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">descendants</span>&#x000A;  <span class="ruby-ivar">@descendants</span> <span class="ruby-operator">||=</span> []&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-descendants-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">descendants</span>&#x000A;  <span class="ruby-ivar">@descendants</span> <span class="ruby-operator">||=</span> []&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-inherited'>
@@ -122,7 +122,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-inherited-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-inherited-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">base</span>)&#x000A;  <span class="ruby-identifier">descendants</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">base</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-inherited-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">base</span>)&#x000A;  <span class="ruby-identifier">descendants</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">base</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-new'>
@@ -139,7 +139,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-use_transactions'>
@@ -156,7 +156,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-use_transactions-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-use_transactions-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">use_transactions</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-use_transactions-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">use_transactions</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -174,7 +174,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-down-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-down-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">down</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-down-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">down</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-method_missing'>
@@ -191,7 +191,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-method_missing-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method_sym</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method_sym</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">method_sym</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">method_sym</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-respond_to_missing-3F'>
@@ -208,7 +208,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-respond_to_missing-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-respond_to_missing-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">respond_to_missing?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">include_private</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">include_private</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-respond_to_missing-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">respond_to_missing?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">include_private</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-identifier">include_private</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-up'>
@@ -225,7 +225,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-up-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-up-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 73</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">up</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-up-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 77</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">up</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -68,7 +68,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-typecast_value_decimal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-typecast_value_decimal-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_decimal</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;    <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-typecast_value_decimal-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_decimal</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">value</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">String</span>)&#x000A;    <span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-typecast_value_float'>
@@ -85,7 +85,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-typecast_value_float-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-typecast_value_float-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_float</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_f</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-typecast_value_float-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 21</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_float</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_f</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-typecast_value_integer'>
@@ -102,7 +102,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-typecast_value_integer-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-typecast_value_integer-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_integer</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_i</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-typecast_value_integer-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_integer</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_i</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-typecast_value_string'>
@@ -113,13 +113,14 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Typecast the value to an Integer using to_i instead of Kernel.Integer</p>
+                  <p>Typecast the value to an <a href="../String.html">String</a> using to_s
+                  instead of Kernel.String</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-typecast_value_string-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-typecast_value_string-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_string</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-typecast_value_string-source'><span class="ruby-comment"># File lib/sequel/extensions/looser_typecasting.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">typecast_value_string</span>(<span class="ruby-identifier">value</span>)&#x000A;  <span class="ruby-identifier">value</span>.<span class="ruby-identifier">to_s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

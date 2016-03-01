@@ -54,6 +54,11 @@
             so that each can check with the flag to determine whether it should call
             all.</p>
             
+            <p>This plugin also makes first and related methods that load single records
+            work with eager loading.  Note that when using eager_graph, calling first
+            or a similar method will result in two queries, one to load the main
+            object, and one to eagerly load all associated objects to that main object.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclass instances eagerly load for each (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">eager_each</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class eagerly load for each</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">eager_each</span></pre>

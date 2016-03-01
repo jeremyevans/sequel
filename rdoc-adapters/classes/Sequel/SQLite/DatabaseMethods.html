@@ -124,7 +124,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>TABLES_FILTER</td>
                     <td>=</td>
-                    <td class='context-item-value'>"type = 'table' AND NOT name = 'sqlite_sequence'".freeze</td>
+                    <td class='context-item-value'>Sequel.~(:name=>'sqlite_sequence'.freeze) & {:type => 'table'.freeze}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -152,7 +152,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>VIEWS_FILTER</td>
                     <td>=</td>
-                    <td class='context-item-value'>"type = 'view'".freeze</td>
+                    <td class='context-item-value'>{:type => 'view'.freeze}.freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>

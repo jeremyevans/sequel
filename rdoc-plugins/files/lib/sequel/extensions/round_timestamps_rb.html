@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-01-25 14:10:57 -0800</span>
+          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -43,9 +43,8 @@
             <p>The round_timestamps extension will automatically round timestamp values to
             the database&#39;s supported level of precision before literalizing them.</p>
             
-            <p>For example, if the database supports microsecond precision, and you give
-            it a Time value with greater than microsecond precision, it will round it
-            appropriately:</p>
+            <p>For example, if the database supports millisecond precision, and you give
+            it a Time value with microsecond precision, it will round it appropriately:</p>
             
             <pre class="ruby"><span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1405341161.917999982833862</span>)&#x000A;<span class="ruby-comment"># default: 2014-07-14 14:32:41.917999</span>&#x000A;<span class="ruby-comment"># with extension: 2014-07-14 14:32:41.918000</span></pre>
             
@@ -61,6 +60,9 @@
             <p>To round timestamps for all datasets on a single database:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">round_timestamps</span>)</pre>
+            
+            <p>Related module: <a
+            href="../../../../classes/Sequel/Dataset/RoundTimestamps.html">Sequel::Dataset::RoundTimestamps</a></p>
           </div>
           <div id='context'>
           </div>
