@@ -1,6 +1,6 @@
 = New Features
 
-* A no_auto_string_literals extension has been added, which removes the
+* A no_auto_literal_strings extension has been added, which removes the
   automatic usage of strings in filter arguments as literal SQL code.
   By default, if you do:
 
@@ -22,7 +22,7 @@
   input as literal SQL code is probably the most common SQL injection
   vector in applications using Sequel.
 
-  With the no_auto_string_literals extension, passing a plain string
+  With the no_auto_literal_strings extension, passing a plain string
   as the first or only argument to a filter method raises an
   exception.  If you want to use literal SQL code, you have to do so
   explicitly:
