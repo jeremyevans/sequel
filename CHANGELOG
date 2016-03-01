@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.32.0 (2016-03-01)
 
 * Use mutex for synchronizing access to association reflection cache on MRI (jeremyevans)
 
