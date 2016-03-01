@@ -40,7 +40,7 @@
             
             <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
             <ul><li>
-            <p>A no_auto_string_literals extension has been added, which removes the
+            <p>A no_auto_literal_strings extension has been added, which removes the
             automatic usage of strings in filter arguments as literal SQL code. By
             default, if you do:</p>
             
@@ -62,7 +62,7 @@
             literal SQL code is probably the most common SQL injection vector in
             applications using <a href="../../../classes/Sequel.html">Sequel</a>.</p>
             
-            <p>With the no_auto_string_literals extension, passing a plain string as the
+            <p>With the no_auto_literal_strings extension, passing a plain string as the
             first or only argument to a filter method raises an exception.  If you want
             to use literal SQL code, you have to do so explicitly:</p>
             
