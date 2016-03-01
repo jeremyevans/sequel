@@ -1,6 +1,6 @@
 = New Features
 
-* A no_auto_string_literals plugin has been added, which removes the
+* A no_auto_string_literals extension has been added, which removes the
   automatic usage of strings in filter arguments as literal SQL code.
   By default, if you do:
 
