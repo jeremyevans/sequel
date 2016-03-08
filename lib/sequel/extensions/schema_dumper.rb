@@ -144,7 +144,6 @@ END_MIG
     # Return a string with a create table block that will recreate the given
     # table's schema.  Takes the same options as dump_schema_migration.
     def dump_table_schema(table, options=OPTS)
-      table = table.value.to_s if table.is_a?(SQL::Identifier)
       gen = dump_table_generator(table, options)
       commands = [gen.dump_columns, gen.dump_constraints, gen.dump_indexes].reject{|x| x == ''}.join("\n\n")
       "create_table(#{table.inspect}#{', :ignore_index_errors=>true' if !options[:same_db] && options[:indexes] != false && !gen.indexes.empty?}) do\n#{commands.gsub(/^/o, '  ')}\nend"
@@ -244,8 +243,6 @@ END_MIG
     # Return a Schema::Generator object that will recreate the
     # table's schema.  Takes the same options as dump_schema_migration.
     def dump_table_generator(table, options=OPTS)
-      table = table.value.to_s if table.is_a?(SQL::Identifier)
-      raise(Error, "must provide table as a Symbol, String, or Sequel::SQL::Identifier") unless [String, Symbol].any?{|c| table.is_a?(c)}
       s = schema(table).dup
       pks = s.find_all{|x| x.last[:primary_key] == true}.map(&:first)
       options = options.merge(:single_pk=>true) if pks.length == 1

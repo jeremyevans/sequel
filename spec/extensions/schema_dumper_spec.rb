@@ -102,7 +102,7 @@ describe "Sequel::Database dump methods" do
   end
 
   it "should support dumping table schemas when given an identifier" do
-    @d.dump_table_schema(Sequel.identifier(:t__t1)).must_equal "create_table(\"t__t1\") do\n  primary_key :c1\n  String :c2, :size=>20\nend"
+    @d.dump_table_schema(Sequel.identifier(:t__t1)).must_equal "create_table(Sequel::SQL::Identifier.new(:t__t1)) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
   end
 
   it "should dump non-Integer primary key columns with explicit :type" do
@@ -803,5 +803,11 @@ END_MIG
     @d.meta_def(:foreign_key_list){|t, *a| [{:columns=>[:c1], :table=>:t3, :key=>[:c1]}] if t == :t4}
     ["create_table(:t4) do\n  primary_key :c1, :table=>:t3, :key=>[:c1]\nend",
      "create_table(:t4) do\n  primary_key :c1, :key=>[:c1], :table=>:t3\nend"].must_include(@d.dump_table_schema(:t4))
+  end
+
+  it "should handle dumping on PostgreSQL using qualified tables" do
+    @d = Sequel.connect('mock://postgres').extension(:schema_dumper)
+    @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'timestamp', :primary_key=>true, :allow_null=>true}]]}
+    @d.dump_table_schema(Sequel.qualify(:foo, :bar), :same_db=>true).must_equal "create_table(Sequel::SQL::QualifiedIdentifier.new(:foo, :bar)) do\n  column :c1, \"timestamp\"\n  \n  primary_key [:c1]\nend"
   end
 end
