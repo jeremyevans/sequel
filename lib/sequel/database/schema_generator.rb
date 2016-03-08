@@ -156,12 +156,10 @@ module Sequel
         opts = case table
         when Hash
           table.merge(opts)
-        when Symbol
-          opts.merge(:table=>table)
         when NilClass
           opts
         else
-          raise(Error, "The second argument to foreign_key should be a Hash, Symbol, or nil")
+          opts.merge(:table=>table)
         end
         return composite_foreign_key(name, opts) if name.is_a?(Array)
         column(name, Integer, opts)

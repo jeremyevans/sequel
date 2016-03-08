@@ -1,3 +1,7 @@
+=== HEAD
+
+* Allow foreign_key schema method to handle SQL::Identifier and SQL::QualifiedIdentifier as 2nd argument (jeremyevans)
+
 === 4.32.0 (2016-03-01)
 
 * Use mutex for synchronizing access to association reflection cache on MRI (jeremyevans)

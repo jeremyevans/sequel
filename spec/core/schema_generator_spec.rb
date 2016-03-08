@@ -43,6 +43,17 @@ describe Sequel::Schema::Generator do
     columns.first[:primary_key].must_equal nil
   end
   
+  it "should handle SQL::Identifier and SQL::QualifiedIdentifier as foreign_key arguments" do
+    generator = Sequel::Schema::Generator.new(Sequel.mock) do
+      foreign_key :a_id, Sequel.identifier(:as)
+      foreign_key :b_id, Sequel.qualify(:c, :b)
+    end
+
+    columns = generator.columns
+    columns.first.values_at(:name, :table).must_equal [:a_id, Sequel.identifier(:as)]
+    columns.last.values_at(:name, :table).must_equal [:b_id, Sequel.qualify(:c, :b)]
+  end
+  
   it "counts definitions correctly" do
     @columns.size.must_equal 6
     @indexes.size.must_equal 2
