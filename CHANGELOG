@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove Sequel.firebird and Sequel.informix adapter methods (jeremyevans)
+
 * Make graph_each extension handle result set splitting when using Dataset#first (jeremyevans)
 
 * Allow raising Sequel::ValidationFailed and Sequel::HookFailed without an argument (jeremyevans)
