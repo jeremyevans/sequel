@@ -1,5 +1,7 @@
 === HEAD
 
+* Make graph_each extension handle result set splitting when using Dataset#first (jeremyevans)
+
 * Allow raising Sequel::ValidationFailed and Sequel::HookFailed without an argument (jeremyevans)
 
 * Allow schema_dumper to handle :qualify=>true option on PostgreSQL (jeremyevans)

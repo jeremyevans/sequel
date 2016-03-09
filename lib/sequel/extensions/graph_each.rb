@@ -31,12 +31,21 @@ module Sequel
       end
     end
 
+    # Call graph_each for graphed datasets that are not being eager graphed.
+    def with_sql_each(sql)
+      if @opts[:graph] && !@opts[:eager_graph]
+        graph_each(sql){|r| yield r}
+      else
+        super
+      end
+    end
+
     private
 
     # Fetch the rows, split them into component table parts,
     # tranform and run the row_proc on each part (if applicable),
     # and yield a hash of the parts.
-    def graph_each
+    def graph_each(sql=select_sql)
       # Reject tables with nil datasets, as they are excluded from
       # the result set
       datasets = @opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
@@ -48,7 +57,7 @@ module Sequel
       # Use the manually set graph aliases, if any, otherwise
       # use the ones automatically created by .graph
       column_aliases = @opts[:graph_aliases] || @opts[:graph][:column_aliases]
-      fetch_rows(select_sql) do |r|
+      fetch_rows(sql) do |r|
         graph = {}
         # Create the sub hashes, one per table
         table_aliases.each{|ta| graph[ta]={}}
