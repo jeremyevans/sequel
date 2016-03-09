@@ -7,7 +7,7 @@ module Sequel
     # The Sequel::Model instance related to this error.
     attr_reader :model
 
-    def initialize(message, model=nil)
+    def initialize(message=nil, model=nil)
       @model = model
       super(message)
     end
@@ -35,7 +35,7 @@ module Sequel
     # The Sequel::Model::Errors object related to this exception.
     attr_reader :errors
 
-    def initialize(errors)
+    def initialize(errors=nil)
       if errors.is_a?(Sequel::Model)
         @model = errors
         errors = @model.errors

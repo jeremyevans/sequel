@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow raising Sequel::ValidationFailed and Sequel::HookFailed without an argument (jeremyevans)
+
 * Allow schema_dumper to handle :qualify=>true option on PostgreSQL (jeremyevans)
 
 * Allow foreign_key schema method to handle SQL::Identifier and SQL::QualifiedIdentifier as 2nd argument (jeremyevans)
