@@ -9,14 +9,13 @@ rvm:
   - 2.3.0
   - jruby-18mode
   - jruby-19mode
+  - jruby-9.0.5.0
   - jruby-head
   - ruby-head
-  - rbx-2
 matrix:
   allow_failures:
     - rvm: jruby-head
     - rvm: ruby-head
-    - rvm: rbx-2
 script: bundle exec rake spec_travis
 gemfile: .travis.gemfile
 before_script:
