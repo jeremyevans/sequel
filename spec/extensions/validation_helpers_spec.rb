@@ -538,4 +538,103 @@ describe "Sequel::Plugins::ValidationHelpers" do
     m.wont_be :valid?
     DB.sqls.must_equal []
   end
+
+  it "should support validates_numericality_of with equal_to option" do
+    @c.set_validations{validates_numericality_of(:value, :equal_to=>123)}
+    @m.value = 456
+    @m.wont_be :valid?
+    @m.value = 0
+    @m.wont_be :valid?
+    @m.value = 123
+    @m.must_be :valid?
+    @m.value = 123.00001
+    @m.wont_be :valid?
+    @m.value = 122.99999
+    @m.wont_be :valid?
+    @m.value = -123
+    @m.wont_be :valid?
+    @m.value = 123.0
+    @m.must_be :valid?
+  end
+
+  it "should support validates_numericality_of with greater_than option" do
+    @c.set_validations{validates_numericality_of(:value, :greater_than=>123)}
+    @m.value = 456
+    @m.must_be :valid?
+    @m.value = 0
+    @m.wont_be :valid?
+    @m.value = 123
+    @m.wont_be :valid?
+    @m.value = 123.00001
+    @m.must_be :valid?
+    @m.value = 122.99999
+    @m.wont_be :valid?
+    @m.value = -123
+    @m.wont_be :valid?
+  end
+
+  it "should support validates_numericality_of with greater_than_or_equal_to option" do
+    @c.set_validations{validates_numericality_of(:value, :greater_than_or_equal_to=>123)}
+    @m.value = 456
+    @m.must_be :valid?
+    @m.value = 0
+    @m.wont_be :valid?
+    @m.value = 123
+    @m.must_be :valid?
+    @m.value = 123.00001
+    @m.must_be :valid?
+    @m.value = 122.99999
+    @m.wont_be :valid?
+    @m.value = -123
+    @m.wont_be :valid?
+  end
+
+  it "should support validates_numericality_of with less_than option" do
+    @c.set_validations{validates_numericality_of(:value, :less_than=>123)}
+    @m.value = 456
+    @m.wont_be :valid?
+    @m.value = 0
+    @m.must_be :valid?
+    @m.value = 123
+    @m.wont_be :valid?
+    @m.value = 123.00001
+    @m.wont_be :valid?
+    @m.value = 122.99999
+    @m.must_be :valid?
+    @m.value = -123
+    @m.must_be :valid?
+  end
+
+  it "should support validates_numericality_of with less_than_or_equal_to option" do
+    @c.set_validations{validates_numericality_of(:value, :less_than_or_equal_to=>123)}
+    @m.value = 456
+    @m.wont_be :valid?
+    @m.value = 0
+    @m.must_be :valid?
+    @m.value = 123
+    @m.must_be :valid?
+    @m.value = 123.00001
+    @m.wont_be :valid?
+    @m.value = 122.99999
+    @m.must_be :valid?
+    @m.value = -123
+    @m.must_be :valid?
+  end
+
+
+  it "should support validates_numericality_of with multiple options" do
+    @c.set_validations{validates_numericality_of(:value, :less_than=>456, :greater_than=>123)}
+    @m.value = 456
+    @m.wont_be :valid?
+    @m.value = 0
+    @m.wont_be :valid?
+    @m.value = 123
+    @m.wont_be :valid?
+    @m.value = 123.00001
+    @m.must_be :valid?
+    @m.value = 122.99999
+    @m.wont_be :valid?
+    @m.value = -123
+    @m.wont_be :valid?
+  end
 end 

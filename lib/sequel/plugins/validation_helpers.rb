@@ -78,18 +78,31 @@ module Sequel
       # messages for all models (e.g. for internationalization), or to set certain
       # default options for validations (e.g. :allow_nil=>true for all validates_format).
       DEFAULT_OPTIONS = {
+        :equal_to=>{:mesage=>lambda{|value| "is not equal to #{value}"}},
         :exact_length=>{:message=>lambda{|exact| "is not #{exact} characters"}},
         :format=>{:message=>lambda{|with| 'is invalid'}},
+        :greater_than=>{:mesage=>lambda{|value| "is not greater than #{value}"}},
+        :greater_than_or_equal_to=>{:mesage=>lambda{|value| "is not greater than or equal to #{value}"}},
         :includes=>{:message=>lambda{|set| "is not in range or set: #{set.inspect}"}},
         :integer=>{:message=>lambda{"is not a number"}},
         :length_range=>{:message=>lambda{|range| "is too short or too long"}},
+        :less_than=>{:mesage=>lambda{|value| "is not less than #{value}"}},
+        :less_than_or_equal_to=>{:mesage=>lambda{|value| "is not less than or equal to #{value}"}},
         :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}, :nil_message=>lambda{"is not present"}},
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_null=>{:message=>lambda{"is not present"}},
         :numeric=>{:message=>lambda{"is not a number"}},
         :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
         :presence=>{:message=>lambda{"is not present"}},
-        :unique=>{:message=>lambda{'is already taken'}}
+        :unique=>{:message=>lambda{'is already taken'}},
+      }
+
+      NUMERICALITY_COMPARISONS = {
+        :equal_to=>:==,
+        :greater_than=>:>,
+        :greater_than_or_equal_to=>:>=,
+        :less_than=>:<,
+        :less_than_or_equal_to=>:<=
       }
 
       module InstanceMethods 
@@ -151,6 +164,24 @@ module Sequel
               nil
             rescue
               validation_error_message(m)
+            end
+          end
+        end
+
+        # Check attribute value(s) are:
+        #
+        #  :equal_to
+        #  :greater_than
+        #  :greater_than_or_equal_to
+        #  :less_than
+        #  :less_than_or_equal_to
+        #
+        # the value given for any of the above options. Multiple options may be
+        # specified together.
+        def validates_numericality_of(atts, opts=OPTS)
+          opts.slice(*NUMERICALITY_COMPARISONS.keys).each do |type, value|
+            validatable_attributes_for_type(type, atts, opts) do |a,v,m|
+              validation_error_message(type, v) unless v.send(numericality_comparison(type), value)
             end
           end
         end
@@ -263,6 +294,10 @@ module Sequel
         # proc or string.
         def default_validation_helpers_options(type)
           DEFAULT_OPTIONS[type]
+        end
+
+        def numericality_comparison(type)
+          NUMERICALITY_COMPARISONS[type]
         end
 
         # Skip validating any attribute that matches one of the allow_* options.
