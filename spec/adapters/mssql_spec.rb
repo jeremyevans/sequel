@@ -518,6 +518,24 @@ describe "A MSSQL database adds index with include" do
   end
 end
 
+describe "MSSQL set_column_allow_null" do
+  before do
+    @db = DB
+  end
+  after do
+    @db.drop_table?(:test3)
+  end
+
+  it "should work with nvarchar(MAX) columns" do
+    @db.create_table!(:test3) do
+      column :t, 'nvarchar(MAX)'
+    end
+    @db.alter_table(:test3) do
+      set_column_not_null :t
+    end
+  end
+end
+
 describe "MSSQL::Database#drop_column with a schema" do
   before do
     DB.run "create schema test" rescue nil
