@@ -534,6 +534,15 @@ describe "MSSQL set_column_allow_null" do
       set_column_not_null :t
     end
   end
+
+  it "should work with text columns" do
+    @db.create_table!(:test3) do
+      column :t, 'text'
+    end
+    @db.alter_table(:test3) do
+      set_column_not_null :t
+    end
+  end
 end
 
 describe "MSSQL::Database#drop_column with a schema" do

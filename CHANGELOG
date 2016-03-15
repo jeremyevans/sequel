@@ -1,6 +1,6 @@
 === HEAD
 
-* Handle altering column NULL settings for varchar(max) columns on MSSQL (Ilja Resch)
+* Handle altering column NULL settings for varchar(max) and text columns on MSSQL (Ilja Resch)
 
 * Remove Sequel.firebird and Sequel.informix adapter methods (jeremyevans)
 
