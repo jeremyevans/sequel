@@ -38,9 +38,3 @@ platforms :jruby do
   gem 'jdbc-mysql'
   gem 'jdbc-postgres', '9.4.1200'
 end
-
-platforms :rbx do
-  gem 'racc'
-  gem 'rubysl', '~> 2.0'
-  gem 'psych'
-end
