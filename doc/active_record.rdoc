@@ -626,6 +626,22 @@ For anything more complex, you can use +dataset_module+:
     end
   end
 
+=== +none+
+
+If you want to return an empty dataset, but still preserve chaining, you can use the +null_dataset+ extension:
+
+  DB.extension(:null_dataset)
+
+  class User < Sequel::Model
+    def self.nullify
+      dataset.nullify
+    end
+  end
+
+  user = User.create(name: 'John Doe')
+  User.nullify.where(name: 'John Doe')
+  # []
+
 ==== +reset_column_information+
 
 If you want to completely reload the schema for the table:
