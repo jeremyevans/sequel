@@ -639,8 +639,8 @@ If you want to return an empty dataset, but still preserve chaining, you can use
   end
 
   user = User.create(name: 'John Doe')
-  User.nullify.where(name: 'John Doe')
-  # []
+  User.nullify.where(name: 'John Doe').all
+  # => []
 
 ==== +reset_column_information+
 
