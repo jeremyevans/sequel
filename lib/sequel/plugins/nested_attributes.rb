@@ -107,6 +107,7 @@ module Sequel
         #                  object. Set to :create to create a new object with that primary
         #                  key, :ignore to ignore the record, or :raise to raise an error.
         #                  The default is :raise.
+        # :find :: Allow find existing nested records instead creating
         #
         # If a block is provided, it is used to set the :reject_if option.
         def nested_attributes(*associations, &block)
@@ -171,6 +172,30 @@ module Sequel
           obj = reflection.associated_class.new
           nested_attributes_set_attributes(meta, obj, attributes)
           delay_validate_associated_object(reflection, obj)
+          nested_attributes_add_association_object(reflection, obj)
+        end
+
+        # Find object with the given attributes, and add it to associations
+        # Returns the object found.
+        def nested_attributes_find(meta, attributes)
+          reflection = meta[:reflection]
+          obj = reflection.associated_class.find(attributes)
+          # Additional compliance checking of attributes
+          return if !obj || attributes.any? { |k, v| obj.values[k] != v }
+          nested_attributes_add_association_object(reflection, obj)
+        end
+
+        # Find or create object with the given attributes,
+        # and add it to associations.
+        # Returns the object found or created.
+        def nested_attributes_find_or_create(meta, attributes)
+          nested_attributes_find(meta, attributes) ||
+            nested_attributes_create(meta, attributes)
+        end
+
+        # Set (or add) object to associations.
+        # Returns the object associated.
+        def nested_attributes_add_association_object(reflection, obj)
           if reflection.returns_array?
             send(reflection[:name]) << obj
             after_save_hook{send(reflection.add_method, obj)}
@@ -184,8 +209,8 @@ module Sequel
 
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
-            if reflection[:type] == :many_to_one 
-              before_save_hook{send(reflection.setter_method, obj.save(:validate=>false))}
+            if reflection[:type] == :many_to_one
+              before_save_hook{send(reflection.setter_method, obj.new? ? obj.save(:validate=>false) : obj)}
             else
               after_save_hook{send(reflection.setter_method, obj)}
             end
@@ -276,6 +301,8 @@ module Sequel
             if meta[:unmatched_pk] == :raise
               raise(Error, "no matching associated object with given primary key (association: #{reflection[:name]}, pk: #{pk})")
             end
+          elsif meta[:find]
+            nested_attributes_find_or_create(meta, attributes)
           else
             nested_attributes_create(meta, attributes)
           end
