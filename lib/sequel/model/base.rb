@@ -513,10 +513,10 @@ module Sequel
 
         unless ivs.include?("@dataset")
           if @dataset && self != Model
-            subclass.set_dataset(@dataset.clone, :inherited=>true) rescue nil
+            subclass.set_dataset(@dataset.clone, :inherited=>true)
           elsif (n = subclass.name) && !n.to_s.empty?
             db
-            subclass.set_dataset(subclass.implicit_table_name) rescue nil
+            subclass.set_dataset(subclass.implicit_table_name)
           end
         end
       end
@@ -689,12 +689,14 @@ module Sequel
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
         if inherited
           self.simple_table = superclass.simple_table
-          @columns = @dataset.columns rescue nil
+          @columns = superclass.instance_variable_get(:@columns)
+          @db_schema = superclass.instance_variable_get(:@db_schema)
         else
           @dataset_method_modules.each{|m| @dataset.extend(m)} if @dataset_method_modules
+          @db_schema = get_db_schema
         end
+
         @dataset.model = self if @dataset.respond_to?(:model=)
-        check_non_connection_error{@db_schema = (inherited ? superclass.db_schema : get_db_schema)}
         reset_instance_dataset
         self
       end
@@ -801,7 +803,7 @@ module Sequel
           yield
         rescue Sequel::DatabaseConnectionError
           raise
-        rescue
+        rescue Sequel::Error
           nil
         end
       end
@@ -904,7 +906,15 @@ module Sequel
         return nil unless @dataset
         schema_hash = {}
         ds_opts = dataset.opts
-        get_columns = proc{check_non_connection_error{columns} || []}
+        get_columns = proc do
+          check_non_connection_error do
+            if db.in_transaction? && db.supports_savepoints?
+              db.transaction(:savepoint=>true){columns}
+            else
+              columns
+            end
+          end || []
+        end
         schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}

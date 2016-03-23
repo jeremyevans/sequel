@@ -1,5 +1,9 @@
 === HEAD
 
+* Creating model classes inside a transaction when the table doesn't exist no longer rolls back the transaction on PostgreSQL (jeremyevans) (#1160)
+
+* Sequel::Model no longer swallows many errors when subclassing or setting datasets (jeremyevans) (#1160)
+
 * Handle altering column NULL settings for varchar(max) and text columns on MSSQL (Ilja Resch)
 
 * Remove Sequel.firebird and Sequel.informix adapter methods (jeremyevans)

@@ -151,6 +151,7 @@ end
 describe Sequel::Model do
   before do
     @model = Class.new(Sequel::Model(:items))
+    DB.reset
   end
 
   it "has table_name return name of table" do
@@ -242,8 +243,9 @@ describe Sequel::Model do
   end
 
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
-    def @model.get_db_schema(*) raise Sequel::Error end
-    @model.set_dataset(DB[:foo])
+    db = Sequel.mock
+    def db.schema(*) raise Sequel::Error; end
+    @model.set_dataset(db[:foo])
   end
 
   it "reload_db_schema? should be false by default" do
@@ -253,8 +255,19 @@ describe Sequel::Model do
   end
 
   it "doesn't raise an error on inherited if there is an error setting the dataset" do
-    def @model.set_dataset(*) raise Sequel::Error end
+    db = Sequel.mock
+    def db.schema(*) raise Sequel::Error; end
+    @model.db = db
     Class.new(@model)
+  end
+
+  it "uses a savepoint if inside a transaction when getting the columns" do
+    db = Sequel.mock
+    def db.supports_savepoints?; true end
+    Sequel::Model(db[:table])
+    db.sqls.must_equal ["SELECT * FROM table LIMIT 1"]
+    c = db.transaction{Sequel::Model(db[:table])}
+    db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SELECT * FROM table LIMIT 1", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
   end
 
   it "should raise if bad inherited instance variable value is used" do

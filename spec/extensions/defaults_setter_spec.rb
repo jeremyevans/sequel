@@ -4,11 +4,12 @@ describe "Sequel::Plugins::DefaultsSetter" do
   before do
     @db = db = Sequel.mock
     def db.supports_schema_parsing?() true end
+    def db.schema(*) [] end
     @c = c = Class.new(Sequel::Model(db[:foo]))
     @c.instance_variable_set(:@db_schema, {:a=>{}})
     @c.plugin :defaults_setter
     @c.columns :a
-    @pr = proc{|x| db.meta_def(:schema){|*| [[:a, {:ruby_default => x}]]}; c.dataset = c.dataset; c}
+    @pr = proc{|x| db.meta_def(:schema){|*| [[:id, {:primary_key=>true}], [:a, {:ruby_default => x, :primary_key=>false}]]}; c.dataset = c.dataset; c}
   end
   after do
     Sequel.datetime_class = Time
