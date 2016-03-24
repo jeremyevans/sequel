@@ -125,7 +125,7 @@ module Sequel
       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
       :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
-      :@db=>nil, :@default_set_fields_options=>:dup}
+      :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to
@@ -153,6 +153,7 @@ module Sequel
     @raise_on_save_failure = true
     @raise_on_typecast_failure = false
     @require_modification = nil
+    @require_valid_table = false
     @restrict_primary_key = true
     @restricted_columns = nil
     @setter_methods = nil

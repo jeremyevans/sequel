@@ -290,6 +290,59 @@ describe Sequel::Model do
   end
 end
 
+describe Sequel::Model, ".require_valid_table = true" do
+  before do
+    @db = Sequel.mock
+    @db.columns = proc do |sql|
+      raise Sequel::Error if sql =~ /foos/
+      [:id]
+    end
+    def @db.supports_schema_parsing?; true end
+    def @db.schema(t, *) t.first_source == :foos ? (raise Sequel::Error) : [[:id, {}]] end
+    Sequel::Model.db = @db
+    Sequel::Model.require_valid_table = true
+  end
+  after do
+    Sequel::Model.require_valid_table = false
+    Sequel::Model.db = DB
+    if Object.const_defined?(:Bar)
+      Object.send(:remove_const, :Bar)
+    end
+    if Object.const_defined?(:Foo)
+      Object.send(:remove_const, :Foo)
+    end
+  end
+
+  it "should raise an exception when creating a model with an invalid implicit table" do
+    proc{class ::Foo < Sequel::Model; end}.must_raise Sequel::Error
+  end
+
+  it "should not raise an exception when creating a model with a valid implicit table" do
+    class ::Bar < Sequel::Model; end
+    Bar.columns.must_equal [:id]
+  end
+
+  it "should raise an exception when creating a model with an invalid explicit table" do
+    proc{Sequel::Model(@db[:foos])}.must_raise Sequel::Error
+  end
+
+  it "should not raise an exception when creating a model with a valid explicit table" do
+    c = Sequel::Model(@db[:bars])
+    c.columns.must_equal [:id]
+  end
+
+  it "should raise an exception when calling set_dataset with an invalid table" do
+    c = Class.new(Sequel::Model)
+    proc{c.set_dataset @db[:foos]}.must_raise Sequel::Error
+  end
+
+  it "should not raise an exception when calling set_dataset with an valid table" do
+    c = Class.new(Sequel::Model)
+    c.set_dataset @db[:bars]
+    c.columns.must_equal [:id]
+  end
+end
+
 describe Sequel::Model, "constructors" do
   before do
     @m = Class.new(Sequel::Model)

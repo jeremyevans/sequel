@@ -60,6 +60,26 @@ module Sequel
       # Sequel will not check the number of rows modified (default: true).
       attr_accessor :require_modification
   
+      # Requires that all models have valid tables, raising exceptions if creating a model
+      # without a valid table backing it.  Enabling this will break code like:
+      #
+      #   class Foo < Sequel::Model
+      #     set_dataset :my_foo
+      #   end
+      #
+      # As when Sequel::Model is subclassed, before set_dataset is executed, it will try to
+      # get the schema for the foos table, which will raise an exception.  You would need to
+      # switch to using:
+      #
+      #   class Foo < Sequel::Model(:my_foo)
+      #   end
+      #
+      # or:
+      #
+      #   Foo = Sequel::Model()
+      #   Foo.set_dataset :my_foo
+      attr_accessor :require_valid_table
+
       # Should be the literal primary key column name if this Model's table has a simple primary key, or
       # nil if the model has a compound primary key or no primary key.
       attr_reader :simple_pk
@@ -804,7 +824,7 @@ module Sequel
         rescue Sequel::DatabaseConnectionError
           raise
         rescue Sequel::Error
-          nil
+          raise if require_valid_table
         end
       end
 
