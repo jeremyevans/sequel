@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#sequence_for_table on Oracle handle cases where the schema for a table cannot be determined (jeremyevans)
+
 * The boolean_readers, boolean_subsets, and class_table_inheritance plugins no longer do blind rescues (jeremyevans) (#1162)
 
 * Add Model.require_valid_table setting, if set to true doesn't swallow any errors for invalid tables (jeremyevans)
