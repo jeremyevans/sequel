@@ -820,7 +820,11 @@ module Sequel
       # Yield to the passed block and swallow all errors other than DatabaseConnectionErrors.
       def check_non_connection_error
         begin
-          yield
+          if db.in_transaction? && db.supports_savepoints?
+            db.transaction(:savepoint=>true){yield}
+          else
+            yield
+          end
         rescue Sequel::DatabaseConnectionError
           raise
         rescue Sequel::Error
@@ -926,15 +930,7 @@ module Sequel
         return nil unless @dataset
         schema_hash = {}
         ds_opts = dataset.opts
-        get_columns = proc do
-          check_non_connection_error do
-            if db.in_transaction? && db.supports_savepoints?
-              db.transaction(:savepoint=>true){columns}
-            else
-              columns
-            end
-          end || []
-        end
+        get_columns = proc{check_non_connection_error{columns} || []}
         schema_array = check_non_connection_error{db.schema(dataset, :reload=>reload)} if db.supports_schema_parsing?
         if schema_array
           schema_array.each{|k,v| schema_hash[k] = v}

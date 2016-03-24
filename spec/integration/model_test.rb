@@ -222,5 +222,9 @@ describe "Sequel::Model with no existing table" do
     db.drop_table?(:items)
     class ::Item < Sequel::Model(db); end; Object.send(:remove_const, :Item)
     c = Class.new(Sequel::Model); c.set_dataset(db[:items])
+    db.transaction do
+      c = Class.new(Sequel::Model(db[:items]))
+      db.get(1).must_equal 1
+    end
   end
 end

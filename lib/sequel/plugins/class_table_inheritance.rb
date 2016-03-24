@@ -245,7 +245,7 @@ module Sequel
               columns = db.from(table).columns
             else
               table = subclass.implicit_table_name
-              columns = db.from(table).columns rescue nil
+              columns = check_non_connection_error{db.from(table).columns}
               table = nil if !columns || columns.empty?
             end
           end

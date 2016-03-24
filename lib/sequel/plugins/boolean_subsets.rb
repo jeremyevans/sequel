@@ -49,8 +49,9 @@ module Sequel
 
         # Add subset methods for all of the boolean columns in this model.
         def create_boolean_subsets
-          cs = columns rescue return
-          cs.each{|c| subset(*boolean_subset_args(c)) if db_schema[c][:type] == :boolean}
+          if cs = check_non_connection_error{columns}
+            cs.each{|c| subset(*boolean_subset_args(c)) if db_schema[c][:type] == :boolean}
+          end
         end
       end
     end

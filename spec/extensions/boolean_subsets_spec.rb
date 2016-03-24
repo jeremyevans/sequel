@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "boolean_subsets plugin" do
   before do
-    @db = Sequel::Database.new
+    @db = Sequel.mock
     def @db.supports_schema_parsing?() true end
     def @db.schema(*args)
       [[:asdaf9898as, {}], [:active, {:type=>:boolean}]]

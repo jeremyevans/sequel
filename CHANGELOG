@@ -1,5 +1,7 @@
 === HEAD
 
+* The boolean_readers, boolean_subsets, and class_table_inheritance plugins no longer do blind rescues (jeremyevans) (#1162)
+
 * Add Model.require_valid_table setting, if set to true doesn't swallow any errors for invalid tables (jeremyevans)
 
 * Creating model classes inside a transaction when the table doesn't exist no longer rolls back the transaction on PostgreSQL (jeremyevans) (#1160)
