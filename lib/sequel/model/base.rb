@@ -820,11 +820,7 @@ module Sequel
       # Yield to the passed block and swallow all errors other than DatabaseConnectionErrors.
       def check_non_connection_error
         begin
-          if db.in_transaction? && db.supports_savepoints?
-            db.transaction(:savepoint=>true){yield}
-          else
-            yield
-          end
+          db.transaction(:savepoint=>:only){yield}
         rescue Sequel::DatabaseConnectionError
           raise
         rescue Sequel::Error

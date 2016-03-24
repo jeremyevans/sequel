@@ -1033,12 +1033,27 @@ describe "Database#transaction with savepoint support" do
     proc{@db.transaction(:prepare=>'XYZ'){@db.transaction(:savepoint=>true){@db.after_rollback{@db.execute('foo')}}}}.must_raise(Sequel::Error)
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
   end
+
+  it "should create savepoint if inside a transaction when :savepoint=>:only is used" do
+    @db.transaction{@db.transaction(:savepoint=>:only){}}
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1','RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+
+  it "should not create transaction if not inside a transaction when :savepoint=>:only is used" do
+    @db.transaction(:savepoint=>:only){}
+    @db.sqls.must_equal []
+  end
 end
   
 describe "Database#transaction without savepoint support" do
   before do
     @db = Sequel.mock(:servers=>{:test=>{}})
     meta_def(@db, :supports_savepoints?){false}
+  end
+
+  it "should not create savepoint if inside a transaction when :savepoint=>:only is used" do
+    @db.transaction{@db.transaction(:savepoint=>:only){}}
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
   end
 
   include DatabaseTransactionSpecs

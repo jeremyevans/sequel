@@ -69,6 +69,8 @@ module Sequel
     #               default Sequel will reuse an existing transaction, so if you want to
     #               use a savepoint you must use this option.  If the surrounding transaction
     #               uses :auto_savepoint, you can set this to false to not use a savepoint.
+    #               If the value given for this option is :only, it will only create a
+    #               savepoint if it is inside a transacation.
     #
     # PostgreSQL specific options:
     #
@@ -97,6 +99,9 @@ module Sequel
         end
       else
         synchronize(opts[:server]) do |conn|
+          if opts[:savepoint] == :only && supports_savepoints? && !_trans(conn)
+            return yield(conn)
+          end
           if already_in_transaction?(conn, opts)
             if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last
               _transaction(conn, Hash[opts].merge!(:savepoint=>true), &block)
