@@ -224,7 +224,7 @@ describe "Sequel::Model with no existing table" do
     c = Class.new(Sequel::Model); c.set_dataset(db[:items])
     db.transaction do
       c = Class.new(Sequel::Model(db[:items]))
-      db.get(1).must_equal 1
+      db.get(Sequel.cast(1, Integer)).must_equal 1
     end
   end
 end
