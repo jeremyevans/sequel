@@ -450,6 +450,8 @@ describe Sequel::Model, "many_to_one" do
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
     d.parent(:reload=>true).wont_equal 42 
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
+    d.parent(Object.new).wont_equal 42 
+    DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
   end
   
   it "should use a callback if given one as the argument" do

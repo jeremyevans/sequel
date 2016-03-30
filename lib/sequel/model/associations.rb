@@ -2272,6 +2272,8 @@ module Sequel
           else
             if dynamic_opts.respond_to?(:call)
               {:callback=>dynamic_opts}
+            else
+              {:reload=>true}
             end
           end
 
