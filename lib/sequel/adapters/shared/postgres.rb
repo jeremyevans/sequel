@@ -1595,9 +1595,8 @@ module Sequel
             sql << " ON CONSTRAINT "
             identifier_append(sql, target)
           elsif target = opts[:target]
-            sql << ' ('
-            identifier_append(sql, target)
-            sql << ')'
+            sql << ' '
+            identifier_append(sql, Array(target))
           end
 
           if values = opts[:update]
