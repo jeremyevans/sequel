@@ -1,4 +1,8 @@
-=== HEAD
+=== 4.33.0 (2016-04-01)
+
+* Handle arbitrary objects passed as arguments to the association method (jeremyevans) (#1166)
+
+* Handle array with multiple columns as Dataset#insert_conflict :target value on PostgreSQL (chanks) (#1165)
 
 * Add Database#transaction :savepoint=>:only option, for only creating a savepoint if already inside a transaction (jeremyevans)
 
