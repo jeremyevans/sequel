@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-11-10 21:51:27 -0800</span>
+          <span class='datetime'>2016-03-20 10:20:28 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -823,6 +823,13 @@
             <p>For anything more complex, you can use <code>dataset_module</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset_module</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">by_artist</span>(<span class="ruby-identifier">artist_id</span>)&#x000A;    <span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">artist_id</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">by_release_date</span>&#x000A;    <span class="ruby-identifier">order</span>(:<span class="ruby-identifier">release_date</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <h3 id="label-none"><code>none</code><span><a href="#label-none">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            
+            <p>If you want to return an empty dataset, but still preserve chaining, you
+            can use the <code>null_dataset</code> extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">null_dataset</span>)&#x000A;&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">User</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">nullify</span>&#x000A;    <span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">nullify</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-identifier">user</span> = <span class="ruby-constant">User</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;John Doe&#39;</span>)&#x000A;<span class="ruby-constant">User</span>.<span class="ruby-identifier">nullify</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span><span class="ruby-operator">:</span> <span class="ruby-string">&#39;John Doe&#39;</span>).<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># =&gt; []</span></pre>
             
             <h4 id="label-reset_column_information"><code>reset_column_information</code><span><a href="#label-reset_column_information">&para;</a> <a href="#top">&uarr;</a></span></h4>
             

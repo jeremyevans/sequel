@@ -43,6 +43,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a target="docwin" href="#method-i-each">each</a></li>
+              <li><a target="docwin" href="#method-i-with_sql_each">with_sql_each</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -65,6 +66,23 @@
                     [show source]
                   </a>
                   <pre id='method-i-each-source'><span class="ruby-comment"># File lib/sequel/extensions/graph_each.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">each</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:eager_graph</span>]&#x000A;    <span class="ruby-identifier">graph_each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">r</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-with_sql_each'>
+                <a name='method-i-with_sql_each'></a>
+                <div class='synopsis'>
+                  <span class='name'>with_sql_each</span>
+                  <span class='arguments'>(sql)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Call graph_each for graphed datasets that are not being eager graphed.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_sql_each-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-with_sql_each-source'><span class="ruby-comment"># File lib/sequel/extensions/graph_each.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_sql_each</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:graph</span>] <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-ivar">@opts</span>[<span class="ruby-value">:eager_graph</span>]&#x000A;    <span class="ruby-identifier">graph_each</span>(<span class="ruby-identifier">sql</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">r</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

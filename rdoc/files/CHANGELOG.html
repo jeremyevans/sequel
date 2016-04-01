@@ -31,12 +31,59 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-03-01 09:39:30 -0800</span>
+          <span class='datetime'>2016-04-01 07:24:12 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.33.0+-282016-04-01-29">4.33.0 (2016-04-01)<span><a href="#label-4.33.0+-282016-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Handle arbitrary objects passed as arguments to the association method
+            (jeremyevans) (#1166)</p>
+            </li><li>
+            <p>Handle array with multiple columns as Dataset#insert_conflict :target value
+            on PostgreSQL (chanks) (#1165)</p>
+            </li><li>
+            <p>Add Database#transaction :savepoint=&gt;:only option, for only creating a
+            savepoint if already inside a transaction (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#sequence_for_table on Oracle handle cases where the schema
+            for a table cannot be determined (jeremyevans)</p>
+            </li><li>
+            <p>The boolean_readers, boolean_subsets, and class_table_inheritance plugins
+            no longer do blind rescues (jeremyevans) (#1162)</p>
+            </li><li>
+            <p>Add Model.require_valid_table setting, if set to true doesn&#39;t swallow
+            any errors for invalid tables (jeremyevans)</p>
+            </li><li>
+            <p>Creating model classes inside a transaction when the table doesn&#39;t
+            exist no longer rolls back the transaction on PostgreSQL (jeremyevans)
+            (#1160)</p>
+            </li><li>
+            <p><a href="../classes/Sequel/Model.html">Sequel::Model</a> no longer swallows
+            many errors when subclassing or setting datasets (jeremyevans) (#1160)</p>
+            </li><li>
+            <p>Handle altering column NULL settings for varchar(max) and text columns on
+            MSSQL (Ilja Resch)</p>
+            </li><li>
+            <p>Remove Sequel.firebird and Sequel.informix adapter methods (jeremyevans)</p>
+            </li><li>
+            <p>Make graph_each extension handle result set splitting when using
+            Dataset#first (jeremyevans)</p>
+            </li><li>
+            <p>Allow raising <a
+            href="../classes/Sequel/ValidationFailed.html">Sequel::ValidationFailed</a>
+            and <a href="../classes/Sequel/HookFailed.html">Sequel::HookFailed</a>
+            without an argument (jeremyevans)</p>
+            </li><li>
+            <p>Allow schema_dumper to handle :qualify=&gt;true option on PostgreSQL
+            (jeremyevans)</p>
+            </li><li>
+            <p>Allow foreign_key schema method to handle SQL::Identifier and
+            SQL::QualifiedIdentifier as 2nd argument (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.32.0+-282016-03-01-29">4.32.0 (2016-03-01)<span><a href="#label-4.32.0+-282016-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
