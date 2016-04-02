@@ -135,7 +135,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |s|
           columns = cols = s.Fields.extend(Enumerable).map{|column| output_identifier(column.Name)}
-          @columns = columns
+          self.columns = columns
           s.getRows.transpose.each do |r|
             row = {}
             cols.each{|c| row[c] = r.shift}

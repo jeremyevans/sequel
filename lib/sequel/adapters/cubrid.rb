@@ -127,7 +127,7 @@ module Sequel
         execute(sql) do |stmt|
           begin
             cols = stmt.column_info.map{|c| [output_identifier(c[COLUMN_INFO_NAME]), CUBRID_TYPE_PROCS[c[COLUMN_INFO_TYPE]]]}
-            @columns = cols.map(&:first)
+            self.columns = cols.map(&:first)
             stmt.each do |r|
               row = {}
               cols.zip(r).each{|(k, p), v| row[k] = (v && p) ? p.call(v) : v}

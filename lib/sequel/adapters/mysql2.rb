@@ -154,7 +154,7 @@ module Sequel
       # Yield all rows matching this dataset.
       def fetch_rows(sql)
         execute(sql) do |r|
-          @columns = if identifier_output_method
+          self.columns = if identifier_output_method
             r.fields.map!{|c| output_identifier(c.to_s)}
           else
             r.fields

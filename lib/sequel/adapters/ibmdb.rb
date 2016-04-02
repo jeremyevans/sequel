@@ -401,7 +401,7 @@ module Sequel
             columns << [key, cps[type]]
           end
           cols = columns.map{|c| c.at(0)}
-          @columns = cols
+          self.columns = cols
 
           while res = stmt.fetch_array
             row = {}

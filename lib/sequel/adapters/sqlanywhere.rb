@@ -159,7 +159,7 @@ module Sequel
             col_infos << [i, output_identifier(name), cp]
           end
 
-          @columns = col_infos.map{|a| a[1]}
+          self.columns = col_infos.map{|a| a[1]}
 
           if rs
             while api.sqlany_fetch_next(rs) == 1

@@ -160,7 +160,7 @@ module Sequel
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |stmt|
-          @columns = cols = stmt.result_fields.map{|c| output_identifier(c)}
+          self.columns = cols = stmt.result_fields.map{|c| output_identifier(c)}
           col_count = cols.size
           stmt.each do |result|
             row = {}
