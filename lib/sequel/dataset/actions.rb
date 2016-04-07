@@ -558,7 +558,9 @@ module Sequel
     end
     
     # Returns a hash with key_column values as keys and value_column values as
-    # values.  Similar to to_hash, but only selects the columns given.
+    # values.  Similar to to_hash, but only selects the columns given.  Like
+    # to_hash, it accepts an optional :hash parameter, into which entries will
+    # be merged. 
     #
     #   DB[:table].select_hash(:id, :name) # SELECT id, name FROM table
     #   # => {1=>'a', 2=>'b', ...}
@@ -572,12 +574,13 @@ module Sequel
     # When using this method, you must be sure that each expression has an alias
     # that Sequel can determine.  Usually you can do this by calling the #as method
     # on the expression and providing an alias.
-    def select_hash(key_column, value_column)
-      _select_hash(:to_hash, key_column, value_column)
+    def select_hash(key_column, value_column, opts = {})
+      _select_hash(:to_hash, key_column, value_column, opts)
     end
     
     # Returns a hash with key_column values as keys and an array of value_column values.
-    # Similar to to_hash_groups, but only selects the columns given.
+    # Similar to to_hash_groups, but only selects the columns given.  Like to_hash_groups,
+    # it accepts an optional :hash parameter, into which entries will be merged. 
     #
     #   DB[:table].select_hash_groups(:name, :id) # SELECT id, name FROM table
     #   # => {'a'=>[1, 4, ...], 'b'=>[2, ...], ...}
@@ -591,8 +594,8 @@ module Sequel
     # When using this method, you must be sure that each expression has an alias
     # that Sequel can determine.  Usually you can do this by calling the #as method
     # on the expression and providing an alias.
-    def select_hash_groups(key_column, value_column)
-      _select_hash(:to_hash_groups, key_column, value_column)
+    def select_hash_groups(key_column, value_column, opts = {})
+      _select_hash(:to_hash_groups, key_column, value_column, opts)
     end
 
     # Selects the column given (either as an argument or as a block), and
@@ -715,10 +718,15 @@ module Sequel
     #
     #   DB[:table].to_hash([:id, :name]) # SELECT * FROM table
     #   # {[1, 'Jim']=>{:id=>1, :name=>'Jim'}, [2, 'Bob'=>{:id=>2, :name=>'Bob'}, ...}
-    def to_hash(key_column, value_column = nil)
-      h = {}
+    #
+    # This method accepts an optional :hash parameter (which can be a hash with
+    # a default value, a hash with a default proc, or any object that supports
+    # #[] and #[]=) into which entries will be merged. The default behavior is
+    # to start with a new, empty hash.
+    def to_hash(key_column, value_column = nil, opts = {})
+      h = opts[:hash] || {}
       if value_column
-        return naked.to_hash(key_column, value_column) if row_proc
+        return naked.to_hash(key_column, value_column, opts) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
             each{|r| h[r.values_at(*key_column)] = r.values_at(*value_column)}
@@ -758,10 +766,15 @@ module Sequel
     #
     #   DB[:table].to_hash_groups([:first, :middle]) # SELECT * FROM table
     #   # {['Jim', 'Bob']=>[{:id=>1, :first=>'Jim', :middle=>'Bob', :last=>'Smith'}, ...], ...}
-    def to_hash_groups(key_column, value_column = nil)
-      h = {}
+    #
+    # This method accepts an optional :hash parameter (which can be a hash with
+    # a default value, a hash with a default proc, or any object that supports
+    # #[] and #[]=) into which entries will be merged. The default behavior is
+    # to start with a new, empty hash.
+    def to_hash_groups(key_column, value_column = nil, opts = {})
+      h = opts[:hash] || {}
       if value_column
-        return naked.to_hash_groups(key_column, value_column) if row_proc
+        return naked.to_hash_groups(key_column, value_column, opts) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
             each{|r| (h[r.values_at(*key_column)] ||= []) << r.values_at(*value_column)}
@@ -896,9 +909,9 @@ module Sequel
     end
     
     # Internals of +select_hash+ and +select_hash_groups+
-    def _select_hash(meth, key_column, value_column)
+    def _select_hash(meth, key_column, value_column, opts)
       select(*(key_column.is_a?(Array) ? key_column : [key_column]) + (value_column.is_a?(Array) ? value_column : [value_column])).
-        send(meth, hash_key_symbols(key_column), hash_key_symbols(value_column))
+        send(meth, hash_key_symbols(key_column), hash_key_symbols(value_column), opts)
     end
     
     # Internals of +select_map+ and +select_order_map+

@@ -1169,6 +1169,8 @@ describe "Sequel::Dataset convenience methods" do
     @ds.to_hash([:a, :c], :b).must_equal([1, 3]=>2, [5, 7]=>6)
     @ds.to_hash(:a, [:b, :c]).must_equal(1=>[2, 3], 5=>[6, 7])
     @ds.to_hash([:a, :c], [:b, :d]).must_equal([1, 3]=>[2, 4], [5, 7]=>[6, 8])
+
+    @ds.to_hash(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 
   it "should have working #to_hash_groups" do
@@ -1182,6 +1184,8 @@ describe "Sequel::Dataset convenience methods" do
     ds.to_hash_groups([:a, :c], :d).must_equal([1, 3]=>[4, 9], [5, 7]=>[8])
     ds.to_hash_groups(:a, [:b, :d]).must_equal(1=>[[2, 4], [2, 9]], 5=>[[6, 8]])
     ds.to_hash_groups([:a, :c], [:b, :d]).must_equal([1, 3]=>[[2, 4], [2, 9]], [5, 7]=>[[6, 8]])
+
+    ds.to_hash_groups(:a, :d, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 
   it "should have working #select_map" do
@@ -1225,6 +1229,7 @@ describe "Sequel::Dataset convenience methods" do
     @ds.select_hash([:a, :c], :b).must_equal([1, 3]=>2, [5, 7]=>6)
     @ds.select_hash(:a, [:b, :c]).must_equal(1=>[2, 3], 5=>[6, 7])
     @ds.select_hash([:a, :c], [:b, :d]).must_equal([1, 3]=>[2, 4], [5, 7]=>[6, 8])
+    @ds.select_hash(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 
   it "should have working #select_hash_groups" do
@@ -1238,6 +1243,7 @@ describe "Sequel::Dataset convenience methods" do
     ds.select_hash_groups([:a, :c], :d).must_equal([1, 3]=>[4, 9], [5, 7]=>[8])
     ds.select_hash_groups(:a, [:b, :d]).must_equal(1=>[[2, 4], [2, 9]], 5=>[[6, 8]])
     ds.select_hash_groups([:a, :c], [:b, :d]).must_equal([1, 3]=>[[2, 4], [2, 9]], [5, 7]=>[[6, 8]])
+    ds.select_hash_groups(:a, :d, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 end
 

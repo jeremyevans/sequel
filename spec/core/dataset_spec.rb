@@ -1761,6 +1761,10 @@ describe "Dataset#to_hash" do
     @d.to_hash(:b).must_equal(2 => {:a => 1, :b => 2}, 4 => {:a => 3, :b => 4}, 6 => {:a => 5, :b => 6})
   end
 
+  it "should accept an optional :hash parameter into which entries can be merged" do
+    @d.to_hash(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
+  end
+
   it "should support using an array of columns as either the key or the value" do
     @d.to_hash([:a, :b], :b).must_equal([1, 2] => 2, [3, 4] => 4, [5, 6] => 6)
     @d.to_hash(:b, [:a, :b]).must_equal(2 => [1, 2], 4 => [3, 4], 6 => [5, 6])
@@ -1816,6 +1820,10 @@ describe "Dataset#to_hash_groups" do
     @d.to_hash_groups(:b, [:a, :b]).must_equal(2 => [[1, 2]], 4 => [[3, 4], [7, 4]], 6 => [[1, 6]])
     @d.to_hash_groups([:b, :a], [:a, :b]).must_equal([2, 1] => [[1, 2]], [4, 3] => [[3, 4]], [6, 1] => [[1, 6]], [4, 7]=>[[7, 4]])
     @d.to_hash_groups([:a, :b]).must_equal([1, 2] => [{:a => 1, :b => 2}], [3, 4] => [{:a => 3, :b => 4}], [1, 6] => [{:a => 1, :b => 6}], [7, 4] => [{:a => 7, :b => 4}])
+  end
+
+  it "should accept an optional :hash parameter into which entries can be merged" do
+    @d.to_hash_groups(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
   end
 
   it "should not call the row_proc if two arguments are given" do

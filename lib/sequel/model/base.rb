@@ -2367,12 +2367,12 @@ module Sequel
       #   # => {1=>#<Artist {:id=>1, ...}>,
       #   #     2=>#<Artist {:id=>2, ...}>,
       #   #     ...}
-      def to_hash(key_column=nil, value_column=nil)
+      def to_hash(key_column=nil, value_column=nil, opts={})
         if key_column
           super
         else
           raise(Sequel::Error, "No primary key for model") unless model && (pk = model.primary_key)
-          super(pk, value_column) 
+          super(pk, value_column, opts) 
         end
       end
 
