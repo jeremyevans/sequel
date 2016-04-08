@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize additional unique constraint violation on Microsoft SQL Server (jeremyevans)
+
 * Add :hash option to Dataset#(select|to)_hash(_groups)? methods for choosing object to populate (mwpastore) (#1167)
 
 === 4.33.0 (2016-04-01)
