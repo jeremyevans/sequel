@@ -574,7 +574,7 @@ module Sequel
     # When using this method, you must be sure that each expression has an alias
     # that Sequel can determine.  Usually you can do this by calling the #as method
     # on the expression and providing an alias.
-    def select_hash(key_column, value_column, opts = {})
+    def select_hash(key_column, value_column, opts = OPTS)
       _select_hash(:to_hash, key_column, value_column, opts)
     end
     
@@ -594,7 +594,7 @@ module Sequel
     # When using this method, you must be sure that each expression has an alias
     # that Sequel can determine.  Usually you can do this by calling the #as method
     # on the expression and providing an alias.
-    def select_hash_groups(key_column, value_column, opts = {})
+    def select_hash_groups(key_column, value_column, opts = OPTS)
       _select_hash(:to_hash_groups, key_column, value_column, opts)
     end
 
@@ -723,7 +723,7 @@ module Sequel
     # a default value, a hash with a default proc, or any object that supports
     # #[] and #[]=) into which entries will be merged. The default behavior is
     # to start with a new, empty hash.
-    def to_hash(key_column, value_column = nil, opts = {})
+    def to_hash(key_column, value_column = nil, opts = OPTS)
       h = opts[:hash] || {}
       if value_column
         return naked.to_hash(key_column, value_column, opts) if row_proc
@@ -771,7 +771,7 @@ module Sequel
     # a default value, a hash with a default proc, or any object that supports
     # #[] and #[]=) into which entries will be merged. The default behavior is
     # to start with a new, empty hash.
-    def to_hash_groups(key_column, value_column = nil, opts = {})
+    def to_hash_groups(key_column, value_column = nil, opts = OPTS)
       h = opts[:hash] || {}
       if value_column
         return naked.to_hash_groups(key_column, value_column, opts) if row_proc

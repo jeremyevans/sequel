@@ -2367,7 +2367,7 @@ module Sequel
       #   # => {1=>#<Artist {:id=>1, ...}>,
       #   #     2=>#<Artist {:id=>2, ...}>,
       #   #     ...}
-      def to_hash(key_column=nil, value_column=nil, opts={})
+      def to_hash(key_column=nil, value_column=nil, opts=OPTS)
         if key_column
           super
         else
