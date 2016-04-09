@@ -87,6 +87,7 @@ module Sequel
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_null=>{:message=>lambda{"is not present"}},
         :numeric=>{:message=>lambda{"is not a number"}},
+        :operator=>{:message=>lambda{|operator, rhs| "is not #{operator} #{rhs}"}},
         :type=>{:message=>lambda{|klass| klass.is_a?(Array) ? "is not a valid #{klass.join(" or ").downcase}" : "is not a valid #{klass.to_s.downcase}"}},
         :presence=>{:message=>lambda{"is not present"}},
         :unique=>{:message=>lambda{'is already taken'}}
@@ -153,6 +154,12 @@ module Sequel
               validation_error_message(m)
             end
           end
+        end
+
+        # Check attribute value(s) against a specified value and operation, e.g.
+        # validates_operator(:>, 3, :value) validates that value > 3.
+        def validates_operator(operator, rhs, atts, opts=OPTS)
+          validatable_attributes_for_type(:operator, atts, opts){|a,v,m| validation_error_message(m, operator, rhs) unless v.send(operator, rhs)}
         end
 
         # Validates for all of the model columns (or just the given columns)

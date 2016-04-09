@@ -231,6 +231,17 @@ These methods check that the specified attributes can be valid integers or valid
     end
   end
 
+=== +validates_operator+
+
++validates_operator+ checks that a given +operator+ method returns a truthy value when called on attribute with a specified value for comparison.  Generally, this is used for inequality checks (>, >=, etc) but any method that can be called on the attribute that accepts an argument and returns a truthy value may be used.
+
+  class Album < Sequel::Model
+    def validate
+      super
+      validates_operator(:>, 3, :tracks)
+    end
+  end
+
 === +validates_type+
 
 +validates_type+ checks that the specified attributes are instances of the class specified in the first argument.  The class can be specified as the class itself, or as a string or symbol with the class name, or as a an array of classes.
