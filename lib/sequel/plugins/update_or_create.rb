@@ -7,7 +7,7 @@ module Sequel
     # The first method is update_or_create, which updates an object if it
     # exists in the database, or creates the object if it does not.
     #
-    # You can call create_or_update with a block:
+    # You can call update_or_create with a block:
     #
     #   Album.update_or_create(:name=>'Hello') do |album|
     #     album.num_copies_sold = 1000
