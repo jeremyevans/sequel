@@ -30,7 +30,7 @@ module Sequel
     def columns
       return @columns if @columns
       if (pcs = probable_columns) && pcs.all?
-        @columns = pcs
+        self.columns = pcs
       else
         super
       end
