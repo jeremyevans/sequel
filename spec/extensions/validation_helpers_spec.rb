@@ -538,4 +538,15 @@ describe "Sequel::Plugins::ValidationHelpers" do
     m.wont_be :valid?
     DB.sqls.must_equal []
   end
+
+  it "should support validates_operator" do
+    @c.set_validations{validates_operator(:>, 3, :value)}
+    @m.value = 1
+    @m.wont_be :valid?
+    @m.errors.full_messages.must_equal ['value is not > 3']
+    @m.value = 3
+    @m.wont_be :valid?
+    @m.value = 4
+    @m.must_be :valid?
+  end
 end 
