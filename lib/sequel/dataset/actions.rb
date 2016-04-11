@@ -909,7 +909,7 @@ module Sequel
     end
     
     # Internals of +select_hash+ and +select_hash_groups+
-    def _select_hash(meth, key_column, value_column, opts)
+    def _select_hash(meth, key_column, value_column, opts=OPTS)
       select(*(key_column.is_a?(Array) ? key_column : [key_column]) + (value_column.is_a?(Array) ? value_column : [value_column])).
         send(meth, hash_key_symbols(key_column), hash_key_symbols(value_column), opts)
     end
