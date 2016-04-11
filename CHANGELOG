@@ -1,10 +1,12 @@
 === HEAD
 
+* Make prepared_statements_safe plugin work correctly with CURRENT_DATE/CURRENT_TIMESTAMP defaults (jeremyevans) (#1168)
+
+* Add validates_operator validation helper (petedmarsh) (#1170)
+
 * Recognize additional unique constraint violation on Microsoft SQL Server (jeremyevans)
 
 * Add :hash option to Dataset#(select|to)_hash(_groups)? methods for choosing object to populate (mwpastore) (#1167)
-
-* Add validates_operator validation helper (petedmarsh)
 
 === 4.33.0 (2016-04-01)
 

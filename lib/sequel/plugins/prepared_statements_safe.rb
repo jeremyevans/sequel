@@ -47,7 +47,8 @@ module Sequel
           if db_schema
             h = {}
             db_schema.each do |k, v|
-              h[k] = v[:ruby_default] if (v[:ruby_default] || !v[:default]) && !v[:primary_key]
+              default = v[:ruby_default]
+              h[k] = default if (default || !v[:default]) && !v[:primary_key] && !default.is_a?(Sequel::SQL::Expression)
             end
             @prepared_statements_column_defaults = h
           end

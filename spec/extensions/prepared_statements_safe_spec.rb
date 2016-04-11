@@ -17,7 +17,7 @@ describe "prepared_statements_safe plugin" do
 
   it "should set default values correctly" do
     @c.prepared_statements_column_defaults.must_equal(:name=>nil, :i=>nil)
-    @c.instance_variable_set(:@db_schema, {:i=>{:default=>'f(x)'}, :name=>{:ruby_default=>'foo'}, :id=>{:primary_key=>true}})
+    @c.instance_variable_set(:@db_schema, {:i=>{:default=>'f(x)'}, :name=>{:ruby_default=>'foo'}, :id=>{:primary_key=>true}, :bar=>{:ruby_default=>Sequel::CURRENT_TIMESTAMP}})
     Class.new(@c).prepared_statements_column_defaults.must_equal(:name=>'foo')
   end
 
