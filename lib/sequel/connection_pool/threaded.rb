@@ -243,8 +243,15 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   end
   
   # Create the maximum number of connections immediately.
-  def preconnect
-    (max_size - size).times{checkin_connection(make_new(nil))}
+  def preconnect(concurrent = false)
+    enum = (max_size - size).times
+    mk_conn = lambda {|*| checkin_connection(make_new(nil)) }
+
+    if concurrent
+      enum.map{ Thread.new(&mk_conn) }.each(&:join)
+    else
+      enum.each(&mk_conn)
+    end
   end
   
   # Releases the connection assigned to the supplied thread back to the pool.

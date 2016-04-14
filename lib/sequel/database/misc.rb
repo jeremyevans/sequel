@@ -149,7 +149,10 @@ module Sequel
         Sequel.synchronize{::Sequel::DATABASES.push(self)}
       end
       Sequel::Database.run_after_initialize(self)
-      @pool.send(:preconnect) if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
+      if typecast_value_boolean(@opts[:preconnect]) && @pool.respond_to?(:preconnect, true)
+        concurrent = typecast_value_string(@opts[:preconnect]) == "concurrently"
+        @pool.send(:preconnect, concurrent)
+      end
     end
 
     # If a transaction is not currently in process, yield to the block immediately.

@@ -495,6 +495,13 @@ describe "A connection pool with multiple servers" do
     i.must_equal @pool.max_size * 2
   end
 
+  it "should support preconnect method that immediately creates the maximum number of connections concurrently" do
+    @pool.send(:preconnect, true)
+    i = 0
+    @pool.all_connections{|c1| i+=1}
+    i.must_equal @pool.max_size * 2
+  end
+
   it "#all_connections should return connections for all servers" do
     @pool.hold{}
     @pool.all_connections{|c1| c1.must_equal "default1"}
@@ -769,6 +776,13 @@ describe "A single threaded pool with multiple servers" do
     i.must_equal 2
   end
 
+  it "should support preconnect method that immediately creates the maximum number of connections, ignoring concurrent param" do
+    @pool.send(:preconnect, true)
+    i = 0
+    @pool.all_connections{|c1| i+=1}
+    i.must_equal 2
+  end
+
   it "#all_connections should return connections for all servers" do
     @pool.hold{}
     @pool.all_connections{|c1| c1.must_equal :default}
@@ -907,6 +921,14 @@ AllConnectionPoolClassesSpecs = shared_description do
   it "should support preconnect method that immediately creates the maximum number of connections" do
     p = @class.new(mock_db.call{123}, {})
     p.send(:preconnect)
+    i = 0
+    p.all_connections{|c1| i+=1}
+    i.must_equal p.max_size
+  end
+
+  it "should support preconnect method that immediately creates the maximum number of connections concurrently" do
+    p = @class.new(mock_db.call{123}, {})
+    p.send(:preconnect, true)
     i = 0
     p.all_connections{|c1| i+=1}
     i.must_equal p.max_size

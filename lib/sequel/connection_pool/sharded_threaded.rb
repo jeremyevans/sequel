@@ -290,8 +290,15 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   end
   
   # Create the maximum number of connections to each server immediately.
-  def preconnect
-    servers.each{|s| (max_size - size(s)).times{checkin_connection(s, make_new(s))}}
+  def preconnect(concurrent = false)
+    mk_conn = lambda {|s| checkin_connection(s, make_new(s)) }
+    conn_servers = servers.reduce([]) { |a,s| a.concat Array.new(max_size - size(s), s) }
+
+    if concurrent
+      conn_servers.map{|s| Thread.new{ mk_conn.call(s) }}.each(&:join)
+    else
+      conn_servers.each(&mk_conn)
+    end
   end
   
   # Releases the connection assigned to the supplied thread and server. If the

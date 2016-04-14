@@ -102,7 +102,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   end
   
   # Make sure there is a valid connection for each server.
-  def preconnect
+  def preconnect(concurrent = nil)
     servers.each{|s| hold(s){}}
   end
   

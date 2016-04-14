@@ -32,6 +32,8 @@ describe "A new Database" do
     end
     db = c.new(1 => 2, :logger => 3, :preconnect=>true)
     db.pool.size.must_equal db.pool.max_size
+    db = c.new(1 => 2, :logger => 3, :preconnect=>:concurrently)
+    db.pool.size.must_equal db.pool.max_size
   end
   
   it "should handle the default string column size" do

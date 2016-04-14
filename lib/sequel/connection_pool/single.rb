@@ -44,7 +44,7 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
   private
 
   # Make sure there is a valid connection.
-  def preconnect
+  def preconnect(concurrent = nil)
     hold{}
   end
 

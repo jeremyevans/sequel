@@ -79,6 +79,8 @@ class Sequel::ConnectionPool
   # :preconnect :: Automatically create the maximum number of connections, so that they don't
   #                need to be created as needed.  This is useful when connecting takes a long time
   #                and you want to avoid possible latency during runtime.
+  #                Set to :concurrently to create the connections in separate threads. Otherwise
+  #                they'll be created sequentially.
   def initialize(db, opts=OPTS)
     @db = db
     @after_connect = opts[:after_connect]
