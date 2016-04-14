@@ -618,13 +618,15 @@ module Sequel
     # so that each number in the array is the migration version
     # that will be in affect after the migration is run.
     def version_numbers
-      versions = files.
-        compact.
-        map{|f| migration_version_from_file(File.basename(f))}.
-        select{|v| up? ? (v > current && v <= target) : (v <= current && v > target)}.
-        sort
-      versions.reverse! unless up?
-      versions
+      @version_numbers ||= begin
+        versions = files.
+          compact.
+          map{|f| migration_version_from_file(File.basename(f))}.
+          select{|v| up? ? (v > current && v <= target) : (v <= current && v > target)}.
+          sort
+        versions.reverse! unless up?
+        versions
+      end
     end
   end
 
