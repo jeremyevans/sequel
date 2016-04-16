@@ -79,6 +79,19 @@ describe "Sequel::DuplicateColumnsHandler" do
       @ds = @db[:things]
       must_not_warn_for_columns(:id, :name)
     end
+
+    it "should raise when `on_duplicate_columns` is callable and returns :raise and 2 or more columns have the same name" do
+      received_columns = nil
+      handler = proc do |columns|
+        received_columns = columns
+        :raise
+      end
+      @db = Sequel.mock(:on_duplicate_columns => handler)
+      @db.extension(:duplicate_columns_handler)
+      @ds = @db[:things]
+      must_raise_for_columns(:id, :name, :id)
+      received_columns.must_equal([:id, :name, :id])
+    end
   end
 
   describe "dataset-level configuration" do
@@ -122,14 +135,14 @@ describe "Sequel::DuplicateColumnsHandler" do
       must_not_warn_for_columns(:id, :name)
     end
 
-    it "should be able to accept a block handler which returns a symbol" do
-      called = false
-      @ds = @db[:things].on_duplicate_columns do
-        called = true
+    it "should be able to accept a block handler which receives a list of columns and returns a symbol" do
+      received_columns = nil
+      @ds = @db[:things].on_duplicate_columns do |columns|
+        received_columns = columns
         :raise
       end
       must_raise_for_columns(:id, :name, :id)
-      called.must_equal(true)
+      received_columns.must_equal([:id, :name, :id])
     end
 
     it "should be able to accept a block handler which performs its own action and does not return anything useful" do
@@ -138,6 +151,7 @@ describe "Sequel::DuplicateColumnsHandler" do
         called = true
       end
       must_not_warn_for_columns(:id, :name, :id)
+      must_not_raise_for_columns(:id, :name, :id)
       called.must_equal(true)
     end
 
@@ -150,15 +164,15 @@ describe "Sequel::DuplicateColumnsHandler" do
       called.must_equal(false)
     end
 
-    it "should be able to accept a callable argument handler which returns a symbol" do
-      called = false
-      handler = proc do
-        called = true
+    it "should be able to accept a callable argument handler which receives a list of columns and returns a symbol" do
+      received_columns = nil
+      handler = proc do |columns|
+        received_columns = columns
         :raise
       end
       @ds = @db[:things].on_duplicate_columns(handler)
       must_raise_for_columns(:id, :name, :id)
-      called.must_equal(true)
+      received_columns.must_equal([:id, :name, :id])
     end
   end
 
