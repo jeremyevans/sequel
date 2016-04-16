@@ -3,23 +3,27 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::DuplicateColumnsHandler" do
 
   def must_warn_for_columns(*cols)
-    out, err = capture_io do
-      @ds.send(:columns=, cols)
+    warned = nil
+    @ds.send(:define_singleton_method, :warn) do |message|
+      warned = message
     end
-    err.must_equal("One or more duplicate columns present in #{cols.inspect}\n")
+    @ds.send(:columns=, cols)
+    warned.must_equal("One or more duplicate columns present in #{cols.inspect}")
   end
 
   def must_raise_for_columns(*cols)
     proc do
       @ds.send(:columns=, cols)
-    end.must_raise(Sequel::DuplicateColumnsHandler::Error)
+    end.must_raise(Sequel::DuplicateColumnError)
   end
 
   def must_not_warn_for_columns(*cols)
-    out, err = capture_io do
-      @ds.send(:columns=, cols)
+    warned = nil
+    @ds.send(:define_singleton_method, :warn) do |message|
+      warned = message
     end
-    err.must_equal("")
+    @ds.send(:columns=, cols)
+    warned.must_be_nil
   end
 
   def must_not_raise_for_columns(*cols)

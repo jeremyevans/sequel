@@ -3,64 +3,55 @@
 module Sequel
   # TODO DOCS
   module DuplicateColumnsHandler
-
-    # TODO DOCS
-    module DatasetMethods
-      def on_duplicate_columns(handler = nil, &block)
-        if block_given?
-          if handler.nil?
-            handler = block
-          else
-            raise Error, "Cannot provide both an argument and a block to on_duplicate_columns"
-          end
-        elsif handler.nil?
-          raise Error, "Must provide either an argument or a block to on_duplicate_columns"
-        end
-
-        ds = clone
-        ds.instance_variable_set(:@on_duplicate_columns, handler)
-        ds
-      end
-
-      def columns=(cols)
-        @columns = cols
-        if cols.uniq.size != cols.size
-          handle_duplicate_columns
-        end
-        cols
-      end
-
-      private
-
-      def handle_duplicate_columns
-        message = "One or more duplicate columns present in #{@columns.inspect}"
-
-        case duplicate_columns_handler_type
-        when :raise
-          raise Error.new(message)
-        when :warn
-          warn message
-        end
-      end
-
-      def duplicate_columns_handler_type
-        handler = if @on_duplicate_columns
-          @on_duplicate_columns
+    def on_duplicate_columns(handler = nil, &block)
+      if block_given?
+        if handler.nil?
+          handler = block
         else
-          db.opts[:on_duplicate_columns] || :warn
+          raise DuplicateColumnError, "Cannot provide both an argument and a block to on_duplicate_columns"
         end
+      elsif handler.nil?
+        raise DuplicateColumnError, "Must provide either an argument or a block to on_duplicate_columns"
+      end
 
-        if handler.respond_to?(:call)
-          handler.call(@columns)
-        else
-          handler
-        end
+      ds = clone
+      ds.opts[:on_duplicate_columns] = handler
+      ds
+    end
+
+    def columns=(cols)
+      if cols.uniq.size != cols.size
+        handle_duplicate_columns(cols)
+      end
+      @columns = cols
+    end
+
+    private
+
+    def handle_duplicate_columns(cols)
+      message = "One or more duplicate columns present in #{cols.inspect}"
+
+      case duplicate_columns_handler_type(cols)
+      when :raise
+        raise DuplicateColumnError, message
+      when :warn
+        warn message
       end
     end
 
-    class Error < Sequel::Error
+    def duplicate_columns_handler_type(cols)
+      handler = opts.fetch(:on_duplicate_columns){db.opts.fetch(:on_duplicate_columns, :warn)}
+
+      if handler.respond_to?(:call)
+        handler.call(cols)
+      else
+        handler
+      end
     end
   end
 
-  Dataset.register_extension(:duplicate_columns_handler, Sequel::DuplicateColumnsHandler::DatasetMethods)
+  class DuplicateColumnError < Error
+  end
+
+  Dataset.register_extension(:duplicate_columns_handler, Sequel::DuplicateColumnsHandler)
 end
