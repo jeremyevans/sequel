@@ -189,7 +189,7 @@ This is similar to +validates_presence+, but only checks for NULL/nil values, al
     def validate
       super
       validates_format /\A\d\d\d-\d-\d{7}-\d-\d\z/, :isbn
-      validates_format /\a[0-9a-zA-Z:' ]+\z/, :name
+      validates_format /\A[0-9a-zA-Z:' ]+\z/, :name
     end
   end
 
