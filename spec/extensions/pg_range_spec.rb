@@ -166,6 +166,46 @@ describe "pg_range extension" do
     Sequel::Postgres::PG_TYPES[331].call('[1,3)').must_be_kind_of(@R)
   end
 
+  it "should support registering custom range types on a per-Database basis" do
+    @db.register_range_type('banana', :oid=>7865){|s| s}
+    @db.typecast_value(:banana, '[1,2]').class.must_equal(Sequel::Postgres::PGRange)
+    @db.fetch = [{:name=>'id', :db_type=>'banana'}]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana]
+    @db.conversion_procs.must_include(7865)
+    @db.respond_to?(:typecast_value_banana, true).must_equal true
+
+    db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
+    db.extension(:pg_range)
+    db.fetch = [{:name=>'id', :db_type=>'banana'}]
+    db.schema(:items).map{|e| e[1][:type]}.must_equal [nil]
+    db.conversion_procs.wont_include(7865)
+    db.respond_to?(:typecast_value_banana, true).must_equal false
+  end
+
+  it "should automatically look up the range and subtype oids when registering per-Database types" do
+    @db.fetch = [[{:rngsubtype=>21, :rngtypid=>7866}], [{:name=>'id', :db_type=>'banana'}]]
+    @db.register_range_type('banana', :subtype_typecast=>:integer)
+    @db.sqls.must_equal ["SELECT rngtypid, rngsubtype FROM pg_range INNER JOIN pg_type ON (pg_type.oid = pg_range.rngtypid) WHERE (typname = 'banana') LIMIT 1"]
+    @db.schema(:items).map{|e| e[1][:type]}.must_equal [:banana]
+    @db.conversion_procs[7866].call("[1,3)").must_be :==, (1...3)
+    @db.typecast_value(:banana, '[1,2]').must_be :==, (1..2)
+  end
+
+  it "should not automatically look up oids if given both subtype and range oids" do
+    @db.register_range_type('banana', :oid=>7866, :subtype_oid=>21)
+    @db.sqls.must_equal []
+    @db.conversion_procs[7866].call("[1,3)").must_be :==, (1...3)
+    @db.typecast_value(:banana, '[1,2]').must_be :==, (1..2)
+  end
+
+  it "should not automatically look up oids if given range oid and block" do
+    @db.register_range_type('banana', :oid=>7866){|s| s.to_i}
+    @db.sqls.must_equal []
+    @db.conversion_procs[7866].call("[1,3)").must_be :==, (1...3)
+    @db.typecast_value(:banana, '[1,2]').must_be :==, (1..2)
+  end
+
   it "should return correct results for Database#schema_type_class" do
     @db.schema_type_class(:int4range).must_equal Sequel::Postgres::PGRange
     @db.schema_type_class(:integer).must_equal Integer

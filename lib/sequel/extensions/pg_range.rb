@@ -50,6 +50,34 @@
 # See the {schema modification guide}[rdoc-ref:doc/schema_modification.rdoc]
 # for details on using range type columns in CREATE/ALTER TABLE statements.
 #
+# This extension makes it easy to add support for other range types.  In
+# general, you just need to make sure that the subtype is handled and has the
+# appropriate converter installed in Sequel::Postgres::PG_TYPES or the Database
+# instance's conversion_procs usingthe appropriate type OID.  For user defined
+# types, you can do this via:
+#
+#   DB.conversion_procs[subtype_oid] = lambda{|string| }
+#
+# Then you can call
+# Sequel::Postgres::PGRange::DatabaseMethods#register_range_type
+# to automatically set up a handler for the range type.  So if you
+# want to support the timerange type (assuming the time type is already
+# supported):
+#
+#   DB.register_range_type('timerange')
+#
+# You can also register range types on a global basis using
+# Sequel::Postgres::PGRange.register.  In this case, you'll have
+# to specify the type oids:
+#
+#   Sequel::Postgres::PG_TYPES[1234] = lambda{|string| }
+#   Sequel::Postgres::PGRange.register('foo', :oid=>4321, :subtype_oid=>1234)
+#
+# Both Sequel::Postgres::PGRange::DatabaseMethods#register_range_type
+# and Sequel::Postgres::PGRange.register support many options to
+# customize the range type handling.  See the Sequel::Postgres::PGRange.register
+# method documentation.
+#
 # This extension integrates with the pg_array extension.  If you plan
 # to use arrays of range types, load the pg_array extension before the
 # pg_range extension:
@@ -94,10 +122,20 @@ module Sequel
       # :subtype_oid :: Should be the PostgreSQL OID for the range's subtype. If given,
       #                 automatically sets the :converter option by looking for scalar conversion
       #                 proc.
+      # :type_procs :: A hash mapping oids to conversion procs, used for setting the default :converter
+      #                for :subtype_oid.  Defaults to the global Sequel::Postgres::PG_TYPES.
+      # :typecast_method_map :: The map in which to place the database type string to type symbol mapping.
+      #                         Defaults to RANGE_TYPES.
+      # :typecast_methods_module :: If given, a module object to add the typecasting method to.  Defaults
+      #                             to DatabaseMethods.
       #
       # If a block is given, it is treated as the :converter option.
       def self.register(db_type, opts=OPTS, &block)
         db_type = db_type.to_s.dup.freeze
+
+        type_procs = opts[:type_procs] || PG_TYPES
+        mod = opts[:typecast_methods_module] || DatabaseMethods
+        typecast_method_map = opts[:typecast_method_map] || RANGE_TYPES
 
         if converter = opts[:converter]
           raise Error, "can't provide both a block and :converter option to register" if block
@@ -106,22 +144,33 @@ module Sequel
         end
 
         if soid = opts[:subtype_oid]
-          raise Error, "can't provide both a converter and :scalar_oid option to register" if converter 
-          raise Error, "no conversion proc for :scalar_oid=>#{soid.inspect} in PG_TYPES" unless converter = PG_TYPES[soid]
+          raise Error, "can't provide both a converter and :subtype_oid option to register" if converter 
+          raise Error, "no conversion proc for :subtype_oid=>#{soid.inspect} in PG_TYPES" unless converter = type_procs[soid]
         end
 
         parser = Parser.new(db_type, converter)
 
-        RANGE_TYPES[db_type] = db_type.to_sym
+        typecast_method_map[db_type] = db_type.to_sym
 
-        DatabaseMethods.define_range_typecast_method(db_type, parser)
+        define_range_typecast_method(mod, db_type, parser)
 
         if oid = opts[:oid]
-          Sequel::Postgres::PG_TYPES[oid] = parser
+          type_procs[oid] = parser
         end
 
         nil
       end
+
+      # Define a private range typecasting method for the given type that uses
+      # the parser argument to do the type conversion.
+      def self.define_range_typecast_method(mod, type, parser)
+        mod.class_eval do
+          meth = :"typecast_value_#{type}"
+          define_method(meth){|v| typecast_value_pg_range(v, parser)}
+          private meth
+        end
+      end
+      private_class_method :define_range_typecast_method
 
       # Creates callable objects that convert strings into PGRange instances.
       class Parser
@@ -190,6 +239,7 @@ module Sequel
         # and extend the datasets to correctly literalize ruby Range values.
         def self.extended(db)
           db.instance_eval do
+            @pg_range_schema_types ||= {}
             extend_datasets(DatasetMethods)
             copy_conversion_procs([3904, 3906, 3912, 3926, 3905, 3907, 3913, 3927])
             [:int4range, :numrange, :tsrange, :tstzrange, :daterange, :int8range].each do |v|
@@ -207,14 +257,6 @@ module Sequel
 
         end
 
-        # Define a private range typecasting method for the given type that uses
-        # the parser argument to do the type conversion.
-        def self.define_range_typecast_method(type, parser)
-          meth = :"typecast_value_#{type}"
-          define_method(meth){|v| typecast_value_pg_range(v, parser)}
-          private meth
-        end
-
         # Handle Range and PGRange values in bound variables
         def bound_variable_arg(arg, conn)
           case arg
@@ -225,6 +267,23 @@ module Sequel
           else
             super
           end
+        end
+
+        # Register a database specific range type.  This can be used to support
+        # different range types per Database.  Use of this method does not
+        # affect global state, unlike PGRange.register.  See PGRange.register for
+        # possible options.
+        def register_range_type(db_type, opts=OPTS, &block)
+          opts = {:type_procs=>conversion_procs, :typecast_method_map=>@pg_range_schema_types, :typecast_methods_module=>(class << self; self; end)}.merge!(opts)
+          unless (opts.has_key?(:subtype_oid) || block) && opts.has_key?(:oid)
+            range_oid, subtype_oid = from(:pg_range).join(:pg_type, :oid=>:rngtypid).where(:typname=>db_type.to_s).get([:rngtypid, :rngsubtype])
+            opts[:subtype_oid] = subtype_oid unless opts.has_key?(:subtype_oid) || block
+            opts[:oid] = range_oid unless opts.has_key?(:oid)
+          end
+
+          PGRange.register(db_type, opts, &block)
+          @schema_type_classes[:"#{opts[:type_symbol] || db_type}"] = PGRange
+          conversion_procs_updated
         end
 
         private
@@ -257,7 +316,7 @@ module Sequel
 
         # Recognize the registered database range types.
         def schema_column_type(db_type)
-          if type = RANGE_TYPES[db_type]
+          if type = @pg_range_schema_types[db_type] || RANGE_TYPES[db_type]
             type
           else
             super
