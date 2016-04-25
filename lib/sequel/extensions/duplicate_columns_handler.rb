@@ -1,0 +1,98 @@
+# frozen-string-literal: true
+#
+# The duplicate_columns_handler extension allows you to customize handling of
+# duplicate column names in your queries on a per-database or per-dataset level.
+#
+# For example, you may want to raise an exception if you join 2 tables together
+# which contains a column that will override another columns.
+#
+# To use the extension, you need to load the extension into the database:
+#
+#   DB.extension :duplicate_columns_handler
+#
+# A database option is introduced: :on_duplicate_columns. It accepts a Symbol
+# or any object that responds to :call.
+#
+#   :on_duplicate_columns => :raise
+#   :on_duplicate_columns => :warn
+#   :on_duplicate_columns => :ignore
+#   :on_duplicate_columns => proc { |columns| arbitrary_condition? ? :raise : :warn }
+#
+# You may also configure duplicate columns handling for a specific dataset:
+#
+#   ds.on_duplicate_columns(:warn)
+#   ds.on_duplicate_columns(:raise)
+#   ds.on_duplicate_columns(:ignore)
+#   ds.on_duplicate_columns { |columns| arbitrary_condition? ? :raise : :warn }
+#   ds.on_duplicate_columns(proc { |columns| arbitrary_condition? ? :raise : :warn })
+#
+# If :raise is specified, a Sequel::DuplicateColumnError is raised.
+# If :warn is specified, you will receive a warning via `warn`.
+# If a callable is specified, it will be called.
+# If no on_duplicate_columns is specified, the default is :warn.
+#
+# Related module: Sequel::DuplicateColumnsHandler
+
+module Sequel
+  module DuplicateColumnsHandler
+    # Customize handling of duplicate columns for this dataset.
+    def on_duplicate_columns(handler = nil, &block)
+      if block_given?
+        if handler.nil?
+          handler = block
+        else
+          raise DuplicateColumnError, "Cannot provide both an argument and a block to on_duplicate_columns"
+        end
+      elsif handler.nil?
+        raise DuplicateColumnError, "Must provide either an argument or a block to on_duplicate_columns"
+      end
+
+      ds = clone
+      ds.opts[:on_duplicate_columns] = handler
+      ds
+    end
+
+    # Override the attr_writer to check for duplicate columns, and call
+    # handle_duplicate_columns if necessary.
+    def columns=(cols)
+      if cols.uniq.size != cols.size
+        handle_duplicate_columns(cols)
+      end
+      @columns = cols
+    end
+
+    private
+
+    # Invoke the appropriate behavior when duplicate columns are present.
+    def handle_duplicate_columns(cols)
+      message = "One or more duplicate columns present in #{cols.inspect}"
+
+      case duplicate_columns_handler_type(cols)
+      when :raise
+        raise DuplicateColumnError, message
+      when :warn
+        warn message
+      end
+    end
+
+    # Try to find dataset option for on_duplicate_columns. If not present on the dataset,
+    # use the on_duplicate_columns option on the database. If not present on the database,
+    # default to :warn.
+    def duplicate_columns_handler_type(cols)
+      handler = opts.fetch(:on_duplicate_columns){db.opts.fetch(:on_duplicate_columns, :warn)}
+
+      if handler.respond_to?(:call)
+        handler.call(cols)
+      else
+        handler
+      end
+    end
+  end
+
+  # Error which is raised when duplicate columns are present in a dataset which is configured
+  # to :raise on_duplicate_columns.
+  class DuplicateColumnError < Error
+  end
+
+  Dataset.register_extension(:duplicate_columns_handler, Sequel::DuplicateColumnsHandler)
+end

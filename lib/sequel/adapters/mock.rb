@@ -365,7 +365,7 @@ module Sequel
         if cs.empty?
           super
         else
-          @columns = cs
+          self.columns = cs
           self
         end
       end

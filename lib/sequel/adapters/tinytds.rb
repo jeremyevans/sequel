@@ -225,7 +225,7 @@ module Sequel
             result.each(*args) do |r|
               unless cols
                 cols = result.fields.map{|c| [c, output_identifier(c)]}
-                @columns = columns = cols.map(&:last)
+                self.columns = columns = cols.map(&:last)
               end
               h = {}
               cols.each do |s, sym|
@@ -234,7 +234,7 @@ module Sequel
               yield h
             end
           else
-            @columns = columns
+            self.columns = columns
             if db.timezone == :utc
               result.each(:timezone=>:utc){|r| yield r}
             else

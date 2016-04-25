@@ -800,7 +800,7 @@ module Sequel
           i += 1
           cols << [output_identifier(meta.getColumnLabel(i)), i, convert ? type_convertor(map, meta, meta.getColumnType(i), i) : basic_type_convertor(map, meta, meta.getColumnType(i), i)]
         end
-        @columns = cols.map{|c| c.at(0)}
+        self.columns = cols.map{|c| c.at(0)}
 
         while result.next
           row = {}

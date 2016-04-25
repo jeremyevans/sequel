@@ -835,7 +835,7 @@ module Sequel
         res.nfields.times do |fieldnum|
           cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
         end
-        @columns = cols.map{|c| c.at(2)}
+        self.columns = cols.map{|c| c.at(2)}
         cols
       end
       

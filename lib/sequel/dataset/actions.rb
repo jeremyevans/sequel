@@ -81,7 +81,7 @@ module Sequel
     #   DB[:table].columns!
     #   # => [:id, :name]
     def columns!
-      @columns = nil
+      self.columns = nil
       columns
     end
     

@@ -134,7 +134,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |res|
           col_map = {}
-          @columns = res.fields.map do |c|
+          self.columns = res.fields.map do |c|
             col_map[c] = output_identifier(c)
           end
           tz = db.timezone if Sequel.application_timezone

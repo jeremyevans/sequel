@@ -366,7 +366,7 @@ module Sequel
           cols = columns = cursor.get_col_names.map{|c| output_identifier(c)}
           metadata = cursor.column_metadata
           cm = cols.zip(metadata).map{|c, m| [c, cps[m.data_type]]}
-          @columns = columns
+          self.columns = columns
           while r = cursor.fetch
             row = {}
             r.zip(cm).each{|v, (c, cp)| row[c] = ((v && cp) ? cp.call(v) : v)}

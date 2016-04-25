@@ -98,7 +98,7 @@ module Sequel
           i = -1
           cols = s.columns(true).map{|c| [output_identifier(c.name), c.type, i+=1]}
           columns = cols.map{|c| c.at(0)}
-          @columns = columns
+          self.columns = columns
           if rows = s.fetch_all
             rows.each do |row|
               hash = {}

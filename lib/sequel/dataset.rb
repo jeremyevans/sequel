@@ -36,6 +36,10 @@ module Sequel
     include SQL::NumericMethods
     include SQL::OrderMethods
     include SQL::StringMethods
+
+    private
+
+    attr_writer :columns
   end
   
   require(%w"query actions features graph prepared_statements misc mutation sql placeholder_literalizer", 'dataset')
