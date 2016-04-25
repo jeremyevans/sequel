@@ -3094,6 +3094,20 @@ describe 'PostgreSQL inet/cidr types' do
   end
 end
 
+describe 'PostgreSQL custom range types' do
+  after do
+    @db.run "DROP TYPE timerange";
+  end
+
+  it "should allow registration and use" do
+    @db = DB
+    @db.run "CREATE TYPE timerange AS range (subtype = time)"
+    @db.register_range_type('timerange')
+    r = Sequel::SQLTime.create(10, 11, 12)..Sequel::SQLTime.create(11, 12, 13)
+    @db.get(Sequel.pg_range(r, :timerange)).to_range.must_equal r
+  end
+end if DB.server_version >= 90200 && DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
+
 describe 'PostgreSQL range types' do
   before(:all) do
     @db = DB
