@@ -1,238 +1,110 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-describe "Sequel::DuplicateColumnsHandler" do
-  describe "database-level configuration" do
-    it "should raise error when `on_duplicate_columns` is :raise and 2 or more columns have the same name" do
-      @db = Sequel.mock(:on_duplicate_columns => :raise)
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name, :id]
-      proc do
-        @ds.send(:columns=, cols)
-      end.must_raise(Sequel::DuplicateColumnError)
-    end
+mod = shared_description do
+  it "should take action depending on :on_duplicate_columns if 2 or more columns have the same name" do
+    check(nil, @cols)
+    @warned.must_equal nil
 
-    it "should warn when `on_duplicate_columns` is :warn and 2 or more columns have the same name" do
-      @db = Sequel.mock(:on_duplicate_columns => :warn)
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name, :id]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_equal("One or more duplicate columns present in #{cols.inspect}")
-    end
+    check(:ignore, @cols)
+    @warned.must_equal nil
 
-    it "should do nothing when `on_duplicate_columns` is :ignore and 2 or more columns have the same name" do
-      @db = Sequel.mock(:on_duplicate_columns => :ignore)
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name, :id]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-    end
+    check(:warn, @cols)
+    @warned.must_equal("One or more duplicate columns present in #{@cols.inspect}")
 
-    it "should warn when `on_duplicate_columns` is not specified and 2 or more columns have the same name" do
-      @db = Sequel.mock
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name, :id]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_equal("One or more duplicate columns present in #{cols.inspect}")
-    end
+    proc{check(:raise, @cols)}.must_raise(Sequel::DuplicateColumnError)
 
-    it "should not raise error when `on_duplicate_columns` is :raise and no columns have the same name" do
-      @db = Sequel.mock(:on_duplicate_columns => :raise)
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name]
-      @ds.send(:columns=, cols)
-    end
+    cols = nil
+    check(proc{|cs| cols = cs; nil}, @cols)
+    @warned.must_equal nil
+    cols.must_equal @cols
 
-    it "should not warn when `on_duplicate_columns` is :warn and no columns have the same name" do
-      @db = Sequel.mock
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-    end
+    cols = nil
+    check(proc{|cs| cols = cs; :ignore}, @cols)
+    @warned.must_equal nil
+    cols.must_equal @cols
 
-    it "should not warn when `on_duplicate_columns` is not specified and no columns have the same name" do
-      @db = Sequel.mock(:on_duplicate_columns => :warn)
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-    end
+    cols = nil
+    proc{check(proc{|cs| cols = cs; :raise}, @cols)}.must_raise(Sequel::DuplicateColumnError)
+    cols.must_equal @cols
 
-    it "should raise when `on_duplicate_columns` is callable and returns :raise and 2 or more columns have the same name" do
-      received_columns = nil
-      handler = proc do |columns|
-        received_columns = columns
-        :raise
-      end
-      @db = Sequel.mock(:on_duplicate_columns => handler)
-      @db.extension(:duplicate_columns_handler)
-      @ds = @db[:things]
-      cols = [:id, :name, :id]
-      proc do
-        @ds.send(:columns=, cols)
-      end.must_raise(Sequel::DuplicateColumnError)
-      received_columns.must_equal(cols)
+    cols = nil
+    check(proc{|cs| cols = cs; :warn}, @cols)
+    @warned.must_equal("One or more duplicate columns present in #{@cols.inspect}")
+    cols.must_equal @cols
+
+    check(:raise, nil)
+    @warned.must_equal nil
+  end
+
+  it "should not raise error or warning if no columns have the same name" do
+    [nil, :ignore, :raise, :warn, proc{|cs| :raise}].each do |handler|
+      check(handler, @cols.uniq)
+      @warned.must_equal nil
+    end
+  end
+end
+
+describe "Sequel::DuplicateColumnsHandler Database configuration" do
+  before do
+    @db = Sequel.mock
+    @db.extension(:duplicate_columns_handler)
+    @ds = @db[:things]
+    @cols = [:id, :name, :id]
+    @warned = nil
+    set_warned = @set_warned = proc{|m| @warned = m}
+    @ds.meta_def(:warn) do |message|
+      set_warned.call(message)
     end
   end
 
-  describe "dataset-level configuration" do
-    before do
-      @db = Sequel.mock
-      @db.extension(:duplicate_columns_handler)
-    end
+  def check(handler, cols)
+    @db.opts[:on_duplicate_columns] = handler
+    @set_warned.call(nil)
+    @ds.send(:columns=, cols)
+  end
 
-    it "should raise error when `on_duplicate_columns` is :raise and 2 or more columns have the same name" do
-      @ds = @db[:things].on_duplicate_columns(:raise)
-      cols = [:id, :name, :id]
-      proc do
-        @ds.send(:columns=, cols)
-      end.must_raise(Sequel::DuplicateColumnError)
-    end
+  include mod
+end
 
-    it "should warn when `on_duplicate_columns` is :warn and 2 or more columns have the same name" do
-      @ds = @db[:things].on_duplicate_columns(:warn)
-      cols = [:id, :name, :id]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_equal("One or more duplicate columns present in #{cols.inspect}")
-    end
-
-    it "should do nothing when `on_duplicate_columns` is :ignore and 2 or more columns have the same name" do
-      @ds = @db[:things].on_duplicate_columns(:ignore)
-      cols = [:id, :name, :id]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-    end
-
-    it "should warn when `on_duplicate_columns` is not specified and 2 or more columns have the same name" do
-      @ds = @db[:things]
-      cols = [:id, :name, :id]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_equal("One or more duplicate columns present in #{cols.inspect}")
-    end
-
-    it "should not raise error when `on_duplicate_columns` is :raise and no columns have the same name" do
-      @ds = @db[:things].on_duplicate_columns(:raise)
-      cols = [:id, :name]
-      @ds.send(:columns=, cols)
-    end
-
-    it "should not warn when `on_duplicate_columns` is :warn and no columns have the same name" do
-      @ds = @db[:things].on_duplicate_columns(:warn)
-      cols = [:id, :name]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-    end
-
-    it "should not warn when `on_duplicate_columns` is not specified and no columns have the same name" do
-      @ds = @db[:things]
-      cols = [:id, :name]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-    end
-
-    it "should be able to accept a block handler which receives a list of columns and returns a symbol" do
-      received_columns = nil
-      @ds = @db[:things].on_duplicate_columns do |columns|
-        received_columns = columns
-        :raise
-      end
-      cols = [:id, :name, :id]
-      proc do
-        @ds.send(:columns=, cols)
-      end.must_raise(Sequel::DuplicateColumnError)
-      received_columns.must_equal(cols)
-    end
-
-    it "should be able to accept a block handler which performs its own action and does not return anything useful" do
-      received_columns = nil
-      @ds = @db[:things].on_duplicate_columns do |columns|
-        received_columns = columns
-      end
-      cols = [:id, :name, :id]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-      received_columns.must_equal(cols)
-    end
-
-    it "should not call the block when no columns have the same name" do
-      called = false
-      @ds = @db[:things].on_duplicate_columns do
-        called = true
-      end
-      cols = [:id, :name]
-      warned = nil
-      @ds.send(:define_singleton_method, :warn) do |message|
-        warned = message
-      end
-      @ds.send(:columns=, cols)
-      warned.must_be_nil
-      called.must_equal(false)
-    end
-
-    it "should be able to accept a callable argument handler which receives a list of columns and returns a symbol" do
-      received_columns = nil
-      handler = proc do |columns|
-        received_columns = columns
-        :raise
-      end
-      @ds = @db[:things].on_duplicate_columns(handler)
-      cols = [:id, :name, :id]
-      proc do
-        @ds.send(:columns=, cols)
-      end.must_raise(Sequel::DuplicateColumnError)
-      received_columns.must_equal(cols)
+describe "Sequel::DuplicateColumnsHandler Dataset configuration" do
+  before do
+    @ds = Sequel.mock[:things].extension!(:duplicate_columns_handler)
+    @cols = [:id, :name, :id]
+    @warned = nil
+    set_warned = @set_warned = proc{|m| @warned = m}
+    @ds.meta_def(:warn) do |message|
+      set_warned.call(message)
     end
   end
 
+  def check(handler, cols)
+    @set_warned.call(nil)
+    @ds.on_duplicate_columns(handler).send(:columns=, cols)
+  end
+
+  include mod
+
+  it "should use handlers passed as blocks to on_duplicate_columns" do
+    proc{@ds.on_duplicate_columns{:raise}.send(:columns=, @cols)}.must_raise(Sequel::DuplicateColumnError)
+  end
+
+  it "should raise an error if not providing either an argument or block to on_duplicate_columns" do
+    proc{@ds.on_duplicate_columns}.must_raise(Sequel::Error)
+  end
+
+  it "should raise an error if providing both an argument and block to on_duplicate_columns" do
+    proc{@ds.on_duplicate_columns(:raise){:raise}}.must_raise(Sequel::Error)
+  end
+
+  it "should warn by defaul if there is no database or dataset handler" do
+    @ds.send(:columns=, @cols)
+    @warned.must_equal("One or more duplicate columns present in #{@cols.inspect}")
+  end
+
+  it "should fallback to database setting if there is no dataset-level handler" do
+    @ds.db.opts[:on_duplicate_columns] = :raise
+    proc{@ds.send(:columns=, @cols)}.must_raise(Sequel::DuplicateColumnError)
+    check(:ignore, @cols)
+    @warned.must_equal nil
+  end
 end

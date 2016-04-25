@@ -393,15 +393,15 @@ end
 
 FilterByAssociations = shared_description do
   it "should handle association inner joins" do
-    @Artist.association_join(:albums).all.must_equal []
-    @Artist.association_join(:first_album).all.must_equal []
-    @Album.association_join(:artist).all.must_equal []
-    @Album.association_join(:tags).all.must_equal []
-    @Album.association_join(:alias_tags).all.must_equal []
-    @Tag.association_join(:albums).all.must_equal []
+    @Artist.association_join(:albums).select(Sequel.qualify(@Artist.first_source, @Artist.columns.first)).all.must_equal []
+    @Artist.association_join(:first_album).select(Sequel.qualify(@Artist.first_source, @Artist.columns.first)).all.must_equal []
+    @Album.association_join(:artist).select(Sequel.qualify(@Album.first_source, @Album.columns.first)).all.must_equal []
+    @Album.association_join(:tags).select(Sequel.qualify(@Album.first_source, @Album.columns.first)).all.must_equal []
+    @Album.association_join(:alias_tags).select(Sequel.qualify(@Album.first_source, @Album.columns.first)).all.must_equal []
+    @Tag.association_join(:albums).select(Sequel.qualify(@Tag.first_source, @Tag.columns.first)).all.must_equal []
     unless @no_many_through_many
-      @Artist.association_join(:tags).all.must_equal []
-      @Artist.association_join(:first_tag).all.must_equal []
+      @Artist.association_join(:tags).select(Sequel.qualify(@Artist.first_source, @Artist.columns.first)).all.must_equal []
+      @Artist.association_join(:first_tag).select(Sequel.qualify(@Artist.first_source, @Artist.columns.first)).all.must_equal []
     end
 
     @album.update(:artist => @artist)

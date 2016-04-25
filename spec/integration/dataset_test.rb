@@ -171,6 +171,10 @@ describe "Simple Dataset operations" do
     @ds.all.must_equal [{:id=>1, :number=>10}]
   end
 
+  it "should raise exception if raising on duplication columns" do
+    proc{@ds.select_map([:id, :id])}.must_raise Sequel::DuplicateColumnError
+  end if DB.opts[:on_duplicate_columns] == :raise
+
   it "should fetch a single row correctly" do
     @ds.first.must_equal(:id=>1, :number=>10)
     @ds.single_record.must_equal(:id=>1, :number=>10)

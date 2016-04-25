@@ -1,5 +1,7 @@
 === HEAD
 
+* Add duplicate_columns_handler extension, for raising or warning if a dataset returns multiple columns with the same name (TSMMark, jeremyevans) (#1175)
+
 * Support registering per-Database custom range types in the pg_range extension (steveh) (#1174)
 
 * Support :preconnect=>:concurrently Database option for preconnecting in separate threads (kch) (#1172)

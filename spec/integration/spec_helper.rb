@@ -50,3 +50,7 @@ if ENV['SEQUEL_CONNECTION_VALIDATOR']
   DB.pool.connection_validation_timeout = -1
 end
 
+if dch = ENV['SEQUEL_DUPLICATE_COLUMNS_HANDLER']
+  DB.extension :duplicate_columns_handler
+  DB.opts[:on_duplicate_columns] = dch.to_sym unless dch.empty?
+end

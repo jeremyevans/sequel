@@ -36,26 +36,15 @@
 module Sequel
   module DuplicateColumnsHandler
     # Customize handling of duplicate columns for this dataset.
-    def on_duplicate_columns(handler = nil, &block)
-      if block_given?
-        if handler.nil?
-          handler = block
-        else
-          raise DuplicateColumnError, "Cannot provide both an argument and a block to on_duplicate_columns"
-        end
-      elsif handler.nil?
-        raise DuplicateColumnError, "Must provide either an argument or a block to on_duplicate_columns"
-      end
-
-      ds = clone
-      ds.opts[:on_duplicate_columns] = handler
-      ds
+    def on_duplicate_columns(handler = (raise Error, "Must provide either an argument or a block to on_duplicate_columns" unless block_given?; nil), &block)
+      raise Error, "Cannot provide both an argument and a block to on_duplicate_columns" if handler && block
+      clone(:on_duplicate_columns=>handler||block)
     end
 
     # Override the attr_writer to check for duplicate columns, and call
     # handle_duplicate_columns if necessary.
     def columns=(cols)
-      if cols.uniq.size != cols.size
+      if cols && cols.uniq.size != cols.size
         handle_duplicate_columns(cols)
       end
       @columns = cols

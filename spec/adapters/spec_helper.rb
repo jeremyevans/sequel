@@ -15,6 +15,7 @@ begin
 rescue LoadError
 end
 
+Sequel::Database.extension :duplicate_column_handler if ENV['SEQUEL_DUPLICATE_COLUMN_HANDLER']
 Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 Sequel::Model.cache_associations = false if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
 Sequel.cache_anonymous_models = false
@@ -40,4 +41,9 @@ unless defined?(DB)
   env_var = "SEQUEL_#{SEQUEL_ADAPTER_TEST.to_s.upcase}_URL"
   env_var = ENV.has_key?(env_var) ? env_var : 'SEQUEL_INTEGRATION_URL'
   DB = Sequel.connect(ENV[env_var])
+end
+
+if dch = ENV['SEQUEL_DUPLICATE_COLUMNS_HANDLER']
+  DB.extension :duplicate_columns_handler
+  DB.opts[:on_duplicate_columns] = dch.to_sym unless dch.empty?
 end
