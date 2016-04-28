@@ -42,6 +42,11 @@ describe "ConnectionPool options" do
     lambda{Sequel::ConnectionPool.get_pool(mock_db.call{1}, :max_connections=>'-10')}.must_raise(Sequel::Error)
     lambda{Sequel::ConnectionPool.get_pool(mock_db.call{1}, :max_connections=>'0')}.must_raise(Sequel::Error)
   end
+
+  it "should support an optional pool name" do
+    cpool = Sequel::ConnectionPool.get_pool(mock_db.call, {:name => 'testing'})
+    cpool.name.must_equal 'testing'
+  end
 end
 
 describe "A connection pool handling connections" do

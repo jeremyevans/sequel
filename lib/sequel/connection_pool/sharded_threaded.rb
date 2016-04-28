@@ -17,6 +17,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   #                  server is used.
   def initialize(db, opts = OPTS)
     super
+    @name = opts[:name]
     @available_connections = {}
     @connections_to_remove = []
     @servers = opts.fetch(:servers_hash, Hash.new(:default))

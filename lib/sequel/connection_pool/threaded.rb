@@ -33,6 +33,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   #   before raising a PoolTimeoutError (default 5)
   def initialize(db, opts = OPTS)
     super
+    @name = opts[:name]
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
     @mutex = Mutex.new  
