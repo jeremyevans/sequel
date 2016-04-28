@@ -108,6 +108,7 @@ module Sequel
     # :identifier_output_method :: A string method symbol to call on identifiers coming from the database.
     # :logger :: A specific logger to use.
     # :loggers :: An array of loggers to use.
+    # :name :: A name to use for the Database object.
     # :preconnect :: Whether to automatically connect to the maximum number of servers.
     # :quote_identifiers :: Whether to quote identifiers.
     # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol .

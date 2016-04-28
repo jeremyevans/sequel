@@ -33,7 +33,6 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   #   before raising a PoolTimeoutError (default 5)
   def initialize(db, opts = OPTS)
     super
-    @name = opts[:name]
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
     @mutex = Mutex.new  
@@ -161,7 +160,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
         until conn = _acquire(thread)
           deadline ||= time + @timeout
           current_time = Time.now
-          raise(::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{current_time - time}, name: #{name}") if current_time > deadline
+          raise_pool_timeout(current_time - time) if current_time > deadline
           # :nocov:
           # It's difficult to get to this point, it can only happen if there is a race condition
           # where a connection cannot be acquired even after the thread is signalled by the condition
@@ -182,7 +181,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
         sleep_time = @sleep_time
         sleep sleep_time
         until conn = sync{_acquire(thread)}
-          raise(::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{Time.now - time}") if Time.now > timeout
+          raise_pool_timeout(Time.now - time) if Time.now > timeout
           sleep sleep_time
         end
       end
@@ -253,6 +252,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     else
       enum.each(&mk_conn)
     end
+  end
+
+  # Raise a PoolTimeout error showing the current timeout, the elapsed time, and the
+  # database's name (if any).
+  def raise_pool_timeout(elapsed)
+    name = db.opts[:name]
+    raise ::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{elapsed}#{", database name: #{name}" if name}"
   end
   
   # Releases the connection assigned to the supplied thread back to the pool.

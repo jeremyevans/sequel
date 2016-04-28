@@ -15,7 +15,6 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
     super
     @conns = {}
     @servers = opts.fetch(:servers_hash, Hash.new(:default))
-    @name = opts[:name]
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
   end

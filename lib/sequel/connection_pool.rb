@@ -17,7 +17,6 @@
 #         or for the given shard/server if sharding is supported.
 # max_size :: an integer representing the maximum size of the connection pool,
 #             or the maximum size per shard/server if sharding is supported.
-# name :: a string used to identify the pool in PoolTimeout errors.
 #
 # For sharded connection pools, the sharded API adds the following methods:
 #
@@ -69,7 +68,6 @@ class Sequel::ConnectionPool
 
   # The Sequel::Database object tied to this connection pool.
   attr_accessor :db
-  attr_reader   :name
 
   # Instantiates a connection pool with the given options.  The block is called
   # with a single symbol (specifying the server/shard to use) every time a new

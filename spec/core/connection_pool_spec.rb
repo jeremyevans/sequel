@@ -1,5 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 CONNECTION_POOL_DEFAULTS = {:pool_timeout=>5, :pool_sleep_time=>0.001, :max_connections=>4}
+require 'sequel/connection_pool/sharded_threaded'
 
 mock_db = lambda do |*a, &b|
   db = Sequel.mock
@@ -41,11 +42,6 @@ describe "ConnectionPool options" do
     lambda{Sequel::ConnectionPool.get_pool(mock_db.call{1}, :max_connections=>-10)}.must_raise(Sequel::Error)
     lambda{Sequel::ConnectionPool.get_pool(mock_db.call{1}, :max_connections=>'-10')}.must_raise(Sequel::Error)
     lambda{Sequel::ConnectionPool.get_pool(mock_db.call{1}, :max_connections=>'0')}.must_raise(Sequel::Error)
-  end
-
-  it "should support an optional pool name" do
-    cpool = Sequel::ConnectionPool.get_pool(mock_db.call, {:name => 'testing'})
-    cpool.name.must_equal 'testing'
   end
 end
 
@@ -301,10 +297,14 @@ ThreadedConnectionPoolSpecs = shared_description do
 
   it "should raise a PoolTimeout error if a connection couldn't be acquired before timeout" do
     q, q1 = Queue.new, Queue.new
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0, :name => "testing"))
+    db = mock_db.call(&@icpp)
+    db.opts[:name] = 'testing'
+    pool = Sequel::ConnectionPool.get_pool(db, @cp_opts.merge(:max_connections=>1, :pool_timeout=>0))
     t = Thread.new{pool.hold{|c| q1.push nil; q.pop}}
     q1.pop
-    proc{pool.hold{|c|}}.must_raise(Sequel::PoolTimeout).message.must_match "name: testing"
+    e = proc{pool.hold{|c|}}.must_raise(Sequel::PoolTimeout)
+    e.message.must_include "name: testing"
+    e.message.must_include "server: default" if pool.is_a?(Sequel::ShardedThreadedConnectionPool)
     q.push nil
     t.join
   end
