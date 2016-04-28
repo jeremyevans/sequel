@@ -301,10 +301,10 @@ ThreadedConnectionPoolSpecs = shared_description do
 
   it "should raise a PoolTimeout error if a connection couldn't be acquired before timeout" do
     q, q1 = Queue.new, Queue.new
-    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0))
+    pool = Sequel::ConnectionPool.get_pool(mock_db.call(&@icpp), @cp_opts.merge(:max_connections=>1, :pool_timeout=>0, :name => "testing"))
     t = Thread.new{pool.hold{|c| q1.push nil; q.pop}}
     q1.pop
-    proc{pool.hold{|c|}}.must_raise(Sequel::PoolTimeout)
+    proc{pool.hold{|c|}}.must_raise(Sequel::PoolTimeout).message.must_match "name: testing"
     q.push nil
     t.join
   end
