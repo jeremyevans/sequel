@@ -33,6 +33,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   #   before raising a PoolTimeoutError (default 5)
   def initialize(db, opts = OPTS)
     super
+    @name = opts[:name]
     @max_size = Integer(opts[:max_connections] || 4)
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
     @mutex = Mutex.new  
@@ -160,7 +161,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
         until conn = _acquire(thread)
           deadline ||= time + @timeout
           current_time = Time.now
-          raise(::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{current_time - time}") if current_time > deadline
+          raise(::Sequel::PoolTimeout, "timeout: #{@timeout}, elapsed: #{current_time - time}, name: #{name}") if current_time > deadline
           # :nocov:
           # It's difficult to get to this point, it can only happen if there is a race condition
           # where a connection cannot be acquired even after the thread is signalled by the condition
