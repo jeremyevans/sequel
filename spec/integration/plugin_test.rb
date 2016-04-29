@@ -158,15 +158,15 @@ describe "Class Table Inheritance Plugin" do
   end
   
   it "should handle one_to_many relationships" do
-    Executive.first.staff_members.must_equal [Staff[@i2]]
+    Executive.first(:name=>'Ex').staff_members.must_equal [Staff[@i2]]
   end
   
   it "should handle eagerly loading one_to_many relationships" do
-    Executive.limit(1).eager(:staff_members).first.staff_members.must_equal [Staff[@i2]]
+    Executive.where(:name=>'Ex').eager(:staff_members).first.staff_members.must_equal [Staff[@i2]]
   end
   
   it "should handle eagerly graphing one_to_many relationships" do
-    es = Executive.limit(1).eager_graph(:staff_members).all
+    es = Executive.where(:name=>'Ex').eager_graph(:staff_members).all
     es.must_equal [Executive[@i4]]
     es.map{|x| x.staff_members}.must_equal [[Staff[@i2]]]
   end

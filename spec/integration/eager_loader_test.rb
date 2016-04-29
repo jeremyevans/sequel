@@ -511,7 +511,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
 
   it "should load all associated one_to_many objects for a single object" do
     invs = @client1.invoices
-    invs.must_equal [@invoice1, @invoice2]
+    invs.sort_by{|x| x.pk}.must_equal [@invoice1, @invoice2]
     invs[0].client.must_equal @client1
     invs[1].client.must_equal @client1
   end
