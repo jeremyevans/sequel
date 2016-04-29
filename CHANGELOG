@@ -10,7 +10,7 @@
 
 * Support registering per-Database custom range types in the pg_range extension (steveh) (#1174)
 
-* Support :preconnect=>:concurrently Database option for preconnecting in separate threads (kch) (#1172)
+* Support :preconnect=>:concurrently Database option for preconnecting in separate threads (kch, jeremyevans) (#1172)
 
 * Make prepared_statements_safe plugin work correctly with CURRENT_DATE/CURRENT_TIMESTAMP defaults (jeremyevans) (#1168)
 

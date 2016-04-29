@@ -245,12 +245,11 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Create the maximum number of connections immediately.
   def preconnect(concurrent = false)
     enum = (max_size - size).times
-    mk_conn = lambda {|*| checkin_connection(make_new(nil)) }
 
     if concurrent
-      enum.map{ Thread.new(&mk_conn) }.each(&:join)
+      enum.map{Thread.new{make_new(nil)}}.map(&:join).each{|t| checkin_connection(t.value)}
     else
-      enum.each(&mk_conn)
+      enum.each{checkin_connection(make_new(nil))}
     end
   end
 

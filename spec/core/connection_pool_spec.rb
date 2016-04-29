@@ -497,14 +497,14 @@ describe "A connection pool with multiple servers" do
     @pool.send(:preconnect)
     i = 0
     @pool.all_connections{|c1| i+=1}
-    i.must_equal @pool.max_size * 2
+    i.must_equal(@pool.max_size * 2)
   end
 
   it "should support preconnect method that immediately creates the maximum number of connections concurrently" do
     @pool.send(:preconnect, true)
     i = 0
     @pool.all_connections{|c1| i+=1}
-    i.must_equal @pool.max_size * 2
+    i.must_equal(@pool.max_size * 2)
   end
 
   it "#all_connections should return connections for all servers" do
