@@ -2067,6 +2067,20 @@ describe "Sequel::Model Simple Associations" do
     proc{@artist.remove_album(@album.id)}.must_raise(Sequel::Error)
     proc{@artist.remove_album(@album)}.must_raise(Sequel::Error)
   end
+
+  it "should handle dataset associations with :dataset_associations_join options" do
+    Album.many_to_many :tags, :right_key=>:tag_id, :select=>[Sequel.expr(:tags).*, :albums_tags__tag_id___atid], :dataset_associations_join=>true
+    Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel.expr(:tags).*, :albums_tags__tag_id___atid, :albums__artist_id___aid], :dataset_associations_join=>true
+
+    Album.tags.order(:tags__name).first.must_equal nil
+    Artist.tags.order(:tags__name).first.must_equal nil
+
+    @album.add_tag(@tag)
+    @artist.add_album(@album)
+
+    Album.tags.order(:tags__name).first.must_equal Tag.load(:id=>1, :name=>"T", :atid=>1)
+    Artist.tags.order(:tags__name).first.must_equal Tag.load(:id=>1, :name=>"T", :atid=>1, :aid=>1)
+  end
 end
 
 describe "Sequel::Model Composite Key Associations" do

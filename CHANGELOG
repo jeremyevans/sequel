@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for :dataset_associations_join association option to dataset_associations plugin, for making resulting datasets have appropriate joins (jeremyevans)
+
 * Log server connection was attempted to in PoolTimeout exception messages in sharded connection pool (jeremyevans)
 
 * Log Database :name option in PoolTimeout exception messages (bigkevmcd, jeremyevans) (#1176)

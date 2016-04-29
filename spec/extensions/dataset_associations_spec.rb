@@ -90,6 +90,38 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds.sql.must_equal "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
   end
 
+  it "should work for many_to_many associations with :dataset_association_join=>true" do
+    @Album.many_to_many :tags, :clone=>:tags, :dataset_associations_join=>true, :select=>[Sequel.expr(:tags).*, :albums_tags__foo]
+    ds = @Album.tags
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Tag
+    ds.sql.must_equal "SELECT tags.*, albums_tags.foo FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id) IN (SELECT albums.id FROM albums))))"
+  end
+
+  it "should work for one_through_one associations with :dataset_association_join=>true" do
+    @Album.one_through_one :first_tag, :clone=>:first_tag, :dataset_associations_join=>true, :select=>[Sequel.expr(:tags).*, :albums_tags__foo]
+    ds = @Album.first_tags
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Tag
+    ds.sql.must_equal "SELECT tags.*, albums_tags.foo FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE ((albums_tags.album_id) IN (SELECT albums.id FROM albums))))"
+  end
+
+  it "should work for many_through_many associations with :dataset_association_join=>true" do
+    @Artist.many_through_many :tags, :clone=>:tags, :dataset_associations_join=>true, :select=>[Sequel.expr(:tags).*, :albums_tags__foo]
+    ds = @Artist.tags
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Tag
+    ds.sql.must_equal "SELECT tags.*, albums_tags.foo FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
+  end
+
+  it "should work for one_through_many associations with :dataset_association_join=>true" do
+    @Artist.one_through_many :otag, :clone=>:otag, :dataset_associations_join=>true, :select=>[Sequel.expr(:tags).*, :albums_tags__foo]
+    ds = @Artist.otags
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Tag
+    ds.sql.must_equal "SELECT tags.*, albums_tags.foo FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
+  end
+
   it "should work for pg_array_to_many associations" do
     ds = @Artist.artist_tags
     ds.must_be_kind_of(Sequel::Dataset)

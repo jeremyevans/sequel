@@ -39,6 +39,14 @@ module Sequel
     #   #       WHERE ((id >= 1) AND (id <= 100)))
     #   #     AND
     #   #     (name < 'M')))))
+    #
+    # For associations that do JOINs, such as many_to_many, note that the datasets returned
+    # by a dataset association method do not do a JOIN by default (they use a subquery that
+    # JOINs).  This can cause problems when you are doing a select, order, or filter on a
+    # column in the joined table.  In that case, you should use the +:dataset_associations_join+
+    # option in the association, which will make sure the datasets returned by the dataset
+    # association methods also use JOINs, allowing such dataset association methods to work
+    # correctly.
     # 
     # Usage:
     #
@@ -101,7 +109,19 @@ module Sequel
           else
             raise Error, "unrecognized association type for association #{name.inspect}: #{r[:type].inspect}"
           end
-          r.apply_eager_dataset_changes(ds).unlimited
+
+          ds = r.apply_eager_dataset_changes(ds).unlimited
+
+          if r[:dataset_associations_join]
+            case r[:type]
+            when :many_to_many, :one_through_one
+              ds = ds.join(r[:join_table], r[:right_keys].zip(r.right_primary_keys))
+            when :many_through_many, :one_through_many
+              (r.reverse_edges + [r.final_reverse_edge]).each{|e| ds = ds.join(e[:table], e.fetch(:only_conditions, (Array(e[:left]).zip(Array(e[:right])) + Array(e[:conditions]))), :table_alias=>ds.unused_table_alias(e[:table]), :qualify=>:deep, &e[:block])}
+            end
+          end
+
+          ds
         end
       end
     end
