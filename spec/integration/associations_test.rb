@@ -2078,8 +2078,8 @@ describe "Sequel::Model Simple Associations" do
     @album.add_tag(@tag)
     @artist.add_album(@album)
 
-    Album.tags.order(:tags__name).first.must_equal Tag.load(:id=>1, :name=>"T", :atid=>1)
-    Artist.tags.order(:tags__name).first.must_equal Tag.load(:id=>1, :name=>"T", :atid=>1, :aid=>1)
+    Album.tags.order(:tags__name).first.must_equal Tag.load(:id=>@tag.id, :name=>"T", :atid=>@tag.id)
+    Artist.tags.order(:tags__name).first.must_equal Tag.load(:id=>@tag.id, :name=>"T", :atid=>@tag.id, :aid=>@artist.id)
   end
 end
 
