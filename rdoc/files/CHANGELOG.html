@@ -31,12 +31,46 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-04-01 07:24:12 -0700</span>
+          <span class='datetime'>2016-05-01 10:31:41 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.34.0+-282016-05-01-29">4.34.0 (2016-05-01)<span><a href="#label-4.34.0+-282016-05-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Add support for :dataset_associations_join association option to
+            dataset_associations plugin, for making resulting datasets have appropriate
+            joins (jeremyevans)</p>
+            </li><li>
+            <p>Log server connection was attempted to in PoolTimeout exception messages in
+            sharded connection pool (jeremyevans)</p>
+            </li><li>
+            <p>Log Database :name option in PoolTimeout exception messages (bigkevmcd,
+            jeremyevans) (#1176)</p>
+            </li><li>
+            <p>Add duplicate_columns_handler extension, for raising or warning if a
+            dataset returns multiple columns with the same name (TSMMark, jeremyevans)
+            (#1175)</p>
+            </li><li>
+            <p>Support registering per-Database custom range types in the pg_range
+            extension (steveh) (#1174)</p>
+            </li><li>
+            <p>Support :preconnect=&gt;:concurrently Database option for preconnecting in
+            separate threads (kch, jeremyevans) (#1172)</p>
+            </li><li>
+            <p>Make prepared_statements_safe plugin work correctly with
+            CURRENT_DATE/CURRENT_TIMESTAMP defaults (jeremyevans) (#1168)</p>
+            </li><li>
+            <p>Add validates_operator validation helper (petedmarsh) (#1170)</p>
+            </li><li>
+            <p>Recognize additional unique constraint violation on Microsoft SQL Server
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add :hash option to Dataset#(select|to)_hash(_groups)? methods for choosing
+            object to populate (mwpastore) (#1167)</p>
+            </li></ul>
             
             <h3 id="label-4.33.0+-282016-04-01-29">4.33.0 (2016-04-01)<span><a href="#label-4.33.0+-282016-04-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

@@ -61,6 +61,9 @@
             <a target="docwin" href="../files/lib/sequel/extensions/date_arithmetic_rb.html">lib/sequel/extensions/date_arithmetic.rb</a>
           </li>
           <li class='other'>
+            <a target="docwin" href="../files/lib/sequel/extensions/duplicate_columns_handler_rb.html">lib/sequel/extensions/duplicate_columns_handler.rb</a>
+          </li>
+          <li class='other'>
             <a target="docwin" href="../files/lib/sequel/extensions/empty_array_consider_nulls_rb.html">lib/sequel/extensions/empty_array_consider_nulls.rb</a>
           </li>
           <li class='other'>
@@ -449,6 +452,37 @@
             
             <p>frozen-string-literal: true</p>
             
+            <p>The duplicate_columns_handler extension allows you to customize handling of
+            duplicate column names in your queries on a per-database or per-dataset
+            level.</p>
+            
+            <p>For example, you may want to raise an exception if you join 2 tables
+            together which contains a column that will override another columns.</p>
+            
+            <p>To use the extension, you need to load the extension into the database:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">duplicate_columns_handler</span></pre>
+            
+            <p>A database option is introduced: :on_duplicate_columns. It accepts a <a
+            href="Symbol.html">Symbol</a> or any object that responds to :call.</p>
+            
+            <pre>:on_duplicate_columns =&gt; :raise&#x000A;:on_duplicate_columns =&gt; :warn&#x000A;:on_duplicate_columns =&gt; :ignore&#x000A;:on_duplicate_columns =&gt; proc { |columns| arbitrary_condition? ? :raise : :warn }</pre>
+            
+            <p>You may also configure duplicate columns handling for a specific dataset:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">warn</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">raise</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(:<span class="ruby-identifier">ignore</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> :<span class="ruby-identifier">raise</span> <span class="ruby-operator">:</span> :<span class="ruby-identifier">warn</span> }&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">proc</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">columns</span><span class="ruby-operator">|</span> <span class="ruby-identifier">arbitrary_condition?</span> <span class="ruby-operator">?</span> :<span class="ruby-identifier">raise</span> <span class="ruby-operator">:</span> :<span class="ruby-identifier">warn</span> })</pre>
+            
+            <p>If :raise is specified, a <a
+            href="Sequel/DuplicateColumnError.html">Sequel::DuplicateColumnError</a> is
+            raised. If :warn is specified, you will receive a warning via `warn`. If a
+            callable is specified, it will be called. If no on_duplicate_columns is
+            specified, the default is :warn.</p>
+            
+            <p>Related module: <a
+            href="Sequel/DuplicateColumnsHandler.html">Sequel::DuplicateColumnsHandler</a></p>
+            
+            <p>frozen-string-literal: true</p>
+            
             <p>frozen-string-literal: true</p>
             
             <p>frozen-string-literal: true</p>
@@ -615,6 +649,7 @@
               <li><a target="docwin" href="Sequel/DatasetPagination.html">Sequel::DatasetPagination</a></li>
               <li><a target="docwin" href="Sequel/DatasetPrinter.html">Sequel::DatasetPrinter</a></li>
               <li><a target="docwin" href="Sequel/DatasetQuery.html">Sequel::DatasetQuery</a></li>
+              <li><a target="docwin" href="Sequel/DuplicateColumnsHandler.html">Sequel::DuplicateColumnsHandler</a></li>
               <li><a target="docwin" href="Sequel/EmptyArrayConsiderNulls.html">Sequel::EmptyArrayConsiderNulls</a></li>
               <li><a target="docwin" href="Sequel/ErrorSQL.html">Sequel::ErrorSQL</a></li>
               <li><a target="docwin" href="Sequel/EvalInspect.html">Sequel::EvalInspect</a></li>
@@ -642,6 +677,7 @@
               <li><a target="docwin" href="Sequel/UnthreadedServerBlock.html">Sequel::UnthreadedServerBlock</a></li>
               <li><a target="docwin" href="Sequel/DatabaseError.html">Sequel::DatabaseError</a></li>
               <li><a target="docwin" href="Sequel/Dataset.html">Sequel::Dataset</a></li>
+              <li><a target="docwin" href="Sequel/DuplicateColumnError.html">Sequel::DuplicateColumnError</a></li>
               <li><a target="docwin" href="Sequel/IntegerMigrator.html">Sequel::IntegerMigrator</a></li>
               <li><a target="docwin" href="Sequel/LiteralString.html">Sequel::LiteralString</a></li>
               <li><a target="docwin" href="Sequel/Migration.html">Sequel::Migration</a></li>

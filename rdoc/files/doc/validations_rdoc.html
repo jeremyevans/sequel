@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-10-26 07:33:10 -0700</span>
+          <span class='datetime'>2016-04-19 12:52:38 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -224,7 +224,7 @@
             codes, ISBN codes, and the like, are in a specific format.  It can also be
             used to validate that only certain characters are used in the string.</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\A\d\d\d-\d-\d{7}-\d-\d\z/</span>, :<span class="ruby-identifier">isbn</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\a[0-9a-zA-Z:&#39; ]+\z/</span>, :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\A\d\d\d-\d-\d{7}-\d-\d\z/</span>, :<span class="ruby-identifier">isbn</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\A[0-9a-zA-Z:&#39; ]+\z/</span>, :<span class="ruby-identifier">name</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-validates_exact_length-2C+validates_min_length-2C+validates_max_length-2C+validates_length_range"><code>validates_exact_length</code>, <code>validates_min_length</code>, <code>validates_max_length</code>, <code>validates_length_range</code><span><a href="#label-validates_exact_length-2C+validates_min_length-2C+validates_max_length-2C+validates_length_range">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -259,6 +259,16 @@
             but can be any object that responds to <code>include?</code>.</p>
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_includes</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>, <span class="ruby-value">4</span>, <span class="ruby-value">5</span>], :<span class="ruby-identifier">rating</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            
+            <h3 id="label-validates_operator"><code>validates_operator</code><span><a href="#label-validates_operator">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            
+            <p><code>validates_operator</code> checks that a given <code>operator</code>
+            method returns a truthy value when called on attribute with a specified
+            value for comparison.  Generally, this is used for inequality checks (&gt;,
+            &gt;=, etc) but any method that can be called on the attribute that accepts
+            an argument and returns a truthy value may be used.</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_operator</span>(:<span class="ruby-operator">&gt;</span>, <span class="ruby-value">3</span>, :<span class="ruby-identifier">tracks</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-validates_type"><code>validates_type</code><span><a href="#label-validates_type">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

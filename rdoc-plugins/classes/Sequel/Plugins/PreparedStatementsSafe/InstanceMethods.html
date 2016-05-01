@@ -66,7 +66,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-before_create-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-before_create-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_create</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">prepared_statements_column_defaults</span>&#x000A;    <span class="ruby-ivar">@values</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">v</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-before_create-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">before_create</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">prepared_statements_column_defaults</span>&#x000A;    <span class="ruby-ivar">@values</span> = <span class="ruby-constant">Hash</span>[<span class="ruby-identifier">v</span>].<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-save_changes'>
@@ -84,7 +84,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-save_changes-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-save_changes-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">save</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-save_changes-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_safe.rb, line 70</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">save_changes</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">save</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">false</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">modified?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-21 12:32:05 -0800</span>
+          <span class='datetime'>2016-04-25 11:33:14 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -97,6 +97,35 @@
             
             <p>See the schema modification guide for details on using range type columns
             in CREATE/ALTER TABLE statements.</p>
+            
+            <p>This extension makes it easy to add support for other range types.  In
+            general, you just need to make sure that the subtype is handled and has the
+            appropriate converter installed in Sequel::Postgres::PG_TYPES or the
+            Database instance&#39;s conversion_procs usingthe appropriate type OID. 
+            For user defined types, you can do this via:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">conversion_procs</span>[<span class="ruby-identifier">subtype_oid</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }</pre>
+            
+            <p>Then you can call <a
+            href="../../../../classes/Sequel/Postgres/PGRange/DatabaseMethods.html#method-i-register_range_type">Sequel::Postgres::PGRange::DatabaseMethods#register_range_type</a>
+            to automatically set up a handler for the range type.  So if you want to
+            support the timerange type (assuming the time type is already supported):</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">register_range_type</span>(<span class="ruby-string">&#39;timerange&#39;</span>)</pre>
+            
+            <p>You can also register range types on a global basis using <a
+            href="../../../../classes/Sequel/Postgres/PGRange.html#method-c-register">Sequel::Postgres::PGRange.register</a>.
+            In this case, you&#39;ll have to specify the type oids:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PG_TYPES</span>[<span class="ruby-value">1234</span>] = <span class="ruby-identifier">lambda</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">string</span><span class="ruby-operator">|</span> }&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">register</span>(<span class="ruby-string">&#39;foo&#39;</span>, :<span class="ruby-identifier">oid=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">4321</span>, :<span class="ruby-identifier">subtype_oid=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1234</span>)</pre>
+            
+            <p>Both <a
+            href="../../../../classes/Sequel/Postgres/PGRange/DatabaseMethods.html#method-i-register_range_type">Sequel::Postgres::PGRange::DatabaseMethods#register_range_type</a>
+            and <a
+            href="../../../../classes/Sequel/Postgres/PGRange.html#method-c-register">Sequel::Postgres::PGRange.register</a>
+            support many options to customize the range type handling.  See the <a
+            href="../../../../classes/Sequel/Postgres/PGRange.html#method-c-register">Sequel::Postgres::PGRange.register</a>
+            method documentation.</p>
             
             <p>This extension integrates with the pg_array extension.  If you plan to use
             arrays of range types, load the pg_array extension before the pg_range

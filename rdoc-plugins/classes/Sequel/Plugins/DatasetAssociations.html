@@ -59,6 +59,15 @@
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-identifier">id</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">100</span>).<span class="ruby-identifier">albums</span>.<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">name</span> <span class="ruby-operator">&lt;</span> <span class="ruby-string">&#39;M&#39;</span>}.<span class="ruby-identifier">tags</span>&#x000A;<span class="ruby-comment"># SELECT tags.* FROM tags</span>&#x000A;<span class="ruby-comment"># WHERE (tags.id IN (</span>&#x000A;<span class="ruby-comment">#   SELECT albums_tags.tag_id FROM albums</span>&#x000A;<span class="ruby-comment">#   INNER JOIN albums_tags</span>&#x000A;<span class="ruby-comment">#     ON (albums_tags.album_id = albums.id)</span>&#x000A;<span class="ruby-comment">#   WHERE</span>&#x000A;<span class="ruby-comment">#     ((albums.artist_id IN (</span>&#x000A;<span class="ruby-comment">#       SELECT id FROM artists</span>&#x000A;<span class="ruby-comment">#       WHERE ((id &gt;= 1) AND (id &lt;= 100)))</span>&#x000A;<span class="ruby-comment">#     AND</span>&#x000A;<span class="ruby-comment">#     (name &lt; &#39;M&#39;)))))</span></pre>
             
+            <p>For associations that do JOINs, such as many_to_many, note that the
+            datasets returned by a dataset association method do not do a JOIN by
+            default (they use a subquery that JOINs).  This can cause problems when you
+            are doing a select, order, or filter on a column in the joined table.  In
+            that case, you should use the <code>:dataset_associations_join</code>
+            option in the association, which will make sure the datasets returned by
+            the dataset association methods also use JOINs, allowing such dataset
+            association methods to work correctly.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclasses create association methods for datasets</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">dataset_associations</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class create association methods for datasets</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">dataset_associations</span></pre>

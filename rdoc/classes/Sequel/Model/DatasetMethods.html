@@ -231,7 +231,7 @@
                 <a name='method-i-to_hash'></a>
                 <div class='synopsis'>
                   <span class='name'>to_hash</span>
-                  <span class='arguments'>(key_column=nil, value_column=nil)</span>
+                  <span class='arguments'>(key_column=nil, value_column=nil, opts=OPTS)</span>
                 </div>
                 <div class='description'>
                   
@@ -245,7 +245,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_hash-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_hash-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2370</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_hash</span>(<span class="ruby-identifier">key_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key for model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">pk</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>)&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">value_column</span>) &#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_hash-source'><span class="ruby-comment"># File lib/sequel/model/base.rb, line 2370</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_hash</span>(<span class="ruby-identifier">key_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">value_column</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">key_column</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;No primary key for model&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">model</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">pk</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">primary_key</span>)&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">pk</span>, <span class="ruby-identifier">value_column</span>, <span class="ruby-identifier">opts</span>) &#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_pk'>
