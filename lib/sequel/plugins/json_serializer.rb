@@ -300,8 +300,16 @@ module Sequel
             if inc.is_a?(Hash)
               inc.each do |k, v|
                 v = v.empty? ? [] : [v]
-                h[k.to_s] = case objs = send(k)
-                when Array
+
+                objs = send(k)
+
+                is_array = if r = model.association_reflection(k)
+                  r.returns_array?
+                else
+                  objs.is_a?(Array)
+                end
+                
+                h[k.to_s] = if is_array
                   objs.map{|obj| Literal.new(Sequel.object_to_json(obj, *v))}
                 else
                   Literal.new(Sequel.object_to_json(objs, *v))

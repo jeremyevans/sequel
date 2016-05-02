@@ -127,6 +127,12 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.from_json(@album.to_json(:include=>{:artist=>{:include=>{:albums=>{:only=>:name}}}}), :associations=>{:artist=>{:associations=>:albums}}).artist.albums.must_equal [Album.load(:name=>@album.name)]
   end
 
+  it "should handle usage of association_proxies when cascading using the :include option" do
+    Artist.plugin :association_proxies
+    Artist.one_to_many :albums, :clone=>:albums
+    Artist.from_json(@artist.to_json(:include=>{:albums=>{:include=>:artist}}), :associations=>{:albums=>{:associations=>:artist}}).albums.map{|a| a.artist}.must_equal [@artist]
+  end
+
   it "should handle the :include option cascading with an empty hash" do
     Album.from_json(@album.to_json(:include=>{:artist=>{}}), :associations=>:artist).artist.must_equal @artist
     Album.from_json(@album.to_json(:include=>{:blah=>{}})).blah.must_equal @album.blah
