@@ -135,6 +135,11 @@ Other options not mentioned above are explained briefly here.
 
 -t tells bin/sequel to output full backtraces in the case of an error, which can aid in debugging.
 
+=== -T
+
+-T is used along with -C option, allowing to copy only the selected tables to the new database (all tables are separated with a comma, if you need to specify any WHERE clause you can put a pipe '|' with following a condition ). Example:
+       ./sequel/bin/sequel -C -T "table1,store|storeid='123'" postgres://postgres:postgres@localhost/exampledb sqlite://./example-output.db
+
 === -h
 
 -h prints the usage information for bin/sequel.
