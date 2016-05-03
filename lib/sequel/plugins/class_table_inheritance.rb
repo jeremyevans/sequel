@@ -84,6 +84,18 @@ module Sequel
     #   a.values # {:id=>1, name=>'S', :kind=>'CEO'}
     #   a.refresh.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
     #
+    # You can also load directly from a subclass:
+    #
+    #   a = Executive.first
+    #   a.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
+    #   
+    # Note that when loading from a subclass, because the subclass dataset uses a JOIN,
+    # if you are referencing the primary key column, you need to disambiguate the reference
+    # by explicitly qualifying it:
+    #
+    #   a = Executive.where(:id=>1).first # database error
+    #   a = Executive.where(:executives__id=>1).first # no error
+    #
     # = Usage
     #
     #   # Use the default of storing the class name in the sti_key
