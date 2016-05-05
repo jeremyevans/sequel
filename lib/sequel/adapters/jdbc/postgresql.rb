@@ -100,7 +100,7 @@ module Sequel
                 end
                 nil
               else
-                b = ''
+                b = String.new
                 while buf = copier.readFromCopy
                   b << String.from_java_bytes(buf)
                 end
