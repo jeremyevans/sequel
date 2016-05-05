@@ -95,7 +95,7 @@ module Sequel
                 op = cs.merge!(op)
               end
             end
-            sql = "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
+            sql = "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}".dup
             column_definition_order.each{|m| send(:"column_definition_#{m}_sql", sql, op)}
             sql
           when :drop_constraint

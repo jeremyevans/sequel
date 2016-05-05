@@ -1,8 +1,6 @@
 === HEAD
 
-* Fix Database#copy_table on jdbc/postgresql on JRuby 9.1.0.0 due to frozen string literal issues (jeremyevans)
-
-* Fix usage of prepared statements in the jdbc adapter on JRuby 9.1.0.0 due to frozen string literal issues (jeremyevans)
+* Fix frozen string literal issues on JRuby 9.1.0.0 (jeremyevans)
 
 * Allow json_serializer :include option with cascaded values to work correctly when used with association_proxies (jeremyevans)
 
