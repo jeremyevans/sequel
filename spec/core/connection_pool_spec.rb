@@ -8,6 +8,8 @@ mock_db = lambda do |*a, &b|
   if b2 = a.shift
     (class << db; self end).send(:define_method, :disconnect_connection){|c| b2.arity == 1 ? b2.call(c) : b2.call}
   end
+  # Work around JRuby Issue #3854
+  (class << db; self end).send(:public, :connect, :disconnect_connection)
   db
 end
 
