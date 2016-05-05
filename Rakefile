@@ -86,7 +86,7 @@ run_spec = proc do |patterns|
   lib_dir = File.join(File.dirname(File.expand_path(__FILE__)), 'lib')
   rubylib = ENV['RUBYLIB']
   ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
-  if RUBY_PLATFORM =~ /mingw32/ || RUBY_DESCRIPTION =~ /windows/i
+  if RUBY_PLATFORM =~ /mingw32/ || RUBY_DESCRIPTION =~ /windows|mswin32/i
     patterns = patterns.split.map{|pat| Dir[pat].to_a}.flatten.join(' ')
   end
   sh "#{FileUtils::RUBY} -e \"ARGV.each{|f| require f}\" #{patterns}"
