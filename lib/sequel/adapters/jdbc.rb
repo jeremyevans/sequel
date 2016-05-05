@@ -429,7 +429,7 @@ module Sequel
           args.each{|arg| set_ps_arg(cps, arg, i+=1)}
           msg = "EXECUTE#{" #{name}" if name}"
           if ps.log_sql
-            msg << " ("
+            msg += " ("
             msg << sql
             msg << ")"
           end
