@@ -405,9 +405,18 @@ module Sequel
 
       # Delegate to the ruby range object so that the object mostly acts like a range.
       range_methods = %w'each last first step'
-      range_methods << 'cover?' if RUBY_VERSION >= '1.9'
       range_methods.each do |m|
         class_eval("def #{m}(*a, &block) to_range.#{m}(*a, &block) end", __FILE__, __LINE__)
+      end
+
+      # Return whether the value is inside the range.
+      def cover?(value)
+        return false if empty?
+        b = self.begin
+        return false if b && b.send(exclude_begin? ? :>= : :>, value)
+        e = self.end
+        return false if e && e.send(exclude_end? ? :<= : :<, value)
+        true
       end
 
       # Consider the receiver equal to other PGRange instances with the

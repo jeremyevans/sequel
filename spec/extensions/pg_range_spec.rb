@@ -325,9 +325,9 @@ describe "pg_range extension" do
     end
 
     it "should quack like a range" do
+      @r1.cover?(1.5).must_equal true
+      @r1.cover?(2.5).must_equal false
       if RUBY_VERSION >= '1.9'
-        @r1.cover?(1.5).must_equal true
-        @r1.cover?(2.5).must_equal false
         @r1.first(1).must_equal [1]
         @r1.last(1).must_equal [2]
       end
@@ -337,6 +337,34 @@ describe "pg_range extension" do
       a = []
       @r1.step{|x| a << x}
       a.must_equal [1, 2]
+    end
+
+    it "should have cover? handle empty, unbounded, and exclusive beginning ranges" do
+      @R.empty.cover?(1).must_equal false
+
+      r = @R.new(1, nil)
+      r.cover?(0).must_equal false
+      r.cover?(1).must_equal true
+      r.cover?(2).must_equal true
+      r.cover?(3).must_equal true
+
+      r = @R.new(nil, 2)
+      r.cover?(0).must_equal true
+      r.cover?(1).must_equal true
+      r.cover?(2).must_equal true
+      r.cover?(3).must_equal false
+
+      r = @R.new(1, 2, :exclude_begin=>true)
+      r.cover?(0).must_equal false
+      r.cover?(1).must_equal false
+      r.cover?(2).must_equal true
+      r.cover?(3).must_equal false
+
+      r = @R.new(1, 2, :exclude_end=>true)
+      r.cover?(0).must_equal false
+      r.cover?(1).must_equal true
+      r.cover?(2).must_equal false
+      r.cover?(3).must_equal false
     end
 
     it "should only consider PGRanges equal if they have the same db_type" do

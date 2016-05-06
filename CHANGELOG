@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Postgres::PGRange#cover? handle empty, unbounded, and exclusive beginning ranges (jeremyevans)
+
 * Fix frozen string literal issues on JRuby 9.1.0.0 (jeremyevans)
 
 * Allow json_serializer :include option with cascaded values to work correctly when used with association_proxies (jeremyevans)
