@@ -325,6 +325,14 @@ describe "Simple Dataset operations" do
     @ds.filter(true).select_map(:number).must_equal [10]
     @ds.filter(false).select_map(:number).must_equal []
   end
+
+  it "should support the sql_comments extension" do
+    ds = @ds.extension(:sql_comments).comment("Some\rComment\r\nHere")
+    ds.all.must_equal [{:id=>1, :number=>10}]
+    ds.insert(:number=>20).must_equal 2
+    ds.update(:number=>30).must_equal 2
+    ds.delete.must_equal 2
+  end
 end
 
 describe "Simple dataset operations with nasty table names" do

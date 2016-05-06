@@ -1,5 +1,7 @@
 === HEAD
 
+* Add sql_comments extension for setting SQL comments on queries (jeremyevans)
+
 * Make Postgres::PGRange#cover? handle empty, unbounded, and exclusive beginning ranges (jeremyevans)
 
 * Fix frozen string literal issues on JRuby 9.1.0.0 (jeremyevans)
