@@ -2142,6 +2142,15 @@ describe "Model#lock!" do
     o.instance_variable_get(:@a).must_equal 1
     DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1 FOR UPDATE"]
   end
+
+  it "should refresh the record using the specified lock when it is not a new record and a style is given" do
+    o = @c.load(:id => 1)
+    def o._refresh(x) instance_variable_set(:@a, 1); super(x) end
+    x = o.lock!('FOR NO KEY UPDATE')
+    x.must_equal o
+    o.instance_variable_get(:@a).must_equal 1
+    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 1) LIMIT 1 FOR NO KEY UPDATE"]
+  end
 end
 
 describe "Model#schema_type_class" do

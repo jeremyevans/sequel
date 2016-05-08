@@ -1402,17 +1402,31 @@ module Sequel
         @values.keys
       end
       
-      # Refresh this record using +for_update+ unless this is a new record.  Returns self.
-      # This can be used to make sure no other process is updating the record at the
-      # same time.
+      # Refresh this record using +for_update+ (by default, or the specified style when given)
+      # unless this is a new record.  Returns self. This can be used to make sure no other
+      # process is updating the record at the same time.
+      #
+      # If style is a string, it will be used directly. You should never pass a string
+      # to this method that is derived from user input, as that can lead to
+      # SQL injection.
+      #
+      # A symbol may be used for database independent locking behavior, but
+      # all supported symbols have separate methods (e.g. for_update).
+      #
       #
       #   a = Artist[1]
       #   Artist.db.transaction do
       #     a.lock!
       #     a.update(:name=>'A')
       #   end
-      def lock!
-        _refresh(this.for_update) unless new?
+      #
+      #  a = Artist[2]
+      #  Artist.db.transaction do
+      #    a.lock!('FOR NO KEY UPDATE')
+      #    a.update(:name=>'B')
+      #  end
+      def lock!(style=:update)
+        _refresh(this.lock_style(style)) unless new?
         self
       end
       

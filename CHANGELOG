@@ -8,6 +8,8 @@
 
 * Allow json_serializer :include option with cascaded values to work correctly when used with association_proxies (jeremyevans)
 
+* Allow Sequel::Model#lock! to accept an (optional) lock style (similarly to Dataset#lock_style) (petedmarsh)
+
 === 4.34.0 (2016-05-01)
 
 * Add support for :dataset_associations_join association option to dataset_associations plugin, for making resulting datasets have appropriate joins (jeremyevans)
