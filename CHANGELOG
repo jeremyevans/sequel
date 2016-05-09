@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Sequel::Model#lock! to accept an optional lock style (petedmarsh) (#1183)
+
 * Add sql_comments extension for setting SQL comments on queries (jeremyevans)
 
 * Make Postgres::PGRange#cover? handle empty, unbounded, and exclusive beginning ranges (jeremyevans)
@@ -7,8 +9,6 @@
 * Fix frozen string literal issues on JRuby 9.1.0.0 (jeremyevans)
 
 * Allow json_serializer :include option with cascaded values to work correctly when used with association_proxies (jeremyevans)
-
-* Allow Sequel::Model#lock! to accept an (optional) lock style (similarly to Dataset#lock_style) (petedmarsh)
 
 === 4.34.0 (2016-05-01)
 
