@@ -116,31 +116,34 @@ module Sequel
     # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
     # All options given are also passed to the connection pool.
-    def initialize(opts = OPTS, &block)
+    def initialize(opts = OPTS)
       @opts ||= opts
       @opts = connection_pool_default_options.merge(@opts)
       @loggers = Array(@opts[:logger]) + Array(@opts[:loggers])
-      self.log_warn_duration = @opts[:log_warn_duration]
-      block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
       @sharded = !!@opts[:servers]
       @opts[:adapter_class] = self.class
-      
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, Database.single_threaded))
-      @schemas = {}
       @default_string_column_size = @opts[:default_string_column_size] || DEFAULT_STRING_COLUMN_SIZE
+
+      @schemas = {}
       @prepared_statements = {}
       @transactions = {}
+      @symbol_literal_cache = {}
+
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil
       @timezone = nil
+
       @dataset_class = dataset_class_default
       @cache_schema = typecast_value_boolean(@opts.fetch(:cache_schema, true))
       @dataset_modules = []
-      @symbol_literal_cache = {}
       @schema_type_classes = SCHEMA_TYPE_CLASSES.dup
+
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
+      self.log_warn_duration = @opts[:log_warn_duration]
+
       @pool = ConnectionPool.get_pool(self, @opts)
 
       reset_identifier_mangling
