@@ -171,19 +171,21 @@ describe "Simple Dataset operations" do
     @ds.all.must_equal [{:id=>1, :number=>10}]
   end
 
-  it "should skip locked rows correctly" do
+  cspecify "should skip locked rows correctly", [:do] do
     @ds.insert(:number=>10)
     q1 = Queue.new
     q2 = Queue.new
     ds = @ds.order(:id).for_update.skip_locked
     begin
-      t = Thread.new{@db.transaction{q2.push(ds.get(:id)); q1.pop}}
+      t = Thread.new{@db.transaction(:isolation=>:committed){q2.push(ds.get(:id)); q1.pop}}
       q2.pop.must_equal 1
       # Some databases do row level locking, others do page level locking
-      [2, nil].must_include ds.get(:id)
+      [2, nil].must_include @db.transaction(:isolation=>:committed){ds.get(:id)}
     ensure
       q1.push(nil)
       t.join
+      # Keep only one active connection, as some other specs expect that
+      @db.disconnect
     end
   end if DB.dataset.supports_skip_locked?
   
