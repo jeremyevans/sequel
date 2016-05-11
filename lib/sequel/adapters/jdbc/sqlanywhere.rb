@@ -51,7 +51,7 @@ module Sequel
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = LAST_INSERT_ID
-            rs = log_yield(sql){stmt.executeQuery(sql)}
+            rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
             rs.next
             rs.getLong(1)
           end

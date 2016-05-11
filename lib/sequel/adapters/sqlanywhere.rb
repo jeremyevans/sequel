@@ -102,7 +102,7 @@ module Sequel
 
       LAST_INSERT_ID = 'SELECT @@IDENTITY'.freeze
       def _execute(conn, type, sql, opts)
-        unless rs = log_yield(sql){@api.sqlany_execute_direct(conn, sql)}
+        unless rs = log_connection_yield(sql, conn){@api.sqlany_execute_direct(conn, sql)}
           result, errstr = @api.sqlany_error(conn)
           raise_error(SQLAnywhereException.new(errstr, result, sql))
         end

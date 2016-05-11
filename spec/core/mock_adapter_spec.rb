@@ -338,7 +338,9 @@ describe "Sequel Mock Adapter" do
     db[:b].delete
     db[:c].insert(:a=>1)
     db[:d].update(:a=>1)
-    a.must_equal ['SELECT * FROM t', 'DELETE FROM b', 'INSERT INTO c (a) VALUES (1)', 'UPDATE d SET a = 1']
+    a.zip(['SELECT * FROM t', 'DELETE FROM b', 'INSERT INTO c (a) VALUES (1)', 'UPDATE d SET a = 1']).each do |is, should|
+      is.must_match should
+    end
   end
 
   it "should correctly handle transactions" do

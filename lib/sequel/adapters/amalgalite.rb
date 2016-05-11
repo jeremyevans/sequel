@@ -81,7 +81,7 @@ module Sequel
         db = ::Amalgalite::Database.new(opts[:database])
         db.busy_handler(::Amalgalite::BusyTimeout.new(opts.fetch(:timeout, 5000)/50, 50))
         db.type_map = SequelTypeMap.new(self)
-        connection_pragmas.each{|s| log_yield(s){db.execute_batch(s)}}
+        connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
         db
       end
       
@@ -92,25 +92,25 @@ module Sequel
 
       # Run the given SQL with the given arguments. Returns nil.
       def execute_ddl(sql, opts=OPTS)
-        _execute(sql, opts){|conn| log_yield(sql){conn.execute_batch(sql)}}
+        _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.execute_batch(sql)}}
         nil
       end
       
       # Run the given SQL with the given arguments and return the number of changed rows.
       def execute_dui(sql, opts=OPTS)
-        _execute(sql, opts){|conn| log_yield(sql){conn.execute_batch(sql)}; conn.row_changes}
+        _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.execute_batch(sql)}; conn.row_changes}
       end
       
       # Run the given SQL with the given arguments and return the last inserted row id.
       def execute_insert(sql, opts=OPTS)
-        _execute(sql, opts){|conn| log_yield(sql){conn.execute_batch(sql)}; conn.last_insert_rowid}
+        _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.execute_batch(sql)}; conn.last_insert_rowid}
       end
       
       # Run the given SQL with the given arguments and yield each row.
       def execute(sql, opts=OPTS)
         _execute(sql, opts) do |conn|
           begin
-            yield(stmt = log_yield(sql){conn.prepare(sql)})
+            yield(stmt = log_connection_yield(sql, conn){conn.prepare(sql)})
           ensure
             stmt.close if stmt
           end
@@ -119,7 +119,7 @@ module Sequel
       
       # Run the given SQL with the given arguments and return the first value of the first row.
       def single_value(sql, opts=OPTS)
-        _execute(sql, opts){|conn| log_yield(sql){conn.first_value_from(sql)}}
+        _execute(sql, opts){|conn| log_connection_yield(sql, conn){conn.first_value_from(sql)}}
       end
       
       private

@@ -14,6 +14,9 @@ module Sequel
     # Array of SQL loggers to use for this database.
     attr_accessor :loggers
     
+    # Whether to include information about the connection in use when logging queries.
+    attr_accessor :log_connection_info
+    
     # Log level at which to log SQL queries.  This is actually the method
     # sent to the logger, so it should be the method name symbol. The default
     # is :info, it can be set to :debug to log at DEBUG level.
@@ -31,9 +34,15 @@ module Sequel
 
     # Yield to the block, logging any errors at error level to all loggers,
     # and all other queries with the duration at warn or info level.
-    def log_yield(sql, args=nil)
+    def log_yield(sql, args=nil, &block)
+      log_connection_yield(sql, nil, args, &block)
+    end
+
+    # Yield to the block, logging any errors at error level to all loggers,
+    # and all other queries with the duration at warn or info level.
+    def log_connection_yield(sql, conn, args=nil)
       return yield if @loggers.empty?
-      sql = "#{sql}; #{args.inspect}" if args
+      sql = "#{connection_info(conn) if conn && log_connection_info}#{sql}#{"; #{args.inspect}" if args}"
       start = Time.now
       begin
         yield
@@ -53,11 +62,17 @@ module Sequel
     end
 
     private
+
+    # String including information about the connection, for use when logging
+    # connection info.
+    def connection_info(conn)
+      "(conn: #{conn.__id__}) "
+    end
     
     # Log the given SQL and then execute it on the connection, used by
     # the transaction code.
     def log_connection_execute(conn, sql)
-      log_yield(sql){conn.send(connection_execute_method, sql)}
+      log_connection_yield(sql, conn){conn.send(connection_execute_method, sql)}
     end
 
     # Log message with message prefixed by duration at info level, or

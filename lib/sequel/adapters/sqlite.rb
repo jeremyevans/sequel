@@ -109,7 +109,7 @@ module Sequel
         db = ::SQLite3::Database.new(opts[:database].to_s, sqlite3_opts)
         db.busy_timeout(opts.fetch(:timeout, 5000))
         
-        connection_pragmas.each{|s| log_yield(s){db.execute_batch(s)}}
+        connection_pragmas.each{|s| log_connection_yield(s, db){db.execute_batch(s)}}
         
         class << db
           attr_reader :prepared_statements
@@ -184,12 +184,12 @@ module Sequel
             opts.fetch(:arguments, {}).each{|k, v| args[k] = prepared_statement_argument(v)}
             case type
             when :select
-              log_yield(sql, log_args){conn.query(sql, args, &block)}
+              log_connection_yield(sql, conn, log_args){conn.query(sql, args, &block)}
             when :insert
-              log_yield(sql, log_args){conn.execute(sql, args)}
+              log_connection_yield(sql, conn, log_args){conn.execute(sql, args)}
               conn.last_insert_row_id
             when :update
-              log_yield(sql, log_args){conn.execute_batch(sql, args)}
+              log_connection_yield(sql, conn, log_args){conn.execute_batch(sql, args)}
               conn.changes
             end
           end
@@ -241,7 +241,7 @@ module Sequel
           end
         end
         unless cps
-          cps = log_yield("PREPARE #{name}: #{sql}"){conn.prepare(sql)}
+          cps = log_connection_yield("PREPARE #{name}: #{sql}", conn){conn.prepare(sql)}
           conn.prepared_statements[name] = [cps, sql]
         end
         log_sql = String.new
@@ -252,9 +252,9 @@ module Sequel
           log_sql << ")"
         end
         if block
-          log_yield(log_sql, args){cps.execute(ps_args, &block)}
+          log_connection_yield(log_sql, conn, args){cps.execute(ps_args, &block)}
         else
-          log_yield(log_sql, args){cps.execute!(ps_args){|r|}}
+          log_connection_yield(log_sql, conn, args){cps.execute!(ps_args){|r|}}
           case type
           when :insert
             conn.last_insert_row_id

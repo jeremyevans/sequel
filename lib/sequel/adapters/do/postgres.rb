@@ -35,7 +35,7 @@ module Sequel
         # Extend the adapter with the DataObjects PostgreSQL AdapterMethods
         def setup_connection(conn)
           conn = super(conn)
-          connection_configuration_sqls.each{|sql| log_yield(sql){conn.create_command(sql).execute_non_query}}
+          connection_configuration_sqls.each{|sql| log_connection_yield(sql, conn){conn.create_command(sql).execute_non_query}}
           conn
         end
       end

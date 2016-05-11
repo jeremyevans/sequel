@@ -24,9 +24,9 @@ module Sequel
         def execute_insert(sql, opts=OPTS)
           synchronize(opts[:server]) do |conn|
             begin
-              log_yield(sql){conn.do(sql)}
+              log_connection_yield(sql, conn){conn.do(sql)}
               begin
-                s = log_yield(LAST_INSERT_ID_SQL){conn.run(LAST_INSERT_ID_SQL)}
+                s = log_connection_yield(LAST_INSERT_ID_SQL, conn){conn.run(LAST_INSERT_ID_SQL)}
                 if (rows = s.fetch_all) and (row = rows.first) and (v = row.first)
                   Integer(v)
                 end

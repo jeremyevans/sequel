@@ -38,7 +38,7 @@ module Sequel
       
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
-          r = log_yield(sql) do
+          r = log_connection_yield(sql, conn) do
             begin
               conn.query(sql)
             rescue => e
@@ -92,11 +92,11 @@ module Sequel
       private
 
       def begin_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_BEGIN){conn.auto_commit = false}
+        log_connection_yield(TRANSACTION_BEGIN, conn){conn.auto_commit = false}
       end
       
       def commit_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_COMMIT){conn.commit}
+        log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
       end
 
       def database_error_classes
@@ -112,7 +112,7 @@ module Sequel
       # This doesn't actually work, as the cubrid ruby driver
       # does not implement transactions correctly.
       def rollback_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+        log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
       end
     end
     

@@ -52,7 +52,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             command = conn.create_command(sql)
-            res = log_yield(sql){block_given? ? command.execute_reader : command.execute_non_query}
+            res = log_connection_yield(sql, conn){block_given? ? command.execute_reader : command.execute_non_query}
           rescue ::DataObjects::Error => e
             raise_error(e)
           end
@@ -126,7 +126,7 @@ module Sequel
       
       # Execute SQL on the connection by creating a command first
       def log_connection_execute(conn, sql)
-        log_yield(sql){conn.create_command(sql).execute_non_query}
+        log_connection_yield(sql, conn){conn.create_command(sql).execute_non_query}
       end
       
       # Allow extending the given connection when it is first created.

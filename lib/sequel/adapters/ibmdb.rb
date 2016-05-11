@@ -242,7 +242,7 @@ module Sequel
         sql = ps.prepared_sql
         synchronize(opts[:server]) do |conn|
           unless conn.prepared_statements.fetch(ps_name, []).first == sql
-            log_yield("PREPARE #{ps_name}: #{sql}"){conn.prepare(sql, ps_name)}
+            log_connection_yield("PREPARE #{ps_name}: #{sql}", conn){conn.prepare(sql, ps_name)}
           end
           args = args.map{|v| v.nil? ? nil : prepared_statement_arg(v)}
           log_sql = "EXECUTE #{ps_name}"
@@ -252,7 +252,7 @@ module Sequel
             log_sql << ")"
           end
           begin
-            stmt = log_yield(log_sql, args){conn.execute_prepared(ps_name, *args)}
+            stmt = log_connection_yield(log_sql, conn, args){conn.execute_prepared(ps_name, *args)}
             if block_given?
               yield(stmt)
             else  
@@ -268,7 +268,7 @@ module Sequel
 
       # Execute the given SQL on the database.
       def _execute(conn, sql, opts)
-        stmt = log_yield(sql){conn.execute(sql)}
+        stmt = log_connection_yield(sql, conn){conn.execute(sql)}
         if block_given?
           yield(stmt)
         else  
@@ -286,14 +286,14 @@ module Sequel
       # IBM_DB uses an autocommit setting instead of sending SQL queries.
       # So starting a transaction just turns autocommit off.
       def begin_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
+        log_connection_yield(TRANSACTION_BEGIN, conn){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
 
       # This commits transaction in progress on the
       # connection and sets autocommit back on.
       def commit_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_COMMIT){conn.commit}
+        log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
       end
     
       def database_error_classes
@@ -337,7 +337,7 @@ module Sequel
       # This rolls back the transaction in progress on the
       # connection and sets autocommit back on.
       def rollback_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+        log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
       end
 
       # Convert smallint type to boolean if convert_smallint_to_bool is true

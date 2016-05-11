@@ -18,7 +18,7 @@ module Sequel
 
         if (ts = opts[:textsize])
           sql = "SET TEXTSIZE #{typecast_value_integer(ts)}"
-          log_yield(sql){c.execute(sql)}
+          log_connection_yield(sql, c){c.execute(sql)}
         end
       
         c
@@ -52,12 +52,12 @@ module Sequel
                 single_value = true
               end
               sql = "EXEC sp_executesql N'#{c.escape(sql)}', N'#{c.escape(types.join(', '))}', #{values.join(', ')}"
-              log_yield(sql) do
+              log_connection_yield(sql, c) do
                 r = c.execute(sql)
                 r.each{|row| return row.values.first} if single_value
               end
             else
-              log_yield(sql) do
+              log_connection_yield(sql, c) do
                 r = c.execute(sql)
                 return r.send(m) if m
               end
@@ -139,7 +139,7 @@ module Sequel
 
       # Dispose of any possible results of execution.
       def log_connection_execute(conn, sql)
-        log_yield(sql){conn.execute(sql).each}
+        log_connection_yield(sql, conn){conn.execute(sql).each}
       end
 
       # Return a 2 element array with the literal value and type to use

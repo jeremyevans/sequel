@@ -118,7 +118,7 @@ module Sequel
         # that feature.
         sqls.unshift("SET NAMES #{literal(encoding.to_s)}") if encoding
 
-        sqls.each{|sql| log_yield(sql){conn.query(sql)}}
+        sqls.each{|sql| log_connection_yield(sql, conn){conn.query(sql)}}
 
         add_prepared_statements_cache(conn)
         conn
@@ -174,7 +174,7 @@ module Sequel
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
         begin
-          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql)}
+          r = log_connection_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql, conn){conn.query(sql)}
           if opts[:type] == :select
             yield r if r
           elsif block_given?

@@ -36,7 +36,7 @@ module Sequel
         if (jdbc_level = JDBC_TRANSACTION_ISOLATION_LEVELS[level]) &&
             conn.getMetaData.supportsTransactionIsolationLevel(jdbc_level)
           _trans(conn)[:original_jdbc_isolation_level] = conn.getTransactionIsolation
-          log_yield("Transaction.isolation_level = #{level}"){conn.setTransactionIsolation(jdbc_level)}
+          log_connection_yield("Transaction.isolation_level = #{level}", conn){conn.setTransactionIsolation(jdbc_level)}
         end
       end
 
@@ -50,14 +50,14 @@ module Sequel
         if supports_savepoints?
           th = _trans(conn)
           if sps = th[:savepoint_objs]
-            sps << log_yield(TRANSACTION_SAVEPOINT){conn.set_savepoint}
+            sps << log_connection_yield(TRANSACTION_SAVEPOINT, conn){conn.set_savepoint}
           else
-            log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
+            log_connection_yield(TRANSACTION_BEGIN, conn){conn.setAutoCommit(false)}
             th[:savepoint_objs] = []
             set_transaction_isolation(conn, opts)
           end
         else
-          log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
+          log_connection_yield(TRANSACTION_BEGIN, conn){conn.setAutoCommit(false)}
           set_transaction_isolation(conn, opts)
         end
       end
@@ -67,12 +67,12 @@ module Sequel
         if supports_savepoints?
           sps = _trans(conn)[:savepoint_objs]
           if sps.empty?
-            log_yield(TRANSACTION_COMMIT){conn.commit}
+            log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
           elsif supports_releasing_savepoints?
-            log_yield(TRANSACTION_RELEASE_SP){supports_releasing_savepoints? ? conn.release_savepoint(sps.last) : sps.last}
+            log_connection_yield(TRANSACTION_RELEASE_SP, conn){supports_releasing_savepoints? ? conn.release_savepoint(sps.last) : sps.last}
           end
         else
-          log_yield(TRANSACTION_COMMIT){conn.commit}
+          log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
         end
       end
       
@@ -97,12 +97,12 @@ module Sequel
         if supports_savepoints?
           sps = _trans(conn)[:savepoint_objs]
           if sps.empty?
-            log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+            log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
           else
-            log_yield(TRANSACTION_ROLLBACK_SP){conn.rollback(sps.last)}
+            log_connection_yield(TRANSACTION_ROLLBACK_SP, conn){conn.rollback(sps.last)}
           end
         else
-          log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+          log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
         end
       end
     end

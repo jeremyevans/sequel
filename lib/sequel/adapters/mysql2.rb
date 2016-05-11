@@ -48,7 +48,7 @@ module Sequel
           sqls.unshift("SET NAMES #{conn.escape(encoding.to_s)}")
         end
 
-        sqls.each{|sql| log_yield(sql){conn.query(sql)}}
+        sqls.each{|sql| log_connection_yield(sql, conn){conn.query(sql)}}
 
         add_prepared_statements_cache(conn)
         conn
@@ -77,7 +77,7 @@ module Sequel
       def _execute(conn, sql, opts)
         begin
           stream = opts[:stream]
-          r = log_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql){conn.query(sql, :database_timezone => timezone, :application_timezone => Sequel.application_timezone, :stream=>stream)}
+          r = log_connection_yield((log_sql = opts[:log_sql]) ? sql + log_sql : sql, conn){conn.query(sql, :database_timezone => timezone, :application_timezone => Sequel.application_timezone, :stream=>stream)}
           if opts[:type] == :select
             if r
               if stream

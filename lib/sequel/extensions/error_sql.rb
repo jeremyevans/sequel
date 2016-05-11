@@ -20,7 +20,7 @@
 #
 # This extension may not work correctly in the following cases:
 #
-# * log_yield is not used when executing the query.
+# * log_connection_yield is not used when executing the query.
 # * The underlying exception is frozen or reused.
 # * The underlying exception doesn't correctly record instance
 #   variables set on it (seems to happen on JRuby when underlying
@@ -57,12 +57,12 @@ module Sequel
     # If there are no loggers for this database and an exception is raised
     # store the SQL related to the exception with the exception, so it
     # is available for DatabaseError#sql later.
-    def log_yield(sql, args=nil)
+    def log_connection_yield(sql, conn, args=nil)
       if @loggers.empty?
         begin
           yield
         rescue => e
-          sql = "#{sql}; #{args.inspect}" if args
+          sql = "#{connection_info(conn) if conn && log_connection_info}#{sql}#{"; #{args.inspect}" if args}"
           e.instance_variable_set(:@sequel_error_sql, sql)
           raise
         end

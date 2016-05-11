@@ -27,7 +27,7 @@ module Sequel
       
         # Apply the connectiong setting SQLs for every new connection.
         def setup_connection(conn)
-          mysql_connection_setting_sqls.each{|sql| log_yield(sql){conn.execute(sql)}}
+          mysql_connection_setting_sqls.each{|sql| log_connection_yield(sql, conn){conn.execute(sql)}}
           super
         end
       end

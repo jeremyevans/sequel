@@ -183,7 +183,7 @@ module Sequel
       # Return the PGResult object that is returned by executing the given
       # sql and args.
       def execute_query(sql, args)
-        @db.log_yield(sql, args){args ? async_exec(sql, args) : async_exec(sql)}
+        @db.log_connection_yield(sql, self, args){args ? async_exec(sql, args) : async_exec(sql)}
       end
     end
     
@@ -584,7 +584,7 @@ module Sequel
 
         unless conn.prepared_statements[ps_name] == sql
           conn.execute("DEALLOCATE #{ps_name}") if conn.prepared_statements.include?(ps_name)
-          conn.check_disconnect_errors{log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}}
+          conn.check_disconnect_errors{log_connection_yield("PREPARE #{ps_name} AS #{sql}", conn){conn.prepare(ps_name, sql)}}
           conn.prepared_statements[ps_name] = sql
         end
 
@@ -595,7 +595,7 @@ module Sequel
           log_sql << ")"
         end
 
-        q = conn.check_disconnect_errors{log_yield(log_sql, args){_execute_prepared_statement(conn, ps_name, args, opts)}}
+        q = conn.check_disconnect_errors{log_connection_yield(log_sql, conn, args){_execute_prepared_statement(conn, ps_name, args, opts)}}
         begin
           block_given? ? yield(q) : q.cmd_tuples
         ensure

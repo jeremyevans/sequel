@@ -111,8 +111,8 @@ module Sequel
         def execute_insert(sql, opts=OPTS)
           synchronize(opts[:server]) do |conn|
             begin
-              log_yield(sql){conn.Execute(sql)}
-              res = log_yield(LAST_INSERT_ID){conn.Execute(LAST_INSERT_ID)}
+              log_connection_yield(sql, conn){conn.Execute(sql)}
+              res = log_connection_yield(LAST_INSERT_ID, conn){conn.Execute(LAST_INSERT_ID)}
               res.getRows.transpose.each{|r| return r.shift}
             rescue ::WIN32OLERuntimeError => e
               raise_error(e)
@@ -203,15 +203,15 @@ module Sequel
         end
 
         def begin_transaction(conn, opts=OPTS)
-          log_yield('Transaction.begin'){conn.BeginTrans}
+          log_connection_yield('Transaction.begin', conn){conn.BeginTrans}
         end
           
         def commit_transaction(conn, opts=OPTS)
-          log_yield('Transaction.commit'){conn.CommitTrans}
+          log_connection_yield('Transaction.commit', conn){conn.CommitTrans}
         end
           
         def rollback_transaction(conn, opts=OPTS)
-          log_yield('Transaction.rollback'){conn.RollbackTrans}
+          log_connection_yield('Transaction.rollback', conn){conn.RollbackTrans}
         end
           
         def schema_column_type(db_type)
@@ -313,7 +313,7 @@ module Sequel
           ado_schema = AdoSchema.new(type, criteria)
           synchronize(opts[:server]) do |conn|
             begin
-              r = log_yield("OpenSchema #{type.inspect}, #{criteria.inspect}") { 
+              r = log_connection_yield("OpenSchema #{type.inspect}, #{criteria.inspect}", conn) { 
                 if ado_schema.criteria.empty?
                   conn.OpenSchema(ado_schema.type) 
                 else

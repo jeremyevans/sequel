@@ -38,7 +38,7 @@ module Sequel
         def setup_connection(conn)
           conn = super(conn)
           conn.native_bind_format = true
-          connection_configuration_sqls.each{|sql| log_yield(sql){conn.execute(sql)}}
+          connection_configuration_sqls.each{|sql| log_connection_yield(sql, conn){conn.execute(sql)}}
           conn
         end
       end

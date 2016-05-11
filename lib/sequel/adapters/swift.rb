@@ -50,7 +50,7 @@ module Sequel
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
-            res = log_yield(sql){conn.execute(sql)}
+            res = log_connection_yield(sql, conn){conn.execute(sql)}
             yield res if block_given?
             nil
           rescue ::Swift::Error => e
@@ -64,7 +64,7 @@ module Sequel
       def execute_dui(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.execute(sql).affected_rows}
+            log_connection_yield(sql, conn){conn.execute(sql).affected_rows}
           rescue ::Swift::Error => e
             raise_error(e)
           end
@@ -76,7 +76,7 @@ module Sequel
       def execute_insert(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.execute(sql).insert_id}
+            log_connection_yield(sql, conn){conn.execute(sql).insert_id}
           rescue ::Swift::Error => e
             raise_error(e)
           end

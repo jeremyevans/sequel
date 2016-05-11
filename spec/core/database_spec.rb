@@ -341,6 +341,35 @@ describe "Database#log_yield" do
   end
 end
 
+describe "Database#log_connection_yield" do
+  before do
+    @o = Object.new
+    def @o.logs; @logs || []; end
+    def @o.to_ary; [self]; end
+    def @o.method_missing(*args); (@logs ||= []) << args; end
+    @conn = Object.new
+    @db = Sequel::Database.new(:logger=>@o)
+  end
+
+  it "should log SQL to the loggers" do
+    @db.log_connection_yield("some SQL", @conn){}
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :info
+    @o.logs.first.last.must_match(/some SQL\z/)
+    @o.logs.first.last.wont_match(/\(conn: -?\d+\) some SQL\z/)
+  end
+
+  it "should include connection information when logging" do
+    @db.log_connection_info = true
+    @db.log_connection_yield("some SQL", @conn){}
+    @o.logs.length.must_equal 1
+    @o.logs.first.length.must_equal 2
+    @o.logs.first.first.must_equal :info
+    @o.logs.first.last.must_match(/\(conn: -?\d+\) some SQL\z/)
+  end
+end
+
 describe "Database#uri" do
   before do
     @c = Class.new(Sequel::Database) do

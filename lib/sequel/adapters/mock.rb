@@ -204,7 +204,7 @@ module Sequel
         sql += " -- args: #{opts[:arguments].inspect}" if opts[:arguments]
         sql += " -- #{@opts[:append]}" if @opts[:append]
         sql += " -- #{c.server.is_a?(Symbol) ? c.server : c.server.inspect}" if c.server != :default
-        log_info(sql) unless opts[:log] == false
+        log_connection_yield(sql, c){} unless opts[:log] == false
         @sqls << sql 
 
         ds = opts[:dataset]

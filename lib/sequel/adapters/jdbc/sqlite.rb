@@ -67,7 +67,7 @@ module Sequel
         def setup_connection(conn)
           conn = super(conn)
           statement(conn) do |stmt|
-            connection_pragmas.each{|s| log_yield(s){stmt.execute(s)}}
+            connection_pragmas.each{|s| log_connection_yield(s, conn){stmt.execute(s)}}
           end
           conn
         end

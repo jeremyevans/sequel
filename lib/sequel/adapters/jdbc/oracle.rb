@@ -72,7 +72,7 @@ module Sequel
             sql = "SELECT #{literal(sequence)}.currval FROM dual"
             statement(conn) do |stmt|
               begin
-                rs = log_yield(sql){stmt.executeQuery(sql)}
+                rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
                 rs.next
                 rs.getLong(1)
               rescue java.sql.SQLException

@@ -131,7 +131,7 @@ module Sequel
         def last_insert_id(conn, opts=OPTS)
           statement(conn) do |stmt|
             sql = 'SELECT IDENTITY_VAL_LOCAL() FROM sysibm.sysdummy1'
-            rs = log_yield(sql){stmt.executeQuery(sql)}
+            rs = log_connection_yield(sql, conn){stmt.executeQuery(sql)}
             rs.next
             rs.getLong(1)
           end

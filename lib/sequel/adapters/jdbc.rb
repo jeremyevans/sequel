@@ -178,14 +178,14 @@ module Sequel
 
           begin
             if block_given?
-              yield log_yield(sql){cps.executeQuery}
+              yield log_connection_yield(sql, conn){cps.executeQuery}
             else
               case opts[:type]
               when :insert
-                log_yield(sql){cps.executeUpdate}
+                log_connection_yield(sql, conn){cps.executeUpdate}
                 last_insert_id(conn, opts)
               else
-                log_yield(sql){cps.executeUpdate}
+                log_connection_yield(sql, conn){cps.executeUpdate}
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
@@ -250,16 +250,16 @@ module Sequel
               if size = fetch_size
                 stmt.setFetchSize(size)
               end
-              yield log_yield(sql){stmt.executeQuery(sql)}
+              yield log_connection_yield(sql, conn){stmt.executeQuery(sql)}
             else
               case opts[:type]
               when :ddl
-                log_yield(sql){stmt.execute(sql)}
+                log_connection_yield(sql, conn){stmt.execute(sql)}
               when :insert
-                log_yield(sql){execute_statement_insert(stmt, sql)}
+                log_connection_yield(sql, conn){execute_statement_insert(stmt, sql)}
                 last_insert_id(conn, Hash[opts].merge!(:stmt=>stmt))
               else
-                log_yield(sql){stmt.executeUpdate(sql)}
+                log_connection_yield(sql, conn){stmt.executeUpdate(sql)}
               end
             end
           end
@@ -418,8 +418,8 @@ module Sequel
           if name and cps = cps_sync(conn){|cpsh| cpsh[name]} and cps[0] == sql
             cps = cps[1]
           else
-            log_yield("CLOSE #{name}"){cps[1].close} if cps
-            cps = log_yield("PREPARE#{" #{name}:" if name} #{sql}"){prepare_jdbc_statement(conn, sql, opts)}
+            log_connection_yield("CLOSE #{name}", conn){cps[1].close} if cps
+            cps = log_connection_yield("PREPARE#{" #{name}:" if name} #{sql}", conn){prepare_jdbc_statement(conn, sql, opts)}
             if size = fetch_size
               cps.setFetchSize(size)
             end
@@ -435,16 +435,16 @@ module Sequel
           end
           begin
             if block_given?
-              yield log_yield(msg, args){cps.executeQuery}
+              yield log_connection_yield(msg, conn, args){cps.executeQuery}
             else
               case opts[:type]
               when :ddl
-                log_yield(msg, args){cps.execute}
+                log_connection_yield(msg, conn, args){cps.execute}
               when :insert
-                log_yield(msg, args){execute_prepared_statement_insert(cps)}
+                log_connection_yield(msg, conn, args){execute_prepared_statement_insert(cps)}
                 last_insert_id(conn, Hash[opts].merge!(:prepared=>true, :stmt=>cps))
               else
-                log_yield(msg, args){cps.executeUpdate}
+                log_connection_yield(msg, conn, args){cps.executeUpdate}
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
@@ -519,7 +519,7 @@ module Sequel
       # Log the given SQL and then execute it on the connection, used by
       # the transaction code.
       def log_connection_execute(conn, sql)
-        statement(conn){|s| log_yield(sql){s.execute(sql)}}
+        statement(conn){|s| log_connection_yield(sql, conn){s.execute(sql)}}
       end
 
       # By default, there is no support for determining the last inserted

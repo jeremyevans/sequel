@@ -80,10 +80,10 @@ module Sequel
             if args = opts[:arguments]
               r = conn.parse(sql)
               args = cursor_bind_params(conn, r, args)
-              nr = log_yield(sql, args){r.exec}
+              nr = log_connection_yield(sql, conn, args){r.exec}
               r = nr unless block_given?
             else
-              r = log_yield(sql){conn.exec(sql)}
+              r = log_connection_yield(sql, conn){conn.exec(sql)}
             end
             if block_given?
               begin
@@ -172,7 +172,7 @@ module Sequel
           end
         end
         unless cursor
-          cursor = log_yield("PREPARE #{name}: #{sql}"){conn.parse(sql)}
+          cursor = log_connection_yield("PREPARE #{name}: #{sql}", conn){conn.parse(sql)}
           conn.prepared_statements[name] = [cursor, sql]
         end
         args = cursor_bind_params(conn, cursor, opts[:arguments])
@@ -182,7 +182,7 @@ module Sequel
           log_sql << sql
           log_sql << ")"
         end
-        r = log_yield(log_sql, args){cursor.exec}
+        r = log_connection_yield(log_sql, conn, args){cursor.exec}
         if block_given?
           yield(cursor)
         elsif type == :insert
@@ -201,7 +201,7 @@ module Sequel
         if sequence
           sql = "SELECT #{literal(sequence)}.currval FROM dual"
           begin
-            cursor = log_yield(sql){conn.exec(sql)}
+            cursor = log_connection_yield(sql, conn){conn.exec(sql)}
             row = cursor.fetch
             row.each{|v| return (v.to_i if v)}
           rescue OCIError
@@ -213,12 +213,12 @@ module Sequel
       end
 
       def begin_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
+        log_connection_yield(TRANSACTION_BEGIN, conn){conn.autocommit = false}
         set_transaction_isolation(conn, opts)
       end
       
       def commit_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_COMMIT){conn.commit}
+        log_connection_yield(TRANSACTION_COMMIT, conn){conn.commit}
       end
 
       def disconnect_error?(e, opts)
@@ -250,7 +250,7 @@ module Sequel
       end
       
       def rollback_transaction(conn, opts=OPTS)
-        log_yield(TRANSACTION_ROLLBACK){conn.rollback}
+        log_connection_yield(TRANSACTION_ROLLBACK, conn){conn.rollback}
       end
 
       def schema_parse_table(table, opts=OPTS)
@@ -283,7 +283,7 @@ module Sequel
 
         metadata = synchronize(opts[:server]) do |conn|
           begin
-          log_yield("Connection.describe_table"){conn.describe_table(schema_and_table)}
+            log_connection_yield("Connection.describe_table", conn){conn.describe_table(schema_and_table)}
           rescue OCIError => e
             raise_error(e)
           end

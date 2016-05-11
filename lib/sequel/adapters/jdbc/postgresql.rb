@@ -171,7 +171,7 @@ module Sequel
         def setup_connection(conn)
           conn = super(conn)
           statement(conn) do |stmt|
-            connection_configuration_sqls.each{|sql| log_yield(sql){stmt.execute(sql)}}
+            connection_configuration_sqls.each{|sql| log_connection_yield(sql, conn){stmt.execute(sql)}}
           end
           conn
         end

@@ -32,7 +32,7 @@ module Sequel
         def setup_connection(conn)
           connection_pragmas.each do |s|
             com = conn.create_command(s)
-            log_yield(s){com.execute_non_query}
+            log_connection_yield(s, conn){com.execute_non_query}
           end
           super
         end

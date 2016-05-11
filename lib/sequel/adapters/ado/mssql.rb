@@ -21,8 +21,8 @@ module Sequel
           return super unless @opts[:provider]
           synchronize(opts[:server]) do |conn|
             begin
-              log_yield(sql){conn.Execute(sql)}
-              res = log_yield(ROWS_AFFECTED){conn.Execute(ROWS_AFFECTED)}
+              log_connection_yield(sql, conn){conn.Execute(sql)}
+              res = log_connection_yield(ROWS_AFFECTED, conn){conn.Execute(ROWS_AFFECTED)}
               res.getRows.transpose.each{|r| return r.shift}
             rescue ::WIN32OLERuntimeError => e
               raise_error(e)

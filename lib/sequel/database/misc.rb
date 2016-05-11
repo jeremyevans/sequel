@@ -143,6 +143,7 @@ module Sequel
 
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       self.log_warn_duration = @opts[:log_warn_duration]
+      self.log_connection_info = typecast_value_boolean(@opts[:log_connection_info])
 
       @pool = ConnectionPool.get_pool(self, @opts)
 

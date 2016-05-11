@@ -28,7 +28,7 @@ module Sequel
         # Set the correct pragmas on the connection.
         def connect(opts)
           c = super
-          connection_pragmas.each{|s| log_yield(s){c.execute(s)}}
+          connection_pragmas.each{|s| log_connection_yield(s, c){c.execute(s)}}
           c
         end
       end

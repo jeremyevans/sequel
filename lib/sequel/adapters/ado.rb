@@ -64,7 +64,7 @@ module Sequel
         return super if opts[:provider]
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.Execute(sql, 1)}
+            log_connection_yield(sql, conn){conn.Execute(sql, 1)}
             WIN32OLE::ARGV[1]
           rescue ::WIN32OLERuntimeError => e
             raise_error(e)
@@ -75,7 +75,7 @@ module Sequel
       def execute(sql, opts=OPTS)
         synchronize(opts[:server]) do |conn|
           begin
-            r = log_yield(sql){conn.Execute(sql)}
+            r = log_connection_yield(sql, conn){conn.Execute(sql)}
             yield(r) if block_given?
           rescue ::WIN32OLERuntimeError => e
             raise_error(e)
