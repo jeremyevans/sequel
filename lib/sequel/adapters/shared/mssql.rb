@@ -516,8 +516,10 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      NOLOCK = ' WITH (NOLOCK)'.freeze
-      UPDLOCK = ' WITH (UPDLOCK)'.freeze
+      TABLE_HINT = " WITH (".freeze
+      READPAST = "READPAST".freeze
+      NOLOCK = 'NOLOCK'.freeze
+      UPDLOCK = 'UPDLOCK'.freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
       EXTRACT_MAP = {:year=>"yy", :month=>"m", :day=>"d", :hour=>"hh", :minute=>"n", :second=>"s"}
@@ -732,7 +734,7 @@ module Sequel
         is_2005_or_later?
       end
 
-      # MSSQL 2005+ supports GROUPING SETS
+      # MSSQL 2008+ supports GROUPING SETS
       def supports_grouping_sets?
         is_2008_or_later?
       end
@@ -780,6 +782,11 @@ module Sequel
       # MSSQL 2005+ can emulate RETURNING via the OUTPUT clause.
       def supports_returning?(type)
         supports_insert_select?
+      end
+
+      # MSSQL uses READPAST to skip locked rows.
+      def supports_skip_locked?
+        true
       end
 
       # MSSQL 2005+ supports window functions
@@ -965,11 +972,32 @@ module Sequel
 
       # Support different types of locking styles
       def select_lock_sql(sql)
-        case @opts[:lock]
-        when :update
-          sql << UPDLOCK
-        when :dirty
-          sql << NOLOCK
+        lock = @opts[:lock]
+        skip_locked = @opts[:skip_locked]
+        for_update = lock == :update
+        dirty = lock == :dirty
+        lock_hint = for_update || dirty
+
+        if lock_hint || skip_locked
+          sql << TABLE_HINT
+
+          if lock_hint
+            sql << if for_update
+              UPDLOCK
+            else
+              NOLOCK
+            end
+          end
+
+          if lock_hint && skip_locked
+            sql << COMMA_SEPARATOR
+          end
+
+          if skip_locked
+            sql << READPAST
+          end
+
+          sql << PAREN_CLOSE
         else
           super
         end

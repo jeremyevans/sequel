@@ -827,6 +827,12 @@ module Sequel
       end
     end
 
+    # Skip locked rows when returning results from this dataset.
+    def skip_locked
+      raise(Error, 'This dataset does not support skipping locked rows') unless supports_skip_locked?
+      clone(:skip_locked=>true)
+    end
+
     # Unbind bound variables from this dataset's filter and return an array of two
     # objects.  The first object is a modified dataset where the filter has been
     # replaced with one that uses bound variable placeholders.  The second object

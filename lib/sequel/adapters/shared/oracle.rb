@@ -287,6 +287,7 @@ module Sequel
       HSTAR = "H*".freeze
       DUAL = ' FROM DUAL'.freeze
       BITAND_PROC = lambda{|a, b| Sequel.lit(["CAST(BITAND(", ", ", ") AS INTEGER)"], a, b)}
+      SKIP_LOCKED = " SKIP LOCKED".freeze
 
       include(Module.new do
         Dataset.def_sql_method(self, :select, %w'with select distinct columns from join where group having compounds order lock')
@@ -431,6 +432,11 @@ module Sequel
         false
       end
       
+      # Oracle supports SKIP LOCKED.
+      def supports_skip_locked?
+        true
+      end
+
       # Oracle supports timezones in literal timestamps.
       def supports_timestamp_timezones?
         true
@@ -534,6 +540,15 @@ module Sequel
       # Oracle can insert multiple rows using a UNION
       def multi_insert_sql_strategy
         :union
+      end
+
+      # Use SKIP LOCKED if skipping locked rows.
+      def select_lock_sql(sql)
+        super
+
+        if @opts[:skip_locked]
+          sql << SKIP_LOCKED
+        end
       end
 
       # Oracle supports quoted function names.

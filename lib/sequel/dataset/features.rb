@@ -157,6 +157,11 @@ module Sequel
       false
     end
 
+    # Whether the dataset supports skipping locked rows when returning data.
+    def supports_skip_locked?
+      false
+    end
+
     # Whether the database supports SELECT *, column FROM table
     def supports_select_all_and_column?
       true

@@ -1214,6 +1214,7 @@ module Sequel
       SELECT_VALUES = "VALUES ".freeze
       EMPTY_STRING = ''.freeze
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
+      SKIP_LOCKED = " SKIP LOCKED".freeze
 
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
       Dataset.def_sql_method(self, :insert, [['if server_version >= 90500', %w'with insert into columns values conflict returning'], ['elsif server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
@@ -1504,6 +1505,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL 9.5+ supports SKIP LOCKED.
+      def supports_skip_locked?
+        server_version >= 90500
+      end
+
       # PostgreSQL supports timezones in literal timestamps
       def supports_timestamp_timezones?
         true
@@ -1684,8 +1690,17 @@ module Sequel
       end
 
       # Support FOR SHARE locking when using the :share lock style.
+      # Use SKIP LOCKED if skipping locked rows.
       def select_lock_sql(sql)
-        @opts[:lock] == :share ? (sql << FOR_SHARE) : super
+        if @opts[:lock] == :share
+          sql << FOR_SHARE
+        else
+          super
+        end
+
+        if @opts[:skip_locked]
+          sql << SKIP_LOCKED
+        end
       end
 
       # Support VALUES clause instead of the SELECT clause to return rows.

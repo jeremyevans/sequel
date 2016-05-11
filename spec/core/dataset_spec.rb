@@ -4534,6 +4534,23 @@ describe "Dataset#lock_style and for_update" do
   end
 end
 
+describe "Dataset#skip_locked" do
+  before do
+    @ds = Sequel.mock.dataset.from(:t).for_update
+  end
+  
+  it "should raise an error if not supported" do
+    proc{@ds.skip_locked}.must_raise Sequel::Error
+  end
+  
+  it "should skipped locked rows if supported" do
+    def @ds.supports_skip_locked?; true end
+    def @ds.select_lock_sql(sql) super; sql << " SKIP LOCKED" if @opts[:skip_locked] end
+    @ds.sql.must_equal "SELECT * FROM t FOR UPDATE"
+    @ds.skip_locked.sql.must_equal "SELECT * FROM t FOR UPDATE SKIP LOCKED"
+  end
+end
+  
 describe "Custom ASTTransformer" do
   it "should transform given objects" do
     c = Class.new(Sequel::ASTTransformer) do

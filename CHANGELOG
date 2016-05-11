@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#skip_locked for skipping locked rows on PostgreSQL 9.5+, MSSQL, and Oracle (jeremyevans)
+
 * Allow Sequel::Model#lock! to accept an optional lock style (petedmarsh) (#1183)
 
 * Add sql_comments extension for setting SQL comments on queries (jeremyevans)
