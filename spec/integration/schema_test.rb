@@ -762,7 +762,7 @@ describe "Database schema modifiers" do
   end if DB.supports_deferrable_constraints?
 end
 
-describe "Database#tables" do
+describe "Database#tables and #views" do
   before do
     class ::String
       @@xxxxx = 0
@@ -771,6 +771,8 @@ describe "Database#tables" do
       end
     end
     @db = DB
+    @db.drop_view(:sequel_test_view) rescue nil
+    @db.drop_table?(:sequel_test_table)
     @db.create_table(:sequel_test_table){Integer :a}
     @db.create_view :sequel_test_view, @db[:sequel_test_table]
     @iom = @db.identifier_output_method
@@ -783,53 +785,31 @@ describe "Database#tables" do
     @db.drop_table :sequel_test_table
   end
 
-  it "should return an array of symbols" do
+  it "#tables should return an array of symbols" do
     ts = @db.tables
     ts.must_be_kind_of(Array)
     ts.each{|t| t.must_be_kind_of(Symbol)}
     ts.must_include(:sequel_test_table)
     ts.wont_include(:sequel_test_view)
-  end
+  end if DB.supports_table_listing?
 
-  it "should respect the database's identifier_output_method" do
+  it "#tables should respect the database's identifier_output_method" do
     @db.identifier_output_method = :xxxxx
     @db.identifier_input_method = :xxxxx
     @db.tables.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
-  end
-end if DB.supports_table_listing?
+  end if DB.supports_table_listing?
 
-describe "Database#views" do
-  before do
-    class ::String
-      @@xxxxx = 0
-      def xxxxx
-        "xxxxx#{@@xxxxx += 1}"
-      end
-    end
-    @db = DB
-    @db.create_table(:sequel_test_table){Integer :a}
-    @db.create_view :sequel_test_view, @db[:sequel_test_table]
-    @iom = @db.identifier_output_method
-    @iim = @db.identifier_input_method
-  end
-  after do
-    @db.identifier_output_method = @iom
-    @db.identifier_input_method = @iim
-    @db.drop_view :sequel_test_view
-    @db.drop_table :sequel_test_table
-  end
-
-  it "should return an array of symbols" do
+  it "#views should return an array of symbols" do
     ts = @db.views
     ts.must_be_kind_of(Array)
     ts.each{|t| t.must_be_kind_of(Symbol)}
     ts.wont_include(:sequel_test_table)
     ts.must_include(:sequel_test_view)
-  end
+  end if DB.supports_view_listing?
 
-  it "should respect the database's identifier_output_method" do
+  it "#views should respect the database's identifier_output_method" do
     @db.identifier_output_method = :xxxxx
     @db.identifier_input_method = :xxxxx
     @db.views.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
-  end
-end if DB.supports_view_listing?
+  end if DB.supports_view_listing?
+end
