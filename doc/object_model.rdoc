@@ -263,7 +263,7 @@ The following shortcuts exist for creating Sequel::SQL::ValueList objects:
 === Sequel::SQL::Identifier
 
 Sequel::SQL::Identifier objects represent single identifiers.  The main reason for
-their existance is that they are not checked for double or triple underscores, so no
+their existence is that they are not checked for double or triple underscores, so no
 automatic qualification or aliasing happens for them:
 
   Sequel::SQL::Identifier.new(:col__umn) # "col__umn"
@@ -389,7 +389,7 @@ The following shortcut exists for creating Sequel::SQL::ColumnAll objects:
 
 === Sequel::SQL::Constant
 
-Sequel::SQL::Constant objects represent constants or psuedo-constants in SQL,
+Sequel::SQL::Constant objects represent constants or pseudo-constants in SQL,
 such as TRUE, NULL, and CURRENT_TIMESTAMP.  These are not designed to be created
 or used by the end user, but some existing values are predefined under the
 Sequel namespace:
@@ -544,9 +544,9 @@ They use a hash-based API, supporting the :frame, :order, :partition, and :windo
 options:
 
   Sequel::SQL::Window.new(:order=>:a) # (ORDER BY "a")
-  Sequel::SQL::Window.new(:parition=>:a) # (PARTITION BY "a")
+  Sequel::SQL::Window.new(:partition=>:a) # (PARTITION BY "a")
 
-  Sequel::SQL::Window.new(:parition=>:a, :frame=>:all)
+  Sequel::SQL::Window.new(:partition=>:a, :frame=>:all)
   # (PARTITION BY "a" ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
 
 === Sequel::SQL::Wrapper
