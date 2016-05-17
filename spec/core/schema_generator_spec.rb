@@ -198,6 +198,6 @@ describe "Sequel::Schema::Generator generic type methods" do
       File :k
       TrueClass :l
       FalseClass :m
-    end.columns.map{|c| c[:type]}.must_equal [String, Integer, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
+    end.columns.map{|c| c[:type]}.must_equal [String, Integer, Fixnum, :Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
   end
 end

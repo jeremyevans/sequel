@@ -25,14 +25,14 @@ module Sequel
         if !$1 && $2 && $2.to_i >= 10 && $3
           # Unsigned integer type with 10 digits can potentially contain values which
           # don't fit signed integer type, so use bigint type in target database.
-          {:type=>Bignum}
+          {:type=>:Bignum}
         else
           {:type=>Integer}
         end
       when /\Atinyint(?:\((\d+)\))?(?: unsigned)?\z/o
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
       when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/o
-        {:type=>Bignum}
+        {:type=>:Bignum}
       when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/o
         {:type=>Float}
       when 'boolean', 'bit'
@@ -206,7 +206,7 @@ END_MIG
           gen.foreign_key(name, table, col_opts)
         else
           gen.column(name, type, col_opts)
-          if [Integer, Bignum, Float].include?(type) && schema[:db_type] =~ / unsigned\z/io
+          if [Integer, :Bignum, Float].include?(type) && schema[:db_type] =~ / unsigned\z/io
             gen.check(Sequel::SQL::Identifier.new(name) >= 0)
           end
         end
@@ -407,8 +407,11 @@ END_MIG
           else
             type = c.delete(:type)
             opts = opts_inspect(c)
-            if type.is_a?(Class)
+            case type
+            when Class
               "#{type.name} #{name.inspect}#{opts}"
+            when :Bignum
+              "Bignum #{name.inspect}#{opts}"
             else
               "column #{name.inspect}, #{type.inspect}#{opts}"
             end

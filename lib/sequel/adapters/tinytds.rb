@@ -146,9 +146,7 @@ module Sequel
       # in the prepared statement call for the given value and connection.
       def ps_arg_type(v)
         case v
-        when Fixnum
-          [v, 'int']
-        when Bignum
+        when Integer
           [v, 'bigint']
         when Float
           [v, 'double precision']

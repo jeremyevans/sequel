@@ -74,6 +74,11 @@ as the second argument, either as ruby classes, symbols, or strings:
     column :a6, 'timestamp(6)'     # timestamp(6)
   end
 
+If you use a ruby class as the type, Sequel will try to guess the appropriate type name for the
+database you are using.  If a symbol or string as used as the type, it is used verbatim as the type
+name in SQL, with the exception of :Bignum.  Using the symbol :Bignum as a type will use the
+appropriate 64-bit integer type for the database you are using.
+
 === Column options
 
 When using the type name as method, the third argument is an options hash, and when using the +column+
@@ -107,7 +112,7 @@ You've seen this one used already.  It's used to create an autoincrementing inte
 
 If you want an autoincrementing 64-bit integer:
 
-  create_table(:a0){primary_key :id, :type=>Bignum}
+  create_table(:a0){primary_key :id, :type=>:Bignum}
 
 If you want to create a primary key column that doesn't use an autoincrementing integer, you should
 not use this method.  Instead, you should use the :primary_key option to the +column+ method or type
@@ -520,11 +525,11 @@ This modifies a column's type.  Most databases will attempt to convert existing 
 the columns to the new type:
 
   alter_table(:albums) do
-    set_column_type :copies_sold, Bignum
+    set_column_type :copies_sold, :Bignum
   end
 
 You can specify the type as a string or symbol, in which case it is used verbatim, or as a supported
-ruby class, in which case it gets converted to an appropriate database type.
+ruby class or the :Bignum symbol, in which case it gets converted to an appropriate database type.
 
 === +set_column_allow_null+
 

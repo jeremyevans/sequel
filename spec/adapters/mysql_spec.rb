@@ -528,7 +528,7 @@ describe "A MySQL database" do
 
   it "should have set_column_type support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}
-    @db.alter_table(:items){set_column_type :id, Bignum}
+    @db.alter_table(:items){set_column_type :id, :Bignum}
     check_sqls do
       @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer NOT NULL DEFAULT 5)", "DESCRIBE `items`", "ALTER TABLE `items` CHANGE COLUMN `id` `id` bigint NOT NULL DEFAULT 5"]
     end

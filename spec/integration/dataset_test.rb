@@ -25,7 +25,7 @@ describe "Simple Dataset operations" do
 
   it "should support sequential primary keys with a Bignum" do
     @db.create_table!(:items) do
-      primary_key :id, :type=>Bignum
+      primary_key :id, :type=>:Bignum
       Integer :number
     end
     @ds << {:number=>20}

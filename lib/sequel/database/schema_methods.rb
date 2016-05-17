@@ -108,7 +108,7 @@ module Sequel
     # be option hashes, so long as the option hashes have a :table
     # entry giving the table referenced:
     #
-    #   create_join_table(:cat_id=>{:table=>:cats, :type=>Bignum}, :dog_id=>:dogs)
+    #   create_join_table(:cat_id=>{:table=>:cats, :type=>:Bignum}, :dog_id=>:dogs)
     #   
     # You can provide a second argument which is a table options hash:
     #
@@ -884,7 +884,14 @@ module Sequel
 
     # SQL fragment specifying the type of a given column.
     def type_literal(column)
-      column[:type].is_a?(Class) ? type_literal_generic(column) : type_literal_specific(column)
+      case column[:type]
+      when Class
+        type_literal_generic(column)
+      when :Bignum
+        type_literal_generic_bignum(column)
+      else
+        type_literal_specific(column)
+      end
     end
     
     # SQL fragment specifying the full type of a column,

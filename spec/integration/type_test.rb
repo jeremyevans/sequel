@@ -38,7 +38,7 @@ describe "Supported types" do
   end
   
   it "should support generic bignum type" do
-    ds = create_items_table_with_column(:number, Bignum)
+    ds = create_items_table_with_column(:number, :Bignum)
     ds.insert(:number => 2**34)
     ds.all.must_equal [{:number=>2**34}]
   end

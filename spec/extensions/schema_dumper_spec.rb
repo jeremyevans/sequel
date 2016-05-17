@@ -107,7 +107,7 @@ describe "Sequel::Database dump methods" do
 
   it "should dump non-Integer primary key columns with explicit :type" do
     @d.meta_def(:schema){|*s| [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true, :auto_increment=>true}]]}
-    @d.dump_table_schema(:t6).must_equal "create_table(:t6) do\n  primary_key :c1, :type=>Bignum\nend"
+    @d.dump_table_schema(:t6).must_equal "create_table(:t6) do\n  primary_key :c1, :type=>:Bignum\nend"
   end
 
   it "should dump auto incrementing primary keys with :keep_order option if they are not first" do

@@ -18,8 +18,7 @@ module Sequel
     # the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     class CreateTableGenerator
       # Classes specifying generic types that Sequel will convert to database-specific types.
-      GENERIC_TYPES=[String, Integer, Fixnum, Bignum, Float, Numeric, BigDecimal,
-      Date, DateTime, Time, File, TrueClass, FalseClass]
+      GENERIC_TYPES=%w'String Integer Fixnum Float Numeric BigDecimal Date DateTime Time File TrueClass FalseClass'
       
       # Return the column hashes created by this generator
       attr_reader :columns
@@ -40,6 +39,12 @@ module Sequel
         @primary_key = nil
         instance_eval(&block) if block
         @columns.unshift(@primary_key) if @primary_key && !has_column?(primary_key_name)
+      end
+
+      # Use custom Bignum method to use :Bignum instead of Bignum class, to work
+      # correctly in cases where Bignum is the same as Integer.
+      def Bignum(name, opts=OPTS)
+        column(name, :Bignum, opts)
       end
       
       # Add a method for each of the given types that creates a column

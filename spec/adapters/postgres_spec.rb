@@ -945,7 +945,7 @@ describe "A PostgreSQL database" do
     @db.create_table!(:posts){primary_key :a, :type=>Fixnum}
     @db[:posts].insert.must_equal 1
     @db[:posts].insert.must_equal 2
-    @db.create_table!(:posts){primary_key :a, :type=>Bignum}
+    @db.create_table!(:posts){primary_key :a, :type=>:Bignum}
     @db[:posts].insert.must_equal 1
     @db[:posts].insert.must_equal 2
   end

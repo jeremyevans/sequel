@@ -63,7 +63,7 @@ module Sequel
     # Format the value so it takes up exactly size characters
     def self.format_cell(size, v) # :nodoc:
       case v
-      when Bignum, Fixnum
+      when Integer
         "%#{size}d" % v
       when Float, BigDecimal
         "%#{size}g" % v
