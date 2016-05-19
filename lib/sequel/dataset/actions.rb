@@ -719,31 +719,33 @@ module Sequel
     #   DB[:table].to_hash([:id, :name]) # SELECT * FROM table
     #   # {[1, 'Jim']=>{:id=>1, :name=>'Jim'}, [2, 'Bob'=>{:id=>2, :name=>'Bob'}, ...}
     #
-    # This method accepts an optional :hash parameter (which can be a hash with
-    # a default value, a hash with a default proc, or any object that supports
-    # #[] and #[]=) into which entries will be merged. The default behavior is
-    # to start with a new, empty hash.
+    # Options:
+    # :all :: Use all instead of each to retrieve the objects
+    # :hash :: The object into which the values will be placed.  If this is not
+    #          given, an empty hash is used.  This can be used to use a hash with
+    #          a default value or default proc.
     def to_hash(key_column, value_column = nil, opts = OPTS)
       h = opts[:hash] || {}
+      meth = opts[:all] ? :all : :each
       if value_column
         return naked.to_hash(key_column, value_column, opts) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
-            each{|r| h[r.values_at(*key_column)] = r.values_at(*value_column)}
+            send(meth){|r| h[r.values_at(*key_column)] = r.values_at(*value_column)}
           else
-            each{|r| h[r[key_column]] = r.values_at(*value_column)}
+            send(meth){|r| h[r[key_column]] = r.values_at(*value_column)}
           end
         else
           if key_column.is_a?(Array)
-            each{|r| h[r.values_at(*key_column)] = r[value_column]}
+            send(meth){|r| h[r.values_at(*key_column)] = r[value_column]}
           else
-            each{|r| h[r[key_column]] = r[value_column]}
+            send(meth){|r| h[r[key_column]] = r[value_column]}
           end
         end
       elsif key_column.is_a?(Array)
-        each{|r| h[key_column.map{|k| r[k]}] = r}
+        send(meth){|r| h[key_column.map{|k| r[k]}] = r}
       else
-        each{|r| h[r[key_column]] = r}
+        send(meth){|r| h[r[key_column]] = r}
       end
       h
     end
@@ -767,31 +769,34 @@ module Sequel
     #   DB[:table].to_hash_groups([:first, :middle]) # SELECT * FROM table
     #   # {['Jim', 'Bob']=>[{:id=>1, :first=>'Jim', :middle=>'Bob', :last=>'Smith'}, ...], ...}
     #
-    # This method accepts an optional :hash parameter (which can be a hash with
-    # a default value, a hash with a default proc, or any object that supports
-    # #[] and #[]=) into which entries will be merged. The default behavior is
+    # Options:
+    # :all :: Use all instead of each to retrieve the objects
+    # :hash :: The object into which the values will be placed.  If this is not
+    #          given, an empty hash is used.  This can be used to use a hash with
+    #          a default value or default proc.
     # to start with a new, empty hash.
     def to_hash_groups(key_column, value_column = nil, opts = OPTS)
       h = opts[:hash] || {}
+      meth = opts[:all] ? :all : :each
       if value_column
         return naked.to_hash_groups(key_column, value_column, opts) if row_proc
         if value_column.is_a?(Array)
           if key_column.is_a?(Array)
-            each{|r| (h[r.values_at(*key_column)] ||= []) << r.values_at(*value_column)}
+            send(meth){|r| (h[r.values_at(*key_column)] ||= []) << r.values_at(*value_column)}
           else
-            each{|r| (h[r[key_column]] ||= []) << r.values_at(*value_column)}
+            send(meth){|r| (h[r[key_column]] ||= []) << r.values_at(*value_column)}
           end
         else
           if key_column.is_a?(Array)
-            each{|r| (h[r.values_at(*key_column)] ||= []) << r[value_column]}
+            send(meth){|r| (h[r.values_at(*key_column)] ||= []) << r[value_column]}
           else
-            each{|r| (h[r[key_column]] ||= []) << r[value_column]}
+            send(meth){|r| (h[r[key_column]] ||= []) << r[value_column]}
           end
         end
       elsif key_column.is_a?(Array)
-        each{|r| (h[key_column.map{|k| r[k]}] ||= []) << r}
+        send(meth){|r| (h[key_column.map{|k| r[k]}] ||= []) << r}
       else
-        each{|r| (h[r[key_column]] ||= []) << r}
+        send(meth){|r| (h[r[key_column]] ||= []) << r}
       end
       h
     end

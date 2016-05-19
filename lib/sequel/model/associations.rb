@@ -2662,6 +2662,26 @@ END
           end
         end
 
+        # If the dataset is being eagerly loaded, default to calling all
+        # instead of each.
+        def to_hash(key_column=nil, value_column=nil, opts=OPTS)
+          if (@opts[:eager_graph] || @opts[:eager]) && !opts.has_key?(:all)
+            opts = Hash[opts]
+            opts[:all] = true
+          end
+          super
+        end
+
+        # If the dataset is being eagerly loaded, default to calling all
+        # instead of each.
+        def to_hash_groups(key_column, value_column=nil, opts=OPTS)
+          if (@opts[:eager_graph] || @opts[:eager]) && !opts.has_key?(:all)
+            opts = Hash[opts]
+            opts[:all] = true
+          end
+          super
+        end
+
         # Do not attempt to split the result set into associations,
         # just return results as simple objects.  This is useful if you
         # want to use eager_graph as a shortcut to have all of the joins

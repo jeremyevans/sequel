@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#to_hash and #to_hash_groups work correctly for model datasets doing eager loading (jeremyevans)
+
 * Make delay_add_association plugin handle hashes and primary keys passed to add_* association methods (jeremyevans) (#1187)
 
 * Treat :Bignum as a generic type, to support 64-bit integers on ruby 2.4+, where Bignum == Integer (jeremyevans)

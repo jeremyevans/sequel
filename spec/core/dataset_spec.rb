@@ -1822,8 +1822,15 @@ describe "Dataset#to_hash_groups" do
     @d.to_hash_groups([:a, :b]).must_equal([1, 2] => [{:a => 1, :b => 2}], [3, 4] => [{:a => 3, :b => 4}], [1, 6] => [{:a => 1, :b => 6}], [7, 4] => [{:a => 7, :b => 4}])
   end
 
-  it "should accept an optional :hash parameter into which entries can be merged" do
+  it "should accept a :hash option into which entries can be merged" do
     @d.to_hash_groups(:a, :b, :hash => (tmp = {})).must_be_same_as(tmp)
+  end
+
+  it "should accept an :all option to use all into which entries can be merged" do
+    called = false
+    meta_def(@d, :post_load){|_| called = true}
+    @d.to_hash_groups(:a, :b, :all=>true)
+    called.must_equal true
   end
 
   it "should not call the row_proc if two arguments are given" do

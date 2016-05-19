@@ -131,6 +131,22 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal []
   end
   
+  it "should eagerly load when using to_hash" do
+    h = EagerAlbum.eager(:band).to_hash
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (2))']
+    h.must_equal(1=>EagerAlbum.load(:id => 1, :band_id => 2))
+    h[1].band.must_equal EagerBand.load(:id=>2)
+    DB.sqls.must_equal []
+  end
+  
+  it "should eagerly load when using to_hash_groups" do
+    h = EagerAlbum.eager(:band).to_hash_groups(:id)
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (bands.id IN (2))']
+    h.must_equal(1=>[EagerAlbum.load(:id => 1, :band_id => 2)])
+    h[1].first.band.must_equal EagerBand.load(:id=>2)
+    DB.sqls.must_equal []
+  end
+  
   it "should skip eager loading for a many_to_one association with no matching keys" do
     EagerAlbum.dataset._fetch = [{:id=>1, :band_id=>nil}]
     a = EagerAlbum.eager(:band).all
