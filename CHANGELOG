@@ -1,5 +1,7 @@
 === HEAD
 
+* Make delay_add_association plugin handle hashes and primary keys passed to add_* association methods (jeremyevans) (#1187)
+
 * Treat :Bignum as a generic type, to support 64-bit integers on ruby 2.4+, where Bignum == Integer (jeremyevans)
 
 * Add server_logging extension for including server/shard information when logging queries (jeremyevans)

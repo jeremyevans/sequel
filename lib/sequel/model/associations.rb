@@ -2194,14 +2194,7 @@ module Sequel
 
         # Add the given associated object to the given association
         def add_associated_object(opts, o, *args)
-          klass = opts.associated_class
-          if o.is_a?(Hash)
-            o = klass.new(o)
-          elsif o.is_a?(Integer) || o.is_a?(String) || o.is_a?(Array)
-            o = klass.with_pk!(o)
-          elsif !o.is_a?(klass)
-            raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
-          end
+          o = make_add_associated_object(opts, o)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           ensure_associated_primary_key(opts, o, *args)
           return if run_association_callbacks(opts, :before_add, o) == false
@@ -2317,6 +2310,25 @@ module Sequel
             opts.send(:cached_fetch, :many_to_one_pk_lookup){opts.primary_key == opts.associated_class.primary_key}
         end
         
+        # Convert the input of the add_* association method into an associated object. For
+        # hashes, this creates a new object using the hash.  For integers, strings, and arrays,
+        # assume the value specifies a primary key, and lookup an existing object with that primary key.
+        # Otherwise, if the object is not already an instance of the class, raise an exception.
+        def make_add_associated_object(opts, o)
+          klass = opts.associated_class
+
+          case o
+          when Hash
+            klass.new(o)
+          when Integer, String, Array
+            klass.with_pk!(o)
+          when klass
+            o
+          else 
+            raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
+          end
+        end
+
         # Remove all associated objects from the given association
         def remove_all_associated_objects(opts, *args)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk

@@ -38,6 +38,7 @@ module Sequel
         # current object.
         def add_associated_object(opts, o, *args)
           if opts.dataset_need_primary_key? && new?
+            o = make_add_associated_object(opts, o)
             delay_validate_associated_object(opts, o)
             send(opts[:name]) << o
             after_create_hook{super(opts, o, *args)}
