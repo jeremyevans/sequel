@@ -1143,7 +1143,7 @@ module Sequel
 
       # Handle bigserial type if :serial option is present
       def type_literal_generic_bignum(column)
-        column[:serial] ? :bigserial : super
+        column[:serial] && !column.include?(:default) ? :bigserial : super
       end
 
       # PostgreSQL uses the bytea data type for blobs
