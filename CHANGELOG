@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize bool type as boolean in the schema dumper (jeremyevans) (#1192)
+
 * Make Dataset#to_hash and #to_hash_groups work correctly for model datasets doing eager loading (jeremyevans)
 
 * Make delay_add_association plugin handle hashes and primary keys passed to add_* association methods (jeremyevans) (#1187)

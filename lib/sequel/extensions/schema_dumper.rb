@@ -35,7 +35,7 @@ module Sequel
         {:type=>:Bignum}
       when /\A(?:real|float|double(?: precision)?|double\(\d+,\d+\)(?: unsigned)?)\z/o
         {:type=>Float}
-      when 'boolean', 'bit'
+      when 'boolean', 'bit', 'bool'
         {:type=>TrueClass}
       when /\A(?:(?:tiny|medium|long|n)?text|clob)\z/o
         {:type=>String, :text=>true}

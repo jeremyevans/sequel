@@ -665,7 +665,7 @@ END_MIG
       %w"nvarchar ntext smalldatetime smallmoney binary varbinary nchar" +
       ["timestamp(6) without time zone", "timestamp(6) with time zone", 'mediumint(10) unsigned', 'int(9) unsigned',
        'int(10) unsigned', "int(12) unsigned", 'bigint unsigned', 'tinyint(3) unsigned', 'identity', 'int identity'] +
-      %w"integer(10) bit"
+      %w"integer(10) bit bool"
     @d.meta_def(:schema) do |t, *o|
       i = 0
       types.map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true}]}
@@ -745,6 +745,7 @@ create_table(:x) do
   Integer :c71
   Integer :c72
   TrueClass :c73
+  TrueClass :c74
   
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c64), 0)
   check Sequel::SQL::BooleanExpression.new(:>=, Sequel::SQL::Identifier.new(:c65), 0)
