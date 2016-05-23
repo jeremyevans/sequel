@@ -80,11 +80,14 @@ module Sequel
     #                 appropriately.  Valid values true, :on, false, :off, :local (9.1+),
     #                 and :remote_write (9.2+).
     def transaction(opts=OPTS, &block)
+      opts = Hash[opts]
       if retry_on = opts[:retry_on]
         tot_retries = opts.fetch(:num_retries, 5)
         num_retries = 0 unless tot_retries.nil?
         begin
-          transaction(Hash[opts].merge!(:retry_on=>nil, :retrying=>true), &block)
+          opts[:retry_on] = nil
+          opts[:retrying] = true
+          transaction(opts, &block)
         rescue *retry_on => e
           if num_retries
             num_retries += 1
@@ -99,21 +102,40 @@ module Sequel
         end
       else
         synchronize(opts[:server]) do |conn|
-          if opts[:savepoint] == :only && supports_savepoints? && !_trans(conn)
-            return yield(conn)
-          end
-          if already_in_transaction?(conn, opts)
-            if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last
-              _transaction(conn, Hash[opts].merge!(:savepoint=>true), &block)
+          if opts[:savepoint] == :only
+            if supports_savepoints?
+              if _trans(conn)
+                opts[:savepoint] = true
+              else
+                return yield(conn)
+              end
             else
+              opts[:savepoint] = false
+            end
+          end
+
+          if already_in_transaction?(conn, opts)
+            if opts[:rollback] == :always && !opts.has_key?(:savepoint)
+              if supports_savepoints? 
+                opts[:savepoint] = true
+              else
+                raise Sequel::Error, "cannot set :rollback=>:always transaction option if already inside a transaction"
+              end
+            end
+
+            if opts[:savepoint] != false && (stack = _trans(conn)[:savepoints]) && stack.last
+              opts[:savepoint] = true
+            end
+
+            unless opts[:savepoint]
               if opts[:retrying]
                 raise Sequel::Error, "cannot set :retry_on options if you are already inside a transaction"
               end
               return yield(conn)
             end
-          else
-            _transaction(conn, opts, &block)
           end
+
+          _transaction(conn, opts, &block)
         end
       end
     end
@@ -177,9 +199,9 @@ module Sequel
       hash = {}
 
       if supports_savepoints?
-        if _trans(conn)
-          hash = nil
-          _trans(conn)[:savepoints].push(opts[:auto_savepoint])
+        if t = _trans(conn)
+          t[:savepoints].push(opts[:auto_savepoint])
+          return
         else
           hash[:savepoints] = [opts[:auto_savepoint]]
           if (prep = opts[:prepare]) && supports_prepared_transactions?
@@ -190,9 +212,7 @@ module Sequel
         hash[:prepare] = prep
       end
 
-      if hash
-        Sequel.synchronize{@transactions[conn] = hash}
-      end
+      Sequel.synchronize{@transactions[conn] = hash}
     end    
 
     # Whether the current thread/connection is already inside a transaction

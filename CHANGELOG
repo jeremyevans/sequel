@@ -1,5 +1,7 @@
 === HEAD
 
+* Make :rollback=>:always inside a transaction use a savepoint automatically if supported (jeremyevans) (#1193)
+
 * Recognize bool type as boolean in the schema dumper (jeremyevans) (#1192)
 
 * Make Dataset#to_hash and #to_hash_groups work correctly for model datasets doing eager loading (jeremyevans)

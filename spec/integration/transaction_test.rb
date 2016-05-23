@@ -93,6 +93,16 @@ describe "Database transactions" do
       @d.select_order_map(:name).must_equal %w'1 2'
     end
 
+    it "should handle :rollback=>:always inside transactions" do
+      @db.transaction do
+        @db.transaction(:rollback=>:always) do
+          @d << {:name => 'abc', :value => 1}
+          2
+        end.must_equal 2
+      end
+      @d.select_order_map(:value).must_equal []
+    end
+
     it "should handle table_exists? failures inside savepoints" do
       @db.transaction do
         @d << {:name => '1'}

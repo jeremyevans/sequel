@@ -1022,6 +1022,15 @@ describe "Database#transaction with savepoint support" do
     a.must_equal [1, 1]
   end
   
+  it "should automatically use a savepoint if :rollback=>:always given inside a transaction" do
+    @db.transaction do
+      @db.transaction(:rollback=>:always) do
+        @db.get(1)
+      end
+    end
+    @db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SELECT 1 AS v LIMIT 1", "ROLLBACK TO SAVEPOINT autopoint_1", "COMMIT"]
+  end
+  
   it "should support :retry_on option for automatically retrying transactions inside an :auto_savepoint transaction" do
     a = []
     @db.transaction(:auto_savepoint=>true) do
@@ -1087,6 +1096,17 @@ describe "Database#transaction without savepoint support" do
     @db.sqls.must_equal ['BEGIN', 'COMMIT']
   end
 
+  it "should automatically use a savepoint if :rollback=>:always given inside a transaction" do
+    proc do
+      @db.transaction do
+        @db.transaction(:rollback=>:always) do
+          @db.get(1)
+        end
+      end
+    end.must_raise Sequel::Error
+    @db.sqls.must_equal ["BEGIN", "ROLLBACK"]
+  end
+  
   include DatabaseTransactionSpecs
 end
   
