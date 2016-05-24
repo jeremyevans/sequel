@@ -1,0 +1,6 @@
+--no-private
+--title "Sequel: The Database Toolkit for Ruby"
+lib/**/*.rb
+-q
+-
+doc/*.rdoc
