@@ -973,6 +973,7 @@ describe "A PostgreSQL database" do
     @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
 
     @db[:posts].full_text_search(:title, 'rails').all.must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search(:title, 'rails', :headline=>true).all.must_equal [{:title=>'ruby rails', :body=>'yowsa', :headline=>'ruby <b>rails</b>'}]
     @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.must_equal [:title=>'ruby rails', :body=>'yowsa']
     @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.must_equal [{:title=>'ruby scooby', :body=>'x'}]
 
@@ -997,7 +998,7 @@ describe "A PostgreSQL database" do
     @db[:posts].insert(:title=>t1)
     @db[:posts].insert(:title=>t2)
     @db[:posts].full_text_search(:title, 'ruby & sequel', :rank=>true).select_map(:title).must_equal [t2, t1]
-  end
+  end if DB.server_version >= 80300
 
   it "should support spatial indexes" do
     @db.create_table(:posts){box :geom; spatial_index [:geom]}

@@ -1342,6 +1342,10 @@ module Sequel
           ds = ds.reverse{ts_rank_cd(cols, terms)}
         end
 
+        if opts[:headline]
+          ds = ds.select_append{ts_headline(lang, phrase_cols, terms).as(:headline)}
+        end
+
         ds
       end
 

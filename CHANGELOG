@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :headline option to PostgreSQL Dataset#full_text_search for adding an extract of the matched text to the SELECT list (jeremyevans)
+
 * Make :rollback=>:always inside a transaction use a savepoint automatically if supported (jeremyevans) (#1193)
 
 * Recognize bool type as boolean in the schema dumper (jeremyevans) (#1192)
