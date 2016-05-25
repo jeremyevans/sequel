@@ -1306,6 +1306,8 @@ module Sequel
       # of any of the terms in any of the cols.
       #
       # Options:
+      # :headline :: Append a expression to the selected columns aliased to headline that
+      #              contains an extract of the matched text.
       # :language :: The language to use for the search (default: 'simple')
       # :plain :: Whether a plain search should be used (default: false).  In this case,
       #           terms should be a single string, and it will do a search where cols
