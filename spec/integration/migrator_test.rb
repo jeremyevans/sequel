@@ -213,20 +213,22 @@ describe Sequel::Migrator do
     [:schema_migrations, :a].each{|n| @db.table_exists?(n).must_equal false}
     @db[:b].columns.must_equal [:a, :c, :e]
 
-    @m.apply(@db, @dir, 6)
-    [:schema_info, :b, :c].each{|n| @db.table_exists?(n).must_equal true}
-    [:schema_migrations, :a].each{|n| @db.table_exists?(n).must_equal false}
-    @db[:b].columns.must_equal [:a, :c, :e, :f]
+    if @db.supports_foreign_key_parsing?
+      @m.apply(@db, @dir, 6)
+      [:schema_info, :b, :c].each{|n| @db.table_exists?(n).must_equal true}
+      [:schema_migrations, :a].each{|n| @db.table_exists?(n).must_equal false}
+      @db[:b].columns.must_equal [:a, :c, :e, :f]
 
-    @m.apply(@db, @dir, 7)
-    [:schema_info, :b, :c, :d].each{|n| @db.table_exists?(n).must_equal true}
-    [:schema_migrations, :a].each{|n| @db.table_exists?(n).must_equal false}
-    @db[:b].columns.must_equal [:a, :c, :e, :f, :g]
+      @m.apply(@db, @dir, 7)
+      [:schema_info, :b, :c, :d].each{|n| @db.table_exists?(n).must_equal true}
+      [:schema_migrations, :a].each{|n| @db.table_exists?(n).must_equal false}
+      @db[:b].columns.must_equal [:a, :c, :e, :f, :g]
 
-    @m.apply(@db, @dir, 6)
-    [:schema_info, :b, :c].each{|n| @db.table_exists?(n).must_equal true}
-    [:schema_migrations, :a, :d].each{|n| @db.table_exists?(n).must_equal false}
-    @db[:b].columns.must_equal [:a, :c, :e, :f]
+      @m.apply(@db, @dir, 6)
+      [:schema_info, :b, :c].each{|n| @db.table_exists?(n).must_equal true}
+      [:schema_migrations, :a, :d].each{|n| @db.table_exists?(n).must_equal false}
+      @db[:b].columns.must_equal [:a, :c, :e, :f]
+    end
 
     @m.apply(@db, @dir, 5)
     [:schema_info, :b].each{|n| @db.table_exists?(n).must_equal true}
