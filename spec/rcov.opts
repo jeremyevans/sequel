@@ -1,8 +1,0 @@
---exclude
-gems
---exclude
-spec
---exclude
-00*
---threshold
-100
