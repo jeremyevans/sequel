@@ -1052,6 +1052,22 @@ describe "Database#transaction with savepoint support" do
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT', 'foo', 'bar', 'baz']
   end
 
+  it "should support the :savepoint option to after_commit inside savepoints" do
+    @db.transaction do
+      @db.after_commit(:savepoint=>true){@db.execute('foo')}
+      @db.transaction(:savepoint=>true) do
+        @db.after_commit{@db.execute('bar1')}
+        @db.after_commit(:savepoint=>true){@db.execute('bar2')}
+      end
+      @db.transaction(:savepoint=>true) do
+        @db.after_commit{@db.execute('bar3')}
+        @db.after_commit(:savepoint=>true){@db.execute('bar4')}
+      end
+      @db.after_commit(:savepoint=>true){@db.execute('baz')}
+    end
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'bar2', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'bar4', 'COMMIT', 'foo', 'bar1', 'bar3', 'baz']
+  end
+
   it "should support after_rollback inside savepoints" do
     @db.transaction do
       @db.after_rollback{@db.execute('foo')}
@@ -1060,6 +1076,25 @@ describe "Database#transaction with savepoint support" do
       raise Sequel::Rollback
     end
     @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'RELEASE SAVEPOINT autopoint_1', 'ROLLBACK', 'foo', 'bar', 'baz']
+  end
+
+  it "should support the :savepoint option to after_rollback inside savepoints" do
+    @db.transaction do
+      @db.after_rollback(:savepoint=>true){@db.execute('foo')}
+      @db.transaction(:savepoint=>true) do
+        @db.after_rollback{@db.execute('bar1')}
+        @db.after_rollback(:savepoint=>true){@db.execute('bar2')}
+        raise Sequel::Rollback
+      end
+      @db.transaction(:savepoint=>true) do
+        @db.after_rollback{@db.execute('bar3')}
+        @db.after_rollback(:savepoint=>true){@db.execute('bar4')}
+        raise Sequel::Rollback
+      end
+      @db.after_rollback(:savepoint=>true){@db.execute('baz')}
+      raise Sequel::Rollback
+    end
+    @db.sqls.must_equal ['BEGIN', 'SAVEPOINT autopoint_1', 'ROLLBACK TO SAVEPOINT autopoint_1', 'bar2', 'SAVEPOINT autopoint_1', 'ROLLBACK TO SAVEPOINT autopoint_1', 'bar4', 'ROLLBACK', 'foo', 'bar1', 'bar3', 'baz']
   end
 
   it "should raise an error if you attempt to use after_commit inside a savepoint in a prepared transaction" do
