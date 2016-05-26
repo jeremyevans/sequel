@@ -165,12 +165,17 @@ module Sequel
     # in progress transaction commits (and only if it commits).
     # Options:
     # :server :: The server/shard to use.
+    # :savepoint :: If set to true, runs the block if the current savepoint
+    #               commits, if any. If set to true but there is no current savepoint,
+    #               runs the block if the transaction commits, as normal.
     def after_commit(opts=OPTS, &block)
       raise Error, "must provide block to after_commit" unless block
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
           raise Error, "cannot call after_commit in a prepared transaction" if h[:prepare]
-          (h[:after_commit] ||= []) << block
+          level = (supports_savepoints? && opts[:savepoint]) ? savepoint_level(conn) : 1
+          hooks = h[:after_commit] ||= {}
+          (hooks[level] ||= []) << block
         else
           yield
         end
@@ -182,12 +187,17 @@ module Sequel
     # in progress transaction rolls back (and only if it rolls back).
     # Options:
     # :server :: The server/shard to use.
+    # :savepoint :: If set to true, runs the block after the current savepoint
+    #               rolls back, if any. If set to true but there is no current savepoint,
+    #               runs the block if the transaction rolls back, as normal.
     def after_rollback(opts=OPTS, &block)
       raise Error, "must provide block to after_rollback" unless block
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
           raise Error, "cannot call after_rollback in a prepared transaction" if h[:prepare]
-          (h[:after_rollback] ||= []) << block
+          level = (supports_savepoints? && opts[:savepoint]) ? savepoint_level(conn) : 1
+          hooks = h[:after_rollback] ||= {}
+          (hooks[level] ||= []) << block
         end
       end
     end

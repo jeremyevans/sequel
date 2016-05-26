@@ -301,13 +301,21 @@ module Sequel
 
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
+      t = _trans(conn)
+      level = supports_savepoints? ? savepoint_level(conn) : 1
+
+      # Remove all callbacks from the current level, so that they don't hang
+      # around and kick in if we enter another nested transaction.
+      after_commit_callbacks   = (ac = t[:after_commit])   && ac.delete(level)
+      after_rollback_callbacks = (ar = t[:after_rollback]) && ar.delete(level)
+
+      callbacks = committed ? after_commit_callbacks : after_rollback_callbacks
+
       if transaction_finished?(conn)
-        callbacks = _trans(conn)[committed ? :after_commit : :after_rollback]
         Sequel.synchronize{@transactions.delete(conn)}
-        if callbacks
-          callbacks.each(&:call)
-        end
       end
+
+      callbacks.each(&:call) if callbacks
     end
 
     # SQL to rollback to a savepoint
