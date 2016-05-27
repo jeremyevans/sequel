@@ -196,9 +196,7 @@ module Sequel
 
     # Add the current thread to the list of active transactions
     def add_transaction(conn, opts)
-      hash = {}
-
-      apply_transaction_options(conn, opts, hash)
+      hash = transaction_options(conn, opts)
 
       if supports_savepoints?
         if t = _trans(conn)
@@ -222,9 +220,10 @@ module Sequel
       _trans(conn) && (!supports_savepoints? || !opts[:savepoint])
     end
 
-    # Apply other transaction options to the transaction hash. Meant to be
-    # overridden.
-    def apply_transaction_options(conn, opts, hash)
+    # Derive the transaction hash from the options passed to the transaction.
+    # Meant to be overridden.
+    def transaction_options(conn, opts)
+      {}
     end
 
     # Issue query to begin a new savepoint.
@@ -308,7 +307,7 @@ module Sequel
 
     # Retrieve the transaction hooks that should be run for the given
     # connection and commit status.
-    def get_hooks(conn, committed)
+    def transaction_hooks(conn, committed)
       if !supports_savepoints? || savepoint_level(conn) == 1
         _trans(conn)[committed ? :after_commit : :after_rollback]
       end
@@ -316,7 +315,7 @@ module Sequel
 
     # Remove the current thread from the list of active transactions
     def remove_transaction(conn, committed)
-      callbacks = get_hooks(conn, committed)
+      callbacks = transaction_hooks(conn, committed)
 
       if transaction_finished?(conn)
         Sequel.synchronize{@transactions.delete(conn)}

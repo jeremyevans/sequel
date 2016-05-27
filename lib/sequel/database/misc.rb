@@ -170,7 +170,7 @@ module Sequel
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
           raise Error, "cannot call after_commit in a prepared transaction" if h[:prepare]
-          add_hook(conn, :after_commit, block)
+          add_transaction_hook(conn, :after_commit, block)
         else
           yield
         end
@@ -187,7 +187,7 @@ module Sequel
       synchronize(opts[:server]) do |conn|
         if h = _trans(conn)
           raise Error, "cannot call after_rollback in a prepared transaction" if h[:prepare]
-          add_hook(conn, :after_rollback, block)
+          add_transaction_hook(conn, :after_rollback, block)
         end
       end
     end
@@ -343,7 +343,7 @@ module Sequel
 
     # Set the given callable as a hook to be called. Type should be either
     # :after_commit or :after_rollback.
-    def add_hook(conn, type, block)
+    def add_transaction_hook(conn, type, block)
       hooks = _trans(conn)[type] ||= []
       hooks << block
     end
