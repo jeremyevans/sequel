@@ -191,10 +191,10 @@ Instead, you should do:
 The no_auto_string_literals extension can also be used to remove the default support
 for plain strings as literal strings in update methods.
 
-==== SQL Fragment passed to Dataset#lock_style
+==== SQL Fragment passed to Dataset#lock_style and Model#lock!
 
-The Sequel::Dataset#lock_style method also treats an input string 
-as SQL code. This method should not be called with user input.
+The Sequel::Dataset#lock_style and Sequel::Model#lock! methods also treat
+an input string as SQL code. This method should not be called with user input.
 
 ==== SQL Type Names
 
