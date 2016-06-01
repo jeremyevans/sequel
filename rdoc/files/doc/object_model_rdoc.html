@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-05-23 13:28:32 -0700</span>
+          <span class='datetime'>2016-05-16 11:05:01 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -331,7 +331,7 @@
             
             <p><a
             href="../../classes/Sequel/SQL/Identifier.html">Sequel::SQL::Identifier</a>
-            objects represent single identifiers.  The main reason for their existance
+            objects represent single identifiers.  The main reason for their existence
             is that they are not checked for double or triple underscores, so no
             automatic qualification or aliasing happens for them:</p>
             
@@ -456,7 +456,7 @@
             <h3 id="label-Sequel-3A-3ASQL-3A-3AConstant"><a href="../../classes/Sequel/SQL/Constant.html">Sequel::SQL::Constant</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AConstant">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p><a href="../../classes/Sequel/SQL/Constant.html">Sequel::SQL::Constant</a>
-            objects represent constants or psuedo-constants in SQL, such as TRUE, NULL,
+            objects represent constants or pseudo-constants in SQL, such as TRUE, NULL,
             and CURRENT_TIMESTAMP.  These are not designed to be created or used by the
             end user, but some existing values are predefined under the <a
             href="../../classes/Sequel.html">Sequel</a> namespace:</p>
@@ -611,7 +611,7 @@
             They use a hash-based API, supporting the :frame, :order, :partition, and
             :window options:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (ORDER BY &quot;a&quot;)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">parition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (PARTITION BY &quot;a&quot;)</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">parition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">frame=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">all</span>)&#x000A;<span class="ruby-comment"># (PARTITION BY &quot;a&quot; ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (ORDER BY &quot;a&quot;)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>) <span class="ruby-comment"># (PARTITION BY &quot;a&quot;)</span>&#x000A;&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Window</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">frame=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">all</span>)&#x000A;<span class="ruby-comment"># (PARTITION BY &quot;a&quot; ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)</span></pre>
             
             <h3 id="label-Sequel-3A-3ASQL-3A-3AWrapper"><a href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AWrapper">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

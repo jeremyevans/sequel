@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Range</title>
+    <title>Sequel::SQLComments</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
         function popupCode(url) {
@@ -26,18 +26,14 @@
     <div class='class' id='wrapper'>
       <div class='header'>
         <h1 class='name'>
-          <span class='type'>class</span>
-          Range
+          <span class='type'>module</span>
+          Sequel::SQLComments
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../files/lib/sequel/extensions/pg_range_rb.html">lib/sequel/extensions/pg_range.rb</a>
+            <a target="docwin" href="../../files/lib/sequel/extensions/sql_comments_rb.html">lib/sequel/extensions/sql_comments.rb</a>
           </li>
         </ol>
-        <div class='parent'>
-          Superclass:
-          <strong><a target="docwin" href="Object.html">Object</a></strong>
-        </div>
       </div>
       <div id='content'>
         <div id='text'>
@@ -46,7 +42,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-pg_range">pg_range</a></li>
+              <li><a target="docwin" href="#method-i-comment">comment</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -54,22 +50,22 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-pg_range'>
-                <a name='method-i-pg_range'></a>
+              <div class='method public-instance' id='method-method-i-comment'>
+                <a name='method-i-comment'></a>
                 <div class='synopsis'>
-                  <span class='name'>pg_range</span>
-                  <span class='arguments'>(db_type=nil)</span>
+                  <span class='name'>comment</span>
+                  <span class='arguments'>(comment)</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Create a new PGRange using the receiver as the input range, with the given
-                  database type.</p>
+                  <p>Return a modified copy of the dataset that will use the given comment. To
+                  uncomment a commented dataset, pass nil as the argument.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pg_range-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-comment-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-pg_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_range.rb, line 610</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pg_range</span>(<span class="ruby-identifier">db_type</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span><span class="ruby-operator">::</span><span class="ruby-constant">PGRange</span>.<span class="ruby-identifier">from_range</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">db_type</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-comment-source'><span class="ruby-comment"># File lib/sequel/extensions/sql_comments.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">comment</span>(<span class="ruby-identifier">comment</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:comment=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">format_sql_comment</span>(<span class="ruby-identifier">comment</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">comment</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

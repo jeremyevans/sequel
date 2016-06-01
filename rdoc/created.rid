@@ -1,6 +1,6 @@
-Sun, 01 May 2016 10:37:15 -0700
+Wed, 01 Jun 2016 07:40:56 -0700
 README.rdoc	Fri, 27 Nov 2015 11:00:03 -0800
-CHANGELOG	Sun, 01 May 2016 10:31:41 -0700
+CHANGELOG	Wed, 01 Jun 2016 07:30:01 -0700
 MIT-LICENSE	Sat, 09 Jan 2016 12:54:32 -0800
 lib/sequel.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/ast_transformer.rb	Thu, 21 Jan 2016 12:21:52 -0800
@@ -14,7 +14,7 @@ lib/sequel/model.rb	Wed, 23 Mar 2016 17:30:20 -0700
 lib/sequel/no_core_ext.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/sql.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/timezones.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/version.rb	Sun, 01 May 2016 10:31:41 -0700
+lib/sequel/version.rb	Wed, 01 Jun 2016 07:30:01 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 15 Apr 2016 07:27:59 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 29 Apr 2016 12:26:44 -0700
 lib/sequel/connection_pool/single.rb	Fri, 15 Apr 2016 07:27:59 -0700
@@ -23,23 +23,23 @@ lib/sequel/database/connecting.rb	Wed, 09 Mar 2016 14:04:40 -0800
 lib/sequel/database/dataset.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/database/dataset_defaults.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/database/features.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/database/logging.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/database/misc.rb	Thu, 28 Apr 2016 16:00:43 -0700
+lib/sequel/database/logging.rb	Thu, 12 May 2016 12:28:13 -0700
+lib/sequel/database/misc.rb	Fri, 27 May 2016 13:00:23 -0700
 lib/sequel/database/query.rb	Thu, 24 Mar 2016 15:25:56 -0700
-lib/sequel/database/schema_generator.rb	Tue, 08 Mar 2016 09:13:30 -0800
-lib/sequel/database/schema_methods.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/database/transactions.rb	Thu, 24 Mar 2016 15:25:56 -0700
-lib/sequel/dataset/actions.rb	Mon, 25 Apr 2016 11:33:14 -0700
-lib/sequel/dataset/features.rb	Thu, 21 Jan 2016 12:21:53 -0800
+lib/sequel/database/schema_generator.rb	Tue, 17 May 2016 14:34:25 -0700
+lib/sequel/database/schema_methods.rb	Tue, 17 May 2016 14:34:25 -0700
+lib/sequel/database/transactions.rb	Fri, 27 May 2016 13:00:23 -0700
+lib/sequel/dataset/actions.rb	Thu, 19 May 2016 11:03:56 -0700
+lib/sequel/dataset/features.rb	Wed, 11 May 2016 12:54:28 -0700
 lib/sequel/dataset/graph.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/misc.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/mutation.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/prepared_statements.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/dataset/query.rb	Thu, 21 Jan 2016 12:21:53 -0800
+lib/sequel/dataset/query.rb	Wed, 11 May 2016 12:54:28 -0700
 lib/sequel/dataset/sql.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/model/associations.rb	Wed, 30 Mar 2016 15:31:29 -0700
-lib/sequel/model/base.rb	Fri, 08 Apr 2016 07:32:40 -0700
+lib/sequel/model/associations.rb	Thu, 19 May 2016 11:03:56 -0700
+lib/sequel/model/base.rb	Mon, 09 May 2016 14:29:38 -0700
 lib/sequel/model/dataset_module.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/model/default_inflections.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/model/errors.rb	Thu, 21 Jan 2016 12:21:53 -0800
@@ -61,14 +61,14 @@ doc/migration.rdoc	Mon, 25 May 2015 07:49:31 -0700
 doc/model_hooks.rdoc	Thu, 29 Jan 2015 16:13:26 -0800
 doc/model_plugins.rdoc	Fri, 06 Sep 2013 13:38:06 -0700
 doc/mssql_stored_procedures.rdoc	Thu, 02 Jan 2014 10:46:37 -0800
-doc/object_model.rdoc	Fri, 23 May 2014 13:28:32 -0700
+doc/object_model.rdoc	Mon, 16 May 2016 11:05:01 -0700
 doc/opening_databases.rdoc	Thu, 04 Feb 2016 15:56:57 -0800
 doc/postgresql.rdoc	Wed, 23 Sep 2015 17:04:24 -0700
 doc/prepared_statements.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/querying.rdoc	Thu, 23 Jul 2015 07:47:01 -0700
 doc/reflection.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
-doc/schema_modification.rdoc	Tue, 16 Feb 2016 18:30:50 -0800
-doc/security.rdoc	Fri, 12 Feb 2016 14:45:49 -0800
+doc/schema_modification.rdoc	Tue, 17 May 2016 14:34:25 -0700
+doc/security.rdoc	Wed, 01 Jun 2016 07:30:01 -0700
 doc/sharding.rdoc	Fri, 22 May 2015 08:18:52 -0700
 doc/sql.rdoc	Tue, 23 Jun 2015 07:26:33 -0700
 doc/testing.rdoc	Mon, 25 Apr 2016 11:33:14 -0700
@@ -172,6 +172,7 @@ doc/release_notes/4.31.0.txt	Mon, 01 Feb 2016 08:16:09 -0800
 doc/release_notes/4.32.0.txt	Tue, 01 Mar 2016 11:27:08 -0800
 doc/release_notes/4.33.0.txt	Fri, 01 Apr 2016 07:24:12 -0700
 doc/release_notes/4.34.0.txt	Sun, 01 May 2016 10:31:41 -0700
+doc/release_notes/4.35.0.txt	Wed, 01 Jun 2016 07:30:01 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
 doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800
 doc/release_notes/4.6.0.txt	Thu, 02 Jan 2014 12:13:25 -0800

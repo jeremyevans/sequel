@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.34.0</h2>
+    <h2>Sequel::Model Plugins for v4.35.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -200,6 +200,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_caching_rb.html">schema_caching</a>: Speeds up loading a large number of models by caching database schema and loading it from a file.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/schema_dumper_rb.html">schema_dumper</a>: Adds Database#dump_schema_migration and related methods for dumping the schema of the database as a migration that can be restored on other databases.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/server_block_rb.html">server_block</a>: Adds Database#with_server method that makes access inside the passed block use the specified shard by default.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/server_logging_rb.html">server_logging</a>: Include server/shard information when logging queries.</li>
 </ul>
 
 <h3>Dataset extensions that ship with Sequel</h3>
@@ -228,6 +229,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sequel_3_dataset_methods_rb.html">sequel_3_dataset_methods</a>: Adds Dataset#[]=, #insert_multiple, #qualify_to, #qualify_to_first_source, #set, #to_csv, #db=, and #opts= methods.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/set_overrides_rb.html">set_overrides</a>: Adds Dataset#set_defaults and #set_overrides for setting default values in some INSERT/UPDATE statements.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil</a>: Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a>: Adds Dataset#comment method, for setting an SQL comment in the queries created by the dataset.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/to_dot_rb.html">to_dot</a>: Adds Dataset#to_dot method, which returns a string suitable for processing by graphviz's dot program to get a visualization of the dataset's abstract syntax tree.</li>
 </ul>
 

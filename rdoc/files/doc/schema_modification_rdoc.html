@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-16 18:30:50 -0800</span>
+          <span class='datetime'>2016-05-17 14:34:25 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -91,6 +91,13 @@
             
             <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">columns_types</span>) <span class="ruby-keyword">do</span>  <span class="ruby-comment"># database type used</span>&#x000A;  <span class="ruby-identifier">column</span> :<span class="ruby-identifier">a1</span>, :<span class="ruby-identifier">string</span>            <span class="ruby-comment"># string</span>&#x000A;  <span class="ruby-identifier">column</span> :<span class="ruby-identifier">a2</span>, <span class="ruby-constant">String</span>             <span class="ruby-comment"># varchar(255)</span>&#x000A;  <span class="ruby-identifier">column</span> :<span class="ruby-identifier">a3</span>, <span class="ruby-string">&#39;string&#39;</span>           <span class="ruby-comment"># string</span>&#x000A;  <span class="ruby-identifier">column</span> :<span class="ruby-identifier">a4</span>, :<span class="ruby-identifier">datetime</span>          <span class="ruby-comment"># datetime</span>&#x000A;  <span class="ruby-identifier">column</span> :<span class="ruby-identifier">a5</span>, <span class="ruby-constant">DateTime</span>           <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-identifier">column</span> :<span class="ruby-identifier">a6</span>, <span class="ruby-string">&#39;timestamp(6)&#39;</span>     <span class="ruby-comment"># timestamp(6)</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
+            <p>If you use a ruby class as the type, <a
+            href="../../classes/Sequel.html">Sequel</a> will try to guess the
+            appropriate type name for the database you are using.  If a symbol or
+            string as used as the type, it is used verbatim as the type name in SQL,
+            with the exception of :Bignum.  Using the symbol :Bignum as a type will use
+            the appropriate 64-bit integer type for the database you are using.</p>
+            
             <h3 id="label-Column+options">Column options<span><a href="#label-Column+options">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>When using the type name as method, the third argument is an options hash,
@@ -135,7 +142,7 @@
             
             <p>If you want an autoincrementing 64-bit integer:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a0</span>){<span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Bignum</span>}</pre>
+            <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">a0</span>){<span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">type=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Bignum</span>}</pre>
             
             <p>If you want to create a primary key column that doesn&#39;t use an
             autoincrementing integer, you should not use this method.  Instead, you
@@ -466,11 +473,11 @@
             <p>This modifies a column&#39;s type.  Most databases will attempt to convert
             existing values in the columns to the new type:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">copies_sold</span>, <span class="ruby-constant">Bignum</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">set_column_type</span> :<span class="ruby-identifier">copies_sold</span>, :<span class="ruby-constant">Bignum</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>You can specify the type as a string or symbol, in which case it is used
-            verbatim, or as a supported ruby class, in which case it gets converted to
-            an appropriate database type.</p>
+            verbatim, or as a supported ruby class or the :Bignum symbol, in which case
+            it gets converted to an appropriate database type.</p>
             
             <h3 id="label-set_column_allow_null"><code>set_column_allow_null</code><span><a href="#label-set_column_allow_null">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

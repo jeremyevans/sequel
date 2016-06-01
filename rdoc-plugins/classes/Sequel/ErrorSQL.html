@@ -42,8 +42,8 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a target="docwin" href="#method-i-log_connection_yield">log_connection_yield</a></li>
               <li><a target="docwin" href="#method-i-log_exception">log_exception</a></li>
-              <li><a target="docwin" href="#method-i-log_yield">log_yield</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -51,6 +51,26 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-log_connection_yield'>
+                <a name='method-i-log_connection_yield'></a>
+                <div class='synopsis'>
+                  <span class='name'>log_connection_yield</span>
+                  <span class='arguments'>(sql, conn, args=nil)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>If there are no loggers for this database and an exception is raised store
+                  the <a href="SQL.html">SQL</a> related to the exception with the exception,
+                  so it is available for <a
+                  href="DatabaseError.html#method-i-sql">Sequel::DatabaseError#sql</a> later.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-log_connection_yield-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-log_connection_yield-source'><span class="ruby-comment"># File lib/sequel/extensions/error_sql.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">conn</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@loggers</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-keyword">yield</span>&#x000A;    <span class="ruby-keyword">rescue</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;#{connection_info(conn) if conn &amp;&amp; log_connection_info}#{sql}#{&quot;; #{args.inspect}&quot; if args}&quot;</span>&#x000A;      <span class="ruby-identifier">e</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@sequel_error_sql</span>, <span class="ruby-identifier">sql</span>)&#x000A;      <span class="ruby-identifier">raise</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-log_exception'>
                 <a name='method-i-log_exception'></a>
                 <div class='synopsis'>
@@ -68,26 +88,6 @@
                     [show source]
                   </a>
                   <pre id='method-i-log_exception-source'><span class="ruby-comment"># File lib/sequel/extensions/error_sql.rb, line 52</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">log_exception</span>(<span class="ruby-identifier">exception</span>, <span class="ruby-identifier">message</span>)&#x000A;  <span class="ruby-identifier">exception</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@sequel_error_sql</span>, <span class="ruby-identifier">message</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-log_yield'>
-                <a name='method-i-log_yield'></a>
-                <div class='synopsis'>
-                  <span class='name'>log_yield</span>
-                  <span class='arguments'>(sql, args=nil)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>If there are no loggers for this database and an exception is raised store
-                  the <a href="SQL.html">SQL</a> related to the exception with the exception,
-                  so it is available for <a
-                  href="DatabaseError.html#method-i-sql">Sequel::DatabaseError#sql</a> later.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-log_yield-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-log_yield-source'><span class="ruby-comment"># File lib/sequel/extensions/error_sql.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">log_yield</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@loggers</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">begin</span>&#x000A;      <span class="ruby-keyword">yield</span>&#x000A;    <span class="ruby-keyword">rescue</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">e</span>&#x000A;      <span class="ruby-identifier">sql</span> = <span class="ruby-node">&quot;#{sql}; #{args.inspect}&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>&#x000A;      <span class="ruby-identifier">e</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@sequel_error_sql</span>, <span class="ruby-identifier">sql</span>)&#x000A;      <span class="ruby-identifier">raise</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
