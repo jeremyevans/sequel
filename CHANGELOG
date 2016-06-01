@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.35.0 (2016-06-01)
 
 * Add :headline option to PostgreSQL Dataset#full_text_search for adding an extract of the matched text to the SELECT list (jeremyevans)
 
