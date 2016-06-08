@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :class_namespace association option for setting default namespace for :class option given as symbol/string (jeremyevans)
+
 * Add Sequel::Model.cache_anonymous_models accessor for changing caching on a per-model basis (jeremyevans)
 
 * Add Sequel::Model.def_Model for adding a Model() method to a module, for easier use of namespaced models (jeremyevans)

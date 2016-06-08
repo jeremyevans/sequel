@@ -1486,7 +1486,9 @@ module Sequel
         # :class :: The associated class or its name as a string or symbol. If not
         #           given, uses the association's name, which is camelized (and
         #           singularized unless the type is :many_to_one, :one_to_one, or one_through_one).  If this is specified
-        #           as a string or symbol, you must specify the full class name (e.g. "SomeModule::MyModel"). 
+        #           as a string or symbol, you must specify the full class name (e.g. "::SomeModule::MyModel"). 
+        # :class_namespace :: If :class is given as a string or symbol, sets the default namespace in which to look for
+        #                     the class.  <tt>:class=>'Foo', :class_namespace=>'Bar'</tt> looks for <tt>::Bar::Foo</tt>.)
         # :clearer :: Proc used to define the private _remove_all_* method for doing the database work
         #             to remove all objects associated to the current object (*_to_many assocations).
         # :clone :: Merge the current options and block into the options and block used in defining

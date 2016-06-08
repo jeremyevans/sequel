@@ -1085,11 +1085,18 @@ module Sequel
         case opts[:class]
           when String, Symbol
             # Delete :class to allow late binding
-            opts[:class_name] ||= opts.delete(:class).to_s
+            class_name = opts.delete(:class).to_s
+
+            if (namespace = opts[:class_namespace]) && !class_name.start_with?('::')
+              class_name = "::#{namespace}::#{class_name}"
+            end
+
+            opts[:class_name] ||= class_name
           when Class
             opts[:class_name] ||= opts[:class].name
         end
-        opts[:class_name] ||= ((name || '').split("::")[0..-2] + [camelize(default)]).join('::')
+
+        opts[:class_name] ||= '::' + ((name || '').split("::")[0..-2] + [camelize(default)]).join('::')
       end
   
       # Module that the class includes that holds methods the class adds for column accessors and

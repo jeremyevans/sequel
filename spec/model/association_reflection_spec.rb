@@ -20,6 +20,16 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     @c.association_reflection(:c).keys.wont_include(:class)
     @c.association_reflection(:c).associated_class.must_equal ParParent
   end
+
+  it "should respect :class_namespace option for specifying the namespace" do
+    class ::ParParent
+      class ParParent < Sequel::Model; end
+    end
+    ParParent.many_to_one :par_parent, :class=>'ParParent'
+    ParParent.association_reflection(:par_parent).associated_class.must_equal ParParent
+    ParParent.many_to_one :par_parent, :class=>'ParParent', :class_namespace=>'ParParent'
+    ParParent.association_reflection(:par_parent).associated_class.must_equal ParParent::ParParent
+  end
 end
 
 describe Sequel::Model::Associations::AssociationReflection, "#primary_key" do

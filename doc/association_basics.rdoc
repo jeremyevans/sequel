@@ -907,11 +907,13 @@ you need to setup a delayed evaluation:
 
 This is the class of the associated objects that will be used.  It's
 one of the most commonly used options.  If it is not given, it guesses
-based on the name of the association.  If a *_to_many association is
-used, uses the singular form of the association name.  For example:
+based on the name of the association, including considering the namespace
+of the current model.  If a *_to_many association is used, uses the
+singular form of the association name.  For example:
 
   Album.many_to_one :artist # guesses Artist
   Artist.one_to_many :albums # guesses Album
+  Foo::Artist.one_to_many :albums # guesses Foo::Album
 
 However, for more complex associations, especially ones that add
 additional filters beyond the foreign/primary key relationships, the
@@ -925,9 +927,17 @@ default class guessed will be wrong:
 You can specify the :class option using the class itself, a Symbol,
 or a String:
 
-  Album.many_to_one :artist, :class=>Artist # Class
-  Album.many_to_one :artist, :class=>:Artist # Symbol
+  Album.many_to_one :artist, :class=>Artist   # Class
+  Album.many_to_one :artist, :class=>:Artist  # Symbol
   Album.many_to_one :artist, :class=>"Artist" # String
+
+If you are namespacing your models, and you need to specify the :class
+option, the path you give to the :class option should be the full path
+to the associated class including any namespaces:
+
+  Foo::Album.many_to_one :artist                        # Uses Foo::Artist
+  Foo::Album.many_to_one :artist, :class=>"Artist"      # Uses Artist
+  Foo::Album.many_to_one :artist, :class=>"Foo::Artist" # Uses Foo::Artist
 
 ==== :key
 
@@ -1757,6 +1767,19 @@ a one_to_one association that can actually return more than one row
 a many_to_many association where there is a unique index in the join table
 so that you know only one object will ever be associated through the
 association.
+
+==== :class_namespace
+
+If the :class option is specified as a symbol or string, the default namespace
+in which to look up the class. If the :class option is not specified as a
+symbol or string, this option is ignored.  This namespace can be overridden
+by starting the string or symbol with <tt>::</tt>:
+
+  Foo::Album.many_to_one :artist, :class=>"Artist"                                 # Uses Artist
+  Foo::Album.many_to_one :artist, :class=>"Artist", :class_namespace=>'Foo'        # Uses Foo::Artist
+  Foo::Album.many_to_one :artist, :class=>"Foo::Artist", :class_namespace=>'Foo'   # Uses Foo::Foo::Artist
+  Foo::Album.many_to_one :artist, :class=>"::Artist", :class_namespace=>'Foo'      # Uses Artist
+  Foo::Album.many_to_one :artist, :class=>"::Foo::Artist", :class_namespace=>'Foo' # Uses Foo::Artist
 
 ==== :methods_module
 
