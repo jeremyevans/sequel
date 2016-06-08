@@ -3,61 +3,14 @@
 require 'sequel/core'
 
 module Sequel
-  # Lets you create a Model subclass with its dataset already set.
-  # +source+ should be an instance of one of the following classes:
-  #
-  # Database :: Sets the database for this model to +source+.
-  #             Generally only useful when subclassing directly
-  #             from the returned class, where the name of the
-  #             subclass sets the table name (which is combined
-  #             with the +Database+ in +source+ to create the
-  #             dataset to use) 
-  # Dataset :: Sets the dataset for this model to +source+. 
-  # other :: Sets the table name for this model to +source+. The
-  #          class will use the default database for model
-  #          classes in order to create the dataset.
-  #
-  # The purpose of this method is to set the dataset/database automatically
-  # for a model class, if the table name doesn't match the implicit
-  # name.  This is neater than using set_dataset inside the class,
-  # doesn't require a bogus query for the schema.
-  #
-  #   # Using a symbol
-  #   class Comment < Sequel::Model(:something)
-  #     table_name # => :something
-  #   end
-  #
-  #   # Using a dataset
-  #   class Comment < Sequel::Model(DB1[:something])
-  #     dataset # => DB1[:something]
-  #   end
-  #
-  #   # Using a database
-  #   class Comment < Sequel::Model(DB1)
-  #     dataset # => DB1[:comments]
-  #   end
-  def self.Model(source)
-    if cache_anonymous_models && (klass = Model::ANONYMOUS_MODEL_CLASSES_MUTEX.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source]})
-      return klass
-    end
-    klass = if source.is_a?(Database)
-      c = Class.new(Model)
-      c.db = source
-      c
-    else
-      Class.new(Model).set_dataset(source)
-    end
-    Model::ANONYMOUS_MODEL_CLASSES_MUTEX.synchronize{Model::ANONYMOUS_MODEL_CLASSES[source] = klass} if cache_anonymous_models
-    klass
+  # Delegate to Sequel::Model, only for backwards compatibility.
+  def self.cache_anonymous_models
+    Model.cache_anonymous_models
   end
 
-  @cache_anonymous_models = true
-
-  class << self
-    # Whether to cache the anonymous models created by Sequel::Model().  This is
-    # required for reloading them correctly (avoiding the superclass mismatch).  True
-    # by default for backwards compatibility.
-    attr_accessor :cache_anonymous_models
+  # Delegate to Sequel::Model, only for backwards compatibility.
+  def self.cache_anonymous_models=(v)
+    Model.cache_anonymous_models = v
   end
 
   # <tt>Sequel::Model</tt> is an object relational mapper built on top of Sequel core.  Each
@@ -78,10 +31,10 @@ module Sequel
 
     # Map that stores model classes created with <tt>Sequel::Model()</tt>, to allow the reopening
     # of classes when dealing with code reloading.
-    ANONYMOUS_MODEL_CLASSES = {}
+    ANONYMOUS_MODEL_CLASSES = @Model_cache = {}
 
     # Mutex protecting access to ANONYMOUS_MODEL_CLASSES
-    ANONYMOUS_MODEL_CLASSES_MUTEX = Mutex.new
+    ANONYMOUS_MODEL_CLASSES_MUTEX = @Model_mutex = Mutex.new
 
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
@@ -125,7 +78,8 @@ module Sequel
       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
       :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
-      :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil}
+      :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
+      :@cache_anonymous_models=>nil, :@Model_mutex=>nil}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to
@@ -137,6 +91,7 @@ module Sequel
     SETTER_METHOD_REGEXP = /=\z/
 
     @allowed_columns = nil
+    @cache_anonymous_models = true
     @db = nil
     @db_schema = nil
     @dataset = nil
@@ -174,5 +129,7 @@ module Sequel
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via +set+/+update+/+new+/etc..
     RESTRICTED_SETTER_METHODS = instance_methods.map(&:to_s).grep(SETTER_METHOD_REGEXP)
+
+    def_Model(::Sequel)
   end
 end

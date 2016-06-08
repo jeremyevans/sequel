@@ -1,3 +1,11 @@
+=== HEAD
+
+* Add Sequel::Model.cache_anonymous_models accessor for changing caching on a per-model basis (jeremyevans)
+
+* Add Sequel::Model.def_Model for adding a Model() method to a module, for easier use of namespaced models (jeremyevans)
+
+* Add Sequel::Model::Model() for creating subclasses of Sequel::Model subclasses, instead of just Sequel::Model itself (jeremyevans)
+
 === 4.35.0 (2016-06-01)
 
 * Add :headline option to PostgreSQL Dataset#full_text_search for adding an extract of the matched text to the SELECT list (jeremyevans)

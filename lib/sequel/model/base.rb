@@ -14,6 +14,11 @@ module Sequel
       # (default: not set, so all columns not otherwise restricted are allowed).
       attr_reader :allowed_columns
 
+      # Whether to cache the anonymous models created by Sequel::Model().  This is
+      # required for reloading them correctly (avoiding the superclass mismatch).  True
+      # by default for backwards compatibility.
+      attr_accessor :cache_anonymous_models
+
       # Array of modules that extend this model's dataset.  Stored
       # so that if the model's dataset is changed, it will be extended
       # with all of these modules.
@@ -116,6 +121,94 @@ module Sequel
       # If you are sending database queries in before_* or after_* hooks, you shouldn't change
       # the default setting without a good reason.
       attr_accessor :use_transactions
+
+      # Define a Model method on the given module that calls the Model
+      # method on the receiver.  This is how the Sequel::Model() method is
+      # defined, and allows you to define Model() methods on other modules,
+      # making it easier to have custom model settings for all models under
+      # a namespace.  Example:
+      #
+      #   module Foo
+      #     Model = Class.new(Sequel::Model)
+      #     Model.def_Model(self)
+      #     DB = Model.db = Sequel.connect(ENV['FOO_DATABASE_URL'])
+      #     Model.plugin :prepared_statements
+      #
+      #     class Bar < Model
+      #       # Uses Foo::DB[:bars]
+      #     end
+      #
+      #     class Baz < Model(:my_baz)
+      #       # Uses Foo::DB[:my_baz]
+      #     end
+      #   end
+      def def_Model(mod)
+        model = self
+        (class << mod; self; end).send(:define_method, :Model) do |source|
+          model.Model(source)
+        end
+      end
+
+      # Lets you create a Model subclass with its dataset already set.
+      # +source+ should be an instance of one of the following classes:
+      #
+      # Database :: Sets the database for this model to +source+.
+      #             Generally only useful when subclassing directly
+      #             from the returned class, where the name of the
+      #             subclass sets the table name (which is combined
+      #             with the +Database+ in +source+ to create the
+      #             dataset to use) 
+      # Dataset :: Sets the dataset for this model to +source+. 
+      # other :: Sets the table name for this model to +source+. The
+      #          class will use the default database for model
+      #          classes in order to create the dataset.
+      #
+      # The purpose of this method is to set the dataset/database automatically
+      # for a model class, if the table name doesn't match the implicit
+      # name.  This is neater than using set_dataset inside the class,
+      # doesn't require a bogus query for the schema.
+      #
+      # When creating subclasses of Sequel::Model itself, this method is usually
+      # called on Sequel itself, using <tt>Sequel::Model(:something)</tt>.
+      #
+      #   # Using a symbol
+      #   class Comment < Sequel::Model(:something)
+      #     table_name # => :something
+      #   end
+      #
+      #   # Using a dataset
+      #   class Comment < Sequel::Model(DB1[:something])
+      #     dataset # => DB1[:something]
+      #   end
+      #
+      #   # Using a database
+      #   class Comment < Sequel::Model(DB1)
+      #     dataset # => DB1[:comments]
+      #   end
+      def Model(source)
+        if cache_anonymous_models
+          mutex = @Model_mutex
+          cache = mutex.synchronize{@Model_cache ||= {}}
+
+          if klass = mutex.synchronize{cache[source]}
+            return klass
+          end
+        end
+
+        klass = Class.new(self)
+
+        if source.is_a?(::Sequel::Database)
+          klass.db = source
+        else
+          klass.set_dataset(source)
+        end
+
+        if cache_anonymous_models
+          mutex.synchronize{cache[source] = klass}
+        end
+
+        klass
+      end
   
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another

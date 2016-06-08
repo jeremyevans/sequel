@@ -54,6 +54,40 @@ describe "Sequel::Model()" do
     c.dataset.must_equal ds
   end
 
+  it "should be callable on Sequel::Model" do
+    ds = @db[:blah]
+    c = Sequel::Model::Model(ds)
+    c.superclass.must_equal Sequel::Model
+    c.dataset.must_equal ds
+  end
+
+  it "should be callable on subclasses of Sequel::Model" do
+    ds = @db[:blah]
+    c = Class.new(Sequel::Model)
+    sc = c::Model(ds)
+    sc.superclass.must_equal c
+    sc.dataset.must_equal ds
+  end
+
+  it "should be callable on other modules if def_Model is used" do
+    m = Module.new
+    Sequel::Model.def_Model(m)
+    ds = @db[:blah]
+    c = m::Model(ds)
+    c.superclass.must_equal Sequel::Model
+    c.dataset.must_equal ds
+  end
+
+  it "should be callable using model subclasses on other modules if def_Model is used" do
+    m = Module.new
+    c = Class.new(Sequel::Model)
+    c.def_Model(m)
+    ds = @db[:blah]
+    sc = m::Model(ds)
+    sc.superclass.must_equal c
+    sc.dataset.must_equal ds
+  end
+
   it "should return a model subclass associated to the given database if given a database" do
     db = Sequel.mock
     c = Sequel::Model(db)
@@ -121,6 +155,21 @@ describe "Sequel::Model()" do
         class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
         class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
       end.must_raise TypeError
+    end
+
+    it "should use separate cache and cache settings for subclasses" do
+      c = Class.new(Sequel::Model)
+      c.cache_anonymous_models.must_equal true
+      class ::Album < c::Model(:table); end
+      class ::Album < c::Model(:table); end
+
+      c1 = c::Model(:t1)
+      c1.must_equal c::Model(:t1)
+      c1.wont_equal Sequel::Model(:t1)
+
+      c.cache_anonymous_models = false
+      Sequel::Model.cache_anonymous_models.must_equal true
+      c1.wont_equal c::Model(:t1)
     end
   end
 end
