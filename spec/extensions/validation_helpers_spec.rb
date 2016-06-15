@@ -546,6 +546,8 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.errors.full_messages.must_equal ['value is not > 3']
     @m.value = 3
     @m.wont_be :valid?
+    @m.value = nil
+    @m.wont_be :valid?
     @m.value = 4
     @m.must_be :valid?
   end

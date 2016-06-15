@@ -1,5 +1,7 @@
 === HEAD
 
+* Make validates_operator validation consider nil values invalid unless :allow_nil or similar option is used (jeremyevans)
+
 * Close cursors for non-SELECT queries after execution, instead of waiting until GC (jeremyevans) (#1203)
 
 * Add :class_namespace association option for setting default namespace for :class option given as symbol/string (jeremyevans)
