@@ -78,6 +78,10 @@
 # includes [1, 2] :: CHECK column IN (1, 2)
 # includes 3..5 :: CHECK column >= 3 AND column <= 5
 # includes 3...5 :: CHECK column >= 3 AND column < 5
+# operator :>, 1 :: CHECK column > 1
+# operator :>=, 2 :: CHECK column >= 2
+# operator :<, "M" :: CHECK column < 'M'
+# operator :<=, 'K' :: CHECK column <= 'K'
 # unique :: UNIQUE (column)
 #
 # There are some additional API differences:
@@ -94,6 +98,8 @@
 #   patters are very simple, so many regexp patterns cannot be expressed by
 #   them, but only a couple databases (PostgreSQL and MySQL) support regexp
 #   patterns.
+# * The operator validation only supports >, >=, <, and <= operators, and the
+#   argument must be a string or an integer.
 # * When using the unique validation, column names cannot have embedded commas.
 #   For similar reasons, when using an includes validation with an array of
 #   strings, none of the strings in the array can have embedded commas.
@@ -131,6 +137,9 @@ module Sequel
   module ConstraintValidations
     # The default table name used for the validation metadata.
     DEFAULT_CONSTRAINT_VALIDATIONS_TABLE = :sequel_constraint_validations
+    OPERATORS = {:< => :lt, :<= => :lte, :> => :gt, :>= => :gte}.freeze
+    REVERSE_OPERATOR_MAP = {:str_lt => :<, :str_lte => :<=, :str_gt => :>, :str_gte => :>=,
+                            :int_lt => :<, :int_lte => :<=, :int_gt => :>, :int_gte => :>=}.freeze
 
     # Set the default validation metadata table name if it has not already
     # been set.
@@ -162,6 +171,23 @@ module Sequel
             @generator.validation({:type=>:#{v}, :columns=>Array(columns), :arg=>arg}.merge!(opts))
           end
         END
+      end
+
+      # Create operator validation.  The op should be either +:>+, +:>=+, +:<+, or +:<=+, and
+      # the arg should be either a string or an integer.
+      def operator(op, arg, columns, opts=OPTS)
+        raise Error, "invalid operator (#{op}) used when creating operator validation" unless suffix = OPERATORS[op]
+
+        prefix = case arg
+        when String
+          "str"
+        when Integer
+          "int"
+        else
+          raise Error, "invalid argument (#{arg.inspect}) used when creating operator validation"
+        end
+
+        @generator.validation({:type=>:"#{prefix}_#{suffix}", :columns=>Array(columns), :arg=>arg}.merge!(opts))
       end
 
       # Given the name of a constraint, drop that constraint from the database,
@@ -349,6 +375,8 @@ module Sequel
           generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.char_length(c) >= arg}))
         when :max_length
           generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.char_length(c) <= arg}))
+        when *REVERSE_OPERATOR_MAP.keys
+          generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| Sequel.identifier(c).send(REVERSE_OPERATOR_MAP[validation_type], arg)}))
         when :length_range
           op = arg.exclude_end? ? :< : :<=
           generator_add_constraint_from_validation(generator, val, Sequel.&(*columns.map{|c| (Sequel.char_length(c) >= arg.begin) & Sequel.char_length(c).send(op, arg.end)}))

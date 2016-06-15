@@ -185,6 +185,20 @@ describe "Sequel::Plugins::ConstraintValidations" do
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\Afoo\z/i}]])
   end
 
+  it "should handle operator validation" do
+    [[:str_lt, :<], [:str_lte, :<=], [:str_gt, :>], [:str_gte, :>=]].each do |vt, op|
+      model_class(:validation_type=>vt.to_s, :argument=>'a').constraint_validations.must_equal [[:validates_operator, op, 'a', :name]]
+      @c.constraint_validation_reflections.must_equal(:name=>[[:operator, {:operator=>op, :argument=>'a'}]])
+      @c = @c.db.constraint_validations = nil
+    end
+
+    [[:int_lt, :<], [:int_lte, :<=], [:int_gt, :>], [:int_gte, :>=]].each do |vt, op|
+      model_class(:validation_type=>vt.to_s, :argument=>'1').constraint_validations.must_equal [[:validates_operator, op, 1, :name]]
+      @c.constraint_validation_reflections.must_equal(:name=>[[:operator, {:operator=>op, :argument=>1}]])
+      @c = @c.db.constraint_validations = nil
+    end
+  end
+
   it "should handle like validation with % metacharacter" do
     model_class(:validation_type=>'like', :argument=>'%foo%').constraint_validations.must_equal [[:validates_format, /\A.*foo.*\z/, :name]]
     @c.constraint_validation_reflections.must_equal(:name=>[[:format, {:argument=>/\A.*foo.*\z/}]])

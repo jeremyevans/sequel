@@ -33,6 +33,10 @@ module Sequel
       # The default constraint validation metadata table name.
       DEFAULT_CONSTRAINT_VALIDATIONS_TABLE = :sequel_constraint_validations
 
+      # Mapping of operator names in table to ruby operators
+      OPERATOR_MAP = {:str_lt => :<, :str_lte => :<=, :str_gt => :>, :str_gte => :>=,
+                      :int_lt => :<, :int_lte => :<=, :int_gt => :>, :int_gte => :>=}.freeze
+
       # Automatically load the validation_helpers plugin to run the actual validations.
       def self.apply(model, opts=OPTS)
         model.instance_eval do
@@ -154,6 +158,10 @@ module Sequel
           when :includes_int_range
             arg = constraint_validation_int_range(arg)
             type = :includes
+          when *OPERATOR_MAP.keys
+            arg = arg.to_i if type.to_s =~ /\Aint_/
+            operator = OPERATOR_MAP[type]
+            type = :operator
           end
 
           column = if type == :unique
@@ -163,16 +171,22 @@ module Sequel
           end
 
           if type_opts = @constraint_validation_options[type]
-            opts = opts.merge(type_opts)
+            opts.merge!(type_opts)
           end
 
-          reflection_opts = opts
+          reflection_opts = opts.dup
           a = [:"validates_#{type}"]
+
+          if operator
+            a << operator
+            reflection_opts[:operator] = operator
+          end
 
           if arg
             a << arg
-            reflection_opts = reflection_opts.merge(:argument=>arg)
+            reflection_opts[:argument] = arg
           end 
+
           a << column
           unless opts.empty?
             a << opts

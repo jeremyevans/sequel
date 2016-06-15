@@ -2014,17 +2014,20 @@ describe "Sequel::Plugins::ConstraintValidations" do
       includes %w'abc def', :inc, opts.merge(:name=>:i)
       unique :uniq, opts.merge(:name=>:u)
       max_length 6, :minlen, opts.merge(:name=>:maxl2)
+      operator :<, 'm', :exactlen, opts.merge(:name=>:lt)
+      operator :>=, 5, :num, opts.merge(:name=>:gte)
     end
-    @valid_row = {:pre=>'a', :exactlen=>'12345', :minlen=>'12345', :maxlen=>'12345', :lenrange=>'1234', :lik=>'fooabc', :ilik=>'FooABC', :inc=>'abc', :uniq=>'u'}
+    @valid_row = {:pre=>'a', :exactlen=>'12345', :minlen=>'12345', :maxlen=>'12345', :lenrange=>'1234', :lik=>'fooabc', :ilik=>'FooABC', :inc=>'abc', :uniq=>'u', :num=>5}
     @violations = [
       [:pre, [nil, '', ' ']],
-      [:exactlen, [nil, '', '1234', '123456']],
+      [:exactlen, [nil, '', '1234', '123456', 'n1234']],
       [:minlen, [nil, '', '1234']],
       [:maxlen, [nil, '123456']],
       [:lenrange, [nil, '', '12', '123456']],
       [:lik, [nil, '', 'fo', 'fotabc', 'FOOABC']],
       [:ilik, [nil, '', 'fo', 'fotabc']],
       [:inc, [nil, '', 'ab', 'abcd']],
+      [:num, [nil, 3, 4]],
     ]
 
     if @regexp
@@ -2101,6 +2104,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
           String :ilik
           String :inc
           String :uniq, :null=>false
+          Integer :num
           validate(&validate_block)
         end
       end
@@ -2146,6 +2150,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
           if regexp
             add_column :form, String
           end
+          add_column :num, Integer
           validate(&validate_block)
         end
       end
