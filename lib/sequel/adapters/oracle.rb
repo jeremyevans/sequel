@@ -86,11 +86,7 @@ module Sequel
               r = log_connection_yield(sql, conn){conn.exec(sql)}
             end
             if block_given?
-              begin
-                yield(r)
-              ensure
-                r.close
-              end
+              yield(r)
             elsif type == :insert
               last_insert_id(conn, opts)
             else
@@ -99,6 +95,8 @@ module Sequel
           rescue OCIException, RuntimeError => e
             # ruby-oci8 is naughty and raises strings in some places
             raise_error(e)
+          ensure
+            r.close if r.is_a?(::OCI8::Cursor)
           end
         end
       end
