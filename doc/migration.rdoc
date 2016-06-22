@@ -611,3 +611,23 @@ or:
 This usage is discouraged in new code, but will continue to be supported indefinitely.
 It is not recommended to convert old-style migration classes to the <tt>Sequel.migration</tt>
 DSL, but it is recommended to use the <tt>Sequel.migration</tt> DSL for all new migrations.
+
+== Database-specific migrations
+
+While not a recommended practice, it is sometimes necessary to write database-specific migrations
+using the run command.  However, if your test database is sqlite and you write a mysql migration,
+your test db will fail to migrate.  Here's a way to write a migration that takes this into account:
+
+  Sequel.migration do
+    up do
+      if database_type === 'mysql'
+        run 'alter table users add password_salt varchar(255) after password'
+      end
+    end
+  
+    down do
+      if database_type === 'mysql'
+        run 'alter table users drop column password_salt'
+      end
+    end
+  end
