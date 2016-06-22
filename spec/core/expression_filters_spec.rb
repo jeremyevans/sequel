@@ -557,6 +557,10 @@ describe Sequel::SQL::VirtualRow do
     @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.must_equal 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'
   end
 
+  it "should support order method on functions to specify orders for aggregate functions" do
+    @d.l{rank(:c).order(:a, :b)}.must_equal 'rank("c" ORDER BY "a", "b")'
+  end
+
   it "should support over method on functions to create window functions" do
     @d.l{rank{}.over}.must_equal 'rank() OVER ()'
     @d.l{sum(c).over(:partition=>a, :order=>b, :window=>:win, :frame=>:rows)}.must_equal 'sum("c") OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)'

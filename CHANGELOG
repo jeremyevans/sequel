@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL::Function#order for ordered aggregate functions (jeremyevans)
+
 * Support operator validation in constraint_validations for <, <=, >, and >= operators with string and integer arguments (jeremyevans)
 
 * Make validates_operator validation consider nil values invalid unless :allow_nil or similar option is used (jeremyevans)

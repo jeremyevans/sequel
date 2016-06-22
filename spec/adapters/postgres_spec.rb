@@ -243,6 +243,10 @@ describe "A PostgreSQL database" do
     @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
   end
 
+  it "should support ordering in aggregate functions" do
+    @db.from(@db.values([['1'], ['2']]).as(:t, [:a])).get{string_agg(:a, '-').order(Sequel.desc(:a)).as(:c)}.must_equal '2-1'
+  end if DB.server_version >= 90000
+
   it "should support ordering and limiting with #values" do
     @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).limit(1).map([:column1, :column2]).must_equal [[3, 4]]
     @db.values([[1, 2], [3, 4]]).reverse(:column2, :column1).offset(1).map([:column1, :column2]).must_equal [[1, 2]]

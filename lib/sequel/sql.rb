@@ -1333,6 +1333,14 @@ module Sequel
         with_opts(:lateral=>true)
       end
 
+      # Return a new function where the function will be ordered.  Only useful for aggregate
+      # functions that are order dependent.
+      #
+      #   Sequel.function(:foo, :a).order(:a, Sequel.desc(:b)) # foo(a ORDER BY a, b DESC)
+      def order(*args)
+        with_opts(:order=>args)
+      end
+
       # Return a new function with an OVER clause (making it a window function).
       #
       #   Sequel.function(:row_number).over(:partition=>:col) # row_number() OVER (PARTITION BY col)

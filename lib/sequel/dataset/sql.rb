@@ -570,6 +570,10 @@ module Sequel
       else
         sql << FUNCTION_DISTINCT if opts[:distinct]
         expression_list_append(sql, f.args)
+        if order = opts[:order]
+          sql << ORDER_BY
+          expression_list_append(sql, order)
+        end
       end
       sql << PAREN_CLOSE
 

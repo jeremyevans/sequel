@@ -3884,6 +3884,10 @@ describe "Sequel::Dataset#qualify" do
     @ds.select{sum(:a).over(:partition=>:b, :order=>:c)}.qualify.sql.must_equal 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
   end
 
+  it "should handle SQL::Functions with orders" do
+    @ds.select{sum(:a).order(:a)}.qualify.sql.must_equal 'SELECT sum(t.a ORDER BY t.a) FROM t'
+  end
+
   it "should handle SQL::DelayedEvaluation" do
     t = :a
     ds = @ds.filter(Sequel.delay{t}).qualify
