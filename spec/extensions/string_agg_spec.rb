@@ -59,8 +59,8 @@ describe "string_agg extension" do
   it "should correctly literalize on Oracle and DB2" do
     [:oracle, :db2].each do |type|
       db = dbf.call(type)
-      db.literal(@sa1).must_equal "listagg(c, ',')"
-      db.literal(@sa2).must_equal "listagg(c, '-')"
+      db.literal(@sa1).must_equal "listagg(c, ',') WITHIN GROUP (ORDER BY 1)"
+      db.literal(@sa2).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY 1)"
       db.literal(@sa3).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY o)"
       proc{db.literal(@sa4)}.must_raise Sequel::Error
     end
