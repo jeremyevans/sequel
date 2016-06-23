@@ -614,20 +614,24 @@ DSL, but it is recommended to use the <tt>Sequel.migration</tt> DSL for all new 
 
 == Database-specific migrations
 
-While not a recommended practice, it is sometimes necessary to write database-specific migrations
-using the run command.  However, if your test database is sqlite and you write a mysql migration,
-your test db will fail to migrate.  Here's a way to write a migration that takes this into account:
+While not a recommended practice, it is sometimes necessary to have parts of migrations be
+database-specific .  You can use the Sequel::Database#database_type method to check which
+database the migration is being run on, and operate accordingly:
 
   Sequel.migration do
     up do
-      if database_type === 'mysql'
-        run 'alter table users add password_salt varchar(255) after password'
+      if database_type == :mysql
+        run 'MySQL specific code'
+      else
+        run 'Generic SQL code'
       end
     end
   
     down do
-      if database_type === 'mysql'
-        run 'alter table users drop column password_salt'
+      if database_type == :mysql
+        run 'MySQL specific code'
+      else
+        run 'Generic SQL code'
       end
     end
   end
