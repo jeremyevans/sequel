@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle disconnection errors raised during string literalization in mysql2 adapter (jeremyevans)
+
 * Add string_agg extension for aggregate string concatenation support on many databases (jeremyevans)
 
 * Add SQL::Function#order for ordered aggregate functions (jeremyevans)
