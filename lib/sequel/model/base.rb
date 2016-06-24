@@ -53,11 +53,8 @@ module Sequel
       attr_accessor :raise_on_save_failure
   
       # Whether to raise an error when unable to typecast data for a column
-      # (default: true).  This should be set to false if you want to use
-      # validations to display nice error messages to the user (e.g. most
-      # web applications).  You can use the validates_schema_types validation
-      # (from the validation_helpers plugin) in connection with this setting to
-      # check for typecast failures during validation.
+      # (default: false).  This should be set to true if you want to have model
+      # setter methods raise errors if the argument cannot be typecast properly.
       attr_accessor :raise_on_typecast_failure
       
       # Whether to raise an error if an UPDATE or DELETE query related to
