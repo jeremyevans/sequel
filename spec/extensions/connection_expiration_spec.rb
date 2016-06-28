@@ -16,6 +16,11 @@ connection_expiration_specs = shared_description do
       @db.synchronize{|c| c}.must_be_kind_of(Sequel::Mock::Connection)
     end
 
+    it "should not override connection_expiration_timeout when loading extension" do
+      @db.extension(:connection_expiration)
+      @db.pool.connection_expiration_timeout.must_equal 2
+    end
+
     it "should only expire if older than timeout" do
       c1 = @db.synchronize{|c| c}
       @db.sqls.must_equal []

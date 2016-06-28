@@ -37,7 +37,7 @@ module Sequel
     def self.extended(pool)
       pool.instance_eval do
         @connection_expiration_timestamps ||= {}
-        @connection_expiration_timeout = 14400
+        @connection_expiration_timeout ||= 14400
       end
     end
 
