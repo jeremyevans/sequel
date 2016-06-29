@@ -72,6 +72,13 @@ connection_expiration_specs = shared_description do
       @db.pool.instance_variable_get(:@connection_expiration_timestamps).wont_include(c1)
     end
 
+    it "should not leak connection references during disconnect" do
+      c1, c2 = multiple_connections
+      @db.pool.instance_variable_get(:@connection_expiration_timestamps).size.must_equal 2
+      @db.disconnect
+      @db.pool.instance_variable_get(:@connection_expiration_timestamps).size.must_equal 0
+    end
+
     def multiple_connections
       q, q1 = Queue.new, Queue.new
       c1 = nil

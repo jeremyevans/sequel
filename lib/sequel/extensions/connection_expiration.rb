@@ -41,6 +41,12 @@ module Sequel
       end
     end
 
+    # Clean up expiration timestamps during disconnect.
+    def disconnect(*)
+      @connection_expiration_timestamps = {}
+      super
+    end
+
     private
 
     # Record the time the connection was created.
@@ -74,12 +80,6 @@ module Sequel
       end
 
       conn
-    end
-
-    # Clean up expiration timestamps when connections are 
-    def disconnect(*)
-      @connection_expiration_timestamps.delete(conn)
-      super
     end
   end
 
