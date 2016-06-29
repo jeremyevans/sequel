@@ -78,6 +78,13 @@ connection_validator_specs = shared_description do
       c3.wont_be_same_as(c2)
     end
 
+    it "should not leak connection references during disconnect" do
+      @db.synchronize{}
+      @db.pool.instance_variable_get(:@connection_timestamps).size.must_equal 1
+      @db.disconnect
+      @db.pool.instance_variable_get(:@connection_timestamps).size.must_equal 0
+    end
+
     it "should not leak connection references" do
       c1 = @db.synchronize do |c|
         @db.pool.instance_variable_get(:@connection_timestamps).must_equal({})

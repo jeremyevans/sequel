@@ -1,6 +1,12 @@
 === HEAD
 
-* Add connection_expiration extension, for automatically removing connections open for too long (pdrakeweb) (#1208)
+* Don't hold connection pool mutex while disconnecting connections (jeremyevans)
+
+* Don't hold references to disconnected connections in the connection_validator extension (jeremyevans)
+
+* Don't overwrite existing connection_validation_timeout when loading connection_validator extension multiple times (jeremyevans)
+
+* Add connection_expiration extension, for automatically removing connections open for too long (pdrakeweb) (#1208, #1209)
 
 * Handle disconnection errors raised during string literalization in mysql2 adapter (jeremyevans)
 

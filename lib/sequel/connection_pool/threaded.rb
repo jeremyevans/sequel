@@ -75,10 +75,12 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
   def disconnect(opts=OPTS)
+    conns = nil
     sync do
-      @available_connections.each{|conn| db.disconnect_connection(conn)}
+      conns = @available_connections.dup
       @available_connections.clear
     end
+    conns.each{|conn| disconnect_connection(conn)}
   end
   
   # Chooses the first available connection, or if none are
@@ -106,7 +108,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     rescue Sequel::DatabaseDisconnectError
       oconn = conn
       conn = nil
-      db.disconnect_connection(oconn) if oconn
+      disconnect_connection(oconn) if oconn
       @allocated.delete(t)
       raise
     ensure
@@ -266,7 +268,7 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     conn = @allocated.delete(thread)
 
     if @connection_handling == :disconnect
-      db.disconnect_connection(conn)
+      disconnect_connection(conn)
     else
       checkin_connection(conn)
     end

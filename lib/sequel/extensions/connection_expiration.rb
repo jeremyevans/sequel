@@ -36,18 +36,20 @@ module Sequel
     # Initialize the data structures used by this extension.
     def self.extended(pool)
       pool.instance_eval do
-        @connection_expiration_timestamps ||= {}
-        @connection_expiration_timeout ||= 14400
+        sync do
+          @connection_expiration_timestamps ||= {}
+          @connection_expiration_timeout ||= 14400
+        end
       end
     end
 
+    private
+
     # Clean up expiration timestamps during disconnect.
-    def disconnect(*)
-      @connection_expiration_timestamps = {}
+    def disconnect_connection(conn)
+      sync{@connection_expiration_timestamps.delete(conn)}
       super
     end
-
-    private
 
     # Record the time the connection was created.
     def make_new(*)
@@ -62,7 +64,7 @@ module Sequel
     def acquire(*a)
       begin
         if (conn = super) &&
-           (t = @connection_expiration_timestamps[conn]) &&
+           (t = sync{@connection_expiration_timestamps[conn]}) &&
            Time.now - t > @connection_expiration_timeout
 
           if pool_type == :sharded_threaded
@@ -71,8 +73,7 @@ module Sequel
             sync{@allocated.delete(Thread.current)}
           end
 
-          @connection_expiration_timestamps.delete(conn)
-          db.disconnect_connection(conn)
+          disconnect_connection(conn)
           raise Retry
         end
       rescue Retry

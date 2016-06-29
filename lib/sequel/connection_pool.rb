@@ -97,6 +97,11 @@ class Sequel::ConnectionPool
   end
   
   private
+
+  # Remove the connection from the pool.
+  def disconnect_connection(conn)
+    db.disconnect_connection(conn)
+  end
   
   # Return a new connection by calling the connection proc with the given server name,
   # and checking for connection errors.

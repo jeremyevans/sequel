@@ -61,8 +61,10 @@ module Sequel
     # Initialize the data structures used by this extension.
     def self.extended(pool)
       pool.instance_eval do
-        @connection_timestamps ||= {}
-        @connection_validation_timeout = 3600
+        sync do
+          @connection_timestamps ||= {}
+          @connection_validation_timeout ||= 3600
+        end
       end
 
       # Make sure the valid connection SQL query is precached,
@@ -79,6 +81,12 @@ module Sequel
       conn = super
       @connection_timestamps[conn] = Time.now
       conn
+    end
+
+    # Clean up timestamps during disconnect.
+    def disconnect_connection(conn)
+      sync{@connection_timestamps.delete(conn)}
+      super
     end
 
     # When acquiring a connection, if it has been
@@ -98,7 +106,7 @@ module Sequel
             sync{@allocated.delete(Thread.current)}
           end
 
-          db.disconnect_connection(conn)
+          disconnect_connection(conn)
           raise Retry
         end
       rescue Retry

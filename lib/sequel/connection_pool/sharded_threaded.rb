@@ -96,9 +96,9 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # :server :: Should be a symbol specifing the server to disconnect from,
   #            or an array of symbols to specify multiple servers.
   def disconnect(opts=OPTS)
-    sync do
-      (opts[:server] ? Array(opts[:server]) : @servers.keys).each do |s|
-        disconnect_server(s)
+    (opts[:server] ? Array(opts[:server]) : sync{@servers.keys}).each do |s|
+      if conns = sync{disconnect_server_connections(s)}
+        disconnect_connections(conns)
       end
     end
   end
@@ -139,17 +139,22 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # except that after it is used, future requests for the server will use the
   # :default server instead.
   def remove_servers(servers)
+    conns = nil
     sync do
       raise(Sequel::Error, "cannot remove default server") if servers.include?(:default)
       servers.each do |server|
         if @servers.include?(server)
-          disconnect_server(server)
+          conns = disconnect_server_connections(server)
           @waiters.delete(server) if USE_WAITER
           @available_connections.delete(server)
           @allocated.delete(server)
           @servers.delete(server)
         end
       end
+    end
+
+    if conns
+      disconnect_connections(conns)
     end
   end
 
@@ -243,16 +248,26 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     conn
   end
 
-  # Disconnect from the given server.  Disconnects available connections
-  # immediately, and schedules currently allocated connections for disconnection
-  # as soon as they are returned to the pool. The calling code should already
-  # have the mutex before calling this.
-  def disconnect_server(server)
-    if conns = available_connections(server)
-      conns.each{|conn| db.disconnect_connection(conn)}
-      conns.clear
-    end
+  # Clear the array of available connections for the server, returning an array
+  # of previous available connections that should be disconnected (or nil if none should be).
+  # Mark any allocated connections to be removed when they are checked back in. The calling
+  # code should already have the mutex before calling this.
+  def disconnect_server_connections(server)
     @connections_to_remove.concat(allocated(server).values)
+
+    if dis_conns = available_connections(server)
+      conns = dis_conns.dup
+      dis_conns.clear
+    end
+    conns
+  end
+
+  # Disconnect all given connections.  
+  # immediately, and schedules currently allocated connections for disconnection
+  # as soon as they are returned to the pool. The calling code should not
+  # have the mutex before calling this.
+  def disconnect_connections(conns)
+    conns.each{|conn| disconnect_connection(conn)}
   end
 
   # Creates a new connection to the given server if the size of the pool for
@@ -318,7 +333,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
       conn = allocated(server).delete(thread)
 
       if @connection_handling == :disconnect
-        db.disconnect_connection(conn)
+        disconnect_connection(conn)
       else
         checkin_connection(server, conn)
       end
@@ -330,7 +345,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   def remove(thread, conn, server)
     @connections_to_remove.delete(conn)
     allocated(server).delete(thread) if @servers.include?(server)
-    db.disconnect_connection(conn)
+    disconnect_connection(conn)
   end
   
   CONNECTION_POOL_MAP[[false, true]] = self

@@ -92,7 +92,7 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   # Disconnect from the given server, if connected.
   def disconnect_server(server)
     if conn = @conns.delete(server)
-      db.disconnect_connection(conn)
+      disconnect_connection(conn)
     end
   end
 
