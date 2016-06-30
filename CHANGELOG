@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate use of Bignum class as generic type, since the behavior will change in ruby 2.4 (jeremyevans)
+
 * Don't hold connection pool mutex while disconnecting connections (jeremyevans)
 
 * Don't hold references to disconnected connections in the connection_validator extension (jeremyevans)

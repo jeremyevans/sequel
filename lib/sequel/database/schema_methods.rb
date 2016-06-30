@@ -888,7 +888,7 @@ module Sequel
       when Class
         type_literal_generic(column)
       when :Bignum
-        type_literal_generic_bignum(column)
+        type_literal_generic_bignum_symbol(column)
       else
         type_literal_specific(column)
       end
@@ -912,6 +912,12 @@ module Sequel
 
     # Sequel uses the bigint type by default for Bignums.
     def type_literal_generic_bignum(column)
+      Sequel::Deprecation.deprecate("Using the Bignum class as a generic type is deprecated and will be removed in Sequel 4.41.0, as the behavior will change in ruby 2.4. Switch to using the :Bignum symbol.")
+      :bigint
+    end
+
+    # Sequel uses the bigint type by default for :Bignum symbol.
+    def type_literal_generic_bignum_symbol(column)
       :bigint
     end
 
