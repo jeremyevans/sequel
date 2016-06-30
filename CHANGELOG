@@ -10,7 +10,7 @@
 
 * Add connection_expiration extension, for automatically removing connections open for too long (pdrakeweb) (#1208, #1209)
 
-* Handle disconnection errors raised during string literalization in mysql2 adapter (jeremyevans)
+* Handle disconnection errors raised during string literalization in mysql2 and postgres adapters (jeremyevans)
 
 * Add string_agg extension for aggregate string concatenation support on many databases (jeremyevans)
 
