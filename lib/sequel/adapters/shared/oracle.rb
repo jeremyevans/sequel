@@ -241,7 +241,7 @@ module Sequel
       # Oracle's integer/:number type handles larger values than
       # most other databases's bigint types, so it should be
       # safe to use for Bignum.
-      def type_literal_generic_bignum(column)
+      def type_literal_generic_bignum_symbol(column)
         :integer
       end
 

@@ -1142,7 +1142,7 @@ module Sequel
       end
 
       # Handle bigserial type if :serial option is present
-      def type_literal_generic_bignum(column)
+      def type_literal_generic_bignum_symbol(column)
         column[:serial] ? :bigserial : super
       end
 

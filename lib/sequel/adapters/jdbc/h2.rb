@@ -147,7 +147,7 @@ module Sequel
 
         # Use BIGINT IDENTITY for identity columns that use bigint, fixes
         # the case where primary_key :column, :type=>:Bignum is used.
-        def type_literal_generic_bignum(column)
+        def type_literal_generic_bignum_symbol(column)
           column[:identity] ? 'BIGINT IDENTITY' : super
         end
       end

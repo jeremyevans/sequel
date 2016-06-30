@@ -487,7 +487,7 @@ module Sequel
       # SQLite only supports AUTOINCREMENT on integer columns, not
       # bigint columns, so use integer instead of bigint for those
       # columns.
-      def type_literal_generic_bignum(column)
+      def type_literal_generic_bignum_symbol(column)
         column[:auto_increment] ? :integer : super
       end
     end
