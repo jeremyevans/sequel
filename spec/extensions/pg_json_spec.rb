@@ -47,7 +47,7 @@ describe "pg_json extension" do
 
   it "should raise an error when attempting to parse invalid json" do
     proc{@m.parse_json('')}.must_raise(Sequel::InvalidValue)
-    proc{@m.parse_json('1')}.must_raise(Sequel::InvalidValue)
+    proc{@m.parse_json('a')}.must_raise(Sequel::InvalidValue)
 
     begin
       Sequel.instance_eval do
