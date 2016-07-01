@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
+          <span class='datetime'>2016-06-15 14:51:12 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -115,6 +115,14 @@
             <p>CHECK column &gt;= 3 AND column &lt;= 5</p>
             </td></tr><tr><td class='label'>includes 3…5 </td><td>
             <p>CHECK column &gt;= 3 AND column &lt; 5</p>
+            </td></tr><tr><td class='label'>operator :&gt;, 1 </td><td>
+            <p>CHECK column &gt; 1</p>
+            </td></tr><tr><td class='label'>operator :&gt;=, 2 </td><td>
+            <p>CHECK column &gt;= 2</p>
+            </td></tr><tr><td class='label'>operator :&lt;, “M” </td><td>
+            <p>CHECK column &lt; &#39;M&#39;</p>
+            </td></tr><tr><td class='label'>operator :&lt;=, &#39;K&#39; </td><td>
+            <p>CHECK column &lt;= &#39;K&#39;</p>
             </td></tr><tr><td class='label'>unique </td><td>
             <p>UNIQUE (column)</p>
             </td></tr></tbody></table>
@@ -137,6 +145,9 @@
             patters are very simple, so many regexp patterns cannot be expressed by
             them, but only a couple databases (PostgreSQL and MySQL) support regexp
             patterns.</p>
+            </li><li>
+            <p>The operator validation only supports &gt;, &gt;=, &lt;, and &lt;=
+            operators, and the argument must be a string or an integer.</p>
             </li><li>
             <p>When using the unique validation, column names cannot have embedded commas.
             For similar reasons, when using an includes validation with an array of

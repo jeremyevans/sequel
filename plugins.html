@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.35.0</h2>
+    <h2>Sequel::Model Plugins for v4.36.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -130,7 +130,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SubsetConditions.html">subset_conditions</a>: Creates an additional method for each subset, returning the filter conditions used for the subset.</li>
 </ul></li>
 <li>Validations:<ul>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations</a>: Automatically add presence, not_string, and unique validations.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/AutoValidations.html">auto_validations</a>: Automatically add presence/not_null, max length, type, and unique validations based on the model's schema.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations</a>: Setup automatic validations for constraints added via the <a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ErrorSplitter.html">error_splitter</a>: Splits multi-column errors entries into separate errors, one per column.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
@@ -182,6 +182,7 @@
 
 <ul>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/arbitrary_servers_rb.html">arbitrary_servers</a>: Adds ability to connection to arbitrary servers (instead of just preconfigured ones) in the sharding support.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_expiration_rb.html">connection_expiration</a>: Automatically removes connections from the pool after they have been open longer than a timeout.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/connection_validator_rb.html">connection_validator</a>: Automatically validates connections on pool checkout and handles disconnections transparently.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations</a>: Creates database constraints when creating/altering tables, with metadata for <a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">automatic model validations via the constraint_validations plugin</a>.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/error_sql_rb.html">error_sql</a>: Makes DatabaseError#sql return the SQL query that caused the underlying exception.</li>
@@ -230,6 +231,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/set_overrides_rb.html">set_overrides</a>: Adds Dataset#set_defaults and #set_overrides for setting default values in some INSERT/UPDATE statements.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/split_array_nil_rb.html">split_array_nil</a>: Splits nils out of IN/NOT IN arrays into separate OR IS NULL or AND IS NOT NULL clauses.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/sql_comments_rb.html">sql_comments</a>: Adds Dataset#comment method, for setting an SQL comment in the queries created by the dataset.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/string_agg_rb.html">string_agg</a>: Adds generic database support for aggregate string concatentation.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/to_dot_rb.html">to_dot</a>: Adds Dataset#to_dot method, which returns a string suitable for processing by graphviz's dot program to get a visualization of the dataset's abstract syntax tree.</li>
 </ul>
 

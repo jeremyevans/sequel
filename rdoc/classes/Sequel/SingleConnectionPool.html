@@ -95,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-disconnect-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-disconnect-source'><span class="ruby-comment"># File lib/sequel/connection_pool/single.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@conn</span>&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-ivar">@conn</span>)&#x000A;  <span class="ruby-ivar">@conn</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-disconnect-source'><span class="ruby-comment"># File lib/sequel/connection_pool/single.rb, line 13</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-keyword">unless</span> <span class="ruby-ivar">@conn</span>&#x000A;  <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-ivar">@conn</span>)&#x000A;  <span class="ruby-ivar">@conn</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hold'>

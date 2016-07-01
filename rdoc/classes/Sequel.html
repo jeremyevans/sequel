@@ -190,8 +190,8 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a target="docwin" href="#method-c-Model">Model</a></li>
-              <li><a target="docwin" href="#attribute-c-cache_anonymous_models">cache_anonymous_models</a></li>
+              <li><a target="docwin" href="#method-c-cache_anonymous_models">cache_anonymous_models</a></li>
+              <li><a target="docwin" href="#method-c-cache_anonymous_models-3D">cache_anonymous_models=</a></li>
               <li><a target="docwin" href="#method-c-condition_specifier-3F">condition_specifier?</a></li>
               <li><a target="docwin" href="#method-c-connect">connect</a></li>
               <li><a target="docwin" href="#method-c-convert_exception_class">convert_exception_class</a></li>
@@ -500,7 +500,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MINOR</td>
                     <td>=</td>
-                    <td class='context-item-value'>35</td>
+                    <td class='context-item-value'>36</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -667,18 +667,6 @@
                 <table>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>
-                      <a name='attribute-c-cache_anonymous_models'>cache_anonymous_models</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Whether to cache the anonymous models created by Sequel::Model().  This is
-                      required for reloading them correctly (avoiding the superclass mismatch). 
-                      True by default for backwards compatibility.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
                       <a name='attribute-c-convert_two_digit_years'>convert_two_digit_years</a>
                     </td>
                     <td class='context-item-value'>[RW]</td>
@@ -721,41 +709,40 @@
             </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
-              <div class='method public-class' id='method-method-c-Model'>
-                <a name='method-c-Model'></a>
+              <div class='method public-class' id='method-method-c-cache_anonymous_models'>
+                <a name='method-c-cache_anonymous_models'></a>
                 <div class='synopsis'>
-                  <span class='name'>Model</span>
-                  <span class='arguments'>(source)</span>
+                  <span class='name'>cache_anonymous_models</span>
+                  <span class='arguments'>()</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Lets you create a <a href="Sequel/Model.html">Model</a> subclass with its
-                  dataset already set. <code>source</code> should be an instance of one of
-                  the following classes:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'><a href="Sequel/Database.html">Database</a> </td><td>
-                  <p>Sets the database for this model to <code>source</code>. Generally only
-                  useful when subclassing directly from the returned class, where the name of
-                  the subclass sets the table name (which is combined with the
-                  <code>Database</code> in <code>source</code> to create the dataset to use)</p>
-                  </td></tr><tr><td class='label'><a href="Sequel/Dataset.html">Dataset</a> </td><td>
-                  <p>Sets the dataset for this model to <code>source</code>.</p>
-                  </td></tr><tr><td class='label'>other </td><td>
-                  <p>Sets the table name for this model to <code>source</code>. The class will
-                  use the default database for model classes in order to create the dataset.</p>
-                  </td></tr></tbody></table>
-                  
-                  <p>The purpose of this method is to set the dataset/database automatically for
-                  a model class, if the table name doesn&#39;t match the implicit name.  This
-                  is neater than using set_dataset inside the class, doesn&#39;t require a
-                  bogus query for the schema.</p>
-                  
-                  <pre class="ruby"><span class="ruby-comment"># Using a symbol</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Comment</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">something</span>)&#x000A;  <span class="ruby-identifier">table_name</span> <span class="ruby-comment"># =&gt; :something</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Using a dataset</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Comment</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB1</span>[:<span class="ruby-identifier">something</span>])&#x000A;  <span class="ruby-identifier">dataset</span> <span class="ruby-comment"># =&gt; DB1[:something]</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-comment"># Using a database</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Comment</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB1</span>)&#x000A;  <span class="ruby-identifier">dataset</span> <span class="ruby-comment"># =&gt; DB1[:comments]</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <p>Delegate to <a href="Sequel/Model.html">Sequel::Model</a>, only for
+                  backwards compatibility.</p>
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-Model-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-cache_anonymous_models-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-Model-source'><span class="ruby-comment"># File lib/sequel/model.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-constant">Model</span>(<span class="ruby-identifier">source</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache_anonymous_models</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">klass</span> = <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">ANONYMOUS_MODEL_CLASSES_MUTEX</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">ANONYMOUS_MODEL_CLASSES</span>[<span class="ruby-identifier">source</span>]})&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-identifier">klass</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">klass</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">source</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Database</span>)&#x000A;    <span class="ruby-identifier">c</span> = <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Model</span>)&#x000A;    <span class="ruby-identifier">c</span>.<span class="ruby-identifier">db</span> = <span class="ruby-identifier">source</span>&#x000A;    <span class="ruby-identifier">c</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Model</span>).<span class="ruby-identifier">set_dataset</span>(<span class="ruby-identifier">source</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">ANONYMOUS_MODEL_CLASSES_MUTEX</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-constant">Model</span><span class="ruby-operator">::</span><span class="ruby-constant">ANONYMOUS_MODEL_CLASSES</span>[<span class="ruby-identifier">source</span>] = <span class="ruby-identifier">klass</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">cache_anonymous_models</span>&#x000A;  <span class="ruby-identifier">klass</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-cache_anonymous_models-source'><span class="ruby-comment"># File lib/sequel/model.rb, line 7</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">cache_anonymous_models</span>&#x000A;  <span class="ruby-constant">Model</span>.<span class="ruby-identifier">cache_anonymous_models</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-class' id='method-method-c-cache_anonymous_models-3D'>
+                <a name='method-c-cache_anonymous_models-3D'></a>
+                <div class='synopsis'>
+                  <span class='name'>cache_anonymous_models=</span>
+                  <span class='arguments'>(v)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Delegate to <a href="Sequel/Model.html">Sequel::Model</a>, only for
+                  backwards compatibility.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-cache_anonymous_models-3D-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-cache_anonymous_models-3D-source'><span class="ruby-comment"># File lib/sequel/model.rb, line 12</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">cache_anonymous_models=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-constant">Model</span>.<span class="ruby-identifier">cache_anonymous_models</span> = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-condition_specifier-3F'>

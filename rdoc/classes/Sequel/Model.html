@@ -112,7 +112,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES</td>
                     <td>=</td>
-                    <td class='context-item-value'>{}</td>
+                    <td class='context-item-value'>@Model_cache = {}</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -123,7 +123,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES_MUTEX</td>
                     <td>=</td>
-                    <td class='context-item-value'>Mutex.new</td>
+                    <td class='context-item-value'>@Model_mutex = Mutex.new</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -214,7 +214,8 @@
                       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
                       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
                       :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
-                      :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil}
+                      :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
+                      :@cache_anonymous_models=>nil, :@Model_mutex=>nil}
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>

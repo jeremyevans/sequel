@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-05-25 07:49:31 -0700</span>
+          <span class='datetime'>2016-06-23 07:55:31 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -640,6 +640,16 @@
             indefinitely. It is not recommended to convert old-style migration classes
             to the <code>Sequel.migration</code> DSL, but it is recommended to use the
             <code>Sequel.migration</code> DSL for all new migrations.</p>
+            
+            <h2 id="label-Database-specific+migrations">Database-specific migrations<span><a href="#label-Database-specific+migrations">&para;</a> <a href="#top">&uarr;</a></span></h2>
+            
+            <p>While not a recommended practice, it is sometimes necessary to have parts
+            of migrations be database-specific .  You can use the <a
+            href="../../classes/Sequel/Database.html#method-i-database_type">Sequel::Database#database_type</a>
+            method to check which database the migration is being run on, and operate
+            accordingly:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">up</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">database_type</span> <span class="ruby-operator">==</span> :<span class="ruby-identifier">mysql</span>&#x000A;      <span class="ruby-identifier">run</span> <span class="ruby-string">&#39;MySQL specific code&#39;</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">run</span> <span class="ruby-string">&#39;Generic SQL code&#39;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">down</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">database_type</span> <span class="ruby-operator">==</span> :<span class="ruby-identifier">mysql</span>&#x000A;      <span class="ruby-identifier">run</span> <span class="ruby-string">&#39;MySQL specific code&#39;</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">run</span> <span class="ruby-string">&#39;Generic SQL code&#39;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
           </div>
           <div id='context'>
           </div>

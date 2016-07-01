@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::SQL::StringAgg::DatasetMethods</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      //<![CDATA[
+        function popupCode(url) {
+          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+        }
+        
+        function toggleCode(id) {
+          var code = document.getElementById(id)
+        
+          code.style.display = code.style.display != 'block' ? 'block' : 'none'
+          return true
+        }
+        
+        // Make codeblocks hidden by default
+        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+      //]]>
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::SQL::StringAgg::DatasetMethods
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a target="docwin" href="../../../../files/lib/sequel/extensions/string_agg_rb.html">lib/sequel/extensions/string_agg.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>These methods are added to datasets using the string_agg extension, for the
+            purposes of correctly literalizing <a
+            href="../StringAgg.html">StringAgg</a> expressions for the appropriate
+            database type.</p>
+          </div>
+          <div id='method-list'>
+            <h2>Methods</h2>
+            <h3>Public Instance</h3>
+            <ol>
+              <li><a target="docwin" href="#method-i-string_agg_sql_append">string_agg_sql_append</a></li>
+            </ol>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='section'>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-string_agg_sql_append'>
+                <a name='method-i-string_agg_sql_append'></a>
+                <div class='synopsis'>
+                  <span class='name'>string_agg_sql_append</span>
+                  <span class='arguments'>(sql, sa)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Append the <a href="../../SQL.html">SQL</a> fragment for the <a
+                  href="../StringAgg.html">StringAgg</a> expression to the <a
+                  href="../../SQL.html">SQL</a> query.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-string_agg_sql_append-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-string_agg_sql_append-source'><span class="ruby-comment"># File lib/sequel/extensions/string_agg.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">string_agg_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">sa</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-keyword">super</span>)&#x000A;    <span class="ruby-keyword">return</span> <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-identifier">expr</span> = <span class="ruby-identifier">sa</span>.<span class="ruby-identifier">expr</span>&#x000A;  <span class="ruby-identifier">separator</span> = <span class="ruby-identifier">sa</span>.<span class="ruby-identifier">separator</span> <span class="ruby-operator">||</span> <span class="ruby-string">&quot;,&quot;</span>&#x000A;  <span class="ruby-identifier">order</span> = <span class="ruby-identifier">sa</span>.<span class="ruby-identifier">order_expr</span>&#x000A;  <span class="ruby-identifier">distinct</span> = <span class="ruby-identifier">sa</span>.<span class="ruby-identifier">is_distinct?</span>&#x000A;&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">db_type</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:postgres</span>, <span class="ruby-value">:sqlanywhere</span>&#x000A;    <span class="ruby-identifier">f</span> = <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">db_type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:postgres</span> <span class="ruby-operator">?</span> <span class="ruby-value">:string_agg</span> <span class="ruby-operator">:</span> <span class="ruby-value">:list</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">separator</span>)&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">order</span>&#x000A;      <span class="ruby-identifier">f</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">order</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">order</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">distinct</span>&#x000A;      <span class="ruby-identifier">f</span> = <span class="ruby-identifier">f</span>.<span class="ruby-identifier">distinct</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">f</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:mysql</span>, <span class="ruby-value">:hsqldb</span>, <span class="ruby-value">:cubrid</span>, <span class="ruby-value">:h2</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;GROUP_CONCAT(&quot;</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">distinct</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;DISTINCT &quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">order</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; ORDER BY &quot;</span>&#x000A;      <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">order</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; SEPARATOR &quot;</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">separator</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:oracle</span>, <span class="ruby-value">:db2</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">distinct</span>&#x000A;      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;string_agg with distinct is not implemented on #{db.database_type}&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:listagg</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">separator</span>))&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">order</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; WITHIN GROUP (ORDER BY &quot;</span>&#x000A;      <span class="ruby-identifier">expression_list_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">order</span>)&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot;)&quot;</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-string">&quot; WITHIN GROUP (ORDER BY 1)&quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;string_agg is not implemented on #{db.database_type}&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-11 13:31:12 -0800</span>
+          <span class='datetime'>2016-06-08 12:35:56 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -684,10 +684,11 @@
             
             <p>This is the class of the associated objects that will be used.  It&#39;s
             one of the most commonly used options.  If it is not given, it guesses
-            based on the name of the association.  If a *_to_many association is used,
-            uses the singular form of the association name.  For example:</p>
+            based on the name of the association, including considering the namespace
+            of the current model.  If a *_to_many association is used, uses the
+            singular form of the association name.  For example:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span> <span class="ruby-comment"># guesses Artist</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span> <span class="ruby-comment"># guesses Album</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span> <span class="ruby-comment"># guesses Artist</span>&#x000A;<span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span> <span class="ruby-comment"># guesses Album</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">albums</span> <span class="ruby-comment"># guesses Foo::Album</span></pre>
             
             <p>However, for more complex associations, especially ones that add additional
             filters beyond the foreign/primary key relationships, the default class
@@ -698,7 +699,13 @@
             <p>You can specify the :class option using the class itself, a Symbol, or a
             String:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-constant">Artist</span> <span class="ruby-comment"># Class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Artist</span> <span class="ruby-comment"># Symbol</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Artist&quot;</span> <span class="ruby-comment"># String</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-constant">Artist</span>   <span class="ruby-comment"># Class</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Artist</span>  <span class="ruby-comment"># Symbol</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Artist&quot;</span> <span class="ruby-comment"># String</span></pre>
+            
+            <p>If you are namespacing your models, and you need to specify the :class
+            option, the path you give to the :class option should be the full path to
+            the associated class including any namespaces:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>                        <span class="ruby-comment"># Uses Foo::Artist</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Artist&quot;</span>      <span class="ruby-comment"># Uses Artist</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Foo::Artist&quot;</span> <span class="ruby-comment"># Uses Foo::Artist</span></pre>
             
             <h4 id="label-3Akey">:key<span><a href="#label-3Akey">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -1395,6 +1402,15 @@
             many_to_many association where there is a unique index in the join table so
             that you know only one object will ever be associated through the
             association.</p>
+            
+            <h4 id="label-3Aclass_namespace">:class_namespace<span><a href="#label-3Aclass_namespace">&para;</a> <a href="#top">&uarr;</a></span></h4>
+            
+            <p>If the :class option is specified as a symbol or string, the default
+            namespace in which to look up the class. If the :class option is not
+            specified as a symbol or string, this option is ignored.  This namespace
+            can be overridden by starting the string or symbol with <code>::</code>:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Artist&quot;</span>                                 <span class="ruby-comment"># Uses Artist</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Artist&quot;</span>, :<span class="ruby-identifier">class_namespace=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>        <span class="ruby-comment"># Uses Foo::Artist</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;Foo::Artist&quot;</span>, :<span class="ruby-identifier">class_namespace=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>   <span class="ruby-comment"># Uses Foo::Foo::Artist</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;::Artist&quot;</span>, :<span class="ruby-identifier">class_namespace=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span>      <span class="ruby-comment"># Uses Artist</span>&#x000A;<span class="ruby-constant">Foo</span><span class="ruby-operator">::</span><span class="ruby-constant">Album</span>.<span class="ruby-identifier">many_to_one</span> :<span class="ruby-identifier">artist</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span><span class="ruby-string">&quot;::Foo::Artist&quot;</span>, :<span class="ruby-identifier">class_namespace=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;Foo&#39;</span> <span class="ruby-comment"># Uses Foo::Artist</span></pre>
             
             <h4 id="label-3Amethods_module">:methods_module<span><a href="#label-3Amethods_module">&para;</a> <a href="#top">&uarr;</a></span></h4>
             

@@ -31,12 +31,61 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-06-01 07:30:01 -0700</span>
+          <span class='datetime'>2016-07-01 07:48:45 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.36.0+-282016-07-01-29">4.36.0 (2016-07-01)<span><a href="#label-4.36.0+-282016-07-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Deprecate use of Bignum class as generic type, since the behavior will
+            change in ruby 2.4 (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t hold connection pool mutex while disconnecting connections
+            (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t hold references to disconnected connections in the
+            connection_validator extension (jeremyevans)</p>
+            </li><li>
+            <p>Don&#39;t overwrite existing connection_validation_timeout when loading
+            connection_validator extension multiple times (jeremyevans)</p>
+            </li><li>
+            <p>Add connection_expiration extension, for automatically removing connections
+            open for too long (pdrakeweb) (#1208, #1209)</p>
+            </li><li>
+            <p>Handle disconnection errors raised during string literalization in mysql2
+            and postgres adapters (jeremyevans)</p>
+            </li><li>
+            <p>Add string_agg extension for aggregate string concatenation support on many
+            databases (jeremyevans)</p>
+            </li><li>
+            <p>Add SQL::Function#order for ordered aggregate functions (jeremyevans)</p>
+            </li><li>
+            <p>Support operator validation in constraint_validations for &lt;, &lt;=,
+            &gt;, and &gt;= operators with string and integer arguments (jeremyevans)</p>
+            </li><li>
+            <p>Make validates_operator validation consider nil values invalid unless
+            :allow_nil or similar option is used (jeremyevans)</p>
+            </li><li>
+            <p>Close cursors for non-SELECT queries in the oracle adapter after execution,
+            instead of waiting until GC (jeremyevans) (#1203)</p>
+            </li><li>
+            <p>Add :class_namespace association option for setting default namespace for
+            :class option given as symbol/string (jeremyevans)</p>
+            </li><li>
+            <p>Add Sequel::Model.cache_anonymous_models accessor for changing caching on a
+            per-model basis (jeremyevans)</p>
+            </li><li>
+            <p>Add Sequel::Model.def_Model for adding a Model() method to a module, for
+            easier use of namespaced models (jeremyevans)</p>
+            </li><li>
+            <p>Add Sequel::Model::Model() for creating subclasses of <a
+            href="../classes/Sequel/Model.html">Sequel::Model</a> subclasses, instead
+            of just <a href="../classes/Sequel/Model.html">Sequel::Model</a> itself
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.35.0+-282016-06-01-29">4.35.0 (2016-06-01)<span><a href="#label-4.35.0+-282016-06-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
@@ -1873,7 +1922,7 @@
             dataset methods (jeremyevans)</p>
             </li><li>
             <p>Add <a
-            href="../classes/Sequel.html#attribute-c-cache_anonymous_models">Sequel.cache_anonymous_models</a>
+            href="../classes/Sequel.html#method-c-cache_anonymous_models">Sequel.cache_anonymous_models</a>
             accessor (jeremyevans)</p>
             </li><li>
             <p>Deprecate Sequel::Model.cache_anonymous_models accessor (jeremyevans)</p>
