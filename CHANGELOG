@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.36.0 (2016-07-01)
 
 * Deprecate use of Bignum class as generic type, since the behavior will change in ruby 2.4 (jeremyevans)
 
