@@ -224,7 +224,7 @@ module Sequel
               c
             rescue JavaSQL::SQLException, NativeException, StandardError => e2
               unless e2.message == e.message
-                e2.message << "\n#{e.class.name}: #{e.message}"
+                e2.message = "#{e2.message}\n#{e.class.name}: #{e.message}"
               end
               raise e2
             end
