@@ -26,8 +26,14 @@ module Sequel
         h = {}
         o.each{|k, val| h[v(k)] = v(val)}
         h
+      when SQL::NumericExpression
+        if o.op == :extract
+          o.class.new(o.op, o.args[0], v(o.args[1]))
+        else
+          o.class.new(o.op, *v(o.args))
+        end
       when SQL::ComplexExpression
-        SQL::ComplexExpression.new(o.op, *v(o.args))
+        o.class.new(o.op, *v(o.args))
       when SQL::Identifier
         SQL::Identifier.new(v(o.value))
       when SQL::QualifiedIdentifier

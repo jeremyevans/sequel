@@ -3888,6 +3888,10 @@ describe "Sequel::Dataset#qualify" do
     @ds.select{sum(:a).order(:a)}.qualify.sql.must_equal 'SELECT sum(t.a ORDER BY t.a) FROM t'
   end
 
+  it "should handle Sequel.extract" do
+    @ds.select(Sequel.extract(:year, :d)).qualify.sql.must_equal 'SELECT extract(year FROM t.d) FROM t'
+  end
+
   it "should handle SQL::DelayedEvaluation" do
     t = :a
     ds = @ds.filter(Sequel.delay{t}).qualify
