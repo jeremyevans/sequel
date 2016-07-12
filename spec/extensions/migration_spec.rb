@@ -129,6 +129,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       alter_table(:b) do
         add_column :d, String
         add_constraint :blah, 'd IS NOT NULL'
+        add_constraint({:name=>:merp}, 'a > 1')
         add_foreign_key :e, :b
         add_foreign_key [:e], :b, :name=>'e_fk'
         add_foreign_key [:e, :a], :b
@@ -154,6 +155,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
       [:alter_table, [
         [:add_column, :d, String],
         [:add_constraint, :blah, "d IS NOT NULL"],
+        [:add_constraint, {:name=>:merp}, "a > 1"],
         [:add_foreign_key, :e, :b],
         [:add_foreign_key, [:e], :b, {:name=>"e_fk"}],
         [:add_foreign_key, [:e, :a], :b],
@@ -182,6 +184,7 @@ describe "Reversible Migrations with Sequel.migration{change{}}" do
         [:drop_foreign_key, [:e, :a]],
         [:drop_foreign_key, [:e], {:name=>"e_fk"}],
         [:drop_foreign_key, :e],
+        [:drop_constraint, :merp],
         [:drop_constraint, :blah],
         [:drop_column, :d]]
       ],

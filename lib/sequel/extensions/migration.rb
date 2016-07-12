@@ -245,7 +245,9 @@ module Sequel
     end
 
     def add_constraint(*args)
-      @actions << [:drop_constraint, args.first]
+      name = args.first
+      name = name.is_a?(Hash) ? name[:name] : name
+      @actions << [:drop_constraint, name]
     end
 
     def add_foreign_key(key, table, *args)
