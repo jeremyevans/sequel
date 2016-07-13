@@ -402,7 +402,7 @@ module Sequel
     # after 2005, otherwise uses the IntegerMigrator.
     def self.migrator_class(directory)
       if self.equal?(Migrator)
-        Dir.new(directory).each do |file|
+        Dir.new(directory).sort.each do |file|
           next unless MIGRATION_FILE_PATTERN.match(file)
           return TimestampMigrator if file.split(MIGRATION_SPLITTER, 2).first.to_i > MINIMUM_TIMESTAMP
         end
@@ -559,7 +559,7 @@ module Sequel
     # Returns any found migration files in the supplied directory.
     def get_migration_files
       files = []
-      Dir.new(directory).each do |file|
+      Dir.new(directory).sort.each do |file|
         next unless MIGRATION_FILE_PATTERN.match(file)
         version = migration_version_from_file(file)
         if version >= 20000101
@@ -702,7 +702,7 @@ module Sequel
     # Returns any migration files found in the migrator's directory.
     def get_migration_files
       files = []
-      Dir.new(directory).each do |file|
+      Dir.new(directory).sort.each do |file|
         next unless MIGRATION_FILE_PATTERN.match(file)
         files << File.join(directory, file)
       end
