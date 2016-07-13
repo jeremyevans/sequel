@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 require 'mysql2'
-Sequel.require %w'shared/mysql_prepared_statements', 'adapters'
+Sequel.require %w'utils/mysql_prepared_statements', 'adapters'
 
 module Sequel
   # Module for holding all Mysql2-related classes and modules for Sequel.
