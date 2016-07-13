@@ -190,6 +190,24 @@ describe "SQLite temporary views" do
   end
 end
     
+describe "SQLite VALUES support" do
+  before do
+    @db = DB
+  end
+
+  it "should create a dataset using the VALUES clause via #values" do
+    @db.values([[1, 2], [3, 4]]).map([:column1, :column2]).must_equal [[1, 2], [3, 4]]
+  end
+
+  it "should support VALUES with unions" do
+    @db.values([[1]]).union(@db.values([[3]])).map(&:values).map(&:first).must_equal [1, 3]
+  end
+
+  it "should support VALUES in CTEs" do
+    @db[:a].cross_join(:b).with(:a, @db.values([[1, 2]]), :args=>[:c1, :c2]).with(:b, @db.values([[3, 4]]), :args=>[:c3, :c4]).map([:c1, :c2, :c3, :c4]).must_equal [[1, 2, 3, 4]]
+  end
+end if DB.sqlite_version >= 30803
+
 describe "SQLite type conversion" do
   before do
     @db = DB

@@ -204,6 +204,14 @@ module Sequel
         pragma_set(:temp_store, value)
       end
       
+      # Creates a dataset that uses the VALUES clause:
+      #
+      #   DB.values([[1, 2], [3, 4]])
+      #   VALUES ((1, 2), (3, 4))
+      def values(v)
+        @default_dataset.clone(:values=>v)
+      end
+
       # Array of symbols specifying the view names in the current database.
       #
       # Options:
@@ -517,9 +525,11 @@ module Sequel
       DATETIME_OPEN = "datetime(".freeze
       ONLY_OFFSET = " LIMIT -1 OFFSET ".freeze
       OR = " OR ".freeze
+      SELECT_VALUES = "VALUES ".freeze
 
       Dataset.def_sql_method(self, :delete, [['if db.sqlite_version >= 30803', %w'with delete from where'], ["else", %w'delete from where']])
       Dataset.def_sql_method(self, :insert, [['if db.sqlite_version >= 30803', %w'with insert conflict into columns values'], ["else", %w'insert conflict into columns values']])
+      Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'with values compounds'], ['else', %w'with select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if db.sqlite_version >= 30803', %w'with update table set where'], ["else", %w'update table set where']])
 
       def cast_sql_append(sql, expr, type)
@@ -747,6 +757,12 @@ module Sequel
         literal_append(sql, @opts[:offset])
       end
   
+      # Support VALUES clause instead of the SELECT clause to return rows.
+      def select_values_sql(sql)
+        sql << SELECT_VALUES
+        expression_list_append(sql, opts[:values])
+      end
+
       # SQLite supports quoted function names.
       def supports_quoted_function_names?
         true
