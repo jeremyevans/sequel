@@ -1,7 +1,7 @@
 # frozen-string-literal: true
 
 require 'mysql2'
-Sequel.require %w'utils/mysql_prepared_statements', 'adapters'
+Sequel.require %w'utils/mysql_mysql2 utils/mysql_prepared_statements', 'adapters'
 
 module Sequel
   # Module for holding all Mysql2-related classes and modules for Sequel.
@@ -9,6 +9,7 @@ module Sequel
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
+      include Sequel::MySQL::MysqlMysql2::DatabaseMethods
       include Sequel::MySQL::PreparedStatements::DatabaseMethods
 
       set_adapter_scheme :mysql2
@@ -146,6 +147,7 @@ module Sequel
     # Dataset class for MySQL datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
+      include Sequel::MySQL::MysqlMysql2::DatasetMethods
       include Sequel::MySQL::PreparedStatements::DatasetMethods
       STREAMING_SUPPORTED = ::Mysql2::VERSION >= '0.3.12'
 

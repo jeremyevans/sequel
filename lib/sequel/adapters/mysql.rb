@@ -7,7 +7,7 @@ rescue LoadError
 end
 raise(LoadError, "require 'mysql' did not define Mysql::CLIENT_MULTI_RESULTS!\n  You are probably using the pure ruby mysql.rb driver,\n  which Sequel does not support. You need to install\n  the C based adapter, and make sure that the mysql.so\n  file is loaded instead of the mysql.rb file.\n") unless defined?(Mysql::CLIENT_MULTI_RESULTS)
 
-Sequel.require %w'utils/mysql_prepared_statements', 'adapters'
+Sequel.require %w'utils/mysql_mysql2 utils/mysql_prepared_statements', 'adapters'
 
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.
@@ -41,6 +41,7 @@ module Sequel
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
+      include Sequel::MySQL::MysqlMysql2::DatabaseMethods
       include Sequel::MySQL::PreparedStatements::DatabaseMethods
       
       # Regular expression used for getting accurate number of rows
@@ -287,6 +288,7 @@ module Sequel
     # Dataset class for MySQL datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
+      include Sequel::MySQL::MysqlMysql2::DatasetMethods
       include Sequel::MySQL::PreparedStatements::DatasetMethods
 
       Database::DatasetClass = self
