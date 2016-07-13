@@ -328,7 +328,7 @@ module Sequel
 
       # SQLite support creating temporary views.
       def create_view_prefix_sql(name, options)
-        "CREATE #{'TEMPORARY 'if options[:temp]}VIEW #{quote_schema_table(name)}"
+        create_view_sql_append_columns("CREATE #{'TEMPORARY 'if options[:temp]}VIEW #{quote_schema_table(name)}", options[:columns])
       end
 
       DATABASE_ERROR_REGEXPS = {

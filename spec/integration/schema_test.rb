@@ -354,7 +354,7 @@ describe "Database schema modifiers" do
       @ds.select_order_map(:number).must_equal [1, 2, 2, 3, 4]
     end if DB.supports_views_with_local_check_option?
 
-    cspecify "should create views with explicit columns correctly", :sqlite do
+    cspecify "should create views with explicit columns correctly", [proc{|db| db.sqlite_version < 30900}, :sqlite] do
       @db.create_view(:items_view, @ds.where(:number=>1), :columns=>[:n])
       @db[:items_view].map(:n).must_equal [1]
     end

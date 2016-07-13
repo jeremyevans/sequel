@@ -1,5 +1,7 @@
 === HEAD
 
+* Support create_view :columns option on SQLite 3.9.0+ (jeremyevans)
+
 * Make migration reverser handle alter_table add_constraint using a hash as the first argument (soupmatt) (#1215)
 
 * Make ASTTransformer handle Sequel.extract (jeremyevans) (#1213)
