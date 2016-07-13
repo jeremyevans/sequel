@@ -1,5 +1,7 @@
 === HEAD
 
+* Make migration reverser handle alter_table add_constraint using a hash as the first argument (soupmatt) (#1215)
+
 * Make ASTTransformer handle Sequel.extract (jeremyevans) (#1213)
 
 === 4.36.0 (2016-07-01)
