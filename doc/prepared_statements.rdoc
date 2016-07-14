@@ -7,8 +7,8 @@ the following adapters:
 
 * ibmdb (prepared statements only)
 * jdbc
-* mysql (prepared statements only)
-* mysql2 (prepared statements only)
+* mysql (server prepared statements using literalized connection variables)
+* mysql2 (full support on 0.4+, otherwise server prepared statements using literalized connection variables)
 * oracle (requires type specifiers for nil/NULL values)
 * postgres (when using the pg driver)
 * sqlite

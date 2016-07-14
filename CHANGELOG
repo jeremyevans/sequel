@@ -1,5 +1,7 @@
 === HEAD
 
+* Support mysql2 0.4+ native prepared statements and bound variables (jeremyevans)
+
 * Add Database#values for VALUES support on SQLite 3.8.3+ (jeremyevans)
 
 * Support create_view :columns option on SQLite 3.9.0+ (jeremyevans)
