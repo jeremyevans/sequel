@@ -84,6 +84,7 @@ class Sequel::ConnectionPool
   def initialize(db, opts=OPTS)
     @db = db
     @after_connect = opts[:after_connect]
+    @error_classes = db.send(:database_error_classes).dup.freeze
   end
   
   # Alias for +size+, not aliased directly for ease of subclass implementation
@@ -101,6 +102,11 @@ class Sequel::ConnectionPool
   # Remove the connection from the pool.
   def disconnect_connection(conn)
     db.disconnect_connection(conn)
+  end
+
+  # Whether the given exception is a disconnect exception.
+  def disconnect_error?(exception)
+    exception.is_a?(Sequel::DatabaseDisconnectError) || db.send(:disconnect_error?, exception, OPTS)
   end
   
   # Return a new connection by calling the connection proc with the given server name,

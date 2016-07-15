@@ -50,8 +50,8 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
     begin
       server = pick_server(server)
       yield(@conns[server] ||= make_new(server))
-    rescue Sequel::DatabaseDisconnectError
-      disconnect_server(server)
+    rescue Sequel::DatabaseDisconnectError, *@error_classes => e
+      disconnect_server(server) if disconnect_error?(e)
       raise
     end
   end

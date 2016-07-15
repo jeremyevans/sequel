@@ -126,8 +126,8 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     begin
       conn = acquire(t, server)
       yield conn
-    rescue Sequel::DatabaseDisconnectError
-      sync{@connections_to_remove << conn} if conn
+    rescue Sequel::DatabaseDisconnectError, *@error_classes => e
+      sync{@connections_to_remove << conn} if conn && disconnect_error?(e)
       raise
     ensure
       sync{release(t, conn, server)} if conn

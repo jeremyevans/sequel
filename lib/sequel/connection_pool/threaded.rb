@@ -105,11 +105,13 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     begin
       conn = acquire(t)
       yield conn
-    rescue Sequel::DatabaseDisconnectError
-      oconn = conn
-      conn = nil
-      disconnect_connection(oconn) if oconn
-      @allocated.delete(t)
+    rescue Sequel::DatabaseDisconnectError, *@error_classes => e
+      if disconnect_error?(e)
+        oconn = conn
+        conn = nil
+        disconnect_connection(oconn) if oconn
+        @allocated.delete(t)
+      end
       raise
     ensure
       sync{release(t)} if conn

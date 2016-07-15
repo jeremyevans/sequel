@@ -1,5 +1,7 @@
 === HEAD
 
+* Make connection pool remove connections for disconnect errors not raised as DatabaseDisconnectError (jeremyevans)
+
 * Support mysql2 0.4+ native prepared statements and bound variables (jeremyevans)
 
 * Add Database#values for VALUES support on SQLite 3.8.3+ (jeremyevans)

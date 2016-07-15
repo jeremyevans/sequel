@@ -125,13 +125,13 @@ end
 
 describe "A connection pool handling connection errors" do 
   it "#hold should raise a Sequel::DatabaseConnectionError if an exception is raised by the connection_proc" do
-    cpool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){raise Interrupt}
+    cpool = Sequel::ConnectionPool.get_pool(mock_db.call{raise Interrupt}, CONNECTION_POOL_DEFAULTS)
     proc{cpool.hold{:block_return}}.must_raise(Sequel::DatabaseConnectionError)
     cpool.created_count.must_equal 0
   end
 
   it "#hold should raise a Sequel::DatabaseConnectionError if nil is returned by the connection_proc" do
-    cpool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){nil}
+    cpool = Sequel::ConnectionPool.get_pool(mock_db.call{nil}, CONNECTION_POOL_DEFAULTS)
     proc{cpool.hold{:block_return}}.must_raise(Sequel::DatabaseConnectionError)
     cpool.created_count.must_equal 0
   end
@@ -905,6 +905,48 @@ describe "A single threaded pool with multiple servers" do
 end
 
 AllConnectionPoolClassesSpecs = shared_description do
+  it "should have pool correctly handle disconnect errors not raised as DatabaseDisconnectError" do
+    db = mock_db.call{Object.new}
+    def db.dec; @dec ||= Class.new(StandardError) end
+    def db.database_error_classes; super + [dec] end
+    def db.disconnect_error?(e, opts); e.message =~ /foo/ end
+    cp = @class.new(db, {})
+
+    conn = nil
+    cp.hold do |c|
+      conn = c
+    end
+
+    proc do
+      cp.hold do |c|
+        c.must_equal conn
+        raise db.dec, "bar"
+      end
+    end.must_raise db.dec
+
+    proc do
+      cp.hold do |c|
+        c.must_equal conn
+        raise StandardError
+      end
+    end.must_raise StandardError
+
+    cp.hold do |c|
+      c.must_equal conn
+    end
+
+    proc do
+      cp.hold do |c|
+        c.must_equal conn
+        raise db.dec, "foo"
+      end
+    end.must_raise db.dec
+
+    cp.hold do |c|
+      c.wont_equal conn
+    end
+  end
+
   it "should have pool_type return a symbol" do
     @class.new(mock_db.call{123}, {}).pool_type.must_be_kind_of(Symbol)
   end

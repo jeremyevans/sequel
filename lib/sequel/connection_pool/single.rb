@@ -20,8 +20,8 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
   def hold(server=nil)
     begin
       yield(@conn ||= make_new(DEFAULT_SERVER))
-    rescue Sequel::DatabaseDisconnectError
-      disconnect
+    rescue Sequel::DatabaseDisconnectError, *@error_classes => e
+      disconnect if disconnect_error?(e)
       raise
     end
   end
