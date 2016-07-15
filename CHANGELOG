@@ -1,5 +1,7 @@
 === HEAD
 
+* Recognize an additional disconnect error in the postgres adapter (jeremyevans)
+
 * Make connection pool remove connections for disconnect errors not raised as DatabaseDisconnectError (jeremyevans)
 
 * Support mysql2 0.4+ native prepared statements and bound variables (jeremyevans)

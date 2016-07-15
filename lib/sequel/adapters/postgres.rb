@@ -125,6 +125,7 @@ module Sequel
         'could not receive data from server',
         'no connection to the server',
         'connection not open',
+        'connection is closed',
         'terminating connection due to administrator command',
         'PQconsumeInput() '
        ]
