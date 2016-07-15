@@ -12,19 +12,16 @@ module Sequel
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgres=>proc do |db|
-        Sequel.require 'adapters/swift/postgres'
         db.extend(Sequel::Swift::Postgres::DatabaseMethods)
         db.extend_datasets Sequel::Postgres::DatasetMethods
         db.swift_class = ::Swift::DB::Postgres
       end,
       :mysql=>proc do |db|
-        Sequel.require 'adapters/swift/mysql'
         db.extend(Sequel::Swift::MySQL::DatabaseMethods)
         db.dataset_class = Sequel::Swift::MySQL::Dataset
         db.swift_class = ::Swift::DB::Mysql
       end,
       :sqlite=>proc do |db|
-        Sequel.require 'adapters/swift/sqlite'
         db.extend(Sequel::Swift::SQLite::DatabaseMethods)
         db.dataset_class = Sequel::Swift::SQLite::Dataset
         db.swift_class = ::Swift::DB::Sqlite3
@@ -38,6 +35,11 @@ module Sequel
       # The Swift adapter class being used by this database.  Connections
       # in this database's connection pool will be instances of this class.
       attr_accessor :swift_class
+
+      def initialize(opts=OPTS)
+        Sequel.require "adapters/swift/#{opts[:db_type]}" if %w'postgres mysql sqlite'.include?(opts[:db_type].to_s)
+        super
+      end
       
       # Create an instance of swift_class for the given options.
       def connect(server)
