@@ -561,6 +561,12 @@ module Sequel
         [PGError]
       end
 
+      def disconnect_error?(exception, opts)
+        super ||
+          Adapter::DISCONNECT_ERROR_CLASSES.any?{|klass| exception.is_a?(klass)} ||
+          exception.message =~ Adapter::DISCONNECT_ERROR_RE
+      end
+
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
           result.error_field(::PGresult::PG_DIAG_SQLSTATE)
