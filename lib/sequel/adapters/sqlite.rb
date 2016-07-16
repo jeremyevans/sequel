@@ -114,7 +114,10 @@ module Sequel
         if opts.has_key?(:extensions)
           ext = opts[:extensions]
           db.enable_load_extension(1)
-          ext.each { |file| db.load_extensison file }
+          ext.each do |file|
+            puts "SQLITE: load extension #{file}" 
+            db.load_extension file
+          end
           db.enable_load_extension(0)
         end
 
