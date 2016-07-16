@@ -101,7 +101,8 @@ module Sequel
       #              static data that you do not want to modify
       # :timeout :: how long to wait for the database to be available if it
       #             is locked, given in milliseconds (default is 5000)
-      # :extensions :: array of SQLITE3 extension files (shared objects) to load
+      # :extensions :: filename or array of filenames of SQLITE3 extension 
+      #                files (shared objects) to load
       # 
       def connect(server)
         opts = server_opts(server)
@@ -113,10 +114,10 @@ module Sequel
         
         if opts.has_key?(:extensions)
           ext = opts[:extensions]
+          ext = [ ext ] if ext.kind_of?(String) 
           db.enable_load_extension(1)
           ext.each do |file|
-            puts "SQLITE: load extension #{file}" 
-            db.load_extension file
+            log_connection_yield(file, db) { db.load_extension(file) }
           end
           db.enable_load_extension(0)
         end
