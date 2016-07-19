@@ -519,6 +519,12 @@ This modifies the default value of a column:
     set_column_default :copies_sold, 0
   end
 
+To remove a default value for a column, use +nil+ as the value:
+
+  alter_table(:albums) do
+    set_column_default :copies_sold, nil
+  end
+
 === +set_column_type+
 
 This modifies a column's type.  Most databases will attempt to convert existing values in

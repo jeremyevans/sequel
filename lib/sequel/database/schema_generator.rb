@@ -494,6 +494,10 @@ module Sequel
       #
       #   set_column_default(:artist_name, 'a') # ALTER COLUMN artist_name SET DEFAULT 'a'
       #
+      # To remove an existing default value, use +nil+ as the value:
+      #
+      #   set_column_default(:artist_name, nil) # ALTER COLUMN artist_name SET DEFAULT NULL
+      #
       # On MySQL, make sure to use a symbol for the name of the column, as otherwise you
       # can lose the type and NULL/NOT NULL setting for the column.
       def set_column_default(name, default)
