@@ -90,6 +90,23 @@ module Sequel
           count > 0
       end 
 
+      # The version of the Oracle server, used for determining capability.
+      def server_version(server=nil)
+        return @server_version if @server_version
+        @server_version = synchronize(server) do |conn|
+          (conn.server_version rescue nil) if conn.respond_to?(:server_version)
+        end
+        unless @server_version
+          @server_version = if m = /(\d+)\.(\d+)\.?(\d+)?\.?(\d+)?/.match(fetch("select version from PRODUCT_COMPONENT_VERSION where lower(product) like 'oracle%'").single_value)
+            (m[1].to_i*1000000) + (m[2].to_i*10000) + (m[3].to_i*100) + m[4].to_i
+          else
+            0
+          end
+        end
+        @server_version
+      end
+
+
       # Oracle supports deferrable constraints.
       def supports_deferrable_constraints?
         true
@@ -305,6 +322,17 @@ module Sequel
             s2 = complex_expression_arg_pairs(x, &BITAND_PROC)
             Sequel.lit(["(", " - ", ")"], s1, s2)
           end
+        when :~, :'!~', :'~*', :'!~*'
+          raise InvalidOperation, "Pattern matching via regular expressions is not supported in this Oracle version" if !supports_regexp?
+          sql << 'NOT ' if [:'!~', :'!~*'].include?(op)
+          sql << 'REGEXP_LIKE('
+          literal_append(sql, args.at(0))
+          sql << ','
+          literal_append(sql, args.at(1))
+          if [:'~*', :'!~*'].include?(op)
+            sql << ", #{literal('i')}"
+          end
+          sql << ')'
         when :%, :<<, :>>, :'B~'
           complex_expression_emulate_append(sql, op, args)
         else
@@ -450,6 +478,16 @@ module Sequel
       # Oracle supports window functions
       def supports_window_functions?
         true
+      end
+
+      # The version of the database server
+      def server_version
+        db.server_version(@opts[:server])
+      end
+
+      # Oracle supports pattern matching via regular expressions
+      def supports_regexp?
+        server_version >= 10010002
       end
 
       private
