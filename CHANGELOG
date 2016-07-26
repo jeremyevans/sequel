@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for regular expression matching on Oracle 10g+ using REGEXP_LIKE (johndcaldwell) (#1221)
+
 * Recognize an additional disconnect error in the postgres adapter (jeremyevans)
 
 * Make connection pool remove connections for disconnect errors not raised as DatabaseDisconnectError (jeremyevans)

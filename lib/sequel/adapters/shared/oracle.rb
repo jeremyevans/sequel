@@ -323,14 +323,16 @@ module Sequel
             Sequel.lit(["(", " - ", ")"], s1, s2)
           end
         when :~, :'!~', :'~*', :'!~*'
-          raise InvalidOperation, "Pattern matching via regular expressions is not supported in this Oracle version" if !supports_regexp?
-          sql << 'NOT ' if [:'!~', :'!~*'].include?(op)
+          raise InvalidOperation, "Pattern matching via regular expressions is not supported in this Oracle version" unless supports_regexp?
+          if op == :'!~' || op == :'!~*'
+            sql << 'NOT '
+          end
           sql << 'REGEXP_LIKE('
           literal_append(sql, args.at(0))
           sql << ','
           literal_append(sql, args.at(1))
-          if [:'~*', :'!~*'].include?(op)
-            sql << ", #{literal('i')}"
+          if op == :'~*' || op == :'!~*'
+            sql << ", 'i'"
           end
           sql << ')'
         when :%, :<<, :>>, :'B~'
