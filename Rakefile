@@ -6,7 +6,7 @@ VERS = lambda do
   require File.expand_path("../lib/sequel/version", __FILE__)
   Sequel.version
 end
-CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*", '**/*.rbc']
+CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*", '**/*.rbc', "spec/bin-sequel-*"]
 
 # Gem Packaging and Release
 
