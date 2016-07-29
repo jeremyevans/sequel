@@ -444,10 +444,11 @@ describe "Sequel Mock Adapter" do
   end
 
   it "should automatically set version for adapters nedding versions" do
-    Sequel.mock(:host=>'postgres').server_version.must_equal 90400
-    Sequel.mock(:host=>'mssql').server_version.must_equal 11000000
-    Sequel.mock(:host=>'mysql').server_version.must_equal 50617
-    Sequel.mock(:host=>'sqlite').sqlite_version.must_equal 30804
+    Sequel.mock(:host=>'postgres').server_version.must_be :>=, 90400
+    Sequel.mock(:host=>'mssql').server_version.must_be :>=, 11000000
+    Sequel.mock(:host=>'mysql').server_version.must_be :>=, 50617
+    Sequel.mock(:host=>'sqlite').sqlite_version.must_be :>=, 30804
+    Sequel.mock(:host=>'oracle').server_version.must_be :>=, 11000000
   end
 
   it "should stub out the primary_key method for postgres" do
