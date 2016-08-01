@@ -52,6 +52,27 @@
             </ol>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>NativePreparedStatements</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      if ::Mysql2::VERSION >= '0.4'
+                      true
+                      else
+                      Sequel.require %w'utils/mysql_prepared_statements', 'adapters'
+                      false
+                      end
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>

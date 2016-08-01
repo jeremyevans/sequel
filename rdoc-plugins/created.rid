@@ -1,4 +1,4 @@
-Fri, 01 Jul 2016 07:56:11 -0700
+Mon, 01 Aug 2016 07:28:16 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 17 May 2016 14:34:25 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Wed, 29 Jun 2016 13:36:28 -0700
 lib/sequel/extensions/blank.rb	Mon, 25 Jan 2016 14:10:57 -0800
@@ -23,7 +23,7 @@ lib/sequel/extensions/hash_aliases.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/inflector.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/looser_typecasting.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/meta_def.rb	Thu, 11 Feb 2016 15:50:14 -0800
-lib/sequel/extensions/migration.rb	Thu, 14 Apr 2016 10:45:14 -0700
+lib/sequel/extensions/migration.rb	Wed, 13 Jul 2016 08:04:43 -0700
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/no_auto_literal_strings.rb	Fri, 12 Feb 2016 14:45:49 -0800

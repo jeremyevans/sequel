@@ -467,7 +467,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_allow_null-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_allow_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 523</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">allow_null</span>=<span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_null</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:null</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">allow_null</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_allow_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 527</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">allow_null</span>=<span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_null</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:null</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">allow_null</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_default'>
@@ -482,6 +482,10 @@
                   
                   <pre class="ruby"><span class="ruby-identifier">set_column_default</span>(:<span class="ruby-identifier">artist_name</span>, <span class="ruby-string">&#39;a&#39;</span>) <span class="ruby-comment"># ALTER COLUMN artist_name SET DEFAULT &#39;a&#39;</span></pre>
                   
+                  <p>To remove an existing default value, use <code>nil</code> as the value:</p>
+                  
+                  <pre class="ruby"><span class="ruby-identifier">set_column_default</span>(:<span class="ruby-identifier">artist_name</span>, <span class="ruby-keyword">nil</span>) <span class="ruby-comment"># ALTER COLUMN artist_name SET DEFAULT NULL</span></pre>
+                  
                   <p>On MySQL, make sure to use a symbol for the name of the column, as
                   otherwise you can lose the type and NULL/NOT NULL setting for the column.</p>
                 </div>
@@ -489,7 +493,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_default-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_default-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 499</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_default</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">default</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_default</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:default</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">default</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_default-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 503</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_default</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">default</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_default</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:default</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">default</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_not_null'>
@@ -511,7 +515,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_not_null-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_not_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 533</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_not_null</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_not_null-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 537</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_not_null</span>(<span class="ruby-identifier">name</span>)&#x000A;  <span class="ruby-identifier">set_column_allow_null</span>(<span class="ruby-identifier">name</span>, <span class="ruby-keyword">false</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_column_type'>
@@ -540,7 +544,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_column_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_column_type-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 513</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_type</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_type</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_column_type-source'><span class="ruby-comment"># File lib/sequel/database/schema_generator.rb, line 517</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_column_type</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@operations</span> <span class="ruby-operator">&lt;&lt;</span> {<span class="ruby-value">:op</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:set_column_type</span>, <span class="ruby-value">:name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">name</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">type</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

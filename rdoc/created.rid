@@ -1,10 +1,10 @@
-Fri, 01 Jul 2016 07:55:06 -0700
+Mon, 01 Aug 2016 07:27:11 -0700
 README.rdoc	Fri, 27 Nov 2015 11:00:03 -0800
-CHANGELOG	Fri, 01 Jul 2016 07:48:45 -0700
+CHANGELOG	Mon, 01 Aug 2016 07:21:11 -0700
 MIT-LICENSE	Sat, 09 Jan 2016 12:54:32 -0800
 lib/sequel.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/ast_transformer.rb	Thu, 21 Jan 2016 12:21:52 -0800
-lib/sequel/connection_pool.rb	Wed, 29 Jun 2016 13:36:28 -0700
+lib/sequel/ast_transformer.rb	Mon, 11 Jul 2016 11:22:53 -0700
+lib/sequel/connection_pool.rb	Fri, 15 Jul 2016 14:07:44 -0700
 lib/sequel/core.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/database.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/dataset.rb	Mon, 25 Apr 2016 11:33:14 -0700
@@ -14,11 +14,11 @@ lib/sequel/model.rb	Wed, 08 Jun 2016 12:35:56 -0700
 lib/sequel/no_core_ext.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/sql.rb	Thu, 23 Jun 2016 07:43:58 -0700
 lib/sequel/timezones.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/version.rb	Fri, 01 Jul 2016 07:48:45 -0700
-lib/sequel/connection_pool/sharded_single.rb	Wed, 29 Jun 2016 13:36:28 -0700
-lib/sequel/connection_pool/sharded_threaded.rb	Wed, 29 Jun 2016 13:36:28 -0700
-lib/sequel/connection_pool/single.rb	Wed, 29 Jun 2016 13:36:28 -0700
-lib/sequel/connection_pool/threaded.rb	Wed, 29 Jun 2016 13:36:28 -0700
+lib/sequel/version.rb	Mon, 01 Aug 2016 07:21:11 -0700
+lib/sequel/connection_pool/sharded_single.rb	Fri, 15 Jul 2016 14:07:44 -0700
+lib/sequel/connection_pool/sharded_threaded.rb	Fri, 15 Jul 2016 14:07:44 -0700
+lib/sequel/connection_pool/single.rb	Fri, 15 Jul 2016 14:07:44 -0700
+lib/sequel/connection_pool/threaded.rb	Fri, 15 Jul 2016 14:07:44 -0700
 lib/sequel/database/connecting.rb	Wed, 09 Mar 2016 14:04:40 -0800
 lib/sequel/database/dataset.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/database/dataset_defaults.rb	Thu, 21 Jan 2016 12:21:52 -0800
@@ -26,7 +26,7 @@ lib/sequel/database/features.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/database/logging.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/database/misc.rb	Fri, 27 May 2016 13:00:23 -0700
 lib/sequel/database/query.rb	Thu, 24 Mar 2016 15:25:56 -0700
-lib/sequel/database/schema_generator.rb	Tue, 17 May 2016 14:34:25 -0700
+lib/sequel/database/schema_generator.rb	Tue, 19 Jul 2016 13:45:40 -0700
 lib/sequel/database/schema_methods.rb	Thu, 30 Jun 2016 09:16:59 -0700
 lib/sequel/database/transactions.rb	Fri, 27 May 2016 13:00:23 -0700
 lib/sequel/dataset/actions.rb	Thu, 19 May 2016 11:03:56 -0700
@@ -64,10 +64,10 @@ doc/mssql_stored_procedures.rdoc	Thu, 02 Jan 2014 10:46:37 -0800
 doc/object_model.rdoc	Mon, 16 May 2016 11:05:01 -0700
 doc/opening_databases.rdoc	Thu, 04 Feb 2016 15:56:57 -0800
 doc/postgresql.rdoc	Wed, 23 Sep 2015 17:04:24 -0700
-doc/prepared_statements.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
+doc/prepared_statements.rdoc	Thu, 14 Jul 2016 09:29:02 -0700
 doc/querying.rdoc	Thu, 23 Jul 2015 07:47:01 -0700
 doc/reflection.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
-doc/schema_modification.rdoc	Tue, 17 May 2016 14:34:25 -0700
+doc/schema_modification.rdoc	Tue, 19 Jul 2016 13:45:40 -0700
 doc/security.rdoc	Wed, 01 Jun 2016 07:30:01 -0700
 doc/sharding.rdoc	Fri, 22 May 2015 08:18:52 -0700
 doc/sql.rdoc	Tue, 23 Jun 2015 07:26:33 -0700
@@ -172,12 +172,13 @@ doc/release_notes/4.31.0.txt	Mon, 01 Feb 2016 08:16:09 -0800
 doc/release_notes/4.32.0.txt	Tue, 01 Mar 2016 11:27:08 -0800
 doc/release_notes/4.33.0.txt	Fri, 01 Apr 2016 07:24:12 -0700
 doc/release_notes/4.34.0.txt	Sun, 01 May 2016 10:31:41 -0700
-doc/release_notes/4.35.0.txt	Wed, 01 Jun 2016 07:30:01 -0700
+doc/release_notes/4.35.0.txt	Thu, 14 Jul 2016 14:38:07 -0700
 doc/release_notes/4.36.0.txt	Fri, 01 Jul 2016 07:48:45 -0700
+doc/release_notes/4.37.0.txt	Mon, 01 Aug 2016 07:21:11 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
 doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800
 doc/release_notes/4.6.0.txt	Thu, 02 Jan 2014 12:13:25 -0800
 doc/release_notes/4.7.0.txt	Fri, 31 Jan 2014 11:26:01 -0800
 doc/release_notes/4.8.0.txt	Fri, 28 Feb 2014 09:33:59 -0800
 doc/release_notes/4.9.0.txt	Tue, 01 Apr 2014 10:01:57 -0700
-lib/sequel/extensions/migration.rb	Thu, 14 Apr 2016 10:45:14 -0700
+lib/sequel/extensions/migration.rb	Wed, 13 Jul 2016 08:04:43 -0700

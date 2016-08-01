@@ -31,7 +31,7 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../../files/lib/sequel/adapters/shared/mysql_prepared_statements_rb.html">lib/sequel/adapters/shared/mysql_prepared_statements.rb</a>
+            <a target="docwin" href="../../../../files/lib/sequel/adapters/utils/mysql_prepared_statements_rb.html">lib/sequel/adapters/utils/mysql_prepared_statements.rb</a>
           </li>
         </ol>
       </div>
@@ -47,12 +47,6 @@
             </ol>
           </div>
           <div id='context'>
-            <div id='includes'>
-              <h2>Included modules</h2>
-              <ol>
-                <li><a target="docwin" href="../../Dataset/StoredProcedures.html">Sequel::Dataset::StoredProcedures</a></li>
-              </ol>
-            </div>
           </div>
           <div id='class-list'>
             <h2>Classes and Modules</h2>
@@ -82,17 +76,6 @@
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>StoredProcedureMethods</td>
-                    <td>=</td>
-                    <td class='context-item-value'>
-                      Sequel::Dataset.send(:prepared_statements_module,
-                      "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
-                      Sequel::Dataset::StoredProcedureMethods, %w'execute execute_dui')
-                    </td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
                 </table>
               </div>
             </div>
@@ -116,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql_prepared_statements.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">bind_arguments</span>={}, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">CallableStatementMethods</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bind_arguments</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">bind_arguments</span>={}, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">CallableStatementMethods</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bind_arguments</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prepare'>
@@ -134,7 +117,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/mysql_prepared_statements.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb, line 70</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

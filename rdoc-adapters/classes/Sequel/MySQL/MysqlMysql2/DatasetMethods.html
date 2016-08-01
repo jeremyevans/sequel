@@ -1,9 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang='en'>
   <head>
-    <title>Sequel::MySQL::PreparedStatements</title>
+    <title>Sequel::MySQL::MysqlMysql2::DatasetMethods</title>
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
-    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
       //<![CDATA[
         function popupCode(url) {
@@ -27,11 +27,11 @@
       <div class='header'>
         <h1 class='name'>
           <span class='type'>module</span>
-          Sequel::MySQL::PreparedStatements
+          Sequel::MySQL::MysqlMysql2::DatasetMethods
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../files/lib/sequel/adapters/utils/mysql_prepared_statements_rb.html">lib/sequel/adapters/utils/mysql_prepared_statements.rb</a>
+            <a target="docwin" href="../../../../files/lib/sequel/adapters/utils/mysql_mysql2_rb.html">lib/sequel/adapters/utils/mysql_mysql2.rb</a>
           </li>
         </ol>
       </div>
@@ -39,15 +39,32 @@
         <div id='text'>
           <div id='description'></div>
           <div id='context'>
-          </div>
-          <div id='class-list'>
-            <h2>Classes and Modules</h2>
-            <ol>
-              <li><a target="docwin" href="PreparedStatements/DatabaseMethods.html">Sequel::MySQL::PreparedStatements::DatabaseMethods</a></li>
-              <li><a target="docwin" href="PreparedStatements/DatasetMethods.html">Sequel::MySQL::PreparedStatements::DatasetMethods</a></li>
-            </ol>
+            <div id='includes'>
+              <h2>Included modules</h2>
+              <ol>
+                <li><a target="docwin" href="../../Dataset/StoredProcedures.html">Sequel::Dataset::StoredProcedures</a></li>
+              </ol>
+            </div>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>StoredProcedureMethods</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      Sequel::Dataset.send(:prepared_statements_module,
+                      "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
+                      Sequel::Dataset::StoredProcedureMethods, %w'execute execute_dui')
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
