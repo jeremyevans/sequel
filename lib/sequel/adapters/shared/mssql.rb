@@ -141,7 +141,7 @@ module Sequel
 
         ds = dataset.with_sql(sql)
         ds = ds.server(opts[:server]) if opts[:server]
-        ds.all
+        ds
       end
 
       # Microsoft SQL Server uses the :mssql type.

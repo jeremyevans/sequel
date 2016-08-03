@@ -670,7 +670,7 @@ describe "MSSQL Stored Procedure support" do
   describe "with dataset" do
     it "should return a Dataset with the hash of output variables" do
       r = @db.mssql_sproc_ds(:SequelTest, {:args => [@now, 1, :output, :output]})
-      r.must_be_kind_of(Array)
+      r.must_be_kind_of(Dataset)
       r.first.must_be_kind_of(Hash)
     end
   end
