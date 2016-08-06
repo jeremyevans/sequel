@@ -14,6 +14,7 @@ migrate_ver = nil
 backtrace = nil
 show_version = false
 test = true
+allow_missing_migration_files = false
 load_dirs = []
 exclusive_options = []
 loggers = []
@@ -34,6 +35,10 @@ options = OptionParser.new do |opts|
   opts.on_tail("-h", "-?", "--help", "Show this message") do
     puts opts
     exit
+  end
+
+  opts.on("-a", "--allow-missing-files", "don't raise an error if there are missing migration files.") do  |v|
+    allow_missing_migration_files = true
   end
 
   opts.on("-c", "--code CODE", "run the given code and exit") do  |v|
@@ -157,7 +162,9 @@ begin
   if migrate_dir
     extra_proc.call
     Sequel.extension :migration, :core_extensions
-    Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
+    opts = {:target => migrate_ver,
+            :allow_missing_migration_files => allow_missing_migration_files}
+    Sequel::Migrator.run(DB, migrate_dir, opts)
     exit
   end
   if dump_migration
