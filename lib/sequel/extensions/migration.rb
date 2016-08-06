@@ -126,6 +126,7 @@ module Sequel
 
     # Defines the migration's down action.
     def down(&block)
+      validate_format(:updown)
       migration.down = block
     end
 
@@ -141,6 +142,7 @@ module Sequel
 
     # Defines the migration's up action.
     def up(&block)
+      validate_format(:updown)
       migration.up = block
     end
 
@@ -152,8 +154,19 @@ module Sequel
     # There are no guarantees that this will work perfectly
     # in all cases, but it should work for most common cases.
     def change(&block)
+      validate_format(:change)
       migration.up = block
       migration.down = MigrationReverser.new.reverse(&block)
+    end
+
+    private
+
+    def validate_format(format)
+      if @migration_format.nil? || @migration_format == format
+        @migration_format = format
+      else
+        ::Kernel.raise(ArgumentError, "Invalid migration - both change and up/down blocks were defined")
+      end 
     end
   end
 
