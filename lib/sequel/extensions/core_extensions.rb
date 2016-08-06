@@ -226,3 +226,9 @@ class Symbol
     Sequel::SQL::Function.new(self, *args)
   end
 end
+
+class NilClass
+  def ~
+    Sequel::SQL::Constants::NOTNULL
+  end
+end
