@@ -533,7 +533,7 @@ end
 describe Sequel::Model, ".strict_param_setting" do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
-      columns :x, :y, :z, :id
+      columns :x, :y, :z, :z2, :id
       set_allowed_columns :x, :y
     end
   end
@@ -549,9 +549,11 @@ describe Sequel::Model, ".strict_param_setting" do
     proc{c.set(:z=>1)}.must_raise(Sequel::MassAssignmentRestriction)
     proc{c.set_all(:use_after_commit_rollback => false)}.must_raise(Sequel::MassAssignmentRestriction)
     proc{c.set_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{c.set_extra({:z2=>1}, :z)}.must_raise(Sequel::MassAssignmentRestriction)
     proc{c.update(:z=>1)}.must_raise(Sequel::MassAssignmentRestriction)
     proc{c.update_all(:use_after_commit_rollback=>false)}.must_raise(Sequel::MassAssignmentRestriction)
     proc{c.update_only({:x=>1}, :y)}.must_raise(Sequel::MassAssignmentRestriction)
+    proc{c.update_extra({:z2=>1}, :z)}.must_raise(Sequel::MassAssignmentRestriction)
   end
 
   it "should be disabled by strict_param_setting = false" do

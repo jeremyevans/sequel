@@ -1787,6 +1787,20 @@ module Sequel
       def set_only(hash, *only)
         set_restricted(hash, only.flatten)
       end
+
+      # Set the values using the entries in the hash, only if the key
+      # is included in extra OR model.allowed_columns.
+      #
+      #   Artist.set_allowed_columns(:name)
+      #
+      #   artist.set_extra({:name=>'Jim', :age => 30}, :age)
+      #   artist.name # => 'Jim'
+      #   artist.age # => 30
+      #
+      #   artist.set_extra({:hometown=>'LA'}, :age) # Raise Error
+      def set_extra(hash, *extra)
+        set_restricted(hash, [model.allowed_columns, extra].flatten)
+      end
   
       # Set the shard that this object is tied to.  Returns self.
       def set_server(s)
@@ -1859,6 +1873,19 @@ module Sequel
         update_restricted(hash, only.flatten)
       end
       
+      # Update the values using the entries in the hash, only if the key
+      # is included in extra OR model.allowed_columns.
+      #
+      #   Artist.set_allowed_columns(:name)
+      #
+      #   artist.update_extra({:name=>'Jim', :age => 30}, :age)
+      #   # UPDATE artists SET name = 'Jim', age = 30 WHERE (id = 1)
+      #
+      #   artist.update_extra({:hometown=>'LA'}, :age) # Raise Error
+      def update_extra(hash, *extra)
+        update_restricted(hash, [model.allowed_columns, extra].flatten)
+      end
+
       # Validates the object.  If the object is invalid, errors should be added
       # to the errors attribute.  By default, does nothing, as all models
       # are valid by default.  See the {"Model Validations" guide}[rdoc-ref:doc/validations.rdoc].
