@@ -1,4 +1,4 @@
-== Sequel: The Database Toolkit for Ruby
+== Sequel: The Database Toolkit for Ruby {<img src="https://secure.travis-ci.org/jeremyevans/sequel.png" />}[http://travis-ci.org/jeremyevans/sequel]
 
 Sequel is a simple, flexible, and powerful SQL database access
 toolkit for Ruby.
