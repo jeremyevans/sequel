@@ -481,6 +481,7 @@ module Sequel
       Sequel.typecast_to_application_timestamp(value)
     end
 
+    NON_NUMERIC_RE = /[^\-\d\.]/.freeze
     # Typecast the value to a BigDecimal
     def typecast_value_decimal(value)
       case value
@@ -489,7 +490,7 @@ module Sequel
       when Numeric
         BigDecimal.new(value.to_s)
       when String
-        d = BigDecimal.new(value)
+        d = BigDecimal.new(value.gsub(NON_NUMERIC_RE, ''))
         if d.zero?
           # BigDecimal parsing is loose by default, returning a 0 value for
           # invalid input.  If a zero value is received, use Float to check
