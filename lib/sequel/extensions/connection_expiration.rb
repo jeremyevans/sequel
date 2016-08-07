@@ -10,6 +10,11 @@
 #
 #   DB.extension(:connection_expiration)
 #
+# The default connection timeout is 14400 seconds (4 hours).
+# To override it:
+#
+#   DB.pool.connection_expiration_timeout = 3600 # 1 hour
+#
 # Note that this extension only affects the default threaded
 # and the sharded threaded connection pool.  The single
 # threaded and sharded single threaded connection pools are
