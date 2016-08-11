@@ -1048,10 +1048,22 @@ describe "Sequel::SQLTime" do
   before do
     @db = Sequel.mock
   end
+  after do
+    Sequel::SQLTime.date = nil
+  end
 
   it ".create should create from hour, minutes, seconds and optional microseconds" do
     @db.literal(Sequel::SQLTime.create(1, 2, 3)).must_equal "'01:02:03.000000'"
     @db.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500000'"
+  end
+
+  it ".create should use today's date by default" do
+    Sequel::SQLTime.create(1, 2, 3).strftime('%Y-%m-%d').must_equal Date.today.strftime('%Y-%m-%d')
+  end
+
+  it ".create should use specific date if set" do
+    Sequel::SQLTime.date = Date.new(2000)
+    Sequel::SQLTime.create(1, 2, 3).strftime('%Y-%m-%d').must_equal Date.new(2000).strftime('%Y-%m-%d')
   end
 
   it "#to_s should include hour, minute, and second by default" do

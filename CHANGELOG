@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add Sequel::SQLTime.date= to set the date used for SQLTime instances (jeremyevans)
+
 === 4.37.0 (2016-08-01)
 
 * Add support for regular expression matching on Oracle 10g+ using REGEXP_LIKE (johndcaldwell) (#1221)
