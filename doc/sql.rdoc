@@ -368,6 +368,7 @@ The standard mathematical operates are defined on most Sequel-specific expressio
   Sequel.expr(:table__column) - 1 # "table"."column" - 1
   Sequel.qualify(:table, :column) * 1 # "table"."column" * 1
   Sequel.expr(:column) / 1 # "column" / 1
+  Sequel.expr(:column) ** 1 # power("column", 1)
 
 You can also call the operator methods directly on the Sequel module:
 
@@ -375,6 +376,7 @@ You can also call the operator methods directly on the Sequel module:
   Sequel.-(:table__column, 1) # "table"."column" - 1
   Sequel.*(Sequel.qualify(:table, :column), 1) # "table"."column" * 1
   Sequel./(:column, 1) # "column" / 1
+  Sequel.**(:column, 1) # power("column", 1)
 
 Note that the following does not work:
 

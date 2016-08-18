@@ -555,6 +555,31 @@ module Sequel
           complex_expression_sql_append(sql, (op == :"NOT ILIKE" ? :ILIKE : :LIKE), args)
         when :^
           complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.lit(["((~(", " & ", ")) & (", " | ", "))"], a, b, a, b)}
+        when :**
+          unless (exp = args[1]).is_a?(Integer)
+            raise(Sequel::Error, "can only emulate exponentiation on SQLite if exponent is an integer, given #{exp.inspect}")
+          end
+          case exp
+          when 0
+            sql << '1'
+          else
+            sql << '('
+            arg = args.at(0)
+            if exp < 0
+              invert = true
+              exp = exp.abs
+              sql << '(1.0 / ('
+            end
+            (exp - 1).times do 
+              literal_append(sql, arg)
+              sql << " * "
+            end
+            literal_append(sql, arg)
+            sql << PAREN_CLOSE
+            if invert
+              sql << "))"
+            end
+          end
         when :extract
           part = args.at(0)
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]

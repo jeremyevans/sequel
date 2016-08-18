@@ -157,6 +157,12 @@ module Sequel
             c ||= true
           end
           sql << PAREN_CLOSE
+        when :**
+          sql << PAREN_OPEN
+          literal_append(sql, args[0])
+          sql << ' ^ '
+          literal_append(sql, args[1])
+          sql << PAREN_CLOSE
         when :extract
           part = args.at(0)
           raise(Sequel::Error, "unsupported extract argument: #{part.inspect}") unless format = EXTRACT_MAP[part]

@@ -174,9 +174,9 @@ module Sequel
         :'NOT ILIKE'=>:ILIKE}
 
       # Standard mathematical operators used in +NumericMethods+
-      MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
+      MATHEMATICAL_OPERATORS = [:+, :-, :/, :*, :**]
 
-      # Bitwise mathematical operators used in +NumericMethods+
+      # Bitwise mathematical operators used in +BitwiseMethods+
       BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>, :%]
 
       # Operators that check for equality
@@ -201,10 +201,10 @@ module Sequel
       LIKE_OPERATORS = [:LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE']
 
       # Operator symbols that take exactly two arguments
-      TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + INEQUALITY_OPERATORS + IS_OPERATORS + IN_OPERATORS + REGEXP_OPERATORS + LIKE_OPERATORS
+      TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + INEQUALITY_OPERATORS + IS_OPERATORS + IN_OPERATORS + REGEXP_OPERATORS + LIKE_OPERATORS + [:**]
 
       # Operator symbols that take one or more arguments
-      N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS + BITWISE_OPERATORS
+      N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS + BITWISE_OPERATORS - [:**]
 
       # Operator symbols that take only a single argument
       ONE_ARITY_OPERATORS = [:NOT, :NOOP, :'B~']
@@ -786,8 +786,8 @@ module Sequel
     #
     #   :a + 'b' # "a" || 'b'
     module NumericMethods
-      ComplexExpression::MATHEMATICAL_OPERATORS.each do |o|
-        module_eval("def #{o}(o) NumericExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__) unless o == :+
+      (ComplexExpression::MATHEMATICAL_OPERATORS - [:+]).each do |o|
+        module_eval("def #{o}(o) NumericExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__)
       end
 
       # Use || as the operator when called with StringExpression and String instances,
@@ -862,6 +862,13 @@ module Sequel
             end
           END
         end
+      end
+
+      # Return NumericExpression for the exponentiation:
+      #
+      #   Sequel.**(2, 3) # SQL: power(2, 3)
+      def **(a, b)
+        SQL::NumericExpression.new(:**, a, b)
       end
       
       # Invert the given expression.  Returns a <tt>Sequel::SQL::BooleanExpression</tt>

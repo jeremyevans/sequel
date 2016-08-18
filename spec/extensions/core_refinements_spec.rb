@@ -22,12 +22,13 @@ describe "Core refinements" do
     @d.l(~:x__y).must_equal 'NOT x.y'
   end
   
-  it "should support + - * / via Symbol#+,-,*,/" do
+  it "should support + - * / power via Symbol#+,-,*,/,**" do
     @d.l(:x + 1 > 100).must_equal '((x + 1) > 100)'
     @d.l((:x * :y) < 100.01).must_equal '((x * y) < 100.01)'
     @d.l((:x - :y/2) >= 100000000000000000000000000000000000).must_equal '((x - (y / 2)) >= 100000000000000000000000000000000000)'
     @d.l((((:x - :y)/(:x + :y))*:z) <= 100).must_equal '((((x - y) / (x + y)) * z) <= 100)'
     @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).must_equal '((((x - y) / (x + y)) * z) > 100)'
+    @d.l(~((((:x ** :y)/(:x + :y))*:z) <= 100)).must_equal '(((power(x, y) / (x + y)) * z) > 100)'
   end
   
   it "should support LIKE via Symbol#like" do

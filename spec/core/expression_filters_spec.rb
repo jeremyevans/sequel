@@ -134,6 +134,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(Sequel.expr(:x) - true).must_equal "(x - 't')"
     @d.lit(Sequel.expr(:x) / false).must_equal "(x / 'f')"
     @d.lit(Sequel.expr(:x) * nil).must_equal '(x * NULL)'
+    @d.lit(Sequel.expr(:x) ** 1).must_equal 'power(x, 1)'
     @d.lit(Sequel.join([:x, nil])).must_equal '(x || NULL)'
   end
 
@@ -145,6 +146,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(Sequel.expr(:x) + Sequel.expr(:y).like('a')).must_equal "(x + (y LIKE 'a' ESCAPE '\\'))"
     @d.lit(Sequel.expr(:x) - ~Sequel.expr(:y).like('a')).must_equal "(x - (y NOT LIKE 'a' ESCAPE '\\'))"
     @d.lit(Sequel.join([:x, ~Sequel.expr(:y).like('a')])).must_equal "(x || (y NOT LIKE 'a' ESCAPE '\\'))"
+    @d.lit(Sequel.expr(:x) ** (Sequel.expr(:y) + 1)).must_equal 'power(x, (y + 1))'
   end
 
   it "should support AND conditions via &" do
@@ -192,6 +194,7 @@ describe "Blockless Ruby Filters" do
     @d.l(Sequel.lit('x').like('a')).must_equal '(x LIKE \'a\' ESCAPE \'\\\')'
     @d.l(Sequel.lit('x') + 1 > 100).must_equal '((x + 1) > 100)'
     @d.l((Sequel.lit('x') * :y) < 100.01).must_equal '((x * y) < 100.01)'
+    @d.l((Sequel.lit('x') ** :y) < 100.01).must_equal '(power(x, y) < 100.01)'
     @d.l((Sequel.lit('x') - Sequel.expr(:y)/2) >= 100000000000000000000000000000000000).must_equal '((x - (y / 2)) >= 100000000000000000000000000000000000)'
     @d.l((Sequel.lit('z') * ((Sequel.lit('x') / :y)/(Sequel.expr(:x) + :y))) <= 100).must_equal '((z * (x / y / (x + y))) <= 100)'
     @d.l(~((((Sequel.lit('x') - :y)/(Sequel.expr(:x) + :y))*:z) <= 100)).must_equal '((((x - y) / (x + y)) * z) > 100)'
@@ -397,6 +400,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(d - 1).must_equal '((SELECT a FROM items) - 1)'
     @d.lit(d * 1).must_equal '((SELECT a FROM items) * 1)'
     @d.lit(d / 1).must_equal '((SELECT a FROM items) / 1)'
+    @d.lit(d ** 1).must_equal 'power((SELECT a FROM items), 1)'
 
     @d.lit(d => 1).must_equal '((SELECT a FROM items) = 1)'
     @d.lit(Sequel.~(d => 1)).must_equal '((SELECT a FROM items) != 1)'
@@ -665,6 +669,7 @@ describe Sequel::SQL::VirtualRow do
     @d.l{|o| o.+(1, :b) > 2}.must_equal '((1 + "b") > 2)'
     @d.l{|o| o.-(1, :b) < 2}.must_equal '((1 - "b") < 2)'
     @d.l{|o| o.*(1, :b) >= 2}.must_equal '((1 * "b") >= 2)'
+    @d.l{|o| o.**(1, :b) >= 2}.must_equal '(power(1, "b") >= 2)'
     @d.l{|o| o./(1, :b) <= 2}.must_equal '((1 / "b") <= 2)'
     @d.l{|o| o.~(:a=>1)}.must_equal '("a" != 1)'
     @d.l{|o| o.~([[:a, 1], [:b, 2]])}.must_equal '(("a" != 1) OR ("b" != 2))'
@@ -934,6 +939,16 @@ describe "Sequel core extension replacements" do
     end
   end
 
+  it "Sequel.** should use power function if given 2 arguments" do
+    l(Sequel.**(1, 2), 'power(1, 2)')
+  end
+
+  it "Sequel.** should raise if not given 2 arguments" do
+    proc{Sequel.**}.must_raise(ArgumentError)
+    proc{Sequel.**(1)}.must_raise(ArgumentError)
+    proc{Sequel.**(1, 2, 3)}.must_raise(ArgumentError)
+  end
+
   it "Sequel.like should use a LIKE expression" do
     l(Sequel.like('a', 'b'), "('a' LIKE 'b' ESCAPE '\\')")
     l(Sequel.like(:a, :b), "(a LIKE b ESCAPE '\\')")
@@ -1094,6 +1109,7 @@ describe "Sequel::SQL::Wrapper" do
     s = Sequel::SQL::Wrapper.new(o)
     @ds.literal(s).must_equal "foo"
     @ds.literal(s+1).must_equal "(foo + 1)"
+    @ds.literal(s**1).must_equal "power(foo, 1)"
     @ds.literal(s & true).must_equal "(foo AND 't')"
     @ds.literal(s < 1).must_equal "(foo < 1)"
     @ds.literal(s.sql_subscript(1)).must_equal "foo[1]"

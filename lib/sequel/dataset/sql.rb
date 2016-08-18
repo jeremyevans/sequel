@@ -476,6 +476,8 @@ module Sequel
         sql << PAREN_CLOSE
       when :ILIKE, :'NOT ILIKE'
         complex_expression_sql_append(sql, (op == :ILIKE ? :LIKE : :"NOT LIKE"), args.map{|v| Sequel.function(:UPPER, v)})
+      when :**
+        function_sql_append(sql, Sequel.function(:power, *args))
       when *TWO_ARITY_OPERATORS
         if REGEXP_OPERATORS.include?(op) && !supports_regexp?
           raise InvalidOperation, "Pattern matching via regular expressions is not supported on #{db.database_type}"

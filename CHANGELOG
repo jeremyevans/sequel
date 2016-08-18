@@ -1,5 +1,7 @@
 === HEAD
 
+* Support ** operator for exponentiation on expressions, similar to +, -, *, and / (jeremyevans)
+
 * Add Sequel::SQLTime.date= to set the date used for SQLTime instances (jeremyevans)
 
 === 4.37.0 (2016-08-01)

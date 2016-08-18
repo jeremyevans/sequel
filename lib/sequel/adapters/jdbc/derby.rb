@@ -224,6 +224,12 @@ module Sequel
             complex_expression_emulate_append(sql, op, args)
           when :&, :|, :^, :<<, :>>
             raise Error, "Derby doesn't support the #{op} operator"
+          when :**
+            sql << 'exp('
+            literal_append(sql, args[1])
+            sql << ' * ln('
+            literal_append(sql, args[0])
+            sql << "))"
           when :extract
             sql << args.at(0).to_s << PAREN_OPEN
             literal_append(sql, args.at(1))

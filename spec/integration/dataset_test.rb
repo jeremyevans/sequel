@@ -1297,6 +1297,14 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a * b}.to_i.must_equal 200
     @ds.get{a / b}.to_i.must_equal 2
   end
+
+  it "should work with exponentiation operator" do
+    @ds.insert(:a=>2)
+    (-4..4).each do |i|
+      # Allow minor differences due to emulation issues on some adapters
+      @ds.get{(a / 1.0) ** i}.to_f.must_be_close_to((2**i).to_f)
+    end
+  end
   
   cspecify "should work with bitwise shift operators", :derby do
     @ds.insert(3, 2)

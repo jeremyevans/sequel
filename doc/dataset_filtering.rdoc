@@ -92,6 +92,9 @@ This works for the standard inequality and arithmetic operators:
   items.where{price / 100 >= 200}.sql
   #=> "SELECT * FROM items WHERE ((price / 100) >= 200)
 
+  items.where{price ** 2 >= 200}.sql
+  #=> "SELECT * FROM items WHERE (power(price, 2) >= 200)
+
 You use the overloaded bitwise and (&) and or (|) operators to combine expressions:
 
   items.where{(price + 100 < 200) & (price * 100 <= 200)}.sql

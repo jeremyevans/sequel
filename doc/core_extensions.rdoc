@@ -130,6 +130,7 @@ The standard mathematical operators are defined on Symbol, and return a Sequel n
     :a - :b # SQL: a - b
     :a * :b # SQL: a * b
     :a / :b # SQL: a / b 
+    :a ** :b # SQL: power(a, b)
 
 Alternatives:
 
@@ -137,6 +138,7 @@ Alternatives:
     Sequel.-(:a, :b)
     Sequel.*(:a, :b)
     Sequel./(:a, :b)
+    Sequel.**(:a, :b)
 
 ==== *
 
