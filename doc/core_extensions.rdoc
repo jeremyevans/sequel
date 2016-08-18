@@ -40,6 +40,16 @@ All of Sequel's extensions to the core classes are stored in Sequel's core_exten
 
 Sequel has no internal dependency on the core extensions.  This includes Sequel's core, Sequel::Model, and all plugins and extensions that ship with Sequel.  However, it is possible that external plugins and extensions will depend on the core extensions.  Such plugins and extensions should be updated so that they no longer depend on the core extensions.
 
+== Refinements
+
+Most of the these extensions can be added on a per-file basis using refinements (if you are using Ruby 2.0+).  To use refinements, first load them:
+
+  Sequel.extension :core_refinements
+
+Then for each file where you want to use the refinements:
+
+  using Sequel::CoreRefinements
+
 == Core Extension Methods
 
 This section will briefly describe all of the methods added to the core classes, and what the alternative method is that doesn't require the core extensions.
@@ -131,6 +141,10 @@ The standard mathematical operators are defined on Symbol, and return a Sequel n
     :a * :b # SQL: a * b
     :a / :b # SQL: a / b 
     :a ** :b # SQL: power(a, b)
+
+Sequel also supports ruby's coercion protocols on symbols (note that this does not work when using refinements):
+
+    1 + :b # SQL: 1 + b
 
 Alternatives:
 

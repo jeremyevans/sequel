@@ -149,6 +149,16 @@ describe "Blockless Ruby Filters" do
     @d.lit(Sequel.expr(:x) ** (Sequel.expr(:y) + 1)).must_equal 'power(x, (y + 1))'
   end
 
+  it "should allow mathematical or string operations on numerics when argument is a generic or numeric expressions" do
+    @d.lit(1 + Sequel.expr(:x)).must_equal '(1 + x)'
+    @d.lit(2**65 - Sequel.+(:x, 1)).must_equal "(#{2**65} - (x + 1))"
+    @d.lit(1.0 / Sequel.function(:x)).must_equal '(1.0 / x())'
+    @d.lit(BigDecimal.new('1.0') * Sequel.expr(:a__y)).must_equal '(1.0 * a.y)'
+    @d.lit(2 ** Sequel.cast(:x, Integer)).must_equal 'power(2, CAST(x AS integer))'
+    @d.lit(1 + Sequel.lit('x')).must_equal '(1 + x)'
+    @d.lit(1 + Sequel.lit('?', :x)).must_equal '(1 + x)'
+  end
+
   it "should support AND conditions via &" do
     @d.l(Sequel.expr(:x) & :y).must_equal '(x AND y)'
     @d.l(Sequel.expr(:x).sql_boolean & :y).must_equal '(x AND y)'

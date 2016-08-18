@@ -95,6 +95,10 @@ describe "Core extensions" do
     @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).must_equal '((((x - y) / (x + y)) * z) > 100)'
     @d.l(~((((:x ** :y)/(:x + :y))*:z) <= 100)).must_equal '(((power(x, y) / (x + y)) * z) > 100)'
   end
+
+  it "should support coercion for symbols" do
+    @d.l(1 + :x > 2).must_equal '((1 + x) > 2)'
+  end
   
   it "should support LIKE via Symbol#like" do
     @d.l(:x.like('a')).must_equal '(x LIKE \'a\' ESCAPE \'\\\')'

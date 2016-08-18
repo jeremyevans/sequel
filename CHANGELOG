@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL::NumericMethods#coerce, allowing code such as Sequel.expr{1 - x} (jeremyevans)
+
 * Support ** operator for exponentiation on expressions, similar to +, -, *, and / (jeremyevans)
 
 * Add Sequel::SQLTime.date= to set the date used for SQLTime instances (jeremyevans)

@@ -790,6 +790,19 @@ module Sequel
         module_eval("def #{o}(o) NumericExpression.new(#{o.inspect}, self, o) end", __FILE__, __LINE__)
       end
 
+      # If the argument given is Numeric, treat it as a NumericExpression,
+      # allowing code such as:
+      #
+      #   1 + Sequel.expr(:x) # SQL: (1 + x)
+      #   Sequel.expr{1 - x(y)} # SQL: (1 - x(y))
+      def coerce(other)
+        if other.is_a?(Numeric)
+          [SQL::NumericExpression.new(:NOOP, other), self]
+        else
+          super 
+        end
+      end
+
       # Use || as the operator when called with StringExpression and String instances,
       # and the + operator for LiteralStrings and all other types.
       def +(ce)
