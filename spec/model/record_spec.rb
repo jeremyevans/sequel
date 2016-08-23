@@ -1304,8 +1304,9 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   end
 
   it "#set_all should set not set restricted fields" do
-    @o1.set_all(:x => 1, :use_after_commit_rollback => false)
-    @o1.use_after_commit_rollback.must_equal true
+    @o1.use_after_commit_rollback.must_equal nil
+    @o1.set_all(:x => 1, :use_after_commit_rollback => true)
+    @o1.use_after_commit_rollback.must_equal nil
     @o1.values.must_equal(:x => 1)
   end
 

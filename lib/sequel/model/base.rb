@@ -1946,7 +1946,8 @@ module Sequel
       # allow running inside a transaction
       def _destroy(opts)
         sh = {:server=>this_server}
-        db.after_rollback(sh){after_destroy_rollback} if uacr = use_after_commit_rollback
+        uacr = use_after_commit_rollback
+        db.after_rollback(sh){after_destroy_rollback} if uacr.nil? ? (method(:after_destroy_rollback).owner != InstanceMethods) : uacr
         called = false
         around_destroy do
           called = true
@@ -1956,7 +1957,7 @@ module Sequel
           true
         end
         raise_hook_failure(:around_destroy) unless called
-        db.after_commit(sh){after_destroy_commit} if uacr
+        db.after_commit(sh){after_destroy_commit} if uacr.nil? ? (method(:after_destroy_commit).owner != InstanceMethods) : uacr
         self
       end
       
@@ -2025,7 +2026,8 @@ module Sequel
       # it's own transaction.
       def _save(opts)
         sh = {:server=>this_server}
-        db.after_rollback(sh){after_rollback} if uacr = use_after_commit_rollback
+        uacr = use_after_commit_rollback
+        db.after_rollback(sh){after_rollback} if uacr.nil? ? (method(:after_rollback).owner != InstanceMethods) : uacr
         pk = nil
         called_save = false
         called_cu = false
@@ -2071,7 +2073,7 @@ module Sequel
         end
         raise_hook_failure(:around_save) unless called_save
         _after_save(pk)
-        db.after_commit(sh){after_commit} if uacr
+        db.after_commit(sh){after_commit} if uacr.nil? ? (method(:after_commit).owner != InstanceMethods) : uacr
         self
       end
       

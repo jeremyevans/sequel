@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't use after commit/rollback database hooks if the model instance methods are not overridden (jeremyevans)
+
 * Add SQL::NumericMethods#coerce, allowing code such as Sequel.expr{1 - x} (jeremyevans)
 
 * Support ** operator for exponentiation on expressions, similar to +, -, *, and / (jeremyevans)

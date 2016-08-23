@@ -601,4 +601,44 @@ describe "Model#after_commit and #after_rollback" do
     o.save
     @db.sqls.must_equal ['BEGIN', 'as', 'COMMIT']
   end
+
+  it "should handle use_after_commit_rollback when subclassing after loading" do
+    @m = Class.new(Sequel::Model(@db[:items]))
+    @m.use_transactions = true
+    o = @m.load({})
+    @db.sqls
+    o.save
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+
+    c = Class.new(@m)
+    o = c.load({})
+    def o.after_commit; db.execute 'ac' end
+    @db.sqls
+    o.save
+    @db.sqls.must_equal ['BEGIN', 'COMMIT', 'ac']
+
+    o = c.load({})
+    @db.sqls
+    o.save
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+
+    c.send(:define_method, :after_commit){db.execute 'ac'}
+    o = c.load({})
+    @db.sqls
+    o.save
+    @db.sqls.must_equal ['BEGIN', 'COMMIT', 'ac']
+
+    c = Class.new(@m)
+    c.send(:include, Module.new{def after_commit; db.execute 'ac'; end})
+    o = c.load({})
+    @db.sqls
+    o.save
+    @db.sqls.must_equal ['BEGIN', 'COMMIT', 'ac']
+
+    c.use_after_commit_rollback = false
+    o = c.load({})
+    @db.sqls
+    o.save
+    @db.sqls.must_equal ['BEGIN', 'COMMIT']
+  end
 end
