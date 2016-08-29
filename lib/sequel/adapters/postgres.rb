@@ -227,8 +227,8 @@ module Sequel
       # client encoding for the connection, :connect_timeout is a
       # connection timeout in seconds, :sslmode sets whether postgres's
       # sslmode, and :notice_receiver handles server notices in a proc.
-      # :connect_timeout, :ssl_mode, and :notice_receiver are only supported
-      # if the pg driver is used.
+      # :connect_timeout, :driver_options, :sslmode, and :notice_receiver
+      # are only supported if the pg driver is used.
       def connect(server)
         opts = server_opts(server)
         if SEQUEL_POSTGRES_USES_PG
@@ -241,6 +241,7 @@ module Sequel
             :connect_timeout => opts[:connect_timeout] || 20,
             :sslmode => opts[:sslmode]
           }.delete_if { |key, value| blank_object?(value) }
+          connection_params.merge!(opts[:driver_options]) if opts[:driver_options]
           conn = Adapter.connect(connection_params)
 
           conn.instance_variable_set(:@prepared_statements, {})

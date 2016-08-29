@@ -1,5 +1,7 @@
 === HEAD
 
+* Support :driver_options option when using the postgres adapter with pg driver (jeremyevans)
+
 * Don't use after commit/rollback database hooks if the model instance methods are not overridden (jeremyevans)
 
 * Add SQL::NumericMethods#coerce, allowing code such as Sequel.expr{1 - x} (jeremyevans)

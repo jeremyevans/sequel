@@ -331,6 +331,7 @@ The following additional options are supported:
                                 as a string, or :float to convert to an infinite float.
 :connect_timeout :: Set the number of seconds to wait for a connection (default 20, only respected
                     if using the pg library).
+:driver_options :: A hash of options to pass to the underlying driver (only respected if using the pg library)
 :encoding :: Set the client_encoding to the given string
 :notice_receiver :: A proc that be called with the PGresult objects that have notice or warning messages.
                     The default notice receiver just prints the messages to stderr, but this can be used
