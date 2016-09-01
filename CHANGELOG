@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.38.0 (2016-09-01)
 
 * Support :driver_options option when using the postgres adapter with pg driver (jeremyevans)
 
