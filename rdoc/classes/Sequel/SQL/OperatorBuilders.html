@@ -53,6 +53,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a target="docwin" href="#method-i-2A-2A">**</a></li>
               <li><a target="docwin" href="#method-i-7E">~</a></li>
             </ol>
           </div>
@@ -61,6 +62,26 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-2A-2A'>
+                <a name='method-i-2A-2A'></a>
+                <div class='synopsis'>
+                  <span class='name'>**</span>
+                  <span class='arguments'>(a, b)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return <a href="NumericExpression.html">NumericExpression</a> for the
+                  exponentiation:</p>
+                  
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">**</span>(<span class="ruby-value">2</span>, <span class="ruby-value">3</span>) <span class="ruby-comment"># SQL: power(2, 3)</span></pre>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-2A-2A-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-2A-2A-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 883</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">**</span>(<span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)&#x000A;  <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:**</span>, <span class="ruby-identifier">a</span>, <span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-7E'>
                 <a name='method-i-7E'></a>
                 <div class='synopsis'>
@@ -79,7 +100,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-7E-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 862</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">~</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">arg</span>)&#x000A;    <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-value">:OR</span>, <span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 893</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">~</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">arg</span>)&#x000A;    <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-value">:OR</span>, <span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

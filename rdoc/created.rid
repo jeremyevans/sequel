@@ -1,6 +1,6 @@
-Mon, 01 Aug 2016 07:27:11 -0700
+Thu, 01 Sep 2016 11:43:26 -0700
 README.rdoc	Fri, 27 Nov 2015 11:00:03 -0800
-CHANGELOG	Mon, 01 Aug 2016 07:21:11 -0700
+CHANGELOG	Thu, 01 Sep 2016 11:38:43 -0700
 MIT-LICENSE	Sat, 09 Jan 2016 12:54:32 -0800
 lib/sequel.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/ast_transformer.rb	Mon, 11 Jul 2016 11:22:53 -0700
@@ -10,11 +10,11 @@ lib/sequel/database.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/dataset.rb	Mon, 25 Apr 2016 11:33:14 -0700
 lib/sequel/deprecated.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/exceptions.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/model.rb	Wed, 08 Jun 2016 12:35:56 -0700
+lib/sequel/model.rb	Tue, 23 Aug 2016 16:07:25 -0700
 lib/sequel/no_core_ext.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/sql.rb	Thu, 23 Jun 2016 07:43:58 -0700
+lib/sequel/sql.rb	Thu, 18 Aug 2016 15:37:24 -0700
 lib/sequel/timezones.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/version.rb	Mon, 01 Aug 2016 07:21:11 -0700
+lib/sequel/version.rb	Thu, 01 Sep 2016 11:38:43 -0700
 lib/sequel/connection_pool/sharded_single.rb	Fri, 15 Jul 2016 14:07:44 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 15 Jul 2016 14:07:44 -0700
 lib/sequel/connection_pool/single.rb	Fri, 15 Jul 2016 14:07:44 -0700
@@ -37,9 +37,9 @@ lib/sequel/dataset/mutation.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/placeholder_literalizer.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/prepared_statements.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/dataset/query.rb	Wed, 11 May 2016 12:54:28 -0700
-lib/sequel/dataset/sql.rb	Thu, 23 Jun 2016 07:43:58 -0700
+lib/sequel/dataset/sql.rb	Thu, 18 Aug 2016 15:37:24 -0700
 lib/sequel/model/associations.rb	Wed, 08 Jun 2016 12:35:56 -0700
-lib/sequel/model/base.rb	Thu, 23 Jun 2016 19:49:37 -0700
+lib/sequel/model/base.rb	Tue, 23 Aug 2016 16:07:25 -0700
 lib/sequel/model/dataset_module.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/model/default_inflections.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/model/errors.rb	Thu, 21 Jan 2016 12:21:53 -0800
@@ -52,9 +52,9 @@ doc/association_basics.rdoc	Wed, 08 Jun 2016 12:35:56 -0700
 doc/bin_sequel.rdoc	Mon, 21 Oct 2013 11:50:03 -0700
 doc/cheat_sheet.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/code_order.rdoc	Thu, 06 Jun 2013 17:24:35 -0700
-doc/core_extensions.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
+doc/core_extensions.rdoc	Thu, 18 Aug 2016 15:37:24 -0700
 doc/dataset_basics.rdoc	Thu, 23 Jul 2015 07:47:00 -0700
-doc/dataset_filtering.rdoc	Mon, 23 Mar 2015 10:16:45 -0700
+doc/dataset_filtering.rdoc	Thu, 18 Aug 2016 15:37:24 -0700
 doc/extensions.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
 doc/mass_assignment.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
 doc/migration.rdoc	Thu, 23 Jun 2016 07:55:31 -0700
@@ -62,7 +62,7 @@ doc/model_hooks.rdoc	Thu, 29 Jan 2015 16:13:26 -0800
 doc/model_plugins.rdoc	Fri, 06 Sep 2013 13:38:06 -0700
 doc/mssql_stored_procedures.rdoc	Thu, 02 Jan 2014 10:46:37 -0800
 doc/object_model.rdoc	Mon, 16 May 2016 11:05:01 -0700
-doc/opening_databases.rdoc	Thu, 04 Feb 2016 15:56:57 -0800
+doc/opening_databases.rdoc	Mon, 29 Aug 2016 08:46:41 -0700
 doc/postgresql.rdoc	Wed, 23 Sep 2015 17:04:24 -0700
 doc/prepared_statements.rdoc	Thu, 14 Jul 2016 09:29:02 -0700
 doc/querying.rdoc	Thu, 23 Jul 2015 07:47:01 -0700
@@ -70,7 +70,7 @@ doc/reflection.rdoc	Sun, 02 Jun 2013 13:49:43 -0700
 doc/schema_modification.rdoc	Tue, 19 Jul 2016 13:45:40 -0700
 doc/security.rdoc	Wed, 01 Jun 2016 07:30:01 -0700
 doc/sharding.rdoc	Fri, 22 May 2015 08:18:52 -0700
-doc/sql.rdoc	Tue, 23 Jun 2015 07:26:33 -0700
+doc/sql.rdoc	Thu, 18 Aug 2016 15:37:24 -0700
 doc/testing.rdoc	Mon, 25 Apr 2016 11:33:14 -0700
 doc/thread_safety.rdoc	Tue, 29 Sep 2015 15:34:03 -0700
 doc/transactions.rdoc	Mon, 26 Oct 2015 15:36:51 -0700
@@ -175,6 +175,7 @@ doc/release_notes/4.34.0.txt	Sun, 01 May 2016 10:31:41 -0700
 doc/release_notes/4.35.0.txt	Thu, 14 Jul 2016 14:38:07 -0700
 doc/release_notes/4.36.0.txt	Fri, 01 Jul 2016 07:48:45 -0700
 doc/release_notes/4.37.0.txt	Mon, 01 Aug 2016 07:21:11 -0700
+doc/release_notes/4.38.0.txt	Thu, 01 Sep 2016 11:38:43 -0700
 doc/release_notes/4.4.0.txt	Fri, 01 Nov 2013 07:58:58 -0700
 doc/release_notes/4.5.0.txt	Sun, 01 Dec 2013 15:10:28 -0800
 doc/release_notes/4.6.0.txt	Thu, 02 Jan 2014 12:13:25 -0800

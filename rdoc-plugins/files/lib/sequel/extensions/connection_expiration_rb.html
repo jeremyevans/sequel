@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-06-29 13:36:28 -0700</span>
+          <span class='datetime'>2016-08-07 13:25:33 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -48,6 +48,10 @@
             unexpired.  Example of use:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">connection_expiration</span>)</pre>
+            
+            <p>The default connection timeout is 14400 seconds (4 hours). To override it:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">pool</span>.<span class="ruby-identifier">connection_expiration_timeout</span> = <span class="ruby-value">3600</span> <span class="ruby-comment"># 1 hour</span></pre>
             
             <p>Note that this extension only affects the default threaded and the sharded
             threaded connection pool.  The single threaded and sharded single threaded

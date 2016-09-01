@@ -1,9 +1,9 @@
-Mon, 01 Aug 2016 07:28:16 -0700
+Thu, 01 Sep 2016 11:44:32 -0700
 lib/sequel/extensions/_pretty_table.rb	Tue, 17 May 2016 14:34:25 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Wed, 29 Jun 2016 13:36:28 -0700
 lib/sequel/extensions/blank.rb	Mon, 25 Jan 2016 14:10:57 -0800
 lib/sequel/extensions/columns_introspection.rb	Mon, 25 Apr 2016 11:33:14 -0700
-lib/sequel/extensions/connection_expiration.rb	Wed, 29 Jun 2016 13:36:28 -0700
+lib/sequel/extensions/connection_expiration.rb	Sun, 07 Aug 2016 13:25:33 -0700
 lib/sequel/extensions/connection_validator.rb	Wed, 29 Jun 2016 13:36:28 -0700
 lib/sequel/extensions/constraint_validations.rb	Wed, 15 Jun 2016 14:51:12 -0700
 lib/sequel/extensions/core_extensions.rb	Thu, 11 Feb 2016 15:50:14 -0800
@@ -142,4 +142,4 @@ lib/sequel/plugins/validate_associated.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/validation_class_methods.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/validation_helpers.rb	Wed, 15 Jun 2016 14:51:12 -0700
 lib/sequel/plugins/xml_serializer.rb	Thu, 21 Jan 2016 12:21:53 -0800
-doc/core_extensions.rdoc	Wed, 27 Aug 2014 16:49:13 -0700
+doc/core_extensions.rdoc	Thu, 18 Aug 2016 15:37:24 -0700

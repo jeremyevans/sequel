@@ -31,7 +31,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2014-08-27 16:49:13 -0700</span>
+          <span class='datetime'>2016-08-18 15:37:24 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -107,6 +107,18 @@
             external plugins and extensions will depend on the core extensions.  Such
             plugins and extensions should be updated so that they no longer depend on
             the core extensions.</p>
+            
+            <h2 id="label-Refinements">Refinements<span><a href="#label-Refinements">&para;</a> <a href="#top">&uarr;</a></span></h2>
+            
+            <p>Most of the these extensions can be added on a per-file basis using
+            refinements (if you are using Ruby 2.0+).  To use refinements, first load
+            them:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">core_refinements</span></pre>
+            
+            <p>Then for each file where you want to use the refinements:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">CoreRefinements</span></pre>
             
             <h2 id="label-Core+Extension+Methods">Core Extension Methods<span><a href="#label-Core+Extension+Methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -211,11 +223,17 @@
             href="../../classes/Sequel.html">Sequel</a> numeric expression object
             representing the operation:</p>
             
-            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a + b</span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a - b</span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">*</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a * b</span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">/</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a / b</span></pre>
+            <pre class="ruby">:<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a + b</span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">-</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a - b</span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">*</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a * b</span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">/</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: a / b </span>&#x000A;:<span class="ruby-identifier">a</span> <span class="ruby-operator">**</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: power(a, b)</span></pre>
+            
+            <p><a href="../../classes/Sequel.html">Sequel</a> also supports ruby&#39;s
+            coercion protocols on symbols (note that this does not work when using
+            refinements):</p>
+            
+            <pre class="ruby"><span class="ruby-value">1</span> <span class="ruby-operator">+</span> :<span class="ruby-identifier">b</span> <span class="ruby-comment"># SQL: 1 + b</span></pre>
             
             <p>Alternatives:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">/</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">/</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">**</span>(:<span class="ruby-identifier">a</span>, :<span class="ruby-identifier">b</span>)</pre>
             
             <h4 id="label-2A">*<span><a href="#label-2A">&para;</a> <a href="#top">&uarr;</a></span></h4>
             

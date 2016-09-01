@@ -103,7 +103,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-attr_reader-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-attr_reader-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">attr_reader</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-attr_reader-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">attr_reader</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-inherited'>
@@ -122,7 +122,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-inherited-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-inherited-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 95</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comparison_attrs</span>, <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">dup</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-inherited-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 106</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">subclass</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@comparison_attrs</span>, <span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">dup</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -140,7 +140,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-3D-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-3D-3D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">==</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-3D-3D-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 125</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">==</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-eql-3F'>
@@ -158,7 +158,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eql-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-eql-3F-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 120</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">a</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-eql-3F-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 131</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eql?</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">find</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">!=</span> <span class="ruby-identifier">other</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">a</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-hash'>
@@ -175,7 +175,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-hash-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-hash-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 125</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hash</span>&#x000A;  ([<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>] <span class="ruby-operator">+</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">x</span>)}).<span class="ruby-identifier">hash</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-hash-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 136</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">hash</span>&#x000A;  ([<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>] <span class="ruby-operator">+</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">comparison_attrs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> <span class="ruby-identifier">send</span>(<span class="ruby-identifier">x</span>)}).<span class="ruby-identifier">hash</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-inspect'>
@@ -193,7 +193,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-inspect-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 131</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inspect</span>&#x000A;  <span class="ruby-node">&quot;#&lt;#{self.class} #{instance_variables.map{|iv| &quot;#{iv}=&gt;#{instance_variable_get(iv).inspect}&quot;}.join(&#39;, &#39;)}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 142</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inspect</span>&#x000A;  <span class="ruby-node">&quot;#&lt;#{self.class} #{instance_variables.map{|iv| &quot;#{iv}=&gt;#{instance_variable_get(iv).inspect}&quot;}.join(&#39;, &#39;)}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-lit'>
@@ -211,7 +211,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-lit-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 136</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lit</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 147</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lit</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_literal'>
@@ -228,7 +228,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_literal-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 141</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-identifier">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_literal-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 152</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal</span>(<span class="ruby-identifier">ds</span>)&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-identifier">to_s_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
