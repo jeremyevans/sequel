@@ -127,6 +127,14 @@ describe "Touch plugin" do
   end
 
   it "should be able to touch many_to_one associations" do
+    @Album.plugin :touch, :associations=>:artist
+    @Album.plugin :skip_create_refresh
+    @Album.create(:artist_id=>4)
+    DB.sqls.must_equal ["INSERT INTO albums (artist_id) VALUES (4)",
+      "UPDATE artists SET updated_at = CURRENT_TIMESTAMP WHERE (artists.id = 4)"]
+  end
+
+  it "should be able to touch one_to_one associations" do
     @Artist.one_to_one :album, :class=>@Album, :key=>:artist_id
     @Artist.plugin :touch, :associations=>:album
     @a.touch

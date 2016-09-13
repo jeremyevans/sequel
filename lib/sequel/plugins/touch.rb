@@ -78,6 +78,12 @@ module Sequel
       end
 
       module InstanceMethods
+        # Touch all of the model's touched_associations when creating the object.
+        def after_create
+          super
+          touch_associations
+        end
+
         # Touch all of the model's touched_associations when destroying the object.
         def after_destroy
           super
