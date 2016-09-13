@@ -1319,6 +1319,8 @@ module Sequel
       # :phrase :: Similar to :plain, but also adding an ILIKE filter to ensure that
       #            returned rows also include the exact phrase used.
       # :rank :: Set to true to order by the rank, so that closer matches are returned first.
+      # :to_tsquery :: Can be set to :plain or :phrase to specify the function to use to
+      #                convert the terms to a ts_query.
       # :tsquery :: Specifies the terms argument is already a valid SQL expression returning a
       #             tsquery, and can be used directly in the query.
       # :tsvector :: Specifies the cols argument is already a valid SQL expression returning a
@@ -1333,7 +1335,14 @@ module Sequel
 
         unless opts[:tsquery]
           phrase_terms = terms.is_a?(Array) ? terms.join(' | ') : terms
-          query_func = (opts[:phrase] || opts[:plain]) ? :plainto_tsquery : :to_tsquery
+
+          query_func = case to_tsquery = opts[:to_tsquery]
+          when :phrase, :plain
+            :"#{to_tsquery}to_tsquery"
+          else
+            (opts[:phrase] || opts[:plain]) ? :plainto_tsquery : :to_tsquery
+          end
+
           terms = Sequel.function(query_func, lang, phrase_terms)
         end
 

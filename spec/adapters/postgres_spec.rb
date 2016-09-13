@@ -991,6 +991,11 @@ describe "A PostgreSQL database" do
     @db[:posts].full_text_search(:title, 'rubinius ruby', :plain=>true).select_order_map(:title).must_equal ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
     @db[:posts].full_text_search(:title, 'jruby maglev', :plain=>true).select_order_map(:title).must_equal ['jruby rubinius ruby maglev mri iron', 'ruby jruby maglev mri rubinius iron']
 
+    if DB.server_version >= 90600
+      @db[:posts].full_text_search(:title, 'rubinius ruby', :to_tsquery=>:phrase).select_order_map(:title).must_equal ['jruby rubinius ruby maglev mri iron']
+      @db[:posts].full_text_search(:title, 'jruby maglev', :to_tsquery=>:phrase).select_order_map(:title).must_equal ['ruby jruby maglev mri rubinius iron']
+    end
+
     @db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rails', :tsvector=>true).all.must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
     @db[:posts].full_text_search(:title, Sequel.function(:to_tsquery, 'simple', 'rails'), :tsquery=>true).all.must_equal [{:title=>'ruby rails', :body=>'yowsa'}]
     proc{@db[:posts].full_text_search(Sequel.function(:to_tsvector, 'simple', :title), 'rubinius ruby', :tsvector=>true, :phrase=>true)}.must_raise(Sequel::Error)
