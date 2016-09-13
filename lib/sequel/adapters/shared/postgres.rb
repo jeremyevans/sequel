@@ -577,6 +577,10 @@ module Sequel
         end
       end
 
+      def alter_table_add_column_sql(table, op)
+        "ADD COLUMN#{' IF NOT EXISTS' if op[:if_not_exists]} #{column_definition_sql(op)}"
+      end
+
       # Use a PostgreSQL-specific alter table generator
       def alter_table_generator_class
         Postgres::AlterTableGenerator

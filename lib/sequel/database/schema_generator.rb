@@ -336,6 +336,10 @@ module Sequel
       # See CreateTableGenerator#column for the available options.
       #
       #   add_column(:name, String) # ADD COLUMN name varchar(255)
+      #
+      # PostgreSQL specific options:
+      #
+      # :if_not_exists :: Set to true to not add the column if it already exists (PostgreSQL 9.6+)
       def add_column(name, type, opts = OPTS)
         @operations << {:op => :add_column, :name => name, :type => type}.merge!(opts)
       end

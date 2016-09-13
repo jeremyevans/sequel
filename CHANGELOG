@@ -1,3 +1,7 @@
+=== HEAD
+
+* Support add_column :if_not_exists option on PostgreSQL 9.6+ (jeremyevans)
+
 === 4.38.0 (2016-09-01)
 
 * Support :driver_options option when using the postgres adapter with pg driver (jeremyevans)

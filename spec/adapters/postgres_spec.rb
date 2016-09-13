@@ -1058,6 +1058,13 @@ describe "A PostgreSQL database" do
     @db.create_table!(:posts1){primary_key :a}
     @db.rename_table(:posts1, :posts)
   end
+
+  it "should adding a primary key only if it does not already exists" do
+    @db.create_table(:posts){Integer :a}
+    @db.alter_table(:posts){add_column :b, Integer}
+    @db.alter_table(:posts){add_column :b, Integer, :if_not_exists=>true}
+    proc{@db.alter_table(:posts){add_column :b, Integer}}.must_raise Sequel::DatabaseError
+  end if DB.server_version >= 90600
 end
 
 describe "Postgres::Dataset#import" do
@@ -1070,7 +1077,6 @@ describe "Postgres::Dataset#import" do
   after do
     @db.drop_table?(:test)
   end
-
 
   it "#import should a single insert statement" do
     @ds.import([:x, :y], [[1, 2], [3, 4]])
