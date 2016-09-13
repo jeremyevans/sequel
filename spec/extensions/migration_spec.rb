@@ -319,6 +319,52 @@ describe "Sequel::IntegerMigrator" do
     @db.dataset.columns.must_equal [:sic]
   end
   
+  it "should support :relative option for running relative migrations" do
+    Sequel::Migrator.run(@db, @dirname, :relative=>2).must_equal 2
+    @db.creates.must_equal [1111, 2222]
+    @db.version.must_equal 2
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1, 2]
+
+    Sequel::Migrator.run(@db, @dirname, :relative=>-1).must_equal 1
+    @db.drops.must_equal [2222]
+    @db.version.must_equal 1
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1]
+
+    Sequel::Migrator.run(@db, @dirname, :relative=>2).must_equal 3
+    @db.creates.must_equal [1111, 2222, 2222, 3333]
+    @db.version.must_equal 3
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [2, 3]
+
+    Sequel::Migrator.run(@db, @dirname, :relative=>-3).must_equal 0
+    @db.drops.must_equal [2222, 3333, 2222, 1111]
+    @db.version.must_equal 0
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [2, 1, 0]
+  end
+  
+  it "should handle :relative option beyond the upper and lower limit" do
+    Sequel::Migrator.run(@db, @dirname, :relative=>100).must_equal 3
+    @db.creates.must_equal [1111, 2222, 3333]
+    @db.version.must_equal 3
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1, 2, 3]
+
+    Sequel::Migrator.run(@db, @dirname, :relative=>-200).must_equal 0
+    @db.drops.must_equal [3333, 2222, 1111]
+    @db.version.must_equal 0
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [2, 1, 0]
+  end
+
+  it "should correctly handle migration target versions beyond the upper and lower limits" do
+    Sequel::Migrator.run(@db, @dirname, :target=>100).must_equal 3
+    @db.creates.must_equal [1111, 2222, 3333]
+    @db.version.must_equal 3
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [1, 2, 3]
+
+    Sequel::Migrator.run(@db, @dirname, :target=>-100).must_equal 0
+    @db.drops.must_equal [3333, 2222, 1111]
+    @db.version.must_equal 0
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.must_equal [2, 1, 0]
+  end
+  
   it "should apply migrations correctly in the up direction if no target is given" do
     Sequel::Migrator.apply(@db, @dirname)
     @db.creates.must_equal [1111, 2222, 3333]

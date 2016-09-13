@@ -1,5 +1,7 @@
 === HEAD
 
+* Support IntegerMigrator :relative option, for running only the specified number of migrations up or down (jeremyevans)
+
 * Make the touch plugin also touch associations on create in addition to update and delete (jeremyevans)
 
 * Add :allow_manual_update timestamps plugin option for not overriding a manually set update timestamp (jeremyevans)

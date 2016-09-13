@@ -387,6 +387,8 @@ module Sequel
     # :column :: The column in the :table argument storing the migration version (default: :version).
     # :current :: The current version of the database.  If not given, it is retrieved from the database
     #             using the :table and :column options.
+    # :relative :: Run the given number of migrations, with a positive number being migrations to migrate
+    #              up, and a negative number being migrations to migrate down (IntegerMigrator only).
     # :table :: The table containing the schema version (default: :schema_info).
     # :target :: The target version to which to migrate.  If not given, migrates to the maximum version.
     #
@@ -520,8 +522,22 @@ module Sequel
     # Set up all state for the migrator instance
     def initialize(db, directory, opts=OPTS)
       super
-      @target = opts[:target] || latest_migration_version
       @current = opts[:current] || current_migration_version
+      latest_version = latest_migration_version
+
+      @target = if opts[:target]
+        opts[:target]
+      elsif opts[:relative]
+        @current + opts[:relative]
+      else
+        latest_version
+      end
+
+      if @target > latest_version
+        @target = latest_version
+      elsif @target < 0
+        @target = 0
+      end
 
       raise(Error, "No current version available") unless current
       raise(Error, "No target version available, probably because no migration files found or filenames don't follow the migration filename convention") unless target
