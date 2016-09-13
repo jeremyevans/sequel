@@ -416,11 +416,11 @@ which is used directly in the filter.
 
 You can use the DSL to create arbitrarily complex expressions.  SQL::Expression
 objects can be created via singleton methods on the Sequel module.  The most common
-method is Sequel.expr, which takes any object and wraps it in a SQL::Expression
+method is Sequel.[], which takes any object and wraps it in a SQL::Expression
 object.  In most cases, the SQL::Expression returned supports the & operator for
 +AND+, the | operator for +OR+, and the ~ operator for inversion:
 
-  Artist.where(Sequel.like(:name, 'Y%') & (Sequel.expr(:b=>1) | Sequel.~(:c=>3)))
+  Artist.where(Sequel.like(:name, 'Y%') & (Sequel[:b=>1] | Sequel.~(:c=>3)))
   # SELECT * FROM artists WHERE name LIKE 'Y%' ESCAPE '\' AND (b = 1 OR c != 3)
 
 You can combine these expression operators with the virtual row support:

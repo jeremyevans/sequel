@@ -2792,7 +2792,7 @@ END
         # included by the association's conditions.
         def add_association_filter_conditions(ref, obj, expr)
           if expr != SQL::Constants::FALSE && ref.filter_by_associations_add_conditions?
-            Sequel.expr(ref.filter_by_associations_conditions_expression(obj))
+            Sequel[ref.filter_by_associations_conditions_expression(obj)]
           else
             expr
           end

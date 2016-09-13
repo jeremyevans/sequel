@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel.[] as an alias to Sequel.expr, for easier expression creation (jeremyevans)
+
 * Add PostgreSQL full_text_search :to_tsquery=>:phrase option, for using PostgreSQL 9.6+ full text search phrase searching (jeremyevans)
 
 * Add JSONBOp#insert in pg_json_ops extension, for jsonb_insert support on PostgreSQL 9.6+ (jeremyevans)

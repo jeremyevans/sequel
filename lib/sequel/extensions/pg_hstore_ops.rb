@@ -20,7 +20,7 @@
 # Also, on most Sequel expression objects, you can call the hstore 
 # method:
 #
-#   h = Sequel.expr(:hstore_column).hstore
+#   h = Sequel[:hstore_column].hstore
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension

@@ -817,7 +817,7 @@ module Sequel
     #   DB[:table].update(:x=>nil) # UPDATE table SET x = NULL
     #   # => 10
     #
-    #   DB[:table].update(:x=>Sequel.expr(:x)+1, :y=>0) # UPDATE table SET x = (x + 1), y = 0
+    #   DB[:table].update(:x=>Sequel[:x]+1, :y=>0) # UPDATE table SET x = (x + 1), y = 0
     #   # => 10
     def update(values=OPTS, &block)
       sql = update_sql(values)

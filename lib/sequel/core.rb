@@ -392,6 +392,16 @@ module Sequel
 
   require(%w"deprecated sql connection_pool exceptions dataset database timezones ast_transformer version")
 
+  class << self
+    # Allow nicer syntax for creating Sequel expressions:
+    #
+    #   Sequel[1]     # => Sequel::SQL::NumericExpression: 1
+    #   Sequel["a"]   # => Sequel::SQL::StringExpression: 'a'
+    #   Sequel[:a]    # => Sequel::SQL::Identifier: "a"
+    #   Sequel[:a=>1] # => Sequel::SQL::BooleanExpression: ("a" = 1)
+    alias_method :[], :expr
+  end
+
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)
 end

@@ -19,7 +19,7 @@
 # Also, on most Sequel expression objects, you can call the pg_range
 # method:
 #
-#   r = Sequel.expr(:range).pg_range
+#   r = Sequel[:range].pg_range
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension

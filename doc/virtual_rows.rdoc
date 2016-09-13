@@ -23,7 +23,7 @@ SQL function expression.
 It's possible to use Sequel's DSL to represent such expressions, but it is a
 little verbose:
 
-  dataset.where(Sequel.expr(:a) > Sequel.function(:b, :c))
+  dataset.where(Sequel[:a] > Sequel.function(:b, :c))
   # WHERE a > b(c)
 
 The virtual row DSL makes such code more concise:

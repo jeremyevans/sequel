@@ -160,9 +160,9 @@ The * operator is overloaded on Symbol such that if it is called with no argumen
 
   :a.* # SQL: a.*
 
-Alternative: Sequel.expr.*:
+Alternative: Sequel.[].*:
 
-  Sequel.expr(:a).*
+  Sequel[:a].*
 
 ==== qualify
 
@@ -226,11 +226,11 @@ These Symbol methods are used to force the treating of the object as a specific 
   :a.sql_number << 1  # SQL: a << 1
   :a.sql_string + 'a' # SQL: a || 'a'
 
-Alternative: Sequel.expr:
+Alternative: Sequel.[]:
 
-  Sequel.expr(:a).sql_boolean
-  Sequel.expr(:a).sql_number
-  Sequel.expr(:a).sql_string
+  Sequel[:a].sql_boolean
+  Sequel[:a].sql_number
+  Sequel[:a].sql_string
 
 ==== sql_function
 
@@ -300,9 +300,9 @@ Array#sql_expr and Hash#sql_expr treat the receiver as a conditions specifier, m
   {:a=>1, :b=>[2, 3]}.sql_expr     # SQL: a = 1 AND b IN (2, 3)
   [[:a, 1], [:b, [2, 3]]].sql_expr # SQL: a = 1 AND b IN (2, 3)
 
-Alternative: Sequel.expr:
+Alternative: Sequel.[]:
 
-  Sequel.expr(:a=>1, :b=>[2, 3])
+  Sequel[:a=>1, :b=>[2, 3]]
 
 ==== sql_negate
 

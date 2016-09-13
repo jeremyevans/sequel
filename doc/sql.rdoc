@@ -352,9 +352,9 @@ Sequel defines the inequality operators directly on most Sequel-specific express
   Sequel.function(:func) >= 1 # (func() >= 1)
   Sequel.function(:func, :column) <= 1 # (func("column") <= 1)
 
-If you want to use them on a symbol, you should call <tt>Sequel.expr</tt> with the symbol:
+If you want to use them on a symbol, you should call <tt>Sequel.[]</tt> with the symbol:
 
-  Sequel.expr(:column) > 1 # ("column" > 1)
+  Sequel[:column] > 1 # ("column" > 1)
 
 A common use of virtual rows is to handle inequality operators:
 
@@ -364,11 +364,11 @@ A common use of virtual rows is to handle inequality operators:
 
 The standard mathematical operates are defined on most Sequel-specific expression objects:
 
-  Sequel.expr(:column) + 1 # "column" + 1
-  Sequel.expr(:table__column) - 1 # "table"."column" - 1
+  Sequel[:column] + 1 # "column" + 1
+  Sequel[:table__column] - 1 # "table"."column" - 1
   Sequel.qualify(:table, :column) * 1 # "table"."column" * 1
-  Sequel.expr(:column) / 1 # "column" / 1
-  Sequel.expr(:column) ** 1 # power("column", 1)
+  Sequel[:column] / 1 # "column" / 1
+  Sequel[:column] ** 1 # power("column", 1)
 
 You can also call the operator methods directly on the Sequel module:
 
@@ -380,15 +380,15 @@ You can also call the operator methods directly on the Sequel module:
 
 Note that since Sequel implements support for ruby's coercion protocol, the following also works:
 
-  1 + Sequel.expr(:column)
+  1 + Sequel[:column]
   1 - Sequel.qualify(:table__column)
 
 === Boolean Operators (AND OR)
 
 Sequel defines the & and | methods on most Sequel-specific expression objects to handle AND and OR:
 
-  Sequel.expr(:column1) & :column2 # ("column1" AND "column2")
-  Sequel.expr(:column1=>1) | {:column2=>2} # (("column1" = 1) OR ("column2" = 2))
+  Sequel[:column1] & :column2 # ("column1" AND "column2")
+  Sequel[:column1=>1] | {:column2=>2} # (("column1" = 1) OR ("column2" = 2))
   (Sequel.function(:func) > 1) & :column3 # ((func() > 1) AND "column3")
 
 Note the use of parentheses in the last statement.  If you omit them, you won't get what you expect.
@@ -430,8 +430,8 @@ Note again that <tt>Dataset#exclude</tt> uses ~, not +negate+:
 
 Casting in Sequel is done with the +cast+ method, which is available on most of the Sequel-specific expression objects:
 
-  Sequel.expr(:name).cast(:text) # CAST("name" AS text)
-  Sequel.expr('1').cast(:integer) # CAST('1' AS integer)
+  Sequel[:name].cast(:text) # CAST("name" AS text)
+  Sequel['1'].cast(:integer) # CAST('1' AS integer)
   Sequel.qualify(:table, :column).cast(:date) # CAST("table"."column" AS date)
 
 You can also use the <tt>Sequel.cast</tt> method:
@@ -442,41 +442,41 @@ You can also use the <tt>Sequel.cast</tt> method:
 
 Sequel allows the use of bitwise mathematical operators on Sequel::SQL::NumericExpression objects:
 
-  Sequel.expr(:number) + 1 # => #<Sequel::SQL::NumericExpression ...>
-  (Sequel.expr(:number) + 1) & 5 # (("number" + 1) & 5)
+  Sequel[:number] + 1 # => #<Sequel::SQL::NumericExpression ...>
+  (Sequel[:number] + 1) & 5 # (("number" + 1) & 5)
 
 As you can see, when you use the + operator on a symbol, you get a NumericExpression.  You can turn an expression a NumericExpression using +sql_number+:
 
-  Sequel.expr(:number).sql_number | 5 # ("number" | 5)
+  Sequel[:number].sql_number | 5 # ("number" | 5)
   Sequel.function(:func).sql_number << 7 # (func() << 7)
   Sequel.cast(:name, :integer).sql_number >> 8 # (CAST("name" AS integer) >> 8)
 
 Sequel allows you to do the cast and conversion at the same time via +cast_numeric+:
 
-  Sequel.expr(:name).cast_numeric ^ 9 # (CAST("name" AS integer) ^ 9)
+  Sequel[:name].cast_numeric ^ 9 # (CAST("name" AS integer) ^ 9)
 
 Note that &, |, and ~ are already defined to do AND, OR, and NOT on most expressions, so if you want to use the bitwise operators, you need to make sure that they are converted first:
 
-  ~Sequel.expr(:name) # NOT "name"
-  ~Sequel.expr(:name).sql_number # ~"name"
+  ~Sequel[:name] # NOT "name"
+  ~Sequel[:name].sql_number # ~"name"
 
 === String Operators (||, LIKE, Regexp)
 
 Sequel allows the use of the string concatenation operator on Sequel::SQL::StringExpression objects, which can be created using the +sql_string+ method on an expression:
 
-  Sequel.expr(:name).sql_string + ' - Name' # ("name" || ' - Name')
+  Sequel[:name].sql_string + ' - Name' # ("name" || ' - Name')
 
 Just like for the bitwise operators, Sequel allows you do do the cast and conversion at the same time via +cast_string+:
 
-  Sequel.expr(:number).cast_string + ' - Number' # (CAST(number AS varchar(255)) || ' - Number')
+  Sequel[:number].cast_string + ' - Number' # (CAST(number AS varchar(255)) || ' - Number')
 
 Note that similar to the mathematical operators, you cannot switch the order the expression and have it work:
 
-  'Name - ' + Sequel.expr(:name).sql_string # raises TypeError
+  'Name - ' + Sequel[:name].sql_string # raises TypeError
 
-Just like for the mathematical operators, you can use <tt>Sequel.expr</tt> to wrap the object:
+Just like for the mathematical operators, you can use <tt>Sequel.[]</tt> to wrap the object:
 
-  Sequel.expr('Name - ') + :name # ('Name - ' || "name")
+  Sequel['Name - '] + :name # ('Name - ' || "name")
   
 The <tt>Sequel.join</tt> method concatenates all of the elements in the array:
 
@@ -488,8 +488,8 @@ Just like ruby's <tt>String#join</tt>, you can provide an argument for a string 
 
 For the LIKE operator, Sequel defines the +like+ and +ilike+ methods on most Sequel-specific expression objects:
 
-  Sequel.expr(:name).like('A%') # ("name" LIKE 'A%' ESCAPE '\') 
-  Sequel.expr(:name).ilike('A%') # ("name" ILIKE 'A%' ESCAPE '\') 
+  Sequel[:name].like('A%') # ("name" LIKE 'A%' ESCAPE '\') 
+  Sequel[:name].ilike('A%') # ("name" ILIKE 'A%' ESCAPE '\') 
 
 You can also use the <tt>Sequel.like</tt> and <tt>Sequel.ilike</tt> methods:
 
@@ -515,24 +515,24 @@ Note that using +ilike+ with a regular expression will always make the regexp ca
 
 Sequel supports specifying ascending or descending order using the +asc+ and +desc+ method on most Sequel-specific expression objects:
 
-  Sequel.expr(:column).asc # "column" ASC
-  Sequel.expr(:column).qualify(:table).desc # "table"."column" DESC
+  Sequel[:column].asc # "column" ASC
+  Sequel[:column].qualify(:table).desc # "table"."column" DESC
 
 You can also use the <tt>Sequel.asc</tt> and <tt>Sequel.desc</tt> methods:
 
   Sequel.asc(:column) # "column" ASC
-  Sequel.desc(Sequel.expr(:column).qualify(:table)) # "table"."column" DESC
+  Sequel.desc(Sequel[:column].qualify(:table)) # "table"."column" DESC
 
 On some databases, you can specify null ordering:
 
   Sequel.asc(:column, :nulls=>:first) # "column" ASC NULLS FIRST
-  Sequel.desc(Sequel.expr(:column).qualify(:table), :nulls=>:last) # "table"."column" DESC NULLS LAST
+  Sequel.desc(Sequel[:column].qualify(:table), :nulls=>:last) # "table"."column" DESC NULLS LAST
 
 === All Columns (.*)
 
 To select all columns in a table, Sequel supports the * method on identifiers without an argument:
 
-  Sequel.expr(:table).* # "table".*
+  Sequel[:table].* # "table".*
 
 === CASE statements
 
@@ -555,8 +555,8 @@ If you provide a 3rd argument to <tt>Sequel.case</tt>, it goes between CASE and 
 
 Sequel supports SQL subscripts using the +sql_subscript+ method on most Sequel-specific expression objects:
 
-  Sequel.expr(:column).sql_subscript(3) # column[3]
-  Sequel.expr(:column).qualify(:table).sql_subscript(3) # table.column[3]
+  Sequel[:column].sql_subscript(3) # column[3]
+  Sequel[:column].qualify(:table).sql_subscript(3) # table.column[3]
 
 You can also use the <tt>Sequel.subscript</tt> method:
 

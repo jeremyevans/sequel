@@ -465,6 +465,10 @@ module Sequel
       # to construct via other methods.  For example:
       #
       #   Sequel.expr(1) - :a # SQL: (1 - a)
+      #
+      # On the Sequel module, this is aliased as #[], for easier use:
+      #
+      #   Sequel[1] - :a # SQL: (1 - a)
       def expr(arg=(no_arg=true), &block)
         if block_given?
           if no_arg
@@ -793,7 +797,7 @@ module Sequel
       # If the argument given is Numeric, treat it as a NumericExpression,
       # allowing code such as:
       #
-      #   1 + Sequel.expr(:x) # SQL: (1 + x)
+      #   1 + Sequel[:x] # SQL: (1 + x)
       #   Sequel.expr{1 - x(y)} # SQL: (1 - x(y))
       def coerce(other)
         if other.is_a?(Numeric)
@@ -822,17 +826,17 @@ module Sequel
     # return when using a hash with a single entry, where the receiver was the key
     # and the argument was the value. Example:
     #
-    #   Sequel.expr(:a) =~ 1 # (a = 1)
-    #   Sequel.expr(:a) =~ [1, 2] # (a IN [1, 2])
-    #   Sequel.expr(:a) =~ nil # (a IS NULL)
+    #   Sequel[:a] =~ 1 # (a = 1)
+    #   Sequel[:a] =~ [1, 2] # (a IN [1, 2])
+    #   Sequel[:a] =~ nil # (a IS NULL)
     #
     # On Ruby 1.9+, this also adds the !~ method, for easily setting up not equals,
     # exclusion, and inverse pattern matching.  This is the same as as inverting the
     # result of the =~ method
     #
-    #   Sequel.expr(:a) !~ 1 # (a != 1)
-    #   Sequel.expr(:a) !~ [1, 2] # (a NOT IN [1, 2])
-    #   Sequel.expr(:a) !~ nil # (a IS NOT NULL)
+    #   Sequel[:a] !~ 1 # (a != 1)
+    #   Sequel[:a] !~ [1, 2] # (a NOT IN [1, 2])
+    #   Sequel[:a] !~ nil # (a IS NOT NULL)
     module PatternMatchMethods
       # Set up an equality, inclusion, or pattern match operation, based on the type
       # of the argument.
@@ -929,7 +933,7 @@ module Sequel
     module QualifyingMethods
       # If no arguments are given, return an SQL::ColumnAll:
       #
-      #   Sequel.expr(:a__b).*  # a.b.*
+      #   Sequel[:a__b].*  # a.b.*
       def *(ce=(arg=false;nil))
         if arg == false
           Sequel::SQL::ColumnAll.new(self)
@@ -940,8 +944,8 @@ module Sequel
 
       # Qualify the receiver with the given +qualifier+ (table for column/schema for table).
       #
-      #   Sequel.expr(:column).qualify(:table) # "table"."column"
-      #   Sequel.expr(:table).qualify(:schema) # "schema"."table"
+      #   Sequel[:column].qualify(:table) # "table"."column"
+      #   Sequel[:table].qualify(:schema) # "schema"."table"
       #   Sequel.qualify(:table, :column).qualify(:schema) # "schema"."table"."column"
       def qualify(qualifier)
         QualifiedIdentifier.new(qualifier, self)
@@ -1392,7 +1396,7 @@ module Sequel
       # Return a new function where the function name will not be quoted even
       # if the database supports quoted functions:
       #
-      #   Sequel.expr(:foo).function.unquoted # foo()
+      #   Sequel[:foo].function.unquoted # foo()
       def unquoted
         with_opts(:quoted=>false)
       end

@@ -40,7 +40,7 @@
 #
 # or construct the same SQL using a non-string based approach:
 #
-#   DB[:table].update(:column => Sequel.expr(:column) + 1)
+#   DB[:table].update(:column => Sequel[:column] + 1)
 #
 # Related module: Sequel::Dataset::NoAutoLiteralStrings
 

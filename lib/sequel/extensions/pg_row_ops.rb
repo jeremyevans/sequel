@@ -19,7 +19,7 @@
 # Also, on most Sequel expression objects, you can call the pg_row
 # method:
 #
-#   r = Sequel.expr(:row_column).pg_row
+#   r = Sequel[:row_column].pg_row
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension

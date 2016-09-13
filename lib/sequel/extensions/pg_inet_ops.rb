@@ -14,7 +14,7 @@
 # Also, on most Sequel expression objects, you can call the pg_inet
 # method:
 #
-#   r = Sequel.expr(:ip).pg_inet
+#   r = Sequel[:ip].pg_inet
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension

@@ -58,7 +58,7 @@ class Array
   #   [[:a, true]].sql_expr # SQL: a IS TRUE
   #   [[:a, 1], [:b, [2, 3]]].sql_expr # SQL: a = 1 AND b IN (2, 3)
   def sql_expr
-    Sequel.expr(self)
+    Sequel[self]
   end
 
   # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, matching none

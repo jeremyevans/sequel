@@ -103,7 +103,7 @@ module Sequel
             edges.each{|e| mds = mds.join(e[:table], Array(e[:right]).zip(Array(e[:left])))}
             ds.filter(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
           when :pg_array_to_many
-            ds.filter(Sequel.expr(r.primary_key=>sds.select{Sequel.pg_array_op(r.qualify(r[:model].table_name, r[:key])).unnest}))
+            ds.filter(Sequel[r.primary_key=>sds.select{Sequel.pg_array_op(r.qualify(r[:model].table_name, r[:key])).unnest}])
           when :many_to_pg_array
             ds.filter(Sequel.function(:coalesce, Sequel.pg_array_op(r[:key]).overlaps(sds.select{array_agg(r.qualify(r[:model].table_name, r.primary_key))}), false))
           else

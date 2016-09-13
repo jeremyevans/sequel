@@ -491,14 +491,14 @@ module Sequel
           expr = case obj
           when Sequel::Model
             if (assoc_pks = obj.get_column_value(key)) && !assoc_pks.empty?
-              Sequel.expr(pk=>assoc_pks.to_a)
+              Sequel[pk=>assoc_pks.to_a]
             end
           when Array
             if (assoc_pks = obj.map{|o| o.get_column_value(key)}.flatten.compact.uniq) && !assoc_pks.empty?
-              Sequel.expr(pk=>assoc_pks)
+              Sequel[pk=>assoc_pks]
             end
           when Sequel::Dataset
-            Sequel.expr(pk=>obj.select{Sequel.pg_array_op(ref.qualify(obj.model.table_name, ref[:key_column])).unnest})
+            Sequel[pk=>obj.select{Sequel.pg_array_op(ref.qualify(obj.model.table_name, ref[:key_column])).unnest}]
           end
           expr = Sequel::SQL::Constants::FALSE unless expr
           expr = add_association_filter_conditions(ref, obj, expr)

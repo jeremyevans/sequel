@@ -19,7 +19,7 @@
 # Also, on most Sequel expression objects, you can call the pg_array
 # method:
 #
-#   ia = Sequel.expr(:int_array_column).pg_array
+#   ia = Sequel[:int_array_column].pg_array
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension

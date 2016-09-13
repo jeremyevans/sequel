@@ -24,8 +24,8 @@
 # Also, on most Sequel expression objects, you can call the pg_json
 # or pg_jsonb # method:
 #
-#   j = Sequel.expr(:json_column).pg_json
-#   jb = Sequel.expr(:jsonb_column).pg_jsonb
+#   j = Sequel[:json_column].pg_json
+#   jb = Sequel[:jsonb_column].pg_jsonb
 #
 # If you have loaded the {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc],
 # or you have loaded the core_refinements extension

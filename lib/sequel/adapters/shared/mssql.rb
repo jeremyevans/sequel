@@ -433,8 +433,8 @@ module Sequel
         tn = m2.call(table_name.to_s)
         table_id = get(Sequel.function(:object_id, tn))
         info_sch_sch = opts[:information_schema_schema]
-        inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel.expr(s)}
-        sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel.expr(s)}
+        inf_sch_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, s) : Sequel[s]}
+        sys_qual = lambda{|s| info_sch_sch ? Sequel.qualify(info_sch_sch, Sequel.qualify(Sequel.lit(''), s)) : Sequel[s]}
 
         identity_cols = metadata_dataset.from(Sequel.lit('[sys].[columns]')).
           where(:object_id=>table_id, :is_identity=>true).

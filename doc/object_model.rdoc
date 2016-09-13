@@ -270,7 +270,7 @@ automatic qualification or aliasing happens for them:
 
 The following shortcuts exist for creating Sequel::SQL::Identifier objects:
 
-  Sequel.expr(:column)
+  Sequel[:column]
   Sequel.identifier(:col__umn)
   :col__umn.identifier # core_extensions extension
 
@@ -282,7 +282,7 @@ Sequel::SQL::QualifiedIdentifier objects represent qualified identifiers:
 
 The following shortcuts exist for creating Sequel::SQL::QualifiedIdentifier objects:
 
-  Sequel.expr(:table__column)
+  Sequel[:table__column]
   Sequel.qualify(:table, :column)
   :column.qualify(:table) # core_extensions extension
 
@@ -299,7 +299,7 @@ is treated as an identifier, but the expression can be an arbitrary Sequel expre
 
 The following shortcuts exist for creating Sequel::SQL::AliasedExpression objects:
 
-  Sequel.expr(:column___alias)
+  Sequel[:column___alias]
   Sequel.as(:column, :alias)
   Sequel.as(:column, :alias, [:column_alias1, :column_alias2])
   :column.as(:alias) # core_extensions extension
@@ -384,7 +384,7 @@ take arguments.  Still, it's possible they are still useful in some code:
 
 The following shortcut exists for creating Sequel::SQL::ColumnAll objects:
 
-  Sequel.expr(:table).*
+  Sequel[:table].*
   :table.* # core_extensions extension
 
 === Sequel::SQL::Constant
@@ -563,11 +563,10 @@ on the wrapper that would not be defined on the object itself:
 
   Sequel::SQL::Wrapper.new(o) + 1 # (foo + 1)
 
-You can use the Sequel.expr method to wrap any object:
+You can use the Sequel.[] method to wrap any object:
 
-  Sequel.expr(o)
+  Sequel[o]
 
 However, note that that does not necessarily return a Sequel::SQL::Wrapper
 object, it may return a different class of object, such as a
 Sequel::SQL::ComplexExpression subclass object.
-  

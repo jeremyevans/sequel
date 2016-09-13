@@ -993,7 +993,7 @@ columns that have the same name in both the join table and the associated
 table.  Example:
 
   Artist.one_to_many :albums, :select=>[:id, :name]
-  Album.many_to_many :tags, :select=>[Sequel.expr(:tags).*, :albums_tags__number]
+  Album.many_to_many :tags, :select=>[Sequel[:tags].*, :albums_tags__number]
 
 ==== :limit
 

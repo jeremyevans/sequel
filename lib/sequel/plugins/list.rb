@@ -94,7 +94,7 @@ module Sequel
         def after_destroy
           super
 
-          f = Sequel.expr(position_field)
+          f = Sequel[position_field]
           list_dataset.where(f > position_value).update(f => f - 1)
         end
 
