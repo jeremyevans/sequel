@@ -190,6 +190,19 @@ describe "Sequel::Postgres::JSONOp" do
     @l[@jb.concat([1, 2])].must_equal "(j || '[1,2]'::jsonb)"
   end
 
+  it "#insert should use the jsonb_insert function" do
+    @l[@jb.insert(:a, :h)].must_equal "jsonb_insert(j, a, h, false)"
+    @l[@jb.insert(:a, :h, true)].must_equal "jsonb_insert(j, a, h, true)"
+  end
+
+  it "#insert should handle hashes" do
+    @l[@jb.insert(:a, 'a'=>'b')].must_equal "jsonb_insert(j, a, '{\"a\":\"b\"}'::jsonb, false)"
+  end
+
+  it "#insert should handle arrays" do
+    @l[@jb.insert(%w'a b', [1, 2])].must_equal "jsonb_insert(j, ARRAY['a','b'], '[1,2]'::jsonb, false)"
+  end
+
   it "#set should use the jsonb_set function" do
     @l[@jb.set(:a, :h)].must_equal "jsonb_set(j, a, h, true)"
     @l[@jb.set(:a, :h, false)].must_equal "jsonb_set(j, a, h, false)"

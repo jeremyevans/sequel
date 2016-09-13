@@ -1,5 +1,7 @@
 === HEAD
 
+* Add JSONBOp#insert in pg_json_ops extension, for jsonb_insert support on PostgreSQL 9.6+ (jeremyevans)
+
 * Support add_column :if_not_exists option on PostgreSQL 9.6+ (jeremyevans)
 
 === 4.38.0 (2016-09-01)

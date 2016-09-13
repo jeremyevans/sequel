@@ -2922,6 +2922,13 @@ describe 'PostgreSQL json type' do
         @db.get(jo.set(%w'a', 'f'=>'g')['a']['f']).must_equal 'g'
       end
 
+      if DB.server_version >= 90600  && json_type == :jsonb
+        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2})[0]['a']).must_equal 2
+        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, false)[0]['a']).must_equal 2
+        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, true)[0]).must_equal 3
+        @db.get(pg_json.call([3]).op.insert(['0'], {'a'=>2}, true)[1]['a']).must_equal 2
+      end
+
       @db.from(jo.keys.as(:k)).select_order_map(:k).must_equal %w'a b'
       @db.from(jo.each).select_order_map(:key).must_equal %w'a b'
       @db.from(jo.each).order(:key).select_map(:value).must_equal [1, {'c'=>2, 'd'=>{'e'=>3}}]
