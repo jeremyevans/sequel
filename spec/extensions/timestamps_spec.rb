@@ -50,6 +50,17 @@ describe "Sequel::Plugins::Timestamps" do
     o.updated_at.must_equal '2009-08-01'
   end
 
+  it "should leave manually set update timestamp, if :allow_manual_update was given" do
+    o = @c.load(:id=>1).update(:updated_at=>Date.new(2016))
+    @c.db.sqls.must_equal ["UPDATE t SET updated_at = '2009-08-01' WHERE (id = 1)"]
+    o.updated_at.must_equal '2009-08-01'
+
+    @c.plugin :timestamps, :allow_manual_update=>true
+    o = @c.load(:id=>1).update(:updated_at=>Date.new(2016))
+    @c.db.sqls.must_equal ["UPDATE t SET updated_at = '2016-01-01' WHERE (id = 1)"]
+    o.updated_at.must_equal Date.new(2016)
+  end
+
   it "should work with current_datetime_timestamp extension" do
     Sequel.datetime_class = Time
     @c.dataset = @c.dataset.extension(:current_datetime_timestamp)

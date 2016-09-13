@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :allow_manual_update timestamps plugin option for not overriding a manually set update timestamp (jeremyevans)
+
 * Add Sequel.[] as an alias to Sequel.expr, for easier expression creation (jeremyevans)
 
 * Add PostgreSQL full_text_search :to_tsquery=>:phrase option, for using PostgreSQL 9.6+ full text search phrase searching (jeremyevans)
