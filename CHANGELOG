@@ -1,5 +1,7 @@
 === HEAD
 
+* Support ActiveSupport 5 in pg_interval extension when weeks/hours are used in ActiveSupport::Duration objects (chanks) (#1233)
+
 * Support IntegerMigrator :relative option, for running only the specified number of migrations up or down (jeremyevans)
 
 * Make the touch plugin also touch associations on create in addition to update and delete (jeremyevans)
