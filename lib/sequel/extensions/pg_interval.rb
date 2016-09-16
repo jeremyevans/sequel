@@ -42,7 +42,7 @@ module Sequel
   module Postgres
     module IntervalDatabaseMethods
       EMPTY_INTERVAL = '0'.freeze
-      DURATION_UNITS = [:years, :months, :days, :minutes, :seconds].freeze
+      DURATION_UNITS = [:years, :months, :weeks, :days, :hours, :minutes, :seconds].freeze
 
       # Return an unquoted string version of the duration object suitable for
       # use as a bound variable.

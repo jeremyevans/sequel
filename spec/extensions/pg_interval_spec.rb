@@ -15,6 +15,7 @@ describe "pg_interval extension" do
     @db.literal(ActiveSupport::Duration.new(0, [])).must_equal "'0'::interval"
     @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 0]])).must_equal "'0'::interval"
     @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 10], [:minutes, 20], [:days, 3], [:months, 4], [:years, 6]])).must_equal "'6 years 4 months 3 days 20 minutes 10 seconds '::interval"
+    @db.literal(ActiveSupport::Duration.new(0, [[:seconds, 10], [:minutes, 20], [:hours, 8], [:days, 3], [:weeks, 2], [:months, 4], [:years, 6]])).must_equal "'6 years 4 months 2 weeks 3 days 8 hours 20 minutes 10 seconds '::interval"
     @db.literal(ActiveSupport::Duration.new(0, [[:seconds, -10.000001], [:minutes, -20], [:days, -3], [:months, -4], [:years, -6]])).must_equal "'-6 years -4 months -3 days -20 minutes -10.000001 seconds '::interval"
   end
 
