@@ -197,6 +197,12 @@ module Sequel
             sql << "CONSTRAINT #{quote_identifier(constraint_name)} "
           end
           sql << "FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"
+        elsif after_col = op.delete(:after)
+          sql = super.dup
+          sql << " AFTER #{quote_identifier(after_col)}"
+        elsif op.delete(:first)
+          sql = super.dup
+          sql << " FIRST"
         else
           super
         end

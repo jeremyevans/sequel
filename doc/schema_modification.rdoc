@@ -339,6 +339,11 @@ hash:
     add_column :copies_sold, Integer, :default=>0
   end
 
+The +add_column+ method also accepts some additional options:
+
+:after :: The name of an existing column that the new column should be positioned after within the table row.
+:first :: Create this new column at the first position within the table row.
+
 === +drop_column+
 
 As you may expect, +drop_column+ takes a column name and drops the column.  It's
