@@ -515,22 +515,22 @@ describe "A MySQL database" do
     end
   end
 
-  it "should correctly format ALTER TABLE statements with specified after column" do
+  it "should correctly handle add_column :after option" do
     @db.create_table(:items){Integer :id; Integer :value}
     @db.alter_table(:items){add_column :name, String, :after=>:id}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer, `value` integer)",
-        "ALTER TABLE `items` ADD COLUMN `name` varchar(255) AFTER `id`"]
-    end
+    @db[:items].columns.must_equal [:id, :name, :value]
   end
 
-  it "should correctly format ALTER TABLE statements with specified first option" do
+  it "should correctly handle add_column :first option" do
     @db.create_table(:items){Integer :id; Integer :value}
     @db.alter_table(:items){add_column :name, String, :first => true}
-    check_sqls do
-      @db.sqls.must_equal ["CREATE TABLE `items` (`id` integer, `value` integer)",
-        "ALTER TABLE `items` ADD COLUMN `name` varchar(255) FIRST"]
-    end
+    @db[:items].columns.must_equal [:name, :id, :value]
+  end
+
+  it "should correctly handle add_foreign_key :first option" do
+    @db.create_table(:items){primary_key :id; Integer :value}
+    @db.alter_table(:items){add_foreign_key :parent_id, :items, :first => true}
+    @db[:items].columns.must_equal [:parent_id, :id, :value]
   end
 
   it "should have rename_column support keep existing options" do

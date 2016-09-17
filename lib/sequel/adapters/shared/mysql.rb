@@ -188,23 +188,22 @@ module Sequel
       private
       
       def alter_table_add_column_sql(table, op)
-        if related = op.delete(:table)
-          sql = super.dup
+        pos = if after_col = op[:after]
+          " AFTER #{quote_identifier(after_col)}"
+        elsif op[:first]
+          " FIRST"
+        end
+
+        sql = if related = op.delete(:table)
+          sql = super + "#{pos}, ADD "
           op[:table] = related
           op[:key] ||= primary_key_from_schema(related)
-          sql << ", ADD "
           if constraint_name = op.delete(:foreign_key_constraint_name)
             sql << "CONSTRAINT #{quote_identifier(constraint_name)} "
           end
           sql << "FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"
-        elsif after_col = op.delete(:after)
-          sql = super.dup
-          sql << " AFTER #{quote_identifier(after_col)}"
-        elsif op.delete(:first)
-          sql = super.dup
-          sql << " FIRST"
         else
-          super
+          "#{super}#{pos}"
         end
       end
 

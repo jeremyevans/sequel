@@ -1,5 +1,7 @@
 === HEAD
 
+* Support add_column :after and :first options on MySQL (AnthonyBobsin, jeremyevans) (#1234)
+
 * Support ActiveSupport 5 in pg_interval extension when weeks/hours are used in ActiveSupport::Duration objects (chanks) (#1233)
 
 * Support IntegerMigrator :relative option, for running only the specified number of migrations up or down (jeremyevans)

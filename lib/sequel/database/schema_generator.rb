@@ -340,6 +340,11 @@ module Sequel
       # PostgreSQL specific options:
       #
       # :if_not_exists :: Set to true to not add the column if it already exists (PostgreSQL 9.6+)
+      #
+      # MySQL specific options:
+      #
+      # :after :: The name of an existing column that the new column should be positioned after
+      # :first :: Create this new column before all other existing columns
       def add_column(name, type, opts = OPTS)
         @operations << {:op => :add_column, :name => name, :type => type}.merge!(opts)
       end
