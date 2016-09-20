@@ -443,7 +443,7 @@ describe "Sequel Mock Adapter" do
     end
   end
 
-  it "should automatically set version for adapters nedding versions" do
+  it "should automatically set version for adapters needing versions" do
     Sequel.mock(:host=>'postgres').server_version.must_be :>=, 90400
     Sequel.mock(:host=>'mssql').server_version.must_be :>=, 11000000
     Sequel.mock(:host=>'mysql').server_version.must_be :>=, 50617
