@@ -168,4 +168,4 @@ behavior to execute multiple times.  For example, with the following code:
 
 The logger.info method will be called multiple times if there is a serialization failure.
 
-The :num_retries option can be used to set the maxmimum number of times to retry.  It is set to 5 times by default.
+The :num_retries option can be used to set the maximum number of times to retry.  It is set to 5 times by default.
