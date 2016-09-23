@@ -119,8 +119,44 @@ module Sequel
       end
 
       module InstanceMethods
-        Model::BEFORE_HOOKS.each{|h| class_eval("def #{h}; model.hook_blocks(:#{h}){|b| return false if instance_eval(&b) == false}; super; end", __FILE__, __LINE__)}
-        Model::AFTER_HOOKS.each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; end", __FILE__, __LINE__)}
+        (Model::BEFORE_HOOKS - [:before_save, :before_destroy]).each{|h| class_eval("def #{h}; model.hook_blocks(:#{h}){|b| return false if instance_eval(&b) == false}; super; end", __FILE__, __LINE__)}
+        (Model::AFTER_HOOKS - [:after_save, :after_destroy, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]).each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; end", __FILE__, __LINE__)}
+
+        def after_destroy
+          super
+          model.hook_blocks(:after_destroy){|b| instance_eval(&b)}
+          if model.has_hooks?(:after_destroy_commit)
+            db.after_rollback{model.hook_blocks(:after_destroy_commit){|b| instance_eval(&b)}}
+          end
+        end
+
+        def after_save
+          super
+          model.hook_blocks(:after_save){|b| instance_eval(&b)}
+          if model.has_hooks?(:after_commit)
+            db.after_rollback{model.hook_blocks(:after_commit){|b| instance_eval(&b)}}
+          end
+        end
+
+        def before_destroy
+          model.hook_blocks(:before_destroy) do |b|
+            return false if instance_eval(&b) == false
+          end
+          super
+          if model.has_hooks?(:after_destroy_rollback)
+            db.after_rollback{model.hook_blocks(:after_destroy_rollback){|b| instance_eval(&b)}}
+          end
+        end
+
+        def before_save
+          model.hook_blocks(:before_save) do |b|
+            return false if instance_eval(&b) == false
+          end
+          super
+          if model.has_hooks?(:after_rollback)
+            db.after_rollback{model.hook_blocks(:after_rollback){|b| instance_eval(&b)}}
+          end
+        end
       end
     end
   end
