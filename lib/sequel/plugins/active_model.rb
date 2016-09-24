@@ -46,13 +46,6 @@ module Sequel
           @destroyed = true
         end
 
-        # Mark current instance as destroyed if the transaction in which this
-        # instance is created is rolled back.
-        def before_create
-          db.after_rollback{@destroyed = true}
-          super
-        end
-
         # Return ::ActiveModel::Name instance for the class.
         def model_name
           model.model_name
@@ -60,7 +53,16 @@ module Sequel
 
         # False if the object is new? or has been destroyed, true otherwise.
         def persisted?
-          !new? && @destroyed != true
+          return false if new?
+          return false if defined?(@destroyed)
+
+          if defined?(@rollback_checker)
+            if @rollback_checker.call
+              return false
+            end
+          end
+          
+          true
         end
         
         # An array of primary key values, or nil if the object is not persisted.
@@ -92,6 +94,15 @@ module Sequel
         end
         
         private
+
+        # For new objects, add a rollback checker to check if the transaction
+        # in which this instance is created is rolled back.
+        def _save(opts)
+          if new? && db.in_transaction?(opts)
+            @rollback_checker = db.rollback_checker(opts)
+          end
+          super
+        end
 
         # Use ActiveModel compliant errors class.
         def errors_class

@@ -1,5 +1,7 @@
 === HEAD
 
+* Make active_model plugin use rollback_checker instead of after_rollback hook (jeremyevans)
+
 * Add Database#rollback_checker, which returns a proc that returns whether the in progress transaction is rolled back (jeremyevans)
 
 * Add Sequel::Database.set_shared_adapter_scheme to allow external adapters to support the mock adapter (jeremyevans)
