@@ -32,6 +32,45 @@ module Sequel
     # on the same connection.
     attr_accessor :transaction_isolation_level
 
+    # If a transaction is not currently in process, yield to the block immediately.
+    # Otherwise, add the block to the list of blocks to call after the currently
+    # in progress transaction commits (and only if it commits).
+    # Options:
+    # :server :: The server/shard to use.
+    def after_commit(opts=OPTS, &block)
+      raise Error, "must provide block to after_commit" unless block
+      synchronize(opts[:server]) do |conn|
+        if h = _trans(conn)
+          raise Error, "cannot call after_commit in a prepared transaction" if h[:prepare]
+          add_transaction_hook(conn, :after_commit, block)
+        else
+          yield
+        end
+      end
+    end
+    
+    # If a transaction is not currently in progress, ignore the block.
+    # Otherwise, add the block to the list of the blocks to call after the currently
+    # in progress transaction rolls back (and only if it rolls back).
+    # Options:
+    # :server :: The server/shard to use.
+    def after_rollback(opts=OPTS, &block)
+      raise Error, "must provide block to after_rollback" unless block
+      synchronize(opts[:server]) do |conn|
+        if h = _trans(conn)
+          raise Error, "cannot call after_rollback in a prepared transaction" if h[:prepare]
+          add_transaction_hook(conn, :after_rollback, block)
+        end
+      end
+    end
+    
+    # Return true if already in a transaction given the options,
+    # false otherwise.  Respects the :server option for selecting
+    # a shard.
+    def in_transaction?(opts=OPTS)
+      synchronize(opts[:server]){|conn| !!_trans(conn)}
+    end
+
     # Starts a database transaction.  When a database transaction is used,
     # either all statements are successful or none of the statements are
     # successful.  Note that MySQL MyISAM tables do not support transactions.
@@ -215,6 +254,13 @@ module Sequel
       Sequel.synchronize{@transactions[conn] = hash}
     end    
 
+    # Set the given callable as a hook to be called. Type should be either
+    # :after_commit or :after_rollback.
+    def add_transaction_hook(conn, type, block)
+      hooks = _trans(conn)[type] ||= []
+      hooks << block
+    end
+
     # Whether the current thread/connection is already inside a transaction
     def already_in_transaction?(conn, opts)
       _trans(conn) && (!supports_savepoints? || !opts[:savepoint])
@@ -303,6 +349,11 @@ module Sequel
     # used by the transaction code.
     def connection_execute_method
       :execute
+    end
+
+    # Which transaction errors to translate, blank by default.
+    def database_error_classes
+      []
     end
 
     # Retrieve the transaction hooks that should be run for the given

@@ -160,38 +160,6 @@ module Sequel
       end
     end
 
-    # If a transaction is not currently in process, yield to the block immediately.
-    # Otherwise, add the block to the list of blocks to call after the currently
-    # in progress transaction commits (and only if it commits).
-    # Options:
-    # :server :: The server/shard to use.
-    def after_commit(opts=OPTS, &block)
-      raise Error, "must provide block to after_commit" unless block
-      synchronize(opts[:server]) do |conn|
-        if h = _trans(conn)
-          raise Error, "cannot call after_commit in a prepared transaction" if h[:prepare]
-          add_transaction_hook(conn, :after_commit, block)
-        else
-          yield
-        end
-      end
-    end
-    
-    # If a transaction is not currently in progress, ignore the block.
-    # Otherwise, add the block to the list of the blocks to call after the currently
-    # in progress transaction rolls back (and only if it rolls back).
-    # Options:
-    # :server :: The server/shard to use.
-    def after_rollback(opts=OPTS, &block)
-      raise Error, "must provide block to after_rollback" unless block
-      synchronize(opts[:server]) do |conn|
-        if h = _trans(conn)
-          raise Error, "cannot call after_rollback in a prepared transaction" if h[:prepare]
-          add_transaction_hook(conn, :after_rollback, block)
-        end
-      end
-    end
-    
     # Cast the given type to a literal type
     #
     #   DB.cast_type_literal(Float) # double precision
@@ -222,13 +190,6 @@ module Sequel
     # the database does not have a timezone.
     def from_application_timestamp(v)
       Sequel.convert_output_timestamp(v, timezone)
-    end
-
-    # Return true if already in a transaction given the options,
-    # false otherwise.  Respects the :server option for selecting
-    # a shard.
-    def in_transaction?(opts=OPTS)
-      synchronize(opts[:server]){|conn| !!_trans(conn)}
     end
 
     # Returns a string representation of the database object including the
@@ -341,13 +302,6 @@ module Sequel
     def adapter_initialize
     end
 
-    # Set the given callable as a hook to be called. Type should be either
-    # :after_commit or :after_rollback.
-    def add_transaction_hook(conn, type, block)
-      hooks = _trans(conn)[type] ||= []
-      hooks << block
-    end
-
     # Returns true when the object is considered blank.
     # The only objects that are blank are nil, false,
     # strings with all whitespace, and ones that respond
@@ -364,11 +318,6 @@ module Sequel
       else
         obj.respond_to?(:empty?) ? obj.empty? : false
       end
-    end
-
-    # Which transaction errors to translate, blank by default.
-    def database_error_classes
-      []
     end
 
     # An enumerable yielding pairs of regexps and exception classes, used
