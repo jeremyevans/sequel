@@ -71,6 +71,19 @@ module Sequel
       synchronize(opts[:server]){|conn| !!_trans(conn)}
     end
 
+    # Returns a proc that you can call to check if the transaction
+    # has been rolled back.  The proc will return nil if the
+    # transaction is still in progress, true if the transaction was
+    # rolled back, and false if it was committed.  Raises an
+    # Error if called outside a transaction.  Respects the :server
+    # option for selecting a shard.
+    def rollback_checker(opts=OPTS)
+      synchronize(opts[:server]) do |conn|
+        raise Error, "not in a transaction" unless t = _trans(conn)
+        t[:rollback_checker] ||= proc{t[:rolled_back]}
+      end
+    end
+
     # Starts a database transaction.  When a database transaction is used,
     # either all statements are successful or none of the statements are
     # successful.  Note that MySQL MyISAM tables do not support transactions.
@@ -369,6 +382,7 @@ module Sequel
       callbacks = transaction_hooks(conn, committed)
 
       if transaction_finished?(conn)
+        @transactions[conn][:rolled_back] = !committed
         Sequel.synchronize{@transactions.delete(conn)}
       end
 

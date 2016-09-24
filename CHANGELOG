@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#rollback_checker, which returns a proc that returns whether the in progress transaction is rolled back (jeremyevans)
+
 * Add Sequel::Database.set_shared_adapter_scheme to allow external adapters to support the mock adapter (jeremyevans)
 
 * Make hook_class_methods plugin not use after commit/rollback model hooks (jeremyevans)

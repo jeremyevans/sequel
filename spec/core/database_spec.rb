@@ -834,6 +834,35 @@ DatabaseTransactionSpecs = shared_description do
     @db.in_transaction?.must_equal false
   end
   
+  it "should have rollback_checker return a proc which returns whether the transaction was rolled back" do
+    proc{@db.rollback_checker}.must_raise Sequel::Error
+    proc{@db.transaction(:server=>:test){@db.rollback_checker}}.must_raise Sequel::Error
+
+    rbc = nil
+    @db.transaction do 
+      rbc = @db.rollback_checker
+      rbc.call.must_equal nil
+    end
+    rbc.call.must_equal false
+
+    @db.transaction(:rollback=>:always) do 
+      rbc = @db.rollback_checker
+      rbc.call.must_equal nil
+    end
+    rbc.call.must_equal true
+
+    proc do
+      @db.transaction do 
+        rbc = @db.rollback_checker
+        raise
+      end
+    end.must_raise RuntimeError
+    rbc.call.must_equal true
+
+    @db.transaction(:server=>:test){rbc = @db.rollback_checker(:server=>:test)}
+    rbc.call.must_equal false
+  end
+  
   it "should return nil if Sequel::Rollback is called in the transaction" do
     @db.transaction{raise Sequel::Rollback}.must_equal nil
   end
