@@ -7,6 +7,37 @@ describe "Sequel Mock Adapter" do
     db.adapter_scheme.must_equal :mock
   end
 
+  it "should support registering mock adapter type" do
+    begin
+      mod = Module.new do
+        Sequel::Database.set_shared_adapter_scheme(:foo, self)
+        
+        def self.mock_adapter_setup(db)
+          db.instance_variable_set(:@foo, :foo)
+        end
+
+        module self::DatabaseMethods
+          def foo
+            @foo
+          end
+        end
+
+        module self::DatasetMethods
+          def foo
+            db.foo
+          end
+        end
+      end
+
+      Sequel.connect('mock://foo') do |db|
+        db.foo.must_equal :foo
+        db.dataset.foo.must_equal :foo
+      end
+    ensure
+      Sequel.synchronize{Sequel::SHARED_ADAPTER_MAP.delete(:foo)}
+    end
+  end
+
   it "should have constructor accept no arguments" do
     Sequel::Mock::Database.new.must_be_kind_of(Sequel::Mock::Database)
   end

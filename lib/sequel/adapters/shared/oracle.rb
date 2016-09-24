@@ -4,6 +4,15 @@ Sequel.require 'adapters/utils/emulate_offset_with_row_number'
 
 module Sequel
   module Oracle
+    Sequel::Database.set_shared_adapter_scheme(:oracle, self)
+    
+    def self.mock_adapter_setup(db)
+      db.instance_eval do
+        @server_version = 11000000
+        @primary_key_sequences = {}
+      end
+    end
+
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
 

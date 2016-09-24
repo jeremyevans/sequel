@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::Database.set_shared_adapter_scheme to allow external adapters to support the mock adapter (jeremyevans)
+
 * Make hook_class_methods plugin not use after commit/rollback model hooks (jeremyevans)
 
 * Support add_column :after and :first options on MySQL (AnthonyBobsin, jeremyevans) (#1234)

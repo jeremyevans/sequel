@@ -4,6 +4,14 @@ Sequel.require 'adapters/utils/replace'
 
 module Sequel
   module SQLite
+    Sequel::Database.set_shared_adapter_scheme(:sqlite, self)
+
+    def self.mock_adapter_setup(db)
+      db.instance_eval do
+        @sqlite_version = 30903
+      end
+    end
+    
     # No matter how you connect to SQLite, the following Database options
     # can be used to set PRAGMAs on connections in a thread-safe manner:
     # :auto_vacuum, :foreign_keys, :synchronous, and :temp_store.

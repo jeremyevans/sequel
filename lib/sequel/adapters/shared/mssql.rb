@@ -5,6 +5,14 @@ Sequel.require %w'emulate_offset_with_row_number split_alter_table', 'adapters/u
 module Sequel
   Dataset::NON_SQL_OPTIONS << :disable_insert_output
   module MSSQL
+    Sequel::Database.set_shared_adapter_scheme(:mssql, self)
+
+    def self.mock_adapter_setup(db)
+      db.instance_eval do
+        @server_version = 11000000
+      end
+    end
+
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
 

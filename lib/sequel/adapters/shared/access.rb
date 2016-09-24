@@ -4,6 +4,8 @@ module Sequel
   require 'adapters/utils/emulate_offset_with_reverse_and_count'
 
   module Access
+    Sequel::Database.set_shared_adapter_scheme(:access, self)
+
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
 

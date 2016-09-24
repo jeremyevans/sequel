@@ -2,6 +2,8 @@
 
 module Sequel
   module Informix
+    Sequel::Database.set_shared_adapter_scheme(:informix, self)
+
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
 

@@ -129,6 +129,34 @@ module Sequel
       Sequel.synchronize{ADAPTER_MAP[scheme] = self}
     end
     private_class_method :set_adapter_scheme
+
+    # Sets the given module as the shared adapter module for the given scheme.
+    # Used to register shared adapters for use by the mock adapter. Example:
+    #
+    #   # in file sequel/adapters/shared/mydb.rb
+    #   class Sequel::MyDB
+    #     Sequel::Database.set_shared_adapter_scheme :mydb, :self
+    #
+    #     def self.mock_adapter_setup(db)
+    #       # ...
+    #     end
+    #
+    #     module DatabaseMethods
+    #       # ...
+    #     end
+    #
+    #     module DatasetMethods
+    #       # ...
+    #     end
+    #   end
+    #
+    # would allow the mock adapter to return a Database instance that supports
+    # the MyDB syntax via:
+    #
+    #   Sequel.connect('mock://mydb')
+    def self.set_shared_adapter_scheme(scheme, mod)
+      Sequel.synchronize{SHARED_ADAPTER_MAP[scheme] = mod}
+    end
     
     # The connection pool for this Database instance.  All Database instances have
     # their own connection pools.

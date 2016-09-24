@@ -4,6 +4,8 @@ Sequel.require 'adapters/utils/emulate_offset_with_row_number'
 
 module Sequel
   module DB2
+    Sequel::Database.set_shared_adapter_scheme(:db2, self)
+
     @use_clob_as_blob = false
 
     class << self

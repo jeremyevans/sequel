@@ -4,6 +4,8 @@ Sequel.require 'adapters/utils/split_alter_table'
 
 module Sequel
   module Cubrid
+    Sequel::Database.set_shared_adapter_scheme(:cubrid, self)
+
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
 

@@ -2,6 +2,8 @@
 
 module Sequel
   module Firebird
+    Sequel::Database.set_shared_adapter_scheme(:firebird, self)
+
     module DatabaseMethods
       extend Sequel::Database::ResetIdentifierMangling
 

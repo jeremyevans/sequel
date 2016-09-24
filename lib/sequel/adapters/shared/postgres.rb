@@ -25,6 +25,26 @@ module Sequel
   #                 qualification, and in which order to check the schemas when
   #                 an unqualified object is referenced.
   module Postgres
+    Sequel::Database.set_shared_adapter_scheme(:postgres, self)
+
+    module MockAdapterDatabaseMethods
+      def bound_variable_arg(arg, conn)
+        arg
+      end
+
+      def primary_key(table)
+        :id
+      end
+    end
+
+    def self.mock_adapter_setup(db)
+      db.instance_eval do
+        @server_version = 90500
+        initialize_postgres_adapter
+        extend(MockAdapterDatabaseMethods)
+      end
+    end
+
     # Array of exceptions that need to be converted.  JDBC
     # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []

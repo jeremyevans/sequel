@@ -2,6 +2,7 @@
 
 module Sequel
   module SqlAnywhere
+    Sequel::Database.set_shared_adapter_scheme(:sqlanywhere, self)
 
     @convert_smallint_to_bool = true
 

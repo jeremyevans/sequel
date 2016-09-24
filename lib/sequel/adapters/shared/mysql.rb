@@ -9,6 +9,14 @@ module Sequel
   Dataset::NON_SQL_OPTIONS << :on_duplicate_key_update
 
   module MySQL
+    Sequel::Database.set_shared_adapter_scheme(:mysql, self)
+
+    def self.mock_adapter_setup(db)
+      db.instance_eval do
+        @server_version = 50617
+      end
+    end
+
     @convert_tinyint_to_bool = true
 
     class << self
