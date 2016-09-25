@@ -88,7 +88,7 @@ module Sequel
     # :schema :: An explicit schema to use.  It may also be implicitly provided
     #            via the table name.
     #
-    # If schema parsing is supported by the database, the column information should hash at least contain the
+    # If schema parsing is supported by the database, the column information hash should contain at least the
     # following entries:
     #
     # :allow_null :: Whether NULL is an allowed value for the column.
