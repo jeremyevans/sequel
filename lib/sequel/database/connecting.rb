@@ -134,7 +134,7 @@ module Sequel
     # Used to register shared adapters for use by the mock adapter. Example:
     #
     #   # in file sequel/adapters/shared/mydb.rb
-    #   class Sequel::MyDB
+    #   module Sequel::MyDB
     #     Sequel::Database.set_shared_adapter_scheme :mydb, :self
     #
     #     def self.mock_adapter_setup(db)
