@@ -204,6 +204,17 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @ds.all.must_equal [{:a=>1, :b=>2, :c=>3}]
   end
 
+  it "Dataset#insert_ignore and insert_conflict should work with multi_insert/import" do
+    @ds.insert(1, 2, 3)
+    @ds.insert_ignore.multi_insert([{:a=>1, :b=>3, :c=>4}])
+    @ds.insert_ignore.import([:a, :b, :c], [[1, 3, 4]])
+    @ds.all.must_equal [{:a=>1, :b=>2, :c=>3}]
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).import([:a, :b, :c], [[1, 3, 4]])
+    @ds.all.must_equal [{:a=>1, :b=>3, :c=>3}]
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>4}).multi_insert([{:a=>1, :b=>5, :c=>6}])
+    @ds.all.must_equal [{:a=>1, :b=>4, :c=>3}]
+    end
+
   it "Dataset#insert_conflict should handle upserts" do
     @ds.insert(1, 2, 3)
     @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).insert(1, 3, 4).must_equal nil
