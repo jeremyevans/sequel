@@ -160,7 +160,7 @@ Sequel generally uses hash objects to represent equality:
 
   {:column => 1} # ("column" = 1)
 
-However, if you use in array as the hash value, it will usually be used to represent inclusion:
+However, if you use an array as the hash value, it will usually be used to represent inclusion:
 
   {:column => [1, 2, 3]} # ("column" IN (1, 2, 3))
 
