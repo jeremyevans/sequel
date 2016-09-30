@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.39.0 (2016-10-01)
 
 * Make active_model plugin use rollback_checker instead of after_rollback hook (jeremyevans)
 
