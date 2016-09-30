@@ -12,6 +12,26 @@ describe "Sequel::Plugins::InsertReturningSelect" do
     @db.sqls
   end
 
+  it "should work if loaded into a model without a dataset that also uses the lazy_attributes or dataset associations plugins" do
+    c = Sequel::Model(@db)
+    c.plugin :insert_returning_select
+    c.columns :id, :x
+    c.plugin :lazy_attributes
+    c.plugin :dataset_associations
+
+    c.set_dataset @db[:albums].select(:id, :x)
+    c.plugin :lazy_attributes, :x
+    c.many_to_one :c, :key=>:id, :class=>c
+    @db.sqls
+
+    c.dataset.sql.must_equal 'SELECT id FROM albums'
+    c.create(:x=>2)
+    @db.sqls.must_equal ['INSERT INTO albums (x) VALUES (2) RETURNING id']
+    c.load(:id=>2).x
+    @db.sqls.must_equal ['SELECT albums.x FROM albums WHERE (id = 2) LIMIT 1']
+    c.dataset.cs.sql.must_equal "SELECT id FROM albums WHERE (albums.id IN (SELECT albums.id FROM albums))"
+  end
+
   it "should add a returning clause when inserting using selected columns" do
     @Album.plugin :insert_returning_select
     @Album.create(:x=>2).must_equal @Album.load(:id=>1, :x=>2)

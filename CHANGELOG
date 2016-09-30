@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make lazy_attributes and dataset_associations plugins work if insert_returning_select plugin is loaded before on model with no dataset (jeremyevans)
+
 === 4.39.0 (2016-10-01)
 
 * Make active_model plugin use rollback_checker instead of after_rollback hook (jeremyevans)

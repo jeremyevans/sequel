@@ -35,7 +35,7 @@ module Sequel
         # When reseting the instance dataset, also reset the instance_insert_dataset.
         def reset_instance_dataset
           ret = super
-          ds = @instance_dataset
+          return unless ds = @instance_dataset
 
           if columns = insert_returning_columns(ds)
             ds = ds.returning(*columns)
