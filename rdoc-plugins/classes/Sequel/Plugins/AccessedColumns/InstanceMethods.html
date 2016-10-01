@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -67,7 +65,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">c</span>)&#x000A;  (<span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">c</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frozen?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-5B-5D-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]</span>(<span class="ruby-identifier">c</span>)&#x000A;  (<span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">||=</span> {})[<span class="ruby-identifier">c</span>] = <span class="ruby-keyword">true</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">frozen?</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-accessed_columns'>
@@ -84,7 +82,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-accessed_columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-accessed_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">accessed_columns</span>&#x000A;  <span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@accessed_columns</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">:</span> []&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-accessed_columns-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">accessed_columns</span>&#x000A;  <span class="ruby-ivar">@accessed_columns</span> <span class="ruby-operator">?</span> <span class="ruby-ivar">@accessed_columns</span>.<span class="ruby-identifier">keys</span> <span class="ruby-operator">:</span> []&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-after_save'>
@@ -101,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_save-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 37</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@accessed_columns</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-ivar">@accessed_columns</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-initialize_copy'>
@@ -118,7 +116,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-initialize_copy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-initialize_copy-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize_copy</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@accessed_columns</span>, <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@accessed_columns</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@accessed_columns</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-initialize_copy-source'><span class="ruby-comment"># File lib/sequel/plugins/accessed_columns.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize_copy</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-identifier">other</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@accessed_columns</span>, <span class="ruby-constant">Hash</span>[<span class="ruby-ivar">@accessed_columns</span>]) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@accessed_columns</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -128,7 +126,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

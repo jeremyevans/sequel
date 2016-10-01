@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -65,7 +63,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-loose_count-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-loose_count-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_loose_count.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">loose_count</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_class</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:oid=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:reltuples</span>, <span class="ruby-constant">Integer</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-loose_count-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_loose_count.rb, line 28</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">loose_count</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">from</span>(<span class="ruby-value">:pg_class</span>).<span class="ruby-identifier">where</span>(<span class="ruby-value">:oid=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">regclass_oid</span>(<span class="ruby-identifier">table</span>)).<span class="ruby-identifier">get</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">cast</span>(<span class="ruby-value">:reltuples</span>, <span class="ruby-constant">Integer</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -75,7 +73,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

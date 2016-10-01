@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -154,7 +152,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 169</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:single_table_inheritance</span>, <span class="ruby-keyword">nil</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span> <span class="ruby-value">:lazy_attributes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -188,7 +186,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 185</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">SingleTableInheritance</span>.<span class="ruby-identifier">configure</span> <span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>], <span class="ruby-identifier">opts</span>&#x000A;&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@cti_models</span> = [<span class="ruby-keyword">self</span>]&#x000A;    <span class="ruby-ivar">@cti_tables</span> = [<span class="ruby-identifier">table_name</span>]&#x000A;    <span class="ruby-ivar">@cti_instance_dataset</span> = <span class="ruby-ivar">@instance_dataset</span>&#x000A;    <span class="ruby-ivar">@cti_table_columns</span> = <span class="ruby-identifier">columns</span>&#x000A;    <span class="ruby-ivar">@cti_table_map</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table_map</span>] <span class="ruby-operator">||</span> {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 184</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-constant">SingleTableInheritance</span>.<span class="ruby-identifier">configure</span> <span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:key</span>], <span class="ruby-identifier">opts</span>&#x000A;&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@cti_models</span> = [<span class="ruby-keyword">self</span>]&#x000A;    <span class="ruby-ivar">@cti_tables</span> = [<span class="ruby-identifier">table_name</span>]&#x000A;    <span class="ruby-ivar">@cti_instance_dataset</span> = <span class="ruby-ivar">@instance_dataset</span>&#x000A;    <span class="ruby-ivar">@cti_table_columns</span> = <span class="ruby-identifier">columns</span>&#x000A;    <span class="ruby-ivar">@cti_table_map</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:table_map</span>] <span class="ruby-operator">||</span> {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -198,7 +196,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

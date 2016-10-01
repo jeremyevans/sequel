@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -31,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-05-16 11:05:01 -0700</span>
+          <span class='datetime'>2016-09-29 14:25:10 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -208,7 +206,7 @@
             
             <pre class="ruby">{:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>} <span class="ruby-comment"># (&quot;column&quot; = 1)</span></pre>
             
-            <p>However, if you use in array as the hash value, it will usually be used to
+            <p>However, if you use an array as the hash value, it will usually be used to
             represent inclusion:</p>
             
             <pre class="ruby">{:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>, <span class="ruby-value">3</span>]} <span class="ruby-comment"># (&quot;column&quot; IN (1, 2, 3))</span></pre>
@@ -341,7 +339,7 @@
             href="../../classes/Sequel/SQL/Identifier.html">Sequel::SQL::Identifier</a>
             objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(:<span class="ruby-identifier">col__umn</span>)&#x000A;:<span class="ruby-identifier">col__umn</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># core_extensions extension</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">identifier</span>(:<span class="ruby-identifier">col__umn</span>)&#x000A;:<span class="ruby-identifier">col__umn</span>.<span class="ruby-identifier">identifier</span> <span class="ruby-comment"># core_extensions extension</span></pre>
             
             <h3 id="label-Sequel-3A-3ASQL-3A-3AQualifiedIdentifier"><a href="../../classes/Sequel/SQL/QualifiedIdentifier.html">Sequel::SQL::QualifiedIdentifier</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AQualifiedIdentifier">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -355,7 +353,7 @@
             href="../../classes/Sequel/SQL/QualifiedIdentifier.html">Sequel::SQL::QualifiedIdentifier</a>
             objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">table__column</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table__column</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
             <h3 id="label-Sequel-3A-3ASQL-3A-3AAliasedExpression"><a href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AAliasedExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -371,7 +369,7 @@
             href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a>
             objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column___alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>, [:<span class="ruby-identifier">column_alias1</span>, :<span class="ruby-identifier">column_alias2</span>])&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column___alias</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>, [:<span class="ruby-identifier">column_alias1</span>, :<span class="ruby-identifier">column_alias2</span>])&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
             <h3 id="label-Sequel-3A-3ASQL-3A-3AComplexExpression"><a href="../../classes/Sequel/SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AComplexExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -451,7 +449,7 @@
             href="../../classes/Sequel/SQL/ColumnAll.html">Sequel::SQL::ColumnAll</a>
             objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-operator">*</span>&#x000A;:<span class="ruby-identifier">table</span>.<span class="ruby-operator">*</span> <span class="ruby-comment"># core_extensions extension</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-operator">*</span>&#x000A;:<span class="ruby-identifier">table</span>.<span class="ruby-operator">*</span> <span class="ruby-comment"># core_extensions extension</span></pre>
             
             <h3 id="label-Sequel-3A-3ASQL-3A-3AConstant"><a href="../../classes/Sequel/SQL/Constant.html">Sequel::SQL::Constant</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AConstant">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -627,9 +625,9 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Wrapper</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">o</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (foo + 1)</span></pre>
             
-            <p>You can use the Sequel.expr method to wrap any object:</p>
+            <p>You can use the Sequel.[] method to wrap any object:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(<span class="ruby-identifier">o</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">o</span>]</pre>
             
             <p>However, note that that does not necessarily return a <a
             href="../../classes/Sequel/SQL/Wrapper.html">Sequel::SQL::Wrapper</a>
@@ -644,7 +642,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

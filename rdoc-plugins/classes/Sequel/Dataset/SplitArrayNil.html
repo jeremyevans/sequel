@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -66,7 +64,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-complex_expression_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/extensions/split_array_nil.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>&#x000A;  <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">any?</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:nil?</span>)&#x000A;    <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>)&#x000A;    <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">compact</span>&#x000A;    <span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>&#x000A;      <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IN</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IS</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;NOT IN&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;IS NOT&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">else</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/extensions/split_array_nil.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;<span class="ruby-keyword">when</span> <span class="ruby-value">:IN</span>, <span class="ruby-value">:&quot;NOT IN&quot;</span>&#x000A;  <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">any?</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:nil?</span>)&#x000A;    <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>)&#x000A;    <span class="ruby-identifier">vals</span> = <span class="ruby-identifier">vals</span>.<span class="ruby-identifier">compact</span>&#x000A;    <span class="ruby-identifier">c</span> = <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:IN</span>&#x000A;      <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IN</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:IS</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;NOT IN&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-identifier">vals</span>), <span class="ruby-identifier">c</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:&quot;IS NOT&quot;</span>, <span class="ruby-identifier">cols</span>, <span class="ruby-keyword">nil</span>)))&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">else</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -76,7 +74,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

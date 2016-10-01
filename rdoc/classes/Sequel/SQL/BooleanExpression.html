@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -113,7 +111,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-from_value_pairs-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-from_value_pairs-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1068</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">pairs</span>, <span class="ruby-identifier">op</span>=<span class="ruby-value">:AND</span>, <span class="ruby-identifier">negate</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-identifier">pairs</span> = <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">l</span>,<span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">from_value_pair</span>(<span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span>)}&#x000A;  <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ce</span><span class="ruby-operator">|</span> <span class="ruby-identifier">invert</span>(<span class="ruby-identifier">ce</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">negate</span>&#x000A;  <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">pairs</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-from_value_pairs-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1071</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">pairs</span>, <span class="ruby-identifier">op</span>=<span class="ruby-value">:AND</span>, <span class="ruby-identifier">negate</span>=<span class="ruby-keyword">false</span>)&#x000A;  <span class="ruby-identifier">pairs</span> = <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">l</span>,<span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">from_value_pair</span>(<span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span>)}&#x000A;  <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ce</span><span class="ruby-operator">|</span> <span class="ruby-identifier">invert</span>(<span class="ruby-identifier">ce</span>)} <span class="ruby-keyword">if</span> <span class="ruby-identifier">negate</span>&#x000A;  <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">pairs</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">new</span>(<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">pairs</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-invert'>
@@ -136,7 +134,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-invert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-invert-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1105</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">ce</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">BooleanExpression</span>&#x000A;    <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span> = <span class="ruby-identifier">ce</span>.<span class="ruby-identifier">op</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:AND</span>, <span class="ruby-value">:OR</span>&#x000A;      <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">OPERTATOR_INVERSIONS</span>[<span class="ruby-identifier">op</span>], <span class="ruby-operator">*</span><span class="ruby-identifier">ce</span>.<span class="ruby-identifier">args</span>.<span class="ruby-identifier">collect</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">a</span>)})&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">OPERTATOR_INVERSIONS</span>[<span class="ruby-identifier">op</span>], <span class="ruby-operator">*</span><span class="ruby-identifier">ce</span>.<span class="ruby-identifier">args</span>.<span class="ruby-identifier">dup</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">StringExpression</span>, <span class="ruby-constant">NumericExpression</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot invert #{ce.inspect}&quot;</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Constant</span>&#x000A;    <span class="ruby-constant">CONSTANT_INVERSIONS</span>[<span class="ruby-identifier">ce</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot invert #{ce.inspect}&quot;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOT</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-invert-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">ce</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">BooleanExpression</span>&#x000A;    <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span> = <span class="ruby-identifier">ce</span>.<span class="ruby-identifier">op</span>&#x000A;    <span class="ruby-keyword">when</span> <span class="ruby-value">:AND</span>, <span class="ruby-value">:OR</span>&#x000A;      <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">OPERTATOR_INVERSIONS</span>[<span class="ruby-identifier">op</span>], <span class="ruby-operator">*</span><span class="ruby-identifier">ce</span>.<span class="ruby-identifier">args</span>.<span class="ruby-identifier">collect</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">invert</span>(<span class="ruby-identifier">a</span>)})&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">OPERTATOR_INVERSIONS</span>[<span class="ruby-identifier">op</span>], <span class="ruby-operator">*</span><span class="ruby-identifier">ce</span>.<span class="ruby-identifier">args</span>.<span class="ruby-identifier">dup</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">StringExpression</span>, <span class="ruby-constant">NumericExpression</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot invert #{ce.inspect}&quot;</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Constant</span>&#x000A;    <span class="ruby-constant">CONSTANT_INVERSIONS</span>[<span class="ruby-identifier">ce</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;cannot invert #{ce.inspect}&quot;</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:NOT</span>, <span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -154,7 +152,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-26-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-26-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-26-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1127</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">&amp;</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:AND</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_boolean'>
@@ -171,7 +169,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_boolean-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_boolean-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_boolean</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_boolean-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1137</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_boolean</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-7C'>
@@ -188,7 +186,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-7C-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-7C-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">|</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">ce</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -198,7 +196,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

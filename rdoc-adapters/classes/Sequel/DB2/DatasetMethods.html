@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -195,7 +193,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cast_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cast_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 290</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST_STRING_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST_STRING_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cast_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 291</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cast_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>, <span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">if</span>(<span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-constant">String</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST_STRING_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">expr</span>)&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST_STRING_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-complex_expression_sql_append'>
@@ -211,7 +209,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-complex_expression_sql_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 300</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>, <span class="ruby-value">:|</span>, <span class="ruby-value">:^</span>, <span class="ruby-value">:%</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>&#x000A;    <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&#39;B~&#39;</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:BITNOT</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>).<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-complex_expression_sql_append-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 301</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">complex_expression_sql_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&amp;</span>, <span class="ruby-value">:|</span>, <span class="ruby-value">:^</span>, <span class="ruby-value">:%</span>, <span class="ruby-value">:&lt;&lt;</span>, <span class="ruby-value">:&gt;&gt;</span>&#x000A;    <span class="ruby-identifier">complex_expression_emulate_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">op</span>, <span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:&#39;B~&#39;</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:BITNOT</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>))&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-value">:extract</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>).<span class="ruby-identifier">to_s</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_OPEN</span>&#x000A;    <span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">args</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">1</span>))&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">PAREN_CLOSE</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_cte-3F'>
@@ -227,7 +225,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_cte-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_cte-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 316</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;  <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_cte-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 317</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_cte?</span>(<span class="ruby-identifier">type</span>=<span class="ruby-value">:select</span>)&#x000A;  <span class="ruby-identifier">type</span> <span class="ruby-operator">==</span> <span class="ruby-value">:select</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_group_cube-3F'>
@@ -244,7 +242,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_group_cube-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_group_cube-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 321</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_group_cube?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_group_cube-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 322</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_group_cube?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_group_rollup-3F'>
@@ -261,7 +259,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_group_rollup-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_group_rollup-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 326</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_group_rollup?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_group_rollup-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 327</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_group_rollup?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_grouping_sets-3F'>
@@ -278,7 +276,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_grouping_sets-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_grouping_sets-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 331</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_grouping_sets?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_grouping_sets-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 332</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_grouping_sets?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_is_true-3F'>
@@ -295,7 +293,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_is_true-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 336</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_is_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 337</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_is_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_lateral_subqueries-3F'>
@@ -312,7 +310,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_lateral_subqueries-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_lateral_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 341</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_lateral_subqueries?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_lateral_subqueries-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 342</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_lateral_subqueries?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_multiple_column_in-3F'>
@@ -329,7 +327,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_multiple_column_in-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 346</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_multiple_column_in-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 347</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_multiple_column_in?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_select_all_and_column-3F'>
@@ -347,7 +345,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_select_all_and_column-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_select_all_and_column-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 351</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_select_all_and_column?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_select_all_and_column-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 352</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_select_all_and_column?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_timestamp_usecs-3F'>
@@ -365,7 +363,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_timestamp_usecs-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_timestamp_usecs-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 356</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_timestamp_usecs?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_timestamp_usecs-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 357</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_timestamp_usecs?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_where_true-3F'>
@@ -382,7 +380,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_where_true-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_where_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 366</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_where_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_where_true-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 367</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_where_true?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_window_functions-3F'>
@@ -399,7 +397,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_window_functions-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_window_functions-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 361</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_window_functions?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_window_functions-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 362</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_window_functions?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -409,7 +407,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

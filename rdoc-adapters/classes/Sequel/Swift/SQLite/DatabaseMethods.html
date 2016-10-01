@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -99,7 +97,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">c</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">s</span>)}}&#x000A;  <span class="ruby-identifier">c</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 28</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">c</span> = <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">connection_pragmas</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">log_connection_yield</span>(<span class="ruby-identifier">s</span>, <span class="ruby-identifier">c</span>){<span class="ruby-identifier">c</span>.<span class="ruby-identifier">execute</span>(<span class="ruby-identifier">s</span>)}}&#x000A;  <span class="ruby-identifier">c</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-database_error_regexps'>
@@ -115,7 +113,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_error_regexps-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-database_error_regexps-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_error_regexps</span>&#x000A;  <span class="ruby-constant">DATABASE_ERROR_REGEXPS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-database_error_regexps-source'><span class="ruby-comment"># File lib/sequel/adapters/swift/sqlite.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_error_regexps</span>&#x000A;  <span class="ruby-constant">DATABASE_ERROR_REGEXPS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -125,7 +123,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

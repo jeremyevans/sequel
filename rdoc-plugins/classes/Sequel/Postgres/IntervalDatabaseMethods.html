@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -66,7 +64,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>DURATION_UNITS</td>
                     <td>=</td>
-                    <td class='context-item-value'>[:years, :months, :days, :minutes, :seconds].freeze</td>
+                    <td class='context-item-value'>[:years, :months, :weeks, :days, :hours, :minutes, :seconds].freeze</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
@@ -108,7 +106,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-extended-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">IntervalDatasetMethods</span>)&#x000A;    <span class="ruby-identifier">copy_conversion_procs</span>([<span class="ruby-value">1186</span>, <span class="ruby-value">1187</span>])&#x000A;    <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:interval</span>] = <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb, line 123</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">extend_datasets</span>(<span class="ruby-constant">IntervalDatasetMethods</span>)&#x000A;    <span class="ruby-identifier">copy_conversion_procs</span>([<span class="ruby-value">1186</span>, <span class="ruby-value">1187</span>])&#x000A;    <span class="ruby-ivar">@schema_type_classes</span>[<span class="ruby-value">:interval</span>] = <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-literal_duration'>
@@ -126,7 +124,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-literal_duration-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-literal_duration-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb, line 49</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">duration</span>)&#x000A;  <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>)&#x000A;  <span class="ruby-identifier">duration</span>.<span class="ruby-identifier">parts</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">unit</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">unit</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">value</span>}&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;&#x000A;  <span class="ruby-constant">DURATION_UNITS</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">unit</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">unit</span>]) <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>&#x000A;      <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{v.is_a?(Integer) ? v : sprintf(&#39;%0.6f&#39;, v)} #{unit} &quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-constant">EMPTY_INTERVAL</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-literal_duration-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb, line 48</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">duration</span>)&#x000A;  <span class="ruby-identifier">h</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">0</span>)&#x000A;  <span class="ruby-identifier">duration</span>.<span class="ruby-identifier">parts</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">unit</span>, <span class="ruby-identifier">value</span><span class="ruby-operator">|</span> <span class="ruby-identifier">h</span>[<span class="ruby-identifier">unit</span>] <span class="ruby-operator">+=</span> <span class="ruby-identifier">value</span>}&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;&#x000A;  <span class="ruby-constant">DURATION_UNITS</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">unit</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">v</span> = <span class="ruby-identifier">h</span>[<span class="ruby-identifier">unit</span>]) <span class="ruby-operator">!=</span> <span class="ruby-value">0</span>&#x000A;      <span class="ruby-identifier">s</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{v.is_a?(Integer) ? v : sprintf(&#39;%0.6f&#39;, v)} #{unit} &quot;</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">s</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-constant">EMPTY_INTERVAL</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -144,7 +142,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-bound_variable_arg-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb, line 133</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;    <span class="ruby-constant">IntervalDatabaseMethods</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-bound_variable_arg-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_interval.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bound_variable_arg</span>(<span class="ruby-identifier">arg</span>, <span class="ruby-identifier">conn</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">arg</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">ActiveSupport</span><span class="ruby-operator">::</span><span class="ruby-constant">Duration</span>&#x000A;    <span class="ruby-constant">IntervalDatabaseMethods</span>.<span class="ruby-identifier">literal_duration</span>(<span class="ruby-identifier">arg</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -154,7 +152,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

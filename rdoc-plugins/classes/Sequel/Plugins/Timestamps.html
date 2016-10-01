@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -79,7 +77,10 @@
                   <p>Configure the plugin by setting the available options.  Note that if this
                   method is run more than once, previous settings are ignored, and it will
                   just use the settings given or the default settings.  Options:</p>
-                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:create </td><td>
+                  <table class="rdoc-list note-list"><tbody><tr><td class='label'>:allow_manual_update </td><td>
+                  <p>Whether to skip setting the update timestamp if it has been modified
+                  manually (default: false)</p>
+                  </td></tr><tr><td class='label'>:create </td><td>
                   <p>The field to hold the create timestamp (default: :created_at)</p>
                   </td></tr><tr><td class='label'>:force </td><td>
                   <p>Whether to overwrite an existing create timestamp (default: false)</p>
@@ -94,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:create</span>]<span class="ruby-operator">||</span><span class="ruby-value">:created_at</span>&#x000A;    <span class="ruby-ivar">@update_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]<span class="ruby-operator">||</span><span class="ruby-value">:updated_at</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@set_update_timestamp_on_create</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update_on_create</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/timestamps.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@allow_manual_timestamp_update</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:allow_manual_update</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:create</span>]<span class="ruby-operator">||</span><span class="ruby-value">:created_at</span>&#x000A;    <span class="ruby-ivar">@update_timestamp_field</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update</span>]<span class="ruby-operator">||</span><span class="ruby-value">:updated_at</span>&#x000A;    <span class="ruby-ivar">@create_timestamp_overwrite</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:force</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-ivar">@set_update_timestamp_on_create</span> = <span class="ruby-identifier">opts</span>[<span class="ruby-value">:update_on_create</span>]<span class="ruby-operator">||</span><span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -104,7 +105,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

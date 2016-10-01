@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -105,7 +103,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:as400</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 28</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:as400</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-last_insert_id'>
@@ -122,7 +120,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-last_insert_id-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-last_insert_id-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">last_insert_id</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-last_insert_id-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">last_insert_id</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_transaction_isolation_levels-3F'>
@@ -139,7 +137,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_transaction_isolation_levels-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_transaction_isolation_levels-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_transaction_isolation_levels?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_transaction_isolation_levels-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/as400.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_transaction_isolation_levels?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -149,7 +147,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

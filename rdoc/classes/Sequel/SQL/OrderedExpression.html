@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -134,7 +132,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1600</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span> = <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@descending</span>, <span class="ruby-ivar">@nulls</span> = <span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:nulls</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1603</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span> = <span class="ruby-keyword">true</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-ivar">@expression</span>, <span class="ruby-ivar">@descending</span>, <span class="ruby-ivar">@nulls</span> = <span class="ruby-identifier">expression</span>, <span class="ruby-identifier">descending</span>, <span class="ruby-identifier">opts</span>[<span class="ruby-value">:nulls</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -152,7 +150,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-asc-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-asc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1605</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">asc</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">:nulls=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-asc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1608</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">asc</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">false</span>, <span class="ruby-value">:nulls=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-desc'>
@@ -169,7 +167,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-desc-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-desc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1610</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">desc</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">:nulls=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-desc-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1613</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">desc</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-keyword">true</span>, <span class="ruby-value">:nulls=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@nulls</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-invert'>
@@ -187,7 +185,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-invert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-invert-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1615</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">invert</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-operator">!</span><span class="ruby-ivar">@descending</span>, <span class="ruby-value">:nulls=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">INVERT_NULLS</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-ivar">@nulls</span>, <span class="ruby-ivar">@nulls</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-invert-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1618</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">invert</span>&#x000A;  <span class="ruby-constant">OrderedExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@expression</span>, <span class="ruby-operator">!</span><span class="ruby-ivar">@descending</span>, <span class="ruby-value">:nulls=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">INVERT_NULLS</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-ivar">@nulls</span>, <span class="ruby-ivar">@nulls</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -197,7 +195,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

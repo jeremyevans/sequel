@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -110,7 +108,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_delete_pk-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cache_delete_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_delete_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_delete</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cache_delete_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_delete_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_delete</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-cache_get_pk'>
@@ -128,7 +126,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_get_pk-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cache_get_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 65</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cache_get_pk-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 64</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_get_pk</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-cache_key'>
@@ -145,7 +143,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cache_key-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-node">&quot;#{cache_key_prefix}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cache_key-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key</span>(<span class="ruby-identifier">pk</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;no primary key for this record&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">pk</span>.<span class="ruby-identifier">all?</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">pk</span>&#x000A;  <span class="ruby-node">&quot;#{cache_key_prefix}:#{Array(pk).join(&#39;,&#39;)}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-cache_key_prefix'>
@@ -162,7 +160,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-cache_key_prefix-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-cache_key_prefix-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 70</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key_prefix</span>&#x000A;  <span class="ruby-node">&quot;#{self}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-cache_key_prefix-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">cache_key_prefix</span>&#x000A;  <span class="ruby-node">&quot;#{self}&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_cache_ttl'>
@@ -180,7 +178,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_cache_ttl-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_cache_ttl-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 83</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;  <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_cache_ttl-source'><span class="ruby-comment"># File lib/sequel/plugins/caching.rb, line 82</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_cache_ttl</span>(<span class="ruby-identifier">ttl</span>)&#x000A;  <span class="ruby-ivar">@cache_ttl</span> = <span class="ruby-identifier">ttl</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -190,7 +188,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

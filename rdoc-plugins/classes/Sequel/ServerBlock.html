@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -72,7 +70,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-extended-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/server_block.rb, line 51</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">pool</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">ShardedThreadedConnectionPool</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">ShardedThreadedConnectionPool</span>)&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">ThreadedServerBlock</span>)&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, {})&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">UnthreadedServerBlock</span>)&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, [])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/extensions/server_block.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">pool</span> = <span class="ruby-identifier">db</span>.<span class="ruby-identifier">pool</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-keyword">defined?</span>(<span class="ruby-constant">ShardedThreadedConnectionPool</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">ShardedThreadedConnectionPool</span>)&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">ThreadedServerBlock</span>)&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, {})&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">UnthreadedServerBlock</span>)&#x000A;    <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@default_servers</span>, [])&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -90,7 +88,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_server-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_server-source'><span class="ruby-comment"># File lib/sequel/extensions/server_block.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_server-source'><span class="ruby-comment"># File lib/sequel/extensions/server_block.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">pool</span>.<span class="ruby-identifier">with_server</span>(<span class="ruby-identifier">server</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -100,7 +98,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

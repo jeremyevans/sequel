@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -63,6 +61,20 @@
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CONNECTION_OK</td>
+                    <td>=</td>
+                    <td class='context-item-value'>-1</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='methods'>
               <h2>Public Class methods</h2>
               <div class='method public-class' id='method-method-c-unescape_bytea'>
@@ -80,7 +92,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-unescape_bytea-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-unescape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;bytea unescaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr.&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-unescape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 62</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;bytea unescaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr.&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -97,7 +109,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-block-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-block-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">block</span>(<span class="ruby-identifier">timeout</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-block-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 71</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">block</span>(<span class="ruby-identifier">timeout</span>=<span class="ruby-keyword">nil</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-escape_bytea'>
@@ -118,7 +130,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-escape_bytea-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-escape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">escape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-escape_bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">escape_bytea</span>(<span class="ruby-identifier">obj</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-escape_string'>
@@ -137,7 +149,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-escape_string-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-escape_string-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_string</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&quot;&#39;&quot;</span>, <span class="ruby-string">&quot;&#39;&#39;&quot;</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">str</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-escape_string-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 22</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">escape_string</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Postgres</span>.<span class="ruby-identifier">force_standard_strings</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">str</span>.<span class="ruby-identifier">gsub</span>(<span class="ruby-string">&quot;&#39;&quot;</span>, <span class="ruby-string">&quot;&#39;&#39;&quot;</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">escape</span>(<span class="ruby-identifier">str</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-status'>
@@ -153,7 +165,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-status-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-status-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">status</span>&#x000A;  <span class="ruby-constant">CONNECTION_OK</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-status-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">status</span>&#x000A;  <span class="ruby-constant">CONNECTION_OK</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -163,7 +175,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

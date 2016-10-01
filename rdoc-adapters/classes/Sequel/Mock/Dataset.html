@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -111,7 +109,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 365</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 320</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -127,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 374</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 329</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -137,7 +135,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

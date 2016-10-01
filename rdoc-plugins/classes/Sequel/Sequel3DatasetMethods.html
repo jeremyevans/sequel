@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -117,7 +115,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-5B-5D-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-5B-5D-3D-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]=</span>(<span class="ruby-identifier">conditions</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">filter</span>(<span class="ruby-identifier">conditions</span>).<span class="ruby-identifier">update</span>(<span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-5B-5D-3D-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">[]=</span>(<span class="ruby-identifier">conditions</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">filter</span>(<span class="ruby-identifier">conditions</span>).<span class="ruby-identifier">update</span>(<span class="ruby-identifier">values</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-insert_multiple'>
@@ -140,7 +138,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-insert_multiple-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-insert_multiple-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_multiple</span>(<span class="ruby-identifier">array</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>))}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">i</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-insert_multiple-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">insert_multiple</span>(<span class="ruby-identifier">array</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>))}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-identifier">insert</span>(<span class="ruby-identifier">i</span>)}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-qualify_to'>
@@ -161,7 +159,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-qualify_to-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-qualify_to-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 76</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualify_to</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">table</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-qualify_to-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualify_to</span>(<span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">table</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-qualify_to_first_source'>
@@ -183,7 +181,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-qualify_to_first_source-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-qualify_to_first_source-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualify_to_first_source</span>&#x000A;  <span class="ruby-identifier">qualify</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-qualify_to_first_source-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualify_to_first_source</span>&#x000A;  <span class="ruby-identifier">qualify</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set'>
@@ -201,7 +199,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">update</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">update</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_csv'>
@@ -226,7 +224,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_csv-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_csv-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 111</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_csv</span>(<span class="ruby-identifier">include_column_titles</span> = <span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-identifier">n</span> = <span class="ruby-identifier">naked</span>&#x000A;  <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">n</span>.<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-identifier">csv</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{cols.join(COMMA)}\r\n&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">include_column_titles</span>&#x000A;  <span class="ruby-identifier">n</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{cols.collect{|c| r[c]}.join(COMMA)}\r\n&quot;</span>}&#x000A;  <span class="ruby-identifier">csv</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_csv-source'><span class="ruby-comment"># File lib/sequel/extensions/sequel_3_dataset_methods.rb, line 110</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_csv</span>(<span class="ruby-identifier">include_column_titles</span> = <span class="ruby-keyword">true</span>)&#x000A;  <span class="ruby-identifier">n</span> = <span class="ruby-identifier">naked</span>&#x000A;  <span class="ruby-identifier">cols</span> = <span class="ruby-identifier">n</span>.<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-identifier">csv</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{cols.join(COMMA)}\r\n&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">include_column_titles</span>&#x000A;  <span class="ruby-identifier">n</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span> <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot;#{cols.collect{|c| r[c]}.join(COMMA)}\r\n&quot;</span>}&#x000A;  <span class="ruby-identifier">csv</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -236,7 +234,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

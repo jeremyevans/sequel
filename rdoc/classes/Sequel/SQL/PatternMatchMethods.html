@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -45,13 +43,13 @@
             return when using a hash with a single entry, where the receiver was the
             key and the argument was the value. Example:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-operator">=~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a = 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NULL)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">=~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a = 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">=~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">=~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NULL)</span></pre>
             
             <p>On Ruby 1.9+, this also adds the !~ method, for easily setting up not
             equals, exclusion, and inverse pattern matching.  This is the same as as
             inverting the result of the =~ method</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-operator">!~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a NOT IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a</span>) <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NOT NULL)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">!~</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (a != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">!~</span> [<span class="ruby-value">1</span>, <span class="ruby-value">2</span>] <span class="ruby-comment"># (a NOT IN [1, 2])</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a</span>] <span class="ruby-operator">!~</span> <span class="ruby-keyword">nil</span> <span class="ruby-comment"># (a IS NOT NULL)</span></pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
@@ -80,7 +78,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-3D-7E-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-3D-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 839</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">=~</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-3D-7E-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 842</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">=~</span>(<span class="ruby-identifier">other</span>)&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:from_value_pair</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">other</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -90,7 +88,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -31,12 +29,54 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-01 11:38:43 -0700</span>
+          <span class='datetime'>2016-09-30 10:05:47 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.39.0+-282016-10-01-29">4.39.0 (2016-10-01)<span><a href="#label-4.39.0+-282016-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make active_model plugin use rollback_checker instead of after_rollback
+            hook (jeremyevans)</p>
+            </li><li>
+            <p>Add Database#rollback_checker, which returns a proc that returns whether
+            the in progress transaction is rolled back (jeremyevans)</p>
+            </li><li>
+            <p>Add <a
+            href="../classes/Sequel/Database.html#method-c-set_shared_adapter_scheme">Sequel::Database.set_shared_adapter_scheme</a>
+            to allow external adapters to support the mock adapter (jeremyevans)</p>
+            </li><li>
+            <p>Make hook_class_methods plugin not use after commit/rollback model hooks
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support add_column :after and :first options on MySQL (AnthonyBobsin,
+            jeremyevans) (#1234)</p>
+            </li><li>
+            <p>Support ActiveSupport 5 in pg_interval extension when weeks/hours are used
+            in ActiveSupport::Duration objects (chanks) (#1233)</p>
+            </li><li>
+            <p>Support IntegerMigrator :relative option, for running only the specified
+            number of migrations up or down (jeremyevans)</p>
+            </li><li>
+            <p>Make the touch plugin also touch associations on create in addition to
+            update and delete (jeremyevans)</p>
+            </li><li>
+            <p>Add :allow_manual_update timestamps plugin option for not overriding a
+            manually set update timestamp (jeremyevans)</p>
+            </li><li>
+            <p>Add Sequel.[] as an alias to Sequel.expr, for easier expression creation
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add PostgreSQL full_text_search :to_tsquery=&gt;:phrase option, for using
+            PostgreSQL 9.6+ full text search phrase searching (jeremyevans)</p>
+            </li><li>
+            <p>Add JSONBOp#insert in pg_json_ops extension, for jsonb_insert support on
+            PostgreSQL 9.6+ (jeremyevans)</p>
+            </li><li>
+            <p>Support add_column :if_not_exists option on PostgreSQL 9.6+ (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.38.0+-282016-09-01-29">4.38.0 (2016-09-01)<span><a href="#label-4.38.0+-282016-09-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
@@ -8778,7 +8818,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

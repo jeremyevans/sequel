@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -140,7 +138,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-subclass-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-subclass-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 163</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">subclass</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>&#x000A;    <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-subclass-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 162</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">subclass</span>(<span class="ruby-identifier">db_type</span>, <span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-constant">Class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@db_type</span> = <span class="ruby-identifier">db_type</span>&#x000A;    <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -160,7 +158,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-check_columns-21-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-check_columns-21-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 196</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_columns!</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot literalize HashRow without columns&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-check_columns-21-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 195</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">check_columns!</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;cannot literalize HashRow without columns&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-columns'>
@@ -178,7 +176,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 183</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-ivar">@columns</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">columns</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 182</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-ivar">@columns</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">columns</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-db_type'>
@@ -196,7 +194,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-db_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-db_type-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 189</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_type</span>&#x000A;  <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-db_type-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 188</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_type</span>&#x000A;  <span class="ruby-ivar">@db_type</span> <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">db_type</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -214,7 +212,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 203</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">check_columns!</span>&#x000A;  <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">ROW</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_row.rb, line 202</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">check_columns!</span>&#x000A;  <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">ROW</span>&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">values_at</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">db_type</span>&#x000A;    <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">CAST</span>&#x000A;    <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">quote_schema_table_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">db_type</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -224,7 +222,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

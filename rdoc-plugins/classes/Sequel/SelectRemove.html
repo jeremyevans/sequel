@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -72,7 +70,7 @@
                   names for all columns the dataset returns, except for the columns given.</p>
                   </li><li>
                   <p>This dataset has an existing explicit selection containing an item that
-                  returns multiple database columns (e.g. Sequel.expr(:table).*,
+                  returns multiple database columns (e.g. <a href=":table">Sequel</a>.*,
                   Sequel.lit(&#39;column1, column2&#39;)).  In this case, the behavior is
                   undefined and this method should not be used.</p>
                   </li></ul>
@@ -84,7 +82,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-select_remove-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-select_remove-source'><span class="ruby-comment"># File lib/sequel/extensions/select_remove.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">select_remove</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sel</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">sel</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">sel</span>).<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>} <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-select_remove-source'><span class="ruby-comment"># File lib/sequel/extensions/select_remove.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">select_remove</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sel</span> = <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:select</span>]) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">sel</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span>.<span class="ruby-identifier">zip</span>(<span class="ruby-identifier">sel</span>).<span class="ruby-identifier">reject</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">c</span>)}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span>, <span class="ruby-identifier">s</span><span class="ruby-operator">|</span> <span class="ruby-identifier">s</span>} <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">select</span>(<span class="ruby-operator">*</span>(<span class="ruby-identifier">columns</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">cols</span>))&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -94,7 +92,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

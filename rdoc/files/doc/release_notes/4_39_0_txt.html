@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.39.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.39.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.39.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2016-09-30 10:05:47 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Sequel.[] has been added as an alias to Sequel.expr. This makes it a little
+            easier to get Sequel-specific objects:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-operator">*</span>                  <span class="ruby-comment"># &quot;table&quot;.*</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table__column</span>].<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span>               <span class="ruby-comment"># (&quot;column&quot; + 1)</span></pre>
+            </li><li>
+            <p>The timestamps plugin now supports an :allow_manual_update option. If this
+            option is used, the timestamps plugin will not override the  update
+            timestamp when saving if the user has modified it since retrieving the
+            object.</p>
+            </li><li>
+            <p>The touch plugin now also touches associations on create in addition to
+            update and delete.</p>
+            </li><li>
+            <p>The IntegerMigrator now supports a :relative option, which will migrate
+            that many migrations up (for positive numbers) or down (for negative
+            numbers).</p>
+            </li><li>
+            <p>Database#rollback_checker has been added, which returns a callable that can
+            be called later to determine whether the transaction ended up committing or
+            rolling back.  So if you may need to check transaction status at some
+            future point, and don&#39;t need immediate action on rollback/commit, it is
+            better to use a rollback checker than to add an after commit/rollback hook.</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">rbc</span> = <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">rbc</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_checker</span>&#x000A;  <span class="ruby-identifier">rbc</span>.<span class="ruby-identifier">call</span> <span class="ruby-comment">#=&gt; nil</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">rbc</span>.<span class="ruby-identifier">call</span> <span class="ruby-comment"># =&gt; false</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">transaction</span>(:<span class="ruby-identifier">rollback=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">always</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">rbc</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">rollback_checker</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-identifier">rbc</span>.<span class="ruby-identifier">call</span> <span class="ruby-comment"># =&gt; true</span></pre>
+            </li><li>
+            <p>The add_column schema method now supports an :if_not_exists option on
+            PostgreSQL 9.6+, which will only add the column if it does not already
+            exist:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">t</span>, :<span class="ruby-identifier">c</span>, <span class="ruby-constant">Integer</span>, :<span class="ruby-identifier">if_not_exists=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-comment"># ALTER TABLE &quot;t&quot; ADD COLUMN IF NOT EXISTS &quot;c&quot; integer</span></pre>
+            </li><li>
+            <p>The add_column schema method now supports an :after and :first option on
+            MySQL to add the column after an existing column or as the first column:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">t</span>, :<span class="ruby-identifier">c</span>, <span class="ruby-constant">Integer</span>, :<span class="ruby-identifier">first=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c` integer FIRST</span>&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">add_column</span> :<span class="ruby-identifier">t</span>, :<span class="ruby-identifier">c1</span>, <span class="ruby-constant">Integer</span>, :<span class="ruby-identifier">after=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">c2</span>&#x000A;<span class="ruby-comment"># ALTER TABLE `t` ADD COLUMN `c1` integer AFTER `c2`</span></pre>
+            </li><li>
+            <p>JSONBOp#insert has been added to the pg_json_ops extension, which supports
+            the new jsonb_insert function added in PostgreSQL 9.6+:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_jsonb_op</span>(:<span class="ruby-identifier">c</span>).<span class="ruby-identifier">insert</span>(<span class="ruby-node">%w&#39;0 a&#39;</span>, <span class="ruby-string">&#39;a&#39;</span>=<span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-comment"># jsonb_insert(&quot;c&quot;, ARRAY[&#39;0&#39;,&#39;a&#39;], &#39;{&quot;a&quot;:1}&#39;::jsonb, false)</span></pre>
+            </li><li>
+            <p>Dataset#full_text_search on PostgreSQL now supports a
+            :to_tsquery=&gt;:phrase option, to enable the native phrase searching added
+            in PostgreSQL 9.6+:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">t</span>].<span class="ruby-identifier">full_text_search</span>(:<span class="ruby-identifier">c</span>, <span class="ruby-string">&#39;foo bar&#39;</span>, :<span class="ruby-identifier">to_tsquery=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">phrase</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM &quot;t&quot;</span>&#x000A;<span class="ruby-comment"># WHERE</span>&#x000A;<span class="ruby-comment">#   (to_tsvector(CAST(&#39;simple&#39; AS regconfig), (COALESCE(&quot;c&quot;, &#39;&#39;)))</span>&#x000A;<span class="ruby-comment">#   @@ phraseto_tsquery(CAST(&#39;simple&#39; AS regconfig), &#39;foo bar&#39;))</span></pre>
+            </li><li>
+            <p><a
+            href="../../../classes/Sequel/Database.html#method-c-set_shared_adapter_scheme">Sequel::Database.set_shared_adapter_scheme</a>
+            has been added, allowing external adapters to add support for Sequel&#39;s
+            mock adapter. External adapters should have a shared adapter requirable at
+            sequel/adapters/shared/adapter_name, that uses the following format:</p>
+            
+            <pre class="ruby"><span class="ruby-comment"># in sequel/adapters/shared/mydb</span>&#x000A;<span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">MyDB</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Database</span>.<span class="ruby-identifier">set_shared_adapter_scheme</span> :<span class="ruby-identifier">mydb</span>, <span class="ruby-keyword">self</span>&#x000A;&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;    <span class="ruby-comment"># Any mock-adapter specific setup to perform on the</span>&#x000A;    <span class="ruby-comment"># given Database instance</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">module</span> <span class="ruby-constant">DatabaseMethods</span>&#x000A;    <span class="ruby-comment"># methods for all Database objects using this adapter</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">module</span> <span class="ruby-constant">DatasetMethods</span>&#x000A;    <span class="ruby-comment"># methods for all Dataset objects using this adapter</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>The hook_class_methods plugin only adds a Database transaction hook if one
+            of the after commit/rollback hook class methods is actually used.  This
+            means that loading the plugin no longer keeps all saved/deleted objects in
+            memory until transaction commit.</p>
+            </li><li>
+            <p>The active_model plugin now uses a rollback checker instead of an
+            after_rollback hook, so models that use the active_model plugin no longer
+            store all saved model instances in memory until transaction commit.</p>
+            </li><li>
+            <p>When using the IntegerMigrator, attempting to migrate to a migration number
+            above the maximum will now migrate to the lastest version, and attempting
+            to migrate to a migration number below 0 will now migrate all the way down.</p>
+            </li><li>
+            <p>The pg_interval extension now supports ActiveSupport::Duration objects that
+            use week and hour parts (new in ActiveSupport 5).</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>The change to the touch plugin to touch associations on create could
+            possibly affect existing behavior, so if you are using this plugin, you
+            should test that this does not cause any problems.</p>
+            </li><li>
+            <p>External adapters that tried to add support for the mock adapter now need
+            to update their code to use the new <a
+            href="../../../classes/Sequel/Database.html#method-c-set_shared_adapter_scheme">Sequel::Database.set_shared_adapter_scheme</a>
+            method.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

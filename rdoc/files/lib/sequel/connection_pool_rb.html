@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -38,7 +36,37 @@
         <div id='text'>
           <div id='description'>
             
-            <p>frozen-string-literal: true</p>
+            <p>The base connection pool class, which all other connection pools are based
+            on.  This class is not instantiated directly, but subclasses should at the
+            very least implement the following API:</p>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>initialize(Database, Hash) </td><td>
+            <p>Initialize using the passed <a
+            href="../../../classes/Sequel/Database.html">Sequel::Database</a> object
+            and options hash.</p>
+            </td></tr><tr><td class='label'>hold(Symbol, &amp;block) </td><td>
+            <p>Yield a connection object (obtained from calling the block passed to
+            <code>initialize</code>) to the current block. For sharded connection
+            pools, the Symbol passed is the shard/server to use.</p>
+            </td></tr><tr><td class='label'>disconnect(Symbol) </td><td>
+            <p>Disconnect the connection object.  For sharded connection pools, the Symbol
+            passed is the shard/server to use.</p>
+            </td></tr><tr><td class='label'>servers </td><td>
+            <p>An array of shard/server symbols for all shards/servers that this
+            connection pool recognizes.</p>
+            </td></tr><tr><td class='label'>size </td><td>
+            <p>an integer representing the total number of connections in the pool, or for
+            the given shard/server if sharding is supported.</p>
+            </td></tr><tr><td class='label'>max_size </td><td>
+            <p>an integer representing the maximum size of the connection pool, or the
+            maximum size per shard/server if sharding is supported.</p>
+            </td></tr></tbody></table>
+            
+            <p>For sharded connection pools, the sharded API adds the following methods:</p>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>add_servers(Array of Symbols) </td><td>
+            <p>start recognizing all shards/servers specified by the array of symbols.</p>
+            </td></tr><tr><td class='label'>remove_servers(Array of Symbols) </td><td>
+            <p>no longer recognize all shards/servers specified by the array of symbols.</p>
+            </td></tr></tbody></table>
           </div>
           <div id='context'>
           </div>
@@ -47,7 +75,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

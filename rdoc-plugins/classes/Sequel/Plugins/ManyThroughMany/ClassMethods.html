@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -99,7 +97,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-many_through_many-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-many_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 205</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">many_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-many_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 204</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">many_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:many_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-one_through_many'>
@@ -120,7 +118,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-one_through_many-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-one_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 210</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-one_through_many-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 209</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">one_through_many</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">through</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">associate</span>(<span class="ruby-value">:one_through_many</span>, <span class="ruby-identifier">name</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">through</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">through</span> <span class="ruby-operator">:</span> {<span class="ruby-value">:through=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">through</span>}), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -130,7 +128,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

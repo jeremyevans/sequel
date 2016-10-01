@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -82,7 +80,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 164</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>&#x000A;  <span class="ruby-ivar">@actions</span> = []&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 163</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>&#x000A;  <span class="ruby-ivar">@actions</span> = []&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -101,7 +99,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-reverse-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-reverse-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 171</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">rescue</span>&#x000A;    <span class="ruby-identifier">just_raise</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">just_raise</span>&#x000A;    <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;irreversible migration method used, you may need to write your own down method&#39;</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">actions</span> = <span class="ruby-ivar">@actions</span>.<span class="ruby-identifier">reverse</span>&#x000A;    <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">actions</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Proc</span>)&#x000A;          <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">a</span>.<span class="ruby-identifier">pop</span>&#x000A;          <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>)&#x000A;        <span class="ruby-keyword">else</span>&#x000A;          <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-reverse-source'><span class="ruby-comment"># File lib/sequel/extensions/migration.rb, line 170</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reverse</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">instance_eval</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">rescue</span>&#x000A;    <span class="ruby-identifier">just_raise</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">just_raise</span>&#x000A;    <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span>{<span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;irreversible migration method used, you may need to write your own down method&#39;</span>}&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">actions</span> = <span class="ruby-ivar">@actions</span>.<span class="ruby-identifier">reverse</span>&#x000A;    <span class="ruby-constant">Proc</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword">do</span>&#x000A;      <span class="ruby-identifier">actions</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;        <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Proc</span>)&#x000A;          <span class="ruby-identifier">pr</span> = <span class="ruby-identifier">a</span>.<span class="ruby-identifier">pop</span>&#x000A;          <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">pr</span>)&#x000A;        <span class="ruby-keyword">else</span>&#x000A;          <span class="ruby-identifier">send</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">a</span>)&#x000A;        <span class="ruby-keyword">end</span>&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -111,7 +109,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

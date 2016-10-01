@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -165,7 +163,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-_load-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-_load-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 208</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">_load</span>(<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-constant">Hash</span>[<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">args</span>)])&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-_load-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 207</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">_load</span>(<span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-constant">Hash</span>[<span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">load</span>(<span class="ruby-identifier">args</span>)])&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-parse'>
@@ -183,7 +181,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-parse-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-parse-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 214</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-constant">Parser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">str</span>).<span class="ruby-identifier">parse</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-parse-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 213</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">str</span>)&#x000A;  <span class="ruby-identifier">new</span>(<span class="ruby-constant">Parser</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">str</span>).<span class="ruby-identifier">parse</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -201,7 +199,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-_dump-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-_dump-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 240</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_dump</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">to_a</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-_dump-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 239</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_dump</span>(<span class="ruby-operator">*</span>)&#x000A;  <span class="ruby-constant">Marshal</span>.<span class="ruby-identifier">dump</span>(<span class="ruby-identifier">to_a</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-fetch'>
@@ -218,7 +216,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 245</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">key</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">key</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 244</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">key</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">super</span>(<span class="ruby-identifier">key</span>.<span class="ruby-identifier">to_s</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-merge'>
@@ -236,7 +234,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-merge-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-merge-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 251</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>(<span class="ruby-identifier">convert_hash</span>(<span class="ruby-identifier">hash</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-merge-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 250</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">merge</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">super</span>(<span class="ruby-identifier">convert_hash</span>(<span class="ruby-identifier">hash</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-op'>
@@ -254,7 +252,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-op-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 319</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-op-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore_ops.rb, line 318</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-constant">HStoreOp</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_literal_append'>
@@ -271,7 +269,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_literal_append-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 259</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">unquoted_literal</span>)&#x000A;  <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">HSTORE_CAST</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_literal_append-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 258</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_literal_append</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">literal_append</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">unquoted_literal</span>)&#x000A;  <span class="ruby-identifier">sql</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">HSTORE_CAST</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-unquoted_literal'>
@@ -289,7 +287,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-unquoted_literal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-unquoted_literal-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 267</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">unquoted_literal</span>&#x000A;  <span class="ruby-identifier">str</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-identifier">commas</span> = <span class="ruby-constant">COMMA</span>&#x000A;  <span class="ruby-identifier">quote</span> = <span class="ruby-constant">QUOTE</span>&#x000A;  <span class="ruby-identifier">kv_sep</span> = <span class="ruby-constant">KV_SEP</span>&#x000A;  <span class="ruby-identifier">null</span> = <span class="ruby-constant">NULL</span>&#x000A;  <span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">commas</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">comma</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">escape_value</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">kv_sep</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">null</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">escape_value</span>(<span class="ruby-identifier">v</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">str</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-unquoted_literal-source'><span class="ruby-comment"># File lib/sequel/extensions/pg_hstore.rb, line 266</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">unquoted_literal</span>&#x000A;  <span class="ruby-identifier">str</span> = <span class="ruby-constant">String</span>.<span class="ruby-identifier">new</span>&#x000A;  <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">false</span>&#x000A;  <span class="ruby-identifier">commas</span> = <span class="ruby-constant">COMMA</span>&#x000A;  <span class="ruby-identifier">quote</span> = <span class="ruby-constant">QUOTE</span>&#x000A;  <span class="ruby-identifier">kv_sep</span> = <span class="ruby-constant">KV_SEP</span>&#x000A;  <span class="ruby-identifier">null</span> = <span class="ruby-constant">NULL</span>&#x000A;  <span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>, <span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">commas</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">comma</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">escape_value</span>(<span class="ruby-identifier">k</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span>&#x000A;    <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">kv_sep</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">null</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">escape_value</span>(<span class="ruby-identifier">v</span>) <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">quote</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">comma</span> = <span class="ruby-keyword">true</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">str</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -299,7 +297,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

@@ -243,7 +243,7 @@ div.header {
     #content table.rdoc-list td.label {
       font-weight: bold; }
     #content table.rdoc-list td {
-      border: 1px solid #dddddd;
+      border: 1px solid #ddd;
       padding: 6px 13px; }
 
 #method-list {
@@ -326,13 +326,13 @@ div.header {
     color: #ffdead;
     background: transparent; }
   #content .method .source pre .ruby-string, #content pre.ruby .ruby-string, #methods .method .description pre.ruby .ruby-string {
-    color: #ffaaaa;
+    color: #faa;
     background: transparent; }
   #content .method .source pre .ruby-node, #content pre.ruby .ruby-node, #methods .method .description pre.ruby .ruby-node {
     color: #ffa07a;
     background: transparent; }
   #content .method .source pre .ruby-comment, #content pre.ruby .ruby-comment, #methods .method .description pre.ruby .ruby-comment {
-    color: #ffddff;
+    color: #fdf;
     font-weight: bold;
     background: transparent; }
   #content .method .source pre .ruby-regexp, #content pre.ruby .ruby-regexp, #methods .method .description pre.ruby .ruby-regexp {

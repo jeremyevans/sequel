@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -109,7 +107,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 255</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">identifier_output_method</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>.<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>(<span class="ruby-value">:cast_booleans=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">convert_tinyint_to_bool?</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 254</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">identifier_output_method</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>.<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">c</span>.<span class="ruby-identifier">to_s</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">r</span>.<span class="ruby-identifier">fields</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-identifier">r</span>.<span class="ruby-identifier">each</span>(<span class="ruby-value">:cast_booleans=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">convert_tinyint_to_bool?</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">h</span><span class="ruby-operator">|</span> <span class="ruby-keyword">yield</span> <span class="ruby-identifier">h</span>}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-paged_each'>
@@ -127,7 +125,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-paged_each-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-paged_each-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 268</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">STREAMING_SUPPORTED</span>&#x000A;    <span class="ruby-identifier">stream</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-paged_each-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 267</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">paged_each</span>(<span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-constant">STREAMING_SUPPORTED</span>&#x000A;    <span class="ruby-identifier">stream</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prepare'>
@@ -145,7 +143,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 243</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 242</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-stream'>
@@ -164,7 +162,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-stream-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-stream-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 279</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">stream</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:stream=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-stream-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql2.rb, line 278</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">stream</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:stream=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -174,7 +172,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

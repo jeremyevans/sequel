@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -67,13 +65,13 @@
                   
                   <p>If no arguments are given, return an SQL::ColumnAll:</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">a__b</span>).<span class="ruby-operator">*</span>  <span class="ruby-comment"># a.b.*</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">a__b</span>].<span class="ruby-operator">*</span>  <span class="ruby-comment"># a.b.*</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-2A-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 933</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-2A-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 936</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">*</span>(<span class="ruby-identifier">ce</span>=(<span class="ruby-identifier">arg</span>=<span class="ruby-keyword">false</span>;<span class="ruby-keyword">nil</span>))&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">arg</span> <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">ColumnAll</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-identifier">ce</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-qualify'>
@@ -87,13 +85,13 @@
                   <p>Qualify the receiver with the given <code>qualifier</code> (table for
                   column/schema for table).</p>
                   
-                  <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span></pre>
+                  <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>).<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">schema</span>) <span class="ruby-comment"># &quot;schema&quot;.&quot;table&quot;.&quot;column&quot;</span></pre>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-qualify-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-qualify-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 946</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">qualifier</span>)&#x000A;  <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-qualify-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 949</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">qualifier</span>)&#x000A;  <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">qualifier</span>, <span class="ruby-keyword">self</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -103,7 +101,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

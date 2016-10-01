@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -75,7 +73,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-basic_type_convertor-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-basic_type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">basic_type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-basic_type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 41</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">basic_type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-type_convertor'>
@@ -91,7 +89,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-type_convertor-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 34</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-type_convertor-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/sqlserver.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">type_convertor</span>(<span class="ruby-identifier">map</span>, <span class="ruby-identifier">meta</span>, <span class="ruby-identifier">type</span>, <span class="ruby-identifier">i</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">output_identifier</span>(<span class="ruby-identifier">meta</span>.<span class="ruby-identifier">getColumnLabel</span>(<span class="ruby-identifier">i</span>)) <span class="ruby-operator">==</span> <span class="ruby-value">:is_autoincrement</span>&#x000A;    <span class="ruby-identifier">map</span>[<span class="ruby-constant">Java</span><span class="ruby-operator">::</span><span class="ruby-constant">JavaSQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Types</span><span class="ruby-operator">::</span><span class="ruby-constant">VARCHAR</span>]&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -101,7 +99,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

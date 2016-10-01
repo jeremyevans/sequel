@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -153,7 +151,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-60-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-60-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1841</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">`</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-60-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1844</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-operator">`</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">s</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-method_missing'>
@@ -173,7 +171,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-method_missing-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1848</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:*</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-operator">*</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:distinct</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-identifier">distinct</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:over</span>&#x000A;        <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>]))&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-identifier">f</span>.<span class="ruby-operator">*</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:*</span>]&#x000A;        <span class="ruby-identifier">f</span>.<span class="ruby-identifier">over</span>(<span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;unsupported VirtualRow method argument used with block&#39;</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-constant">DOUBLE_UNDERSCORE</span>, <span class="ruby-value">2</span>)&#x000A;    <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-method_missing-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1851</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">method_missing</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;      <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-keyword">case</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:*</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-operator">*</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:distinct</span>&#x000A;        <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>).<span class="ruby-identifier">distinct</span>&#x000A;      <span class="ruby-keyword">when</span> <span class="ruby-value">:over</span>&#x000A;        <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">shift</span> <span class="ruby-operator">||</span> <span class="ruby-constant">OPTS</span>&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-operator">::</span><span class="ruby-constant">Kernel</span>.<span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:args</span>]))&#x000A;        <span class="ruby-identifier">f</span> = <span class="ruby-identifier">f</span>.<span class="ruby-operator">*</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:*</span>]&#x000A;        <span class="ruby-identifier">f</span>.<span class="ruby-identifier">over</span>(<span class="ruby-identifier">opts</span>)&#x000A;      <span class="ruby-keyword">else</span>&#x000A;        <span class="ruby-constant">Kernel</span>.<span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;unsupported VirtualRow method argument used with block&#39;</span>)&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span> = <span class="ruby-identifier">m</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">split</span>(<span class="ruby-constant">DOUBLE_UNDERSCORE</span>, <span class="ruby-value">2</span>)&#x000A;    <span class="ruby-identifier">column</span> <span class="ruby-operator">?</span> <span class="ruby-constant">QualifiedIdentifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">column</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">Identifier</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-constant">Function</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">m</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -183,7 +181,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

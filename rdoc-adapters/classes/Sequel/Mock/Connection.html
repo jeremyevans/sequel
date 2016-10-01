@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -118,7 +116,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">server</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@server</span> = <span class="ruby-identifier">server</span>&#x000A;  <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">db</span>, <span class="ruby-identifier">server</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-ivar">@db</span> = <span class="ruby-identifier">db</span>&#x000A;  <span class="ruby-ivar">@server</span> = <span class="ruby-identifier">server</span>&#x000A;  <span class="ruby-ivar">@opts</span> = <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -136,7 +134,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 26</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:_execute</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-value">:log=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>) &#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>)&#x000A;  <span class="ruby-ivar">@db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:_execute</span>, <span class="ruby-keyword">self</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-value">:log=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>) &#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -146,7 +144,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

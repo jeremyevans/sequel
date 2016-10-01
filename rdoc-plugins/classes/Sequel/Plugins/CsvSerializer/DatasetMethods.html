@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -71,7 +69,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_csv-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 162</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_csv</span>(<span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>({<span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">columns</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;  <span class="ruby-identifier">items</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:array</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>&#x000A;&#x000A;  <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">csv</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">items</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">object</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>].<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">header</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">header</span>) }&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 161</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_csv</span>(<span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-identifier">opts</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">process_csv_serializer_opts</span>({<span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">columns</span>}.<span class="ruby-identifier">merge!</span>(<span class="ruby-identifier">opts</span>))&#x000A;  <span class="ruby-identifier">items</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:array</span>) <span class="ruby-operator">||</span> <span class="ruby-keyword">self</span>&#x000A;&#x000A;  <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">generate</span>(<span class="ruby-identifier">opts</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">csv</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">items</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">object</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">csv</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>].<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">header</span><span class="ruby-operator">|</span> <span class="ruby-identifier">object</span>.<span class="ruby-identifier">send</span>(<span class="ruby-identifier">header</span>) }&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -81,7 +79,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

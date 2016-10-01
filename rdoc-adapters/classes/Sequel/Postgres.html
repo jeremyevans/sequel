@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -88,6 +86,7 @@
             <ol>
               <li><a target="docwin" href="#attribute-c-client_min_messages">client_min_messages</a></li>
               <li><a target="docwin" href="#attribute-c-force_standard_strings">force_standard_strings</a></li>
+              <li><a target="docwin" href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
               <li><a target="docwin" href="#attribute-c-use_iso_date_format">use_iso_date_format</a></li>
             </ol>
             <h3>Public Instance</h3>
@@ -102,6 +101,7 @@
             <ol>
               <li><a target="docwin" href="Postgres/DatabaseMethods.html">Sequel::Postgres::DatabaseMethods</a></li>
               <li><a target="docwin" href="Postgres/DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
+              <li><a target="docwin" href="Postgres/MockAdapterDatabaseMethods.html">Sequel::Postgres::MockAdapterDatabaseMethods</a></li>
               <li><a target="docwin" href="Postgres/Adapter.html">Sequel::Postgres::Adapter</a></li>
               <li><a target="docwin" href="Postgres/AlterTableGenerator.html">Sequel::Postgres::AlterTableGenerator</a></li>
               <li><a target="docwin" href="Postgres/CreateTableGenerator.html">Sequel::Postgres::CreateTableGenerator</a></li>
@@ -307,6 +307,23 @@
               </div>
             </div>
             <div id='methods'>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-mock_adapter_setup'>
+                <a name='method-c-mock_adapter_setup'></a>
+                <div class='synopsis'>
+                  <span class='name'>mock_adapter_setup</span>
+                  <span class='arguments'>(db)</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-mock_adapter_setup-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-mock_adapter_setup-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/postgres.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">mock_adapter_setup</span>(<span class="ruby-identifier">db</span>)&#x000A;  <span class="ruby-identifier">db</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@server_version</span> = <span class="ruby-value">90500</span>&#x000A;    <span class="ruby-identifier">initialize_postgres_adapter</span>&#x000A;    <span class="ruby-identifier">extend</span>(<span class="ruby-constant">MockAdapterDatabaseMethods</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-bytea'>
                 <a name='method-i-bytea'></a>
@@ -321,7 +338,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-bytea-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bytea</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">s</span>)) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 101</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bytea</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">s</span>)) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -331,7 +348,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

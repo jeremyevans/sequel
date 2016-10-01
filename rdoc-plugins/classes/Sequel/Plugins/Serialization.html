@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -136,7 +134,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@deserialization_map</span> = {}&#x000A;    <span class="ruby-ivar">@serialization_map</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 78</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_eval</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-ivar">@deserialization_map</span> = {}&#x000A;    <span class="ruby-ivar">@serialization_map</span> = {}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-configure'>
@@ -154,7 +152,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-configure-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">format</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-configure-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">configure</span>(<span class="ruby-identifier">model</span>, <span class="ruby-identifier">format</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">serialize_attributes</span>(<span class="ruby-identifier">format</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-register_format'>
@@ -173,7 +171,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-register_format-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-register_format-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 95</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">register_format</span>(<span class="ruby-identifier">format</span>, <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>)&#x000A;  <span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>] = [<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-register_format-source'><span class="ruby-comment"># File lib/sequel/plugins/serialization.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">register_format</span>(<span class="ruby-identifier">format</span>, <span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>)&#x000A;  <span class="ruby-constant">REGISTERED_FORMATS</span>[<span class="ruby-identifier">format</span>] = [<span class="ruby-identifier">serializer</span>, <span class="ruby-identifier">deserializer</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -183,7 +181,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

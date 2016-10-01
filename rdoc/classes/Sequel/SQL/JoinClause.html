@@ -5,21 +5,19 @@
     <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
     <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
     <script type='text/javascript'>
-      //<![CDATA[
-        function popupCode(url) {
-          window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
-        }
-        
-        function toggleCode(id) {
-          var code = document.getElementById(id)
-        
-          code.style.display = code.style.display != 'block' ? 'block' : 'none'
-          return true
-        }
-        
-        // Make codeblocks hidden by default
-        document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
-      //]]>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
     </script>
   </head>
   <body class='page'>
@@ -111,7 +109,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1473</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)&#x000A;  <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>&#x000A;  <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1476</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)&#x000A;  <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>&#x000A;  <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -130,7 +128,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-column_aliases-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-column_aliases-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1497</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">column_aliases</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-column_aliases-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1500</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">column_aliases</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-table'>
@@ -147,7 +145,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-table-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-table-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1479</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@table_expr</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-table-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1482</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@table_expr</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-table_alias'>
@@ -165,7 +163,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-table_alias-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-table_alias-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1489</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table_alias</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-table_alias-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1492</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table_alias</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -175,7 +173,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="http://github.com/mislav/hanna/tree/master"><strong>Hanna</strong> RDoc template</a>
+      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>
