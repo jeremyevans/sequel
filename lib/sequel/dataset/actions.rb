@@ -10,7 +10,7 @@ module Sequel
     # ---------------------
     
     # Action methods defined by Sequel that execute code on the database.
-    ACTION_METHODS = (<<-METHS).split.map(&:to_sym)
+    ACTION_METHODS = (<<-METHS).split.map(&:to_sym).freeze
       << [] all avg count columns columns! delete each
       empty? fetch_rows first first! get import insert interval last
       map max min multi_insert paged_each range select_hash select_hash_groups select_map select_order_map

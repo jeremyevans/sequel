@@ -23,18 +23,18 @@ module Sequel
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
     # block from the method call.
-    CONDITIONED_JOIN_TYPES = [:inner, :full_outer, :right_outer, :left_outer, :full, :right, :left]
+    CONDITIONED_JOIN_TYPES = [:inner, :full_outer, :right_outer, :left_outer, :full, :right, :left].freeze
 
     # These symbols have _join methods created (e.g. natural_join).
     # They accept a table argument and options hash which is passed to join_table,
     # and they raise an error if called with a block.
-    UNCONDITIONED_JOIN_TYPES = [:natural, :natural_left, :natural_right, :natural_full, :cross]
+    UNCONDITIONED_JOIN_TYPES = [:natural, :natural_left, :natural_right, :natural_full, :cross].freeze
     
     # All methods that return modified datasets with a joined table added.
-    JOIN_METHODS = (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).map{|x| "#{x}_join".to_sym} + [:join, :join_table]
+    JOIN_METHODS = ((CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).map{|x| "#{x}_join".to_sym} + [:join, :join_table]).freeze
     
     # Methods that return modified datasets
-    QUERY_METHODS = (<<-METHS).split.map(&:to_sym) + JOIN_METHODS
+    QUERY_METHODS = ((<<-METHS).split.map(&:to_sym) + JOIN_METHODS).freeze
       add_graph_aliases and distinct except exclude exclude_having exclude_where
       filter for_update from from_self graph grep group group_and_count group_append group_by having intersect invert
       limit lock_style naked offset or order order_append order_by order_more order_prepend qualify
