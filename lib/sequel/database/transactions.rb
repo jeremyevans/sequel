@@ -80,7 +80,7 @@ module Sequel
     def rollback_checker(opts=OPTS)
       synchronize(opts[:server]) do |conn|
         raise Error, "not in a transaction" unless t = _trans(conn)
-        t[:rollback_checker] ||= proc{t[:rolled_back]}
+        t[:rollback_checker] ||= proc{Sequel.synchronize{t[:rolled_back]}}
       end
     end
 
@@ -382,7 +382,9 @@ module Sequel
       callbacks = transaction_hooks(conn, committed)
 
       if transaction_finished?(conn)
-        @transactions[conn][:rolled_back] = !committed
+        h = @transactions[conn]
+        rolled_back = !committed
+        Sequel.synchronize{h[:rolled_back] = rolled_back}
         Sequel.synchronize{@transactions.delete(conn)}
       end
 
