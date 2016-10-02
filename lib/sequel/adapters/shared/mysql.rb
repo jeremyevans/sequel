@@ -4,10 +4,6 @@ Sequel.require 'adapters/utils/split_alter_table'
 Sequel.require 'adapters/utils/replace'
 
 module Sequel
-  Dataset::NON_SQL_OPTIONS << :insert_ignore
-  Dataset::NON_SQL_OPTIONS << :update_ignore
-  Dataset::NON_SQL_OPTIONS << :on_duplicate_key_update
-
   module MySQL
     Sequel::Database.set_shared_adapter_scheme(:mysql, self)
 
@@ -623,6 +619,8 @@ module Sequel
       # Comes directly from MySQL's documentation, used for queries with limits without offsets
       ONLY_OFFSET = ",18446744073709551615".freeze
 
+      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:insert_ignore, :update_ignore, :on_duplicate_key_update]).freeze
+
       Dataset.def_sql_method(self, :delete, %w'delete from where order limit')
       Dataset.def_sql_method(self, :insert, %w'insert ignore into columns values on_duplicate_key_update')
       Dataset.def_sql_method(self, :select, %w'select distinct calc_found_rows columns from join where group having compounds order limit lock')
@@ -996,6 +994,11 @@ module Sequel
       # MySQL supports multiple rows in INSERT.
       def multi_insert_sql_strategy
         :values
+      end
+
+      # Dataset options that do not affect the generated SQL.
+      def non_sql_options
+        NON_SQL_OPTIONS
       end
 
       def select_only_offset_sql(sql)

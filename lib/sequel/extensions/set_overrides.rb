@@ -21,7 +21,6 @@
 #
 module Sequel
   module SetOverrides
-    Dataset::NON_SQL_OPTIONS.concat([:defaults, :overrides])
     Dataset.def_mutation_method(:set_defaults, :set_overrides, :module=>self)
 
     # Set overrides/defaults for insert hashes
@@ -69,6 +68,11 @@ module Sequel
       vals = @opts[:defaults].merge(vals) if @opts[:defaults]
       vals = vals.merge(@opts[:overrides]) if @opts[:overrides]
       vals
+    end
+
+    # Dataset options that do not affect the generated SQL.
+    def non_sql_options
+      super + [:defaults, :overrides]
     end
   end
 

@@ -1,5 +1,7 @@
 === HEAD
 
+* Freeze Dataset::NON_SQL_OPTIONS, add private Dataset#non_sql_options, fixing thread safety issues during require (jeremyevans)
+
 * Make the callable returned by Database#rollback_checker thread safe (jeremyevans)
 
 * Make lazy_attributes and dataset_associations plugins work if insert_returning_select plugin is loaded before on model with no dataset (jeremyevans)

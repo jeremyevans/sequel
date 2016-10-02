@@ -3,7 +3,6 @@
 Sequel.require %w'emulate_offset_with_row_number split_alter_table', 'adapters/utils'
 
 module Sequel
-  Dataset::NON_SQL_OPTIONS << :disable_insert_output
   module MSSQL
     Sequel::Database.set_shared_adapter_scheme(:mssql, self)
 
@@ -567,11 +566,12 @@ module Sequel
       ROWS_ONLY = " ROWS ONLY".freeze
       FETCH_NEXT = " FETCH NEXT ".freeze
 
+      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output]).freeze
+
       Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
       Dataset.def_sql_method(self, :delete, %w'with delete from output from2 where')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns output values')
       Dataset.def_sql_method(self, :update, [['if is_2005_or_later?', %w'with update limit table set output from where'], ['else', %w'update table set output from where']])
-
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
       attr_writer :mssql_unicode_strings
@@ -951,6 +951,11 @@ module Sequel
       # can use UNION.
       def multi_insert_sql_strategy
         is_2008_or_later? ? :values : :union
+      end
+
+      # Dataset options that do not affect the generated SQL.
+      def non_sql_options
+        NON_SQL_OPTIONS
       end
 
       def select_into_sql(sql)

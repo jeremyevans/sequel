@@ -18,7 +18,7 @@ module Sequel
 
     # Which options don't affect the SQL generation.  Used by simple_select_all?
     # to determine if this is a simple SELECT * FROM table.
-    NON_SQL_OPTIONS = [:server, :defaults, :overrides, :graph, :eager, :eager_graph, :graph_aliases]
+    NON_SQL_OPTIONS = [:server, :graph, :eager, :eager_graph, :graph_aliases].freeze
     
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
@@ -221,7 +221,8 @@ module Sequel
     #   # SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS foo(c1, c2)
     def from_self(opts=OPTS)
       fs = {}
-      @opts.keys.each{|k| fs[k] = nil unless NON_SQL_OPTIONS.include?(k)}
+      non_sql = non_sql_options
+      @opts.keys.each{|k| fs[k] = nil unless non_sql.include?(k)}
       clone(fs).from(opts[:alias] ? as(opts[:alias], opts[:column_aliases]) : self)
     end
 
@@ -1043,7 +1044,8 @@ module Sequel
     #   SELECT * FROM table
     #   SELECT table.* FROM table
     def simple_select_all?
-      o = @opts.reject{|k,v| v.nil? || NON_SQL_OPTIONS.include?(k)}
+      non_sql = non_sql_options
+      o = @opts.reject{|k,v| v.nil? || non_sql.include?(k)}
       if (f = o[:from]) && f.length == 1 && (f.first.is_a?(Symbol) || f.first.is_a?(SQL::AliasedExpression))
         case o.length
         when 1
@@ -1159,6 +1161,11 @@ module Sequel
     # default server otherwise.
     def default_server
       server?(:default)
+    end
+
+    # Dataset options that do not affect the generated SQL.
+    def non_sql_options
+      NON_SQL_OPTIONS
     end
 
     # Treat the +block+ as a virtual_row block if not +nil+ and

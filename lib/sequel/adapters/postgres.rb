@@ -94,7 +94,6 @@ rescue LoadError => e
 end
 
 module Sequel
-  Dataset::NON_SQL_OPTIONS << :cursor
   module Postgres
     CONVERTED_EXCEPTIONS << PGError
 

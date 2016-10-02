@@ -1240,6 +1240,8 @@ module Sequel
       LOCK_MODES = ['ACCESS SHARE', 'ROW SHARE', 'ROW EXCLUSIVE', 'SHARE UPDATE EXCLUSIVE', 'SHARE', 'SHARE ROW EXCLUSIVE', 'EXCLUSIVE', 'ACCESS EXCLUSIVE'].each(&:freeze)
       SKIP_LOCKED = " SKIP LOCKED".freeze
 
+      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:cursor, :insert_conflict]).freeze
+
       Dataset.def_sql_method(self, :delete, [['if server_version >= 90100', %w'with delete from using where returning'], ['else', %w'delete from using where returning']])
       Dataset.def_sql_method(self, :insert, [['if server_version >= 90500', %w'with insert into columns values conflict returning'], ['elsif server_version >= 90100', %w'with insert into columns values returning'], ['else', %w'insert into columns values returning']])
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'values order limit'], ['elsif server_version >= 80400', %w'with select distinct columns from join where group having window compounds order limit lock'], ['else', %w'select distinct columns from join where group having compounds order limit lock']])
@@ -1718,6 +1720,11 @@ module Sequel
       # PostgreSQL supports multiple rows in INSERT.
       def multi_insert_sql_strategy
         :values
+      end
+
+      # Dataset options that do not affect the generated SQL.
+      def non_sql_options
+        NON_SQL_OPTIONS
       end
 
       # PostgreSQL requires parentheses around compound datasets if they use
