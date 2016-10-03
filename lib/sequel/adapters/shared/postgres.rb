@@ -1405,9 +1405,9 @@ module Sequel
 
       # Handle uniqueness violations when inserting, by updating the conflicting row, using
       # ON CONFLICT. With no options, uses ON CONFLICT DO NOTHING.  Options:
+      # :conflict_where :: The index filter, when using a partial index to determine uniqueness.
       # :constraint :: An explicit constraint name, has precendence over :target.
       # :target :: The column name or expression to handle uniqueness violations on.
-      # :conflict_where :: The index filter, when using a partial index to determine uniqueness.
       # :update :: A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.
       # :update_where :: A WHERE condition to use for the update.
       #
