@@ -203,7 +203,7 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @ds.insert_conflict.insert(1, 3, 4).must_equal nil
     @ds.insert_conflict.insert(11, 12, 3, true).must_equal nil
     @ds.insert_conflict(:target=>:a).insert(1, 3, 4).must_equal nil
-    @ds.insert_conflict(:target=>:c, :where=>:c_is_unique).insert(11, 12, 3, true).must_equal nil
+    @ds.insert_conflict(:target=>:c, :conflict_where=>:c_is_unique).insert(11, 12, 3, true).must_equal nil
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx).insert(1, 3, 4).must_equal nil
     @ds.all.must_equal [{:a=>1, :b=>2, :c=>3, :c_is_unique=>false}, {:a=>10, :b=>11, :c=>3, :c_is_unique=>true}]
   end
@@ -235,7 +235,7 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
 
   it "Dataset#insert_conflict should respect expressions in the target argument" do
     @ds.insert_conflict(:target=>:a).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"a\") DO NOTHING"
-    @ds.insert_conflict(:target=>:c, :where=>{:c_is_unique=>true}).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"c\") WHERE (\"c_is_unique\" IS TRUE) DO NOTHING"
+    @ds.insert_conflict(:target=>:c, :conflict_where=>{:c_is_unique=>true}).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"c\") WHERE (\"c_is_unique\" IS TRUE) DO NOTHING"
     @ds.insert_conflict(:target=>[:b, :c]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", \"c\") DO NOTHING"
     @ds.insert_conflict(:target=>[:b, Sequel.function(:round, :c)]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"
     @ds.insert_conflict(:target=>[:b, Sequel.virtual_row{|o| o.round(:c)}]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"

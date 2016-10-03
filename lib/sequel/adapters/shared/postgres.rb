@@ -1407,7 +1407,7 @@ module Sequel
       # ON CONFLICT. With no options, uses ON CONFLICT DO NOTHING.  Options:
       # :constraint :: An explicit constraint name, has precendence over :target.
       # :target :: The column name or expression to handle uniqueness violations on.
-      # :where :: The index filter, when using a partial index to determine uniqueness.
+      # :conflict_where :: The index filter, when using a partial index to determine uniqueness.
       # :update :: A hash of columns and values to set.  Uses ON CONFLICT DO UPDATE.
       # :update_where :: A WHERE condition to use for the update.
       #
@@ -1425,7 +1425,7 @@ module Sequel
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) DO NOTHING
       #
-      #   DB[:table].insert_conflict(:target=>:a, :where=>{:c=>true}).insert(:a=>1, :b=>2)
+      #   DB[:table].insert_conflict(:target=>:a, :conflict_where=>{:c=>true}).insert(:a=>1, :b=>2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING
       #   
@@ -1649,9 +1649,9 @@ module Sequel
           elsif target = opts[:target]
             sql << ' '
             identifier_append(sql, Array(target))
-            if where = opts[:where]
+            if conflict_where = opts[:conflict_where]
               sql << " WHERE "
-              literal_append(sql, where)
+              literal_append(sql, conflict_where)
             end
           end
 
