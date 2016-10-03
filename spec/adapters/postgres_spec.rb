@@ -184,7 +184,7 @@ end
 describe "PostgreSQL", 'INSERT ON CONFLICT' do
   before(:all) do
     @db = DB
-    @db.create_table!(:ic_test){Integer :a; Integer :b; Integer :c; unique :a, :name=>:ic_test_a_uidx; unique [:b, :c], :name=>:ic_test_b_c_uidx}
+    @db.create_table!(:ic_test){Integer :a; Integer :b; Integer :c; TrueClass :c_is_unique, :default=>false; unique :a, :name=>:ic_test_a_uidx; unique [:b, :c], :name=>:ic_test_b_c_uidx; index [:c], :where=>:c_is_unique, :unique=>true}
     @ds = @db[:ic_test]
   end
   before do
@@ -196,41 +196,46 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
 
   it "Dataset#insert_ignore and insert_conflict should ignore uniqueness violations" do
     @ds.insert(1, 2, 3)
+    @ds.insert(10, 11, 3, true)
     proc{@ds.insert(1, 3, 4)}.must_raise Sequel::UniqueConstraintViolation
+    proc{@ds.insert(11, 12, 3, true)}.must_raise Sequel::UniqueConstraintViolation
     @ds.insert_ignore.insert(1, 3, 4).must_equal nil
     @ds.insert_conflict.insert(1, 3, 4).must_equal nil
+    @ds.insert_conflict.insert(11, 12, 3, true).must_equal nil
     @ds.insert_conflict(:target=>:a).insert(1, 3, 4).must_equal nil
+    @ds.insert_conflict(:target=>:c, :where=>:c_is_unique).insert(11, 12, 3, true).must_equal nil
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx).insert(1, 3, 4).must_equal nil
-    @ds.all.must_equal [{:a=>1, :b=>2, :c=>3}]
+    @ds.all.must_equal [{:a=>1, :b=>2, :c=>3, :c_is_unique=>false}, {:a=>10, :b=>11, :c=>3, :c_is_unique=>true}]
   end
 
   it "Dataset#insert_ignore and insert_conflict should work with multi_insert/import" do
     @ds.insert(1, 2, 3)
     @ds.insert_ignore.multi_insert([{:a=>1, :b=>3, :c=>4}])
     @ds.insert_ignore.import([:a, :b, :c], [[1, 3, 4]])
-    @ds.all.must_equal [{:a=>1, :b=>2, :c=>3}]
+    @ds.all.must_equal [{:a=>1, :b=>2, :c=>3, :c_is_unique=>false}]
     @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).import([:a, :b, :c], [[1, 3, 4]])
-    @ds.all.must_equal [{:a=>1, :b=>3, :c=>3}]
+    @ds.all.must_equal [{:a=>1, :b=>3, :c=>3, :c_is_unique=>false}]
     @ds.insert_conflict(:target=>:a, :update=>{:b=>4}).multi_insert([{:a=>1, :b=>5, :c=>6}])
-    @ds.all.must_equal [{:a=>1, :b=>4, :c=>3}]
+    @ds.all.must_equal [{:a=>1, :b=>4, :c=>3, :c_is_unique=>false}]
     end
 
   it "Dataset#insert_conflict should handle upserts" do
     @ds.insert(1, 2, 3)
     @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).insert(1, 3, 4).must_equal nil
-    @ds.all.must_equal [{:a=>1, :b=>3, :c=>3}]
+    @ds.all.must_equal [{:a=>1, :b=>3, :c=>3, :c_is_unique=>false}]
     @ds.insert_conflict(:target=>[:b, :c], :update=>{:c=>5}).insert(5, 3, 3).must_equal nil
-    @ds.all.must_equal [{:a=>1, :b=>3, :c=>5}]
+    @ds.all.must_equal [{:a=>1, :b=>3, :c=>5, :c_is_unique=>false}]
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>4}).insert(1, 3).must_equal nil
-    @ds.all.must_equal [{:a=>1, :b=>4, :c=>5}]
+    @ds.all.must_equal [{:a=>1, :b=>4, :c=>5, :c_is_unique=>false}]
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>5}, :update_where=>{:ic_test__b=>4}).insert(1, 3, 4).must_equal nil
-    @ds.all.must_equal [{:a=>1, :b=>5, :c=>5}]
+    @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{:ic_test__b=>4}).insert(1, 3, 4).must_equal nil
-    @ds.all.must_equal [{:a=>1, :b=>5, :c=>5}]
+    @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
   end
 
   it "Dataset#insert_conflict should respect expressions in the target argument" do
     @ds.insert_conflict(:target=>:a).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"a\") DO NOTHING"
+    @ds.insert_conflict(:target=>:c, :where=>{:c_is_unique=>true}).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"c\") WHERE (\"c_is_unique\" IS TRUE) DO NOTHING"
     @ds.insert_conflict(:target=>[:b, :c]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", \"c\") DO NOTHING"
     @ds.insert_conflict(:target=>[:b, Sequel.function(:round, :c)]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"
     @ds.insert_conflict(:target=>[:b, Sequel.virtual_row{|o| o.round(:c)}]).insert_sql(1, 2, 3).must_equal "INSERT INTO \"ic_test\" VALUES (1, 2, 3) ON CONFLICT (\"b\", round(\"c\")) DO NOTHING"
