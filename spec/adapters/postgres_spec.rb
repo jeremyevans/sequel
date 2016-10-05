@@ -315,13 +315,19 @@ describe "A PostgreSQL database" do
   end
 
   it "should support a :qualify option to tables and views" do
-    @db.tables(:qualify=>true).must_include(Sequel.qualify(:public, :testfk))
+    @db.tables(:qualify=>true).must_include(Sequel.qualify('public', 'testfk'))
     begin
       @db.create_view(:testfkv, @db[:testfk])
-      @db.views(:qualify=>true).must_include(Sequel.qualify(:public, :testfkv))
+      @db.views(:qualify=>true).must_include(Sequel.qualify('public', 'testfkv'))
     ensure
       @db.drop_view(:testfkv)
     end
+  end
+
+  it "should handle double underscores in tables when using the qualify option" do
+    @db.create_table!(Sequel.qualify(:public, 'test__fk')){Integer :a}
+    @db.tables(:qualify=>true).must_include(Sequel.qualify('public', 'test__fk'))
+    @db.drop_table(Sequel.qualify(:public, 'test__fk'))
   end
 
   it "should not typecast the int2vector type incorrectly" do

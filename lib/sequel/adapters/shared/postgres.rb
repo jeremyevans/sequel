@@ -1032,7 +1032,7 @@ module Sequel
         if block_given?
           yield(ds)
         elsif opts[:qualify]
-          ds.select_append(:pg_namespace__nspname).map{|r| Sequel.qualify(m.call(r[:nspname]), m.call(r[:relname]))}
+          ds.select_append(:pg_namespace__nspname).map{|r| Sequel.qualify(m.call(r[:nspname]).to_s, m.call(r[:relname]).to_s)}
         else
           ds.map{|r| m.call(r[:relname])}
         end
