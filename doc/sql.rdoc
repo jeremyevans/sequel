@@ -133,8 +133,11 @@ Also note that specifying the period inside the symbol doesn't work if you are q
 
   :"table.column" # "table.column"
 
-The other way to qualify an identifier is to use the <tt>Sequel.qualify</tt> with the table and column symbols:
+A couple other ways two create a qualified identifier are to use <tt>Sequel.[]</tt> to create an identifier,
+and call <tt>[]</tt> or +qualify+ on that, or to use the <tt>Sequel.qualify</tt> with the table and column symbols:
 
+  Sequel[:table][:column]         # "table"."column"
+  Sequel[:column].qualify(:table) # "table"."column"
   Sequel.qualify(:table, :column) # "table"."column"
 
 Another way to generate identifiers is to use Sequel's {virtual row support}[rdoc-ref:doc/virtual_rows.rdoc]:
@@ -175,8 +178,9 @@ You can combine this with implicit qualification:
 
 You can also use the <tt>Sequel.as</tt> method to create an alias, and the +as+ method on most Sequel-specific expression objects:
 
-  Sequel.as(:column, :alias) # "column" AS "alias"
-  Sequel.qualify(:table, :column).as(:alias) # "table"."column" AS "alias"
+  Sequel.as(:column, :alias)                 # "column" AS "alias"
+  Sequel[:column].as(:alias)                 # "column" AS "alias"
+  Sequel[:table][:column].as(:alias)         # "table"."column" AS "alias"
 
 If you want to use a derived column list, you can provide an array of column aliases:
 
@@ -347,8 +351,8 @@ produces <tt>(column != 1)</tt> instead of <tt>NOT (column = 1)</tt>.
 
 Sequel defines the inequality operators directly on most Sequel-specific expression objects:
 
-  Sequel.qualify(:table, :column) > 1 # ("table"."column" > 1)
-  Sequel.qualify(:table, :column) < 1 # ("table"."column" < 1)
+  Sequel[:table][:column] > 1 # ("table"."column" > 1)
+  Sequel[:table][:column] < 1 # ("table"."column" < 1)
   Sequel.function(:func) >= 1 # (func() >= 1)
   Sequel.function(:func, :column) <= 1 # (func("column") <= 1)
 
@@ -365,8 +369,8 @@ A common use of virtual rows is to handle inequality operators:
 The standard mathematical operates are defined on most Sequel-specific expression objects:
 
   Sequel[:column] + 1 # "column" + 1
-  Sequel[:table__column] - 1 # "table"."column" - 1
-  Sequel.qualify(:table, :column) * 1 # "table"."column" * 1
+  Sequel[:table][:column] - 1 # "table"."column" - 1
+  Sequel[:table][:column] * 1 # "table"."column" * 1
   Sequel[:column] / 1 # "column" / 1
   Sequel[:column] ** 1 # power("column", 1)
 
@@ -374,14 +378,14 @@ You can also call the operator methods directly on the Sequel module:
 
   Sequel.+(:column, 1) # "column" + 1
   Sequel.-(:table__column, 1) # "table"."column" - 1
-  Sequel.*(Sequel.qualify(:table, :column), 1) # "table"."column" * 1
+  Sequel.*(Sequel[:table][:column], 1) # "table"."column" * 1
   Sequel./(:column, 1) # "column" / 1
   Sequel.**(:column, 1) # power("column", 1)
 
 Note that since Sequel implements support for ruby's coercion protocol, the following also works:
 
   1 + Sequel[:column]
-  1 - Sequel.qualify(:table__column)
+  1 - Sequel[:table][:column]
 
 === Boolean Operators (AND OR)
 
@@ -432,7 +436,7 @@ Casting in Sequel is done with the +cast+ method, which is available on most of 
 
   Sequel[:name].cast(:text) # CAST("name" AS text)
   Sequel['1'].cast(:integer) # CAST('1' AS integer)
-  Sequel.qualify(:table, :column).cast(:date) # CAST("table"."column" AS date)
+  Sequel[:table][:column].cast(:date) # CAST("table"."column" AS date)
 
 You can also use the <tt>Sequel.cast</tt> method:
 
@@ -516,17 +520,17 @@ Note that using +ilike+ with a regular expression will always make the regexp ca
 Sequel supports specifying ascending or descending order using the +asc+ and +desc+ method on most Sequel-specific expression objects:
 
   Sequel[:column].asc # "column" ASC
-  Sequel[:column].qualify(:table).desc # "table"."column" DESC
+  Sequel[:table][:column].desc # "table"."column" DESC
 
 You can also use the <tt>Sequel.asc</tt> and <tt>Sequel.desc</tt> methods:
 
   Sequel.asc(:column) # "column" ASC
-  Sequel.desc(Sequel[:column].qualify(:table)) # "table"."column" DESC
+  Sequel.desc(Sequel[:table][:column]) # "table"."column" DESC
 
 On some databases, you can specify null ordering:
 
   Sequel.asc(:column, :nulls=>:first) # "column" ASC NULLS FIRST
-  Sequel.desc(Sequel[:column].qualify(:table), :nulls=>:last) # "table"."column" DESC NULLS LAST
+  Sequel.desc(Sequel[:table][:column], :nulls=>:last) # "table"."column" DESC NULLS LAST
 
 === All Columns (.*)
 
@@ -556,7 +560,7 @@ If you provide a 3rd argument to <tt>Sequel.case</tt>, it goes between CASE and 
 Sequel supports SQL subscripts using the +sql_subscript+ method on most Sequel-specific expression objects:
 
   Sequel[:column].sql_subscript(3) # column[3]
-  Sequel[:column].qualify(:table).sql_subscript(3) # table.column[3]
+  Sequel[:table][:column].sql_subscript(3) # table.column[3]
 
 You can also use the <tt>Sequel.subscript</tt> method:
 

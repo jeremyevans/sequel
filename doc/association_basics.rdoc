@@ -1364,7 +1364,7 @@ via eager_graph.  This is useful to specify conditions that can't be specified
 in a hash or array of two element arrays.
 
   Artist.one_to_many :gold_albums, :class=>:Album,
-    :graph_block=>proc{|j,lj,js| Sequel.qualify(j, :copies_sold) > 500000}
+    :graph_block=>proc{|j,lj,js| Sequel[j][:copies_sold] > 500000}
 
 ==== :graph_join_type
 
@@ -1396,8 +1396,8 @@ where the artist's name differs in case:
 
   Artist.one_to_many :albums, :key=>:artist_name, 
     :graph_only_conditions=>nil, 
-    :graph_block=>proc{|j,lj,js| {Sequel.function(:lower, Sequel.qualify(j, :artist_name))=>
-      Sequel.function(:lower, Sequel.qualify(lj, :name))}}
+    :graph_block=>proc{|j,lj,js| {Sequel.function(:lower, Sequel[j][:artist_name])=>
+      Sequel.function(:lower, Sequel[lj][:name])}}
 
 Note how :graph_only_conditions is set to nil to ignore any existing conditions,
 and :graph_block is used to set up the case insensitive comparison.
@@ -1504,7 +1504,7 @@ has received a bachelor's degree (degree starting with B):
 
   Person.many_to_many :bachelor_degree_colleges, :class=>:College,
     :join_table=>:degrees_received,
-    :graph_join_table_block=>proc{|j,lj,js| Sequel.qualify(j, :degree).like('B%')}
+    :graph_join_table_block=>proc{|j,lj,js| Sequel[j][:degree].like('B%')}
 
 This should be done when graphing the join table, instead of when graphing the
 final table, as :degree is a column of the join table.

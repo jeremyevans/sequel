@@ -242,7 +242,8 @@ derived from user input unless absolutely necessary.
 
 Sequel also allows you to create identifiers using
 Sequel.identifier[rdoc-ref:Sequel::SQL::Builders#identifier] for plain identifiers,
-Sequel.qualify[rdoc-ref:Sequel::SQL::Builders#qualify] for qualified identifiers, and
+Sequel.qualify[rdoc-ref:Sequel::SQL::Builders#qualify] and
+Sequel::SQL::Indentifier#[][rdoc-ref:Sequel::SQL::QualifyingMethods#[]] for qualified identifiers, and
 Sequel.as[rdoc-ref:Sequel::SQL::Builders#as] for aliased expressions.  So if you
 pass any of those values derived from user input, you are dealing with the same scenario.
 

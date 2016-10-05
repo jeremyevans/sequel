@@ -458,9 +458,9 @@ Identifiers can be qualified by using the double underscore special notation <tt
   items.literal(:items__price)
   # items.price
 
-Another way to qualify columns is to use the <tt>Sequel.qualify</tt> method:
+Another way to qualify columns is to use the <tt>Sequel[][]</tt> method:
 
-  items.literal(Sequel.qualify(:items, :price))
+  items.literal(Sequel[:items][:price])
   # items.price
 
 While it is more common to qualify column identifiers with table identifiers, you can also qualify table identifiers with schema identifiers

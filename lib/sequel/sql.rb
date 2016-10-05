@@ -944,11 +944,20 @@ module Sequel
 
       # Qualify the receiver with the given +qualifier+ (table for column/schema for table).
       #
-      #   Sequel[:column].qualify(:table) # "table"."column"
-      #   Sequel[:table].qualify(:schema) # "schema"."table"
+      #   Sequel[:column].qualify(:table)                  # "table"."column"
+      #   Sequel[:table].qualify(:schema)                  # "schema"."table"
       #   Sequel.qualify(:table, :column).qualify(:schema) # "schema"."table"."column"
       def qualify(qualifier)
         QualifiedIdentifier.new(qualifier, self)
+      end
+
+      # Qualify the receiver with the given +qualifier+ (table for column/schema for table).
+      #
+      #   Sequel[:table][:column]          # "table"."column"
+      #   Sequel[:schema][:table]          # "schema"."table"
+      #   Sequel[:schema][:table][:column] # "schema"."table"."column"
+      def [](identifier)
+        QualifiedIdentifier.new(self, identifier)
       end
     end
 

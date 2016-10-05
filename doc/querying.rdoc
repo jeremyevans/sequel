@@ -876,7 +876,7 @@ and artists tables, but only want albums where the artist's name
 comes before the album's name.
 
   Album.join(:artists, :id=>:artist_id) do |j, lj, js|
-    Sequel.qualify(j, :name) < Sequel.qualify(lj, :name)
+    Sequel[j][:name] < Sequel[lj][:name]
   end
   # SELECT * FROM albums INNER JOIN artists
   # ON artists.id = albums.artist_id

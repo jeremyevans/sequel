@@ -84,7 +84,7 @@ module Sequel
         def _update_without_checking(columns)
           ds = _update_dataset
           lc = model.lock_column
-          rows = ds.clone(ds.send(:default_server_opts, :sql=>ds.output(nil, [Sequel.qualify(:inserted, lc)]).update_sql(columns))).all
+          rows = ds.clone(ds.send(:default_server_opts, :sql=>ds.output(nil, [Sequel[:inserted][lc]]).update_sql(columns))).all
           values[lc] = rows.first[lc] unless rows.empty?
           rows.length
         end

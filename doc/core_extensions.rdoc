@@ -170,11 +170,11 @@ Symbol#qualify qualifies the identifier (e.g. a column) with a another identifie
 
   :column.qualify(:table) # SQL: table.column
 
-Alternative: Sequel.qualify:
+Alternative: Sequel[][]:
 
-  Sequel.qualify(:table, :column)
+  Sequel[:table][:column]
 
-Note the reversed order of the arguments.  For the Symbol#qualify method, the argument is the qualifier, while for Sequel.qualify, the qualifier is the first argument.
+Note the reversed order of the arguments.  For the Symbol#qualify method, the argument is the qualifier, while for Sequel[][], the first [] is the qualifier, and the second [] is the identifier.
 
 ==== like
 

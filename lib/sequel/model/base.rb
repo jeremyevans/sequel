@@ -1614,12 +1614,12 @@ module Sequel
         model.primary_key_hash(pk)
       end
       
-      # Returns a hash mapping the receivers primary key column(s) to their values.
+      # Returns a hash mapping the receivers qualified primary key column(s) to their values.
       # 
       #   Artist[1].qualified_pk_hash
-      #   # => {Sequel.qualify(:artists, :id)=>1}
+      #   # => {Sequel[:artists][:id]=>1}
       #   Artist[[1, 2]].qualified_pk_hash
-      #   # => {Sequel.qualify(:artists, :id1)=>1, Sequel.qualify(:artists, :id2)=>2}
+      #   # => {Sequel[:artists][:id1]=>1, Sequel[:artists][:id2]=>2}
       def qualified_pk_hash(qualifier=model.table_name)
         model.qualified_primary_key_hash(pk, qualifier)
       end

@@ -921,6 +921,14 @@ describe "Sequel core extension replacements" do
     l(Sequel.qualify(:t, :c), "t.c")
   end
 
+  it "Sequel::SQL::Identifier#[] should return a qualified identifier" do
+    l(Sequel[:t][:c], "t.c")
+  end
+
+  it "Sequel::SQL::QualifiedIdentifier#[] should return a nested qualified identifier" do
+    l(Sequel[:s][:t][:c], "s.t.c")
+  end
+
   it "Sequel.identifier should return an identifier" do
     l(Sequel.identifier(:t__c), "t__c")
   end

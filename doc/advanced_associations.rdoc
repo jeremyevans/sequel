@@ -50,12 +50,12 @@ These can be used like this:
     
   # Only returns albums that have sold more than 500,000 copies
   Artist.one_to_many :gold_albums, :class=>:Album, \
-    :graph_block=>proc{|j,lj,js| Sequel.qualify(j, :copies_sold) > 500000}
+    :graph_block=>proc{|j,lj,js| Sequel[j][:copies_sold] > 500000}
     
   # Handles the case where the tables are associated by a case insensitive name string
   Artist.one_to_many :albums, :key=>:artist_name, \
     :graph_only_conditions=>nil, \
-    :graph_block=>proc{|j,lj,js| {Sequel.function(:lower, Sequel.qualify(j, :artist_name))=>Sequel.function(:lower, Sequel.qualify(lj, :name))}}
+    :graph_block=>proc{|j,lj,js| {Sequel.function(:lower, Sequel[j][:artist_name])=>Sequel.function(:lower, Sequel[lj][:name])}}
     
   # Handles the case where both key columns have the name artist_name, and you want to use
   # a JOIN USING

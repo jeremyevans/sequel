@@ -761,8 +761,8 @@ module Sequel
     #
     #   ds.split_qualifiers(:s) # ['s']
     #   ds.split_qualifiers(:t__s) # ['t', 's']
-    #   ds.split_qualifiers(Sequel.qualify(:d, :t__s)) # ['d', 't', 's']
-    #   ds.split_qualifiers(Sequel.qualify(:h__d, :t__s)) # ['h', 'd', 't', 's']
+    #   ds.split_qualifiers(Sequel[:d][:t__s]) # ['d', 't', 's']
+    #   ds.split_qualifiers(Sequel[:h__d][:t__s]) # ['h', 'd', 't', 's']
     def split_qualifiers(table_name, *args)
       case table_name
       when SQL::QualifiedIdentifier

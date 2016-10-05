@@ -283,6 +283,7 @@ Sequel::SQL::QualifiedIdentifier objects represent qualified identifiers:
 The following shortcuts exist for creating Sequel::SQL::QualifiedIdentifier objects:
 
   Sequel[:table__column]
+  Sequel[:table][:column]
   Sequel.qualify(:table, :column)
   :column.qualify(:table) # core_extensions extension
 

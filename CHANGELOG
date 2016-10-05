@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL::Identifier#[] and SQL::QualifiedIdentifier#[] for creating qualified identifiers (jeremyevans)
+
 * Add support for Dataset#insert_conflict :conflict_where option, for a predicate to use in ON CONFLICT clauses (chanks) (#1240)
 
 * Freeze Dataset::NON_SQL_OPTIONS, add private Dataset#non_sql_options, fixing thread safety issues during require (jeremyevans)
