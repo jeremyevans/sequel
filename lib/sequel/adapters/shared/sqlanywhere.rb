@@ -142,6 +142,11 @@ module Sequel
         AUTO_INCREMENT
       end
       
+      # Sybase does not allow adding primary key constraints to NULLable columns.
+      def can_add_primary_key_constraint_on_nullable_columns?
+        false
+      end
+
       # SQL fragment for marking a table as temporary
       def temporary_table_sql
         TEMPORARY
