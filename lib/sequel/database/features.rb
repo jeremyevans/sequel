@@ -108,6 +108,13 @@ module Sequel
 
     private
 
+    # Whether the database supports adding primary key constraints on NULLable columns,
+    # automatically making them NOT NULL.  If false, the columns must be set NOT NULL
+    # before the primary key constraint is added.
+    def can_add_primary_key_constraint_on_nullable_columns?
+      true
+    end
+
     # Whether the database supports combining multiple alter table
     # operations into a single query, false by default.
     def supports_combining_alter_table_ops?

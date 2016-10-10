@@ -422,7 +422,15 @@ module Sequel
     
     # Apply the operations in the given generator to the table given by name.
     def apply_alter_table_generator(name, generator)
-      apply_alter_table(name, generator.operations)
+      ops = generator.operations
+
+      unless can_add_primary_key_constraint_on_nullable_columns?
+        if add_pk = ops.find{|op| op[:op] == :add_constraint && op[:type] == :primary_key}
+          ops = add_pk[:columns].map{|column| {:op => :set_column_null, :name => column, :null => false}} + ops
+        end
+      end
+
+      apply_alter_table(name, ops)
     end
 
     # The class used for alter_table generators.
@@ -558,8 +566,16 @@ module Sequel
     # Add null/not null SQL fragment to column creation SQL.
     def column_definition_null_sql(sql, column)
       null = column.fetch(:null, column[:allow_null])
-      sql << NOT_NULL if null == false
-      sql << NULL if null == true
+      if null.nil? && !can_add_primary_key_constraint_on_nullable_columns? && column[:primary_key]
+        null = false
+      end
+
+      case null
+      when false
+        sql << NOT_NULL
+      when true
+        sql << NULL
+      end
     end
     
     # Add primary key SQL fragment to column creation SQL.
@@ -702,6 +718,17 @@ module Sequel
           end
         end
       end
+
+      unless can_add_primary_key_constraint_on_nullable_columns?
+        if pk = generator.constraints.find{|op| op[:type] == :primary_key}
+          pk[:columns].each do |column|
+            if matched_column = generator.columns.find{|gc| gc[:name] == column}
+              matched_column[:null] = false
+            end
+          end
+        end
+      end
+
       "#{create_table_prefix_sql(name, options)} (#{column_list_sql(generator)})"
     end
 

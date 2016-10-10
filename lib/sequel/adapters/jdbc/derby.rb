@@ -82,9 +82,15 @@ module Sequel
           end
         end
 
+        # Derby does not allow adding primary key constraints to NULLable columns.
+        def can_add_primary_key_constraint_on_nullable_columns?
+          false
+        end
+
         # Derby doesn't allow specifying NULL for columns, only NOT NULL.
         def column_definition_null_sql(sql, column)
-          sql << " NOT NULL" if column.fetch(:null, column[:allow_null]) == false
+          null = column.fetch(:null, column[:allow_null])
+          sql << " NOT NULL" if null == false || (null.nil? && column[:primary_key])
         end
     
         # Add NOT LOGGED for temporary tables to improve performance.

@@ -132,6 +132,23 @@ describe "DB#create_table" do
     @db.sqls.must_equal ['CREATE TABLE cats (id integer CONSTRAINT foo PRIMARY KEY AUTOINCREMENT)']
   end
 
+  it "should automatically set primary key column NOT NULL if database doesn't do it automatically" do
+    def @db.can_add_primary_key_constraint_on_nullable_columns?; false end
+    @db.create_table(:cats) do
+      primary_key :id
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (id integer NOT NULL PRIMARY KEY AUTOINCREMENT)']
+  end
+
+  it "should automatically set primary key column NOT NULL when adding constraint if database doesn't do it automatically" do
+    def @db.can_add_primary_key_constraint_on_nullable_columns?; false end
+    @db.create_table(:cats) do
+      String :id
+      primary_key [:id]
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (id varchar(255) NOT NULL, PRIMARY KEY (id))']
+  end
+
   it "should handling splitting named column constraints into table constraints if unsupported" do
     def @db.supports_named_column_constraints?; false end
     @db.create_table(:cats) do
@@ -1098,6 +1115,22 @@ describe "DB#alter_table" do
       add_primary_key [:id, :type], :name => :cpk
     end
     @db.sqls.must_equal ["ALTER TABLE cats ADD CONSTRAINT cpk PRIMARY KEY (id, type)"]
+  end
+
+  it "should set primary key column NOT NULL when using add_primary_key if database doesn't handle it" do
+    def @db.can_add_primary_key_constraint_on_nullable_columns?; false end
+    @db.alter_table(:cats) do
+      add_primary_key :id
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats ADD COLUMN id integer NOT NULL PRIMARY KEY AUTOINCREMENT"]
+  end
+
+  it "should set primary key column NOT NULL when adding primary key constraint if database doesn't handle it" do
+    def @db.can_add_primary_key_constraint_on_nullable_columns?; false end
+    @db.alter_table(:cats) do
+      add_primary_key [:id, :type]
+    end
+    @db.sqls.must_equal ["ALTER TABLE cats ALTER COLUMN id SET NOT NULL", "ALTER TABLE cats ALTER COLUMN type SET NOT NULL", "ALTER TABLE cats ADD PRIMARY KEY (id, type)"]
   end
 
   it "should support drop_column" do

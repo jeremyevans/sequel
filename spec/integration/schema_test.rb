@@ -515,6 +515,27 @@ describe "Database schema modifiers" do
     proc{@ds.insert(:id=>nil)}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
   end
 
+  it "should not allow NULLs when adding a primary key column" do
+    @db.create_table!(:items){String :foo}
+    @db.alter_table(:items){add_column :id, String, :primary_key=>true, :default=>'a'}
+    proc{@ds.insert(:id=>nil)}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+  end
+
+  it "should not allow NULLs when creating table with primary key constraint" do
+    @db.create_table!(:items){String :id1; String :id2; primary_key [:id1, :id2]}
+    proc{@ds.insert(:id1=>nil, :id2=>nil)}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+    proc{@ds.insert(:id1=>nil, :id2=>'1')}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+    proc{@ds.insert(:id1=>'1', :id2=>nil)}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+  end
+
+  it "should not allow NULLs when adding a primary key constraint" do
+    @db.create_table!(:items){String :id1; String :id2}
+    @db.alter_table(:items){add_primary_key [:id1, :id2]}
+    proc{@ds.insert(:id1=>nil, :id2=>nil)}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+    proc{@ds.insert(:id1=>nil, :id2=>'1')}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+    proc{@ds.insert(:id1=>'1', :id2=>nil)}.must_raise(Sequel::NotNullConstraintViolation, Sequel::ConstraintViolation, Sequel::DatabaseError)
+  end
+
   it "should rename columns correctly" do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)

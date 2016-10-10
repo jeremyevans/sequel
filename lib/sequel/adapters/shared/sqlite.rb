@@ -314,15 +314,15 @@ module Sequel
         end
       end
 
+      # SQLite allows adding primary key constraints on NULLABLE columns, but then
+      # does not enforce NOT NULL for such columns, so force setting the columns NOT NULL.
+      def can_add_primary_key_constraint_on_nullable_columns?
+        false
+      end
+
       # Surround default with parens to appease SQLite
       def column_definition_default_sql(sql, column)
         sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
-      end
-    
-      # Add null/not null SQL fragment to column creation SQL.
-      def column_definition_null_sql(sql, column)
-        column = column.merge(:null=>false) if column[:primary_key]
-        super(sql, column)
       end
     
       # Array of PRAGMA SQL statements based on the Database options that should be applied to

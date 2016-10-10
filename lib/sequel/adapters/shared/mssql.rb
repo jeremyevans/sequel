@@ -312,6 +312,11 @@ module Sequel
         SQL_BEGIN
       end
 
+      # MSSQL does not allow adding primary key constraints to NULLable columns.
+      def can_add_primary_key_constraint_on_nullable_columns?
+        false
+      end
+
       # Handle MSSQL specific default format.
       def column_schema_normalize_default(default, type)
         if m = MSSQL_DEFAULT_RE.match(default)

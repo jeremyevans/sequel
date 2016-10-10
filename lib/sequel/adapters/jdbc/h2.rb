@@ -58,6 +58,11 @@ module Sequel
         
         private
         
+        # H2 does not allow adding primary key constraints to NULLable columns.
+        def can_add_primary_key_constraint_on_nullable_columns?
+          false
+        end
+
         # If the :prepare option is given and we aren't in a savepoint,
         # prepare the transaction for a two-phase commit.
         def commit_transaction(conn, opts=OPTS)
@@ -73,12 +78,21 @@ module Sequel
           case op[:op]
           when :add_column
             if (pk = op.delete(:primary_key)) || (ref = op.delete(:table))
+              if pk
+                op[:null] = false
+              end
+
               sqls = [super(table, op)]
-              sqls << "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})" if pk && op[:type] != :identity
+
+              if pk && op[:type] != :identity
+                sqls << "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})"
+              end
+
               if ref
                 op[:table] = ref
                 sqls << "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])}) #{column_references_sql(op)}"
               end
+
               sqls
             else
               super(table, op)
