@@ -160,6 +160,11 @@ module Sequel
         AUTOINCREMENT
       end
 
+      # DB2 does not allow adding primary key constraints to NULLable columns.
+      def can_add_primary_key_constraint_on_nullable_columns?
+        false
+      end
+
       # Add null/not null SQL fragment to column creation SQL.
       def column_definition_null_sql(sql, column)
         null = column.fetch(:null, column[:allow_null]) 
