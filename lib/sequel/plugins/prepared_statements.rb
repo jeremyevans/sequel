@@ -134,6 +134,7 @@ module Sequel
 
         # Use a prepared statement to query the database for the row matching the given primary key.
         def primary_key_lookup(pk)
+          return super if dataset.joined_dataset?
           prepared_lookup.call(primary_key_hash(pk))
         end
 

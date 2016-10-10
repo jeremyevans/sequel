@@ -1,5 +1,7 @@
 === HEAD
 
+* Make prepared_statements plugin correctly handle lookup on joined datasets (jeremyevans) (#1244)
+
 * Make Database#tables with :qualify=>true option handle table names with double underscores correctly (jeremyevans) (#1241)
 
 * Add SQL::Identifier#[] and SQL::QualifiedIdentifier#[] for creating qualified identifiers (jeremyevans)

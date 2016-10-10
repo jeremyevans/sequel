@@ -17,6 +17,13 @@ describe "prepared_statements plugin" do
     @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
+  it "should correctly lookup by primary key for joined dataset" do
+    @c.dataset = @c.dataset.from(:people, :people2)
+    @db.sqls
+    @c[1].must_equal @p
+    @db.sqls.must_equal ["SELECT * FROM people, people2 WHERE (people.id = 1) LIMIT 1 -- read_only"]
+  end 
+
   prepared_statements_spec = shared_description do
     it "should correctly delete instance" do
       @p.destroy.must_equal @p
