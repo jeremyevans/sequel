@@ -354,6 +354,11 @@ module Sequel
             cti_this(m).update(h) unless h.empty?
           end
         end
+
+        # Don't allow use of prepared statements.
+        def use_prepared_statements_for?(type)
+          false
+        end
       end
     end
   end

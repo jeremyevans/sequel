@@ -51,6 +51,14 @@ describe "class_table_inheritance plugin" do
     Object.send(:remove_const, :Employee)
   end
 
+  it "should not attempt to use prepared statements" do
+    Manager.plugin :prepared_statements
+    Manager[1]
+    @db.sqls.must_equal ["SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 1) LIMIT 1"]
+    Manager.load(:id=>1, :kind=>'Manager', :num_staff=>2).save
+    @db.sqls.must_equal ["UPDATE employees SET kind = 'Manager' WHERE (id = 1)", "UPDATE managers SET num_staff = 2 WHERE (id = 1)"]
+  end
+
   it "#cti_base_model should be the model that loaded the plugin" do
     Executive.cti_base_model.must_equal Employee
   end
