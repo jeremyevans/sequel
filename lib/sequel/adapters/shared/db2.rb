@@ -165,15 +165,6 @@ module Sequel
         false
       end
 
-      # Add null/not null SQL fragment to column creation SQL.
-      def column_definition_null_sql(sql, column)
-        null = column.fetch(:null, column[:allow_null]) 
-        null = false  if column[:primary_key]
-
-        sql << NOT_NULL if null == false
-        sql << NULL if null == true
-      end
-
       # Supply columns with NOT NULL if they are part of a composite
       # primary key or unique constraint
       def column_list_sql(g)
