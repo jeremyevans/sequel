@@ -5108,13 +5108,13 @@ describe "Dataset emulated complex expression operators" do
   it "should emulate >>" do
     @ds.literal(Sequel::SQL::NumericExpression.new(:>>, @n)).must_equal "x"
     @ds.literal(@n >> 1).must_equal "(x / power(2, 1))"
-    @ds.literal(@n >> 1 >> 2).must_equal "(x / power(2, 1) / power(2, 2))"
+    @ds.literal(@n >> 1 >> 2).must_equal "((x / power(2, 1)) / power(2, 2))"
   end
 
   it "should emulate <<" do
     @ds.literal(Sequel::SQL::NumericExpression.new(:<<, @n)).must_equal "x"
     @ds.literal(@n << 1).must_equal "(x * power(2, 1))"
-    @ds.literal(@n << 1 << 2).must_equal "(x * power(2, 1) * power(2, 2))"
+    @ds.literal(@n << 1 << 2).must_equal "((x * power(2, 1)) * power(2, 2))"
   end
 
   it "should emulate B~" do

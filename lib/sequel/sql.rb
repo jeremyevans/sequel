@@ -206,6 +206,9 @@ module Sequel
       # Operator symbols that take one or more arguments
       N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS + BITWISE_OPERATORS - [:**]
 
+      # Operator symbols that are associative
+      ASSOCIATIVE_OPERATORS = [:AND, :OR, :'||', :+, :*, :&, :|]
+
       # Operator symbols that take only a single argument
       ONE_ARITY_OPERATORS = [:NOT, :NOOP, :'B~']
 
@@ -229,9 +232,12 @@ module Sequel
         case op
         when *N_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires at least 1 argument") unless args.length >= 1
-          old_args = args.map{|a| a.is_a?(self.class) && a.op == :NOOP ? a.args.first : a}
-          args = []
-          old_args.each{|a| a.is_a?(self.class) && a.op == op ? args.concat(a.args) : args.push(a)}
+          args.map!{|a| a.is_a?(self.class) && a.op == :NOOP ? a.args.first : a}
+          if ASSOCIATIVE_OPERATORS.include?(op)
+            old_args = args
+            args = []
+            old_args.each{|a| a.is_a?(self.class) && a.op == op ? args.concat(a.args) : args.push(a)}
+          end
         when *TWO_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires precisely 2 arguments") unless args.length == 2
           # With IN/NOT IN, even if the second argument is an array of two element arrays,

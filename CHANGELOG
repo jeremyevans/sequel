@@ -1,5 +1,7 @@
 === HEAD
 
+* Do not attempt to combine non-associative operators (jeremyevans) (#1246)
+
 * Automatically add NOT NULL to columns when adding primary keys if the database doesn't handle it (jeremyevans)
 
 * Make prepared_statements plugin correctly handle lookup on joined datasets (jeremyevans) (#1244)

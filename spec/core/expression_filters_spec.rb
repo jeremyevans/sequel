@@ -129,6 +129,21 @@ describe "Blockless Ruby Filters" do
     proc{~Sequel.expr(:x).sql_string}.must_raise(NoMethodError) 
   end
 
+  it "should only allow combining associative operators" do
+    @d.lit(Sequel.expr{a + b + c}).must_equal '(a + b + c)'
+    @d.lit(Sequel.expr{a - b - c}).must_equal '((a - b) - c)'
+    @d.lit(Sequel.expr{a * b * c}).must_equal '(a * b * c)'
+    @d.lit(Sequel.expr{a / b / c}).must_equal '((a / b) / c)'
+    @d.lit(Sequel.expr{a & b & c}).must_equal '(a AND b AND c)'
+    @d.lit(Sequel.expr{a | b | c}).must_equal '(a OR b OR c)'
+    @d.lit(Sequel.expr{a.sql_string + b + c}).must_equal '(a || b || c)'
+    @d.lit(Sequel.expr{a.sql_number >> b >> c}).must_equal '((a >> b) >> c)'
+    @d.lit(Sequel.expr{a.sql_number << b << c}).must_equal '((a << b) << c)'
+    @d.lit(Sequel.expr{a.sql_number % b % c}).must_equal '((a % b) % c)'
+    @d.lit(Sequel.expr{a.sql_number & b & c}).must_equal '(a & b & c)'
+    @d.lit(Sequel.expr{a.sql_number | b | c}).must_equal '(a | b | c)'
+  end
+
   it "should allow mathematical or string operations on true, false, or nil" do
     @d.lit(Sequel.expr(:x) + 1).must_equal '(x + 1)'
     @d.lit(Sequel.expr(:x) - true).must_equal "(x - 't')"
@@ -206,7 +221,7 @@ describe "Blockless Ruby Filters" do
     @d.l((Sequel.lit('x') * :y) < 100.01).must_equal '((x * y) < 100.01)'
     @d.l((Sequel.lit('x') ** :y) < 100.01).must_equal '(power(x, y) < 100.01)'
     @d.l((Sequel.lit('x') - Sequel.expr(:y)/2) >= 100000000000000000000000000000000000).must_equal '((x - (y / 2)) >= 100000000000000000000000000000000000)'
-    @d.l((Sequel.lit('z') * ((Sequel.lit('x') / :y)/(Sequel.expr(:x) + :y))) <= 100).must_equal '((z * (x / y / (x + y))) <= 100)'
+    @d.l((Sequel.lit('z') * ((Sequel.lit('x') / :y)/(Sequel.expr(:x) + :y))) <= 100).must_equal '((z * ((x / y) / (x + y))) <= 100)'
     @d.l(~((((Sequel.lit('x') - :y)/(Sequel.expr(:x) + :y))*:z) <= 100)).must_equal '((((x - y) / (x + y)) * z) > 100)'
   end
 
