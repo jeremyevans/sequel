@@ -47,7 +47,7 @@ Sequel can check for null values:
 
 Or compare two columns:
 
-  items.where(:x => :some_table__y).sql
+  items.where{{:x => some_table[:y]}}.sql
   #=> "SELECT * FROM items WHERE (x = some_table.y)"
 
 And also compare against multiple values:

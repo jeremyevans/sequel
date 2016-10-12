@@ -62,11 +62,11 @@ describe "MSSQL" do
   end
 
   it "should should support CROSS APPLY" do
-    @db[:test3].cross_apply(@db[:test4].where(:test3__v3=>:test4__v4)).select_order_map([:v3, :v4]).must_equal [[1,1]]
+    @db[:test3].cross_apply(@db[:test4].where(Sequel[:test3][:v3]=>Sequel[:test4][:v4])).select_order_map([:v3, :v4]).must_equal [[1,1]]
   end
 
   it "should should support OUTER APPLY" do
-    @db[:test3].outer_apply(@db[:test4].where(:test3__v3=>:test4__v4)).select_order_map([:v3, :v4]).must_equal [[1,1], [2, nil]]
+    @db[:test3].outer_apply(@db[:test4].where(Sequel[:test3][:v3]=>Sequel[:test4][:v4])).select_order_map([:v3, :v4]).must_equal [[1,1], [2, nil]]
   end
 end
 
@@ -105,7 +105,7 @@ describe "MSSQL Dataset#join_table" do
     ['SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID1] = [ITEMS].[ID1]) AND ([CATEGORIES].[ID2] = [ITEMS].[ID2]))',
       'SELECT * FROM [ITEMS] INNER JOIN [CATEGORIES] ON (([CATEGORIES].[ID2] = [ITEMS].[ID2]) AND ([CATEGORIES].[ID1] = [ITEMS].[ID1]))'].
       must_include(DB[:items].join(:categories, [:id1, :id2]).sql)
-    DB[:items___i].join(:categories___c, [:id]).sql.must_equal 'SELECT * FROM [ITEMS] AS [I] INNER JOIN [CATEGORIES] AS [C] ON ([C].[ID] = [I].[ID])'
+    DB[Sequel[:items].as(:i)].join(Sequel[:categories].as(:c), [:id]).sql.must_equal 'SELECT * FROM [ITEMS] AS [I] INNER JOIN [CATEGORIES] AS [C] ON ([C].[ID] = [I].[ID])'
   end
 end
 
@@ -121,56 +121,56 @@ describe "MSSQL Dataset#output" do
   end
 
   it "should format OUTPUT clauses without INTO for DELETE statements" do
-    @ds.output(nil, [:deleted__name, :deleted__value]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\]/)
+    @ds.output(nil, [Sequel[:deleted][:name], Sequel[:deleted][:value]]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\]/)
     @ds.output(nil, [Sequel::SQL::ColumnAll.new(:deleted)]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].*/)
   end
   
   it "should format OUTPUT clauses with INTO for DELETE statements" do
-    @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\]/)
-    @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
+    @ds.output(:out, [Sequel[:deleted][:name], Sequel[:deleted][:value]]).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\]/)
+    @ds.output(:out, {:name => Sequel[:deleted][:name], :value => Sequel[:deleted][:value]}).delete_sql.must_match(/DELETE FROM \[ITEMS\] OUTPUT \[DELETED\].\[(NAME|VALUE)\], \[DELETED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
   end
 
   it "should format OUTPUT clauses without INTO for INSERT statements" do
-    @ds.output(nil, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] VALUES \((N'name'|1), (N'name'|1)\)/)
+    @ds.output(nil, [Sequel[:inserted][:name], Sequel[:inserted][:value]]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] VALUES \((N'name'|1), (N'name'|1)\)/)
     @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].* VALUES \((N'name'|1), (N'name'|1)\)/)
   end
 
   it "should format OUTPUT clauses with INTO for INSERT statements" do
-    @ds.output(:out, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \((\[NAME\]|\[VALUE\]), (\[NAME\]|\[VALUE\])\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] VALUES \((N'name'|1), (N'name'|1)\)/)
-    @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) VALUES \((N'name'|1), (N'name'|1)\)/)
+    @ds.output(:out, [Sequel[:inserted][:name], Sequel[:inserted][:value]]).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \((\[NAME\]|\[VALUE\]), (\[NAME\]|\[VALUE\])\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] VALUES \((N'name'|1), (N'name'|1)\)/)
+    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:inserted][:value]}).insert_sql(:name => "name", :value => 1).must_match(/INSERT INTO \[ITEMS\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) OUTPUT \[INSERTED\].\[(NAME|VALUE)\], \[INSERTED\].\[(NAME|VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\) VALUES \((N'name'|1), (N'name'|1)\)/)
   end
 
   it "should format OUTPUT clauses without INTO for UPDATE statements" do
-    @ds.output(nil, [:inserted__name, :deleted__value]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\]/)
+    @ds.output(nil, [Sequel[:inserted][:name], Sequel[:deleted][:value]]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\]/)
     @ds.output(nil, [Sequel::SQL::ColumnAll.new(:inserted)]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[INSERTED\].*/)
   end
 
   it "should format OUTPUT clauses with INTO for UPDATE statements" do
-    @ds.output(:out, [:inserted__name, :deleted__value]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\]/)
-    @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
+    @ds.output(:out, [Sequel[:inserted][:name], Sequel[:deleted][:value]]).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\]/)
+    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:deleted][:value]}).update_sql(:value => 2).must_match(/UPDATE \[ITEMS\] SET \[VALUE\] = 2 OUTPUT \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\], \[(INSERTED\].\[NAME|DELETED\].\[VALUE)\] INTO \[OUT\] \(\[(NAME|VALUE)\], \[(NAME|VALUE)\]\)/)
   end
 
   it "should execute OUTPUT clauses in DELETE statements" do
     @ds.insert(:name => "name", :value => 1)
-    @ds.output(:out, [:deleted__name, :deleted__value]).delete
+    @ds.output(:out, [Sequel[:deleted][:name], Sequel[:deleted][:value]]).delete
     @db[:out].all.must_equal [{:name => "name", :value => 1}]
     @ds.insert(:name => "name", :value => 2)
-    @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete
+    @ds.output(:out, {:name => Sequel[:deleted][:name], :value => Sequel[:deleted][:value]}).delete
     @db[:out].all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
   end
 
   it "should execute OUTPUT clauses in INSERT statements" do
-    @ds.output(:out, [:inserted__name, :inserted__value]).insert(:name => "name", :value => 1)
+    @ds.output(:out, [Sequel[:inserted][:name], Sequel[:inserted][:value]]).insert(:name => "name", :value => 1)
     @db[:out].all.must_equal [{:name => "name", :value => 1}]
-    @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert(:name => "name", :value => 2)
+    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:inserted][:value]}).insert(:name => "name", :value => 2)
     @db[:out].all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
   end
 
   it "should execute OUTPUT clauses in UPDATE statements" do
     @ds.insert(:name => "name", :value => 1)
-    @ds.output(:out, [:inserted__name, :deleted__value]).update(:value => 2)
+    @ds.output(:out, [Sequel[:inserted][:name], Sequel[:deleted][:value]]).update(:value => 2)
     @db[:out].all.must_equal [{:name => "name", :value => 1}]
-    @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update(:value => 3)
+    @ds.output(:out, {:name => Sequel[:inserted][:name], :value => Sequel[:deleted][:value]}).update(:value => 3)
     @db[:out].all.must_equal [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
   end
 end
@@ -216,7 +216,7 @@ describe "MSSQL::Dataset#import" do
   
   it "#import should work correctly with an arbitrary output value" do
     @db.create_table!(:test){primary_key :x; Integer :y}
-    @ds.output(nil, [:inserted__y, :inserted__x]).import([:y], [[3], [4]]).must_equal [{:y=>3, :x=>1}, {:y=>4, :x=>2}]
+    @ds.output(nil, [Sequel[:inserted][:y], Sequel[:inserted][:x]]).import([:y], [[3], [4]]).must_equal [{:y=>3, :x=>1}, {:y=>4, :x=>2}]
     @ds.all.must_equal [{:x=>1, :y=>3}, {:x=>2, :y=>4}]
   end
 
@@ -233,11 +233,11 @@ describe "MSSQL joined datasets" do
   end
 
   it "should format DELETE statements" do
-    @db[:t1].inner_join(:t2, :t1__pk => :t2__pk).delete_sql.must_equal "DELETE FROM [T1] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
+    @db[:t1].inner_join(:t2, Sequel[:t1][:pk] => Sequel[:t2][:pk]).delete_sql.must_equal "DELETE FROM [T1] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
   end
 
   it "should format UPDATE statements" do
-    @db[:t1].inner_join(:t2, :t1__pk => :t2__pk).update_sql(:pk => :t2__pk).must_equal "UPDATE [T1] SET [PK] = [T2].[PK] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
+    @db[:t1].inner_join(:t2, Sequel[:t1][:pk] => Sequel[:t2][:pk]).update_sql(:pk => Sequel[:t2][:pk]).must_equal "UPDATE [T1] SET [PK] = [T2].[PK] FROM [T1] INNER JOIN [T2] ON ([T1].[PK] = [T2].[PK])"
   end
 end
 
@@ -281,7 +281,7 @@ describe "Common Table Expressions" do
     @ds.insert(:id=>1)
     @ds2.insert(:id=>2, :parent_id=>1)
     @ds2.insert(:id=>3, :parent_id=>2)
-    @ds.with(:t, @ds2).filter(:id => @db[:t].select(:id)).update(:parent_id => @db[:t].filter(:id => :i1__id).select(:parent_id).limit(1))
+    @ds.with(:t, @ds2).filter(:id => @db[:t].select(:id)).update(:parent_id => @db[:t].filter(:id => Sequel[:i1][:id]).select(:parent_id).limit(1))
     @ds[:id => 1].must_equal(:id => 1, :parent_id => nil)
     @ds[:id => 2].must_equal(:id => 2, :parent_id => 1)
     @ds[:id => 3].must_equal(:id => 3, :parent_id => 2)
@@ -289,7 +289,7 @@ describe "Common Table Expressions" do
   end
 
   it "using #with_recursive should be able to update" do
-    ds = @ds.with_recursive(:t, @ds.filter(:parent_id=>1).or(:id => 1), @ds.join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi])
+    ds = @ds.with_recursive(:t, @ds.filter(:parent_id=>1).or(:id => 1), @ds.join(:t, :i=>:parent_id).select(Sequel[:i1][:id], Sequel[:i1][:parent_id]), :args=>[:i, :pi])
     ds.exclude(:id => @db[:t].select(:i)).update(:parent_id => 1)
     @ds[:id => 1].must_equal(:id => 1, :parent_id => nil)
     @ds[:id => 2].must_equal(:id => 2, :parent_id => 1)
@@ -303,7 +303,7 @@ describe "Common Table Expressions" do
   end
 
   it "using #with_recursive should be able to insert" do
-    ds = @ds2.with_recursive(:t, @ds.filter(:parent_id=>1), @ds.join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi])
+    ds = @ds2.with_recursive(:t, @ds.filter(:parent_id=>1), @ds.join(:t, :i=>:parent_id).select(Sequel[:i1][:id], Sequel[:i1][:parent_id]), :args=>[:i, :pi])
     ds.insert @db[:t]
     @ds2.all.must_equal [{:id => 3, :parent_id => 1}, {:id => 4, :parent_id => 1}, {:id => 5, :parent_id => 3}, {:id => 6, :parent_id => 5}]
   end
@@ -318,8 +318,8 @@ describe "Common Table Expressions" do
 
   it "using #with_recursive should be able to delete" do
     @ds.insert(:id=>7, :parent_id=>2)
-    ds = @ds.with_recursive(:t, @ds.filter(:parent_id=>1), @ds.join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi])
-    ds.filter(:i1__id => @db[:t].select(:i)).delete
+    ds = @ds.with_recursive(:t, @ds.filter(:parent_id=>1), @ds.join(:t, :i=>:parent_id).select(Sequel[:i1][:id], Sequel[:i1][:parent_id]), :args=>[:i, :pi])
+    ds.filter(Sequel[:i1][:id] => @db[:t].select(:i)).delete
     @ds.all.must_equal [{:id => 1, :parent_id => nil}, {:id => 2, :parent_id => nil}, {:id => 7, :parent_id => 2}]
   end
 
@@ -330,7 +330,7 @@ describe "Common Table Expressions" do
   end
 
   it "using #with_recursive should be able to import" do
-    ds = @ds2.with_recursive(:t, @ds.filter(:parent_id=>1), @ds.join(:t, :i=>:parent_id).select(:i1__id, :i1__parent_id), :args=>[:i, :pi])
+    ds = @ds2.with_recursive(:t, @ds.filter(:parent_id=>1), @ds.join(:t, :i=>:parent_id).select(Sequel[:i1][:id], Sequel[:i1][:parent_id]), :args=>[:i, :pi])
     ds.import [:id, :parent_id], @db[:t].select(:i, :pi)
     @ds2.all.must_equal [{:id => 3, :parent_id => 1}, {:id => 4, :parent_id => 1}, {:id => 5, :parent_id => 3}, {:id => 6, :parent_id => 5}]
   end
@@ -442,11 +442,11 @@ describe "MSSQL::Database#rename_table" do
       IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'MY')
         EXECUTE sp_executesql N'create schema MY'
     SQL
-    DB.create_table! :MY__foo do
+    DB.create_table! Sequel[:MY][:foo] do
       text :name
     end
-    DB.rename_table :MY__foo, :MY__bar
-    DB.rename_table :MY__bar, :foo
+    DB.rename_table Sequel[:MY][:foo], Sequel[:MY][:bar]
+    DB.rename_table Sequel[:MY][:bar], :foo
   end
 end
 
@@ -550,14 +550,14 @@ describe "MSSQL::Database#drop_column with a schema" do
     DB.run "create schema test" rescue nil
   end
   after do
-    DB.drop_table(:test__items)
+    DB.drop_table(Sequel[:test][:items])
     DB.run "drop schema test" rescue nil
   end
 
   it "drops columns with a default value" do
-    DB.create_table!(:test__items){ Integer :id; String :name, :default => 'widget' }
-    DB.drop_column(:test__items, :name)
-    DB[:test__items].columns.must_equal [:id]
+    DB.create_table!(Sequel[:test][:items]){ Integer :id; String :name, :default => 'widget' }
+    DB.drop_column(Sequel[:test][:items], :name)
+    DB[Sequel[:test][:items]].columns.must_equal [:id]
   end
 end
 
@@ -606,24 +606,24 @@ describe "Database#foreign_key_list" do
   describe "with multiple schemas" do
     before(:all) do
       DB.execute_ddl "create schema vendor"
-      DB.create_table! :vendor__vendors do
+      DB.create_table! Sequel[:vendor][:vendors] do
         primary_key :id
         varchar     :name
       end
-      DB.create_table! :vendor__mapping do
+      DB.create_table! Sequel[:vendor][:mapping] do
         integer :vendor_id
         integer :item_id
-        foreign_key [:vendor_id], :vendor__vendors, :name => :fk_mapping_vendor
+        foreign_key [:vendor_id], Sequel[:vendor][:vendors], :name => :fk_mapping_vendor
         foreign_key [:item_id], :items, :name => :fk_mapping_item
       end
     end
     after(:all) do
-      DB.drop_table? :vendor__mapping
-      DB.drop_table? :vendor__vendors
+      DB.drop_table? Sequel[:vendor][:mapping]
+      DB.drop_table? Sequel[:vendor][:vendors]
       DB.execute_ddl "drop schema vendor"
     end
     it "should support mixed schema bound tables" do
- DB.foreign_key_list(:vendor__mapping).sort_by{|h| h[:name].to_s}.must_equal [{:name => :fk_mapping_item, :table => :items, :columns => [:item_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }, {:name => :fk_mapping_vendor, :table => Sequel.qualify(:vendor, :vendors), :columns => [:vendor_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }]
+ DB.foreign_key_list(Sequel[:vendor][:mapping]).sort_by{|h| h[:name].to_s}.must_equal [{:name => :fk_mapping_item, :table => :items, :columns => [:item_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }, {:name => :fk_mapping_vendor, :table => Sequel.qualify(:vendor, :vendors), :columns => [:vendor_id], :key => [:id], :on_update => :no_action, :on_delete => :no_action }]
     end
   end
 end

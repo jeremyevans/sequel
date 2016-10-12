@@ -73,8 +73,8 @@ ordered by the albums name, you can do:
 
   albums = Artist.
     eager_graph(:albums).
-    where(Sequel.like(:albums__name, 'A%')).
-    order(:albums__name).
+    where{Sequel.like(albums[:name], 'A%')}.
+    order{albums[:name]}.
     all
 
 For lazy loading (e.g. Model[1].association), the <tt>:dataset</tt> option can be used
@@ -780,16 +780,16 @@ What you want to do is get all songs for a given artist, ordered by the song's
 name, with no duplicates?
 
   class Artist < Sequel::Model
-    one_to_many :songs, :order=>:songs__name, \
+    one_to_many :songs, :order=>Sequel[:songs][:name], \
       :dataset=>proc{Song.select_all(:songs).join(Lyric, :id=>:lyric_id, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])}, \
       :eager_loader=>(proc do |eo|
         h = eo[:id_map]
         ids = h.keys
         eo[:rows].each{|r| r.associations[:songs] = []}
         Song.select_all(:songs).
-          select_append(:lyrics__composer_id, :lyrics__arranger_id, :lyrics__vocalist_id, :lyrics__lyricist_id).
+          select_append{[lyrics[:composer_id], lyrics[:arranger_id], lyrics[:vocalist_id], lyrics[:lyricist_id]}.
           join(Lyric, :id=>:lyric_id){Sequel.or(:composer_id=>ids, :arranger_id=>ids, :vocalist_id=>ids, :lyricist_id=>ids)}.
-          order(:songs__name).all do |song|
+          order{songs[:name]}.all do |song|
           [:composer_id, :arranger_id, :vocalist_id, :lyricist_id].each do |x|
             recs = h[song.values.delete(x)]
             recs.each{|r| r.associations[:songs] << song} if recs

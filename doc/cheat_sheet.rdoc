@@ -129,7 +129,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   # SELECT * FROM items
   # LEFT OUTER JOIN categories ON categories.id = items.category_id
 
-  DB[:items].join(:categories, :id => :category_id).join(:groups, :id => :items__group_id) 
+  DB[:items].join(:categories, :id => :category_id).join(:groups, :id => Sequel[:items][:group_id]) 
   # SELECT * FROM items
   # INNER JOIN categories ON categories.id = items.category_id
   # INNER JOIN groups ON groups.id = items.group_id
@@ -170,8 +170,10 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Aliasing
 
   DB[:items].select(Sequel.as(:name, :item_name))
-  DB[:items].select(:name___item_name)
-  DB[:items___items_table].select(:items_table__name___item_name)
+  DB[:items].select{name.as(:item_name)}
+  # SELECT name AS item_name FROM items
+
+  DB[Sequel[:items].as(:items_table)].select{items_table[:name].as(:item_name)}
   # SELECT items_table.name AS item_name FROM items AS items_table
 
 == Transactions

@@ -123,7 +123,7 @@ describe "Class Table Inheritance Plugin" do
   end
   
   it "should handle associations only defined in subclasses" do
-    Employee.filter(:employees__id=>@i2).all.first.manager.id.must_equal @i4
+    Employee.filter(Sequel[:employees][:id]=>@i2).all.first.manager.id.must_equal @i4
   end
 
   it "should insert rows into all tables" do
@@ -248,10 +248,10 @@ describe "Many Through Many Plugin" do
     Artist.filter(:id=>@artist3.id).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B C'
     Artist.filter(:id=>@artist4.id).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
     
-    Artist.filter(:artists__id=>@artist1.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A D'
-    Artist.filter(:artists__id=>@artist2.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A C'
-    Artist.filter(:artists__id=>@artist3.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B C'
-    Artist.filter(:artists__id=>@artist4.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
+    Artist.filter(Sequel[:artists][:id]=>@artist1.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A D'
+    Artist.filter(Sequel[:artists][:id]=>@artist2.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'A C'
+    Artist.filter(Sequel[:artists][:id]=>@artist3.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B C'
+    Artist.filter(Sequel[:artists][:id]=>@artist4.id).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
 
     Artist.filter(:albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'1 2'
     Artist.filter(:albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'3 4'
@@ -289,8 +289,8 @@ describe "Many Through Many Plugin" do
     c.exclude(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'4'
     c.exclude(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w'2'
 
-    c.filter(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
-    c.exclude(:albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
+    c.filter(:albums=>self_join(Album).filter(Sequel[:albums][:id]=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.exclude(:albums=>self_join(Album).filter(Sequel[:albums][:id]=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
   end
 
   it "should handle typical case with 3 join tables" do
@@ -311,10 +311,10 @@ describe "Many Through Many Plugin" do
     Artist.filter(:id=>@artist3.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'2 3 4'
     Artist.filter(:id=>@artist4.id).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 3 4'
     
-    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 4'
-    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 3'
-    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'2 3 4'
-    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 3 4'
+    Artist.filter(Sequel[:artists][:id]=>@artist1.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 4'
+    Artist.filter(Sequel[:artists][:id]=>@artist2.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 2 3'
+    Artist.filter(Sequel[:artists][:id]=>@artist3.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'2 3 4'
+    Artist.filter(Sequel[:artists][:id]=>@artist4.id).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.must_equal %w'1 3 4'
 
     Artist.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.must_equal %w'1 2 4'
     Artist.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
@@ -346,8 +346,8 @@ describe "Many Through Many Plugin" do
     c.filter(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
     c.exclude(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.must_equal %w''
 
-    c.filter(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'1 2 4'
-    c.exclude(:related_artists=>c.filter(:artists__id=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'3'
+    c.filter(:related_artists=>c.filter(Sequel[:artists][:id]=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'1 2 4'
+    c.exclude(:related_artists=>c.filter(Sequel[:artists][:id]=>@artist1.id)).all.map{|a| a.name}.sort.must_equal %w'3'
   end
 
   it "should handle extreme case with 5 join tables" do
@@ -377,10 +377,10 @@ describe "Many Through Many Plugin" do
     Artist.filter(:id=>@artist3.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B D'
     Artist.filter(:id=>@artist4.id).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
     
-    Artist.filter(:artists__id=>@artist1.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C'
-    Artist.filter(:artists__id=>@artist2.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C D'
-    Artist.filter(:artists__id=>@artist3.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B D'
-    Artist.filter(:artists__id=>@artist4.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
+    Artist.filter(Sequel[:artists][:id]=>@artist1.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C'
+    Artist.filter(Sequel[:artists][:id]=>@artist2.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B C D'
+    Artist.filter(Sequel[:artists][:id]=>@artist3.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'A B D'
+    Artist.filter(Sequel[:artists][:id]=>@artist4.id).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.must_equal %w'B D'
 
     Artist.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
     Artist.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.must_equal %w'1 2 3 4'
@@ -418,8 +418,8 @@ describe "Many Through Many Plugin" do
     c.exclude(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.must_equal %w'4'
     c.exclude(:related_albums=>[@album2, @album4]).all.map{|a| a.name}.sort.must_equal %w''
 
-    c.filter(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
-    c.exclude(:related_albums=>self_join(Album).filter(:albums__id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
+    c.filter(:related_albums=>self_join(Album).filter(Sequel[:albums][:id]=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'1 2 3'
+    c.exclude(:related_albums=>self_join(Album).filter(Sequel[:albums][:id]=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.must_equal %w'4'
   end
 end
 
@@ -1893,7 +1893,7 @@ describe "Sequel::Plugins::PreparedStatements with schema changes" do
     @c = Class.new(Sequel::Model(@db[:ps_test]))
     @c.many_to_one :ps_test, :key=>:id, :class=>@c
     @c.one_to_many :ps_tests, :key=>:id, :class=>@c
-    @c.many_to_many :mps_tests, :left_key=>:id, :right_key=>:id, :class=>@c, :join_table=>:ps_test___x
+    @c.many_to_many :mps_tests, :left_key=>:id, :right_key=>:id, :class=>@c, :join_table=>Sequel[:ps_test].as(:x)
     @c.plugin :prepared_statements
     @c.plugin :prepared_statements_associations
   end

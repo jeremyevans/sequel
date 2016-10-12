@@ -804,7 +804,7 @@ is wrong as the foreign key <tt>tracks.album_id</tt> refers to <tt>albums.id</tt
 <tt>artists.id</tt>.  To fix this, you need to explicitly qualify when joining:
 
   Album.join(:artists, :id=>:artist_id).
-   join(:tracks, :album_id=>:albums__id)
+   join(:tracks, :album_id=>Sequel[:albums][:id])
   # SELECT * FROM albums
   # INNER JOIN artists ON artists.id = albums.artist_id
   # INNER JOIN tracks ON tracks.album_id = albums.id
@@ -904,7 +904,7 @@ number of old albums.
 Using multiple FROM tables and setting conditions in the WHERE clause is
 an old-school way of joining tables:
 
-  DB.from(:albums, :artists).where(:artists__id=>:albums__artist_id)
+  DB.from(:albums, :artists).where{{artists[:id]=>albums[:artist_id]}}
   # SELECT * FROM albums, artists WHERE artists.id = albums.artist_id
 
 === Using the current dataset in a subselect

@@ -444,7 +444,7 @@ describe "Dataset#unbind" do
 
   it "should handle QualifiedIdentifiers" do
     @ct[Integer, 10]
-    @u[@ds.filter{items__c > 1}].must_equal(:c=>10)
+    @u[@ds.filter{items[:c] > 1}].must_equal(:c=>10)
   end
 
   cspecify "should handle deep nesting", :h2 do

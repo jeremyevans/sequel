@@ -36,7 +36,7 @@ OneToOneEagerGraphLimitStrategies = shared_description do
     @album.update(:artist => @artist)
     diff_album = @diff_album.call
     ar = @pr.call[1]
-    ds = Artist.order(:artists__name)
+    ds = Artist.order(Sequel[:artists][:name])
     limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
     a = ds.eager_graph_with_options(:first_album, limit_strategy).all
@@ -105,7 +105,7 @@ OneToManyEagerGraphLimitStrategies = shared_description do
     middle_album = @middle_album.call
     diff_album = @diff_album.call
     ar = @pr.call[1]
-    ds = Artist.order(:artists__name)
+    ds = Artist.order(Sequel[:artists][:name])
     limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
     ars = ds.eager_graph_with_options(:first_two_albums, limit_strategy).all
@@ -164,7 +164,7 @@ OneThroughOneEagerGraphLimitStrategies = shared_description do
   it "should correctly handle offsets when eager graphing one_through_one associations" do
     tu, tv = @other_tags.call
     al = @pr.call.first
-    ds = Album.order(:albums__name)
+    ds = Album.order(Sequel[:albums][:name])
     limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
     als = ds.eager_graph_with_options(:first_tag, limit_strategy).all
@@ -220,7 +220,7 @@ ManyToManyEagerGraphLimitStrategies = shared_description do
     tu, tv = @other_tags.call
     al = @pr.call.first
     al.add_tag(tu)
-    ds = Album.order(:albums__name)
+    ds = Album.order(Sequel[:albums][:name])
     limit_strategy = {:limit_strategy=>(@els||{})[:eager_limit_strategy]}
     
     als = ds.eager_graph_with_options(:first_two_tags, limit_strategy).all
@@ -287,7 +287,7 @@ ManyThroughManyEagerGraphLimitStrategies = shared_description do
     al, ar, _ = @pr.call
     al.update(:artist=>ar)
     al.add_tag(tu)
-    ds = Artist.order(:artists__name)
+    ds = Artist.order(Sequel[:artists][:name])
     limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
     ars = ds.eager_graph_with_options(:first_two_tags, limit_strategy).all
@@ -350,7 +350,7 @@ OneThroughManyEagerGraphLimitStrategies = shared_description do
     al, ar, _ = @pr.call
     al.update(:artist=>ar)
     al.add_tag(tu)
-    ds = Artist.order(:artists__name)
+    ds = Artist.order(Sequel[:artists][:name])
     limit_strategy = {:limit_strategy=>@els[:eager_limit_strategy]}
     
     ars = ds.eager_graph_with_options(:first_tag, limit_strategy).all
@@ -1060,7 +1060,7 @@ FilterByAssociationsOneToOneLimitStrategies = shared_description do
     ds.exclude(:last_album=>@album).all.must_equal [@artist, ar]
     ds.exclude(:last_album=>diff_album).all.must_equal [ar]
 
-    Artist.one_to_one :first_album, :clone=>:first_album do |ads| ads.where(:albums__name=>diff_album.name) end
+    Artist.one_to_one :first_album, :clone=>:first_album do |ads| ads.where(Sequel[:albums][:name]=>diff_album.name) end
     ar.add_album(diff_album)
     ds.where(:first_album=>[@album, diff_album]).all.must_equal [ar]
     ds.exclude(:first_album=>[@album, diff_album]).all.must_equal [@artist]
@@ -1086,7 +1086,7 @@ FilterByAssociationsSingularLimitStrategies = shared_description do
     ds.where(ar.pk_hash).second_albums.all.must_equal []
     ds.where(ar.pk_hash).last_albums.all.must_equal []
 
-    Artist.one_to_one :first_album, :clone=>:first_album do |ads| ads.where(:albums__name=>diff_album.name) end
+    Artist.one_to_one :first_album, :clone=>:first_album do |ads| ads.where(Sequel[:albums][:name]=>diff_album.name) end
     ar.add_album(diff_album)
     ds.where(@artist.pk_hash).first_albums.all.must_equal []
     ds.where(ar.pk_hash).first_albums.all.must_equal [diff_album]
@@ -1122,8 +1122,8 @@ FilterByAssociationsSingularLimitStrategies = shared_description do
     ds.exclude(:last_tag=>tu).all.must_equal [@album]
     ds.exclude(:last_tag=>tv).all.must_equal [al]
 
-    Album.one_through_one :first_tag, :clone=>:first_tag do |ads| ads.where(:tags__name=>tu.name) end
-    Album.one_through_one :second_tag, :clone=>:second_tag do |ads| ads.where(:tags__name=>[tu.name, tv.name]) end
+    Album.one_through_one :first_tag, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Album.one_through_one :second_tag, :clone=>:second_tag do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
 
     ds.where(:first_tag=>[@tag, tu]).all.must_equal [@album, al]
     ds.exclude(:first_tag=>[@tag, tu]).all.must_equal []
@@ -1149,8 +1149,8 @@ FilterByAssociationsSingularLimitStrategies = shared_description do
     ds.where(al.pk_hash).second_tags.all.must_equal []
     ds.where(al.pk_hash).last_tags.all.must_equal [tu]
 
-    Album.one_through_one :first_tag, :clone=>:first_tag do |ads| ads.where(:tags__name=>tu.name) end
-    Album.one_through_one :second_tag, :clone=>:second_tag do |ads| ads.where(:tags__name=>[tu.name, tv.name]) end
+    Album.one_through_one :first_tag, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Album.one_through_one :second_tag, :clone=>:second_tag do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
 
     ds.where(@album.pk_hash).first_tags.all.must_equal [tu]
     ds.where(@album.pk_hash).second_tags.all.must_equal [tv]
@@ -1196,8 +1196,8 @@ FilterByAssociationsSingularLimitStrategies = shared_description do
     ds.exclude(:last_tag=>tu).all.must_equal [@artist]
     ds.exclude(:last_tag=>tv).all.must_equal [ar]
 
-    Artist.one_through_many :first_tag, :clone=>:first_tag do |ads| ads.where(:tags__name=>tu.name) end
-    Artist.one_through_many :second_tag, :clone=>:second_tag do |ads| ads.where(:tags__name=>[tu.name, tv.name]) end
+    Artist.one_through_many :first_tag, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Artist.one_through_many :second_tag, :clone=>:second_tag do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
 
     ds.where(:first_tag=>[@tag, tu]).all.must_equal [@artist, ar]
     ds.exclude(:first_tag=>[@tag, tu]).all.must_equal []
@@ -1225,8 +1225,8 @@ FilterByAssociationsSingularLimitStrategies = shared_description do
     ds.where(ar.pk_hash).second_tags.all.must_equal []
     ds.where(ar.pk_hash).last_tags.all.must_equal [tu]
 
-    Artist.one_through_many :first_tag, :clone=>:first_tag do |ads| ads.where(:tags__name=>tu.name) end
-    Artist.one_through_many :second_tag, :clone=>:second_tag do |ads| ads.where(:tags__name=>[tu.name, tv.name]) end
+    Artist.one_through_many :first_tag, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Artist.one_through_many :second_tag, :clone=>:second_tag do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
 
     ds.where(@artist.pk_hash).first_tags.all.must_equal [tu]
     ds.where(@artist.pk_hash).second_tags.all.must_equal [tv]
@@ -1275,7 +1275,7 @@ FilterByAssociationsOneToManyLimitStrategies = shared_description do
       ds.exclude(a=>diff_album).all.must_equal [ar]
     end
 
-    Artist.one_to_one :first_two_albums, :clone=>:first_two_albums do |ads| ads.where(:albums__name=>diff_album.name) end
+    Artist.one_to_one :first_two_albums, :clone=>:first_two_albums do |ads| ads.where(Sequel[:albums][:name]=>diff_album.name) end
     ar.add_album(diff_album)
     ds.where(:first_two_albums=>[@album, diff_album]).all.must_equal [ar]
     ds.exclude(:first_two_albums=>[@album, diff_album]).all.must_equal [@artist]
@@ -1306,7 +1306,7 @@ FilterByAssociationsLimitStrategies = shared_description do
     ds.where(ar.pk_hash).not_first_albums.all.must_equal []
     ds.where(ar.pk_hash).last_two_albums.all.must_equal []
 
-    Artist.one_to_one :first_two_albums, :clone=>:first_two_albums do |ads| ads.where(:albums__name=>[diff_album.name, middle_album.name]) end
+    Artist.one_to_one :first_two_albums, :clone=>:first_two_albums do |ads| ads.where(Sequel[:albums][:name]=>[diff_album.name, middle_album.name]) end
     ar.add_album(diff_album)
     ds.where(@artist.pk_hash).first_two_albums.all.must_equal [middle_album]
     ds.where(ar.pk_hash).first_two_albums.all.must_equal [diff_album]
@@ -1350,8 +1350,8 @@ FilterByAssociationsLimitStrategies = shared_description do
     ds.exclude(:last_two_tags=>tu).all.must_equal []
     ds.exclude(:last_two_tags=>tv).all.must_equal [al]
 
-    Album.many_to_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(:tags__name=>tu.name) end
-    Album.many_to_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(:tags__name=>[tu.name, tv.name]) end
+    Album.many_to_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Album.many_to_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
 
     ds.where(:first_two_tags=>[@tag, tu]).all.must_equal [@album, al]
     ds.exclude(:first_two_tags=>[@tag, tu]).all.must_equal []
@@ -1380,8 +1380,8 @@ FilterByAssociationsLimitStrategies = shared_description do
     ds.where(al.pk_hash).not_first_tags.all.must_equal []
     ds.where(al.pk_hash).last_two_tags.all.must_equal [tu]
 
-    Album.many_to_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(:tags__name=>tu.name) end
-    Album.many_to_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(:tags__name=>[tu.name, tv.name]) end
+    Album.many_to_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Album.many_to_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
 
     ds.where(@album.pk_hash).first_two_tags.all.must_equal [tu]
     ds.where(@album.pk_hash).second_two_tags.all.must_equal [tv]
@@ -1435,8 +1435,8 @@ FilterByAssociationsLimitStrategies = shared_description do
     ds.exclude(:last_two_tags=>tu).all.must_equal []
     ds.exclude(:last_two_tags=>tv).all.must_equal [ar]
 
-    Artist.many_through_many :first_two_tags, :clone=>:first_tag do |ads| ads.where(:tags__name=>tu.name) end
-    Artist.many_through_many :second_two_tags, :clone=>:first_tag do |ads| ads.where(:tags__name=>[tv.name, tu.name]) end
+    Artist.many_through_many :first_two_tags, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Artist.many_through_many :second_two_tags, :clone=>:first_tag do |ads| ads.where(Sequel[:tags][:name]=>[tv.name, tu.name]) end
 
     ds.where(:first_two_tags=>[@tag, tu]).all.must_equal [@artist, ar]
     ds.exclude(:first_two_tags=>[@tag, tu]).all.must_equal []
@@ -1467,8 +1467,8 @@ FilterByAssociationsLimitStrategies = shared_description do
     ds.where(ar.pk_hash).not_first_tags.all.must_equal []
     ds.where(ar.pk_hash).last_two_tags.all.must_equal [tu]
 
-    Artist.many_through_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(:tags__name=>tu.name) end
-    Artist.many_through_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(:tags__name=>[tu.name, tv.name]) end
+    Artist.many_through_many :first_two_tags, :clone=>:first_two_tags do |ads| ads.where(Sequel[:tags][:name]=>tu.name) end
+    Artist.many_through_many :second_two_tags, :clone=>:second_two_tags do |ads| ads.where(Sequel[:tags][:name]=>[tu.name, tv.name]) end
 
     ds.where(@artist.pk_hash).first_two_tags.all.must_equal [tu]
     ds.where(@artist.pk_hash).second_two_tags.all.must_equal [tv]
@@ -1848,28 +1848,28 @@ describe "Sequel::Model Simple Associations" do
       one_to_one :first_a_album, :clone=>:a_albums
       plugin :many_through_many
       many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
-      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2, :graph_order=>:name
-      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1], :graph_order=>:name
-      many_through_many :not_first_tags, :clone=>:tags, :order=>:tags__name, :limit=>[nil, 1], :graph_order=>:name
-      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2, :graph_order=>Sequel.desc(:name)
-      many_through_many :t_tags, :clone=>:tags, :conditions=>{:tags__name=>'T'}
-      one_through_many :first_tag, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :order=>:tags__name, :graph_order=>:name, :class=>:Tag
+      many_through_many :first_two_tags, :clone=>:tags, :order=>Sequel[:tags][:name], :limit=>2, :graph_order=>:name
+      many_through_many :second_two_tags, :clone=>:tags, :order=>Sequel[:tags][:name], :limit=>[2, 1], :graph_order=>:name
+      many_through_many :not_first_tags, :clone=>:tags, :order=>Sequel[:tags][:name], :limit=>[nil, 1], :graph_order=>:name
+      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(Sequel[:tags][:name]), :limit=>2, :graph_order=>Sequel.desc(:name)
+      many_through_many :t_tags, :clone=>:tags, :conditions=>{Sequel[:tags][:name]=>'T'}
+      one_through_many :first_tag, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :order=>Sequel[:tags][:name], :graph_order=>:name, :class=>:Tag
       one_through_many :second_tag, :clone=>:first_tag, :limit=>[nil, 1]
-      one_through_many :last_tag, :clone=>:first_tag, :order=>Sequel.desc(:tags__name), :graph_order=>Sequel.desc(:name)
-      one_through_many :t_tag, :clone=>:first_tag, :conditions=>{:tags__name=>'T'}
+      one_through_many :last_tag, :clone=>:first_tag, :order=>Sequel.desc(Sequel[:tags][:name]), :graph_order=>Sequel.desc(:name)
+      one_through_many :t_tag, :clone=>:first_tag, :conditions=>{Sequel[:tags][:name]=>'T'}
     end
     class ::Album < Sequel::Model(@db)
       plugin :dataset_associations
       many_to_one :artist, :reciprocal=>nil
       many_to_one :a_artist, :clone=>:artist, :conditions=>{:name=>'Ar'}, :key=>:artist_id
       many_to_many :tags, :right_key=>:tag_id
-      many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
+      many_to_many :alias_tags, :clone=>:tags, :join_table=>Sequel[:albums_tags].as(:at)
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
       many_to_many :not_first_tags, :clone=>:tags, :order=>:name, :limit=>[nil, 1]
       many_to_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:name), :limit=>2
       many_to_many :t_tags, :clone=>:tags, :conditions=>{:name=>'T'}
-      many_to_many :alias_t_tags, :clone=>:t_tags, :join_table=>:albums_tags___at
+      many_to_many :alias_t_tags, :clone=>:t_tags, :join_table=>Sequel[:albums_tags].as(:at)
       one_through_one :first_tag, :clone=>:tags, :order=>:name
       one_through_one :second_tag, :clone=>:first_tag, :limit=>[nil, 1]
       one_through_one :last_tag, :clone=>:tags, :order=>Sequel.desc(:name)
@@ -1970,9 +1970,9 @@ describe "Sequel::Model Simple Associations" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
-    Artist.set_dataset(:artists___ar)
-    Album.set_dataset(:albums___a)
-    Tag.set_dataset(:tags___t)
+    Artist.set_dataset(Sequel[:artists].as(:ar))
+    Album.set_dataset(Sequel[:albums].as(:a))
+    Tag.set_dataset(Sequel[:tags].as(:t))
     Artist.one_to_many :balbums, :class=>Album, :key=>:artist_id, :reciprocal=>nil
     Album.many_to_many :btags, :class=>Tag, :join_table=>:albums_tags, :right_key=>:tag_id
     Album.many_to_one :bartist, :class=>Artist, :key=>:artist_id
@@ -2069,17 +2069,17 @@ describe "Sequel::Model Simple Associations" do
   end
 
   it "should handle dataset associations with :dataset_associations_join options" do
-    Album.many_to_many :tags, :right_key=>:tag_id, :select=>[Sequel.expr(:tags).*, :albums_tags__tag_id___atid], :dataset_associations_join=>true
-    Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel.expr(:tags).*, :albums_tags__tag_id___atid, :albums__artist_id___aid], :dataset_associations_join=>true
+    Album.many_to_many :tags, :right_key=>:tag_id, :select=>[Sequel.expr(:tags).*, Sequel[:albums_tags][:tag_id].as(:atid)], :dataset_associations_join=>true
+    Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel.expr(:tags).*, Sequel[:albums_tags][:tag_id].as(:atid), Sequel[:albums][:artist_id].as(:aid)], :dataset_associations_join=>true
 
-    Album.tags.order(:tags__name).first.must_equal nil
-    Artist.tags.order(:tags__name).first.must_equal nil
+    Album.tags.order(Sequel[:tags][:name]).first.must_equal nil
+    Artist.tags.order(Sequel[:tags][:name]).first.must_equal nil
 
     @album.add_tag(@tag)
     @artist.add_album(@album)
 
-    Album.tags.order(:tags__name).first.must_equal Tag.load(:id=>@tag.id, :name=>"T", :atid=>@tag.id)
-    Artist.tags.order(:tags__name).first.must_equal Tag.load(:id=>@tag.id, :name=>"T", :atid=>@tag.id, :aid=>@artist.id)
+    Album.tags.order(Sequel[:tags][:name]).first.must_equal Tag.load(:id=>@tag.id, :name=>"T", :atid=>@tag.id)
+    Artist.tags.order(Sequel[:tags][:name]).first.must_equal Tag.load(:id=>@tag.id, :name=>"T", :atid=>@tag.id, :aid=>@artist.id)
   end
 end
 
@@ -2135,15 +2135,15 @@ describe "Sequel::Model Composite Key Associations" do
       one_to_one :first_a_album, :clone=>:a_albums
       plugin :many_through_many
       many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
-      many_through_many :first_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>2, :graph_order=>:name
-      many_through_many :second_two_tags, :clone=>:tags, :order=>:tags__name, :limit=>[2, 1], :graph_order=>:name
-      many_through_many :not_first_tags, :clone=>:tags, :order=>:tags__name, :limit=>[nil, 1], :graph_order=>:name
-      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:tags__name), :limit=>2, :graph_order=>Sequel.desc(:name)
-      many_through_many :t_tags, :clone=>:tags do |ds| ds.where(:tags__name=>'T') end
-      one_through_many :first_tag, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :order=>:tags__name, :graph_order=>:name, :class=>:Tag
+      many_through_many :first_two_tags, :clone=>:tags, :order=>Sequel[:tags][:name], :limit=>2, :graph_order=>:name
+      many_through_many :second_two_tags, :clone=>:tags, :order=>Sequel[:tags][:name], :limit=>[2, 1], :graph_order=>:name
+      many_through_many :not_first_tags, :clone=>:tags, :order=>Sequel[:tags][:name], :limit=>[nil, 1], :graph_order=>:name
+      many_through_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(Sequel[:tags][:name]), :limit=>2, :graph_order=>Sequel.desc(:name)
+      many_through_many :t_tags, :clone=>:tags do |ds| ds.where(Sequel[:tags][:name]=>'T') end
+      one_through_many :first_tag, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :order=>Sequel[:tags][:name], :graph_order=>:name, :class=>:Tag
       one_through_many :second_tag, :clone=>:first_tag, :limit=>[nil, 1]
-      one_through_many :last_tag, :clone=>:first_tag, :order=>Sequel.desc(:tags__name), :graph_order=>Sequel.desc(:name)
-      one_through_many :t_tag, :clone=>:first_tag do |ds| ds.where(:tags__name=>'T') end
+      one_through_many :last_tag, :clone=>:first_tag, :order=>Sequel.desc(Sequel[:tags][:name]), :graph_order=>Sequel.desc(:name)
+      one_through_many :t_tag, :clone=>:first_tag do |ds| ds.where(Sequel[:tags][:name]=>'T') end
     end
     class ::Album < Sequel::Model(@db)
       plugin :dataset_associations
@@ -2152,13 +2152,13 @@ describe "Sequel::Model Composite Key Associations" do
       many_to_one :artist, :key=>[:artist_id1, :artist_id2], :reciprocal=>nil
       many_to_one(:a_artist, :clone=>:artist){|ds| ds.where(:name=>'Ar')}
       many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
-      many_to_many :alias_tags, :clone=>:tags, :join_table=>:albums_tags___at
+      many_to_many :alias_tags, :clone=>:tags, :join_table=>Sequel[:albums_tags].as(:at)
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
       many_to_many :not_first_tags, :clone=>:tags, :order=>:name, :limit=>[nil, 1]
       many_to_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:name), :limit=>2
       many_to_many :t_tags, :clone=>:tags do |ds| ds.where(:name=>'T') end
-      many_to_many :alias_t_tags, :clone=>:t_tags, :join_table=>:albums_tags___at
+      many_to_many :alias_t_tags, :clone=>:t_tags, :join_table=>Sequel[:albums_tags].as(:at)
       one_through_one :first_tag, :clone=>:tags, :order=>:name
       one_through_one :second_tag, :clone=>:first_tag, :limit=>[nil, 1]
       one_through_one :last_tag, :clone=>:tags, :order=>Sequel.desc(:name)
@@ -2283,7 +2283,7 @@ describe "Sequel::Model pg_array_to_many" do
       pg_array_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
       pg_array_to_many :not_first_tags, :clone=>:tags, :order=>:name, :limit=>[nil, 1]
       pg_array_to_many :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:name), :limit=>2
-      pg_array_to_many :t_tags, :clone=>:tags do |ds| ds.where(:tags__name=>'T') end
+      pg_array_to_many :t_tags, :clone=>:tags do |ds| ds.where(Sequel[:tags][:name]=>'T') end
       pg_array_to_many :alias_t_tags, :clone=>:t_tags
     end
     class ::Tag < Sequel::Model(@db)
@@ -2364,7 +2364,7 @@ describe "Sequel::Model many_to_pg_array" do
       many_to_pg_array :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
       many_to_pg_array :not_first_tags, :clone=>:tags, :order=>:name, :limit=>[nil, 1]
       many_to_pg_array :last_two_tags, :clone=>:tags, :order=>Sequel.desc(:name), :limit=>2
-      many_to_pg_array :t_tags, :clone=>:tags do |ds| ds.where(:tags__name=>'T') end
+      many_to_pg_array :t_tags, :clone=>:tags do |ds| ds.where(Sequel[:tags][:name]=>'T') end
       many_to_pg_array :alias_t_tags, :clone=>:t_tags
     end
     class ::Tag < Sequel::Model(@db)

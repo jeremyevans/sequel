@@ -23,11 +23,11 @@ module Sequel
         m2 = input_identifier_meth
         indexes = {}
         metadata_dataset.
-          from(:db_index___i).
-          join(:db_index_key___k, :index_name=>:index_name, :class_name=>:class_name).
-          where(:i__class_name=>m2.call(table), :is_primary_key=>'NO').
-          order(:k__key_order).
-          select(:i__index_name, :k__key_attr_name___column, :is_unique).
+          from{db_index[:i]}.
+          join(Sequel[:db_index_key].as(:k), :index_name=>:index_name, :class_name=>:class_name).
+          where{{i[:class_name]=>m2.call(table), :is_primary_key=>'NO'}}.
+          order{k[:key_order]}.
+          select{[i[:index_name], k[:key_attr_name].as(:column), :is_unique]}.
           each do |row|
             index = indexes[m.call(row[:index_name])] ||= {:columns=>[], :unique=>row[:is_unique]=='YES'}
             index[:columns] << m.call(row[:column])
@@ -44,18 +44,18 @@ module Sequel
         m2 = input_identifier_meth(opts[:dataset])
 
         pks = metadata_dataset.
-          from(:db_index___i).
-          join(:db_index_key___k, :index_name=>:index_name, :class_name=>:class_name).
-          where(:i__class_name=>m2.call(table_name), :is_primary_key=>'YES').
-          order(:k__key_order).
-          select_map(:k__key_attr_name).
+          from{db_index[:i]}.
+          join(Sequel[:db_index_key].as(:k), :index_name=>:index_name, :class_name=>:class_name).
+          where{{i[:class_name]=>m2.call(table_name), :is_primary_key=>'YES'}}.
+          order{k[:key_order]}.
+          select_map{k[:key_attr_name]}.
           map{|c| m.call(c)}
 
         metadata_dataset.
           from(:db_attribute).
           where(:class_name=>m2.call(table_name)).
           order(:def_order).
-          select(:attr_name, :data_type___db_type, :default_value___default, :is_nullable___allow_null, :prec).
+          select{[:attr_name, data_type.as(:db_type), default_value.as(:default), is_nullable.as(:allow_null), :prec]}.
           map do |row|
             name = m.call(row.delete(:attr_name))
             row[:allow_null] = row[:allow_null] == 'YES'

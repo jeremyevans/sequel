@@ -125,7 +125,7 @@ describe "A Firebird dataset" do
     @d.select(:now[]).sql.must_equal \
     'SELECT now() FROM "TEST"'
 
-    @d.select(:max[:items__val]).sql.must_equal \
+    @d.select(:max[Sequel[:items][:val]]).sql.must_equal \
       'SELECT max("ITEMS"."VAL") FROM "TEST"'
 
     @d.order(:name.desc).sql.must_equal \
@@ -143,10 +143,10 @@ describe "A Firebird dataset" do
     @d.select(:test[:ABC, 'hello']).sql.must_equal \
       "SELECT test(\"ABC\", 'hello') FROM \"TEST\""
 
-    @d.select(:test[:ABC__DEF, 'hello']).sql.must_equal \
+    @d.select(:test[Sequel[:ABC][:DEF], 'hello']).sql.must_equal \
       "SELECT test(\"ABC\".\"DEF\", 'hello') FROM \"TEST\""
 
-    @d.select(:test[:ABC__DEF, 'hello'].as(:X2)).sql.must_equal \
+    @d.select(:test[Sequel[:ABC][:DEF], 'hello'].as(:X2)).sql.must_equal \
       "SELECT test(\"ABC\".\"DEF\", 'hello') AS \"X2\" FROM \"TEST\""
 
     @d.insert_sql(:val => 333).must_match \

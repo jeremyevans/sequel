@@ -432,7 +432,7 @@ module Sequel
 
           # Get basic oid information for the composite type.
           ds = from(:pg_type).
-            select(:pg_type__oid, :typrelid, :typarray).
+            select{[pg_type[:oid], :typrelid, :typarray]}.
             where([[:typtype, 'c'], [:typname, type_name.to_s]])
           if type_schema
             ds = ds.join(:pg_namespace, [[:oid, :typnamespace], [:nspname, type_schema.to_s]])
@@ -454,7 +454,7 @@ module Sequel
             where{attnum > 0}.
             exclude(:attisdropped).
             order(:attnum).
-            select_map([:attname, Sequel.case({0=>:atttypid}, :pg_type__typbasetype, :pg_type__typbasetype).as(:atttypid)])
+            select_map{[:attname, Sequel.case({0=>:atttypid}, pg_type[:typbasetype], pg_type[:typbasetype]).as(:atttypid)]}
           if res.empty?
             raise Error, "no columns for row type #{db_type.inspect} in database"
           end

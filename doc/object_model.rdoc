@@ -126,20 +126,28 @@ For example, ruby symbols represent SQL identifiers (tables, columns, schemas):
   :table  # "table"
   :column # "column"
 
-However, they can also represent qualified identifiers by including a double
-underscore inside a symbol:
+By default, Sequel supports splitting symbols using double or triple underscores
+to represent qualified and aliased identifiers.  A symbol with a double underscore
+is treated as a qualified identifier:
 
   :table__column # "table"."column"
 
-They can also represent an aliased identifier by including a triple underscore
-inside a symbol:
+A symbol with a triple underscore is treated as an aliased identifier:
 
   :column___alias # "column" AS "alias"
 
-You can combine both qualification and aliasing by using a double underscore
-and a triple underscore:
+A symbol with a double underscore followed by a triple underscore is treated
+as an aliased qualified identifer:
 
   :table__column___alias # "table"."column" AS "alias"
+
+By allowing the creation of qualified and aliased identifiers via symbols,
+Sequel makes it simpler to represent more SQL expressions.  However, if you
+are using double or triple underscores in your own identifiers, Sequel's
+automatic splitting of identifiers can be problematic, in which case you
+may want to turn them off via:
+
+  Sequel.split_symbols = false
 
 === Integer, Float, BigDecimal, String, Date, Time, DateTime
 

@@ -24,6 +24,7 @@
 module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
+  @split_symbols = true
 
   # Whether Sequel is being run in single threaded mode
   @single_threaded = false
@@ -234,26 +235,76 @@ module Sequel
   COLUMN_REF_RE3 = /\A((?:(?!__).)+)__(.+)\z/.freeze
   SPLIT_SYMBOL_CACHE = {}
 
-  # Splits the symbol into three parts.  Each part will
-  # either be a string or nil.
+  # Splits the symbol into three parts, if symbol splitting is enabled.
+  # Each part will either be a string or nil. If symbol splitting
+  # is disabled, returns an array with the first and third parts
+  # being nil, and the second part beind a string version of the symbol.
   #
   # For columns, these parts are the table, column, and alias.
   # For tables, these parts are the schema, table, and alias.
   def self.split_symbol(sym)
     unless v = Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym]}
-      v = case s = sym.to_s
-      when COLUMN_REF_RE1
-        [$1.freeze, $2.freeze, $3.freeze].freeze
-      when COLUMN_REF_RE2
-        [nil, $1.freeze, $2.freeze].freeze
-      when COLUMN_REF_RE3
-        [$1.freeze, $2.freeze, nil].freeze
+      if split_symbols?
+        v = case s = sym.to_s
+        when COLUMN_REF_RE1
+          [$1.freeze, $2.freeze, $3.freeze].freeze
+        when COLUMN_REF_RE2
+          [nil, $1.freeze, $2.freeze].freeze
+        when COLUMN_REF_RE3
+          [$1.freeze, $2.freeze, nil].freeze
+        else
+          [nil, s.freeze, nil].freeze
+        end
       else
-        [nil, s.freeze, nil].freeze
+        v = [nil,sym.to_s.freeze,nil].freeze
       end
       Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym] = v}
     end
     v
+  end
+
+  # Sequel by default will split symbols, treating:
+  #
+  #   :table__column         # table.column
+  #   :column___alias        # column AS alias
+  #   :table__column___alias # table.column AS alias
+  #
+  # This can cause problems if any identifiers in the database use a double
+  # or triple underscore.  When Sequel was first created, using symbols with
+  # double or triple underscores was the only way to represent qualified or
+  # aliased identifiers.  Sequel now offers many ways to create qualified and
+  # aliased identifiers, so there is less of a need for this now.  This allows
+  # you to turn off symbol splitting, potentially avoiding problems if you
+  # have identifiers that use double underscores:
+  #
+  #   Sequel.split_symbols = false
+  #
+  # Note that Sequel::Database instances do their own caching of literalized
+  # symbols, and changing this setting does not affect those caches.  It is
+  # recommended that if you want to change this setting, you do so directly
+  # after requiring Sequel, before creating any Sequel::Database instances.
+  #
+  # Also note that disabling symbol splitting will also disable the handling
+  # of double underscores in virtual row methods, causing such methods to
+  # yield regular identifers instead of qualified identifiers. To make sure
+  # the code works when splitting symbols is both disabled and enabled, you
+  # can use Sequel::SQL::Identifier#[].
+  #
+  #   # Sequel.split_symbols = true
+  #   Sequel.expr{table__column}  # table.column
+  #   Sequel.expr{table[:column]} # table.column
+  #
+  #   # Sequel.split_symbols = false
+  #   Sequel.expr{table__column}  # table__column
+  #   Sequel.expr{table[:column]} # table.column
+  def self.split_symbols=(v)
+    Sequel.synchronize{SPLIT_SYMBOL_CACHE.clear}
+    @split_symbols = v
+  end
+
+  # Whether Sequel currently splits symbols into qualified/aliased identifiers.
+  def self.split_symbols?
+    @split_symbols
   end
 
   # Converts the given +string+ into a +Date+ object.

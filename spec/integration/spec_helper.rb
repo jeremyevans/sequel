@@ -16,6 +16,7 @@ rescue LoadError
 end
 Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_(spec|test)\.rb/}
 
+Sequel.split_symbols = false if ENV['SEQUEL_NO_SPLIT_SYMBOLS']
 Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 Sequel::Model.cache_associations = false if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
 Sequel::Model.use_transactions = false

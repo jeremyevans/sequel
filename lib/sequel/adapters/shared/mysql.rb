@@ -72,11 +72,11 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         ds = metadata_dataset.
-          from(:INFORMATION_SCHEMA__KEY_COLUMN_USAGE).
+          from(Sequel[:INFORMATION_SCHEMA][:KEY_COLUMN_USAGE]).
           where(:TABLE_NAME=>im.call(table), :TABLE_SCHEMA=>Sequel.function(:DATABASE)).
           exclude(:CONSTRAINT_NAME=>'PRIMARY').
           exclude(:REFERENCED_TABLE_NAME=>nil).
-          select(:CONSTRAINT_NAME___name, :COLUMN_NAME___column, :REFERENCED_TABLE_NAME___table, :REFERENCED_COLUMN_NAME___key)
+          select(Sequel[:CONSTRAINT_NAME].as(:name), Sequel[:COLUMN_NAME].as(:column), Sequel[:REFERENCED_TABLE_NAME].as(:table), Sequel[:REFERENCED_COLUMN_NAME].as(:key))
         
         h = {}
         ds.each do |row|

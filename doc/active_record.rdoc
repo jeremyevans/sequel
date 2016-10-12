@@ -260,7 +260,7 @@ You just use:
 At the instance level, this means that if you select columns that aren't in the models table, you need to use <tt>Model#[]</tt> to access them:
 
   album = Album.join(:artist, :id=>:artist_id).
-   select(:albums__id, :albums__name, :artists__name___artist).first
+   select{[albums[:id], albums[:name], artists[:name].as(:artist)]}.first
    # SELECT albums.id, albums.name, artists.name AS artist
 
   album.artist # Error!

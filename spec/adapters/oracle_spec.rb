@@ -263,25 +263,25 @@ describe "An Oracle database" do
     @d2 << {:id => 100, :cat_name => 'ruby'}
     @d2 << {:id => 101, :cat_name => 'rails'}
   
-    @d1.join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).order(:books__id).to_a.must_equal [
+    @d1.join(:categories, :id => :category_id).select(Sequel[:books][:id], :title, :cat_name).order(Sequel[:books][:id]).to_a.must_equal [
       {:id => 1, :title => 'aaa', :cat_name => 'ruby'},
       {:id => 2, :title => 'bbb', :cat_name => 'ruby'},
       {:id => 3, :title => 'ccc', :cat_name => 'rails'}
     ]
 
-    @d1.join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).order(:books__id).limit(2, 1).to_a.must_equal [
+    @d1.join(:categories, :id => :category_id).select(Sequel[:books][:id], :title, :cat_name).order(Sequel[:books][:id]).limit(2, 1).to_a.must_equal [
       {:id => 2, :title => 'bbb', :cat_name => 'ruby'},
       {:id => 3, :title => 'ccc', :cat_name => 'rails'},
     ]
    
-    @d1.left_outer_join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).order(:books__id).to_a.must_equal [
+    @d1.left_outer_join(:categories, :id => :category_id).select(Sequel[:books][:id], :title, :cat_name).order(Sequel[:books][:id]).to_a.must_equal [
       {:id => 1, :title => 'aaa', :cat_name => 'ruby'},
       {:id => 2, :title => 'bbb', :cat_name => 'ruby'},
       {:id => 3, :title => 'ccc', :cat_name => 'rails'},
       {:id => 4, :title => 'ddd', :cat_name => nil} 
     ]
     
-    @d1.left_outer_join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).reverse_order(:books__id).limit(2, 0).to_a.must_equal [      
+    @d1.left_outer_join(:categories, :id => :category_id).select(Sequel[:books][:id], :title, :cat_name).reverse_order(Sequel[:books][:id]).limit(2, 0).to_a.must_equal [      
       {:id => 4, :title => 'ddd', :cat_name => nil}, 
       {:id => 3, :title => 'ccc', :cat_name => 'rails'}
     ]      

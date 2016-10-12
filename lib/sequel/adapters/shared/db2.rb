@@ -76,7 +76,7 @@ module Sequel
         m = output_identifier_meth
         indexes = {}
         metadata_dataset.
-         from(:syscat__indexes).
+         from(Sequel[:syscat][:indexes]).
          select(:indname, :uniquerule, :colnames).
          where(:tabname=>input_identifier_meth.call(table), :system_required=>0).
          each do |r|

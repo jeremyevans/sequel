@@ -453,7 +453,7 @@ Ruby strings are generally treated as SQL strings:
 === Qualifying identifiers (column/table names)
 
 An identifier in SQL is a name that represents a column, table, or schema.
-Identifiers can be qualified by using the double underscore special notation <tt>:table__column</tt>:
+By default, identifiers can be qualified by using the double underscore special notation <tt>:table__column</tt>:
 
   items.literal(:items__price)
   # items.price
@@ -471,7 +471,7 @@ to select from a qualified table:
 
 === Identifier aliases
 
-You can also alias identifiers by using the triple underscore special notation <tt>:column___alias</tt> or <tt>:table__column___alias</tt>:
+By default, you can also alias identifiers by using the triple underscore special notation <tt>:column___alias</tt> or <tt>:table__column___alias</tt>:
 
   items.literal(:price___p)
   # price AS p
@@ -487,6 +487,10 @@ You can use the <tt>Sequel.as</tt> method to alias arbitrary expressions, not ju
 
   items.literal(Sequel.as(DB[:posts].select{max(id)}, :p))
   # (SELECT max(id) FROM posts) AS p
+
+You can turn off the splitting of symbols containing double and triple underscores, and treat all symbols as regular identifiers, by using:
+
+  Sequel.split_symbols = false
 
 == Sequel Models
 

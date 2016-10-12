@@ -309,11 +309,15 @@ module Sequel
         m = output_identifier_meth
         schema, _ = opts.fetch(:schema, schema_and_table(table))
         range = 0...32
+        oid = regclass_oid(table)
 
         base_ds = metadata_dataset.
-          from(:pg_constraint___co).
-          join(:pg_class___cl, :oid=>:conrelid).
-          where(:cl__relkind=>'r', :co__contype=>'f', :cl__oid=>regclass_oid(table))
+          from{pg_constraint.as(:co)}.
+          join(Sequel[:pg_class].as(:cl), :oid=>:conrelid).
+          where{{
+            cl[:relkind]=>'r',
+            co[:contype]=>'f',
+            cl[:oid]=>oid}}
 
         # We split the parsing into two separate queries, which are merged manually later.
         # This is because PostgreSQL stores both the referencing and referenced columns in
@@ -322,22 +326,33 @@ module Sequel
         # the index of that element in the array.
 
         ds = base_ds.
-          join(:pg_attribute___att, :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, :co__conkey)).
-          order(:co__conname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:co__conkey, [x]), x]}, 32, :att__attnum)).
-          select(:co__conname___name, :att__attname___column, :co__confupdtype___on_update, :co__confdeltype___on_delete,
-                 SQL::BooleanExpression.new(:AND, :co__condeferrable, :co__condeferred).as(:deferrable))
+          join(Sequel[:pg_attribute].as(:att), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:conkey])).
+          order{[
+            co[:conname],
+            SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:conkey], [x]), x]}, 32, att[:attnum])]}.
+          select{[
+            co[:conname].as(:name),
+            att[:attname].as(:column),
+            co[:confupdtype].as(:on_update),
+            co[:confdeltype].as(:on_delete),
+            SQL::BooleanExpression.new(:AND, co[:condeferrable], co[:condeferred]).as(:deferrable)]}
 
         ref_ds = base_ds.
-          join(:pg_class___cl2, :oid=>:co__confrelid).
-          join(:pg_attribute___att2, :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, :co__confkey)).
-          order(:co__conname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:co__confkey, [x]), x]}, 32, :att2__attnum)).
-          select(:co__conname___name, :cl2__relname___table, :att2__attname___refcolumn)
+          join(Sequel[:pg_class].as(:cl2), :oid=>Sequel[:co][:confrelid]).
+          join(Sequel[:pg_attribute].as(:att2), :attrelid=>:oid, :attnum=>SQL::Function.new(:ANY, Sequel[:co][:confkey])).
+          order{[
+            co[:conname],
+            SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(co[:confkey], [x]), x]}, 32, att2[:attnum])]}.
+          select{[
+            co[:conname].as(:name),
+            cl2[:relname].as(:table),
+            att2[:attname].as(:refcolumn)]}
 
         # If a schema is given, we only search in that schema, and the returned :table
         # entry is schema qualified as well.
         if schema
-          ref_ds = ref_ds.join(:pg_namespace___nsp2, :oid=>:cl2__relnamespace).
-            select_more(:nsp2__nspname___schema)
+          ref_ds = ref_ds.join(Sequel[:pg_namespace].as(:nsp2), :oid=>Sequel[:cl2][:relnamespace]).
+            select_more{nsp2[:nspname].as(:schema)}
         end
 
         h = {}
@@ -362,18 +377,25 @@ module Sequel
       def indexes(table, opts=OPTS)
         m = output_identifier_meth
         range = 0...32
-        attnums = server_version >= 80100 ? SQL::Function.new(:ANY, :ind__indkey) : range.map{|x| SQL::Subscript.new(:ind__indkey, [x])}
+        attnums = server_version >= 80100 ? SQL::Function.new(:ANY, Sequel[:ind][:indkey]) : range.map{|x| SQL::Subscript.new(Sequel[:ind][:indkey], [x])}
+        oid = regclass_oid(table, opts)
         ds = metadata_dataset.
-          from(:pg_class___tab).
-          join(:pg_index___ind, :indrelid=>:oid).
-          join(:pg_class___indc, :oid=>:indexrelid).
-          join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>attnums).
-          left_join(:pg_constraint___con, :conname=>:indc__relname).
-          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil, :indisvalid=>true, :tab__oid=>regclass_oid(table, opts)).
-          order(:indc__relname, SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}, 32, :att__attnum)).
-          select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column, :con__condeferrable___deferrable)
+          from{pg_class.as(:tab)}.
+          join(Sequel[:pg_index].as(:ind), :indrelid=>:oid).
+          join(Sequel[:pg_class].as(:indc), :oid=>:indexrelid).
+          join(Sequel[:pg_attribute].as(:att), :attrelid=>Sequel[:tab][:oid], :attnum=>attnums).
+          left_join(Sequel[:pg_constraint].as(:con), :conname=>Sequel[:indc][:relname]).
+          where{{
+            indc[:relkind]=>'i',
+            ind[:indisprimary]=>false,
+            :indexprs=>nil,
+            :indpred=>nil,
+            :indisvalid=>true,
+            tab[:oid]=>oid}}.
+          order{[indc[:relname], SQL::CaseExpression.new(range.map{|x| [SQL::Subscript.new(ind[:indkey], [x]), x]}, 32, att[:attnum])]}.
+          select{[indc[:relname].as(:name), ind[:indisunique].as(:unique), att[:attname].as(:column), con[:condeferrable].as(:deferrable)]}
 
-        ds.filter!(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
+        ds = ds.where(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
 
         indexes = {}
         ds.each do |r|
@@ -385,7 +407,7 @@ module Sequel
 
       # Dataset containing all current database locks
       def locks
-        dataset.from(:pg_class).join(:pg_locks, :relation=>:relfilenode).select(:pg_class__relname, Sequel::SQL::ColumnAll.new(:pg_locks))
+        dataset.from(:pg_class).join(:pg_locks, :relation=>:relfilenode).select{[pg_class[:relname], Sequel::SQL::ColumnAll.new(:pg_locks)]}
       end
 
       # Notifies the given channel.  See the PostgreSQL NOTIFY documentation. Options:
@@ -972,7 +994,7 @@ module Sequel
         else
           Sequel.function(:any, Sequel.function(:current_schemas, false))
         end
-        ds.where(:pg_namespace__nspname=>expr)
+        ds.where{{pg_namespace[:nspname]=>expr}}
       end
 
       # Return a hash with oid keys and callable values, used for converting types.
@@ -1032,7 +1054,7 @@ module Sequel
         if block_given?
           yield(ds)
         elsif opts[:qualify]
-          ds.select_append(:pg_namespace__nspname).map{|r| Sequel.qualify(m.call(r[:nspname]).to_s, m.call(r[:relname]).to_s)}
+          ds.select_append{pg_namespace[:nspname]}.map{|r| Sequel.qualify(m.call(r[:nspname]).to_s, m.call(r[:relname]).to_s)}
         else
           ds.map{|r| m.call(r[:relname])}
         end
@@ -1098,24 +1120,26 @@ module Sequel
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth(opts[:dataset])
-        ds = metadata_dataset.select(:pg_attribute__attname___name,
-            SQL::Cast.new(:pg_attribute__atttypid, :integer).as(:oid),
-            SQL::Cast.new(:basetype__oid, :integer).as(:base_oid),
-            SQL::Function.new(:format_type, :basetype__oid, :pg_type__typtypmod).as(:db_base_type),
-            SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
-            SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
-            SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
-            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)), false).as(:primary_key)).
+        oid = regclass_oid(table_name, opts)
+        ds = metadata_dataset.select{[
+            pg_attribute[:attname].as(:name),
+            SQL::Cast.new(pg_attribute[:atttypid], :integer).as(:oid),
+            SQL::Cast.new(basetype[:oid], :integer).as(:base_oid),
+            SQL::Function.new(:format_type, basetype[:oid], pg_type[:typtypmod]).as(:db_base_type),
+            SQL::Function.new(:format_type, pg_type[:oid], pg_attribute[:atttypmod]).as(:db_type),
+            SQL::Function.new(:pg_get_expr, pg_attrdef[:adbin], pg_class[:oid]).as(:default),
+            SQL::BooleanExpression.new(:NOT, pg_attribute[:attnotnull]).as(:allow_null),
+            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(pg_attribute[:attnum] => SQL::Function.new(:ANY, pg_index[:indkey])), false).as(:primary_key)]}.
           from(:pg_class).
           join(:pg_attribute, :attrelid=>:oid).
           join(:pg_type, :oid=>:atttypid).
-          left_outer_join(:pg_type___basetype, :oid=>:typbasetype).
-          left_outer_join(:pg_attrdef, :adrelid=>:pg_class__oid, :adnum=>:pg_attribute__attnum).
-          left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
-          filter(:pg_attribute__attisdropped=>false).
-          filter{|o| o.pg_attribute__attnum > 0}.
-          filter(:pg_class__oid=>regclass_oid(table_name, opts)).
-          order(:pg_attribute__attnum)
+          left_outer_join(Sequel[:pg_type].as(:basetype), :oid=>:typbasetype).
+          left_outer_join(:pg_attrdef, :adrelid=>Sequel[:pg_class][:oid], :adnum=>Sequel[:pg_attribute][:attnum]).
+          left_outer_join(:pg_index, :indrelid=>Sequel[:pg_class][:oid], :indisprimary=>true).
+          where{{pg_attribute[:attisdropped]=>false}}.
+          where{pg_attribute[:attnum] > 0}.
+          where{{pg_class[:oid]=>oid}}.
+          order{pg_attribute[:attnum]}
         ds.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           if row[:base_oid]

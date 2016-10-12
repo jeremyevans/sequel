@@ -140,20 +140,22 @@ module Sequel
         schema, table = schema_and_table(table)
         current_schema = m.call(get(Sequel.function('schema_name')))
         fk_action_map = FOREIGN_KEY_ACTION_MAP
+        fk = Sequel[:fk]
+        fkc = Sequel[:fkc]
         ds = metadata_dataset.from(Sequel.lit('[sys].[foreign_keys]').as(:fk)).
           join(Sequel.lit('[sys].[foreign_key_columns]').as(:fkc), :constraint_object_id => :object_id).
-          join(Sequel.lit('[sys].[all_columns]').as(:pc), :object_id => :fkc__parent_object_id,     :column_id => :fkc__parent_column_id).
-          join(Sequel.lit('[sys].[all_columns]').as(:rc), :object_id => :fkc__referenced_object_id, :column_id => :fkc__referenced_column_id).
-          where{{object_schema_name(:fk__parent_object_id) => im.call(schema || current_schema)}}.
-          where{{object_name(:fk__parent_object_id) => im.call(table)}}.
-          select{[:fk__name, 
-                  :fk__delete_referential_action, 
-                  :fk__update_referential_action, 
-                  :pc__name___column, 
-                  :rc__name___referenced_column, 
-                  object_schema_name(:fk__referenced_object_id).as(:schema), 
-                  object_name(:fk__referenced_object_id).as(:table)]}.
-          order(:fk__name, :fkc__constraint_column_id)
+          join(Sequel.lit('[sys].[all_columns]').as(:pc), :object_id => fkc[:parent_object_id],     :column_id => fkc[:parent_column_id]).
+          join(Sequel.lit('[sys].[all_columns]').as(:rc), :object_id => fkc[:referenced_object_id], :column_id => fkc[:referenced_column_id]).
+          where{{object_schema_name(fk[:parent_object_id]) => im.call(schema || current_schema)}}.
+          where{{object_name(fk[:parent_object_id]) => im.call(table)}}.
+          select{[fk[:name], 
+                  fk[:delete_referential_action], 
+                  fk[:update_referential_action], 
+                  pc[:name].as(:column), 
+                  rc[:name].as(:referenced_column), 
+                  object_schema_name(fk[:referenced_object_id]).as(:schema), 
+                  object_name(fk[:referenced_object_id]).as(:table)]}.
+          order(fk[:name], fkc[:constraint_column_id])
         h = {}
         ds.each do |row|
           if r = h[row[:name]]
@@ -178,17 +180,18 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}
+        i = Sequel[:i]
         ds = metadata_dataset.from(Sequel.lit('[sys].[tables]').as(:t)).
          join(Sequel.lit('[sys].[indexes]').as(:i), :object_id=>:object_id).
          join(Sequel.lit('[sys].[index_columns]').as(:ic), :object_id=>:object_id, :index_id=>:index_id).
          join(Sequel.lit('[sys].[columns]').as(:c), :object_id=>:object_id, :column_id=>:column_id).
-         select(:i__name, :i__is_unique, :c__name___column).
-         where{{t__name=>im.call(table)}}.
-         where(:i__is_primary_key=>0, :i__is_disabled=>0).
-         order(:i__name, :ic__index_column_id)
+         select(i[:name], i[:is_unique], Sequel[:c][:name].as(:column)).
+         where{{t[:name]=>im.call(table)}}.
+         where(i[:is_primary_key]=>0, i[:is_disabled]=>0).
+         order(i[:name], Sequel[:ic][:index_column_id])
 
         if supports_partial_indexes?
-          ds = ds.where(:i__has_filter=>0)
+          ds = ds.where(i[:has_filter]=>0)
         end
 
         ds.each do |r|
@@ -369,7 +372,7 @@ module Sequel
       def default_constraint_name(table, column_name)
         if server_version >= 9000000
           table_name = schema_and_table(table).compact.join('.')
-          self[:sys__default_constraints].
+          self[Sequel[:sys][:default_constraints]].
             where{{:parent_object_id => Sequel::SQL::Function.new(:object_id, table_name), col_name(:parent_object_id, :parent_column_id) => column_name.to_s}}.
             get(:name)
         end
@@ -394,7 +397,7 @@ module Sequel
       # Backbone of the tables and views support.
       def information_schema_tables(type, opts)
         m = output_identifier_meth
-        metadata_dataset.from(:information_schema__tables___t).
+        metadata_dataset.from(Sequel[:information_schema][:tables].as(:t)).
           select(:table_name).
           filter(:table_type=>type, :table_schema=>(opts[:schema]||'dbo').to_s).
           map{|x| m.call(x[:table_name])}
@@ -457,17 +460,17 @@ module Sequel
           get(:indid)
         pk_cols = metadata_dataset.from(sys_qual.call(Sequel.lit('sysindexkeys')).as(:sik)).
           join(sys_qual.call(Sequel.lit('syscolumns')).as(:sc), :id=>:id, :colid=>:colid).
-          where(:sik__id=>table_id, :sik__indid=>pk_index_id).
-          select_order_map(:sc__name)
+          where{{sik[:id]=>table_id, sik[:indid]=>pk_index_id}}.
+          select_order_map{sc[:name]}
 
-        ds = metadata_dataset.from(inf_sch_qual.call(:information_schema__tables).as(:t)).
-         join(inf_sch_qual.call(:information_schema__columns).as(:c), :table_catalog=>:table_catalog,
+        ds = metadata_dataset.from(inf_sch_qual.call(Sequel[:information_schema][:tables]).as(:t)).
+         join(inf_sch_qual.call(Sequel[:information_schema][:columns]).as(:c), :table_catalog=>:table_catalog,
               :table_schema => :table_schema, :table_name => :table_name).
-         select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null, :numeric_precision___column_size, :numeric_scale___scale).
-         filter(:c__table_name=>tn)
+         select{[column_name.as(:column), data_type.as(:db_type), character_maximum_length.as(:max_chars), column_default.as(:default), is_nullable.as(:allow_null), numeric_precision.as(:column_size), numeric_scale.as(:scale)]}.
+         where{{c[:table_name]=>tn}}
 
         if schema = opts[:schema]
-          ds.filter!(:c__table_schema=>schema)
+          ds = ds.where{{c[:table_schema]=>schema}}
         end
 
         ds.map do |row|

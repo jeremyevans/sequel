@@ -993,7 +993,7 @@ columns that have the same name in both the join table and the associated
 table.  Example:
 
   Artist.one_to_many :albums, :select=>[:id, :name]
-  Album.many_to_many :tags, :select=>[Sequel[:tags].*, :albums_tags__number]
+  Album.many_to_many :tags, :select=>[Sequel[:tags].*, Sequel[:albums_tags][:number]]
 
 ==== :limit
 
@@ -1332,11 +1332,11 @@ association based on dependent associations:
 
   Artist.one_to_many :albums_with_short_tracks, :class=>:Album,
    :eager_graph=>:tracks do |ds|
-    ds.where{tracks__seconds < 120}
+    ds.where{tracks[:seconds] < 120}
   end
   Artist.one_to_many :albums_by_track_name, :class=>:Album,
    :eager_graph=>:tracks do |ds|
-    ds.order(:tracks__name)
+    ds.order{tracks[:name]}
   end
 
 You can also use a hash or array of arguments for :eager_graph, similar to

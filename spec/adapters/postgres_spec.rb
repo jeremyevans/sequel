@@ -121,11 +121,11 @@ describe "PostgreSQL", '#create_table' do
     @db.create_table(:tmp_dolls){text :name}
     @db.loose_count(:tmp_dolls).must_be_kind_of(Integer)
     @db.loose_count(:tmp_dolls).must_equal 0
-    @db.loose_count(:public__tmp_dolls).must_equal 0
+    @db.loose_count(Sequel[:public][:tmp_dolls]).must_equal 0
     @db[:tmp_dolls].insert('a')
     @db << 'VACUUM ANALYZE tmp_dolls'
     @db.loose_count(:tmp_dolls).must_equal 1
-    @db.loose_count(:public__tmp_dolls).must_equal 1
+    @db.loose_count(Sequel[:public][:tmp_dolls]).must_equal 1
   end
 end
 
@@ -227,9 +227,9 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @ds.all.must_equal [{:a=>1, :b=>3, :c=>5, :c_is_unique=>false}]
     @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>4}).insert(1, 3).must_equal nil
     @ds.all.must_equal [{:a=>1, :b=>4, :c=>5, :c_is_unique=>false}]
-    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>5}, :update_where=>{:ic_test__b=>4}).insert(1, 3, 4).must_equal nil
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>5}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_equal nil
     @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
-    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{:ic_test__b=>4}).insert(1, 3, 4).must_equal nil
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_equal nil
     @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
   end
 
@@ -245,10 +245,10 @@ end if DB.server_version >= 90500
 describe "A PostgreSQL database" do
   before(:all) do
     @db = DB
-    @db.create_table!(:public__testfk){primary_key :id; foreign_key :i, :public__testfk}
+    @db.create_table!(Sequel[:public][:testfk]){primary_key :id; foreign_key :i, Sequel[:public][:testfk]}
   end
   after(:all) do
-    @db.drop_table?(:public__testfk)
+    @db.drop_table?(Sequel[:public][:testfk])
   end
 
   it "should provide the server version" do
@@ -273,16 +273,16 @@ describe "A PostgreSQL database" do
   end
 
   it "should respect the :read_only option per-savepoint" do
-    proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].insert}}}.must_raise(Sequel::DatabaseError)
-    proc{@db.transaction(:auto_savepoint=>true, :read_only=>true){@db.transaction(:read_only=>false){@db[:public__testfk].insert}}}.must_raise(Sequel::DatabaseError)
-    @db[:public__testfk].delete
-    @db.transaction{@db[:public__testfk].insert; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}
-    @db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){}; @db[:public__testfk].insert}
-    @db.transaction{@db[:public__testfk].all; @db.transaction(:savepoint=>true, :read_only=>true){@db[:public__testfk].all;}}
+    proc{@db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){@db[Sequel[:public][:testfk]].insert}}}.must_raise(Sequel::DatabaseError)
+    proc{@db.transaction(:auto_savepoint=>true, :read_only=>true){@db.transaction(:read_only=>false){@db[Sequel[:public][:testfk]].insert}}}.must_raise(Sequel::DatabaseError)
+    @db[Sequel[:public][:testfk]].delete
+    @db.transaction{@db[Sequel[:public][:testfk]].insert; @db.transaction(:savepoint=>true, :read_only=>true){@db[Sequel[:public][:testfk]].all;}}
+    @db.transaction{@db.transaction(:savepoint=>true, :read_only=>true){}; @db[Sequel[:public][:testfk]].insert}
+    @db.transaction{@db[Sequel[:public][:testfk]].all; @db.transaction(:savepoint=>true, :read_only=>true){@db[Sequel[:public][:testfk]].all;}}
   end
 
   it "should support disable_insert_returning" do
-    ds = @db[:public__testfk].disable_insert_returning
+    ds = @db[Sequel[:public][:testfk]].disable_insert_returning
     ds.delete
     ds.insert.must_equal nil
     id = ds.max(:id)
@@ -304,13 +304,13 @@ describe "A PostgreSQL database" do
   end
 
   it "should support functions with and without quoting" do
-    ds = @db[:public__testfk]
+    ds = @db[Sequel[:public][:testfk]]
     ds.delete
     ds.insert
     ds.get{sum(1)}.must_equal 1
     ds.get{Sequel.function('pg_catalog.sum', 1)}.must_equal 1
     ds.get{sum.function(1)}.must_equal 1
-    ds.get{pg_catalog__sum.function(1)}.must_equal 1
+    ds.get{pg_catalog[:sum].function(1)}.must_equal 1
     ds.delete
   end
 
@@ -339,11 +339,11 @@ describe "A PostgreSQL database" do
   end
 
   it "should correctly parse the schema" do
-    @db.schema(:public__testfk, :reload=>true).map{|c,s| [c, s[:oid]]}.must_equal [[:id, 23], [:i, 23]]
+    @db.schema(Sequel[:public][:testfk], :reload=>true).map{|c,s| [c, s[:oid]]}.must_equal [[:id, 23], [:i, 23]]
   end
 
   it "should parse foreign keys for tables in a schema" do
-    @db.foreign_key_list(:public__testfk).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
+    @db.foreign_key_list(Sequel[:public][:testfk]).must_equal [{:on_delete=>:no_action, :on_update=>:no_action, :columns=>[:i], :key=>[:id], :deferrable=>false, :table=>Sequel.qualify(:public, :testfk), :name=>:testfk_i_fkey}]
   end
 
   it "should return uuid fields as strings" do
@@ -416,7 +416,7 @@ describe "A PostgreSQL dataset" do
       @d.select(Sequel.lit('COUNT(*)')).sql.must_equal 'SELECT COUNT(*) FROM "test"'
       @d.select(Sequel.function(:max, :value)).sql.must_equal 'SELECT max("value") FROM "test"'
       @d.select(Sequel.function(:NOW)).sql.must_equal 'SELECT NOW() FROM "test"'
-      @d.select(Sequel.function(:max, :items__value)).sql.must_equal 'SELECT max("items"."value") FROM "test"'
+      @d.select(Sequel.function(:max, Sequel[:items][:value])).sql.must_equal 'SELECT max("items"."value") FROM "test"'
       @d.order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM "test" ORDER BY "name" DESC'
       @d.select(Sequel.lit('test.name AS item_name')).sql.must_equal 'SELECT test.name AS item_name FROM "test"'
       @d.select(Sequel.lit('"name"')).sql.must_equal 'SELECT "name" FROM "test"'
@@ -424,8 +424,8 @@ describe "A PostgreSQL dataset" do
       @d.insert_sql(:x => :y).must_match(/\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/)
 
       @d.select(Sequel.function(:test, :abc, 'hello')).sql.must_equal "SELECT test(\"abc\", 'hello') FROM \"test\""
-      @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
-      @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
+      @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello')).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
+      @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello').as(:x2)).sql.must_equal "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
       @d.insert_sql(:value => 333).must_match(/\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/)
     end
   end
@@ -1165,13 +1165,13 @@ describe "Postgres::Dataset#insert" do
   end
 
   it "should have insert_select respect existing returning clause" do
-    h = @ds.returning(:value___v, :xid___x).insert_select(:value=>10)
+    h = @ds.returning(Sequel[:value].as(:v), Sequel[:xid].as(:x)).insert_select(:value=>10)
     h[:v].must_equal 10
     @ds.first(:xid=>h[:x])[:value].must_equal 10
   end
 
   it "should have prepared insert_select respect existing returning clause" do
-    h = @ds.returning(:value___v, :xid___x).prepare(:insert_select, :insert_select, :value=>10).call
+    h = @ds.returning(Sequel[:value].as(:v), Sequel[:xid].as(:x)).prepare(:insert_select, :insert_select, :value=>10).call
     h[:v].must_equal 10
     @ds.first(:xid=>h[:x])[:value].must_equal 10
   end
@@ -1204,33 +1204,33 @@ describe "Postgres::Database schema qualified tables" do
   end
 
   it "should be able to create, drop, select and insert into tables in a given schema" do
-    @db.create_table(:schema_test__schema_test){primary_key :i}
-    @db[:schema_test__schema_test].first.must_equal nil
-    @db[:schema_test__schema_test].insert(:i=>1).must_equal 1
-    @db[:schema_test__schema_test].first.must_equal(:i=>1)
+    @db.create_table(Sequel[:schema_test][:schema_test]){primary_key :i}
+    @db[Sequel[:schema_test][:schema_test]].first.must_equal nil
+    @db[Sequel[:schema_test][:schema_test]].insert(:i=>1).must_equal 1
+    @db[Sequel[:schema_test][:schema_test]].first.must_equal(:i=>1)
     @db.from(Sequel.lit('schema_test.schema_test')).first.must_equal(:i=>1)
-    @db.drop_table(:schema_test__schema_test)
+    @db.drop_table(Sequel[:schema_test][:schema_test])
     @db.create_table(Sequel.qualify(:schema_test, :schema_test)){integer :i}
-    @db[:schema_test__schema_test].first.must_equal nil
+    @db[Sequel[:schema_test][:schema_test]].first.must_equal nil
     @db.from(Sequel.lit('schema_test.schema_test')).first.must_equal nil
     @db.drop_table(Sequel.qualify(:schema_test, :schema_test))
   end
 
   it "#tables should not include tables in a default non-public schema" do
-    @db.create_table(:schema_test__schema_test){integer :i}
+    @db.create_table(Sequel[:schema_test][:schema_test]){integer :i}
     @db.tables(:schema=>:schema_test).must_include(:schema_test)
     @db.tables.wont_include(:pg_am)
     @db.tables.wont_include(:domain_udt_usage)
   end
 
   it "#tables should return tables in the schema provided by the :schema argument" do
-    @db.create_table(:schema_test__schema_test){integer :i}
+    @db.create_table(Sequel[:schema_test][:schema_test]){integer :i}
     @db.tables(:schema=>:schema_test).must_equal [:schema_test]
   end
 
   it "#schema should not include columns from tables in a default non-public schema" do
-    @db.create_table(:schema_test__domains){integer :i}
-    sch = @db.schema(:schema_test__domains)
+    @db.create_table(Sequel[:schema_test][:domains]){integer :i}
+    sch = @db.schema(Sequel[:schema_test][:domains])
     cs = sch.map{|x| x.first}
     cs.must_include(:i)
     cs.wont_include(:data_type)
@@ -1238,7 +1238,7 @@ describe "Postgres::Database schema qualified tables" do
 
   it "#schema should only include columns from the table in the given :schema argument" do
     @db.create_table!(:domains){integer :d}
-    @db.create_table(:schema_test__domains){integer :i}
+    @db.create_table(Sequel[:schema_test][:domains]){integer :i}
     sch = @db.schema(:domains, :schema=>:schema_test)
     cs = sch.map{|x| x.first}
     cs.must_include(:i)
@@ -1247,64 +1247,64 @@ describe "Postgres::Database schema qualified tables" do
   end
 
   it "#schema should not include columns in tables from other domains by default" do
-    @db.create_table!(:public__domains){integer :d}
-    @db.create_table(:schema_test__domains){integer :i}
+    @db.create_table!(Sequel[:public][:domains]){integer :d}
+    @db.create_table(Sequel[:schema_test][:domains]){integer :i}
     begin
       @db.schema(:domains).map{|x| x.first}.must_equal [:d]
-      @db.schema(:schema_test__domains).map{|x| x.first}.must_equal [:i]
+      @db.schema(Sequel[:schema_test][:domains]).map{|x| x.first}.must_equal [:i]
     ensure
-      @db.drop_table?(:public__domains)
+      @db.drop_table?(Sequel[:public][:domains])
     end
   end
 
   it "#table_exists? should see if the table is in a given schema" do
-    @db.create_table(:schema_test__schema_test){integer :i}
-    @db.table_exists?(:schema_test__schema_test).must_equal true
+    @db.create_table(Sequel[:schema_test][:schema_test]){integer :i}
+    @db.table_exists?(Sequel[:schema_test][:schema_test]).must_equal true
   end
 
   it "should be able to add and drop indexes in a schema" do
-    @db.create_table(:schema_test__schema_test){Integer :i, :index=>true}
-    @db.indexes(:schema_test__schema_test).keys.must_equal [:schema_test_schema_test_i_index]
-    @db.drop_index :schema_test__schema_test, :i
-    @db.indexes(:schema_test__schema_test).keys.must_equal []
+    @db.create_table(Sequel[:schema_test][:schema_test]){Integer :i, :index=>true}
+    @db.indexes(Sequel[:schema_test][:schema_test]).keys.must_equal [:schema_test_schema_test_i_index]
+    @db.drop_index Sequel[:schema_test][:schema_test], :i
+    @db.indexes(Sequel[:schema_test][:schema_test]).keys.must_equal []
   end
 
   it "should be able to get primary keys for tables in a given schema" do
-    @db.create_table(:schema_test__schema_test){primary_key :i}
-    @db.primary_key(:schema_test__schema_test).must_equal 'i'
+    @db.create_table(Sequel[:schema_test][:schema_test]){primary_key :i}
+    @db.primary_key(Sequel[:schema_test][:schema_test]).must_equal 'i'
   end
 
   it "should be able to get serial sequences for tables in a given schema" do
-    @db.create_table(:schema_test__schema_test){primary_key :i}
-    @db.primary_key_sequence(:schema_test__schema_test).must_equal '"schema_test"."schema_test_i_seq"'
+    @db.create_table(Sequel[:schema_test][:schema_test]){primary_key :i}
+    @db.primary_key_sequence(Sequel[:schema_test][:schema_test]).must_equal '"schema_test"."schema_test_i_seq"'
   end
 
   it "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
-    @db.create_table(:"schema_test__schema test"){primary_key :i}
-    @db.primary_key_sequence(:"schema_test__schema test").must_equal '"schema_test"."schema test_i_seq"'
+    @db.create_table(Sequel[:schema_test][:"schema test"]){primary_key :i}
+    @db.primary_key_sequence(Sequel[:schema_test][:"schema test"]).must_equal '"schema_test"."schema test_i_seq"'
   end
 
   it "should be able to get custom sequences for tables in a given schema" do
     @db << "CREATE SEQUENCE schema_test.kseq"
-    @db.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.kseq'::regclass)")}
-    @db.primary_key_sequence(:schema_test__schema_test).must_equal '"schema_test".kseq'
+    @db.create_table(Sequel[:schema_test][:schema_test]){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.kseq'::regclass)")}
+    @db.primary_key_sequence(Sequel[:schema_test][:schema_test]).must_equal '"schema_test".kseq'
   end
 
   it "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
     @db << "CREATE SEQUENCE schema_test.\"ks eq\""
-    @db.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.\"ks eq\"'::regclass)")}
-    @db.primary_key_sequence(:"schema_test__schema test").must_equal '"schema_test"."ks eq"'
+    @db.create_table(Sequel[:schema_test][:"schema test"]){integer :j; primary_key :k, :type=>:integer, :default=>Sequel.lit("nextval('schema_test.\"ks eq\"'::regclass)")}
+    @db.primary_key_sequence(Sequel[:schema_test][:"schema test"]).must_equal '"schema_test"."ks eq"'
   end
 
   it "should handle schema introspection cases with tables with same name in multiple schemas" do
     begin
-      @db.create_table(:schema_test__schema_test) do
+      @db.create_table(Sequel[:schema_test][:schema_test]) do
         primary_key :id
-        foreign_key :i, :schema_test__schema_test, :index=>{:name=>:schema_test_sti}
+        foreign_key :i, Sequel[:schema_test][:schema_test], :index=>{:name=>:schema_test_sti}
       end
-      @db.create_table!(:public__schema_test) do
+      @db.create_table!(Sequel[:public][:schema_test]) do
         primary_key :id
-        foreign_key :j, :public__schema_test, :index=>{:name=>:public_test_sti}
+        foreign_key :j, Sequel[:public][:schema_test], :index=>{:name=>:public_test_sti}
       end
 
       h = @db.schema(:schema_test)
@@ -1314,7 +1314,7 @@ describe "Postgres::Database schema qualified tables" do
       @db.indexes(:schema_test).must_equal(:public_test_sti=>{:unique=>false, :columns=>[:j], :deferrable=>nil})
       @db.foreign_key_list(:schema_test).must_equal [{:on_update=>:no_action, :columns=>[:j], :deferrable=>false, :key=>[:id], :table=>:schema_test, :on_delete=>:no_action, :name=>:schema_test_j_fkey}]
     ensure
-      @db.drop_table?(:public__schema_test)
+      @db.drop_table?(Sequel[:public][:schema_test])
     end
   end
 end
@@ -1325,15 +1325,15 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     @db.run "DROP SCHEMA s CASCADE" rescue nil
     @db.run "CREATE SCHEMA s"
 
-    @db.create_table(:s__bands){primary_key :id; String :name}
-    @db.create_table(:s__albums){primary_key :id; String :name; foreign_key :band_id, :s__bands}
-    @db.create_table(:s__tracks){primary_key :id; String :name; foreign_key :album_id, :s__albums}
-    @db.create_table(:s__members){primary_key :id; String :name; foreign_key :band_id, :s__bands}
+    @db.create_table(Sequel[:s][:bands]){primary_key :id; String :name}
+    @db.create_table(Sequel[:s][:albums]){primary_key :id; String :name; foreign_key :band_id, Sequel[:s][:bands]}
+    @db.create_table(Sequel[:s][:tracks]){primary_key :id; String :name; foreign_key :album_id, Sequel[:s][:albums]}
+    @db.create_table(Sequel[:s][:members]){primary_key :id; String :name; foreign_key :band_id, Sequel[:s][:bands]}
 
-    @Band = Class.new(Sequel::Model(:s__bands))
-    @Album = Class.new(Sequel::Model(:s__albums))
-    @Track = Class.new(Sequel::Model(:s__tracks))
-    @Member = Class.new(Sequel::Model(:s__members))
+    @Band = Class.new(Sequel::Model(Sequel[:s][:bands]))
+    @Album = Class.new(Sequel::Model(Sequel[:s][:albums]))
+    @Track = Class.new(Sequel::Model(Sequel[:s][:tracks]))
+    @Member = Class.new(Sequel::Model(Sequel[:s][:members]))
     def @Band.name; :Band; end
     def @Album.name; :Album; end
     def @Track.name; :Track; end
@@ -1346,8 +1346,8 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
     @Track.many_to_one :album, :class=>@Album, :order=>:name
     @Member.many_to_one :band, :class=>@Band, :order=>:name
 
-    @Member.many_to_many :members, :class=>@Member, :join_table=>:s__bands, :right_key=>:id, :left_key=>:id, :left_primary_key=>:band_id, :right_primary_key=>:band_id, :order=>:name
-    @Band.many_to_many :tracks, :class=>@Track, :join_table=>:s__albums, :right_key=>:id, :right_primary_key=>:album_id, :order=>:name
+    @Member.many_to_many :members, :class=>@Member, :join_table=>Sequel[:s][:bands], :right_key=>:id, :left_key=>:id, :left_primary_key=>:band_id, :right_primary_key=>:band_id, :order=>:name
+    @Band.many_to_many :tracks, :class=>@Track, :join_table=>Sequel[:s][:albums], :right_key=>:id, :right_primary_key=>:album_id, :order=>:name
 
     @b1 = @Band.create(:name=>"BM")
     @b2 = @Band.create(:name=>"J")
@@ -1369,16 +1369,16 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
   end
 
   it "should return all eager graphs correctly" do
-    bands = @Band.order(:bands__name).eager_graph(:albums).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:albums).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
 
-    bands = @Band.order(:bands__name).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
 
-    bands = @Band.order(:bands__name).eager_graph({:albums=>:tracks}, :members).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph({:albums=>:tracks}, :members).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
@@ -1386,14 +1386,14 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
   end
 
   it "should have eager graphs work with previous joins" do
-    bands = @Band.order(:bands__name).select_all(:s__bands).join(:s__members, :band_id=>:id).from_self(:alias=>:bands0).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).select_all(Sequel[:s][:bands]).join(Sequel[:s][:members], :band_id=>:id).from_self(:alias=>:bands0).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
   end
 
   it "should have eager graphs work with joins with the same tables" do
-    bands = @Band.order(:bands__name).select_all(:s__bands).join(:s__members, :band_id=>:id).eager_graph({:albums=>:tracks}, :members).all
+    bands = @Band.order(Sequel[:bands][:name]).select_all(Sequel[:s][:bands]).join(Sequel[:s][:members], :band_id=>:id).eager_graph({:albums=>:tracks}, :members).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.albums.map{|y| y.tracks}}.must_equal [[[@t1, @t2], [@t3, @t4]], [[], []]]
@@ -1401,17 +1401,17 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
   end
 
   it "should have eager graphs work with self referential associations" do
-    bands = @Band.order(:bands__name).eager_graph(:tracks=>{:album=>:band}).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:tracks=>{:album=>:band}).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
     bands.map{|x| x.tracks.map{|y| y.album}}.must_equal [[@a1, @a1, @a2, @a2], []]
     bands.map{|x| x.tracks.map{|y| y.album.band}}.must_equal [[@b1, @b1, @b1, @b1], []]
 
-    members = @Member.order(:members__name).eager_graph(:members).all
+    members = @Member.order(Sequel[:members][:name]).eager_graph(:members).all
     members.must_equal [@m4, @m3, @m1, @m2]
     members.map{|x| x.members}.must_equal [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
 
-    members = @Member.order(:members__name).eager_graph(:band, :members=>:band).all
+    members = @Member.order(Sequel[:members][:name]).eager_graph(:band, :members=>:band).all
     members.must_equal [@m4, @m3, @m1, @m2]
     members.map{|x| x.band}.must_equal [@b2, @b2, @b1, @b1]
     members.map{|x| x.members}.must_equal [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
@@ -1419,7 +1419,7 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
   end
 
   it "should have eager graphs work with a from_self dataset" do
-    bands = @Band.order(:bands__name).from_self.eager_graph(:tracks=>{:album=>:band}).all
+    bands = @Band.order(Sequel[:bands][:name]).from_self.eager_graph(:tracks=>{:album=>:band}).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
     bands.map{|x| x.tracks.map{|y| y.album}}.must_equal [[@a1, @a1, @a2, @a2], []]
@@ -1427,70 +1427,70 @@ describe "Postgres::Database schema qualified tables and eager graphing" do
   end
 
   it "should have eager graphs work with different types of aliased from tables" do
-    bands = @Band.order(:tracks__name).from(:s__bands___tracks).eager_graph(:tracks).all
+    bands = @Band.order(Sequel[:tracks][:name]).from(Sequel[:s][:bands].as(:tracks)).eager_graph(:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as(:tracks)).eager_graph(:tracks).all
+    bands = @Band.order(Sequel[:tracks][:name]).from(Sequel.expr(Sequel[:s][:bands]).as(:tracks)).eager_graph(:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as(Sequel.identifier(:tracks))).eager_graph(:tracks).all
+    bands = @Band.order(Sequel[:tracks][:name]).from(Sequel.expr(Sequel[:s][:bands]).as(Sequel.identifier(:tracks))).eager_graph(:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:tracks__name).from(Sequel.expr(:s__bands).as('tracks')).eager_graph(:tracks).all
+    bands = @Band.order(Sequel[:tracks][:name]).from(Sequel.expr(Sequel[:s][:bands]).as('tracks')).eager_graph(:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
   end
 
   it "should have eager graphs work with join tables with aliases" do
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums___tracks, :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:members).join(Sequel[:s][:albums].as(:tracks), :band_id=>Sequel.qualify(Sequel[:s][:bands], :id)).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, :tracks), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:members).join(Sequel.as(Sequel[:s][:albums], :tracks), :band_id=>Sequel.qualify(Sequel[:s][:bands], :id)).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, 'tracks'), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:members).join(Sequel.as(Sequel[:s][:albums], 'tracks'), :band_id=>Sequel.qualify(Sequel[:s][:bands], :id)).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(Sequel.as(:s__albums, Sequel.identifier(:tracks)), :band_id=>Sequel.qualify(:s__bands, :id)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:members).join(Sequel.as(Sequel[:s][:albums], Sequel.identifier(:tracks)), :band_id=>Sequel.qualify(Sequel[:s][:bands], :id)).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>:tracks).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:members).join(Sequel[:s][:albums], {:band_id=>Sequel.qualify(Sequel[:s][:bands], :id)}, :table_alias=>:tracks).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>'tracks').eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:members).join(Sequel[:s][:albums], {:band_id=>Sequel.qualify(Sequel[:s][:bands], :id)}, :table_alias=>'tracks').eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
 
-    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>Sequel.qualify(:s__bands, :id)}, :table_alias=>Sequel.identifier(:tracks)).eager_graph(:albums=>:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).eager_graph(:members).join(Sequel[:s][:albums], {:band_id=>Sequel.qualify(Sequel[:s][:bands], :id)}, :table_alias=>Sequel.identifier(:tracks)).eager_graph(:albums=>:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.albums}.must_equal [[@a1, @a2], [@a3, @a4]]
     bands.map{|x| x.members}.must_equal [[@m1, @m2], [@m4, @m3]]
   end
 
   it "should have eager graphs work with different types of qualified from tables" do
-    bands = @Band.order(:bands__name).from(Sequel.qualify(:s, :bands)).eager_graph(:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).from(Sequel.qualify(:s, :bands)).eager_graph(:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:bands__name).from(Sequel.identifier(:bands).qualify(:s)).eager_graph(:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).from(Sequel.identifier(:bands).qualify(:s)).eager_graph(:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
 
-    bands = @Band.order(:bands__name).from(Sequel::SQL::QualifiedIdentifier.new(:s, 'bands')).eager_graph(:tracks).all
+    bands = @Band.order(Sequel[:bands][:name]).from(Sequel::SQL::QualifiedIdentifier.new(:s, 'bands')).eager_graph(:tracks).all
     bands.must_equal [@b1, @b2]
     bands.map{|x| x.tracks}.must_equal [[@t1, @t2, @t3, @t4], []]
   end
@@ -1621,7 +1621,7 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.send(:drop_schema_sql, :sequel, :if_exists=>true, :cascade=>true).must_equal 'DROP SCHEMA IF EXISTS "sequel" CASCADE'
     @d.create_schema(:sequel)
     @d.create_schema(:sequel, :if_not_exists=>true) if @d.server_version >= 90300
-    @d.create_table(:sequel__test){Integer :a}
+    @d.create_table(Sequel[:sequel][:test]){Integer :a}
     @d.drop_schema(:sequel, :if_exists=>true, :cascade=>true)
   end
 
@@ -1645,8 +1645,8 @@ describe "Postgres::Database functions, languages, schemas, and triggers" do
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
 
     if @d.supports_trigger_conditions?
-      @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true, :when=> {:new__name => 'b'}).must_equal %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()}
-      @d.create_trigger(:test, :identity, :tf, :each_row=>true, :events => :update, :when=> {:new__name => 'b'})
+      @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true, :when=> {Sequel[:new][:name] => 'b'}).must_equal %q{CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON "test" FOR EACH ROW WHEN ("new"."name" = 'b') EXECUTE PROCEDURE tf()}
+      @d.create_trigger(:test, :identity, :tf, :each_row=>true, :events => :update, :when=> {Sequel[:new][:name] => 'b'})
       @d[:test].filter(:name=>'a').update(:value=>nil)
       @d[:test].filter(:name=>'a').all.must_equal [{:name=>'a', :value=>nil}]
       proc{@d[:test].filter(:name=>'a').update(:name=>'b')}.must_raise(Sequel::DatabaseError)
@@ -1891,7 +1891,7 @@ if ((DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_sc
     end
 
     it "should accept dataset as first argument" do
-      @db.copy_table(@db[:test_copy].cross_join(:test_copy___tc).order(:test_copy__x, :test_copy__y, :tc__x, :tc__y)).must_equal "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
+      @db.copy_table(@db[:test_copy].cross_join(Sequel[:test_copy].as(:tc)).order(Sequel[:test_copy][:x], Sequel[:test_copy][:y], Sequel[:tc][:x], Sequel[:tc][:y])).must_equal "1\t2\t1\t2\n1\t2\t3\t4\n3\t4\t1\t2\n3\t4\t3\t4\n"
     end
 
     it "with a block and no options should yield each row as a string in text format" do
@@ -2636,11 +2636,11 @@ describe 'PostgreSQL hstore handling' do
 
     c.many_to_one :item, :class=>c, :key_column=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer)
     c.one_to_many :items, :class=>c, :key=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer), :key_method=>:item_id
-    c.many_to_many :related_items, :class=>c, :join_table=>:items___i, :left_key=>Sequel.cast(Sequel.hstore(:h)['left_item_id'], Integer), :right_key=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer)
+    c.many_to_many :related_items, :class=>c, :join_table=>Sequel[:items].as(:i), :left_key=>Sequel.cast(Sequel.hstore(:h)['left_item_id'], Integer), :right_key=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer)
 
     c.many_to_one :other_item, :class=>c, :key=>:id, :primary_key_method=>:item_id, :primary_key=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer), :reciprocal=>:other_items
     c.one_to_many :other_items, :class=>c, :primary_key=>:item_id, :key=>:id, :primary_key_column=>Sequel.cast(Sequel.hstore(:h)['item_id'], Integer), :reciprocal=>:other_item
-    c.many_to_many :other_related_items, :class=>c, :join_table=>:items___i, :left_key=>:id, :right_key=>:id,
+    c.many_to_many :other_related_items, :class=>c, :join_table=>Sequel[:items].as(:i), :left_key=>:id, :right_key=>:id,
       :left_primary_key_column=>Sequel.cast(Sequel.hstore(:h)['left_item_id'], Integer),
       :left_primary_key=>:left_item_id,
       :right_primary_key=>Sequel.cast(Sequel.hstore(:h)['left_item_id'], Integer),
@@ -2677,13 +2677,13 @@ describe 'PostgreSQL hstore handling' do
     os.other_item.must_equal o
 
     # Eager Loading via eager_graph
-    c.eager_graph(:item).where(:items__id=>1).all.first.item.must_equal o2
-    c.eager_graph(:items).where(:items__id=>2).all.first.items.must_equal [o]
-    c.eager_graph(:related_items).where(:items__id=>1).all.first.related_items.must_equal [o2]
-    c.eager_graph(:other_item).where(:items__id=>2).all.first.other_item.must_equal o
-    c.eager_graph(:other_items).where(:items__id=>1).all.first.other_items.must_equal [o2]
-    c.eager_graph(:other_related_items).where(:items__id=>1).all.first.other_related_items.must_equal [o]
-    c.eager_graph(:mtm_items).where(:items__id=>1).all.first.mtm_items.must_equal [o]
+    c.eager_graph(:item).where(Sequel[:items][:id]=>1).all.first.item.must_equal o2
+    c.eager_graph(:items).where(Sequel[:items][:id]=>2).all.first.items.must_equal [o]
+    c.eager_graph(:related_items).where(Sequel[:items][:id]=>1).all.first.related_items.must_equal [o2]
+    c.eager_graph(:other_item).where(Sequel[:items][:id]=>2).all.first.other_item.must_equal o
+    c.eager_graph(:other_items).where(Sequel[:items][:id]=>1).all.first.other_items.must_equal [o2]
+    c.eager_graph(:other_related_items).where(Sequel[:items][:id]=>1).all.first.other_related_items.must_equal [o]
+    c.eager_graph(:mtm_items).where(Sequel[:items][:id]=>1).all.first.mtm_items.must_equal [o]
 
     # Filter By Associations - Model Instances
     c.filter(:item=>o2).all.must_equal [o]
@@ -2760,7 +2760,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h2.akeys.length).must_equal 1
 
     @ds.from(Sequel.hstore('t'=>'s').op.populate(Sequel::SQL::Cast.new(nil, :items))).select_map(:t).must_equal ['s']
-    @ds.from(:items___i).select(Sequel.hstore('t'=>'s').op.record_set(:i).as(:r)).from_self(:alias=>:s).select(Sequel.lit('(r).*')).from_self.select_map(:t).must_equal ['s']
+    @ds.from(Sequel[:items].as(:i)).select(Sequel.hstore('t'=>'s').op.record_set(:i).as(:r)).from_self(:alias=>:s).select(Sequel.lit('(r).*')).from_self.select_map(:t).must_equal ['s']
 
     @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.skeys.as(:s)).select_order_map(:s).must_equal %w'a t'
     @ds.from((Sequel.hstore('t'=>'s', 'a'=>'b').op - 'a').skeys.as(:s)).select_order_map(:s).must_equal %w't'
@@ -3455,7 +3455,7 @@ describe 'PostgreSQL row-valued/composite types' do
     end
     @db.register_row_type(:address)
     @db.register_row_type(Sequel.qualify(:public, :person))
-    @db.register_row_type(:public__company)
+    @db.register_row_type(Sequel[:public][:company])
 
     @native = DB.adapter_scheme == :postgres || DB.adapter_scheme == :jdbc
   end
@@ -3498,8 +3498,8 @@ describe 'PostgreSQL row-valued/composite types' do
       end
       @db.register_row_type(:domain_check)
       @db.get(@db.row_type(:domain_check, [1])).must_equal(:id=>1)
-      @db.register_row_type(:public__domain_check)
-      @db.get(@db.row_type(:public__domain_check, [1])).must_equal(:id=>1)
+      @db.register_row_type(Sequel[:public][:domain_check])
+      @db.get(@db.row_type(Sequel[:public][:domain_check], [1])).must_equal(:id=>1)
       @db.get(@db.row_type(Sequel.qualify(:public, :domain_check), [1])).must_equal(:id=>1)
     ensure
       @db.drop_table(:domain_check)
@@ -3583,7 +3583,7 @@ describe 'PostgreSQL row-valued/composite types' do
 
     it "splat should reference the table type" do
       @db[:b].select(:a).first.must_equal(:a=>1)
-      @db[:b].select(:b__a).first.must_equal(:a=>1)
+      @db[:b].select(Sequel[:b][:a]).first.must_equal(:a=>1)
       @db[:b].select(Sequel.pg_row(:b)[:a]).first.must_equal(:a=>2)
       @db[:b].select(Sequel.pg_row(:b).splat[:a]).first.must_equal(:a=>1)
 
@@ -3600,11 +3600,11 @@ describe 'PostgreSQL row-valued/composite types' do
         ds.first.must_equal(:b=>{:a=>1, :b=>{:a=>2}})
         ds.select(Sequel.pg_row(:b).*).first.must_equal(:a=>1, :b=>{:a=>2})
         ds.select(Sequel.pg_row(:b)[:b]).first.must_equal(:b=>{:a=>2})
-        ds.select(Sequel.pg_row(:t__b).*).first.must_equal(:a=>1, :b=>{:a=>2})
-        ds.select(Sequel.pg_row(:t__b)[:b]).first.must_equal(:b=>{:a=>2})
+        ds.select(Sequel.pg_row(Sequel[:t][:b]).*).first.must_equal(:a=>1, :b=>{:a=>2})
+        ds.select(Sequel.pg_row(Sequel[:t][:b])[:b]).first.must_equal(:b=>{:a=>2})
       end
       ds.select(Sequel.pg_row(:b)[:a]).first.must_equal(:a=>1)
-      ds.select(Sequel.pg_row(:t__b)[:a]).first.must_equal(:a=>1)
+      ds.select(Sequel.pg_row(Sequel[:t][:b])[:a]).first.must_equal(:a=>1)
     end
   end
 

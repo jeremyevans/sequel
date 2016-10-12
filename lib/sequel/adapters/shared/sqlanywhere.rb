@@ -57,8 +57,8 @@ module Sequel
         im = input_identifier_meth(opts[:dataset])
         metadata_dataset.
          from{sa_describe_query("select * from #{im.call(table)}").as(:a)}.
-         join(:syscolumn___b, :table_id=>:base_table_id, :column_id=>:base_column_id).
-         order(:a__column_number).
+         join(Sequel[:syscolumn].as(:b), :table_id=>:base_table_id, :column_id=>:base_column_id).
+         order{a[:column_number]}.
          map do |row|
           auto_increment = row.delete(:is_autoincrement)
           row[:auto_increment] = auto_increment == 1 || auto_increment == true
@@ -80,11 +80,15 @@ module Sequel
         im = input_identifier_meth
         indexes = {}
         metadata_dataset.
-         from(:dbo__sysobjects___z).
-         select(:z__name___table_name, :i__name___index_name, :si__indextype___type, :si__colnames___columns).
-         join(:dbo__sysindexes___i, :id___i=> :id___z).
-         join(:sys__sysindexes___si, :iname=> :name___i).
-         where(:z__type => 'U', :table_name=>im.call(table)).
+         from(Sequel[:dbo][:sysobjects].as(:z)).
+         select{[
+           z[:name].as(:table_name),
+           i[:name].as(:index_name),
+           si[:indextype].as(:type),
+           si[:colnames].as(:columns)]}.
+         join(Sequel[:dbo][:sysindexes].as(:i), :id=>:id).
+         join(Sequel[:sys][:sysindexes].as(:si), :iname=> :name).
+         where{{z[:type] => 'U', :table_name=>im.call(table)}}.
          each do |r|
           indexes[m.call(r[:index_name])] =
             {:unique=>(r[:type].downcase=='unique'),
@@ -98,11 +102,16 @@ module Sequel
         im = input_identifier_meth
         fk_indexes = {}
         metadata_dataset.
-         from(:sys__sysforeignkey___fk).
-         select(:fk__role___name, :fks__columns___column_map, :si__indextype___type, :si__colnames___columns, :fks__primary_tname___table_name).
-         join(:sys__sysforeignkeys___fks, :role => :role).
-         join_table(:inner, :sys__sysindexes___si, [:iname=> :fk__role], {:implicit_qualifier => :fk}).
-         where(:fks__foreign_tname=>im.call(table)).
+         from{sys[:sysforeignkey].as(:fk)}.
+         select{[
+           fk[:role].as(:name),
+           fks[:columns].as(:column_map),
+           si[:indextype].as(:type),
+           si[:colnames].as(:columns),
+           fks[:primary_tname].as(:table_name)]}.
+         join(Sequel[:sys][:sysforeignkeys].as(:fks), :role => :role).
+         join(Sequel[:sys][:sysindexes].as(:si), [:iname=> Sequel[:fk][:role]], {:implicit_qualifier => :fk}).
+         where{{fks[:foreign_tname]=>im.call(table)}}.
          each do |r|
           unless r[:type].downcase == 'primary key'
             fk_indexes[r[:name]] =
@@ -240,9 +249,9 @@ module Sequel
       def tables_and_views(type, opts=OPTS)
         m = output_identifier_meth
         metadata_dataset.
-          from(:sysobjects___a).
-          where(:a__type=>type).
-          select_map(:a__name).
+          from{sysobjects.as(:a)}.
+          where{{a[:type]=>type}}.
+          select_map{a[:name]}.
           map{|n| m.call(n)}
       end
       

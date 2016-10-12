@@ -125,6 +125,8 @@ A plain symbol is usually treated as an unqualified identifier.  However, if you
 
   :table__column # "table"."column"
 
+This works by default, but it is possible to turn off by setting <tt>Sequel.split_symbols = false</tt>.
+
 Note that you can't use a period to separate them:
 
   :table.column # calls the column method on the symbol
@@ -143,7 +145,7 @@ and call <tt>[]</tt> or +qualify+ on that, or to use the <tt>Sequel.qualify</tt>
 Another way to generate identifiers is to use Sequel's {virtual row support}[rdoc-ref:doc/virtual_rows.rdoc]:
 
   DB[:albums].select{name} # SELECT "name" FROM "albums"
-  DB[:albums].select{albums__name} # SELECT "albums"."name" FROM "albums"
+  DB[:albums].select{albums[:name]} # SELECT "albums"."name" FROM "albums"
 
 === Numbers
 
@@ -175,6 +177,8 @@ Sequel allows for implicit aliasing in column symbols using the triple underscor
 You can combine this with implicit qualification:
 
   :table__column___alias # "table"."column" AS "alias"
+
+As with creating qualified identifiers via a double underscore, This works by default, but it is possible to turn off by setting <tt>Sequel.split_symbols = false</tt>.
 
 You can also use the <tt>Sequel.as</tt> method to create an alias, and the +as+ method on most Sequel-specific expression objects:
 
@@ -235,10 +239,10 @@ If the database supports window functions, Sequel can handle them by calling the
 
 If the database supports schema qualified functions, Sequel can handle them by calling the function method on a QuailfiedIdentifier:
 
-  DB[:albums].select{schema__function.function}
+  DB[:albums].select{schema[:function].function}
   # SELECT schema.function() FROM albums
   
-  DB[:albums].select{schema__function.function(col, 2, "a")}
+  DB[:albums].select{schema[:function].function(col, 2, "a")}
   # SELECT schema.function(col, 2, 'a') FROM albums
 
 === Portable/Emulated Functions
@@ -377,7 +381,7 @@ The standard mathematical operates are defined on most Sequel-specific expressio
 You can also call the operator methods directly on the Sequel module:
 
   Sequel.+(:column, 1) # "column" + 1
-  Sequel.-(:table__column, 1) # "table"."column" - 1
+  Sequel.-(Sequel[:table][:column], 1) # "table"."column" - 1
   Sequel.*(Sequel[:table][:column], 1) # "table"."column" * 1
   Sequel./(:column, 1) # "column" / 1
   Sequel.**(:column, 1) # power("column", 1)

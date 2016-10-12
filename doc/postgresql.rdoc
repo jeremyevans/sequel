@@ -160,7 +160,7 @@ Sequel has built in support for creating and dropping PostgreSQL schemas, proced
   DB.drop_function(:set_updated_at)
   # DROP FUNCTION set_updated_at()
 
-  DB.create_trigger(:table, :trg_updated_at, :set_updated_at, :events=>:update, :each_row=>true, :when => {:new__updated_at => :old__updated_at})
+  DB.create_trigger(:table, :trg_updated_at, :set_updated_at, :events=>:update, :each_row=>true, :when => {Sequel[:new][:updated_at] => Sequel[:old][:updated_at]})
   # CREATE TRIGGER trg_updated_at BEFORE UPDATE ON "table" FOR EACH ROW WHEN ("new"."updated_at" = "old"."updated_at") EXECUTE PROCEDURE set_updated_at()
   DB.drop_trigger(:table, :trg_updated_at)
   # DROP TRIGGER trg_updated_at ON "table"
@@ -231,7 +231,7 @@ If you want to update the existing row instead of ignoring the constraint violat
 can pass an +:update+ option with a hash of values to update.  You must pass either the
 +:target+ or +:constraint+ options when passing the +:update+ option:
 
-  DB[:table].insert_conflict(:target=>:a, :update=>{:b=>:excluded__b}).insert(:a=>1, :b=>2)
+  DB[:table].insert_conflict(:target=>:a, :update=>{:b=>Sequel[:excluded][:b]}).insert(:a=>1, :b=>2)
   # INSERT INTO TABLE (a, b) VALUES (1, 2)
   # ON CONFLICT (a) DO UPDATE SET b = excluded.b
  
@@ -240,7 +240,7 @@ Additionally, if you only want to do the update in certain cases, you can specif
 conditions, the constraint violation will be ignored, but the row will not be updated:
 
   DB[:table].insert_conflict(:constraint=>:table_a_uidx,
-    :update=>{:b=>:excluded__b}, :update_where=>{:table__status_id=>1}).insert(:a=>1, :b=>2)
+    :update=>{:b=>Sequel[:excluded][:b]}, :update_where=>{Sequel[:table][:status_id]=>1}).insert(:a=>1, :b=>2)
   # INSERT INTO TABLE (a, b) VALUES (1, 2)
   # ON CONFLICT ON CONSTRAINT table_a_uidx
   # DO UPDATE SET b = excluded.b WHERE (table.status_id = 1)

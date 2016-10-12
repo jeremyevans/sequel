@@ -178,7 +178,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     class ::Firm < Sequel::Model
       one_to_many :clients
       one_to_many :invoices, :read_only=>true, \
-        :dataset=>proc{Invoice.eager_graph(:client).filter(:client__firm_id=>pk)}, \
+        :dataset=>proc{Invoice.eager_graph(:client).filter(Sequel[:client][:firm_id]=>pk)}, \
         :after_load=>(proc do |firm, invs|
           invs.each do |inv|
             inv.client.associations[:firm] = inv.associations[:firm] = firm
@@ -187,7 +187,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
         :eager_loader=>(proc do |eo|
           id_map = eo[:id_map]
           eo[:rows].each{|firm| firm.associations[:invoices] = []}
-          Invoice.eager_graph(:client).filter(:client__firm_id=>id_map.keys).all do |inv|
+          Invoice.eager_graph(:client).filter(Sequel[:client][:firm_id]=>id_map.keys).all do |inv|
             id_map[inv.client.firm_id].each do |firm|
               firm.associations[:invoices] << inv
             end
@@ -211,7 +211,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     class ::Invoice < Sequel::Model
       many_to_one :client
       many_to_one :firm, :key=>nil, :read_only=>true, \
-        :dataset=>proc{Firm.eager_graph(:clients).filter(:clients__id=>client_id)}, \
+        :dataset=>proc{Firm.eager_graph(:clients).filter(Sequel[:clients][:id]=>client_id)}, \
         :after_load=>(proc do |inv, firm|
           # Delete the cached associations from firm, because it only has the
           # client with this invoice, instead of all clients of the firm
@@ -226,7 +226,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
             inv.associations[:firm] = nil
             (id_map[inv.client_id] ||= []) << inv
           end
-          Firm.eager_graph(:clients).filter(:clients__id=>id_map.keys).all do |firm|
+          Firm.eager_graph(:clients).filter(Sequel[:clients][:id]=>id_map.keys).all do |firm|
             # Delete the cached associations from firm, because it only has the
             # clients related the invoices being eagerly loaded, instead of all
             # clients of the firm.
@@ -666,19 +666,19 @@ describe "one to one associations" do
   end
 
   it "should be eager loadable" do
-    bk1, bk2 = Book.filter(:books__id=>[1,2]).eager(:first_page).all
+    bk1, bk2 = Book.filter(Sequel[:books][:id]=>[1,2]).eager(:first_page).all
     bk1.first_page.must_equal @page1
     bk2.first_page.must_equal @page3
   end
 
   it "should be eager graphable" do
-    bk1, bk2 = Book.filter(:books__id=>[1,2]).eager_graph(:first_page).all
+    bk1, bk2 = Book.filter(Sequel[:books][:id]=>[1,2]).eager_graph(:first_page).all
     bk1.first_page.must_equal @page1
     bk2.first_page.must_equal @page3
   end
 
   it "should be eager graphable two at once" do
-    bk1, bk2 = Book.filter(:books__id=>[1,2]).eager_graph(:first_page, :second_page).all
+    bk1, bk2 = Book.filter(Sequel[:books][:id]=>[1,2]).eager_graph(:first_page, :second_page).all
     bk1.first_page.must_equal @page1
     bk1.second_page.must_equal @page2
     bk2.first_page.must_equal @page3

@@ -47,11 +47,22 @@ module Sequel
         im = input_identifier_meth
         schema, table = schema_and_table(table)
         ds = metadata_dataset.
-          from(:all_cons_columns___pc, :all_constraints___p, :all_cons_columns___fc, :all_constraints___f).
-          where(:f__table_name=>im.call(table), :f__constraint_type=>'R', :p__owner=>:f__r_owner, :p__constraint_name=>:f__r_constraint_name, :pc__owner=>:p__owner, :pc__constraint_name=>:p__constraint_name, :pc__table_name=>:p__table_name, :fc__owner=>:f__owner, :fc__constraint_name=>:f__constraint_name, :fc__table_name=>:f__table_name, :fc__position=>:pc__position).
-          select(:p__table_name___table, :pc__column_name___key, :fc__column_name___column, :f__constraint_name___name).
-          order(:table, :fc__position)
-        ds = ds.where(:f__schema_name=>im.call(schema)) if schema
+          from{[all_cons_columns.as(:pc), all_constraints.as(:p), all_cons_columns.as(:fc), all_constraints.as(:f)]}.
+          where{{
+            f[:table_name]=>im.call(table),
+            f[:constraint_type]=>'R',
+            p[:owner]=>f[:r_owner],
+            p[:constraint_name]=>f[:r_constraint_name],
+            pc[:owner]=>p[:owner],
+            pc[:constraint_name]=>p[:constraint_name],
+            pc[:table_name]=>p[:table_name],
+            fc[:owner]=>f[:owner],
+            fc[:constraint_name]=>f[:constraint_name],
+            fc[:table_name]=>f[:table_name],
+            fc[:position]=>pc[:position]}}.
+          select{[p[:table_name].as(:table), pc[:column_name].as(:key), fc[:column_name].as(:column), f[:constraint_name].as(:name)]}.
+          order{[:table, fc[:position]]}
+        ds = ds.where{{f[:schema_name]=>im.call(schema)}} if schema
 
         fks = {}
         ds.each do |r|

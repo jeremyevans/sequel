@@ -309,12 +309,12 @@ describe "An SQLite dataset" do
 end
 
 describe "An SQLite dataset AS clause" do
-  it "should use a string literal for :col___alias" do
-    DB.literal(:c___a).must_equal "`c` AS 'a'"
+  it "should use a string literal for Sequel[:col].as(:alias)" do
+    DB.literal(Sequel[:c].as(:a)).must_equal "`c` AS 'a'"
   end
 
-  it "should use a string literal for :table__col___alias" do
-    DB.literal(:t__c___a).must_equal "`t`.`c` AS 'a'"
+  it "should use a string literal for Sequel[:table][:col].as(:alias)" do
+    DB.literal(Sequel[:t][:c].as(:a)).must_equal "`t`.`c` AS 'a'"
   end
 
   it "should use a string literal for :column.as(:alias)" do
@@ -322,11 +322,11 @@ describe "An SQLite dataset AS clause" do
   end
 
   it "should use a string literal in the SELECT clause" do
-    DB[:t].select(:c___a).sql.must_equal "SELECT `c` AS 'a' FROM `t`"
+    DB[:t].select(Sequel[:c].as(:a)).sql.must_equal "SELECT `c` AS 'a' FROM `t`"
   end
 
   it "should use a string literal in the FROM clause" do
-    DB[:t___a].sql.must_equal "SELECT * FROM `t` AS 'a'"
+    DB[Sequel[:t].as(:a)].sql.must_equal "SELECT * FROM `t` AS 'a'"
   end
 
   it "should use a string literal in the JOIN clause" do

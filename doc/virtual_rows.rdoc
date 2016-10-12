@@ -121,8 +121,17 @@ in the method name:
   # WHERE table.column > 1
 
 Using the double underscore for SQL::QualifiedIdentifiers was done to make
-usage very similar to using symbols, which also translate the double underscore
-into a qualified column.
+usage very similar to using symbols, which by default also translate the
+double underscore into a qualified column.
+
+Note that when <tt>Sequel.split_symbols = false</tt> is used, then virtual
+rows do not split symbols either.  If you need to create qualified identifers
+when disabling symbol splitting, it is easy to do by calling #[] on the
+SQL::Identifiers returned by regular methods calls:
+
+  ds.where{|o| o.table[:column] > 1}
+  ds.where{table[:column] > 1}
+  # WHERE table.column > 1
 
 == SQL::Functions - SQL function calls
 

@@ -1897,8 +1897,12 @@ module Sequel
             end
           end
         elsif args.empty?
-          table, column = m.to_s.split(DOUBLE_UNDERSCORE, 2)
-          column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
+          if Sequel.split_symbols?
+            table, column = m.to_s.split(DOUBLE_UNDERSCORE, 2)
+            column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
+          else
+            Identifier.new(m)
+          end
         else
           Function.new(m, *args)
         end

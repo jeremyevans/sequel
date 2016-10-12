@@ -264,11 +264,15 @@ module Sequel
         im = input_identifier_meth(ds)
 
         # Primary Keys
-        ds = metadata_dataset.from(:all_constraints___cons, :all_cons_columns___cols).
-          where(:cols__table_name=>im.call(table), :cons__constraint_type=>'P',
-                :cons__constraint_name=>:cols__constraint_name, :cons__owner=>:cols__owner)
-        ds = ds.where(:cons__owner=>im.call(schema)) if schema
-        pks = ds.select_map(:cols__column_name)
+        ds = metadata_dataset.
+          from{[all_constraints.as(:cons), all_cons_columns.as(:cols)]}.
+          where{{
+           cols[:table_name]=>im.call(table),
+           cons[:constraint_type]=>'P',
+           cons[:constraint_name]=>cols[:constraint_name],
+           cons[:owner]=>cols[:owner]}}
+        ds = ds.where{{cons[:owner]=>im.call(schema)}} if schema
+        pks = ds.select_map{cols[:column_name]}
 
         # Default values
         defaults = begin

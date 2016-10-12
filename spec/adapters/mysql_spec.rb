@@ -177,14 +177,14 @@ describe "A MySQL dataset" do
     @d.select(Sequel.lit('COUNT(*)')).sql.must_equal 'SELECT COUNT(*) FROM `items`'
     @d.select(Sequel.function(:max, :value)).sql.must_equal 'SELECT max(`value`) FROM `items`'
     @d.select(Sequel.function(:NOW)).sql.must_equal 'SELECT NOW() FROM `items`'
-    @d.select(Sequel.function(:max, :items__value)).sql.must_equal 'SELECT max(`items`.`value`) FROM `items`'
+    @d.select(Sequel.function(:max, Sequel[:items][:value])).sql.must_equal 'SELECT max(`items`.`value`) FROM `items`'
     @d.order(Sequel.expr(:name).desc).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` DESC'
     @d.select(Sequel.lit('items.name AS item_name')).sql.must_equal 'SELECT items.name AS item_name FROM `items`'
     @d.select(Sequel.lit('`name`')).sql.must_equal 'SELECT `name` FROM `items`'
     @d.select(Sequel.lit('max(items.`name`) AS `max_name`')).sql.must_equal 'SELECT max(items.`name`) AS `max_name` FROM `items`'
     @d.select(Sequel.function(:test, :abc, 'hello')).sql.must_equal "SELECT test(`abc`, 'hello') FROM `items`"
-    @d.select(Sequel.function(:test, :abc__def, 'hello')).sql.must_equal "SELECT test(`abc`.`def`, 'hello') FROM `items`"
-    @d.select(Sequel.function(:test, :abc__def, 'hello').as(:x2)).sql.must_equal "SELECT test(`abc`.`def`, 'hello') AS `x2` FROM `items`"
+    @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello')).sql.must_equal "SELECT test(`abc`.`def`, 'hello') FROM `items`"
+    @d.select(Sequel.function(:test, Sequel[:abc][:def], 'hello').as(:x2)).sql.must_equal "SELECT test(`abc`.`def`, 'hello') AS `x2` FROM `items`"
     @d.insert_sql(:value => 333).must_equal 'INSERT INTO `items` (`value`) VALUES (333)'
     @d.insert_sql(:x => :y).must_equal 'INSERT INTO `items` (`x`) VALUES (`y`)'
   end
@@ -1324,13 +1324,13 @@ describe "MySQL joined datasets" do
   end
 
   it "should support deletions from a single table" do
-    @ds.where(:a__id=>1).delete
+    @ds.where(Sequel[:a][:id]=>1).delete
     @db[:a].select_order_map(:id).must_equal [2]
     @db[:b].select_order_map(:id).must_equal [3, 4, 5]
   end
 
   it "should support deletions from multiple tables" do
-    @ds.delete_from(:a, :b).where(:a__id=>1).delete
+    @ds.delete_from(:a, :b).where(Sequel[:a][:id]=>1).delete
     @db[:a].select_order_map(:id).must_equal [2]
     @db[:b].select_order_map(:id).must_equal [5]
   end
