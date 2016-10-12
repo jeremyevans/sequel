@@ -246,8 +246,13 @@ module Sequel
     # double embedded underscores which would be considered an implicit qualified identifier
     # if not wrapped in an SQL::Identifier.
     def qualifier_from_alias_symbol(aliaz, identifier)
-      identifier = identifier.column if identifier.is_a?(SQL::QualifiedIdentifier)
       case identifier
+      when SQL::QualifiedIdentifier
+        if identifier.column.is_a?(String)
+          Sequel.identifier(aliaz)
+        else
+          aliaz
+        end
       when SQL::Identifier
         Sequel.identifier(aliaz)
       else

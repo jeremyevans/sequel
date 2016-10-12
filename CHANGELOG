@@ -1,5 +1,7 @@
 === HEAD
 
+* Make SQL::QualifiedIdentifier convert SQL::Identifier arguments to strings, fixing Sequel[:schema][:table] usage in schema methods (jeremyevans)
+
 * Do not attempt to combine non-associative operators (jeremyevans) (#1246)
 
 * Automatically add NOT NULL to columns when adding primary keys if the database doesn't handle it (jeremyevans)

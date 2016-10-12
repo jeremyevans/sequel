@@ -1650,7 +1650,8 @@ module Sequel
 
       # Set the table and column to the given arguments
       def initialize(table, column)
-        @table, @column = table, column
+        @table = convert_identifier(table)
+        @column = convert_identifier(column)
       end
       
       # Create a Function using this identifier as the functions name, with
@@ -1660,6 +1661,18 @@ module Sequel
       end
       
       to_s_method :qualified_identifier_sql, "@table, @column"
+
+      private
+
+      # Automatically convert SQL::Identifiers to strings
+      def convert_identifier(identifier)
+        case identifier
+        when SQL::Identifier
+          identifier.value.to_s
+        else
+          identifier
+        end
+      end
     end
     
     # Subclass of +ComplexExpression+ where the expression results

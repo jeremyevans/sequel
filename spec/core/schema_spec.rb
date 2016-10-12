@@ -12,10 +12,11 @@ describe "DB#create_table" do
 
   it "should accept the table name in multiple formats" do
     @db.create_table(:cats__cats) {}
+    @db.create_table(Sequel[:cats][:cats]) {}
     @db.create_table("cats__cats1") {}
     @db.create_table(Sequel.identifier(:cats__cats2)) {}
     @db.create_table(Sequel.qualify(:cats3, :cats)) {}
-    @db.sqls.must_equal ['CREATE TABLE cats.cats ()', 'CREATE TABLE cats__cats1 ()', 'CREATE TABLE cats__cats2 ()', 'CREATE TABLE cats3.cats ()']
+    @db.sqls.must_equal ['CREATE TABLE cats.cats ()', 'CREATE TABLE cats.cats ()', 'CREATE TABLE cats__cats1 ()', 'CREATE TABLE cats__cats2 ()', 'CREATE TABLE cats3.cats ()']
   end
 
   it "should raise an error if the table name argument is not valid" do
