@@ -159,7 +159,7 @@ module Sequel
       end
 
       cols = schema_parse_table(table_name, opts)
-      raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
+      raise(Error, "schema parsing returned no columns, table '#{table_name}' probably doesn't exist") if cols.nil? || cols.empty?
 
       primary_keys = 0
       auto_increment_set = false
