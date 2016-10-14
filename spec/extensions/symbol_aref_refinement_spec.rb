@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-if RUBY_VERSION >= '2.0.0'
+if (RUBY_VERSION >= '2.0.0' && RUBY_ENGINE == 'ruby') || (RUBY_VERSION >= '2.3.0' && RUBY_ENGINE == 'jruby')
 Sequel.extension :symbol_aref_refinement
 using Sequel::SymbolAref
 
