@@ -1,5 +1,7 @@
 === HEAD
 
+* Add symbol_aref and symbol_aref_refinement extensions so that :table[:column] is treated as Sequel.qualify(:table, :column) (jeremyevans)
+
 * Add Sequel.split_symbols=, to support the disabling of splitting symbols with double/triple underscores (jeremyevans)
 
 * Make SQL::QualifiedIdentifier convert SQL::Identifier arguments to strings, fixing Sequel[:schema][:table] usage in schema methods (jeremyevans)

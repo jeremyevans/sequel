@@ -21,6 +21,7 @@ Sequel.extension :core_extensions
 if RUBY_VERSION < '1.9.0'
   Sequel.extension :ruby18_symbol_extensions
 end
+Sequel.extension :symbol_aref
 
 require 'minitest/autorun'
 
@@ -700,5 +701,31 @@ describe "Postgres extensions integration" do
   it "Range#pg_range should return an PGRange" do
     @db.literal((1..2).pg_range).must_equal "'[1,2]'"
     @db.literal((1..2).pg_range(:int4range)).must_equal "int4range(1,2,'[]')"
+  end
+end
+
+describe "symbol_aref extensions" do
+  before do
+    @db = Sequel.mock
+  end
+
+  it "Symbol#[] should create qualified identifier if given a symbol" do
+    @db.literal(:x[:y]).must_equal "x.y"
+  end
+
+  it "Symbol#[] should create qualified identifier if given an identifier" do
+    @db.literal(:x[Sequel[:y]]).must_equal "x.y"
+  end
+
+  it "Symbol#[] should create qualified identifier if given a qualified identifier" do
+    @db.literal(:x[:y[:z]]).must_equal "x.y.z"
+  end
+
+  it "should not affect other arguments to Symbol#[]" do
+    if RUBY_VERSION >= '1.9'
+      :x[0].must_equal "x"
+    else
+      @db.literal(:x[0]).must_equal "x(0)"
+    end
   end
 end
