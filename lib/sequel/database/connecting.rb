@@ -135,7 +135,7 @@ module Sequel
     #
     #   # in file sequel/adapters/shared/mydb.rb
     #   module Sequel::MyDB
-    #     Sequel::Database.set_shared_adapter_scheme :mydb, :self
+    #     Sequel::Database.set_shared_adapter_scheme :mydb, self
     #
     #     def self.mock_adapter_setup(db)
     #       # ...
