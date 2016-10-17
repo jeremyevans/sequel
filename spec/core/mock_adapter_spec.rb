@@ -20,6 +20,10 @@ describe "Sequel Mock Adapter" do
           def foo
             @foo
           end
+
+          def quote_identifiers_default
+            true
+          end
         end
 
         module self::DatasetMethods
@@ -32,6 +36,7 @@ describe "Sequel Mock Adapter" do
       Sequel.connect('mock://foo') do |db|
         db.foo.must_equal :foo
         db.dataset.foo.must_equal :foo
+        db.quote_identifiers?.must_equal true
       end
     ensure
       Sequel.synchronize{Sequel::SHARED_ADAPTER_MAP.delete(:foo)}
