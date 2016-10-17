@@ -1,5 +1,7 @@
 === HEAD
 
+* Add s extension, with adds Sequel::S module that includes private #S method for calling Sequel.expr, including use as refinement (jeremyevans)
+
 * Add symbol_as and symbol_as_refinement extensions so that :column.as(:alias) is treated as Sequel.as(:column, :alias) (jeremyevans)
 
 * Add symbol_aref and symbol_aref_refinement extensions so that :table[:column] is treated as Sequel.qualify(:table, :column) (jeremyevans)
