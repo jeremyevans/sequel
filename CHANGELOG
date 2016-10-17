@@ -1,5 +1,7 @@
 === HEAD
 
+* Add symbol_as and symbol_as_refinement extensions so that :column.as(:alias) is treated as Sequel.as(:column, :alias) (jeremyevans)
+
 * Add symbol_aref and symbol_aref_refinement extensions so that :table[:column] is treated as Sequel.qualify(:table, :column) (jeremyevans)
 
 * Add Sequel.split_symbols=, to support the disabling of splitting symbols with double/triple underscores (jeremyevans)

@@ -12,6 +12,8 @@ def Sequel.core_extensions?
   true
 end
 
+Sequel.extension :symbol_as
+
 # Sequel extends +Array+ to add methods to implement the SQL DSL.
 # Most of these methods require that the array not be empty and that it
 # must consist solely of other arrays that have exactly two elements.
@@ -195,7 +197,6 @@ end
 
 # Sequel extends +Symbol+ to add methods to implement the SQL DSL.
 class Symbol
-  include Sequel::SQL::AliasMethods
   include Sequel::SQL::CastMethods
   include Sequel::SQL::OrderMethods
   include Sequel::SQL::BooleanMethods
