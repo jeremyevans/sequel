@@ -311,7 +311,7 @@ The following shortcuts exist for creating Sequel::SQL::AliasedExpression object
   Sequel[:column___alias]
   Sequel.as(:column, :alias)
   Sequel.as(:column, :alias, [:column_alias1, :column_alias2])
-  :column.as(:alias) # core_extensions extension
+  :column.as(:alias) # core_extensions or symbol_as extension
   
 === Sequel::SQL::ComplexExpression
 

@@ -147,6 +147,10 @@ Another way to generate identifiers is to use Sequel's {virtual row support}[rdo
   DB[:albums].select{name} # SELECT "name" FROM "albums"
   DB[:albums].select{albums[:name]} # SELECT "albums"."name" FROM "albums"
 
+You can also use the symbol_aref extension for creating qualified identifiers:
+
+  :table[:column] # "table"."column"
+
 === Numbers
 
 In general, ruby numbers map directly to SQL numbers:
@@ -185,6 +189,10 @@ You can also use the <tt>Sequel.as</tt> method to create an alias, and the +as+ 
   Sequel.as(:column, :alias)                 # "column" AS "alias"
   Sequel[:column].as(:alias)                 # "column" AS "alias"
   Sequel[:table][:column].as(:alias)         # "table"."column" AS "alias"
+
+You can also use the symbol_as extension for creating aliased identifiers:
+
+  :column.as(:alias) # "column" AS "alias"
 
 If you want to use a derived column list, you can provide an array of column aliases:
 
