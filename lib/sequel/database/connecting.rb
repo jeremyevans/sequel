@@ -142,6 +142,7 @@ module Sequel
     #     end
     #
     #     module DatabaseMethods
+    #       extend Sequel::Database::ResetIdentifierMangling
     #       # ...
     #     end
     #
