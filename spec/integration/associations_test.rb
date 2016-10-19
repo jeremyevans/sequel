@@ -1624,6 +1624,7 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
     Album.alias_tags.all.must_equal [@tag]
     Artist.albums.all.must_equal [@album]
     unless @no_many_through_many
+      Album.mthm_tags.all.must_equal [@tag]
       Album.first_tags.all.must_equal [@tag]
       Artist.tags.all.must_equal [@tag]
       Artist.first_tags.all.must_equal [@tag]
@@ -1863,6 +1864,8 @@ describe "Sequel::Model Simple Associations" do
       many_to_one :artist, :reciprocal=>nil
       many_to_one :a_artist, :clone=>:artist, :conditions=>{:name=>'Ar'}, :key=>:artist_id
       many_to_many :tags, :right_key=>:tag_id
+      plugin :many_through_many
+      many_through_many :mthm_tags, [[:albums_tags, :album_id, :tag_id]], :class=>:Tag
       many_to_many :alias_tags, :clone=>:tags, :join_table=>Sequel[:albums_tags].as(:at)
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]
@@ -2152,6 +2155,8 @@ describe "Sequel::Model Composite Key Associations" do
       many_to_one :artist, :key=>[:artist_id1, :artist_id2], :reciprocal=>nil
       many_to_one(:a_artist, :clone=>:artist){|ds| ds.where(:name=>'Ar')}
       many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
+      plugin :many_through_many
+      many_through_many :mthm_tags, [[:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]], :class=>:Tag
       many_to_many :alias_tags, :clone=>:tags, :join_table=>Sequel[:albums_tags].as(:at)
       many_to_many :first_two_tags, :clone=>:tags, :order=>:name, :limit=>2
       many_to_many :second_two_tags, :clone=>:tags, :order=>:name, :limit=>[2, 1]

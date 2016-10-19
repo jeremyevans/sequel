@@ -26,6 +26,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Album.columns :id, :name, :artist_id
     @Tag.columns :id, :name
 
+    @Album.plugin :many_through_many
     @Artist.plugin :many_through_many
     @Artist.plugin :pg_array_associations
     @Tag.plugin :pg_array_associations
@@ -33,6 +34,7 @@ describe "Sequel::Plugins::DatasetAssociations" do
     @Artist.one_to_one :first_album, :class=>@Album
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag
+    @Album.many_through_many :mthm_tags, [[:albums_tags, :album_id, :tag_id]], :class=>@Tag
     @Album.one_through_one :first_tag, :class=>@Tag, :right_key=>:tag_id
     @Tag.many_to_many :albums, :class=>@Album
     @Artist.pg_array_to_many :artist_tags, :class=>@Tag, :key=>:tag_ids
@@ -81,6 +83,13 @@ describe "Sequel::Plugins::DatasetAssociations" do
     ds.must_be_kind_of(Sequel::Dataset)
     ds.model.must_equal @Tag
     ds.sql.must_equal "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM artists INNER JOIN albums ON (albums.artist_id = artists.id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) INNER JOIN tags ON (tags.id = albums_tags.tag_id) WHERE (albums.artist_id IN (SELECT artists.id FROM artists))))"
+  end
+
+  it "should work for many_through_many associations with a single join table" do
+    ds = @Album.mthm_tags
+    ds.must_be_kind_of(Sequel::Dataset)
+    ds.model.must_equal @Tag
+    ds.sql.must_equal "SELECT tags.* FROM tags WHERE (tags.id IN (SELECT albums_tags.tag_id FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id IN (SELECT albums.id FROM albums))))"
   end
 
   it "should work for one_through_many associations" do

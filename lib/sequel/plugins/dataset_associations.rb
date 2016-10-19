@@ -93,12 +93,20 @@ module Sequel
               where(r.qualify(r.join_table_alias, r[:left_keys])=>sds.select(*r.qualify(model.table_name, r[:left_primary_key_columns])))
             ds.filter(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
           when :many_through_many, :one_through_many
-            fre = r.reverse_edges.first
             fe, *edges = r.edges
             edges << r.final_edge
-            mds = model.
-              select(*Array(r.qualify(fre[:table], fre[:left]))).
-              join(fe[:table], Array(fe[:right]).zip(Array(fe[:left])), :implicit_qualifier=>model.table_name).
+            if fre = r.reverse_edges.first
+              table = fre[:table]
+              left = fre[:left]
+              mds = model.join(fe[:table], Array(fe[:right]).zip(Array(fe[:left])), :implicit_qualifier=>model.table_name)
+            else
+              table = fe[:table]
+              left = edges.first[:left]
+              edges = []
+              mds = r.associated_dataset
+            end
+            mds = mds.
+              select(*Array(r.qualify(table, left))).
               where(r.qualify(fe[:table], fe[:right])=>sds.select(*r.qualify(model.table_name, r[:left_primary_key_columns])))
             edges.each{|e| mds = mds.join(e[:table], Array(e[:right]).zip(Array(e[:left])))}
             ds.filter(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
