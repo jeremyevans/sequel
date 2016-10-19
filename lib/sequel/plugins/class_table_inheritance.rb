@@ -31,9 +31,15 @@ module Sequel
     # The class_table_inheritance plugin assumes that the root table
     # (e.g. employees) has a primary key column (usually autoincrementing),
     # and all other tables have a foreign key of the same name that points
-    # to the same column in their superclass's table.  In this example,
-    # the employees id column is a primary key and the id column in every
-    # other table is a foreign key referencing the employees id.
+    # to the same column in their superclass's table, which is also the primary
+    # key for that table.  In this example, the employees table has an id column
+    # is a primary key and the id column in every other table is a foreign key
+    # referencing employees.id, which is also the primary key of that table.
+    #
+    # Additionally, note that other than the primary key column, no subclass
+    # table has a column with the same name as any superclass table. This plugin
+    # does not support cases where the column names in a subclass table overlap
+    # with any column names in a superclass table.
     #
     # In this example the staff table also stores Cook model objects and the
     # executives table also stores CEO model objects.
