@@ -98,6 +98,14 @@ describe "Sequel::Plugins::ColumnSelect" do
     @Album.dataset.sql.must_equal 'SELECT albums.id, albums.a, albums.b, albums.c FROM albums'
   end
 
+  it "should handle case where schema parsing and columns does not produce results" do
+    def @db.supports_schema_parsing?() true end
+    def @db.schema_parse_table(t, *) [] end
+    @db.extend_datasets{def columns; raise Sequel::DatabaseError; end}
+    @Album.plugin :column_select
+    @Album.dataset.sql.must_equal 'SELECT * FROM albums'
+  end
+
   it "works correctly when loaded on model without a dataset" do
     c = Class.new(Sequel::Model)
     c.plugin :column_select

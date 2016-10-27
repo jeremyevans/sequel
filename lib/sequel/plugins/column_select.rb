@@ -48,8 +48,10 @@ module Sequel
                 cols = cols.map{|c, _| c}
               end
             end
-            cols ||= check_non_connection_error{ds.columns}
-            ds = ds.select(*cols.map{|c| Sequel.qualify(ds.first_source, Sequel.identifier(c))})
+
+            if cols ||= check_non_connection_error{ds.columns}
+              ds = ds.select(*cols.map{|c| Sequel.qualify(ds.first_source, Sequel.identifier(c))})
+            end
           end
           ds
         end
