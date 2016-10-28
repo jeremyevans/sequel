@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-11-27 11:00:03 -0800</span>
+          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -465,15 +465,15 @@
             <h3 id="label-Qualifying+identifiers+-28column-2Ftable+names-29">Qualifying identifiers (column/table names)<span><a href="#label-Qualifying+identifiers+-28column-2Ftable+names-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>An identifier in SQL is a name that represents a column, table, or schema.
-            Identifiers can be qualified by using the double underscore special
-            notation <code>:table__column</code>:</p>
+            By default, identifiers can be qualified by using the double underscore
+            special notation <code>:table__column</code>:</p>
             
             <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">items__price</span>)&#x000A;<span class="ruby-comment"># items.price</span></pre>
             
-            <p>Another way to qualify columns is to use the <code>Sequel.qualify</code>
+            <p>Another way to qualify columns is to use the <code>Sequel[][]</code>
             method:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">items</span>, :<span class="ruby-identifier">price</span>))&#x000A;<span class="ruby-comment"># items.price</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">items</span>][:<span class="ruby-identifier">price</span>])&#x000A;<span class="ruby-comment"># items.price</span></pre>
             
             <p>While it is more common to qualify column identifiers with table
             identifiers, you can also qualify table identifiers with schema identifiers
@@ -483,8 +483,8 @@
             
             <h3 id="label-Identifier+aliases">Identifier aliases<span><a href="#label-Identifier+aliases">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>You can also alias identifiers by using the triple underscore special
-            notation <code>:column___alias</code> or
+            <p>By default, you can also alias identifiers by using the triple underscore
+            special notation <code>:column___alias</code> or
             <code>:table__column___alias</code>:</p>
             
             <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">price___p</span>)&#x000A;<span class="ruby-comment"># price AS p</span>&#x000A;<span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(:<span class="ruby-identifier">items__price___p</span>)&#x000A;<span class="ruby-comment"># items.price AS p</span></pre>
@@ -497,6 +497,11 @@
             expressions, not just identifiers:</p>
             
             <pre class="ruby"><span class="ruby-identifier">items</span>.<span class="ruby-identifier">literal</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">posts</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">max</span>(<span class="ruby-identifier">id</span>)}, :<span class="ruby-identifier">p</span>))&#x000A;<span class="ruby-comment"># (SELECT max(id) FROM posts) AS p</span></pre>
+            
+            <p>You can turn off the splitting of symbols containing double and triple
+            underscores, and treat all symbols as regular identifiers, by using:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">false</span></pre>
             
             <h2 id="label-Sequel+Models"><a href="../classes/Sequel.html">Sequel</a> Models<span><a href="#label-Sequel+Models">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -798,7 +803,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

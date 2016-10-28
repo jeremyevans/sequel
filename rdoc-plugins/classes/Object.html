@@ -29,10 +29,10 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../files/lib/sequel/extensions/blank_rb.html">lib/sequel/extensions/blank.rb</a>
+            <a href="../files/lib/sequel/extensions/blank_rb.html">lib/sequel/extensions/blank.rb</a>
           </li>
           <li class='other'>
-            <a target="docwin" href="../files/lib/sequel/extensions/sql_expr_rb.html">lib/sequel/extensions/sql_expr.rb</a>
+            <a href="../files/lib/sequel/extensions/sql_expr_rb.html">lib/sequel/extensions/sql_expr.rb</a>
           </li>
           <li>
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
@@ -45,25 +45,13 @@
       </div>
       <div id='content'>
         <div id='text'>
-          <div id='description'>
-            
-            <p>The <a href="Object.html#method-i-sql_expr">#sql_expr</a> extension adds
-            the <a href="Object.html#method-i-sql_expr">#sql_expr</a> method to every
-            object, which returns an wrapped object that works nicely with Sequel&#39;s
-            DSL by calling Sequel.expr:</p>
-            
-            <pre class="ruby"><span class="ruby-value">1</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&lt;</span> :<span class="ruby-identifier">a</span>     <span class="ruby-comment"># 1 &lt; a</span>&#x000A;<span class="ruby-keyword">false</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">a</span> <span class="ruby-comment"># FALSE AND a</span>&#x000A;<span class="ruby-keyword">true</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">|</span> :<span class="ruby-identifier">a</span>  <span class="ruby-comment"># TRUE OR a</span>&#x000A;<span class="ruby-operator">~</span><span class="ruby-keyword">nil</span>.<span class="ruby-identifier">sql_expr</span>       <span class="ruby-comment"># NOT NULL</span>&#x000A;<span class="ruby-string">&quot;a&quot;</span>.<span class="ruby-identifier">sql_expr</span> <span class="ruby-operator">+</span> <span class="ruby-string">&quot;b&quot;</span>  <span class="ruby-comment"># &#39;a&#39; || &#39;b&#39;</span></pre>
-            
-            <p>To load the extension:</p>
-            
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">sql_expr</span></pre>
-          </div>
+          <div id='description'></div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-blank-3F">blank?</a></li>
-              <li><a target="docwin" href="#method-i-sql_expr">sql_expr</a></li>
+              <li><a href="#method-i-blank-3F">blank?</a></li>
+              <li><a href="#method-i-sql_expr">sql_expr</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -103,7 +91,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_expr-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_expr-source'><span class="ruby-comment"># File lib/sequel/extensions/sql_expr.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_expr</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_expr-source'><span class="ruby-comment"># File lib/sequel/extensions/sql_expr.rb, line 19</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_expr</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-keyword">self</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -113,7 +101,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

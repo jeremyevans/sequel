@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-13 13:21:30 -0700</span>
+          <span class='datetime'>2016-10-17 10:57:05 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -204,6 +204,9 @@
             
             <pre class="ruby">:<span class="ruby-identifier">table__column</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
             
+            <p>This works by default, but it is possible to turn off by setting
+            <code>Sequel.split_symbols = false</code>.</p>
+            
             <p>Note that you can&#39;t use a period to separate them:</p>
             
             <pre class="ruby">:<span class="ruby-identifier">table</span>.<span class="ruby-identifier">column</span> <span class="ruby-comment"># calls the column method on the symbol</span></pre>
@@ -213,15 +216,22 @@
             
             <pre class="ruby">:<span class="ruby-string">&quot;table.column&quot;</span> <span class="ruby-comment"># &quot;table.column&quot;</span></pre>
             
-            <p>The other way to qualify an identifier is to use the
-            <code>Sequel.qualify</code> with the table and column symbols:</p>
+            <p>A couple other ways two create a qualified identifier are to use
+            <code>Sequel.[]</code> to create an identifier, and call <code>[]</code> or
+            <code>qualify</code> on that, or to use the <code>Sequel.qualify</code>
+            with the table and column symbols:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]         <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
             
             <p>Another way to generate identifiers is to use Sequel&#39;s <a
             href="virtual_rows_rdoc.html">virtual row support</a>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">name</span>} <span class="ruby-comment"># SELECT &quot;name&quot; FROM &quot;albums&quot;</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">albums__name</span>} <span class="ruby-comment"># SELECT &quot;albums&quot;.&quot;name&quot; FROM &quot;albums&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">name</span>} <span class="ruby-comment"># SELECT &quot;name&quot; FROM &quot;albums&quot;</span>&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">albums</span>[:<span class="ruby-identifier">name</span>]} <span class="ruby-comment"># SELECT &quot;albums&quot;.&quot;name&quot; FROM &quot;albums&quot;</span></pre>
+            
+            <p>You can also use the symbol_aref extension for creating qualified
+            identifiers:</p>
+            
+            <pre class="ruby">:<span class="ruby-identifier">table</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
             
             <h3 id="label-Numbers">Numbers<span><a href="#label-Numbers">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -246,10 +256,18 @@
             
             <pre class="ruby">:<span class="ruby-identifier">table__column___alias</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span></pre>
             
+            <p>As with creating qualified identifiers via a double underscore, This works
+            by default, but it is possible to turn off by setting
+            <code>Sequel.split_symbols = false</code>.</p>
+            
             <p>You can also use the <code>Sequel.as</code> method to create an alias, and
             the <code>as</code> method on most Sequel-specific expression objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>).<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>)                 <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>)                 <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>)         <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span></pre>
+            
+            <p>You can also use the symbol_as extension for creating aliased identifiers:</p>
+            
+            <pre class="ruby">:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span></pre>
             
             <p>If you want to use a derived column list, you can provide an array of
             column aliases:</p>
@@ -304,7 +322,7 @@
             href="../../classes/Sequel.html">Sequel</a> can handle them by calling the
             function method on a QuailfiedIdentifier:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema__function</span>.<span class="ruby-identifier">function</span>}&#x000A;<span class="ruby-comment"># SELECT schema.function() FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema__function</span>.<span class="ruby-identifier">function</span>(<span class="ruby-identifier">col</span>, <span class="ruby-value">2</span>, <span class="ruby-string">&quot;a&quot;</span>)}&#x000A;<span class="ruby-comment"># SELECT schema.function(col, 2, &#39;a&#39;) FROM albums</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema</span>[:<span class="ruby-identifier">function</span>].<span class="ruby-identifier">function</span>}&#x000A;<span class="ruby-comment"># SELECT schema.function() FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema</span>[:<span class="ruby-identifier">function</span>].<span class="ruby-identifier">function</span>(<span class="ruby-identifier">col</span>, <span class="ruby-value">2</span>, <span class="ruby-string">&quot;a&quot;</span>)}&#x000A;<span class="ruby-comment"># SELECT schema.function(col, 2, &#39;a&#39;) FROM albums</span></pre>
             
             <h3 id="label-Portable-2FEmulated+Functions">Portable/Emulated Functions<span><a href="#label-Portable-2FEmulated+Functions">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -422,7 +440,7 @@
             <p><a href="../../classes/Sequel.html">Sequel</a> defines the inequality
             operators directly on most Sequel-specific expression objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (&quot;table&quot;.&quot;column&quot; &gt; 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (&quot;table&quot;.&quot;column&quot; &lt; 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>) <span class="ruby-operator">&gt;=</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (func() &gt;= 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (func(&quot;column&quot;) &lt;= 1)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (&quot;table&quot;.&quot;column&quot; &gt; 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (&quot;table&quot;.&quot;column&quot; &lt; 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>) <span class="ruby-operator">&gt;=</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (func() &gt;= 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-operator">&lt;=</span> <span class="ruby-value">1</span> <span class="ruby-comment"># (func(&quot;column&quot;) &lt;= 1)</span></pre>
             
             <p>If you want to use them on a symbol, you should call <code>Sequel.[]</code>
             with the symbol:</p>
@@ -438,17 +456,17 @@
             <p>The standard mathematical operates are defined on most Sequel-specific
             expression objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;column&quot; + 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table__column</span>] <span class="ruby-operator">-</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; - 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-operator">*</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; * 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">/</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;column&quot; / 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">**</span> <span class="ruby-value">1</span> <span class="ruby-comment"># power(&quot;column&quot;, 1)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;column&quot; + 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>] <span class="ruby-operator">-</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; - 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>] <span class="ruby-operator">*</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; * 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">/</span> <span class="ruby-value">1</span> <span class="ruby-comment"># &quot;column&quot; / 1</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">**</span> <span class="ruby-value">1</span> <span class="ruby-comment"># power(&quot;column&quot;, 1)</span></pre>
             
             <p>You can also call the operator methods directly on the <a
             href="../../classes/Sequel.html">Sequel</a> module:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;column&quot; + 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(:<span class="ruby-identifier">table__column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; - 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>), <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; * 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">/</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;column&quot; / 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">**</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># power(&quot;column&quot;, 1)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;column&quot; + 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>], <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; - 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>], <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; * 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">/</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;column&quot; / 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">**</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># power(&quot;column&quot;, 1)</span></pre>
             
             <p>Note that since <a href="../../classes/Sequel.html">Sequel</a> implements
             support for ruby&#39;s coercion protocol, the following also works:</p>
             
-            <pre class="ruby"><span class="ruby-value">1</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-value">1</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table__column</span>)</pre>
+            <pre class="ruby"><span class="ruby-value">1</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-value">1</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]</pre>
             
             <h3 id="label-Boolean+Operators+-28AND+OR-29">Boolean Operators (AND OR)<span><a href="#label-Boolean+Operators+-28AND+OR-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -502,7 +520,7 @@
             <code>cast</code> method, which is available on most of the Sequel-specific
             expression objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">name</span>].<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">text</span>) <span class="ruby-comment"># CAST(&quot;name&quot; AS text)</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-string">&#39;1&#39;</span>].<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">integer</span>) <span class="ruby-comment"># CAST(&#39;1&#39; AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>).<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">date</span>) <span class="ruby-comment"># CAST(&quot;table&quot;.&quot;column&quot; AS date)</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">name</span>].<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">text</span>) <span class="ruby-comment"># CAST(&quot;name&quot; AS text)</span>&#x000A;<span class="ruby-constant">Sequel</span>[<span class="ruby-string">&#39;1&#39;</span>].<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">integer</span>) <span class="ruby-comment"># CAST(&#39;1&#39; AS integer)</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">cast</span>(:<span class="ruby-identifier">date</span>) <span class="ruby-comment"># CAST(&quot;table&quot;.&quot;column&quot; AS date)</span></pre>
             
             <p>You can also use the <code>Sequel.cast</code> method:</p>
             
@@ -611,16 +629,16 @@
             ascending or descending order using the <code>asc</code> and
             <code>desc</code> method on most Sequel-specific expression objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">asc</span> <span class="ruby-comment"># &quot;column&quot; ASC</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-identifier">desc</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; DESC</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">asc</span> <span class="ruby-comment"># &quot;column&quot; ASC</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">desc</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; DESC</span></pre>
             
             <p>You can also use the <code>Sequel.asc</code> and <code>Sequel.desc</code>
             methods:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">column</span>) <span class="ruby-comment"># &quot;column&quot; ASC</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>)) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; DESC</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">column</span>) <span class="ruby-comment"># &quot;column&quot; ASC</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; DESC</span></pre>
             
             <p>On some databases, you can specify null ordering:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">first</span>) <span class="ruby-comment"># &quot;column&quot; ASC NULLS FIRST</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>), :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">last</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; DESC NULLS LAST</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">asc</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">first</span>) <span class="ruby-comment"># &quot;column&quot; ASC NULLS FIRST</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>], :<span class="ruby-identifier">nulls=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">last</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; DESC NULLS LAST</span></pre>
             
             <h3 id="label-All+Columns+-28.-2A-29">All Columns (.*)<span><a href="#label-All+Columns+-28.-2A-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -658,7 +676,7 @@
             using the <code>sql_subscript</code> method on most Sequel-specific
             expression objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">3</span>) <span class="ruby-comment"># column[3]</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>).<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">3</span>) <span class="ruby-comment"># table.column[3]</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">3</span>) <span class="ruby-comment"># column[3]</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">sql_subscript</span>(<span class="ruby-value">3</span>) <span class="ruby-comment"># table.column[3]</span></pre>
             
             <p>You can also use the <code>Sequel.subscript</code> method:</p>
             
@@ -730,7 +748,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

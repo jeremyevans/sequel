@@ -29,7 +29,7 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../files/lib/sequel/adapters/shared/db2_rb.html">lib/sequel/adapters/shared/db2.rb</a>
+            <a href="../../../files/lib/sequel/adapters/shared/db2_rb.html">lib/sequel/adapters/shared/db2.rb</a>
           </li>
         </ol>
       </div>
@@ -40,14 +40,14 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-database_type">database_type</a></li>
-              <li><a target="docwin" href="#method-i-db2_version">db2_version</a></li>
-              <li><a target="docwin" href="#method-i-indexes">indexes</a></li>
-              <li><a target="docwin" href="#method-i-schema_parse_table">schema_parse_table</a></li>
-              <li><a target="docwin" href="#method-i-supports_transaction_isolation_levels-3F">supports_transaction_isolation_levels?</a></li>
-              <li><a target="docwin" href="#method-i-table_exists-3F">table_exists?</a></li>
-              <li><a target="docwin" href="#method-i-tables">tables</a></li>
-              <li><a target="docwin" href="#method-i-views">views</a></li>
+              <li><a href="#method-i-database_type">database_type</a></li>
+              <li><a href="#method-i-db2_version">db2_version</a></li>
+              <li><a href="#method-i-indexes">indexes</a></li>
+              <li><a href="#method-i-schema_parse_table">schema_parse_table</a></li>
+              <li><a href="#method-i-supports_transaction_isolation_levels-3F">supports_transaction_isolation_levels?</a></li>
+              <li><a href="#method-i-table_exists-3F">table_exists?</a></li>
+              <li><a href="#method-i-tables">tables</a></li>
+              <li><a href="#method-i-views">views</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -103,7 +103,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>server_version</td>
                     <td>-&gt;</td>
-                    <td class='context-item-value'><a target="docwin" href="#method-i-db2_version">db2_version</a></td>
+                    <td class='context-item-value'><a href="#method-i-db2_version">db2_version</a></td>
                   </tr>
                 </table>
               </div>
@@ -159,7 +159,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-indexes-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.&#x000A;   <span class="ruby-identifier">from</span>(<span class="ruby-value">:syscat__indexes</span>).&#x000A;   <span class="ruby-identifier">select</span>(<span class="ruby-value">:indname</span>, <span class="ruby-value">:uniquerule</span>, <span class="ruby-value">:colnames</span>).&#x000A;   <span class="ruby-identifier">where</span>(<span class="ruby-value">:tabname=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">input_identifier_meth</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>), <span class="ruby-value">:system_required=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).&#x000A;   <span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:indname</span>])] = {<span class="ruby-value">:unique=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:uniquerule</span>]<span class="ruby-operator">==</span><span class="ruby-string">&#39;U&#39;</span>), <span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:colnames</span>][<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;+&#39;</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)}}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-indexes-source'><span class="ruby-comment"># File lib/sequel/adapters/shared/db2.rb, line 74</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">indexes</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">opts</span> = <span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">m</span> = <span class="ruby-identifier">output_identifier_meth</span>&#x000A;  <span class="ruby-identifier">indexes</span> = {}&#x000A;  <span class="ruby-identifier">metadata_dataset</span>.&#x000A;   <span class="ruby-identifier">from</span>(<span class="ruby-constant">Sequel</span>[<span class="ruby-value">:syscat</span>][<span class="ruby-value">:indexes</span>]).&#x000A;   <span class="ruby-identifier">select</span>(<span class="ruby-value">:indname</span>, <span class="ruby-value">:uniquerule</span>, <span class="ruby-value">:colnames</span>).&#x000A;   <span class="ruby-identifier">where</span>(<span class="ruby-value">:tabname=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">input_identifier_meth</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">table</span>), <span class="ruby-value">:system_required=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">0</span>).&#x000A;   <span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">r</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">indexes</span>[<span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:indname</span>])] = {<span class="ruby-value">:unique=</span><span class="ruby-operator">&gt;</span>(<span class="ruby-identifier">r</span>[<span class="ruby-value">:uniquerule</span>]<span class="ruby-operator">==</span><span class="ruby-string">&#39;U&#39;</span>), <span class="ruby-value">:columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">r</span>[<span class="ruby-value">:colnames</span>][<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-string">&#39;+&#39;</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">m</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">v</span>)}}&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">indexes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-schema_parse_table'>
@@ -256,7 +256,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

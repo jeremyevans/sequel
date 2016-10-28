@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-03-20 10:20:28 -0700</span>
+          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -304,7 +304,7 @@
             aren&#39;t in the models table, you need to use <code>Model#[]</code> to
             access them:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">select</span>(:<span class="ruby-identifier">albums__id</span>, :<span class="ruby-identifier">albums__name</span>, :<span class="ruby-identifier">artists__name___artist</span>).<span class="ruby-identifier">first</span>&#x000A; <span class="ruby-comment"># SELECT albums.id, albums.name, artists.name AS artist</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span> <span class="ruby-comment"># Error!</span>&#x000A;<span class="ruby-identifier">album</span>[:<span class="ruby-identifier">artist</span>] <span class="ruby-comment"># Works</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">album</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artist</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">select</span>{[<span class="ruby-identifier">albums</span>[:<span class="ruby-identifier">id</span>], <span class="ruby-identifier">albums</span>[:<span class="ruby-identifier">name</span>], <span class="ruby-identifier">artists</span>[:<span class="ruby-identifier">name</span>].<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">artist</span>)]}.<span class="ruby-identifier">first</span>&#x000A; <span class="ruby-comment"># SELECT albums.id, albums.name, artists.name AS artist</span>&#x000A;&#x000A;<span class="ruby-identifier">album</span>.<span class="ruby-identifier">artist</span> <span class="ruby-comment"># Error!</span>&#x000A;<span class="ruby-identifier">album</span>[:<span class="ruby-identifier">artist</span>] <span class="ruby-comment"># Works</span></pre>
             
             <h2 id="label-Associations">Associations<span><a href="#label-Associations">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -1242,7 +1242,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-13 13:21:30 -0700</span>
+          <span class='datetime'>2016-10-05 07:35:29 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -248,13 +248,13 @@
             
             <pre class="ruby">:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># SQL: table.column</span></pre>
             
-            <p>Alternative: Sequel.qualify:</p>
+            <p>Alternative: <a href="">Sequel[]</a>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]</pre>
             
             <p>Note the reversed order of the arguments.  For the Symbol#qualify method,
-            the argument is the qualifier, while for Sequel.qualify, the qualifier is
-            the first argument.</p>
+            the argument is the qualifier, while for <a href="">Sequel[]</a>, the first
+            [] is the qualifier, and the second [] is the identifier.</p>
             
             <h4 id="label-like">like<span><a href="#label-like">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -471,7 +471,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

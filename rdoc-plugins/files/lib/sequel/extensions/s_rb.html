@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>s.rb</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>s.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/s.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2016-10-17 10:57:05 -0700</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The s extension adds <a
+            href="../../../../classes/Sequel/S.html">Sequel::S</a>, a module containing
+            a private #S method that calls Sequel.expr.  It&#39;s designed as a
+            shortcut so that instead of:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>(:<span class="ruby-identifier">column</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">expr</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>}</pre>
+            
+            <p>you can just write:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">S</span>(:<span class="ruby-identifier">column</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-comment"># or</span>&#x000A;<span class="ruby-constant">S</span>{<span class="ruby-identifier">column</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>}</pre>
+            
+            <p>To load the extension:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">extension</span> :<span class="ruby-identifier">s</span></pre>
+            
+            <p>Then you can include the <a
+            href="../../../../classes/Sequel/S.html">Sequel::S</a> module into whatever
+            classes or objects you care about:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">send</span>(:<span class="ruby-identifier">include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>)   <span class="ruby-comment"># available in model instance methods</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>)           <span class="ruby-comment"># available in model class methods</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Dataset</span>.<span class="ruby-identifier">send</span>(:<span class="ruby-identifier">include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>) <span class="ruby-comment"># available in dataset methods</span></pre>
+            
+            <p>or just into <a href="../../../../classes/Object.html">Object</a> if you
+            want it available everywhere:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Object</span>.<span class="ruby-identifier">send</span>(:<span class="ruby-identifier">include</span>, <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span>)</pre>
+            
+            <p>If you are using Ruby 2+, and you would like to use refinements, you can
+            use <a href="../../../../classes/Sequel/S.html">Sequel::S</a> as a
+            refinement, in which case the private #S method will be available on all
+            objects while the refinement is active.</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">using</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">S</span>&#x000A;&#x000A;<span class="ruby-constant">S</span>(:<span class="ruby-identifier">column</span>) <span class="ruby-operator">+</span> <span class="ruby-value">1</span></pre>
+            
+            <p>Related module: <a href="../../../../classes/Sequel/S.html">Sequel::S</a></p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

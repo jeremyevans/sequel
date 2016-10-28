@@ -29,22 +29,22 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../files/lib/sequel/adapters/do/postgres_rb.html">lib/sequel/adapters/do/postgres.rb</a>
+            <a href="../../files/lib/sequel/adapters/do/postgres_rb.html">lib/sequel/adapters/do/postgres.rb</a>
           </li>
           <li class='other'>
-            <a target="docwin" href="../../files/lib/sequel/adapters/jdbc/postgresql_rb.html">lib/sequel/adapters/jdbc/postgresql.rb</a>
+            <a href="../../files/lib/sequel/adapters/jdbc/postgresql_rb.html">lib/sequel/adapters/jdbc/postgresql.rb</a>
           </li>
           <li class='other'>
-            <a target="docwin" href="../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
+            <a href="../../files/lib/sequel/adapters/postgres_rb.html">lib/sequel/adapters/postgres.rb</a>
           </li>
           <li class='other'>
-            <a target="docwin" href="../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
+            <a href="../../files/lib/sequel/adapters/shared/postgres_rb.html">lib/sequel/adapters/shared/postgres.rb</a>
           </li>
           <li class='other'>
-            <a target="docwin" href="../../files/lib/sequel/adapters/swift/postgres_rb.html">lib/sequel/adapters/swift/postgres.rb</a>
+            <a href="../../files/lib/sequel/adapters/swift/postgres_rb.html">lib/sequel/adapters/swift/postgres.rb</a>
           </li>
           <li class='other'>
-            <a target="docwin" href="../../files/lib/sequel/adapters/utils/pg_types_rb.html">lib/sequel/adapters/utils/pg_types.rb</a>
+            <a href="../../files/lib/sequel/adapters/utils/pg_types_rb.html">lib/sequel/adapters/utils/pg_types.rb</a>
           </li>
           <li>
             <a class='show' href='#' onclick='this.parentNode.parentNode.className += " expanded"; this.parentNode.removeChild(this); return false'>show all</a>
@@ -84,14 +84,14 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a target="docwin" href="#attribute-c-client_min_messages">client_min_messages</a></li>
-              <li><a target="docwin" href="#attribute-c-force_standard_strings">force_standard_strings</a></li>
-              <li><a target="docwin" href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
-              <li><a target="docwin" href="#attribute-c-use_iso_date_format">use_iso_date_format</a></li>
+              <li><a href="#attribute-c-client_min_messages">client_min_messages</a></li>
+              <li><a href="#attribute-c-force_standard_strings">force_standard_strings</a></li>
+              <li><a href="#method-c-mock_adapter_setup">mock_adapter_setup</a></li>
+              <li><a href="#attribute-c-use_iso_date_format">use_iso_date_format</a></li>
             </ol>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-bytea">bytea</a></li>
+              <li><a href="#method-i-bytea">bytea</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -99,15 +99,15 @@
           <div id='class-list'>
             <h2>Classes and Modules</h2>
             <ol>
-              <li><a target="docwin" href="Postgres/DatabaseMethods.html">Sequel::Postgres::DatabaseMethods</a></li>
-              <li><a target="docwin" href="Postgres/DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
-              <li><a target="docwin" href="Postgres/MockAdapterDatabaseMethods.html">Sequel::Postgres::MockAdapterDatabaseMethods</a></li>
-              <li><a target="docwin" href="Postgres/Adapter.html">Sequel::Postgres::Adapter</a></li>
-              <li><a target="docwin" href="Postgres/AlterTableGenerator.html">Sequel::Postgres::AlterTableGenerator</a></li>
-              <li><a target="docwin" href="Postgres/CreateTableGenerator.html">Sequel::Postgres::CreateTableGenerator</a></li>
-              <li><a target="docwin" href="Postgres/Database.html">Sequel::Postgres::Database</a></li>
-              <li><a target="docwin" href="Postgres/Dataset.html">Sequel::Postgres::Dataset</a></li>
-              <li><a target="docwin" href="Postgres/ExclusionConstraintViolation.html">Sequel::Postgres::ExclusionConstraintViolation</a></li>
+              <li><a href="Postgres/DatabaseMethods.html">Sequel::Postgres::DatabaseMethods</a></li>
+              <li><a href="Postgres/DatasetMethods.html">Sequel::Postgres::DatasetMethods</a></li>
+              <li><a href="Postgres/MockAdapterDatabaseMethods.html">Sequel::Postgres::MockAdapterDatabaseMethods</a></li>
+              <li><a href="Postgres/Adapter.html">Sequel::Postgres::Adapter</a></li>
+              <li><a href="Postgres/AlterTableGenerator.html">Sequel::Postgres::AlterTableGenerator</a></li>
+              <li><a href="Postgres/CreateTableGenerator.html">Sequel::Postgres::CreateTableGenerator</a></li>
+              <li><a href="Postgres/Database.html">Sequel::Postgres::Database</a></li>
+              <li><a href="Postgres/Dataset.html">Sequel::Postgres::Dataset</a></li>
+              <li><a href="Postgres/ExclusionConstraintViolation.html">Sequel::Postgres::ExclusionConstraintViolation</a></li>
             </ol>
           </div>
           <div id='section'>
@@ -338,7 +338,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-bytea-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 101</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bytea</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">s</span>)) <span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-bytea-source'><span class="ruby-comment"># File lib/sequel/adapters/postgres.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">bytea</span>(<span class="ruby-identifier">s</span>) <span class="ruby-operator">::</span><span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Blob</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">Adapter</span>.<span class="ruby-identifier">unescape_bytea</span>(<span class="ruby-identifier">s</span>)) <span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -348,7 +348,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

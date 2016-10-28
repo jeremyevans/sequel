@@ -29,12 +29,67 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-30 10:05:47 -0700</span>
+          <span class='datetime'>2016-10-28 08:17:27 -0700</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.40.0+-282016-10-28-29">4.40.0 (2016-10-28)<span><a href="#label-4.40.0+-282016-10-28-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Make column_select plugin not raise an exception if the model&#39;s table
+            does not exist (jeremyevans)</p>
+            </li><li>
+            <p>Make dataset_associations plugin correctly handle (many|one)_through_many
+            associations with single join table (jeremyevans) (#1253)</p>
+            </li><li>
+            <p>Add s extension, with adds Sequel::S module that includes private #S method
+            for calling Sequel.expr, including use as refinement (jeremyevans)</p>
+            </li><li>
+            <p>Add symbol_as and symbol_as_refinement extensions so that
+            :column.as(:alias) is treated as Sequel.as(:column, :alias) (jeremyevans)</p>
+            </li><li>
+            <p>Add symbol_aref and symbol_aref_refinement extensions so that :<a
+            href=":column">table</a> is treated as Sequel.qualify(:table, :column)
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add <a
+            href="../classes/Sequel.html#method-c-split_symbols-3D">Sequel.split_symbols=</a>,
+            to support the disabling of splitting symbols with double/triple
+            underscores (jeremyevans)</p>
+            </li><li>
+            <p>Make SQL::QualifiedIdentifier convert SQL::Identifier arguments to strings,
+            fixing <a href=":schema">Sequel</a>[:table] usage in schema methods
+            (jeremyevans)</p>
+            </li><li>
+            <p>Do not attempt to combine non-associative operators (jeremyevans) (#1246)</p>
+            </li><li>
+            <p>Automatically add NOT NULL to columns when adding primary keys if the
+            database doesn&#39;t handle it (jeremyevans)</p>
+            </li><li>
+            <p>Make <a href="doc/prepared_statements_rdoc.html">prepared_statements</a>
+            plugin correctly handle lookup on joined datasets (jeremyevans) (#1244)</p>
+            </li><li>
+            <p>Make Database#tables with :qualify=&gt;true option handle table names with
+            double underscores correctly (jeremyevans) (#1241)</p>
+            </li><li>
+            <p>Add SQL::Identifier#[] and SQL::QualifiedIdentifier#[] for creating
+            qualified identifiers (jeremyevans)</p>
+            </li><li>
+            <p>Add support for Dataset#insert_conflict :conflict_where option, for a
+            predicate to use in ON CONFLICT clauses (chanks) (#1240)</p>
+            </li><li>
+            <p>Freeze Dataset::NON_SQL_OPTIONS, add private Dataset#non_sql_options,
+            fixing thread safety issues during require (jeremyevans)</p>
+            </li><li>
+            <p>Make the callable returned by Database#rollback_checker thread safe
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make lazy_attributes and dataset_associations plugins work if
+            insert_returning_select plugin is loaded before on model with no dataset
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.39.0+-282016-10-01-29">4.39.0 (2016-10-01)<span><a href="#label-4.39.0+-282016-10-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
@@ -8818,7 +8873,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

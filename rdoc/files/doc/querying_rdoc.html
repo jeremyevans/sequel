@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-13 13:21:30 -0700</span>
+          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -750,7 +750,7 @@
             <code>artists.id</code>.  To fix this, you need to explicitly qualify when
             joining:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">tracks</span>, :<span class="ruby-identifier">album_id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums__id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># INNER JOIN tracks ON tracks.album_id = albums.id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>).&#x000A; <span class="ruby-identifier">join</span>(:<span class="ruby-identifier">tracks</span>, :<span class="ruby-identifier">album_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">albums</span>][:<span class="ruby-identifier">id</span>])&#x000A;<span class="ruby-comment"># SELECT * FROM albums</span>&#x000A;<span class="ruby-comment"># INNER JOIN artists ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># INNER JOIN tracks ON tracks.album_id = albums.id</span></pre>
             
             <p>Just like in filters, an array of two element arrays is treated the same as
             a hash, but allows for duplicate keys:</p>
@@ -811,7 +811,7 @@
             tables, but only want albums where the artist&#39;s name comes before the
             album&#39;s name.</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">j</span>, <span class="ruby-identifier">lj</span>, <span class="ruby-identifier">js</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">j</span>, :<span class="ruby-identifier">name</span>) <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(<span class="ruby-identifier">lj</span>, :<span class="ruby-identifier">name</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment"># ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># AND artists.name &lt; albums.name</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">join</span>(:<span class="ruby-identifier">artists</span>, :<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">artist_id</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">j</span>, <span class="ruby-identifier">lj</span>, <span class="ruby-identifier">js</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">j</span>][:<span class="ruby-identifier">name</span>] <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span>[<span class="ruby-identifier">lj</span>][:<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums INNER JOIN artists</span>&#x000A;<span class="ruby-comment"># ON artists.id = albums.artist_id</span>&#x000A;<span class="ruby-comment"># AND artists.name &lt; albums.name</span></pre>
             
             <p>Because greater than can&#39;t be expressed with a hash in <a
             href="../../classes/Sequel.html">Sequel</a>, you need to use a block and
@@ -838,7 +838,7 @@
             <p>Using multiple FROM tables and setting conditions in the WHERE clause is an
             old-school way of joining tables:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artists</span>).<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artists__id=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">albums__artist_id</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM albums, artists WHERE artists.id = albums.artist_id</span></pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">from</span>(:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artists</span>).<span class="ruby-identifier">where</span>{{<span class="ruby-identifier">artists</span>[:<span class="ruby-identifier">id</span>]=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">albums</span>[:<span class="ruby-identifier">artist_id</span>]}}&#x000A;<span class="ruby-comment"># SELECT * FROM albums, artists WHERE artists.id = albums.artist_id</span></pre>
             
             <h3 id="label-Using+the+current+dataset+in+a+subselect">Using the current dataset in a subselect<span><a href="#label-Using+the+current+dataset+in+a+subselect">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -947,7 +947,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

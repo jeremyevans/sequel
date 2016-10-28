@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-13 13:21:30 -0700</span>
+          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -144,8 +144,15 @@
             <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table__column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table__column</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE table.column &gt; 1</span></pre>
             
             <p>Using the double underscore for SQL::QualifiedIdentifiers was done to make
-            usage very similar to using symbols, which also translate the double
-            underscore into a qualified column.</p>
+            usage very similar to using symbols, which by default also translate the
+            double underscore into a qualified column.</p>
+            
+            <p>Note that when <code>Sequel.split_symbols = false</code> is used, then
+            virtual rows do not split symbols either.  If you need to create qualified
+            identifers when disabling symbol splitting, it is easy to do by calling []
+            on the SQL::Identifiers returned by regular methods calls:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">o</span><span class="ruby-operator">|</span> <span class="ruby-identifier">o</span>.<span class="ruby-identifier">table</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>{<span class="ruby-identifier">table</span>[:<span class="ruby-identifier">column</span>] <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>}&#x000A;<span class="ruby-comment"># WHERE table.column &gt; 1</span></pre>
             
             <h2 id="label-SQL-3A-3AFunctions+-+SQL+function+calls">SQL::Functions - SQL function calls<span><a href="#label-SQL-3A-3AFunctions+-+SQL+function+calls">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
@@ -285,7 +292,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

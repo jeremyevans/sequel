@@ -29,12 +29,12 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+            <a href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
           </li>
         </ol>
         <div class='parent'>
           Superclass:
-          <strong><a target="docwin" href="Expression.html">Expression</a></strong>
+          <strong><a href="Expression.html">Expression</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -48,15 +48,15 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a target="docwin" href="#method-c-new">new</a></li>
+              <li><a href="#method-c-new">new</a></li>
             </ol>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-column_aliases">column_aliases</a></li>
-              <li><a target="docwin" href="#attribute-i-join_type">join_type</a></li>
-              <li><a target="docwin" href="#method-i-table">table</a></li>
-              <li><a target="docwin" href="#method-i-table_alias">table_alias</a></li>
-              <li><a target="docwin" href="#attribute-i-table_expr">table_expr</a></li>
+              <li><a href="#method-i-column_aliases">column_aliases</a></li>
+              <li><a href="#attribute-i-join_type">join_type</a></li>
+              <li><a href="#method-i-table">table</a></li>
+              <li><a href="#method-i-table_alias">table_alias</a></li>
+              <li><a href="#attribute-i-table_expr">table_expr</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -109,7 +109,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1476</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)&#x000A;  <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>&#x000A;  <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1491</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">join_type</span>, <span class="ruby-identifier">table_expr</span>)&#x000A;  <span class="ruby-ivar">@join_type</span> = <span class="ruby-identifier">join_type</span>&#x000A;  <span class="ruby-ivar">@table_expr</span> = <span class="ruby-identifier">table_expr</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -128,7 +128,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-column_aliases-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-column_aliases-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1500</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">column_aliases</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-column_aliases-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1515</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">column_aliases</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">columns</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-table'>
@@ -145,7 +145,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-table-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-table-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1482</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@table_expr</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-table-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1497</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">expression</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@table_expr</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-table_alias'>
@@ -163,7 +163,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-table_alias-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-table_alias-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1492</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table_alias</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-table_alias-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1507</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">table_alias</span>&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">AliasedExpression</span>)&#x000A;    <span class="ruby-ivar">@table_expr</span>.<span class="ruby-identifier">alias</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -173,7 +173,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

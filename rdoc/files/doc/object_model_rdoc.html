@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-09-29 14:25:10 -0700</span>
+          <span class='datetime'>2016-10-17 10:57:05 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -177,20 +177,30 @@
             
             <pre class="ruby">:<span class="ruby-identifier">table</span>  <span class="ruby-comment"># &quot;table&quot;</span>&#x000A;:<span class="ruby-identifier">column</span> <span class="ruby-comment"># &quot;column&quot;</span></pre>
             
-            <p>However, they can also represent qualified identifiers by including a
-            double underscore inside a symbol:</p>
+            <p>By default, <a href="../../classes/Sequel.html">Sequel</a> supports
+            splitting symbols using double or triple underscores to represent qualified
+            and aliased identifiers.  A symbol with a double underscore is treated as a
+            qualified identifier:</p>
             
             <pre class="ruby">:<span class="ruby-identifier">table__column</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
             
-            <p>They can also represent an aliased identifier by including a triple
-            underscore inside a symbol:</p>
+            <p>A symbol with a triple underscore is treated as an aliased identifier:</p>
             
             <pre class="ruby">:<span class="ruby-identifier">column___alias</span> <span class="ruby-comment"># &quot;column&quot; AS &quot;alias&quot;</span></pre>
             
-            <p>You can combine both qualification and aliasing by using a double
-            underscore and a triple underscore:</p>
+            <p>A symbol with a double underscore followed by a triple underscore is
+            treated as an aliased qualified identifer:</p>
             
             <pre class="ruby">:<span class="ruby-identifier">table__column___alias</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span></pre>
+            
+            <p>By allowing the creation of qualified and aliased identifiers via symbols,
+            <a href="../../classes/Sequel.html">Sequel</a> makes it simpler to
+            represent more SQL expressions.  However, if you are using double or triple
+            underscores in your own identifiers, Sequel&#39;s automatic splitting of
+            identifiers can be problematic, in which case you may want to turn them off
+            via:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">split_symbols</span> = <span class="ruby-keyword">false</span></pre>
             
             <h3 id="label-Integer-2C+Float-2C+BigDecimal-2C+String-2C+Date-2C+Time-2C+DateTime">Integer, Float, BigDecimal, String, Date, Time, DateTime<span><a href="#label-Integer-2C+Float-2C+BigDecimal-2C+String-2C+Date-2C+Time-2C+DateTime">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -353,7 +363,7 @@
             href="../../classes/Sequel/SQL/QualifiedIdentifier.html">Sequel::SQL::QualifiedIdentifier</a>
             objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table__column</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table__column</span>]&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>)&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
             
             <h3 id="label-Sequel-3A-3ASQL-3A-3AAliasedExpression"><a href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AAliasedExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -369,7 +379,7 @@
             href="../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a>
             objects:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column___alias</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>, [:<span class="ruby-identifier">column_alias1</span>, :<span class="ruby-identifier">column_alias2</span>])&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># core_extensions extension</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column___alias</span>]&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>)&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">column</span>, :<span class="ruby-keyword">alias</span>, [:<span class="ruby-identifier">column_alias1</span>, :<span class="ruby-identifier">column_alias2</span>])&#x000A;:<span class="ruby-identifier">column</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-keyword">alias</span>) <span class="ruby-comment"># core_extensions or symbol_as extension</span></pre>
             
             <h3 id="label-Sequel-3A-3ASQL-3A-3AComplexExpression"><a href="../../classes/Sequel/SQL/ComplexExpression.html">Sequel::SQL::ComplexExpression</a><span><a href="#label-Sequel-3A-3ASQL-3A-3AComplexExpression">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -642,7 +652,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

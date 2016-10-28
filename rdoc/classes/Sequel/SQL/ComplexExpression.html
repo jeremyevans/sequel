@@ -29,12 +29,12 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+            <a href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
           </li>
         </ol>
         <div class='parent'>
           Superclass:
-          <strong><a target="docwin" href="Expression.html">Expression</a></strong>
+          <strong><a href="Expression.html">Expression</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -44,26 +44,26 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a target="docwin" href="#method-c-new">new</a></li>
+              <li><a href="#method-c-new">new</a></li>
             </ol>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#attribute-i-args">args</a></li>
-              <li><a target="docwin" href="#attribute-i-op">op</a></li>
-              <li><a target="docwin" href="#method-i-sql_boolean">sql_boolean</a></li>
-              <li><a target="docwin" href="#method-i-sql_number">sql_number</a></li>
-              <li><a target="docwin" href="#method-i-sql_string">sql_string</a></li>
+              <li><a href="#attribute-i-args">args</a></li>
+              <li><a href="#attribute-i-op">op</a></li>
+              <li><a href="#method-i-sql_boolean">sql_boolean</a></li>
+              <li><a href="#method-i-sql_number">sql_number</a></li>
+              <li><a href="#method-i-sql_string">sql_string</a></li>
             </ol>
           </div>
           <div id='context'>
             <div id='includes'>
               <h2>Included modules</h2>
               <ol>
-                <li><a target="docwin" href="AliasMethods.html">AliasMethods</a></li>
-                <li><a target="docwin" href="CastMethods.html">CastMethods</a></li>
-                <li><a target="docwin" href="OrderMethods.html">OrderMethods</a></li>
-                <li><a target="docwin" href="PatternMatchMethods.html">PatternMatchMethods</a></li>
-                <li><a target="docwin" href="SubscriptMethods.html">SubscriptMethods</a></li>
+                <li><a href="AliasMethods.html">AliasMethods</a></li>
+                <li><a href="CastMethods.html">CastMethods</a></li>
+                <li><a href="OrderMethods.html">OrderMethods</a></li>
+                <li><a href="PatternMatchMethods.html">PatternMatchMethods</a></li>
+                <li><a href="SubscriptMethods.html">SubscriptMethods</a></li>
               </ol>
             </div>
           </div>
@@ -72,6 +72,16 @@
               <h2>Constants</h2>
               <div class='name-list'>
                 <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>ASSOCIATIVE_OPERATORS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>[:AND, :OR, :'||', :+, :*, :&, :|]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>Operator symbols that are associative</p>
+                    </td>
+                  </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>BITWISE_OPERATORS</td>
                     <td>=</td>
@@ -286,7 +296,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 225</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">orig_args</span> = <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">a</span>}&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">N_ARITY_OPERATORS</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;The #{op} operator requires at least 1 argument&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">old_args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:NOOP</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">a</span>}&#x000A;    <span class="ruby-identifier">args</span> = []&#x000A;    <span class="ruby-identifier">old_args</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">a</span>.<span class="ruby-identifier">args</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">a</span>)}&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">TWO_ARITY_OPERATORS</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;The #{op} operator requires precisely 2 arguments&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span>&#x000A;    <span class="ruby-comment"># With IN/NOT IN, even if the second argument is an array of two element arrays,</span>&#x000A;    <span class="ruby-comment"># don&#39;t convert it into a boolean expression, since it&#39;s definitely being used</span>&#x000A;    <span class="ruby-comment"># as a value list.</span>&#x000A;    <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>] = <span class="ruby-identifier">orig_args</span>[<span class="ruby-value">1</span>] <span class="ruby-keyword">if</span> <span class="ruby-constant">IN_OPERATORS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">op</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">ONE_ARITY_OPERATORS</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;The #{op} operator requires a single argument&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">CUSTOM_EXPRESSIONS</span>&#x000A;    <span class="ruby-comment"># nothing</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid operator #{op}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-ivar">@op</span> = <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 228</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">orig_args</span> = <span class="ruby-identifier">args</span>&#x000A;  <span class="ruby-identifier">args</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">condition_specifier?</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">?</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">from_value_pairs</span>(<span class="ruby-identifier">a</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">a</span>}&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">N_ARITY_OPERATORS</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;The #{op} operator requires at least 1 argument&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">&gt;=</span> <span class="ruby-value">1</span>&#x000A;    <span class="ruby-identifier">args</span>.<span class="ruby-identifier">map!</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-value">:NOOP</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">a</span>}&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-constant">ASSOCIATIVE_OPERATORS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">op</span>)&#x000A;      <span class="ruby-identifier">old_args</span> = <span class="ruby-identifier">args</span>&#x000A;      <span class="ruby-identifier">args</span> = []&#x000A;      <span class="ruby-identifier">old_args</span>.<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">class</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">op</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">op</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">a</span>.<span class="ruby-identifier">args</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">a</span>)}&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">TWO_ARITY_OPERATORS</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;The #{op} operator requires precisely 2 arguments&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">2</span>&#x000A;    <span class="ruby-comment"># With IN/NOT IN, even if the second argument is an array of two element arrays,</span>&#x000A;    <span class="ruby-comment"># don&#39;t convert it into a boolean expression, since it&#39;s definitely being used</span>&#x000A;    <span class="ruby-comment"># as a value list.</span>&#x000A;    <span class="ruby-identifier">args</span>[<span class="ruby-value">1</span>] = <span class="ruby-identifier">orig_args</span>[<span class="ruby-value">1</span>] <span class="ruby-keyword">if</span> <span class="ruby-constant">IN_OPERATORS</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">op</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">ONE_ARITY_OPERATORS</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;The #{op} operator requires a single argument&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-operator">*</span><span class="ruby-constant">CUSTOM_EXPRESSIONS</span>&#x000A;    <span class="ruby-comment"># nothing</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;Invalid operator #{op}&quot;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-ivar">@op</span> = <span class="ruby-identifier">op</span>&#x000A;  <span class="ruby-ivar">@args</span> = <span class="ruby-identifier">args</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -305,7 +315,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_boolean-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_boolean-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1221</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_boolean</span>&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_boolean-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1236</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_boolean</span>&#x000A;  <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_number'>
@@ -323,7 +333,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_number-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_number-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1226</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_number</span>&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_number-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1241</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_number</span>&#x000A;  <span class="ruby-constant">NumericExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sql_string'>
@@ -341,7 +351,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_string-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1231</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1246</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-constant">StringExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>.<span class="ruby-identifier">op</span>, <span class="ruby-operator">*</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -351,7 +361,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>

@@ -29,12 +29,12 @@
         </h1>
         <ol class='paths'>
           <li>
-            <a target="docwin" href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
+            <a href="../../../files/lib/sequel/sql_rb.html">lib/sequel/sql.rb</a>
           </li>
         </ol>
         <div class='parent'>
           Superclass:
-          <strong><a target="docwin" href="ComplexExpression.html">ComplexExpression</a></strong>
+          <strong><a href="ComplexExpression.html">ComplexExpression</a></strong>
         </div>
       </div>
       <div id='content'>
@@ -48,20 +48,20 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
-              <li><a target="docwin" href="#method-c-like">like</a></li>
+              <li><a href="#method-c-like">like</a></li>
             </ol>
             <h3>Public Instance</h3>
             <ol>
-              <li><a target="docwin" href="#method-i-sql_string">sql_string</a></li>
+              <li><a href="#method-i-sql_string">sql_string</a></li>
             </ol>
           </div>
           <div id='context'>
             <div id='includes'>
               <h2>Included modules</h2>
               <ol>
-                <li><a target="docwin" href="StringMethods.html">StringMethods</a></li>
-                <li><a target="docwin" href="StringConcatenationMethods.html">StringConcatenationMethods</a></li>
-                <li><a target="docwin" href="InequalityMethods.html">InequalityMethods</a></li>
+                <li><a href="StringMethods.html">StringMethods</a></li>
+                <li><a href="StringConcatenationMethods.html">StringConcatenationMethods</a></li>
+                <li><a href="InequalityMethods.html">InequalityMethods</a></li>
               </ol>
             </div>
           </div>
@@ -123,7 +123,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-like-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-like-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1681</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">l</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;  <span class="ruby-identifier">l</span>, <span class="ruby-identifier">lre</span>, <span class="ruby-identifier">lci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">l</span>)&#x000A;  <span class="ruby-identifier">lci</span> = (<span class="ruby-identifier">ces</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {})[<span class="ruby-value">:case_insensitive</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">true</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">lci</span>&#x000A;  <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">collect!</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ce</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span>, <span class="ruby-identifier">rre</span>, <span class="ruby-identifier">rci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">ce</span>)&#x000A;    <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">LIKE_MAP</span>[[<span class="ruby-identifier">lre</span><span class="ruby-operator">||</span><span class="ruby-identifier">rre</span>, <span class="ruby-identifier">lci</span><span class="ruby-operator">||</span><span class="ruby-identifier">rci</span>]], <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-like-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1709</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">l</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;  <span class="ruby-identifier">l</span>, <span class="ruby-identifier">lre</span>, <span class="ruby-identifier">lci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">l</span>)&#x000A;  <span class="ruby-identifier">lci</span> = (<span class="ruby-identifier">ces</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {})[<span class="ruby-value">:case_insensitive</span>] <span class="ruby-operator">?</span> <span class="ruby-keyword">true</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">lci</span>&#x000A;  <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">collect!</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">ce</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">r</span>, <span class="ruby-identifier">rre</span>, <span class="ruby-identifier">rci</span> = <span class="ruby-identifier">like_element</span>(<span class="ruby-identifier">ce</span>)&#x000A;    <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-constant">LIKE_MAP</span>[[<span class="ruby-identifier">lre</span><span class="ruby-operator">||</span><span class="ruby-identifier">rre</span>, <span class="ruby-identifier">lci</span><span class="ruby-operator">||</span><span class="ruby-identifier">rci</span>]], <span class="ruby-identifier">l</span>, <span class="ruby-identifier">r</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">length</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">ces</span>.<span class="ruby-identifier">at</span>(<span class="ruby-value">0</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">BooleanExpression</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value">:OR</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">ces</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <h2>Public Instance methods</h2>
@@ -141,7 +141,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sql_string-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1705</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sql_string-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1733</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sql_string</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
@@ -151,7 +151,7 @@
       <div id='footer-push'></div>
     </div>
     <div id='footer'>
-      <a target="docwin" href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
     </div>
   </body>
 </html>
