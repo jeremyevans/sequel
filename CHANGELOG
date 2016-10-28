@@ -1,4 +1,4 @@
-=== HEAD
+=== 4.40.0 (2016-10-28)
 
 * Make column_select plugin not raise an exception if the model's table does not exist (jeremyevans)
 
