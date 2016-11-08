@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for :offset_strategy Database option on DB2, with :limit_offset and :offset_fetch values, to disable OFFSET emulation (#1254) (jeremyevans)
+
 * Remove deprecated support for using Bignum class as a generic type (jeremyevans)
 
 === 4.40.0 (2016-10-28)

@@ -85,6 +85,17 @@ module Sequel
         indexes
       end
 
+      def offset_strategy
+        return @offset_strategy if defined?(@offset_strategy)
+
+        @offset_strategy = case strategy = opts[:offset_strategy].to_s
+        when "limit_offset", "offset_fetch"
+          opts[:offset_strategy] = strategy.to_sym
+        else
+          opts[:offset_strategy] = :emulate
+        end
+      end
+
       # DB2 supports transaction isolation levels.
       def supports_transaction_isolation_levels?
         true
@@ -371,6 +382,13 @@ module Sequel
         EMPTY_FROM_TABLE
       end
 
+      # Emulate offset with row number by default, and also when the limit_offset
+      # strategy is used without a limit, as DB2 doesn't support that syntax with
+      # no limit.
+      def emulate_offset_with_row_number?
+        super && (db.offset_strategy == :emulate || (db.offset_strategy == :limit_offset && !@opts[:limit]))
+      end
+
       # DB2 needs the standard workaround to insert all default values into
       # a table with more than one column.
       def insert_supports_empty_values?
@@ -406,17 +424,19 @@ module Sequel
         false
       end
 
-      # Modify the sql to limit the number of rows returned
-      # Note: 
-      #
-      #     After db2 v9.7, MySQL flavored "LIMIT X OFFSET Y" can be enabled using
-      #
-      #     db2set DB2_COMPATIBILITY_VECTOR=MYSQL
-      #     db2stop
-      #     db2start
-      #
-      #     Support for this feature is not used in this adapter however.
+      # Modify the sql to limit the number of rows returned.
+      # Uses :offset_strategy Database option to determine how to format the
+      # limit and offset.
       def select_limit_sql(sql)
+        strategy = db.offset_strategy
+        return super if strategy == :limit_offset
+
+        if strategy == :offset_fetch && (o = @opts[:offset]) 
+          sql << " OFFSET "
+          literal_append(sql, o)
+          sql << " ROWS"
+        end
+
         if l = @opts[:limit]
           if l == 1
             sql << FETCH_FIRST_ROW_ONLY
