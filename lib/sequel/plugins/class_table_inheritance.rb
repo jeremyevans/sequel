@@ -88,7 +88,7 @@ module Sequel
     #
     #   a = Employee.first
     #   a.values # {:id=>1, name=>'S', :kind=>'CEO'}
-    #   a.refresh.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
+    #   a.refresh.values # {:id=>1, name=>'S', :kind=>'CEO', :num_staff=>4, :num_managers=>2}
     #
     # You can also load directly from a subclass:
     #
