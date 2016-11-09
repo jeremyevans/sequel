@@ -176,9 +176,9 @@ module Sequel
       # having callable values for the conversion proc for that type.
       attr_reader :conversion_procs
 
-      # Add a conversion proc for a named type.  This should be used 
+      # Add a conversion proc for a named type.  This should be used
       # for types without fixed OIDs, which includes all types that
-      # are not included in a default PostgreSQL installation.  If 
+      # are not included in a default PostgreSQL installation.  If
       # a block is given, it is used as the conversion proc, otherwise
       # the conversion proc is looked up in the PG_NAMED_TYPES hash.
       def add_named_conversion_proc(name, &block)
@@ -356,7 +356,7 @@ module Sequel
         end
 
         h = {}
-        fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP 
+        fklod_map = FOREIGN_KEY_LIST_ON_DELETE_MAP
         ds.each do |row|
           if r = h[row[:name]]
             r[:columns] << m.call(row[:column])
@@ -454,7 +454,7 @@ module Sequel
       end
 
       # Refresh the materialized view with the given name.
-      # 
+      #
       #   DB.refresh_view(:items_view)
       #   # REFRESH MATERIALIZED VIEW items_view
       #   DB.refresh_view(:items_view, :concurrently=>true)
@@ -462,7 +462,7 @@ module Sequel
       def refresh_view(name, opts=OPTS)
         run "REFRESH MATERIALIZED VIEW#{' CONCURRENTLY' if opts[:concurrently]} #{quote_schema_table(name)}"
       end
-      
+
       # Reset the database's conversion procs, requires a server query if there
       # any named types.
       def reset_conversion_procs
@@ -508,7 +508,7 @@ module Sequel
             0
           end
         end
-        warn 'Sequel no longer supports PostgreSQL <8.2, some things may not work' if @server_version < 80200
+        print 'Sequel no longer supports PostgreSQL <8.2, some things may not work' if @server_version < 80200
         @server_version
       end
 
@@ -627,7 +627,7 @@ module Sequel
       def alter_table_generator_class
         Postgres::AlterTableGenerator
       end
-    
+
       def alter_table_set_column_type_sql(table, op)
         s = super
         if using = op[:using]
@@ -664,7 +664,7 @@ module Sequel
           log_connection_execute(conn, "SET LOCAL synchronous_commit = #{sync}")
         end
       end
-      
+
       # Set the READ ONLY transaction setting per savepoint, as PostgreSQL supports that.
       def begin_savepoint(conn, opts)
         super
@@ -762,7 +762,7 @@ module Sequel
         nil
       end
 
-      # Convert the hash of named conversion procs into a hash a oid conversion procs. 
+      # Convert the hash of named conversion procs into a hash a oid conversion procs.
       def convert_named_procs_to_procs(named_procs)
         h = {}
         from(:pg_type).where(:typtype=>['b', 'e'], :typname=>named_procs.keys.map(&:to_s)).select_map([:oid, :typname]).each do |oid, name|
@@ -928,7 +928,7 @@ module Sequel
       def create_table_generator_class
         Postgres::CreateTableGenerator
       end
-    
+
       # SQL for creating a database trigger.
       def create_trigger_sql(table, name, function, opts=OPTS)
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
@@ -954,7 +954,7 @@ module Sequel
       def drop_function_sql(name, opts=OPTS)
         "DROP FUNCTION#{' IF EXISTS' if opts[:if_exists]} #{name}#{sql_function_args(opts[:args])}#{' CASCADE' if opts[:cascade]}"
       end
-      
+
       # Support :if_exists, :cascade, and :concurrently options.
       def drop_index_sql(table, op)
         sch, _ = schema_and_table(table)
@@ -1078,7 +1078,7 @@ module Sequel
         if sch
           expr = Sequel.qualify(sch, table)
         end
-        
+
         expr = if ds = opts[:dataset]
           ds.literal(expr)
         else
@@ -1173,7 +1173,7 @@ module Sequel
           log_connection_execute(conn, sql)
         end
       end
-     
+
       # Turns an array of argument specifiers into an SQL fragment used for function arguments.  See create_function_sql.
       def sql_function_args(args)
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
@@ -1440,11 +1440,11 @@ module Sequel
       #   DB[:table].insert_conflict.insert(:a=>1, :b=>2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT DO NOTHING
-      #   
+      #
       #   DB[:table].insert_conflict(:constraint=>:table_a_uidx).insert(:a=>1, :b=>2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT ON CONSTRAINT table_a_uidx DO NOTHING
-      #   
+      #
       #   DB[:table].insert_conflict(:target=>:a).insert(:a=>1, :b=>2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) DO NOTHING
@@ -1452,11 +1452,11 @@ module Sequel
       #   DB[:table].insert_conflict(:target=>:a, :conflict_where=>{:c=>true}).insert(:a=>1, :b=>2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) WHERE (c IS TRUE) DO NOTHING
-      #   
+      #
       #   DB[:table].insert_conflict(:target=>:a, :update=>{:b=>:excluded__b}).insert(:a=>1, :b=>2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
       #   # ON CONFLICT (a) DO UPDATE SET b = excluded.b
-      #   
+      #
       #   DB[:table].insert_conflict(:constraint=>:table_a_uidx,
       #     :update=>{:b=>:excluded__b}, :update_where=>{:table__status_id=>1}).insert(:a=>1, :b=>2)
       #   # INSERT INTO TABLE (a, b) VALUES (1, 2)
@@ -1559,7 +1559,7 @@ module Sequel
       def supports_lateral_subqueries?
         server_version >= 90300
       end
-      
+
       # PostgreSQL supports modifying joined datasets
       def supports_modifying_joins?
         true
@@ -1667,7 +1667,7 @@ module Sequel
         if opts = @opts[:insert_conflict]
           sql << " ON CONFLICT"
 
-          if target = opts[:constraint] 
+          if target = opts[:constraint]
             sql << " ON CONSTRAINT "
             identifier_append(sql, target)
           elsif target = opts[:target]
@@ -1725,7 +1725,7 @@ module Sequel
       def literal_false
         BOOL_FALSE
       end
-      
+
       # PostgreSQL quotes NaN and Infinity.
       def literal_float(value)
         if value.finite?
@@ -1737,7 +1737,7 @@ module Sequel
         else
           "'-Infinity'"
         end
-      end 
+      end
 
       # Assume that SQL standard quoting is on, per Sequel's defaults
       def literal_string_append(sql, v)
