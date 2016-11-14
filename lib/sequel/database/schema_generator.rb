@@ -18,7 +18,7 @@ module Sequel
     # the {"Schema Modification" guide}[rdoc-ref:doc/schema_modification.rdoc].
     class CreateTableGenerator
       # Classes specifying generic types that Sequel will convert to database-specific types.
-      GENERIC_TYPES=%w'String Integer Fixnum Float Numeric BigDecimal Date DateTime Time File TrueClass FalseClass'
+      GENERIC_TYPES=%w'String Integer Float Numeric BigDecimal Date DateTime Time File TrueClass FalseClass'.freeze
       
       # Return the column hashes created by this generator
       attr_reader :columns
@@ -47,6 +47,12 @@ module Sequel
         column(name, :Bignum, opts)
       end
       
+      # Use custom Fixnum method to use Integer instead of Fixnum class, to avoid 
+      # warnings on ruby 2.4+.
+      def Fixnum(name, opts=OPTS)
+        column(name, Integer, opts)
+      end
+
       # Add a method for each of the given types that creates a column
       # with that type as a constant.  Types given should either already
       # be constants/classes or a capitalized string/symbol with the same name

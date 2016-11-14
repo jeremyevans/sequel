@@ -61,7 +61,7 @@ describe "DB#create_table" do
       File :k
       TrueClass :l
       FalseClass :m
-      column :n, Fixnum
+      column :n, Integer
       primary_key :o, :type=>String
       foreign_key :p, :f, :type=>Date
     end
