@@ -964,11 +964,8 @@ describe "A PostgreSQL database" do
     @db[:posts].order(:a).map(:a).must_equal [1, 2, 10, 20, 21]
   end
     
-  it "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
+  it "should support specifying Integer/Bignum types in primary keys and have them be auto incrementing" do
     @db.create_table(:posts){primary_key :a, :type=>Integer}
-    @db[:posts].insert.must_equal 1
-    @db[:posts].insert.must_equal 2
-    @db.create_table!(:posts){primary_key :a, :type=>Fixnum}
     @db[:posts].insert.must_equal 1
     @db[:posts].insert.must_equal 2
     @db.create_table!(:posts){primary_key :a, :type=>:Bignum}
