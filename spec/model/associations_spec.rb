@@ -3051,7 +3051,7 @@ describe Sequel::Model, "one_through_one" do
   it "should use a transaction in the setter method" do
     @c2.one_through_one :attribute, :class => @c1
     @c2.use_transactions = true
-    attrib = @c1.load(:id=>3)
+    @c1.load(:id=>3)
     DB.fetch = []
     @c2.new(:id => 1234).attribute = nil
     DB.sqls.must_equal ['BEGIN',

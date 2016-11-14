@@ -315,7 +315,7 @@ describe Sequel::Model do
     def db.supports_savepoints?; true end
     Sequel::Model(db[:table])
     db.sqls.must_equal ["SELECT * FROM table LIMIT 1"]
-    c = db.transaction{Sequel::Model(db[:table])}
+    db.transaction{Sequel::Model(db[:table])}
     db.sqls.must_equal ["BEGIN", "SAVEPOINT autopoint_1", "SELECT * FROM table LIMIT 1", "RELEASE SAVEPOINT autopoint_1", "COMMIT"]
   end
 
