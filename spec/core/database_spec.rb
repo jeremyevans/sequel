@@ -1899,8 +1899,9 @@ describe "Database#raise_error" do
     def @db.database_error_regexps
       {/foo/ => Sequel::DatabaseDisconnectError, /bar/ => Sequel::ConstraintViolation}
     end
-    proc{@db.send(:raise_error, Interrupt.new('foo'))}.must_raise(Sequel::DatabaseDisconnectError)
-    proc{@db.send(:raise_error, Interrupt.new('bar'))}.must_raise(Sequel::ConstraintViolation)
+    e = Class.new(StandardError)
+    proc{@db.send(:raise_error, e.new('foo'))}.must_raise(Sequel::DatabaseDisconnectError)
+    proc{@db.send(:raise_error, e.new('bar'))}.must_raise(Sequel::ConstraintViolation)
   end
 end
 
