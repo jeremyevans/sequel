@@ -86,7 +86,6 @@ module Sequel
       if NativePreparedStatements
         # Use a native mysql2 prepared statement to implement prepared statements.
         def execute_prepared_statement(ps_name, opts, &block)
-          args = opts[:arguments]
           ps = prepared_statement(ps_name)
           sql = ps.prepared_sql
 
