@@ -93,6 +93,15 @@ describe "DB#create_table" do
     @db.sqls.must_equal ['CREATE TABLE cats (a varchar(50), b text, c char(40), d time, e numeric(11, 2))']
   end
 
+  it "should allow the use of modifiers with ruby class types" do
+    c = Class.new
+    def c.name; 'Fixnum'; end
+    @db.create_table(:cats) do
+      column :a, c
+    end
+    @db.sqls.must_equal ['CREATE TABLE cats (a integer)']
+  end
+
   it "should raise an error if you use a ruby class that isn't handled" do
     proc{@db.create_table(:cats){column :a, Class}}.must_raise(Sequel::Error)
   end
