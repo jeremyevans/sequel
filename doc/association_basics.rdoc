@@ -318,11 +318,11 @@ Associations are cached after being retrieved:
   @album.artists # Cached - No Database Query
   
 You can choose to ignore the cached versions and do a database query to
-retrieve results by passing a true argument to the association method:
+retrieve results by passing a :reload=>true option to the association method:
 
   @album.artists # Not cached - Database Query
   @album.artists # Cached - No Database Query
-  @album.artists(true) # Ignore cache - Database Query
+  @album.artists(:reload=>true) # Ignore cache - Database Query
 
 If you reload/refresh the object, it will automatically clear the
 associations cache for the object:
@@ -654,7 +654,7 @@ used is not correct, you need to specify the full class name with the
 In all of these methods, _association_ is replaced by the symbol you
 pass to the association.
 
-=== _association_(reload = false) (e.g. albums)
+=== _association_(opts={}) (e.g. albums)
 
 For +many_to_one+ and +one_to_one+ associations, the _association_ method
 returns either the single object associated, or nil if no object is
