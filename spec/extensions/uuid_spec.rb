@@ -4,7 +4,6 @@ describe "Sequel::Plugins::Uuid" do
   before do
     uuid = @uuid = '57308544-4e83-47b8-b87f-6f68b987f4f9'
     @alt_uuid = 'd5d1ec46-5e8e-4a7b-adc9-50e76b819e19'
-    dc = Object.new
     @c = Class.new(Sequel::Model(:t))
     @c.class_eval do
       columns :id, :uuid
@@ -49,7 +48,7 @@ describe "Sequel::Plugins::Uuid" do
       end
       o = c.create
       c.db.sqls.first.must_match(/INSERT INTO t \(u\) VALUES \('[-0-9a-f]+'\)/)
-      o.u.must_match /[-0-9a-f]+/
+      o.u.must_match(/[-0-9a-f]+/)
     end
   end
 
