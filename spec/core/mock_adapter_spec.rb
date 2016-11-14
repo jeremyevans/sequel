@@ -9,7 +9,7 @@ describe "Sequel Mock Adapter" do
 
   it "should support registering mock adapter type" do
     begin
-      mod = Module.new do
+      Module.new do
         Sequel::Database.set_shared_adapter_scheme(:foo, self)
         
         def self.mock_adapter_setup(db)
