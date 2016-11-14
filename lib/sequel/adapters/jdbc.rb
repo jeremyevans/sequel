@@ -223,7 +223,7 @@ module Sequel
               raise(Sequel::DatabaseError, 'driver.new.connect returned nil: probably bad JDBC connection string') unless c
               c
             rescue JavaSQL::SQLException, NativeException, StandardError => e2
-              unless e2.message == e.message
+              if e2.respond_to?(:message=) && e2.message != e.message
                 e2.message = "#{e2.message}\n#{e.class.name}: #{e.message}"
               end
               raise e2
