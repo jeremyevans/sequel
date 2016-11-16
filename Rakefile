@@ -98,9 +98,12 @@ spec_task = proc do |description, name, file, coverage|
 
   desc "#{description} with warnings, some warnings filtered"
   task :"#{name}_w" do
-    ENV['RUBYOPT'] ? (ENV['RUBYOPT'] += " -w") : (ENV['RUBYOPT'] = '-w')
-    rake = ENV['RAKE'] || "#{FileUtils::RUBY} -S rake"
-    sh "#{rake} #{name} 2>&1 | egrep -v \"(: warning: instance variable @.* not initialized|: warning: method redefined; discarding old|: warning: previous definition of)\""
+    rubyopt = ENV['RUBYOPT']
+    ENV['RUBYOPT'] = "#{rubyopt} -w"
+    ENV['WARNING'] = '1'
+    run_spec.call(file)
+    ENV.delete('WARNING')
+    ENV['RUBYOPT'] = rubyopt
   end
 
   if coverage

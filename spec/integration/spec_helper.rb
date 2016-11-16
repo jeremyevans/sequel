@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'logger'
+require "#{File.dirname(File.dirname(__FILE__))}/sequel_warning.rb"
 
 if ENV['COVERAGE']
   require File.join(File.dirname(File.expand_path(__FILE__)), "../sequel_coverage")
