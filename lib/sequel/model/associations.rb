@@ -197,7 +197,13 @@ module Sequel
         # Return an dataset that will load the appropriate associated objects for
         # the given object using this association.
         def association_dataset_for(object)
-          associated_dataset.where(predicate_keys.zip(predicate_key_values(object)))
+          condition = if can_have_associated_objects?(object)
+            predicate_keys.zip(predicate_key_values(object))
+          else
+            false
+          end
+
+          associated_dataset.where(condition)
         end
 
         ASSOCIATION_DATASET_PROC = proc{|r| r.association_dataset_for(self)}

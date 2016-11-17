@@ -1496,13 +1496,20 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
 
   it "should return no objects if none are associated" do
     @album.artist.must_equal nil
+    @album.artist_dataset.first.must_equal nil
     @artist.first_album.must_equal nil
+    @artist.first_album_dataset.first.must_equal nil
     @artist.albums.must_equal []
+    @artist.albums_dataset.all.must_equal []
     @album.tags.must_equal []
+    @album.tags_dataset.all.must_equal []
     @album.alias_tags.must_equal []
+    @album.alias_tags_dataset.all.must_equal []
     @tag.albums.must_equal []
+    @tag.albums_dataset.all.must_equal []
     unless @no_many_through_many
       @album.first_tag.must_equal nil
+      @album.first_tag_dataset.first.must_equal nil
     end
   end
 
@@ -2244,6 +2251,13 @@ describe "Sequel::Model Composite Key Associations" do
   it "should have remove method raise an error for one_to_many records if the object isn't already associated" do
     proc{@artist.remove_album([@album.id1, @album.id2])}.must_raise(Sequel::Error)
     proc{@artist.remove_album(@album)}.must_raise(Sequel::Error)
+  end
+
+  it "should not have association method or dataset method return rows with NULL keys" do
+    Album.one_to_many :other_albums, :class=>Album, :key=>[:artist_id1, :artist_id2], :primary_key=>[:artist_id1, :artist_id2]
+    @album.update(:artist_id1=>1)
+    @album.other_albums.must_equal []
+    @album.other_albums_dataset.all.must_equal []
   end
 end
 

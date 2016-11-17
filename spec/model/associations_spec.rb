@@ -709,6 +709,11 @@ describe Sequel::Model, "many_to_one" do
     @c2.many_to_one :parent, :class => @c2, :before_set=>Object.new
     proc{@c2.new.parent = @c2.load(:id=>1)}.must_raise(Sequel::Error)
   end
+
+  it "should have association dataset use false condition if any key is nil" do
+    @c2.many_to_one :parent, :class => @c2
+    @c2.load({}).parent_dataset.sql.must_equal "SELECT * FROM nodes WHERE 'f' LIMIT 1"
+  end
 end
 
 describe Sequel::Model, "one_to_one" do
@@ -1143,6 +1148,11 @@ describe Sequel::Model, "one_to_one" do
     @c2.associate :one_to_one, :parent, :class => @c2
     @c2.load(:id => 567).parent.must_equal @c2.load({})
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.node_id = 567) LIMIT 1"]
+  end
+
+  it "should have association dataset use false condition if any key is nil" do
+    @c2.one_to_one :parent, :class => @c2, :primary_key=>:parent_id
+    @c2.load(:id=>1).parent_dataset.sql.must_equal "SELECT * FROM nodes WHERE 'f' LIMIT 1"
   end
 end
 
@@ -1908,6 +1918,11 @@ describe Sequel::Model, "one_to_many" do
     def p.br(o); cancel_action; end
     p.remove_attribute(c).must_equal nil
     p.attributes.must_equal [c]
+  end
+
+  it "should have association dataset use false condition if any key is nil" do
+    @c1.one_to_many :children, :class => @c1, :primary_key=>:node_id
+    @c1.load(:id=>1).children_dataset.sql.must_equal "SELECT * FROM attributes WHERE 'f'"
   end
 end
 
@@ -2777,6 +2792,11 @@ describe Sequel::Model, "many_to_many" do
     DB.sqls.must_equal ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE ((attributes_nodes.node_id = 1) AND (join_table_att = 3) AND (attributes.id = 2)) LIMIT 1",
       "DELETE FROM attributes_nodes WHERE ((node_id = 1) AND (attribute_id = 2))"] 
   end
+
+  it "should have association dataset use false condition if any key is nil" do
+    @c1.many_to_many :attributes, :class => @c1, :left_primary_key=>:y
+    @c1.load(:id=>1).attributes_dataset.sql.must_equal "SELECT attributes.* FROM attributes INNER JOIN attributes_attributes ON (attributes_attributes.attribute_id = attributes.id) WHERE 'f'"
+  end
 end
 
 describe Sequel::Model, "one_through_one" do
@@ -3183,6 +3203,11 @@ describe Sequel::Model, "one_through_one" do
     h.must_equal [1234, -3, 3, :l]
     o.attribute = nil
     h.must_equal [1234, -3, 3, :l, 1234, :y, :x, :l]
+  end
+
+  it "should have association dataset use false condition if any key is nil" do
+    @c1.one_through_one :attribute, :class => @c1, :left_primary_key=>:y
+    @c1.load(:id=>1).attribute_dataset.sql.must_equal "SELECT attributes.* FROM attributes INNER JOIN attributes_attributes ON (attributes_attributes.attribute_id = attributes.id) WHERE 'f' LIMIT 1"
   end
 end
 

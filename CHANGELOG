@@ -1,5 +1,7 @@
 === HEAD
 
+* Make association dataset method correctly handle cases where key fields are nil (jeremyevans)
+
 * Handle pure java exceptions that don't support message= when reraising the exception in the jdbc adapter (jeremyevans)
 
 * Add support for :offset_strategy Database option on DB2, with :limit_offset and :offset_fetch values, to disable OFFSET emulation (#1254) (jeremyevans)
