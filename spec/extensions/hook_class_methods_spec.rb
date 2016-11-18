@@ -361,6 +361,52 @@ describe "Model#before_validation && Model#after_validation" do
   end
 end
 
+describe "Model transaction hooks" do
+  before do
+    DB.reset
+
+    @c = model_class.call(Sequel::Model(:items)) do
+      columns :x
+      after_save {DB << "AS"}
+      after_destroy {DB << "AD"}
+      self.use_transactions = true
+    end
+  end
+  
+  it "should call after_commit or after_rollback depending on whether the transaction commits or rolls back" do
+    @c.after_commit{DB << 'AC'}
+    @c.after_rollback{DB << 'AR'}
+    m = @c.load(:id => 2233, :x=>123)
+
+    m.save
+    DB.sqls.must_equal ['BEGIN', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'AS', 'COMMIT', 'AC']
+
+    @c.db.transaction(:rollback=>:always){m.save}
+    DB.sqls.must_equal ['BEGIN', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'AS', 'ROLLBACK', 'AR']
+
+    @c.db.transaction do
+      m.save
+      DB.sqls.must_equal ['BEGIN', 'UPDATE items SET x = 123 WHERE (id = 2233)', 'AS']
+    end
+  end
+  
+  it "should call after_destroy_commit or after_destroy_rollback depending on whether the transaction commits or rolls back" do
+    @c.after_destroy_commit {DB << 'ADC'}
+    @c.after_destroy_rollback{DB << 'ADR'}
+
+    @c.load(:id => 2233).destroy
+    DB.sqls.must_equal ['BEGIN', 'DELETE FROM items WHERE id = 2233', 'AD', 'COMMIT', 'ADC']
+
+    @c.db.transaction(:rollback=>:always){@c.load(:id => 2233).destroy}
+    DB.sqls.must_equal ['BEGIN', 'DELETE FROM items WHERE id = 2233', 'AD', 'ROLLBACK', 'ADR']
+
+    @c.db.transaction do
+      @c.load(:id => 2233).destroy
+      DB.sqls.must_equal ['BEGIN', 'DELETE FROM items WHERE id = 2233', 'AD']
+    end
+  end
+end
+
 describe "Model.has_hooks?" do
   before do
     @c = model_class.call(Sequel::Model(:items))

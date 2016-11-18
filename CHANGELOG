@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix hook_class_methods plugin handling of commit hooks (jeremyevans)
+
 * Make association dataset method correctly handle cases where key fields are nil (jeremyevans)
 
 * Handle pure java exceptions that don't support message= when reraising the exception in the jdbc adapter (jeremyevans)

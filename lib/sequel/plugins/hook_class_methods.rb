@@ -126,7 +126,7 @@ module Sequel
           super
           model.hook_blocks(:after_destroy){|b| instance_eval(&b)}
           if model.has_hooks?(:after_destroy_commit)
-            db.after_rollback{model.hook_blocks(:after_destroy_commit){|b| instance_eval(&b)}}
+            db.after_commit{model.hook_blocks(:after_destroy_commit){|b| instance_eval(&b)}}
           end
         end
 
@@ -134,7 +134,7 @@ module Sequel
           super
           model.hook_blocks(:after_save){|b| instance_eval(&b)}
           if model.has_hooks?(:after_commit)
-            db.after_rollback{model.hook_blocks(:after_commit){|b| instance_eval(&b)}}
+            db.after_commit{model.hook_blocks(:after_commit){|b| instance_eval(&b)}}
           end
         end
 
