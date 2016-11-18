@@ -77,9 +77,12 @@ module Sequel
           begin
             r = log_connection_yield(sql, conn){conn.Execute(sql)}
             begin
-              yield(r) if block_given?
+              yield r if block_given?
             ensure
-              r.close
+              begin
+                r.close
+              rescue ::WIN32OLERuntimeError
+              end
             end
           rescue ::WIN32OLERuntimeError => e
             raise_error(e)

@@ -1,5 +1,7 @@
 === HEAD
 
+* Avoid memory leak in ado adapter by closing result sets after yielding them (vais, jeremyevans) (#1259)
+
 * Fix hook_class_methods plugin handling of commit hooks (jeremyevans)
 
 * Make association dataset method correctly handle cases where key fields are nil (jeremyevans)
