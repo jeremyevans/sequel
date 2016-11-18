@@ -315,6 +315,11 @@ module Sequel
           self
         end
 
+        # Don't allow use of prepared statements.
+        def use_prepared_statements_for?(type)
+          false
+        end
+
         private
 
         def cti_this(model)
@@ -359,11 +364,6 @@ module Sequel
             m.cti_table_columns.each{|c| h[c] = columns[c] if columns.include?(c)}
             cti_this(m).update(h) unless h.empty?
           end
-        end
-
-        # Don't allow use of prepared statements.
-        def use_prepared_statements_for?(type)
-          false
         end
       end
     end
