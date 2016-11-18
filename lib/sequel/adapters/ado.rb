@@ -76,7 +76,11 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             r = log_connection_yield(sql, conn){conn.Execute(sql)}
-            yield(r) if block_given?
+            begin
+              yield(r) if block_given?
+            ensure
+              r.close
+            end
           rescue ::WIN32OLERuntimeError => e
             raise_error(e)
           end
