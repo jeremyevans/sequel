@@ -66,6 +66,10 @@ describe "string_agg extension" do
     end
   end
 
+  it "should raise Sequel::Error on unsupported database" do
+    proc{dbf.call(:foo).literal(@sa1)}.must_raise Sequel::Error
+  end
+
   it "should handle order without arguments" do
     db = dbf.call(:postgres)
     db.literal(@sa1.order).must_equal "string_agg(c, ',')"

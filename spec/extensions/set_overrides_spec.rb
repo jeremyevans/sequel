@@ -58,4 +58,8 @@ describe "Sequel::Dataset #set_overrides" do
     @ds.set_overrides!(:x=>1)
     @ds.insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
   end
+
+  it "should consider dataset with select overrides and default a simple select all" do
+    @ds.send(:simple_select_all?).must_equal true
+  end
 end

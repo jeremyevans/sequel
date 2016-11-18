@@ -192,6 +192,10 @@ describe "Blockless Ruby Filters" do
     @d.lit(1 + Sequel.lit('?', :x)).must_equal '(1 + x)'
   end
 
+  it "should raise a NoMethodError if coerce is called with a non-Numeric" do
+    proc{Sequel.expr(:x).coerce(:a)}.must_raise NoMethodError
+  end
+
   it "should support AND conditions via &" do
     @d.l(Sequel.expr(:x) & :y).must_equal '(x AND y)'
     @d.l(Sequel.expr(:x).sql_boolean & :y).must_equal '(x AND y)'

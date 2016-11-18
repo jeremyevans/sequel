@@ -116,4 +116,10 @@ describe Sequel::Dataset, " graphing" do
     @db.fetch = {:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}
     @ds1.graph(@ds2, :x=>:id).all.must_equal [{:points=>{:id=>2, :x=>4, :y=>6}, :lines=>{:id=>12, :x=>15, :y=>18, :graph_id=>21}}]
   end
+
+  it "#with_sql_each should work normally if the dataset is not graphed" do
+    @db.fetch = {:x=>1}
+    @db.dataset.with_sql_each('SELECT 1 AS x'){|r| r.must_equal(:x=>1)}
+    @db.sqls.must_equal ['SELECT 1 AS x']
+  end
 end
