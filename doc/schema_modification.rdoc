@@ -22,7 +22,7 @@ Columns are generally created by specifying the column type as the method
 name, followed by the column name symbol to use, and after that any options that should be used.
 If the method is a ruby class name that Sequel recognizes, Sequel will transform it into the appropriate
 type for the given database.  So while you specified +String+, Sequel will actually use +varchar+ or
-+text+ depending on the underlying database.  Here's a list of all of ruby classes that Sequel will
++text+ depending on the underlying database.  Here's a list of all ruby classes that Sequel will
 convert to database types:
 
   create_table(:columns_types) do       # common database type used
@@ -75,7 +75,7 @@ as the second argument, either as ruby classes, symbols, or strings:
   end
 
 If you use a ruby class as the type, Sequel will try to guess the appropriate type name for the
-database you are using.  If a symbol or string as used as the type, it is used verbatim as the type
+database you are using.  If a symbol or string is used as the type, it is used verbatim as the type
 name in SQL, with the exception of :Bignum.  Using the symbol :Bignum as a type will use the
 appropriate 64-bit integer type for the database you are using.
 
@@ -102,7 +102,7 @@ method, the fourth argument is the options hash.  The following options are supp
 
 === Other methods
 
-In addition to the +column+ method and other methods that create columns, there are a other methods that can be used:
+In addition to the +column+ method and other methods that create columns, there are other methods that can be used:
 
 ==== +primary_key+
 
@@ -129,7 +129,7 @@ via the :name option:
     Integer :group_id
     Integer :position
     primary_key [:group_id, :position], :name=>:items_pk
-  end 
+  end
 
 If provided with an array, +primary_key+ does not create a column, it just sets up the primary key constraint.
 
@@ -159,7 +159,7 @@ as its third argument.  A simple example is:
         references the primary key of the associated table, at least
         on most databases.
 :on_delete :: Specify the behavior of this foreign key column when the row with the primary key
-              it references is deleted , can be :restrict, :cascade, :set_null, or :set_default.
+              it references is deleted, can be :restrict, :cascade, :set_null, or :set_default.
               You can also use a string, which is used literally.
 :on_update :: Specify the behavior of this foreign key column when the row with the primary key
               it references modifies the value of the primary key.  Takes the same options as
@@ -276,7 +276,7 @@ both take the same options as +index+.
     String :name
     constraint(:name_min_length){char_length(name) > 2}
   end
-  
+
 Instead of using a block, you can use arguments that will be handled similarly
 to <tt>Dataset#where</tt>:
 
@@ -285,7 +285,7 @@ to <tt>Dataset#where</tt>:
     String :name
     constraint(:name_length_range, Sequel.function(:char_length, :name)=>3..50)
   end
-  
+
 ==== +check+
 
 +check+ operates just like +constraint+, except that it doesn't take a name
@@ -296,7 +296,7 @@ and it creates an unnamed constraint:
     String :name
     check{char_length(name) > 2}
   end
-  
+
 It's recommended that you use the +constraint+ method and provide a name for the
 constraint, as that makes it easier to drop the constraint later if necessary.
 
@@ -478,8 +478,8 @@ method:
     add_constraint(:name_min_length){char_length(name) > 2}
   end
 
-There is no method to add an unnamed constraint, but you can pass nil as the first
-argument of +add_constraint+ to do so.  However, it's not recommend to do that
+There is no method to add an unnamed constraint, but you can pass +nil+ as the first
+argument of +add_constraint+ to do so.  However, it's not recommended to do that
 as it is difficult to drop such a constraint.
 
 === +add_unique_constraint+
@@ -640,7 +640,7 @@ is the same as:
   unless table_exists?(:artists)
     create_table(:artists) do
       primary_key :id
-    end 
+    end
   end
 
 Like <tt>create_table!</tt>, it should not be used inside migrations.
