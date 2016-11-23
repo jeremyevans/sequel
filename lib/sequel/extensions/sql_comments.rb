@@ -71,7 +71,12 @@ module Sequel
           # SQL is appened to the query after the comment is added,
           # it will become part of the comment unless it is preceded
           # by a newline.
-          sql << comment
+          if sql.frozen?
+            sql += comment
+            sql.freeze
+          else
+            sql << comment
+          end
         end
         sql
       end

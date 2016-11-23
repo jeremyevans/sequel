@@ -56,7 +56,7 @@ module Sequel
         # is necessary as ADO's default :provider uses a separate native
         # connection for each query.
         def insert(*values)
-          return super if @opts[:sql]
+          return super if @opts[:sql] || @opts[:returning]
           with_sql("SET NOCOUNT ON; #{insert_sql(*values)}; SELECT CAST(SCOPE_IDENTITY() AS INTEGER)").single_value
         end
         

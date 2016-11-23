@@ -139,15 +139,82 @@ module Sequel
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
 
+      # ADO constants (DataTypeEnum)
+      # Source: https://msdn.microsoft.com/en-us/library/ms675318(v=vs.85).aspx
+      AdBigInt           = 20
+      AdBinary           = 128
+      AdBoolean          = 11
+      AdBSTR             = 8
+      AdChapter          = 136
+      AdChar             = 129
+      AdCurrency         = 6
+      AdDate             = 7
+      AdDBDate           = 133
+      AdDBTime           = 134
+      AdDBTimeStamp      = 135
+      AdDecimal          = 14
+      AdDouble           = 5
+      AdEmpty            = 0
+      AdError            = 10
+      AdFileTime         = 64
+      AdGUID             = 72
+      AdIDispatch        = 9
+      AdInteger          = 3
+      AdIUnknown         = 13
+      AdLongVarBinary    = 205
+      AdLongVarChar      = 201
+      AdLongVarWChar     = 203
+      AdNumeric          = 131
+      AdPropVariant      = 138
+      AdSingle           = 4
+      AdSmallInt         = 2
+      AdTinyInt          = 16
+      AdUnsignedBigInt   = 21
+      AdUnsignedInt      = 19
+      AdUnsignedSmallInt = 18
+      AdUnsignedTinyInt  = 17
+      AdUserDefined      = 132
+      AdVarBinary        = 204
+      AdVarChar          = 200
+      AdVariant          = 12
+      AdVarNumeric       = 139
+      AdVarWChar         = 202
+      AdWChar            = 130
+
       def fetch_rows(sql)
-        execute(sql) do |s|
-          columns = cols = s.Fields.extend(Enumerable).map{|column| output_identifier(column.Name)}
-          self.columns = columns
-          s.getRows.transpose.each do |r|
-            row = {}
-            cols.each{|c| row[c] = r.shift}
-            yield row
-          end unless s.eof
+        execute(sql) do |recordset|
+          field_names = []
+          field_types = []
+
+          recordset.Fields.each do |field|
+            field_names << output_identifier(field.Name)
+            field_types << field.Type
+          end
+
+          self.columns = field_names
+          return if recordset.EOF
+
+          recordset.GetRows.transpose.each do |field_values|
+            field_index = -1
+            field_values.map! do |v|
+              field_index += 1
+              case field_types[field_index]
+              when AdBigInt
+                v && v.to_i
+              when AdNumeric, AdVarNumeric
+                v && BigDecimal.new(v)
+              when AdDBDate
+                v && Date.new(v.year, v.month, v.day)
+              when AdDBTimeStamp
+                v && db.to_application_timestamp([v.year, v.month, v.day, v.hour, v.min, v.sec, v.nsec])
+              when AdBinary, AdVarBinary, AdLongVarBinary
+                v && Sequel.blob(v.pack('c*'))
+              else
+                v
+              end
+            end
+            yield Hash[field_names.zip(field_values)]
+          end
         end
       end
       

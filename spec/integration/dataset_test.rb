@@ -108,7 +108,7 @@ describe "Simple Dataset operations" do
     @ds.all.must_equal [{:id=>1, :number=>11}]
   end
   
-  cspecify "should have update return the number of matched rows", [:do, :mysql], [:ado] do
+  cspecify "should have update return the number of matched rows", [:do, :mysql] do
     @ds.update(:number=>:number).must_equal 1
     @ds.filter(:id=>1).update(:number=>:number).must_equal 1
     @ds.filter(:id=>2).update(:number=>:number).must_equal 0
