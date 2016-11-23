@@ -1,5 +1,15 @@
 === HEAD
 
+* Add Dataset#with_identifier_output_method, returning a clone with identifier_output_method set (jeremyevans)
+
+* Add Dataset#with_identifier_input_method, returning a clone with identifier_input_method set (jeremyevans)
+
+* Add Dataset#with_quote_identifiers, returning a clone with quote_identifiers set (jeremyevans)
+
+* Add Dataset#with_extend, returning a clone extended with given modules (jeremyevans)
+
+* Add Dataset#with_row_proc, returning a clone with row_proc set (jeremyevans)
+
 * Support use of SQL::AliasedExpressions as Model#to_json :include option keys in the json_serializer plugin (sensadrome) (#1269)
 
 * Major improvements to type conversion in the ado adapter (vais, jeremyevans) (#1265)

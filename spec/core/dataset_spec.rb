@@ -89,6 +89,33 @@ describe "Dataset" do
     @dataset.send(:output_identifier, "at_b_C").must_equal :C_b_ta
   end
   
+  it "should have with_quote_identifiers method which returns cloned dataset with changed literalization of identifiers" do
+    @dataset.with_quote_identifiers(true).literal(:a).must_equal '"a"'
+    @dataset.with_quote_identifiers(false).literal(:a).must_equal 'a'
+    ds = @dataset.freeze.with_quote_identifiers(false)
+    ds.literal(:a).must_equal 'a'
+    ds.frozen?.must_equal true
+  end
+  
+  it "should have with_identifier_input_method method which returns cloned dataset with changed literalization of identifiers" do
+    @dataset.with_identifier_input_method(:upcase).literal(:a).must_equal 'A'
+    @dataset.with_identifier_input_method(:downcase).literal(:A).must_equal 'a'
+    @dataset.with_identifier_input_method(:reverse).literal(:at_b).must_equal 'b_ta'
+    ds = @dataset.freeze.with_identifier_input_method(:reverse)
+    ds.frozen?.must_equal true
+    ds.literal(:at_b).must_equal 'b_ta'
+  end
+  
+  it "should have with_identifier_output_method method which returns cloned dataset with changed identifiers returned from the database" do
+    @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
+    @dataset.with_identifier_output_method(:upcase).send(:output_identifier, "at_b_C").must_equal :AT_B_C
+    @dataset.with_identifier_output_method(:downcase).send(:output_identifier, "at_b_C").must_equal :at_b_c
+    @dataset.with_identifier_output_method(:reverse).send(:output_identifier, "at_b_C").must_equal :C_b_ta
+    ds = @dataset.freeze.with_identifier_output_method(:reverse)
+    ds.send(:output_identifier, "at_b_C").must_equal :C_b_ta
+    ds.frozen?.must_equal true
+  end
+  
   it "should have output_identifier handle empty identifiers" do
     @dataset.send(:output_identifier, "").must_equal :untitled
     @dataset.identifier_output_method = :upcase
@@ -167,8 +194,7 @@ describe "Dataset#==" do
   
   it "should be different for datasets with different SQL" do
     ds = @db[:t]
-    ds.quote_identifiers = true
-    ds.wont_equal @db[:t]
+    ds.with_quote_identifiers(true).wont_equal ds
   end
 end
 
@@ -194,8 +220,7 @@ describe "Dataset#hash" do
   
   it "should be different for datasets with different SQL" do
     ds = @db[:t]
-    ds.quote_identifiers = true
-    ds.hash.wont_equal @db[:t].hash
+    ds.with_quote_identifiers(true).hash.wont_equal ds.hash
   end
 end
 
@@ -937,7 +962,7 @@ describe "Dataset#literal" do
   end
 
   it "should support spaces inside column names" do
-    @ds.quote_identifiers = true
+    @ds = @ds.with_quote_identifiers(true)
     @ds.literal(:"AB C").must_equal '"AB C"'
     @ds.literal(:"Zvas htoy__aB cD").must_equal '"Zvas htoy"."aB cD"'
     @ds.literal(:"aB cD___XX XX").must_equal '"aB cD" AS "XX XX"'
@@ -1061,7 +1086,7 @@ describe "Dataset#literal" do
   end
   
   it "should not modify literal strings" do
-    @dataset.quote_identifiers = true
+    @dataset = @dataset.with_quote_identifiers(true)
     @dataset.literal(Sequel.lit('col1 + 2')).must_equal 'col1 + 2'
     @dataset.update_sql(Sequel::SQL::Identifier.new(Sequel.lit('a')) => Sequel.lit('a + 2')).must_equal 'UPDATE "test" SET a = a + 2'
   end
@@ -1115,12 +1140,11 @@ describe "Dataset#from" do
   end
   
   it "should treat string arguments as identifiers" do
-    @dataset.quote_identifiers = true
-    @dataset.from('a').select_sql.must_equal "SELECT * FROM \"a\""
+    @dataset.with_quote_identifiers(true).from('a').select_sql.must_equal "SELECT * FROM \"a\""
   end
   
   it "should not treat literal strings or blobs as identifiers" do
-    @dataset.quote_identifiers = true
+    @dataset = @dataset.with_quote_identifiers(true)
     @dataset.from(Sequel.lit('a')).select_sql.must_equal "SELECT * FROM a"
     @dataset.from(Sequel.blob('a')).select_sql.must_equal "SELECT * FROM 'a'"
   end
@@ -1671,6 +1695,31 @@ describe "Dataset#offset" do
   end
 end
 
+describe "Dataset#with_extend" do
+  it "should returned clone dataset extended with given modules" do
+    d = Sequel.mock.dataset
+    m1 = Module.new{def a; 1; end}
+    m2 = Module.new{def b; a+2; end}
+    d.with_extend(m1, m2).b.must_equal 3
+    d.respond_to?(:b).must_equal false
+    ds = d.freeze.with_extend(m1, m2)
+    ds.b.must_equal 3
+    ds.frozen?.must_equal true
+  end
+end
+
+describe "Dataset#with_row_proc" do
+  it "should returned clone dataset with the given row_proc" do
+    d = Sequel.mock.dataset
+    l = lambda{|r| r}
+    d.with_row_proc(l).row_proc.must_equal l
+    assert_equal nil, d.row_proc
+    ds = d.freeze.with_row_proc(l)
+    ds.frozen?.must_equal true
+    ds.row_proc.must_equal l
+  end
+end
+
 describe "Dataset#naked" do
   it "should returned clone dataset without row_proc" do
     d = Sequel.mock.dataset
@@ -2126,8 +2175,7 @@ end
 
 describe "Dataset#join_table" do
   before do
-    @d = Sequel.mock.dataset.from(:items)
-    @d.quote_identifiers = true
+    @d = Sequel.mock.dataset.from(:items).with_quote_identifiers(true)
   end
   
   it "should format the JOIN clause properly" do
@@ -3302,8 +3350,7 @@ describe "Dataset#insert_sql" do
   end
 
   it "should quote string keys" do
-    @ds.quote_identifiers = true
-    @ds.insert_sql('c' => 'd').must_equal "INSERT INTO \"items\" (\"c\") VALUES ('d')"
+    @ds.with_quote_identifiers(true).insert_sql('c' => 'd').must_equal "INSERT INTO \"items\" (\"c\") VALUES ('d')"
   end
 
   it "should accept array subscript references" do
@@ -4015,7 +4062,7 @@ describe "Sequel::Dataset #with and #with_recursive" do
   end
   
   it "#with and #with_recursive should quote the columns in the :args option" do
-    @ds.quote_identifiers = true
+    @ds = @ds.with_quote_identifiers(true)
     @ds.with(:t, @db[:x], :args=>[:b]).sql.must_equal 'WITH "t"("b") AS (SELECT * FROM x) SELECT * FROM "t"'
     @ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c]).sql.must_equal 'WITH "t"("b", "c") AS (SELECT * FROM x UNION ALL SELECT * FROM t) SELECT * FROM "t"'
   end
@@ -4630,8 +4677,7 @@ end
 
 describe "Dataset emulating bitwise operator support" do
   before do
-    @ds = Sequel::Database.new.dataset
-    @ds.quote_identifiers = true
+    @ds = Sequel::Database.new.dataset.with_quote_identifiers(true)
     def @ds.complex_expression_sql_append(sql, op, args)
       complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(:bitand, a, b)}
     end
@@ -4680,20 +4726,19 @@ describe "Dataset extensions" do
   end
 
   it "should be able to register an extension with a block and Database#extension call the block" do
-    @ds.quote_identifiers = false
+    @ds = @ds.with_quote_identifiers(false)
     Sequel::Dataset.register_extension(:foo){|db| db.quote_identifiers = true}
     @ds.extension(:foo).quote_identifiers?.must_equal true
   end
 
   it "should be able to register an extension with a callable and Database#extension call the callable" do
-    @ds.quote_identifiers = false
+    @ds = @ds.with_quote_identifiers(false)
     Sequel::Dataset.register_extension(:foo, proc{|db| db.quote_identifiers = true})
     @ds.extension(:foo).quote_identifiers?.must_equal true
   end
 
   it "should be able to load multiple extensions in the same call" do
-    @ds.quote_identifiers = false
-    @ds.identifier_input_method = :downcase
+    @ds = @ds.with_quote_identifiers(false).with_identifier_input_method(:downcase)
     Sequel::Dataset.register_extension(:foo, proc{|ds| ds.quote_identifiers = true})
     Sequel::Dataset.register_extension(:bar, proc{|ds| ds.identifier_input_method = nil})
     ds = @ds.extension(:foo, :bar)

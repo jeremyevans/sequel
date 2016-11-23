@@ -32,22 +32,10 @@ module Sequel
     # a single hash argument and returns the object you want #each to return.
     attr_reader :row_proc
     
-    # Load an extension into the receiver.  In addition to requiring the extension file, this
-    # also modifies the dataset to work with the extension (usually extending it with a
-    # module defined in the extension file).  If no related extension file exists or the
-    # extension does not have specific support for Database objects, an Error will be raised.
-    # Returns self.
+    # Like #extension, but modifies and returns the receiver instead of returning a modified clone.
     def extension!(*exts)
       raise_if_frozen!
-      Sequel.extension(*exts)
-      exts.each do |ext|
-        if pr = Sequel.synchronize{EXTENSIONS[ext]}
-          pr.call(self)
-        else
-          raise(Error, "Extension #{ext} does not have specific support handling individual datasets (try: Sequel.extension #{ext.inspect})")
-        end
-      end
-      self
+      _extension!(exts)
     end
 
     # Avoid self-referential dataset by cloning.
@@ -92,6 +80,19 @@ module Sequel
     
     private
     
+    # Load the extensions into the receiver, without checking if the receiver is frozen.
+    def _extension!(exts)
+      Sequel.extension(*exts)
+      exts.each do |ext|
+        if pr = Sequel.synchronize{EXTENSIONS[ext]}
+          pr.call(self)
+        else
+          raise(Error, "Extension #{ext} does not have specific support handling individual datasets (try: Sequel.extension #{ext.inspect})")
+        end
+      end
+      self
+    end
+
     # Modify the receiver with the results of sending the meth, args, and block
     # to the receiver and merging the options of the resulting dataset into
     # the receiver's options.

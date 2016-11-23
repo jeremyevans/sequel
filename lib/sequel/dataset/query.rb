@@ -148,9 +148,13 @@ module Sequel
       exclude(*cond, &block)
     end
 
-    # Return a clone of the dataset loaded with the extensions, see #extension!.
+    # Return a clone of the dataset loaded with the given dataset extensions.
+    # If no related extension file exists or the extension does not have
+    # specific support for Dataset objects, an Error will be raised.
     def extension(*exts)
-      clone.extension!(*exts)
+      c = clone
+      c.send(:_extension!, exts)
+      c
     end
 
     # Alias for where.
@@ -611,9 +615,7 @@ module Sequel
     #   ds.all # => [{2=>:id}]
     #   ds.naked.all # => [{:id=>2}]
     def naked
-      ds = clone
-      ds.row_proc = nil
-      ds
+      with_row_proc(nil)
     end
 
     # Returns a copy of the dataset with a specified order. Can be safely combined with limit.
@@ -1001,6 +1003,24 @@ module Sequel
       end
     end
     
+    # Return a clone of the dataset extended with the given modules.
+    def with_extend(*mods)
+      c = clone
+      c.extend(*mods)
+      c
+    end
+
+    # Returns a cloned dataset with the given row_proc.
+    #
+    #   ds = DB[:items]
+    #   ds.all # => [{:id=>2}]
+    #   ds.with_row_proc(proc(&:invert)).all # => [{2=>:id}]
+    def with_row_proc(callable)
+      c = clone
+      c.instance_variable_set(:@row_proc, callable)
+      c
+    end
+
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
     # to keep the same row_proc/graph, but change the SQL used to custom SQL.
     #

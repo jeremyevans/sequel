@@ -248,6 +248,29 @@ module Sequel
       end
     end
 
+    # Return a modified dataset with quote_identifiers set.
+    def with_quote_identifiers(v)
+      c = clone
+      c.send(:skip_symbol_cache!)
+      c.instance_variable_set(:@quote_identifiers, v)
+      c
+    end
+    
+    # Return a modified dataset with identifier_input_method set.
+    def with_identifier_input_method(meth)
+      c = clone
+      c.send(:skip_symbol_cache!)
+      c.instance_variable_set(:@identifier_input_method, meth)
+      c
+    end
+    
+    # Return a modified dataset with identifier_output_method set.
+    def with_identifier_output_method(meth)
+      c = clone
+      c.instance_variable_set(:@identifier_output_method, meth)
+      c
+    end
+
     private
 
     # Internal recursive version of unqualified_column_for, handling Strings inside
