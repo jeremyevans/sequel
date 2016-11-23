@@ -1043,7 +1043,7 @@ module Sequel
             set_columns(cols)
             # Also set the columns for the dataset, so the dataset
             # doesn't have to do a query to get them.
-            dataset.instance_variable_set(:@columns, cols)
+            dataset.send(:columns=, cols)
           end
         else
           # If the dataset uses multiple tables or custom sql or getting
