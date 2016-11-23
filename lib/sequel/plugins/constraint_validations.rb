@@ -117,8 +117,7 @@ module Sequel
           end
 
           if @dataset
-            ds = @dataset.clone
-            ds.quote_identifiers = false
+            ds = @dataset.with_quote_identifiers(false)
             table_name = ds.literal(ds.first_source_table)
             reflections = {}
             @constraint_validations = (Sequel.synchronize{hash[table_name]} || []).map{|r| constraint_validation_array(r, reflections)}

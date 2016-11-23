@@ -9,7 +9,7 @@ describe "Sequel::Model()" do
     ds = @db[:blah]
     c = Sequel::Model(ds)
     c.superclass.must_equal Sequel::Model
-    c.dataset.must_equal ds
+    c.dataset.row_proc.must_equal c
   end
 
   it "should return a model subclass with a dataset with the default database and given table name if given a Symbol" do
@@ -51,14 +51,14 @@ describe "Sequel::Model()" do
     ds = @db[Sequel.identifier(:blah)]
     c = Sequel::Model(ds)
     c.superclass.must_equal Sequel::Model
-    c.dataset.must_equal ds
+    c.dataset.row_proc.must_equal c
   end
 
   it "should be callable on Sequel::Model" do
     ds = @db[:blah]
     c = Sequel::Model::Model(ds)
     c.superclass.must_equal Sequel::Model
-    c.dataset.must_equal ds
+    c.dataset.row_proc.must_equal c
   end
 
   it "should be callable on subclasses of Sequel::Model" do
@@ -66,7 +66,7 @@ describe "Sequel::Model()" do
     c = Class.new(Sequel::Model)
     sc = c::Model(ds)
     sc.superclass.must_equal c
-    sc.dataset.must_equal ds
+    sc.dataset.row_proc.must_equal sc
   end
 
   it "should be callable on other modules if def_Model is used" do
@@ -75,7 +75,7 @@ describe "Sequel::Model()" do
     ds = @db[:blah]
     c = m::Model(ds)
     c.superclass.must_equal Sequel::Model
-    c.dataset.must_equal ds
+    c.dataset.row_proc.must_equal c
   end
 
   it "should be callable using model subclasses on other modules if def_Model is used" do
@@ -85,7 +85,7 @@ describe "Sequel::Model()" do
     ds = @db[:blah]
     sc = m::Model(ds)
     sc.superclass.must_equal c
-    sc.dataset.must_equal ds
+    sc.dataset.row_proc.must_equal sc
   end
 
   it "should return a model subclass associated to the given database if given a database" do
@@ -227,6 +227,12 @@ describe Sequel::Model do
     @model.table_name.must_equal :foo
   end
 
+  it "allows frozen dataset" do
+    @model.set_dataset(DB[:foo].freeze)
+    @model.table_name.must_equal :foo
+    @model.dataset.sql.must_equal 'SELECT * FROM foo'
+  end
+
   it "allows set_dataset to accept a Symbol" do
     @model.db = DB
     @model.set_dataset(:foo)
@@ -269,7 +275,7 @@ describe Sequel::Model do
   it "set_dataset should add the destroy method to the dataset that destroys each object" do
     ds = DB[:foo]
     ds.wont_respond_to(:destroy)
-    @model.set_dataset(ds)
+    ds = @model.set_dataset(ds).dataset
     ds.must_respond_to(:destroy)
     DB.sqls
     ds._fetch = [{:id=>1}, {:id=>2}]
@@ -281,7 +287,7 @@ describe Sequel::Model do
     db = Sequel.mock(:servers=>{:s1=>{}})
     ds = db[:foo].server(:s1)
     @model.use_transactions = true
-    @model.set_dataset(ds)
+    ds = @model.set_dataset(ds).dataset
     db.sqls
     ds.destroy.must_equal 0
     db.sqls.must_equal ["BEGIN -- s1", "SELECT * FROM foo -- s1", "COMMIT -- s1"]

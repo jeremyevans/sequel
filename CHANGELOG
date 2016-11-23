@@ -1,3 +1,7 @@
+=== HEAD
+
+* Model.set_dataset now operates on a clone of the dataset given instead of modifying it, so it works with frozen datasets (jeremyevans)
+
 === 4.41.0 (2016-12-01)
 
 * Add Dataset#with_mssql_unicode_strings on Microsoft SQL Server, returning a clone with mssql_unicode_strings set (jeremyevans)

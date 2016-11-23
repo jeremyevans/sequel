@@ -2014,8 +2014,10 @@ describe Sequel::Model, "#eager_graph" do
   it "should eagerly load schema qualified tables correctly with joins" do
     c1 = Class.new(GraphAlbum)
     c2 = Class.new(GraphGenre)
-    ds = c1.dataset = c1.dataset.from(:s__a)
+    ds = c1.dataset.from(:s__a)
     def ds.columns() [:id] end
+    c1.dataset = ds
+    ds = c1.dataset
     c2.dataset = c2.dataset.from(:s__g)
     c1.many_to_many :a_genres, :class=>c2, :left_primary_key=>:id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:s__ag
     ds = c1.join(:s__t, [:b_id]).eager_graph(:a_genres)

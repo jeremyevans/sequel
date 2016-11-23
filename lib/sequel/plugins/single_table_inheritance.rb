@@ -119,7 +119,8 @@ module Sequel
             lambda{|klass| klass.name.to_s}
           end
           @sti_key_chooser = opts[:key_chooser] || lambda{|inst| Array(inst.model.sti_key_map[inst.model]).last }
-          dataset.row_proc = lambda{|r| model.sti_load(r)}
+
+          @dataset = @dataset.with_row_proc(model.method(:sti_load))
         end
       end
 
@@ -160,7 +161,7 @@ module Sequel
           rp = dataset.row_proc
           subclass.set_dataset(sti_dataset.filter(SQL::QualifiedIdentifier.new(sti_dataset.first_source_alias, sti_key)=>key), :inherited=>true)
           subclass.instance_eval do
-            dataset.row_proc = rp
+            @dataset = @dataset.with_row_proc(rp)
             @sti_key_array = key
             self.simple_table = nil
           end
@@ -187,7 +188,11 @@ module Sequel
         # If calling set_dataset manually, make sure to set the dataset
         # row proc to one that handles inheritance correctly.
         def set_dataset_row_proc(ds)
-          ds.row_proc = @dataset.row_proc if @dataset
+          if @dataset
+            ds.with_row_proc(@dataset.row_proc)
+          else
+            super
+          end
         end
 
         # Return a class object.  If a class is given, return it directly.

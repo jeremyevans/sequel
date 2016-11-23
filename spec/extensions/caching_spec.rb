@@ -43,13 +43,17 @@ describe Sequel::Model, "caching" do
       columns :name, :id
     end
    
-    @dataset = @c.dataset = @c3.dataset = @c4.dataset
-    @dataset._fetch = {:name => 'sharon'.dup, :id => 1}
-    @dataset.numrows = 1
     
     @c2 = Class.new(@c) do
       def self.name; 'SubItem' end
     end    
+
+    [@c, @c2, @c3, @c4].each do |c|
+      ds = c.dataset
+      ds._fetch = {:name => 'sharon'.dup, :id => 1}
+      ds.numrows = 1
+    end
+
     @c.db.reset
   end
   

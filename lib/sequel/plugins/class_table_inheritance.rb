@@ -280,7 +280,7 @@ module Sequel
             @sti_dataset = ds.join(table, pk=>pk).select_append(*sel_app)
             set_dataset(@sti_dataset)
             set_columns(self.columns)
-            dataset.row_proc = lambda{|r| subclass.sti_load(r)}
+            @dataset = @dataset.with_row_proc(lambda{|r| subclass.sti_load(r)})
             (columns - [pk]).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
 
             @cti_models += [self]

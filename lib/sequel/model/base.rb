@@ -802,7 +802,7 @@ module Sequel
           @columns = superclass.instance_variable_get(:@columns)
           @db_schema = superclass.instance_variable_get(:@db_schema)
         else
-          @dataset_method_modules.each{|m| @dataset.extend(m)} if @dataset_method_modules
+          @dataset_method_modules.each{|m| @dataset = @dataset.with_extend(m)} if @dataset_method_modules
           @db_schema = get_db_schema
         end
 
@@ -934,14 +934,13 @@ module Sequel
           raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
         end
         set_dataset_row_proc(ds)
-        ds
       end
 
       # Add the module to the class's dataset_method_modules.  Extend the dataset with the
       # module if the model has a dataset.  Add dataset methods to the class for all
       # public dataset methods.
       def dataset_extend(mod, opts=OPTS)
-        @dataset.extend(mod) if @dataset
+        @dataset = @dataset.with_extend(mod) if @dataset
         reset_instance_dataset
         dataset_method_modules << mod
         unless opts[:create_class_methods] == false
@@ -1204,7 +1203,7 @@ module Sequel
 
       # Set the dataset's row_proc to the current model.
       def set_dataset_row_proc(ds)
-        ds.row_proc = self
+        ds.with_row_proc(self)
       end
 
       # Reset the fast primary key lookup SQL when the simple_pk value changes.
