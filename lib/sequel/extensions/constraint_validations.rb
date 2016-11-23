@@ -343,9 +343,7 @@ module Sequel
     # This allows the code to handle schema qualified tables,
     # without quoting all table names.
     def constraint_validations_literal_table(table)
-      ds = dataset
-      ds.quote_identifiers = false
-      ds.literal(table)
+      dataset.with_quote_identifiers(false).literal(table)
     end
 
     # Before creating the table, add constraints for all of the

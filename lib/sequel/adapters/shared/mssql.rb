@@ -405,9 +405,7 @@ module Sequel
 
       # Always quote identifiers in the metadata_dataset, so schema parsing works.
       def metadata_dataset
-        ds = super
-        ds.quote_identifiers = true
-        ds
+        super.with_quote_identifiers(true)
       end
       
       # Use sp_rename to rename the table

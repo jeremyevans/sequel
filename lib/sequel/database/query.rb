@@ -291,12 +291,9 @@ module Sequel
     # for this database.  Used when parsing metadata so that column symbols are
     # returned as expected.
     def metadata_dataset
-      @metadata_dataset ||= (
-        ds = dataset;
-        ds.identifier_input_method = identifier_input_method_default;
-        ds.identifier_output_method = identifier_output_method_default;
-        ds
-      )
+      @metadata_dataset ||= dataset.
+        with_identifier_input_method(identifier_input_method_default).
+        with_identifier_output_method(identifier_output_method_default)
     end
 
     # Return a Method object for the dataset's output_identifier_method.
