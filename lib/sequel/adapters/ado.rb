@@ -5,10 +5,91 @@ require 'win32ole'
 module Sequel
   # The ADO adapter provides connectivity to ADO databases in Windows.
   module ADO
+    # ADO constants (DataTypeEnum)
+    # Source: https://msdn.microsoft.com/en-us/library/ms675318(v=vs.85).aspx
+    AdBigInt           = 20
+    AdBinary           = 128
+    #AdBoolean          = 11
+    #AdBSTR             = 8
+    #AdChapter          = 136
+    #AdChar             = 129
+    #AdCurrency         = 6
+    #AdDate             = 7
+    AdDBDate           = 133
+    #AdDBTime           = 134
+    AdDBTimeStamp      = 135
+    #AdDecimal          = 14
+    #AdDouble           = 5
+    #AdEmpty            = 0
+    #AdError            = 10
+    #AdFileTime         = 64
+    #AdGUID             = 72
+    #AdIDispatch        = 9
+    #AdInteger          = 3
+    #AdIUnknown         = 13
+    AdLongVarBinary    = 205
+    #AdLongVarChar      = 201
+    #AdLongVarWChar     = 203
+    AdNumeric          = 131
+    #AdPropVariant      = 138
+    #AdSingle           = 4
+    #AdSmallInt         = 2
+    #AdTinyInt          = 16
+    #AdUnsignedBigInt   = 21
+    #AdUnsignedInt      = 19
+    #AdUnsignedSmallInt = 18
+    #AdUnsignedTinyInt  = 17
+    #AdUserDefined      = 132
+    AdVarBinary        = 204
+    #AdVarChar          = 200
+    #AdVariant          = 12
+    AdVarNumeric       = 139
+    #AdVarWChar         = 202
+    #AdWChar            = 130
+
+    cp = Object.new
+
+    def cp.bigint(v)
+      v.to_i
+    end
+
+    def cp.numeric(v)
+      BigDecimal.new(v)
+    end
+
+    def cp.binary(v)
+      Sequel.blob(v.pack('c*'))
+    end
+
+    if RUBY_VERSION >= '1.9'
+      def cp.date(v)
+        Date.new(v.year, v.month, v.day)
+      end
+    else
+      def cp.date(v)
+        Date.new(*v[0...10].split('/').map{|x| x.to_i})
+      end
+    end
+
+    CONVERSION_PROCS = {}
+    [
+      [:bigint, AdBigInt],
+      [:numeric, AdNumeric, AdVarNumeric],
+      [:date, AdDBDate],
+      [:binary, AdBinary, AdVarBinary, AdLongVarBinary]
+    ].each do |meth, *types|
+      method = cp.method(meth)
+      types.each do |i|
+        CONVERSION_PROCS[i] = method
+      end
+    end
+
     class Database < Sequel::Database
       DISCONNECT_ERROR_RE = /Communication link failure/
 
       set_adapter_scheme :ado
+
+      attr_reader :conversion_procs
 
       # In addition to the usual database options,
       # the following options have an effect:
@@ -109,6 +190,9 @@ module Sequel
             set_mssql_unicode_strings
           end
         end
+
+        @conversion_procs = CONVERSION_PROCS.dup
+
         super
       end
 
@@ -139,81 +223,51 @@ module Sequel
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
 
-      # ADO constants (DataTypeEnum)
-      # Source: https://msdn.microsoft.com/en-us/library/ms675318(v=vs.85).aspx
-      AdBigInt           = 20
-      AdBinary           = 128
-      AdBoolean          = 11
-      AdBSTR             = 8
-      AdChapter          = 136
-      AdChar             = 129
-      AdCurrency         = 6
-      AdDate             = 7
-      AdDBDate           = 133
-      AdDBTime           = 134
-      AdDBTimeStamp      = 135
-      AdDecimal          = 14
-      AdDouble           = 5
-      AdEmpty            = 0
-      AdError            = 10
-      AdFileTime         = 64
-      AdGUID             = 72
-      AdIDispatch        = 9
-      AdInteger          = 3
-      AdIUnknown         = 13
-      AdLongVarBinary    = 205
-      AdLongVarChar      = 201
-      AdLongVarWChar     = 203
-      AdNumeric          = 131
-      AdPropVariant      = 138
-      AdSingle           = 4
-      AdSmallInt         = 2
-      AdTinyInt          = 16
-      AdUnsignedBigInt   = 21
-      AdUnsignedInt      = 19
-      AdUnsignedSmallInt = 18
-      AdUnsignedTinyInt  = 17
-      AdUserDefined      = 132
-      AdVarBinary        = 204
-      AdVarChar          = 200
-      AdVariant          = 12
-      AdVarNumeric       = 139
-      AdVarWChar         = 202
-      AdWChar            = 130
+
 
       def fetch_rows(sql)
         execute(sql) do |recordset|
-          field_names = []
-          field_types = []
+          cols = []
+          conversion_procs = db.conversion_procs
 
+          i = -1
+          ts_cp = nil
           recordset.Fields.each do |field|
-            field_names << output_identifier(field.Name)
-            field_types << field.Type
+            type = field.Type
+            cp = if type == AdDBTimeStamp
+              ts_cp ||= if RUBY_VERSION >= '1.9'
+                nsec_div = 1000000000.0/(10**(timestamp_precision))
+                nsec_mul = 10**(timestamp_precision+3)
+                meth = db.method(:to_application_timestamp)
+                lambda do |v|
+                  # Fractional second handling is not correct on ruby <2.2
+                  meth.call([v.year, v.month, v.day, v.hour, v.min, v.sec, (v.nsec/nsec_div).round * nsec_mul])
+                end
+              else
+                # Ruby 1.8 returns AdDBTimeStamp values as a string
+                db.method(:to_application_timestamp)
+              end
+            else
+              conversion_procs[type]
+            end
+            cols << [output_identifier(field.Name), cp, i+=1]
           end
 
-          self.columns = field_names
+          self.columns = cols.map(&:first)
           return if recordset.EOF
 
           recordset.GetRows.transpose.each do |field_values|
-            field_index = -1
-            field_values.map! do |v|
-              field_index += 1
-              case field_types[field_index]
-              when AdBigInt
-                v && v.to_i
-              when AdNumeric, AdVarNumeric
-                v && BigDecimal.new(v)
-              when AdDBDate
-                v && Date.new(v.year, v.month, v.day)
-              when AdDBTimeStamp
-                v && db.to_application_timestamp([v.year, v.month, v.day, v.hour, v.min, v.sec, v.nsec])
-              when AdBinary, AdVarBinary, AdLongVarBinary
-                v && Sequel.blob(v.pack('c*'))
+            h = {}
+
+            cols.each do |name, cp, i|
+              h[name] = if (v = field_values[i]) && cp
+                cp[v]
               else
                 v
               end
             end
-            yield Hash[field_names.zip(field_values)]
+            
+            yield h
           end
         end
       end

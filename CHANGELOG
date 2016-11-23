@@ -1,5 +1,7 @@
 === HEAD
 
+* Major improvements to type conversion in the ado adapter (vais, jeremyevans) (#1265)
+
 * Avoid memory leak in ado adapter by closing result sets after yielding them (vais, jeremyevans) (#1259)
 
 * Fix hook_class_methods plugin handling of commit hooks (jeremyevans)
