@@ -806,7 +806,6 @@ module Sequel
           @db_schema = get_db_schema
         end
 
-        @dataset.model = self if @dataset.respond_to?(:model=)
         reset_instance_dataset
         self
       end
@@ -933,7 +932,8 @@ module Sequel
         else
           raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, LiteralString, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
         end
-        set_dataset_row_proc(ds)
+
+        set_dataset_row_proc(ds.clone(:model=>self))
       end
 
       # Add the module to the class's dataset_method_modules.  Extend the dataset with the
@@ -2367,10 +2367,14 @@ module Sequel
     # Dataset methods are methods that the model class extends its dataset with in
     # the call to set_dataset.
     module DatasetMethods
+      Dataset.def_deprecated_opts_setter(self, :model)
+
       # The model class associated with this dataset
       #
       #   Artist.dataset.model # => Artist
-      attr_accessor :model
+      def model
+        @opts[:model]
+      end
 
       # Assume if a single integer is given that it is a lookup by primary
       # key, and call with_pk with the argument.

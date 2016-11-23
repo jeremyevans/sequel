@@ -68,9 +68,9 @@ module Sequel
 
         # Apply all non-instance specific changes to the given dataset and return it.
         def apply_dataset_changes(ds)
-          ds.extend(AssociationDatasetMethods)
-          ds.association_reflection = self
-          self[:extend].each{|m| ds.extend(m)}
+          ds = ds.with_extend(AssociationDatasetMethods).
+            clone(:association_reflection => self)
+          self[:extend].each{|m| ds = ds.with_extend(m)}
           ds = ds.select(*select) if select
           if c = self[:conditions]
             ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
@@ -1358,11 +1358,17 @@ module Sequel
     
       # This module contains methods added to all association datasets
       module AssociationDatasetMethods
+        Dataset.def_deprecated_opts_setter(self, :model, :association_reflection)
+
         # The model object that created the association dataset
-        attr_accessor :model_object
+        def model_object
+          @opts[:model_object]
+        end
     
         # The association reflection related to the association dataset
-        attr_accessor :association_reflection
+        def association_reflection
+          @opts[:association_reflection]
+        end
       end
       
       # Each kind of association adds a number of instance methods to the model class which
@@ -2118,7 +2124,7 @@ module Sequel
           unless ds.kind_of?(AssociationDatasetMethods)
             ds = opts.apply_dataset_changes(ds)
           end
-          ds.model_object = self
+          ds = ds.clone(:model_object => self)
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
           ds = instance_exec(ds, &opts[:block]) if opts[:block]
           ds
