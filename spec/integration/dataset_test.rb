@@ -494,7 +494,7 @@ describe Sequel::Database do
   end
 
   cspecify "should properly escape identifiers", :db2, :oracle, :sqlanywhere do
-    DB.create_table(:"\\'\"[]"){Integer :id}
+    DB.create_table!(:"\\'\"[]"){Integer :id}
     DB.drop_table(:"\\'\"[]")
   end
 
