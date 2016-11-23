@@ -117,7 +117,7 @@ module Sequel
       add_columns = !ds.opts.include?(:graph_aliases)
 
       if graph = opts[:graph]
-        opts[:graph] = graph = graph.dup
+        graph = graph.dup
         select = opts[:select].dup
         [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k] = graph[k].dup}
       else
@@ -127,7 +127,7 @@ module Sequel
         raise_alias_error.call if master == table_alias
 
         # Master hash storing all .graph related information
-        graph = opts[:graph] = {}
+        graph = {}
 
         # Associates column aliases back to tables and columns
         column_aliases = graph[:column_aliases] = {}
@@ -200,6 +200,7 @@ module Sequel
           select.push(identifier)
         end
       end
+      ds = ds.clone(:graph=>graph)
       add_columns ? ds.select(*select) : ds
     end
 
