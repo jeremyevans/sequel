@@ -123,9 +123,9 @@ The following options are supported:
              for every query, which breaks things such as transactions and temporary tables.
 
 Pay special attention to the :provider option, as without specifying a provider,
-many things will be broken.  The SQLNCLI10 provider appears to work well if you
-are connecting to Microsoft SQL Server, but it is not the default as that would
-break backwards compatability.
+many things will be broken.  The SQLNCLI10 and SQLNCLI11 providers work well if you
+are connecting to Microsoft SQL Server, but it is not the default as it depends on
+those providers being installed.
 
 Example connections:
 
