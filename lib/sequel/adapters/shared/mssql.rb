@@ -494,6 +494,11 @@ module Sequel
         @mssql_unicode_strings = typecast_value_boolean(@opts.fetch(:mssql_unicode_strings, true))
       end
       
+      # MSSQL doesn't have a true boolean class, so it uses bit
+      def type_literal_specific_boolean(column)
+        :bit
+      end
+
       # MSSQL has both datetime and timestamp classes, most people are going
       # to want datetime
       def type_literal_generic_datetime(column)
@@ -505,7 +510,7 @@ module Sequel
       def type_literal_generic_time(column)
         column[:only_time] ? :time : :datetime
       end
-      
+
       # MSSQL doesn't have a true boolean class, so it uses bit
       def type_literal_generic_trueclass(column)
         :bit
