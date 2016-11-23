@@ -899,7 +899,7 @@ describe Sequel::SQL::Constants do
     d.to_s.must_equal Date.today.to_s
   end
 
-  cspecify "should have working CURRENT_TIME", [:jdbc, :sqlite], [:mysql2], [:tinytds] do
+  cspecify "should have working CURRENT_TIME", [:jdbc, :sqlite], [:mysql2], [:tinytds], [:ado] do
     @db.create_table!(:constants){Time :t, :only_time=>true}
     @ds.insert(:t=>Sequel::CURRENT_TIME)
     (Time.now - @c[@ds.get(:t)]).must_be_close_to 0, 60
