@@ -135,8 +135,8 @@ module Sequel
     # running queries inside the block, you should use +all+ instead of +each+
     # for the outer queries, or use a separate thread or shard inside +each+.
     def each
-      if row_proc = @row_proc
-        fetch_rows(select_sql){|r| yield row_proc.call(r)}
+      if rp = row_proc
+        fetch_rows(select_sql){|r| yield rp.call(r)}
       else
         fetch_rows(select_sql){|r| yield r}
       end
@@ -847,8 +847,8 @@ module Sequel
     # This method should not be called on a shared dataset if the columns selected
     # in the given SQL do not match the columns in the receiver.
     def with_sql_each(sql)
-      if row_proc = @row_proc
-        fetch_rows(sql){|r| yield row_proc.call(r)}
+      if rp = row_proc
+        fetch_rows(sql){|r| yield rp.call(r)}
       else
         fetch_rows(sql){|r| yield r}
       end
