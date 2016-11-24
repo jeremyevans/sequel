@@ -424,20 +424,16 @@ describe "A MSSQL database" do
 end
 
 describe "MSSQL::Database#rename_table" do
-  after do
-    DB.drop_table?(:foo)
-  end
-
   it "should work on non-schema bound tables which need escaping" do
     DB.quote_identifiers = true
     DB.create_table! :'foo bar' do
       text :name
     end
-    DB.drop_table? :foo
     DB.rename_table 'foo bar', 'foo'
+    DB.drop_table :foo
   end
   
-  it "should work on schema bound tables" do
+  it "should work on schema bound tables within the same schema" do
     DB.execute(<<-SQL)
       IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'MY')
         EXECUTE sp_executesql N'create schema MY'
@@ -447,6 +443,7 @@ describe "MSSQL::Database#rename_table" do
     end
     DB.rename_table Sequel[:MY][:foo], Sequel[:MY][:bar]
     DB.rename_table Sequel[:MY][:bar], :foo
+    DB.drop_table Sequel[:MY][:foo]
   end
 end
 
