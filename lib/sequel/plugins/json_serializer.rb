@@ -32,6 +32,13 @@ module Sequel
     #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
     #   #      "artist":{"json_class":"Artist","name":"YJM"}}'
     #
+    # You can specify a name for a given association by passing <tt>:name</tt>
+    # to the <tt>:include</tt> hash
+    #
+    #   album.to_json(:include=>{:artist=>{:only=>:name, :name=>:singer}})
+    #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
+    #   #      "singer":{"json_class":"Artist","name":"YJM"}}'
+    # 
     # You can specify the <tt>:root</tt> option to nest the JSON under the
     # name of the model:
     #
@@ -299,6 +306,11 @@ module Sequel
           if inc = opts[:include]
             if inc.is_a?(Hash)
               inc.each do |k, v|
+                key_name = if v.is_a?(Hash) && v[:name]
+                  v.delete(:name)
+                else
+                  k.to_s
+                end
                 v = v.empty? ? [] : [v]
 
                 objs = send(k)
@@ -309,7 +321,7 @@ module Sequel
                   objs.is_a?(Array)
                 end
                 
-                h[k.to_s] = if is_array
+                h[key_name] = if is_array
                   objs.map{|obj| Literal.new(Sequel.object_to_json(obj, *v))}
                 else
                   Literal.new(Sequel.object_to_json(objs, *v))
