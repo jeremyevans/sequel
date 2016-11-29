@@ -191,13 +191,15 @@ module Sequel
         
         # Add the shared PostgreSQL prepared statement methods
         def prepare(type, name=nil, *values)
-          ps = to_prepared_statement(type, values)
-          ps.extend(JDBC::Dataset::PreparedStatementMethods)
-          ps.extend(::Sequel::Postgres::DatasetMethods::PreparedStatementMethods)
+          ps = to_prepared_statement(type, values).
+            with_extend(JDBC::Dataset::PreparedStatementMethods).
+            with_extend(::Sequel::Postgres::DatasetMethods::PreparedStatementMethods)
+
           if name
-            ps.prepared_statement_name = name
+            ps = ps.clone(:prepared_statement_name => name)
             db.set_prepared_statement(name, ps)
           end
+
           ps
         end
 

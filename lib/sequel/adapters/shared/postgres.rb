@@ -1275,8 +1275,16 @@ module Sequel
       module PreparedStatementMethods
         # Override insert action to use RETURNING if the server supports it.
         def run
-          if @prepared_type == :insert && (opts[:returning_pk] || !opts[:returning])
+          if prepared_type == :insert && (opts[:returning_pk] || !opts[:returning])
             fetch_rows(prepared_sql){|r| return r.values.first}
+          else
+            super
+          end
+        end
+
+        def prepare(type, *a)
+          if type == :insert && opts.has_key?(:returning)
+            clone(:returning=>insert_pk, :returning_pk=>true).prepare(type, *a)
           else
             super
           end
@@ -1284,12 +1292,12 @@ module Sequel
 
         def prepared_sql
           return @prepared_sql if @prepared_sql
-          if @prepared_type == :insert && !opts[:returning]
-            @opts[:returning] = insert_pk
-            @opts[:returning_pk] = true
+
+          if prepared_type == :insert && !@opts.has_key?(:returning)
+            return(@prepared_sql = clone(:returning => insert_pk, :returning_pk => true).prepared_sql)
           end
+
           super
-          @prepared_sql
         end
       end
 

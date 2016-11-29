@@ -3761,7 +3761,7 @@ describe "Dataset prepared statements and bound variables " do
   it "should handle usage with Dataset.prepared_statements_module" do
     @ds.extend(Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, [Sequel::Dataset::ArgumentMapper, Sequel::Dataset::PreparedStatementMethods]){def foo; :bar; end})
     @ds.foo.must_equal :bar
-    @ds.prepared_statement_name = 'foo'
+    @ds = @ds.clone(:prepared_statement_name => 'foo')
     @ds.call(:a=>1)
     @db.sqls.must_equal ["foo"]
   end

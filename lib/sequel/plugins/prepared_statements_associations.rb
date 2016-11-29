@@ -77,9 +77,7 @@ module Sequel
                 end
                 ds = ds.bind(h)
               end
-              ps = ds.prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
-              ps.log_sql = true
-              ps
+              ds.clone(:log_sql=>true).prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
             end
           end
         end

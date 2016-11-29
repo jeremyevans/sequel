@@ -359,10 +359,10 @@ module Sequel
         # Extend given dataset with this module so subselects inside subselects in
         # prepared statements work.
         def subselect_sql_append(sql, ds)
-          ps = ds.to_prepared_statement(:select).clone(:append_sql=>sql)
-          ps.extend(CallableStatementMethods)
+          ps = ds.to_prepared_statement(:select).
+            clone(:append_sql=>sql, :prepared_args=>prepared_args).
+            with_extend(CallableStatementMethods)
           ps = ps.bind(@opts[:bind_vars]) if @opts[:bind_vars]
-          ps.prepared_args = prepared_args
           ps.prepared_sql
         end
       end
@@ -371,9 +371,9 @@ module Sequel
 
       # Emulate support of bind arguments in called statements.
       def call(type, bind_arguments={}, *values, &block)
-        ps = to_prepared_statement(type, values)
-        ps.extend(CallableStatementMethods)
-        ps.call(bind_arguments, &block)
+        to_prepared_statement(type, values).
+          with_extend(CallableStatementMethods).
+          call(bind_arguments, &block)
       end
 
       # Whether to convert smallint to boolean arguments for this dataset.
@@ -417,12 +417,13 @@ module Sequel
       # Store the given type of prepared statement in the associated database
       # with the given name.
       def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values)
-        ps.extend(PreparedStatementMethods)
+        ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
+
         if name
-          ps.prepared_statement_name = name
+          ps = ps.clone(:prepared_statement_name=>name)
           db.set_prepared_statement(name, ps)
         end
+
         ps
       end
     end

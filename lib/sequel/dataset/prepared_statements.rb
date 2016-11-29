@@ -36,30 +36,46 @@ module Sequel
       end
     end
     private_class_method :prepared_statements_module
+
+    def self.def_deprecated_opts_setter(mod, *meths)
+      meths.each do |meth|
+        mod.send(:define_method, :"#{meth}=") do |v|
+          # :nocov:
+          Sequel.deprecate("Dataset##{meth}=", "The API has changed, and this value should now be passed in as an option via Dataset#clone.")
+          @opts[meth] = v
+          # :nocov:
+        end
+      end
+    end
     
     # Default implementation of the argument mapper to allow
     # native database support for bind variables and prepared
     # statements (as opposed to the emulated ones used by default).
     module ArgumentMapper
-      # The name of the prepared statement, if any.
-      attr_accessor :prepared_statement_name
+      Dataset.def_deprecated_opts_setter(self, :prepared_statement_name, :bind_arguments)
       
+      # The name of the prepared statement, if any.
+      def prepared_statement_name
+        @opts[:prepared_statement_name]
+      end
+
       # The bind arguments to use for running this prepared statement
-      attr_accessor :bind_arguments
+      def bind_arguments
+        @opts[:bind_arguments]
+      end
 
       # Set the bind arguments based on the hash and call super.
       def call(bind_vars={}, &block)
-        ds = bind(bind_vars)
-        ds.prepared_sql
-        ds.bind_arguments = ds.map_to_prepared_args(ds.opts[:bind_vars])
-        ds.run(&block)
+        ps = bind(bind_vars)
+        ps.prepared_sql
+        prepared_args.freeze
+        ps.clone(:bind_arguments=>ps.map_to_prepared_args(ps.opts[:bind_vars])).run(&block)
       end
         
       # Override the given *_sql method based on the type, and
       # cache the result of the sql.
       def prepared_sql
         return @prepared_sql if @prepared_sql
-        @prepared_args ||= []
         @prepared_sql = super
         @opts[:sql] = @prepared_sql
         @prepared_sql
@@ -73,25 +89,37 @@ module Sequel
     # into the query, which works on all databases, as it is no different
     # from using the dataset without bind variables.
     module PreparedStatementMethods
+      Dataset.def_deprecated_opts_setter(self, :log_sql, :prepared_type, :prepared_args, :orig_dataset, :prepared_modify_values)
+
       PLACEHOLDER_RE = /\A\$(.*)\z/
       
       # Whether to log the full SQL query.  By default, just the prepared statement
       # name is generally logged on adapters that support native prepared statements.
-      attr_accessor :log_sql
+      def log_sql
+        @opts[:log_sql]
+      end
       
       # The type of prepared statement, should be one of :select, :first,
       # :insert, :update, or :delete
-      attr_accessor :prepared_type
+      def prepared_type
+        @opts[:prepared_type]
+      end
       
       # The array/hash of bound variable placeholder names.
-      attr_accessor :prepared_args
+      def prepared_args
+        @opts[:prepared_args]
+      end
       
       # The dataset that created this prepared statement.
-      attr_accessor :orig_dataset
+      def orig_dataset
+        @opts[:orig_dataset]
+      end
       
       # The argument to supply to insert and update, which may use
       # placeholders specified by prepared_args
-      attr_accessor :prepared_modify_values
+      def prepared_modify_values
+        @opts[:prepared_modify_values]
+      end
 
       # Sets the prepared_args to the given hash and runs the
       # prepared statement.
@@ -115,18 +143,18 @@ module Sequel
       # Returns the SQL for the prepared statement, depending on
       # the type of the statement and the prepared_modify_values.
       def prepared_sql
-        case @prepared_type
+        case prepared_type
         when :select, :all, :each
           # Most common scenario, so listed first.
           select_sql
         when :first
           clone(:limit=>1).select_sql
         when :insert_select
-          insert_select_sql(*@prepared_modify_values)
+          insert_select_sql(*prepared_modify_values)
         when :insert
-          insert_sql(*@prepared_modify_values)
+          insert_sql(*prepared_modify_values)
         when :update
-          update_sql(*@prepared_modify_values)
+          update_sql(*prepared_modify_values)
         when :delete
           delete_sql
         else
@@ -163,7 +191,7 @@ module Sequel
       # :select running #all to get all of the rows, and the other
       # types running the method with the same name as the type.
       def run(&block)
-        case @prepared_type
+        case prepared_type
         when :select, :all
           # Most common scenario, so listed first
           all(&block)
@@ -174,17 +202,17 @@ module Sequel
         when :first
           first
         when :insert, :update, :delete
-          if opts[:returning] && supports_returning?(@prepared_type)
+          if opts[:returning] && supports_returning?(prepared_type)
             returning_fetch_rows(prepared_sql)
-          elsif @prepared_type == :delete
+          elsif prepared_type == :delete
             delete
           else
-            send(@prepared_type, *@prepared_modify_values)
+            send(prepared_type, *prepared_modify_values)
           end
         when Array
-          case @prepared_type.at(0)
+          case prepared_type.at(0)
           when :map, :to_hash, :to_hash_groups
-            send(*@prepared_type, &block) 
+            send(*prepared_type, &block) 
           end
         else
           all(&block)
@@ -213,9 +241,7 @@ module Sequel
       # support and using the same argument hash so that you can use
       # bind variables/prepared arguments in subselects.
       def subselect_sql_append(sql, ds)
-        ps = ds.clone(:append_sql=>sql).prepare(:select)
-        ps = ps.bind(@opts[:bind_vars]) if @opts[:bind_vars]
-        ps.prepared_args = prepared_args
+        ps = ds.clone(:append_sql=>sql, :prepared_args=>prepared_args, :bind_vars=>@opts[:bind_vars]).prepare(:select)
         ps.prepared_sql
       end
     end
@@ -302,12 +328,9 @@ module Sequel
     # Return a cloned copy of the current dataset extended with
     # PreparedStatementMethods, setting the type and modify values.
     def to_prepared_statement(type, values=nil)
-      ps = bind
-      ps.extend(PreparedStatementMethods)
-      ps.orig_dataset = self
-      ps.prepared_type = type
-      ps.prepared_modify_values = values
-      ps
+      bind.
+        clone(:prepared_type=>type, :prepared_modify_values=>values, :orig_dataset=>self, :prepared_args=>@opts[:prepared_args]||[]).
+        with_extend(PreparedStatementMethods)
     end
 
     private

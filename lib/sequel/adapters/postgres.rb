@@ -767,20 +767,21 @@ module Sequel
         
         # Execute the given type of statement with the hash of values.
         def call(type, bind_vars=OPTS, *values, &block)
-          ps = to_prepared_statement(type, values)
-          ps.extend(BindArgumentMethods)
-          ps.call(bind_vars, &block)
+          to_prepared_statement(type, values).
+            with_extend(BindArgumentMethods).
+            call(bind_vars, &block)
         end
 
         # Prepare the given type of statement with the given name, and store
         # it in the database to be called later.
         def prepare(type, name=nil, *values)
-          ps = to_prepared_statement(type, values)
-          ps.extend(PreparedStatementMethods)
+          ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
+
           if name
-            ps.prepared_statement_name = name
+            ps = ps.clone(:prepared_statement_name=>name)
             db.set_prepared_statement(name, ps)
           end
+
           ps
         end
         

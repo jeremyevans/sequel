@@ -240,12 +240,13 @@ module Sequel
         # Create a named prepared statement that is stored in the
         # database (and connection) for reuse.
         def prepare(type, name=nil, *values)
-          ps = to_prepared_statement(type, values)
-          ps.extend(PreparedStatementMethods)
+          ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
+
           if name
-            ps.prepared_statement_name = name
+            ps = ps.clone(:prepared_statement_name=>name)
             db.set_prepared_statement(name, ps)
           end
+
           ps
         end
       end

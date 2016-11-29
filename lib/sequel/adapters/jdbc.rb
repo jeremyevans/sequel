@@ -712,16 +712,16 @@ module Sequel
       end
       
       StoredProcedureMethods = prepared_statements_module(
-        "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
+        "sql = @opts[:sproc_name]; opts = Hash[opts]; opts[:args] = @opts[:sproc_args]; opts[:sproc] = true",
         Sequel::Dataset::StoredProcedureMethods,
         %w"execute execute_dui") do
           private
 
           # Same as execute, explicit due to intricacies of alias and super.
           def execute_insert(sql, opts=OPTS)
-            sql = @sproc_name
+            sql = @opts[:sproc_name]
             opts = Hash[opts]
-            opts[:args] = @sproc_args
+            opts[:args] = @opts[:sproc_args]
             opts[:sproc] = true
             opts[:type] = :insert
             super
@@ -742,12 +742,13 @@ module Sequel
       # Create a named prepared statement that is stored in the
       # database (and connection) for reuse.
       def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values)
-        ps.extend(PreparedStatementMethods)
+        ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
+
         if name
-          ps.prepared_statement_name = name
+          ps = ps.clone(:prepared_statement_name=>name)
           db.set_prepared_statement(name, ps)
         end
+
         ps
       end
 
@@ -766,7 +767,7 @@ module Sequel
 
       # Extend the dataset with the JDBC stored procedure methods.
       def prepare_extend_sproc(ds)
-        ds.extend(StoredProcedureMethods)
+        ds.with_extend(StoredProcedureMethods)
       end
 
       # The type conversion proc to use for the given column number i,

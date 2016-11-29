@@ -337,7 +337,7 @@ module Sequel
       def split_multiple_result_sets
         raise(Error, "Can't split multiple statements on a graphed dataset") if opts[:graph]
         ds = clone(:split_multiple_result_sets=>true)
-        ds.row_proc = proc{|x| x.map{|h| row_proc.call(h)}} if row_proc
+        ds = ds.with_row_proc(proc{|x| x.map{|h| row_proc.call(h)}}) if row_proc
         ds
       end
       

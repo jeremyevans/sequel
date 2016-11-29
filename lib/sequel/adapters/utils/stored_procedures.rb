@@ -3,17 +3,16 @@
 module Sequel 
   class Dataset
     module StoredProcedureMethods
+      Dataset.def_deprecated_opts_setter(self, :sproc_type, :sproc_name, :sproc_args)
+
       # The name of the stored procedure to call
-      attr_accessor :sproc_name
-      
-      # The name of the stored procedure to call
-      attr_writer :sproc_args
+      def sproc_name
+        @opts[:sproc_name]
+      end
       
       # Call the stored procedure with the given args
       def call(*args, &block)
-        sp = clone
-        sp.sproc_args = args
-        sp.run(&block)
+        clone(:sproc_args=>args).run(&block)
       end
 
       # Programmer friendly string showing this is a stored procedure,
@@ -24,7 +23,7 @@ module Sequel
       
       # Run the stored procedure with the current args on the database
       def run(&block)
-        case @sproc_type
+        case @opts[:sproc_type]
         when :select, :all
           all(&block)
         when :first
@@ -36,14 +35,6 @@ module Sequel
         when :delete
           delete
         end
-      end
-      
-      # Set the type of the stored procedure and override the corresponding _sql
-      # method to return the empty string (since the result will be
-      # ignored anyway).
-      def sproc_type=(type)
-        @sproc_type = type
-        @opts[:sql] = ''
       end
     end
   
@@ -58,18 +49,14 @@ module Sequel
       # Transform this dataset into a stored procedure that you can call
       # multiple times with new arguments.
       def prepare_sproc(type, name)
-        sp = clone
-        prepare_extend_sproc(sp)
-        sp.sproc_type = type
-        sp.sproc_name = name
-        sp
+        prepare_extend_sproc(self).clone(:sproc_type=>type, :sproc_name=>name, :sql=>'')
       end
       
       private
       
       # Extend the dataset with the stored procedure methods.
       def prepare_extend_sproc(ds)
-        ds.extend(StoredProcedureMethods)
+        ds.with_extend(StoredProcedureMethods)
       end
     end
   end

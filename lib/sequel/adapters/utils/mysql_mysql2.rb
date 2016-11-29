@@ -67,14 +67,14 @@ module Sequel
         include Sequel::Dataset::StoredProcedures
        
         StoredProcedureMethods = Sequel::Dataset.send(:prepared_statements_module,
-          "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
+          "sql = @opts[:sproc_name]; opts = Hash[opts]; opts[:args] = @opts[:sproc_args]; opts[:sproc] = true",
           Sequel::Dataset::StoredProcedureMethods, %w'execute execute_dui')
         
         private
 
         # Extend the dataset with the MySQL stored procedure methods.
         def prepare_extend_sproc(ds)
-          ds.extend(StoredProcedureMethods)
+          ds.with_extend(StoredProcedureMethods)
         end
       end
     end
