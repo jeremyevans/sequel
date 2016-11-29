@@ -150,9 +150,10 @@ if [:mysql, :mysql2].include?(DB.adapter_scheme)
 
     it "should allow disabling the conversion on a per-dataset basis" do
       @db.convert_tinyint_to_bool = true
-      ds = @ds.clone
-      def ds.cast_tinyint_integer?(f) true end #mysql
-      def ds.convert_tinyint_to_bool?() false end #mysql2
+      ds = @ds.with_extend(Module.new do
+        def cast_tinyint_integer?(f) true end #mysql
+        def convert_tinyint_to_bool?() false end #mysql2
+      end)
       ds.delete
       ds << {:b=>true, :i=>10}
       ds.all.must_equal [{:b=>1, :i=>10}]
@@ -172,7 +173,7 @@ describe "A MySQL dataset" do
   end
 
   it "should quote columns and tables using back-ticks if quoting identifiers" do
-    @d.quote_identifiers = true
+    @d = @d.with_quote_identifiers(true)
     @d.select(:name).sql.must_equal 'SELECT `name` FROM `items`'
     @d.select(Sequel.lit('COUNT(*)')).sql.must_equal 'SELECT COUNT(*) FROM `items`'
     @d.select(Sequel.function(:max, :value)).sql.must_equal 'SELECT max(`value`) FROM `items`'
@@ -190,7 +191,7 @@ describe "A MySQL dataset" do
   end
 
   it "should quote fields correctly when reversing the order" do
-    @d.quote_identifiers = true
+    @d = @d.with_quote_identifiers(true)
     @d.reverse_order(:name).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` DESC'
     @d.reverse_order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` ASC'
     @d.reverse_order(:name, Sequel.desc(:test)).sql.must_equal 'SELECT * FROM `items` ORDER BY `name` DESC, `test` ASC'
@@ -242,7 +243,7 @@ describe "MySQL datasets" do
   end
 
   it "should correctly quote column references" do
-    @d.quote_identifiers = true
+    @d = @d.with_quote_identifiers(true)
     market = 'ICE'
     ack_stamp = Time.now - 15 * 60 # 15 minutes ago
     @d.select(:market, Sequel.function(:minute, Sequel.function(:from_unixtime, :ack)).as(:minute)).
@@ -321,8 +322,7 @@ describe "Joined MySQL dataset" do
   end
 
   it "should quote fields correctly" do
-    @ds.quote_identifiers = true
-    @ds.join(:attributes, :node_id => :id).sql.must_equal "SELECT * FROM `nodes` INNER JOIN `attributes` ON (`attributes`.`node_id` = `nodes`.`id`)"
+    @ds.with_quote_identifiers(true).join(:attributes, :node_id => :id).sql.must_equal "SELECT * FROM `nodes` INNER JOIN `attributes` ON (`attributes`.`node_id` = `nodes`.`id`)"
   end
 
   it "should put a having clause before an order by clause" do
@@ -1168,7 +1168,7 @@ if DB.adapter_scheme == :mysql or DB.adapter_scheme == :jdbc or DB.adapter_schem
         @d.call_sproc(:select, :test_sproc, 3).must_equal []
         @d.insert(:value=>1)
         @d.call_sproc(:select, :test_sproc, 4).must_equal [{:id=>nil, :value=>1, :b=>4}]
-        @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
+        @d = @d.with_row_proc(proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r})
         @d.call_sproc(:select, :test_sproc, 3).must_equal [{:id=>nil, :value=>2, :b=>6}]
       end
 
@@ -1179,7 +1179,7 @@ if DB.adapter_scheme == :mysql or DB.adapter_scheme == :jdbc or DB.adapter_schem
         @d.call_sproc(:select, :test_sproc, 3, 4).must_equal []
         @d.insert(:value=>1)
         @d.call_sproc(:select, :test_sproc, 4, 5).must_equal [{:id=>nil, :value=>1, :b=>4, :d=>5}]
-        @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
+        @d = @d.with_row_proc(proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r})
         @d.call_sproc(:select, :test_sproc, 3, 4).must_equal [{:id=>nil, :value=>2, :b=>6, :d => 8}]
       end
     end
@@ -1259,7 +1259,7 @@ if DB.adapter_scheme == :mysql
     end
 
     it "should have regular row_procs work when splitting multiple result sets" do
-      @ds.row_proc = proc{|x| x[x.keys.first] *= 2; x}
+      @ds = @ds.with_row_proc(proc{|x| x[x.keys.first] *= 2; x})
       @ds.split_multiple_result_sets.all.must_equal [[{:a=>20}, {:a=>30}], [{:b=>40}, {:b=>50}]]
     end
 

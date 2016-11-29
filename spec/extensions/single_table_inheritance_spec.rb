@@ -30,7 +30,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     Object.send(:remove_const, :StiTestSub2)
     class ::StiTestSub1 < StiTest; end 
     class ::StiTestSub2 < StiTest; end 
-    @ds._fetch = [{:blah=>'StiTest'}, {:blah=>'StiTestSub1'}, {:blah=>'StiTestSub2'}]
+    StiTest.dataset._fetch = [{:blah=>'StiTest'}, {:blah=>'StiTestSub1'}, {:blah=>'StiTestSub2'}]
     StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTestSub1, StiTestSub2]
     StiTest.dataset.sql.must_equal "SELECT * FROM sti_tests"
     StiTestSub1.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub1'))"
@@ -65,7 +65,7 @@ describe Sequel::Model, "single table inheritance plugin" do
       Object
     end
     StiTest.plugin :single_table_inheritance, :kind
-    @ds._fetch = [{:kind=>''}, {:kind=>nil}]
+    StiTest.dataset._fetch = [{:kind=>''}, {:kind=>nil}]
     StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTest]
     called.must_equal false
   end

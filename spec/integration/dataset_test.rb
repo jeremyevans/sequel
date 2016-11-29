@@ -559,7 +559,7 @@ describe "Simple Dataset operations" do
     @ds.insert(:number=>1, :flag=>true)
     @ds.insert(:number=>2, :flag=>false)
     @ds.insert(:number=>3, :flag=>nil)
-    @ds.order!(:number)
+    @ds = @ds.order(:number)
     @ds.filter(:flag=>true).map(:number).must_equal [1]
     @ds.filter(:flag=>false).map(:number).must_equal [2]
     @ds.filter(:flag=>nil).map(:number).must_equal [3]
@@ -1134,7 +1134,7 @@ describe "Sequel::Dataset main SQL methods" do
   end
 
   it "#select_group should work correctly" do
-    @ds.unordered!
+    @ds = @ds.unordered
     @ds.select_group(:a).all.must_equal []
     @ds.insert(20, 30)
     @ds.select_group(:a).all.must_equal [{:a=>20}]
@@ -1145,13 +1145,13 @@ describe "Sequel::Dataset main SQL methods" do
   end
 
   it "#select_group should work correctly when aliasing" do
-    @ds.unordered!
+    @ds = @ds.unordered
     @ds.insert(20, 30)
     @ds.select_group(Sequel[:b].as(:c)).all.must_equal [{:c=>30}]
   end
   
   it "#having should work correctly" do
-    @ds.unordered!
+    @ds = @ds.unordered
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.must_equal []
     @ds.insert(20, 30)
     @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.must_equal []
@@ -1160,7 +1160,7 @@ describe "Sequel::Dataset main SQL methods" do
   end
   
   cspecify "#having should work without a previous group", :sqlite do
-    @ds.unordered!
+    @ds = @ds.unordered
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.must_equal []
     @ds.insert(20, 30)
     @ds.select{max(a).as(c)}.having{max(a) > 30}.all.must_equal []
@@ -1435,7 +1435,7 @@ describe "Sequel::Dataset DSL support" do
   
   it "should work with multiple value arrays" do
     @ds.insert(20, 10)
-    @ds.quote_identifiers = false
+    @ds = @ds.with_quote_identifiers(false)
     @ds.filter([:a, :b]=>[[20, 10]]).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter([:a, :b]=>[[10, 20]]).all.must_equal []
     @ds.filter([:a, :b]=>[[20, 10], [1, 2]]).all.must_equal [{:a=>20, :b=>10}]
@@ -1449,8 +1449,7 @@ describe "Sequel::Dataset DSL support" do
 
   it "should work with IN/NOT in with datasets" do
     @ds.insert(20, 10)
-    ds = @ds.unordered
-    @ds.quote_identifiers = false
+    ds = @ds.unordered.with_quote_identifiers(false)
 
     @ds.filter(:a=>ds.select(:a)).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(:a=>ds.select(:a).where(:a=>15)).all.must_equal []
@@ -1532,7 +1531,7 @@ describe "SQL Extract Function" do
   
   it "should return the part of the datetime asked for" do
     t = Time.now
-    def @ds.supports_timestamp_timezones?() false end
+    @ds = @ds.with_extend(Module.new do def supports_timestamp_timezones?() false end end)
     @ds.insert(t)
     @ds.get{a.extract(:year)}.must_equal t.year
     @ds.get{a.extract(:month)}.must_equal t.month
@@ -1715,20 +1714,16 @@ describe "Dataset identifier methods" do
   end
   
   it "#identifier_output_method should change how identifiers are output" do
-    @ds.identifier_output_method = :upcase
-    @ds.first.must_equal(:AB=>1)
-    @ds.identifier_output_method = :uprev
-    @ds.first.must_equal(:BA=>1)
+    @ds.with_identifier_output_method(:upcase).first.must_equal(:AB=>1)
+    @ds.with_identifier_output_method(:uprev).first.must_equal(:BA=>1)
   end
   
   it "should work with a nil identifier_output_method" do
-    @ds.identifier_output_method = nil
-    [{:ab=>1}, {:AB=>1}].must_include(@ds.first)
+    [{:ab=>1}, {:AB=>1}].must_include(@ds.with_identifier_output_method(nil).first)
   end
 
   it "should work when not quoting identifiers" do
-    @ds.quote_identifiers = false
-    @ds.first.must_equal(:ab=>1)
+    @ds.with_quote_identifiers(false).first.must_equal(:ab=>1)
   end
 end
 

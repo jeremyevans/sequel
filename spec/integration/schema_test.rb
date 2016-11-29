@@ -33,9 +33,9 @@ describe "Database schema parser" do
     DB.create_table!(:items){Integer :number}
     DB.identifier_output_method = @iom
     DB.identifier_input_method = @iim
-    ds = DB[:items]
-    ds.identifier_output_method = :reverse
-    ds.identifier_input_method = :reverse
+    ds = DB[:items].
+      with_identifier_output_method(:reverse).
+      with_identifier_input_method(:reverse)
     begin
       DB.schema(ds, :reload=>true).must_be_kind_of(Array)
       DB.schema(ds, :reload=>true).first.first.must_equal :number

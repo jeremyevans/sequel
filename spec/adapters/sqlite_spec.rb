@@ -457,9 +457,7 @@ describe "SQLite dataset" do
   end
   
   it "should have #explain work when identifier_output_method is modified" do
-    ds = DB[:test]
-    ds.identifier_output_method = :upcase
-    ds.explain.must_be_kind_of(String)
+    DB[:test].with_identifier_output_method(:upcase).explain.must_be_kind_of(String)
   end
 end
 

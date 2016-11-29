@@ -58,9 +58,8 @@ end
 
 describe "A Firebird dataset" do
   before do
-    @d = DB[:test]
-    @d.delete # remove all records
-    @d.quote_identifiers = true
+    @d = DB[:test].with_quote_identifiers(true)
+    @d.delete
   end
 
   it "should return the correct record count" do
@@ -90,8 +89,6 @@ describe "A Firebird dataset" do
     @d << {:name => 'def', :val => 789}
     @d.filter(:name => 'abc').update(:val => 530)
 
-    # the third record should stay the same
-    # floating-point precision bullshit
     @d[:name => 'def'][:val].must_equal 789
     @d.filter(:val => 530).count.must_equal 2
   end
@@ -112,7 +109,6 @@ describe "A Firebird dataset" do
   end
 
   it "should quote columns and tables using double quotes if quoting identifiers" do
-    @d.quote_identifiers = true
     @d.select(:name).sql.must_equal \
       'SELECT "NAME" FROM "TEST"'
 
@@ -157,7 +153,6 @@ describe "A Firebird dataset" do
   end
 
   it "should quote fields correctly when reversing the order if quoting identifiers" do
-    @d.quote_identifiers = true
     @d.reverse_order(:name).sql.must_equal \
       'SELECT * FROM "TEST" ORDER BY "NAME" DESC'
 
@@ -220,7 +215,6 @@ describe "A Firebird dataset" do
 
   it "should quote and upcase reserved keywords" do
     @d = DB[:testing]
-    @d.quote_identifiers = true
     @d.select(:select).sql.must_equal \
       'SELECT "SELECT" FROM "TESTING"'
   end

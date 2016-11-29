@@ -247,7 +247,7 @@ describe "Offset support" do
     @db.create_table!(:i){Integer :id; Integer :parent_id}
     @ds = @db[:i].order(:id)
     @hs = []
-    @ds.row_proc = proc{|r| @hs << r.dup; r[:id] *= 2; r[:parent_id] *= 3; r}
+    @ds = @ds.with_row_proc(proc{|r| @hs << r.dup; r[:id] *= 2; r[:parent_id] *= 3; r})
     @ds.import [:id, :parent_id], [[1,nil],[2,nil],[3,1],[4,1],[5,3],[6,5]]
   end
   after do
@@ -356,7 +356,9 @@ describe "MSSSQL::Dataset#insert" do
   end
   
   it "should have insert_select return nil if the server version is not 2005+" do
-    def @ds.server_version() 8000760 end
+    @ds = @ds.with_extend(Module.new do
+      def server_version() 8000760 end
+    end)
     @ds.insert_select(:value=>10).must_equal nil
   end
 
