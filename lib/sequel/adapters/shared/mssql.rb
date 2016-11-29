@@ -574,7 +574,7 @@ module Sequel
       ROWS_ONLY = " ROWS ONLY".freeze
       FETCH_NEXT = " FETCH NEXT ".freeze
 
-      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output]).freeze
+      NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output, :mssql_unicode_strings]).freeze
 
       Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
       Dataset.def_sql_method(self, :delete, %w'with delete from output from2 where')
@@ -582,11 +582,18 @@ module Sequel
       Dataset.def_sql_method(self, :update, [['if is_2005_or_later?', %w'with update limit table set output from where'], ['else', %w'update table set output from where']])
 
       # Allow overriding of the mssql_unicode_strings option at the dataset level.
-      attr_writer :mssql_unicode_strings
+      def mssql_unicode_strings=(v)
+        @opts[:mssql_unicode_strings] = v
+      end
 
       # Use the database's mssql_unicode_strings setting if the dataset hasn't overridden it.
       def mssql_unicode_strings
-        defined?(@mssql_unicode_strings) ? @mssql_unicode_strings : (@mssql_unicode_strings = db.mssql_unicode_strings)
+        opts.has_key?(:mssql_unicode_strings) ? opts[:mssql_unicode_strings] : db.mssql_unicode_strings
+      end
+
+      # Return a cloned dataset with the mssql_unicode_strings option set.
+      def with_mssql_unicode_strings(v)
+        clone(:mssql_unicode_strings=>v)
       end
 
       # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.

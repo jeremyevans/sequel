@@ -485,10 +485,11 @@ describe "MSSQL::Database#mssql_unicode_strings = false" do
     DB.create_table!(:items){String :name}
     ds = DB[:items]
     ds.mssql_unicode_strings.must_equal false
-    ds.mssql_unicode_strings = true
-    ds.mssql_unicode_strings.must_equal true
-    ds.insert(:name=>'foo')
-    ds.select_map(:name).must_equal ['foo']
+    ds1 = ds.with_mssql_unicode_strings(true)
+    ds.mssql_unicode_strings.must_equal false
+    ds1.mssql_unicode_strings.must_equal true
+    ds1.insert(:name=>'foo')
+    ds1.select_map(:name).must_equal ['foo']
   end
 end
 

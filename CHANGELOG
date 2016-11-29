@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#with_mssql_unicode_strings on Microsoft SQL Server, returning a clone with mssql_unicode_strings set (jeremyevans)
+
 * Add Dataset#with_identifier_output_method, returning a clone with identifier_output_method set (jeremyevans)
 
 * Add Dataset#with_identifier_input_method, returning a clone with identifier_input_method set (jeremyevans)
