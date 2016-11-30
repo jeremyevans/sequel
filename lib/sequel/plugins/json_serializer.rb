@@ -307,7 +307,7 @@ module Sequel
             if inc.is_a?(Hash)
               inc.each do |k, v|
                 key_name = if v.is_a?(Hash) && v[:name]
-                  v.delete(:name)
+                  v[:name]
                 else
                   k.to_s
                 end
