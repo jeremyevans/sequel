@@ -66,12 +66,12 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   it "should raise an error if attempting to parse json when providing array to non-array association or vice-versa" do
-    proc{Artist.from_json('{"albums":{"id":1,"name":"RF","artist_id":2,"json_class":"Album"},"id":2,"name":"YJM"}', :associations=>:albums)}.must_raise(Sequel::Error)
-    proc{Album.from_json('{"artist":[{"id":2,"name":"YJM","json_class":"Artist"}],"id":1,"name":"RF","artist_id":2}', :associations=>:artist)}.must_raise(Sequel::Error)
+    proc{Artist.from_json('{"albums":{"id":1,"name":"RF","artist_id":2},"id":2,"name":"YJM"}', :associations=>:albums)}.must_raise(Sequel::Error)
+    proc{Album.from_json('{"artist":[{"id":2,"name":"YJM"}],"id":1,"name":"RF","artist_id":2}', :associations=>:artist)}.must_raise(Sequel::Error)
   end
 
   it "should raise an error if attempting to parse an array containing non-hashes" do
-    proc{Artist.from_json('[{"id":2,"name":"YJM","json_class":"Artist"}, 2]')}.must_raise(Sequel::Error)
+    proc{Artist.from_json('[{"id":2,"name":"YJM"}, 2]')}.must_raise(Sequel::Error)
   end
 
   it "should raise an error if attempting to parse invalid JSON" do
@@ -260,12 +260,7 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.dataset.to_json(:root=>"bars", :only => :id).to_s.must_equal '{"bars":[{"id":1},{"id":1}]}'
   end
 
-  it "should use an alias for an included asscociation to qualify an association" do
-    @artist.json_serializer_opts(:only=>:name)
-    JSON.parse(@album.to_json(:include => Sequel.as(:artist, :singer)).to_s).must_equal JSON.parse('{"id":1,"name":"RF","artist_id":2,"singer":{"name":"YJM"}}')
-  end
-
-  it "should use an alias for an included asscociation when passed in a hash to qualify an association" do
+  it "should use an alias for an included asscociation to qualify an association" do\
     JSON.parse(@album.to_json(:include=>{Sequel.as(:artist, :singer)=>{:only=>:name}}).to_s).must_equal JSON.parse('{"id":1,"name":"RF","artist_id":2,"singer":{"name":"YJM"}}')
   end
 
