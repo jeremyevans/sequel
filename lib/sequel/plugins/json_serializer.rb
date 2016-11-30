@@ -13,7 +13,7 @@ module Sequel
     #
     #   album = Album[1]
     #   album.to_json
-    #   # => '{"json_class"=>"Album","id"=>1,"name"=>"RF","artist_id"=>2}'
+    #   # => '{"id"=>1,"name"=>"RF","artist_id"=>2}'
     #
     # In addition, you can provide options to control the JSON output:
     #
@@ -22,22 +22,22 @@ module Sequel
     #   # => '{"json_class"="Album","name"=>"RF"}'
     #   
     #   album.to_json(:include=>:artist)
-    #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
-    #   #      "artist":{"json_class":"Artist","id":2,"name":"YJM"}}'
+    #   # => '{"id":1,"name":"RF","artist_id":2,
+    #   #      "artist":{"id":2,"name":"YJM"}}'
     # 
     # You can use a hash value with <tt>:include</tt> to pass options
     # to associations:
     #
     #   album.to_json(:include=>{:artist=>{:only=>:name}})
-    #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
-    #   #      "artist":{"json_class":"Artist","name":"YJM"}}'
+    #   # => '{"id":1,"name":"RF","artist_id":2,
+    #   #      "artist":{"name":"YJM"}}'
     #
     # You can specify a name for a given association by passing <tt>:name</tt>
     # to the <tt>:include</tt> hash
     #
     #   album.to_json(:include=>{:artist=>{:only=>:name, :name=>:singer}})
-    #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
-    #   #      "singer":{"json_class":"Artist","name":"YJM"}}'
+    #   # => '{"id":1,"name":"RF","artist_id":2,
+    #   #      "singer":{"name":"YJM"}}'
     # 
     # You can specify the <tt>:root</tt> option to nest the JSON under the
     # name of the model:
