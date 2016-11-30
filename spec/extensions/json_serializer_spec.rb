@@ -260,7 +260,8 @@ describe "Sequel::Plugins::JsonSerializer" do
     Album.dataset.to_json(:root=>"bars", :only => :id).to_s.must_equal '{"bars":[{"id":1},{"id":1}]}'
   end
 
-  it "should use an alias for an included asscociation to qualify an association" do\
+  it "should use an alias for an included asscociation to qualify an association" do
+    JSON.parse(@album.to_json(:include=>Sequel.as(:artist, :singer)).to_s).must_equal JSON.parse('{"id":1,"name":"RF","artist_id":2,"singer":{"id":2,"name":"YJM"}}')
     JSON.parse(@album.to_json(:include=>{Sequel.as(:artist, :singer)=>{:only=>:name}}).to_s).must_equal JSON.parse('{"id":1,"name":"RF","artist_id":2,"singer":{"name":"YJM"}}')
   end
 
