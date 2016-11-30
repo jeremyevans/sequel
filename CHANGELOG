@@ -1,5 +1,7 @@
 === HEAD
 
+* Support use of SQL::AliasedExpressions as Model#to_json :include option keys in the json_serializer plugin (sensadrome) (#1269)
+
 * Major improvements to type conversion in the ado adapter (vais, jeremyevans) (#1265)
 
 * Avoid memory leak in ado adapter by closing result sets after yielding them (vais, jeremyevans) (#1259)

@@ -306,11 +306,13 @@ module Sequel
           if inc = opts[:include]
             if inc.is_a?(Hash)
               inc.each do |k, v|
-                key_name = k.to_s
                 if k.is_a?(Sequel::SQL::AliasedExpression)
                   key_name = k.aliaz.to_s
                   k = k.expression
+                else
+                  key_name = k.to_s
                 end
+
                 v = v.empty? ? [] : [v]
 
                 objs = send(k)
