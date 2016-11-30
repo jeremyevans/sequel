@@ -331,10 +331,11 @@ module Sequel
               end
             else
               Array(inc).each do |c|
-                key_name = c.to_s
                 if c.is_a?(Sequel::SQL::AliasedExpression)
                   key_name = c.aliaz.to_s
                   c = c.expression
+                else
+                  key_name = c.to_s
                 end
                 h[key_name] = send(c)
               end
