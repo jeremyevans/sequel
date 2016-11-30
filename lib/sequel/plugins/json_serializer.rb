@@ -35,7 +35,7 @@ module Sequel
     # You can specify a name for a given association by passing <tt>:name</tt>
     # to the <tt>:include</tt> hash
     #
-    #   album.to_json(:include=>{:artist=>{:only=>:name, :name=>:singer}})
+    #   album.to_json(:include=>{Sequel.as(:artist, :singer)=>{:only=>:name}})
     #   # => '{"id":1,"name":"RF","artist_id":2,
     #   #      "singer":{"name":"YJM"}}'
     # 
