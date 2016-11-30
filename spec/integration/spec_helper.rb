@@ -27,6 +27,7 @@ require './spec/guards_helper'
 
 unless defined?(DB)
   DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'])
+  DB.extension(:freeze_datasets) if ENV['SEQUEL_FREEZE_DATASETS']
 end
 
 if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type == :access)

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add freeze_datasets extension, making all datasets for a given Database frozen (jeremyevans)
+
 * Refactor prepared statement internals, using opts instead of instance variables (jeremyevans)
 
 * Model.set_dataset now operates on a clone of the dataset given instead of modifying it, so it works with frozen datasets (jeremyevans)
