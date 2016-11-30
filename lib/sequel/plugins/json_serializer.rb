@@ -330,7 +330,14 @@ module Sequel
                 end
               end
             else
-              Array(inc).each{|c| h[c.to_s] = send(c)}
+              Array(inc).each do |c|
+                key_name = c.to_s
+                if c.is_a?(Sequel::SQL::AliasedExpression)
+                  key_name = c.aliaz.to_s
+                  c = c.expression
+                end
+                h[key_name] = send(c)
+              end
             end
           end
 
