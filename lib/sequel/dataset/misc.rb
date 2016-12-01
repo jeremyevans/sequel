@@ -29,7 +29,7 @@ module Sequel
     # the Database#dataset method return an instance of that subclass.
     def initialize(db)
       @db = db
-      @opts = OPTS
+      @opts = {}
     end
 
     # Define a hash value such that datasets with the same DB, opts, and SQL
