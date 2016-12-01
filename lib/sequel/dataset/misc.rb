@@ -182,6 +182,12 @@ module Sequel
       :x_sequel_row_number_x
     end
 
+    # The row_proc for this database, should be any object that responds to +call+ with
+    # a single hash argument and returns the object you want #each to return.
+    def row_proc
+      @opts[:row_proc]
+    end
+    
     # Splits a possible implicit alias in +c+, handling both SQL::AliasedExpressions
     # and Symbols.  Returns an array of two elements, with the first being the
     # main expression, and the second being the alias.

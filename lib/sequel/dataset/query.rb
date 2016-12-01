@@ -18,7 +18,7 @@ module Sequel
 
     # Which options don't affect the SQL generation.  Used by simple_select_all?
     # to determine if this is a simple SELECT * FROM table.
-    NON_SQL_OPTIONS = [:server, :graph, :eager, :eager_graph, :graph_aliases, :model, :model_object, :association_reflection].freeze
+    NON_SQL_OPTIONS = [:server, :graph, :eager, :eager_graph, :graph_aliases, :row_proc, :model, :model_object, :association_reflection].freeze
     
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
@@ -1016,9 +1016,7 @@ module Sequel
     #   ds.all # => [{:id=>2}]
     #   ds.with_row_proc(proc(&:invert)).all # => [{2=>:id}]
     def with_row_proc(callable)
-      c = clone
-      c.instance_variable_set(:@row_proc, callable)
-      c
+      clone(:row_proc=>callable)
     end
 
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want

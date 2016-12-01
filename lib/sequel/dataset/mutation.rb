@@ -28,10 +28,6 @@ module Sequel
     # Add the mutation methods via metaprogramming
     def_mutation_method(*MUTATION_METHODS)
     
-    # The row_proc for this database, should be any object that responds to +call+ with
-    # a single hash argument and returns the object you want #each to return.
-    attr_reader :row_proc
-    
     # Like #extension, but modifies and returns the receiver instead of returning a modified clone.
     def extension!(*exts)
       raise_if_frozen!
@@ -61,7 +57,7 @@ module Sequel
     # Remove the row_proc from the current dataset.
     def naked!
       raise_if_frozen!
-      self.row_proc = nil
+      @opts[:row_proc] = nil
       self
     end
     
@@ -75,7 +71,7 @@ module Sequel
     # Override the row_proc for this dataset
     def row_proc=(v)
       raise_if_frozen!
-      @row_proc = v
+      @opts[:row_proc] = v
     end
     
     private
