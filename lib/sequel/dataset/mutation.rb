@@ -45,13 +45,13 @@ module Sequel
     def identifier_input_method=(v)
       raise_if_frozen!
       skip_symbol_cache!
-      @identifier_input_method = v
+      @opts[:identifier_input_method] = v
     end
     
     # Set the method to call on identifiers coming the database for this dataset
     def identifier_output_method=(v)
       raise_if_frozen!
-      @identifier_output_method = v
+      @opts[:identifier_output_method] = v
     end
 
     # Remove the row_proc from the current dataset.
@@ -65,7 +65,7 @@ module Sequel
     def quote_identifiers=(v)
       raise_if_frozen!
       skip_symbol_cache!
-      @quote_identifiers = v
+      @opts[:quote_identifiers] = v
     end
 
     # Override the row_proc for this dataset
@@ -103,6 +103,11 @@ module Sequel
       if frozen?
         raise RuntimeError, "can't modify frozen #{visible_class_name}"
       end
+    end
+
+    # Set the dataset to skip the symbol cache
+    def skip_symbol_cache!
+      @opts[:skip_symbol_cache] = true
     end
   end
 end

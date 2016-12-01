@@ -148,21 +148,13 @@ module Sequel
     # The String instance method to call on identifiers before sending them to
     # the database.
     def identifier_input_method
-      if defined?(@identifier_input_method)
-        @identifier_input_method
-      else
-        @identifier_input_method = db.identifier_input_method
-      end
+      @opts.fetch(:identifier_input_method, db.identifier_input_method)
     end
     
     # The String instance method to call on identifiers before sending them to
     # the database.
     def identifier_output_method
-      if defined?(@identifier_output_method)
-        @identifier_output_method
-      else
-        @identifier_output_method = db.identifier_output_method
-      end
+      @opts.fetch(:identifier_output_method, db.identifier_output_method)
     end
     
     # Returns a string representation of the dataset including the class name 
@@ -256,25 +248,17 @@ module Sequel
 
     # Return a modified dataset with quote_identifiers set.
     def with_quote_identifiers(v)
-      c = clone
-      c.send(:skip_symbol_cache!)
-      c.instance_variable_set(:@quote_identifiers, v)
-      c
+      clone(:quote_identifiers=>v, :skip_symbol_cache=>true)
     end
     
     # Return a modified dataset with identifier_input_method set.
     def with_identifier_input_method(meth)
-      c = clone
-      c.send(:skip_symbol_cache!)
-      c.instance_variable_set(:@identifier_input_method, meth)
-      c
+      clone(:identifier_input_method=>meth, :skip_symbol_cache=>true)
     end
     
     # Return a modified dataset with identifier_output_method set.
     def with_identifier_output_method(meth)
-      c = clone
-      c.instance_variable_set(:@identifier_output_method, meth)
-      c
+      clone(:identifier_output_method=>meth)
     end
 
     private

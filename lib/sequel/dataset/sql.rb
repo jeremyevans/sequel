@@ -1496,12 +1496,7 @@ module Sequel
 
     # Whether the symbol cache should be skipped when literalizing the dataset
     def skip_symbol_cache?
-      @skip_symbol_cache
-    end
-
-    # Set the dataset to skip the symbol cache
-    def skip_symbol_cache!
-      @skip_symbol_cache = true
+      @opts[:skip_symbol_cache]
     end
 
     # Append literalization of array of sources/tables to SQL string, raising an Error if there
