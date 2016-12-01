@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
+          <span class='datetime'>2016-11-14 12:48:12 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -237,9 +237,10 @@
             <pre class="ruby"><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">album</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">album</span> <span class="ruby-comment"># Cached - No Database Query</span>&#x000A;&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span></pre>
             
             <p>You can choose to ignore the cached versions and do a database query to
-            retrieve results by passing a true argument to the association method:</p>
+            retrieve results by passing a :reload=&gt;true option to the association
+            method:</p>
             
-            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span>(<span class="ruby-keyword">true</span>) <span class="ruby-comment"># Ignore cache - Database Query</span></pre>
+            <pre class="ruby"><span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Not cached - Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span> <span class="ruby-comment"># Cached - No Database Query</span>&#x000A;<span class="ruby-ivar">@album</span>.<span class="ruby-identifier">artists</span>(:<span class="ruby-identifier">reload=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>) <span class="ruby-comment"># Ignore cache - Database Query</span></pre>
             
             <p>If you reload/refresh the object, it will automatically clear the
             associations cache for the object:</p>
@@ -465,7 +466,7 @@
             <p>In all of these methods, <em>association</em> is replaced by the symbol you
             pass to the association.</p>
             
-            <h3 id="label-association-28reload+-3D+false-29+-28e.g.+albums-29"><em>association</em>(reload = false) (e.g. albums)<span><a href="#label-association-28reload+-3D+false-29+-28e.g.+albums-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <h3 id="label-association-28opts-3D-7B-7D-29+-28e.g.+albums-29"><em>association</em>(opts={}) (e.g. albums)<span><a href="#label-association-28opts-3D-7B-7D-29+-28e.g.+albums-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>For <code>many_to_one</code> and <code>one_to_one</code> associations, the
             <em>association</em> method returns either the single object associated, or

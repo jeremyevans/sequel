@@ -1,7 +1,7 @@
-Fri, 28 Oct 2016 08:28:19 -0700
-lib/sequel/adapters/ado.rb	Thu, 12 May 2016 12:28:12 -0700
+Thu, 01 Dec 2016 10:46:22 -0800
+lib/sequel/adapters/ado.rb	Wed, 23 Nov 2016 09:48:29 -0800
 lib/sequel/adapters/ado/access.rb	Thu, 12 May 2016 12:28:13 -0700
-lib/sequel/adapters/ado/mssql.rb	Thu, 12 May 2016 12:28:13 -0700
+lib/sequel/adapters/ado/mssql.rb	Wed, 23 Nov 2016 09:48:29 -0800
 lib/sequel/adapters/amalgalite.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/adapters/cubrid.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/adapters/do.rb	Thu, 12 May 2016 12:28:13 -0700
@@ -9,7 +9,7 @@ lib/sequel/adapters/do/mysql.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/adapters/do/postgres.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/adapters/do/sqlite3.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/adapters/ibmdb.rb	Thu, 12 May 2016 12:28:13 -0700
-lib/sequel/adapters/jdbc.rb	Thu, 07 Jul 2016 10:22:46 -0700
+lib/sequel/adapters/jdbc.rb	Mon, 14 Nov 2016 07:56:07 -0800
 lib/sequel/adapters/jdbc/as400.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/jdbc/cubrid.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/jdbc/db2.rb	Thu, 12 May 2016 12:28:13 -0700
@@ -30,7 +30,7 @@ lib/sequel/adapters/jdbc/sqlserver.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/jdbc/transactions.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/adapters/mock.rb	Mon, 17 Oct 2016 18:59:53 -0700
 lib/sequel/adapters/mysql.rb	Thu, 14 Jul 2016 09:29:02 -0700
-lib/sequel/adapters/mysql2.rb	Fri, 15 Jul 2016 14:07:44 -0700
+lib/sequel/adapters/mysql2.rb	Mon, 14 Nov 2016 15:59:54 -0800
 lib/sequel/adapters/odbc.rb	Thu, 12 May 2016 12:28:13 -0700
 lib/sequel/adapters/odbc/db2.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/odbc/mssql.rb	Thu, 12 May 2016 12:28:13 -0700
@@ -40,10 +40,10 @@ lib/sequel/adapters/postgres.rb	Sun, 02 Oct 2016 15:10:16 -0700
 lib/sequel/adapters/postgresql.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/adapters/shared/access.rb	Sun, 25 Sep 2016 08:06:13 -0700
 lib/sequel/adapters/shared/cubrid.rb	Thu, 13 Oct 2016 11:56:48 -0700
-lib/sequel/adapters/shared/db2.rb	Thu, 13 Oct 2016 11:56:48 -0700
+lib/sequel/adapters/shared/db2.rb	Tue, 08 Nov 2016 15:03:09 -0800
 lib/sequel/adapters/shared/firebird.rb	Sun, 25 Sep 2016 08:06:13 -0700
 lib/sequel/adapters/shared/informix.rb	Sun, 25 Sep 2016 08:06:13 -0700
-lib/sequel/adapters/shared/mssql.rb	Thu, 13 Oct 2016 11:56:48 -0700
+lib/sequel/adapters/shared/mssql.rb	Wed, 30 Nov 2016 11:55:27 -0800
 lib/sequel/adapters/shared/mysql.rb	Thu, 13 Oct 2016 11:56:48 -0700
 lib/sequel/adapters/shared/oracle.rb	Thu, 13 Oct 2016 11:56:48 -0700
 lib/sequel/adapters/shared/postgres.rb	Thu, 13 Oct 2016 11:56:48 -0700

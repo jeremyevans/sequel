@@ -101,7 +101,7 @@
             <p>If you want to get all columns in a subclass instance after loading via the
             superclass, call Model#refresh.</p>
             
-            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;CEO&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">refresh</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;Executive&#39;, :num_staff=&gt;4, :num_managers=&gt;2}</span></pre>
+            <pre class="ruby"><span class="ruby-identifier">a</span> = <span class="ruby-constant">Employee</span>.<span class="ruby-identifier">first</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;CEO&#39;}</span>&#x000A;<span class="ruby-identifier">a</span>.<span class="ruby-identifier">refresh</span>.<span class="ruby-identifier">values</span> <span class="ruby-comment"># {:id=&gt;1, name=&gt;&#39;S&#39;, :kind=&gt;&#39;CEO&#39;, :num_staff=&gt;4, :num_managers=&gt;2}</span></pre>
             
             <p>You can also load directly from a subclass:</p>
             

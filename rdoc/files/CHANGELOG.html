@@ -29,12 +29,56 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-10-28 08:17:27 -0700</span>
+          <span class='datetime'>2016-12-01 10:38:16 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.41.0+-282016-12-01-29">4.41.0 (2016-12-01)<span><a href="#label-4.41.0+-282016-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Add Dataset#with_mssql_unicode_strings on Microsoft SQL Server, returning a
+            clone with mssql_unicode_strings set (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_identifier_output_method, returning a clone with
+            identifier_output_method set (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_identifier_input_method, returning a clone with
+            identifier_input_method set (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_quote_identifiers, returning a clone with
+            quote_identifiers set (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_extend, returning a clone extended with given modules
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_row_proc, returning a clone with row_proc set
+            (jeremyevans)</p>
+            </li><li>
+            <p>Support use of SQL::AliasedExpressions as Model#to_json :include option
+            keys in the json_serializer plugin (sensadrome) (#1269)</p>
+            </li><li>
+            <p>Major improvements to type conversion in the ado adapter (vais,
+            jeremyevans) (#1265)</p>
+            </li><li>
+            <p>Avoid memory leak in ado adapter by closing result sets after yielding them
+            (vais, jeremyevans) (#1259)</p>
+            </li><li>
+            <p>Fix hook_class_methods plugin handling of commit hooks (jeremyevans)</p>
+            </li><li>
+            <p>Make association dataset method correctly handle cases where key fields are
+            nil (jeremyevans)</p>
+            </li><li>
+            <p>Handle pure java exceptions that don&#39;t support message= when reraising
+            the exception in the jdbc adapter (jeremyevans)</p>
+            </li><li>
+            <p>Add support for :offset_strategy Database option on DB2, with :limit_offset
+            and :offset_fetch values, to disable OFFSET emulation (#1254) (jeremyevans)</p>
+            </li><li>
+            <p>Remove deprecated support for using Bignum class as a generic type
+            (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.40.0+-282016-10-28-29">4.40.0 (2016-10-28)<span><a href="#label-4.40.0+-282016-10-28-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

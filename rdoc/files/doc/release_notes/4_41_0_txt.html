@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>4.41.0.txt</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>4.41.0.txt</h1>
+        <div class='paths'>
+          doc/release_notes/4.41.0.txt
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2016-12-01 10:38:16 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <h1 id="label-New+Features">New Features<span><a href="#label-New+Features">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Dataset#with_* methods have been added as equivalents for a few Dataset#*=
+            methods, but instead of modifying the receiver, they return a modified
+            copy, similar to the dataset query methods. Specific methods added:</p>
+            <table class="rdoc-list note-list"><tbody><tr><td class='label'>with_extend </td><td>
+            <p>Extends clone with given modules</p>
+            </td></tr><tr><td class='label'>with_row_proc </td><td>
+            <p>Modifies row_proc in clone</p>
+            </td></tr><tr><td class='label'>with_quote_identifiers </td><td>
+            <p>Modifies quote_identifiers setting in clone</p>
+            </td></tr><tr><td class='label'>with_identifier_input_method </td><td>
+            <p>Modifies identifier_input_method setting in clone</p>
+            </td></tr><tr><td class='label'>with_identifier_output_method </td><td>
+            <p>Modifies identifier_output_method setting in clone</p>
+            </td></tr></tbody></table>
+            
+            <p>Similarly, on Microsoft SQL Server, a with_mssql_unicode_strings method has
+            been added, which returns a clone with the mssql_unicode_strings setting
+            modified.</p>
+            </li><li>
+            <p>On DB2, <a href="../../../classes/Sequel.html">Sequel</a> now supports an
+            :offset_strategy Database option, which can be set to :limit_offset for
+            “LIMIT X OFFSET Y” or :offset_fetch for “OFFSET Y FETCH FIRST X ROWS ONLY”.
+            Depending on what version of DB2 is used and how DB2 is configured,
+            it&#39;s possible one of these strategies will work.  For backwards
+            compatibility, the current default is still to emulate offsets using the
+            ROW_NUMBER window function.</p>
+            </li><li>
+            <p>In the json_serializer plugin, you can now use an <a
+            href="../../../classes/Sequel/SQL/AliasedExpression.html">Sequel::SQL::AliasedExpression</a>
+            instance as an association name value, which allows you to rename the
+            association in the resulting JSON:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">album</span>.<span class="ruby-identifier">to_json</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>{<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">as</span>(:<span class="ruby-identifier">album</span>, :<span class="ruby-identifier">s</span>)=<span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">only=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">name</span>}})&#x000A;<span class="ruby-comment"># =&gt; &#39;{&quot;id&quot;:1,&quot;name&quot;:&quot;RF&quot;,&quot;artist_id&quot;:2,&quot;s&quot;:{&quot;name&quot;:&quot;YJM&quot;}}&#39;</span></pre>
+            </li></ul>
+            
+            <h1 id="label-Other+Improvements">Other Improvements<span><a href="#label-Other+Improvements">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>The association dataset methods now correctly handle cases where one of the
+            keys is nil.  Previously, they would incorrectly use an IS NULL predicate
+            in such cases.  Now, they use a false predicate.</p>
+            </li><li>
+            <p>The hook_class_methods plugin handling of commit hooks has been fixed.  The
+            implementation of commit hooks (but not rollback hooks) was broken in
+            hook_class_methods starting in 4.39.0 due to changes to avoid keeping
+            references to all model instances until the transaction was committed or
+            rolled back.</p>
+            </li><li>
+            <p>Using the Fixnum schema method no longer raises a warning on ruby 2.4+, as
+            it now uses the Integer class instead of the Fixnum constant.</p>
+            </li><li>
+            <p>The ado adapter has been greatly improved.  It now avoids memory leaks, has
+            much better type handling, and passes almost all specs. Note that the ado
+            adapter&#39;s behavior can change depending on the version of ruby in use,
+            try to use ruby 2.2+ for best compatibility.</p>
+            </li><li>
+            <p>Dataset#graph no longer mutates the receiver.  Previously, it set an empty
+            hash as the :graph option in the receiver, which was unintentional and not
+            desired.</p>
+            </li><li>
+            <p>Pure java exceptions that don&#39;t support the message= method are now
+            handled properly when reraising the exception on connection errors in the
+            jdbc adapter.</p>
+            </li></ul>
+            
+            <h1 id="label-Backwards+Compatibility">Backwards Compatibility<span><a href="#label-Backwards+Compatibility">&para;</a> <a href="#top">&uarr;</a></span></h1>
+            <ul><li>
+            <p>Support for using the Bignum constant as a generic type has been removed,
+            as was preannounced in the 4.36.0 release notes.  Users should switch to
+            using the :Bignum constant if they haven&#39;t already.</p>
+            </li><li>
+            <p>Users of the ado adapter may need to update their code now that the ado
+            adapter correctly handles most types.</p>
+            </li><li>
+            <p>The spec_*_w rake tasks in the repository now require ruby 2.4+ and use the
+            warning library for filtering warnings, instead of trying to filter
+            warnings with egrep.</p>
+            </li></ul>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

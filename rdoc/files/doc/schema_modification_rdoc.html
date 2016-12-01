@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-07-19 13:45:40 -0700</span>
+          <span class='datetime'>2016-11-22 08:26:57 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -65,7 +65,7 @@
             appropriate type for the given database.  So while you specified
             <code>String</code>, <a href="../../classes/Sequel.html">Sequel</a> will
             actually use <code>varchar</code> or <code>text</code> depending on the
-            underlying database.  Here&#39;s a list of all of ruby classes that <a
+            underlying database.  Here&#39;s a list of all ruby classes that <a
             href="../../classes/Sequel.html">Sequel</a> will convert to database types:</p>
             
             <pre class="ruby"><span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">columns_types</span>) <span class="ruby-keyword">do</span>       <span class="ruby-comment"># common database type used</span>&#x000A;  <span class="ruby-constant">Integer</span> :<span class="ruby-identifier">a0</span>                         <span class="ruby-comment"># integer</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a1</span>                          <span class="ruby-comment"># varchar(255)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a2</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">50</span>               <span class="ruby-comment"># varchar(50)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a3</span>, :<span class="ruby-identifier">fixed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>            <span class="ruby-comment"># char(255)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a4</span>, :<span class="ruby-identifier">fixed=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">50</span> <span class="ruby-comment"># char(50)</span>&#x000A;  <span class="ruby-constant">String</span> :<span class="ruby-identifier">a5</span>, :<span class="ruby-identifier">text=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>             <span class="ruby-comment"># text</span>&#x000A;  <span class="ruby-constant">File</span> :<span class="ruby-identifier">b</span>                             <span class="ruby-comment"># blob</span>&#x000A;  <span class="ruby-constant">Fixnum</span> :<span class="ruby-identifier">c</span>                           <span class="ruby-comment"># integer</span>&#x000A;  <span class="ruby-constant">Bignum</span> :<span class="ruby-identifier">d</span>                           <span class="ruby-comment"># bigint</span>&#x000A;  <span class="ruby-constant">Float</span> :<span class="ruby-identifier">e</span>                            <span class="ruby-comment"># double precision</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f</span>                       <span class="ruby-comment"># numeric</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f2</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">10</span>           <span class="ruby-comment"># numeric(10)</span>&#x000A;  <span class="ruby-constant">BigDecimal</span> :<span class="ruby-identifier">f3</span>, :<span class="ruby-identifier">size=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-value">10</span>, <span class="ruby-value">2</span>]      <span class="ruby-comment"># numeric(10, 2)</span>&#x000A;  <span class="ruby-constant">Date</span> :<span class="ruby-identifier">g</span>                             <span class="ruby-comment"># date</span>&#x000A;  <span class="ruby-constant">DateTime</span> :<span class="ruby-identifier">h</span>                         <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">i</span>                             <span class="ruby-comment"># timestamp</span>&#x000A;  <span class="ruby-constant">Time</span> :<span class="ruby-identifier">i2</span>, :<span class="ruby-identifier">only_time=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>          <span class="ruby-comment"># time</span>&#x000A;  <span class="ruby-constant">Numeric</span> :<span class="ruby-identifier">j</span>                          <span class="ruby-comment"># numeric</span>&#x000A;  <span class="ruby-constant">TrueClass</span> :<span class="ruby-identifier">k</span>                        <span class="ruby-comment"># boolean</span>&#x000A;  <span class="ruby-constant">FalseClass</span> :<span class="ruby-identifier">l</span>                       <span class="ruby-comment"># boolean</span>&#x000A;<span class="ruby-keyword">end</span></pre>
@@ -92,7 +92,7 @@
             <p>If you use a ruby class as the type, <a
             href="../../classes/Sequel.html">Sequel</a> will try to guess the
             appropriate type name for the database you are using.  If a symbol or
-            string as used as the type, it is used verbatim as the type name in SQL,
+            string is used as the type, it is used verbatim as the type name in SQL,
             with the exception of :Bignum.  Using the symbol :Bignum as a type will use
             the appropriate 64-bit integer type for the database you are using.</p>
             
@@ -129,7 +129,7 @@
             <h3 id="label-Other+methods">Other methods<span><a href="#label-Other+methods">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>In addition to the <code>column</code> method and other methods that create
-            columns, there are a other methods that can be used:</p>
+            columns, there are other methods that can be used:</p>
             
             <h4 id="label-primary_key"><code>primary_key</code><span><a href="#label-primary_key">&para;</a> <a href="#top">&uarr;</a></span></h4>
             
@@ -185,7 +185,7 @@
             table, at least on most databases.</p>
             </td></tr><tr><td class='label'>:on_delete </td><td>
             <p>Specify the behavior of this foreign key column when the row with the
-            primary key it references is deleted , can be :restrict, :cascade,
+            primary key it references is deleted, can be :restrict, :cascade,
             :set_null, or :set_default. You can also use a string, which is used
             literally.</p>
             </td></tr><tr><td class='label'>:on_update </td><td>
@@ -431,10 +431,10 @@
             
             <pre class="ruby"><span class="ruby-identifier">alter_table</span>(:<span class="ruby-identifier">albums</span>) <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">add_constraint</span>(:<span class="ruby-identifier">name_min_length</span>){<span class="ruby-identifier">char_length</span>(<span class="ruby-identifier">name</span>) <span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>There is no method to add an unnamed constraint, but you can pass nil as
-            the first argument of <code>add_constraint</code> to do so.  However,
-            it&#39;s not recommend to do that as it is difficult to drop such a
-            constraint.</p>
+            <p>There is no method to add an unnamed constraint, but you can pass
+            <code>nil</code> as the first argument of <code>add_constraint</code> to do
+            so.  However, it&#39;s not recommended to do that as it is difficult to
+            drop such a constraint.</p>
             
             <h3 id="label-add_unique_constraint"><code>add_unique_constraint</code><span><a href="#label-add_unique_constraint">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
@@ -578,7 +578,7 @@
             
             <p>is the same as:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">unless</span> <span class="ruby-identifier">table_exists?</span>(:<span class="ruby-identifier">artists</span>)&#x000A;  <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-keyword">end</span> &#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">unless</span> <span class="ruby-identifier">table_exists?</span>(:<span class="ruby-identifier">artists</span>)&#x000A;  <span class="ruby-identifier">create_table</span>(:<span class="ruby-identifier">artists</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">primary_key</span> :<span class="ruby-identifier">id</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Like <code>create_table!</code>, it should not be used inside migrations.</p>
             

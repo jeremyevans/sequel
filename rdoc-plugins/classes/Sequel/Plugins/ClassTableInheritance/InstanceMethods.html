@@ -41,6 +41,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-delete">delete</a></li>
+              <li><a href="#method-i-use_prepared_statements_for-3F">use_prepared_statements_for?</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -64,6 +65,23 @@
                     [show source]
                   </a>
                   <pre id='method-i-delete-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 309</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete</span>&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;can&#39;t delete frozen object&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">frozen?</span>&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">cti_models</span>.<span class="ruby-identifier">reverse_each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">m</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">cti_this</span>(<span class="ruby-identifier">m</span>).<span class="ruby-identifier">delete</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-use_prepared_statements_for-3F'>
+                <a name='method-i-use_prepared_statements_for-3F'></a>
+                <div class='synopsis'>
+                  <span class='name'>use_prepared_statements_for?</span>
+                  <span class='arguments'>(type)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Don&#39;t allow use of prepared statements.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-use_prepared_statements_for-3F-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-use_prepared_statements_for-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/class_table_inheritance.rb, line 318</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">use_prepared_statements_for?</span>(<span class="ruby-identifier">type</span>)&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
