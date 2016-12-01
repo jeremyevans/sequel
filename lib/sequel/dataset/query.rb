@@ -76,11 +76,12 @@ module Sequel
     def clone(opts = nil)
       c = super()
       if opts
-        c.instance_variable_set(:@opts, Hash[@opts].merge!(opts))
+        c_opts = c.instance_variable_set(:@opts, Hash[@opts].merge!(opts))
         c.instance_variable_set(:@columns, nil) if @columns && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
       else
-        c.instance_variable_set(:@opts, Hash[@opts])
+        c_opts = c.instance_variable_set(:@opts, Hash[@opts])
       end
+      c_opts.freeze if frozen?
       c
     end
 

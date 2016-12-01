@@ -51,9 +51,9 @@ module Sequel
 
     # Similar to #clone, but returns an unfrozen clone if the receiver is frozen.
     def dup
-      o = clone
-      o.instance_variable_set(:@frozen, false) if frozen?
-      o
+      c = clone
+      c.instance_variable_set(:@opts, Hash[c.opts])
+      c
     end
     
     # Yield a dataset for each server in the connection pool that is tied to that server.
@@ -76,13 +76,13 @@ module Sequel
 
     # Sets the frozen flag on the dataset, so you can't modify it. Returns the receiver.
     def freeze
-      @frozen = true
+      @opts.freeze
       self
     end
 
     # Whether the object is frozen.
     def frozen?
-      @frozen == true
+      @opts.frozen?
     end
    
     # Alias of +first_source_alias+
