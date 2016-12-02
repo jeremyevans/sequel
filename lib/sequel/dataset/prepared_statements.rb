@@ -41,7 +41,7 @@ module Sequel
       meths.each do |meth|
         mod.send(:define_method, :"#{meth}=") do |v|
           # :nocov:
-          Sequel.deprecate("Dataset##{meth}=", "The API has changed, and this value should now be passed in as an option via Dataset#clone.")
+          Sequel::Deprecation.deprecate("Dataset##{meth}=", "The API has changed, and this value should now be passed in as an option via Dataset#clone.")
           @opts[meth] = v
           # :nocov:
         end
