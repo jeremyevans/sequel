@@ -47,7 +47,7 @@ module Sequel
       if cols && cols.uniq.size != cols.size
         handle_duplicate_columns(cols)
       end
-      @columns = cols
+      super
     end
 
     private

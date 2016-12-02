@@ -69,20 +69,44 @@ module Sequel
       where(*cond, &block)
     end
     
-    # Returns a new clone of the dataset with the given options merged.
-    # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
-    # columns are deleted.  This method should generally not be called
-    # directly by user code.
-    def clone(opts = nil)
-      c = super()
-      if opts
-        c_opts = c.instance_variable_set(:@opts, Hash[@opts].merge!(opts))
-        c.instance_variable_set(:@columns, nil) if @columns && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
-      else
-        c_opts = c.instance_variable_set(:@opts, Hash[@opts])
+    # On Ruby 2.4+, use clone(:freeze=>false) to create clones, because
+    # we use true freezing in that case, and we need to modify the opts
+    # in the frozen copy.
+    #
+    # On Ruby <2.4, just use Object#clone directly, since we don't
+    # use true freezing as it isn't possible.
+    if TRUE_FREEZE
+      # Save original clone implementation, as some other methods need
+      # to call it internally.
+      alias _clone clone
+      private :_clone
+
+      # Returns a new clone of the dataset with the given options merged.
+      # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
+      # columns are deleted.  This method should generally not be called
+      # directly by user code.
+      def clone(opts = OPTS)
+        c = super(:freeze=>false)
+        c.opts.merge!(opts)
+        if (cols = @cache[:columns]) && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
+          c.cache.delete(:columns)
+        end
+        c.freeze if frozen?
+        c
       end
-      c_opts.freeze if frozen?
-      c
+    else
+      # :nocov:
+      # :nodoc:
+      def clone(opts = OPTS)
+        c = super()
+        c.opts.merge!(opts)
+        if (cols = @cache[:columns]) && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
+          c.cache.delete(:columns)
+        end
+        c.freeze if frozen?
+        c
+      end
+      # :nocov:
     end
 
     # Returns a copy of the dataset with the SQL DISTINCT clause. The DISTINCT
@@ -149,13 +173,25 @@ module Sequel
       exclude(*cond, &block)
     end
 
-    # Return a clone of the dataset loaded with the given dataset extensions.
-    # If no related extension file exists or the extension does not have
-    # specific support for Dataset objects, an Error will be raised.
-    def extension(*exts)
-      c = clone
-      c.send(:_extension!, exts)
-      c
+    if TRUE_FREEZE
+      # Return a clone of the dataset loaded with the given dataset extensions.
+      # If no related extension file exists or the extension does not have
+      # specific support for Dataset objects, an Error will be raised.
+      def extension(*a)
+        c = _clone(:freeze=>false)
+        c.send(:_extension!, a)
+        c.freeze if frozen?
+        c
+      end
+    else
+      # :nocov:
+      # :nodoc:
+      def extension(*exts)
+        c = clone
+        c.send(:_extension!, exts)
+        c
+      end
+      # :nocov:
     end
 
     # Alias for where.
@@ -1004,11 +1040,23 @@ module Sequel
       end
     end
     
-    # Return a clone of the dataset extended with the given modules.
-    def with_extend(*mods)
-      c = clone
-      c.extend(*mods)
-      c
+    if TRUE_FREEZE
+      # Return a clone of the dataset extended with the given modules.
+      def with_extend(*mods)
+        c = _clone(:freeze=>false)
+        c.extend(*mods)
+        c.freeze if frozen?
+        c
+      end
+    else
+      # :nocov:
+      # :nodoc:
+      def with_extend(*mods)
+        c = clone
+        c.extend(*mods)
+        c
+      end
+      # :nocov:
     end
 
     # Returns a cloned dataset with the given row_proc.

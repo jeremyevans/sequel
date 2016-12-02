@@ -835,7 +835,7 @@ module Sequel
         end
       end
       
-      # Set the @columns based on the result set, and return the array of
+      # Set the columns based on the result set, and return the array of
       # field numers, type conversion procs, and name symbol arrays.
       def fetch_rows_set_cols(res)
         cols = []

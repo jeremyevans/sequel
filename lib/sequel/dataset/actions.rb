@@ -17,6 +17,9 @@ module Sequel
       single_record single_record! single_value single_value! sum to_hash to_hash_groups truncate update
     METHS
 
+    # The clone options to use when retriveing columns for a dataset.
+    COLUMNS_CLONE_OPTIONS = {:distinct => nil, :limit => 1, :offset=>nil, :where=>nil, :having=>nil, :order=>nil, :row_proc=>nil, :graph=>nil, :eager_graph=>nil}.freeze
+
     # Inserts the given argument into the database.  Returns self so it
     # can be used safely when chaining:
     # 
@@ -68,11 +71,7 @@ module Sequel
     #   DB[:table].columns
     #   # => [:id, :name]
     def columns
-      return @columns if @columns
-      ds = unfiltered.unordered.naked.clone(:distinct => nil, :limit => 1, :offset=>nil)
-      ds.each{break}
-      @columns = ds.instance_variable_get(:@columns)
-      @columns || []
+      cache_get(:columns) || columns!
     end
         
     # Ignore any cached column information and perform a query to retrieve
@@ -81,8 +80,9 @@ module Sequel
     #   DB[:table].columns!
     #   # => [:id, :name]
     def columns!
-      self.columns = nil
-      columns
+      ds = clone(COLUMNS_CLONE_OPTIONS)
+      ds.each{break}
+      cache_set(:columns, ds.cache[:columns]) || []
     end
     
     # Returns the number of records in the dataset. If an argument is provided,

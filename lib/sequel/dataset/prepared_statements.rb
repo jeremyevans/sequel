@@ -75,10 +75,33 @@ module Sequel
       # Override the given *_sql method based on the type, and
       # cache the result of the sql.
       def prepared_sql
-        return @prepared_sql if @prepared_sql
-        @prepared_sql = super
-        @opts[:sql] = @prepared_sql
-        @prepared_sql
+        if sql = cache_get(:prepared_sql)
+          return sql
+        end
+        cache_set(:sql, super)
+      end
+
+      def clone(opts=OPTS)
+        c = super
+        c.cache[:prepared_args] = cache_get(:prepared_args)
+        c.cache[:sql] = cache_get(:sql)
+        c
+      end
+
+      def select_sql
+        cache_get(:sql) || super
+      end
+
+      def delete_sql
+        cache_get(:sql) || super
+      end
+
+      def insert_sql(*)
+        cache_get(:sql) || super
+      end
+
+      def update_sql(*)
+        cache_get(:sql) || super
       end
     end
 

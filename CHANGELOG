@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Dataset#freeze actually freeze the dataset on ruby 2.4+ (jeremyevans)
+
+* Avoid using instance variables other than @opts for dataset data storage (jeremyevans)
+
 * Add freeze_datasets extension, making all datasets for a given Database frozen (jeremyevans)
 
 * Refactor prepared statement internals, using opts instead of instance variables (jeremyevans)

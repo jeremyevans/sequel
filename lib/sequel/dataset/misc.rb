@@ -30,6 +30,7 @@ module Sequel
     def initialize(db)
       @db = db
       @opts = {}
+      @cache = {}
     end
 
     # Define a hash value such that datasets with the same DB, opts, and SQL
@@ -49,11 +50,19 @@ module Sequel
       self == o
     end
 
-    # Similar to #clone, but returns an unfrozen clone if the receiver is frozen.
-    def dup
-      c = clone
-      c.instance_variable_set(:@opts, Hash[c.opts])
-      c
+    if TRUE_FREEZE
+      # Similar to #clone, but returns an unfrozen clone if the receiver is frozen.
+      def dup
+        _clone(:freeze=>false)
+      end
+    else
+      # :nocov:
+      def dup
+        c = clone
+        c.instance_variable_set(:@opts, Hash[c.opts])
+        c
+      end
+      # :nocov:
     end
     
     # Yield a dataset for each server in the connection pool that is tied to that server.
@@ -74,15 +83,25 @@ module Sequel
       string.gsub(/[\\%_]/){|m| "\\#{m}"}
     end
 
-    # Sets the frozen flag on the dataset, so you can't modify it. Returns the receiver.
-    def freeze
-      @opts.freeze
-      self
-    end
+    if TRUE_FREEZE
+      # Freeze the opts when freezing the dataset.
+      def freeze
+        @opts.freeze
+        super
+      end
+    else
+      # :nocov:
+      # :nodoc:
+      def freeze
+        @opts.freeze
+        self
+      end
 
-    # Whether the object is frozen.
-    def frozen?
-      @opts.frozen?
+      # :nodoc:
+      def frozen?
+        @opts.frozen?
+      end
+      # :nocov:
     end
    
     # Alias of +first_source_alias+
@@ -261,7 +280,40 @@ module Sequel
       clone(:identifier_output_method=>meth)
     end
 
+    protected
+
+    # Access the cache for the current dataset.  Should be used with caution,
+    # as access to the cache is not thread safe without a mutex if other
+    # threads can reference the dataset.
+    attr_reader :cache
+
     private
+
+    # Retreive a value from the dataset's cache in a thread safe manner.
+    def cache_get(k)
+      Sequel.synchronize{@cache[k]}
+    end
+
+    # Set a value in the dataset's cache in a thread safe manner.
+    def cache_set(k, v)
+      Sequel.synchronize{@cache[k] = v}
+    end
+
+    # Set the columns for the current dataset.
+    def columns=(v)
+      cache_set(:columns, v)
+    end
+
+    # Set the db, opts, and cache for the copy of the dataset.
+    def initialize_copy(c)
+      @db = c.db
+      @opts = Hash[c.opts]
+      if cols = c.cache[:columns]
+        @cache = {:columns=>cols}
+      else
+        @cache = {}
+      end
+    end
 
     # Internal recursive version of unqualified_column_for, handling Strings inside
     # of other objects.

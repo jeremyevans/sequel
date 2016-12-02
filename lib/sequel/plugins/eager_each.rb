@@ -30,7 +30,7 @@ module Sequel
     module EagerEach 
       module DatasetMethods
         # Don't call #all when attempting to load the columns.
-        def columns
+        def columns!
           if use_eager_all?
             clone(:all_called=>true).columns
           else

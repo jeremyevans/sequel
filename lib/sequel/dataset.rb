@@ -27,6 +27,10 @@ module Sequel
   class Dataset
     OPTS = Sequel::OPTS
 
+    # Whether Dataset#freeze can actually freeze datasets.  True only on ruby 2.4+,
+    # as it requires clone(freeze: false)
+    TRUE_FREEZE = RUBY_VERSION >= '2.4'
+
     include Enumerable
     include SQL::AliasMethods
     include SQL::BooleanMethods
@@ -36,10 +40,6 @@ module Sequel
     include SQL::NumericMethods
     include SQL::OrderMethods
     include SQL::StringMethods
-
-    private
-
-    attr_writer :columns
   end
   
   require(%w"query actions features graph prepared_statements misc mutation sql placeholder_literalizer", 'dataset')
