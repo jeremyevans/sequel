@@ -166,7 +166,7 @@ describe "Sequel::Plugins::CsvSerializer" do
   it "should use a dataset's selected columns" do
     columns = [:id]
     ds = @Artist.select(*columns).limit(1)
-    ds.instance_variable_set(:@columns, columns)
+    ds.send(:columns=, columns)
     ds._fetch = [:id => 10]
     ds.to_csv(:write_headers => true).must_equal "id\n10\n"
   end

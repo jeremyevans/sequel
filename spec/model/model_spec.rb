@@ -977,12 +977,15 @@ describe "Model.db_schema" do
     def @db.schema(table, opts = {})
       raise Sequel::Error
     end
-    @dataset.instance_variable_set(:@columns, [:x, :y])
+    @dataset = @dataset.with_extend(Module.new do
+      def columns
+        [:x, :y]
+      end
+    end)
 
     @c.dataset = @dataset
     @c.db_schema.must_equal(:x=>{}, :y=>{})
     @c.columns.must_equal [:x, :y]
-    @c.dataset.instance_variable_get(:@columns).must_equal [:x, :y]
   end
 
   it "should use the database's schema and set the columns and dataset columns" do
@@ -992,7 +995,7 @@ describe "Model.db_schema" do
     @c.dataset = @dataset
     @c.db_schema.must_equal(:x=>{:type=>:integer}, :y=>{:type=>:string})
     @c.columns.must_equal [:x, :y]
-    @c.dataset.instance_variable_get(:@columns).must_equal [:x, :y]
+    @c.dataset.columns.must_equal [:x, :y]
   end
 
   it "should not restrict the schema for datasets with a :select option" do

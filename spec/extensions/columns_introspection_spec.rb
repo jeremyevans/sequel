@@ -10,7 +10,7 @@ describe "columns_introspection extension" do
   end
 
   it "should not issue a database query if the columns are already loaded" do
-    @ds.instance_variable_set(:@columns, [:x])
+    @ds.send(:columns=, [:x])
     @ds.columns.must_equal [:x]
     @db.sqls.length.must_equal 0
   end

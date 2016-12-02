@@ -5054,7 +5054,7 @@ describe "Dataset mutation methods" do
 
   it "should modify the dataset in place" do
     dsc = Sequel.mock[:u]
-    dsc.instance_variable_set(:@columns, [:v])
+    dsc.send(:columns=, [:v])
 
     m{and!(:a=>1).or!(:b=>2)}.must_equal "SELECT * FROM t WHERE ((a = 1) OR (b = 2))"
     m{select!(:f).graph!(dsc, :b=>:c).set_graph_aliases!(:e=>[:m, :n]).add_graph_aliases!(:d=>[:g, :c])}.must_equal "SELECT m.n AS e, g.c AS d FROM t LEFT OUTER JOIN u ON (u.b = t.c)"

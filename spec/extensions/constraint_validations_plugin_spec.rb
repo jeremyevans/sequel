@@ -19,9 +19,9 @@ describe "Sequel::Plugins::ConstraintValidations" do
     @db = Sequel.mock
     set_fetch({})
     @ds = @db[:items]
-    @ds.instance_variable_set(:@columns, [:name])
+    @ds.send(:columns=, [:name])
     @ds2 = Sequel.mock[:items2]
-    @ds2.instance_variable_set(:@columns, [:name])
+    @ds2.send(:columns=, [:name])
   end
 
   it "should load the validation_helpers plugin into the class" do

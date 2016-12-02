@@ -172,7 +172,7 @@ describe "Sequel::Plugins::StaticCache" do
 
     it "set_dataset should work correctly" do
       ds = @c.dataset.from(:t2)
-      ds.instance_variable_set(:@columns, [:id])
+      ds.send(:columns=, [:id])
       ds._fetch = {:id=>3}
       @c.dataset = ds
       @c.all.must_equal [@c.load(:id=>3)]
