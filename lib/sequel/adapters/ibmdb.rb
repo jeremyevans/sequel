@@ -309,9 +309,7 @@ module Sequel
       # boolean columns, and some smallint columns are
       # accidently treated as booleans.
       def metadata_dataset
-        ds = super
-        ds.convert_smallint_to_bool = false
-        ds
+        super.with_convert_smallint_to_bool(false)
       end
 
       # Format Numeric, Date, and Time types specially for use
@@ -376,14 +374,21 @@ module Sequel
           call(bind_arguments, &block)
       end
 
+      # Override the default IBMDB.convert_smallint_to_bool setting for this dataset.
+      def convert_smallint_to_bool=(v)
+        @opts[:convert_smallint_to_bool] = v
+      end
+
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the IBMDB module setting.
       def convert_smallint_to_bool
-        defined?(@convert_smallint_to_bool) ? @convert_smallint_to_bool : (@convert_smallint_to_bool = IBMDB.convert_smallint_to_bool)
+        opts.has_key?(:convert_smallint_to_bool) ? opts[:convert_smallint_to_bool] : IBMDB.convert_smallint_to_bool
       end
 
-      # Override the default IBMDB.convert_smallint_to_bool setting for this dataset.
-      attr_writer :convert_smallint_to_bool
+      # Return a cloned dataset with the convert_smallint_to_bool option set.
+      def with_convert_smallint_to_bool(v)
+        clone(:convert_smallint_to_bool=>v)
+      end
 
       # Fetch the rows from the database and yield plain hashes.
       def fetch_rows(sql)

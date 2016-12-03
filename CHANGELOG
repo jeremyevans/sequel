@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#with_convert_smallint_to_bool on DB2, returning a clone with convert_smallint_to_bool set (jeremyevans)
+
 * Make Dataset#freeze actually freeze the dataset on ruby 2.4+ (jeremyevans)
 
 * Avoid using instance variables other than @opts for dataset data storage (jeremyevans)
