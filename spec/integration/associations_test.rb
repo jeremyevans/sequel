@@ -14,9 +14,9 @@ OneToOneEagerLimitStrategies = shared_description do
     a.first.first_album.must_equal @album
     a.first.last_album.must_equal diff_album
     a.first.second_album.must_equal diff_album
-    a.last.first_album.must_equal nil
-    a.last.last_album.must_equal nil
-    a.last.second_album.must_equal nil
+    a.last.first_album.must_be_nil
+    a.last.last_album.must_be_nil
+    a.last.second_album.must_be_nil
 
     # Check that no extra columns got added by the eager loading
     a.first.first_album.values.must_equal @album.values
@@ -27,7 +27,7 @@ OneToOneEagerLimitStrategies = shared_description do
     a = Artist.eager(:first_album).order(:name).all
     a.must_equal [@artist, ar]
     [@album, same_album].must_include(a.first.first_album)
-    a.last.first_album.must_equal nil
+    a.last.first_album.must_be_nil
   end
 end
 
@@ -42,14 +42,14 @@ OneToOneEagerGraphLimitStrategies = shared_description do
     a = ds.eager_graph_with_options(:first_album, limit_strategy).all
     a.must_equal [@artist, ar]
     a.first.first_album.must_equal @album
-    a.last.first_album.must_equal nil
+    a.last.first_album.must_be_nil
     a.first.first_album.values.must_equal @album.values
 
     a = ds.eager_graph_with_options(:last_album, limit_strategy).all
     a = ds.eager_graph(:last_album).all
     a.must_equal [@artist, ar]
     a.first.last_album.must_equal diff_album
-    a.last.last_album.must_equal nil
+    a.last.last_album.must_be_nil
     a.first.last_album.values.must_equal diff_album.values
 
     if @els[:eager_limit_strategy] != :distinct_on && (@els[:eager_limit_strategy] != :correlated_subquery || Album.dataset.supports_offsets_in_correlated_subqueries?) 
@@ -57,7 +57,7 @@ OneToOneEagerGraphLimitStrategies = shared_description do
       a = ds.eager_graph(:second_album).all
       a.must_equal [@artist, ar]
       a.first.second_album.must_equal diff_album
-      a.last.second_album.must_equal nil
+      a.last.second_album.must_be_nil
       a.first.second_album.values.must_equal diff_album.values
     end
 
@@ -65,7 +65,7 @@ OneToOneEagerGraphLimitStrategies = shared_description do
     a = ds.eager_graph_with_options(:first_album, limit_strategy).all
     a.must_equal [@artist, ar]
     [@album, same_album].must_include(a.first.first_album)
-    a.last.first_album.must_equal nil
+    a.last.first_album.must_be_nil
   end
 end
 
@@ -149,9 +149,9 @@ OneThroughOneEagerLimitStrategies = shared_description do
     als.first.first_tag.must_equal @tag
     als.first.second_tag.must_equal tu
     als.first.last_tag.must_equal tv
-    als.last.first_tag.must_equal nil
-    als.last.second_tag.must_equal nil
-    als.last.last_tag.must_equal nil
+    als.last.first_tag.must_be_nil
+    als.last.second_tag.must_be_nil
+    als.last.last_tag.must_be_nil
     
     # Check that no extra columns got added by the eager loading
     als.first.first_tag.values.must_equal @tag.values
@@ -170,19 +170,19 @@ OneThroughOneEagerGraphLimitStrategies = shared_description do
     als = ds.eager_graph_with_options(:first_tag, limit_strategy).all
     als.must_equal [@album, al]
     als.first.first_tag.must_equal @tag
-    als.last.first_tag.must_equal nil
+    als.last.first_tag.must_be_nil
     als.first.first_tag.values.must_equal @tag.values
 
     als = ds.eager_graph_with_options(:second_tag, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
     als.must_equal [@album, al]
     als.first.second_tag.must_equal tu
-    als.last.second_tag.must_equal nil
+    als.last.second_tag.must_be_nil
     als.first.second_tag.values.must_equal tu.values
 
     als = ds.eager_graph_with_options(:last_tag, limit_strategy).all
     als.must_equal [@album, al]
     als.first.last_tag.must_equal tv
-    als.last.last_tag.must_equal nil
+    als.last.last_tag.must_be_nil
     als.first.last_tag.values.must_equal tv.values
   end
 end
@@ -333,7 +333,7 @@ OneThroughManyEagerLimitStrategies = shared_description do
     ars.first.second_tag.must_equal tu
     ars.first.last_tag.must_equal tv
     ars.last.first_tag.must_equal tu
-    ars.last.second_tag.must_equal nil
+    ars.last.second_tag.must_be_nil
     ars.last.last_tag.must_equal tu
     
     # Check that no extra columns got added by the eager loading
@@ -362,7 +362,7 @@ OneThroughManyEagerGraphLimitStrategies = shared_description do
     ars = ds.eager_graph_with_options(:second_tag, @els[:eager_limit_strategy] != :distinct_on ? limit_strategy : {}).all
     ars.must_equal [@artist, ar]
     ars.first.second_tag.must_equal tu
-    ars.last.second_tag.must_equal nil
+    ars.last.second_tag.must_be_nil
     ars.first.second_tag.values.must_equal tu.values
 
     ars = ds.eager_graph_with_options(:last_tag, limit_strategy).all
@@ -1495,10 +1495,10 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
   end
 
   it "should return no objects if none are associated" do
-    @album.artist.must_equal nil
-    @album.artist_dataset.first.must_equal nil
-    @artist.first_album.must_equal nil
-    @artist.first_album_dataset.first.must_equal nil
+    @album.artist.must_be_nil
+    @album.artist_dataset.first.must_be_nil
+    @artist.first_album.must_be_nil
+    @artist.first_album_dataset.first.must_be_nil
     @artist.albums.must_equal []
     @artist.albums_dataset.all.must_equal []
     @album.tags.must_equal []
@@ -1508,8 +1508,8 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
     @tag.albums.must_equal []
     @tag.albums_dataset.all.must_equal []
     unless @no_many_through_many
-      @album.first_tag.must_equal nil
-      @album.first_tag_dataset.first.must_equal nil
+      @album.first_tag.must_be_nil
+      @album.first_tag_dataset.first.must_be_nil
     end
   end
 
@@ -1518,13 +1518,13 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
     @album.update(:artist => @artist)
     @album.reload.artist.must_equal @artist
     @album.update(:artist => nil)
-    @album.reload.artist.must_equal nil
+    @album.reload.artist.must_be_nil
 
     # one to one
     @artist.update(:first_album => @album)
     @artist.reload.first_album.must_equal @album
     @artist.update(:first_album => nil)
-    @artist.reload.first_album.must_equal nil
+    @artist.reload.first_album.must_be_nil
 
     unless @no_many_through_many
       tag = @pr.call.last
@@ -1536,15 +1536,15 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
       @album.update(:first_tag => tag)
       @album.reload.first_tag.must_equal tag
       @album.update(:first_tag => nil)
-      @album.reload.first_tag.must_equal nil
+      @album.reload.first_tag.must_be_nil
       @album.update(:first_tag => nil)
-      @album.reload.first_tag.must_equal nil
+      @album.reload.first_tag.must_be_nil
 
       # one through one with alias
       @album.update(:alias_t_tag => @tag)
       @album.reload.alias_t_tag.must_equal @tag
       @album.update(:alias_t_tag => nil)
-      @album.reload.alias_t_tag.must_equal nil
+      @album.reload.alias_t_tag.must_be_nil
     end
   end
 
@@ -2041,12 +2041,12 @@ describe "Sequel::Model Simple Associations" do
     @artist.albums(proc{|ds| ds.filter(:id=>@album.id)}).must_equal [@album]
 
     @album.artist.must_equal @artist
-    @album.artist(proc{|ds| ds.exclude(:id=>@artist.id)}).must_equal nil
+    @album.artist(proc{|ds| ds.exclude(:id=>@artist.id)}).must_be_nil
     @album.artist(proc{|ds| ds.filter(:id=>@artist.id)}).must_equal @artist
 
     @artist.albums{|ds| ds.exclude(:id=>@album.id)}.must_equal []
     @artist.albums{|ds| ds.filter(:id=>@album.id)}.must_equal [@album]
-    @album.artist{|ds| ds.exclude(:id=>@artist.id)}.must_equal nil
+    @album.artist{|ds| ds.exclude(:id=>@artist.id)}.must_be_nil
     @album.artist{|ds| ds.filter(:id=>@artist.id)}.must_equal @artist
   end
   
@@ -2082,8 +2082,8 @@ describe "Sequel::Model Simple Associations" do
     Album.many_to_many :tags, :right_key=>:tag_id, :select=>[Sequel.expr(:tags).*, Sequel[:albums_tags][:tag_id].as(:atid)], :dataset_associations_join=>true
     Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel.expr(:tags).*, Sequel[:albums_tags][:tag_id].as(:atid), Sequel[:albums][:artist_id].as(:aid)], :dataset_associations_join=>true
 
-    Album.tags.order(Sequel[:tags][:name]).first.must_equal nil
-    Artist.tags.order(Sequel[:tags][:name]).first.must_equal nil
+    Album.tags.order(Sequel[:tags][:name]).first.must_be_nil
+    Artist.tags.order(Sequel[:tags][:name]).first.must_be_nil
 
     @album.add_tag(@tag)
     @artist.add_album(@album)

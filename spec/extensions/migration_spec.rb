@@ -54,8 +54,8 @@ describe "Migration.apply" do
 
   it "should have default up and down actions that do nothing" do
     m = Class.new(Sequel::Migration)
-    m.apply(@db, :up).must_equal nil
-    m.apply(@db, :down).must_equal nil
+    m.apply(@db, :up).must_be_nil
+    m.apply(@db, :down).must_be_nil
   end
 
   it "should respond to the methods the database responds to" do
@@ -89,8 +89,8 @@ describe "SimpleMigration#apply" do
 
   it "should have default up and down actions that do nothing" do
     m = Sequel.migration{}
-    m.apply(@db, :up).must_equal nil
-    m.apply(@db, :down).must_equal nil
+    m.apply(@db, :up).must_be_nil
+    m.apply(@db, :down).must_be_nil
   end
 end
 
@@ -739,9 +739,9 @@ describe "Sequel::TimestampMigrator" do
 
   it "should return nil" do
     @dir = 'spec/files/timestamped_migrations'
-    @m.apply(@db, @dir, 1273253850).must_equal nil
-    @m.apply(@db, @dir, 0).must_equal nil
-    @m.apply(@db, @dir).must_equal nil
+    @m.apply(@db, @dir, 1273253850).must_be_nil
+    @m.apply(@db, @dir, 0).must_be_nil
+    @m.apply(@db, @dir).must_be_nil
   end
 
   it "should use TimestampMigrator if TimestampMigrator.apply is called even for integer migrations directory" do

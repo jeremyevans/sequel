@@ -543,7 +543,7 @@ describe "A SQLite database" do
       @db.drop_column :test3, :value
 
       @db[:test].filter(:name => 'bar').delete
-      @db[:test3][:name => 'def'][:test_id].must_equal nil
+      @db[:test3][:name => 'def'][:test_id].must_be_nil
 
       @db[:test].filter(:name => 'foo').update(:id=>100)
       @db[:test3][:name => 'abc'][:test_id].must_equal 100
@@ -679,7 +679,7 @@ describe "A SQLite database" do
       sqls.last.must_equal Sequel::Database::SQL_BEGIN
     end
 
-    @db.transaction_mode.must_equal nil
+    @db.transaction_mode.must_be_nil
     @db.transaction_mode = :immediate
     @db.transaction_mode.must_equal :immediate
     @db.transaction do

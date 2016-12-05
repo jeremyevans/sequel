@@ -78,7 +78,7 @@ describe Sequel::Model, "class dataset methods"  do
     @db.sqls.must_equal ["SELECT min(id) AS min FROM items LIMIT 1"]
     @c.multi_insert([{:id=>1}])
     @db.sqls.must_equal ["BEGIN", "INSERT INTO items (id) VALUES (1)", "COMMIT"]
-    @c.naked.row_proc.must_equal nil
+    @c.naked.row_proc.must_be_nil
     @c.natural_full_join(@c).sql.must_equal "SELECT * FROM items NATURAL FULL JOIN items"
     @c.natural_join(@c).sql.must_equal "SELECT * FROM items NATURAL JOIN items"
     @c.natural_left_join(@c).sql.must_equal "SELECT * FROM items NATURAL LEFT JOIN items"
@@ -145,6 +145,6 @@ describe Sequel::Model, "class dataset methods"  do
     sc.unordered.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a LIMIT 2'
     sc.unlimited.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a ORDER BY a'
     sc.dataset.graph!(:a)
-    sc.dataset.ungraphed.opts[:graph].must_equal nil
+    sc.dataset.ungraphed.opts[:graph].must_be_nil
   end
 end

@@ -3,10 +3,10 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 mod = shared_description do
   it "should take action depending on :on_duplicate_columns if 2 or more columns have the same name" do
     check(nil, @cols)
-    @warned.must_equal nil
+    @warned.must_be_nil
 
     check(:ignore, @cols)
-    @warned.must_equal nil
+    @warned.must_be_nil
 
     check(:warn, @cols)
     @warned.must_equal("One or more duplicate columns present in #{@cols.inspect}")
@@ -15,12 +15,12 @@ mod = shared_description do
 
     cols = nil
     check(proc{|cs| cols = cs; nil}, @cols)
-    @warned.must_equal nil
+    @warned.must_be_nil
     cols.must_equal @cols
 
     cols = nil
     check(proc{|cs| cols = cs; :ignore}, @cols)
-    @warned.must_equal nil
+    @warned.must_be_nil
     cols.must_equal @cols
 
     cols = nil
@@ -33,13 +33,13 @@ mod = shared_description do
     cols.must_equal @cols
 
     check(:raise, nil)
-    @warned.must_equal nil
+    @warned.must_be_nil
   end
 
   it "should not raise error or warning if no columns have the same name" do
     [nil, :ignore, :raise, :warn, proc{|cs| :raise}].each do |handler|
       check(handler, @cols.uniq)
-      @warned.must_equal nil
+      @warned.must_be_nil
     end
   end
 end
@@ -105,6 +105,6 @@ describe "Sequel::DuplicateColumnsHandler Dataset configuration" do
     @ds.db.opts[:on_duplicate_columns] = :raise
     proc{@ds.send(:columns=, @cols)}.must_raise(Sequel::DuplicateColumnError)
     check(:ignore, @cols)
-    @warned.must_equal nil
+    @warned.must_be_nil
   end
 end

@@ -1242,7 +1242,7 @@ describe "Sequel.delay" do
 
   it "should delay calling the block until literalization" do
     ds = Sequel.mock[:b].where(:a=>Sequel.delay{@o.a})
-    @o._a.must_equal nil
+    @o._a.must_be_nil
     ds.sql.must_equal "SELECT * FROM b WHERE (a = 1)"
     @o._a.must_equal 1
     ds.sql.must_equal "SELECT * FROM b WHERE (a = 2)"

@@ -419,7 +419,7 @@ describe Sequel::Model, "many_through_many" do
   it "should populate cache when accessed" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
-    n.associations[:tags].must_equal nil
+    n.associations[:tags].must_be_nil
     DB.sqls.must_equal []
     n.tags.must_equal [@c2.load(:id=>1)]
     DB.sqls.must_equal ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id = 1234)']
@@ -514,7 +514,7 @@ describe 'Sequel::Plugins::ManyThroughMany::ManyThroughManyAssociationReflection
   end
   
   it "#reciprocal should be nil" do
-    @ar.reciprocal.must_equal nil
+    @ar.reciprocal.must_be_nil
   end
 end
 
@@ -1562,7 +1562,7 @@ describe Sequel::Model, "one_through_many" do
   it "should populate cache when accessed" do
     @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
-    n.associations[:tag].must_equal nil
+    n.associations[:tag].must_be_nil
     DB.sqls.must_equal []
     n.tag.must_equal @c2.load(:id=>1)
     DB.sqls.must_equal ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id = 1234) LIMIT 1']
@@ -1574,7 +1574,7 @@ describe Sequel::Model, "one_through_many" do
     @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
     n.associations[:tag] = nil
-    n.tag.must_equal nil
+    n.tag.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -2042,7 +2042,7 @@ describe "one_through_many eager loading methods" do
     a = ds.all
     a.must_equal [@c1.load(:id=>1)]
     DB.sqls.must_equal ['SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id)']
-    a.first.tag.must_equal nil
+    a.first.tag.must_be_nil
     DB.sqls.length.must_equal 0
   end
 
@@ -2054,8 +2054,8 @@ describe "one_through_many eager loading methods" do
     DB.sqls.must_equal ['SELECT artists.id, tag.id AS tag_id, album.id AS album_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id) LEFT OUTER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) LEFT OUTER JOIN albums AS album ON (album.id = albums_artists_0.album_id)']
     a.first.tag.must_equal Tag.load(:id=>5)
     a.first.album.must_equal Album.load(:id=>6)
-    a.last.tag.must_equal nil
-    a.last.album.must_equal nil
+    a.last.tag.must_be_nil
+    a.last.album.must_be_nil
     DB.sqls.length.must_equal 0
   end
 
@@ -2065,10 +2065,10 @@ describe "one_through_many eager loading methods" do
     a = ds.all
     a.must_equal [@c1.load(:id=>1), @c1.load(:id=>2)]
     DB.sqls.must_equal ['SELECT artists.id, tag.id AS tag_id, track.id AS track_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id) LEFT OUTER JOIN albums_tags AS albums_tags_0 ON (albums_tags_0.tag_id = tag.id) LEFT OUTER JOIN albums AS albums_0 ON (albums_0.id = albums_tags_0.album_id) LEFT OUTER JOIN tracks AS track ON (track.album_id = albums_0.id)']
-    a.last.tag.must_equal nil
+    a.last.tag.must_be_nil
     a = a.first
     a.tag.must_equal Tag.load(:id=>2)
-    a.tag.track.must_equal nil
+    a.tag.track.must_be_nil
     DB.sqls.length.must_equal 0
   end
 

@@ -309,7 +309,7 @@ describe "Model#save" do
       false
     end
     DB.transaction do
-      o.save(:columns=>:y).must_equal nil
+      o.save(:columns=>:y).must_be_nil
       DB.run "BLAH"
     end
     DB.sqls.must_equal ["BEGIN", "BLAH", "COMMIT"]
@@ -322,7 +322,7 @@ describe "Model#save" do
     def o.before_save
       false
     end
-    o.save(:columns=>:y).must_equal nil
+    o.save(:columns=>:y).must_be_nil
     DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
 
@@ -820,7 +820,7 @@ end
 
 describe Sequel::Model, "without a primary key" do
   it "should return nil for primary key" do
-    Class.new(Sequel::Model){no_primary_key}.primary_key.must_equal nil
+    Class.new(Sequel::Model){no_primary_key}.primary_key.must_be_nil
   end
 
   it "should raise a Sequel::Error on 'this'" do
@@ -1304,9 +1304,9 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
   end
 
   it "#set_all should set not set restricted fields" do
-    @o1.use_after_commit_rollback.must_equal nil
+    @o1.use_after_commit_rollback.must_be_nil
     @o1.set_all(:x => 1, :use_after_commit_rollback => true)
-    @o1.use_after_commit_rollback.must_equal nil
+    @o1.use_after_commit_rollback.must_be_nil
     @o1.values.must_equal(:x => 1)
   end
 
@@ -1795,7 +1795,7 @@ describe Sequel::Model, "typecasting" do
       @c.db_schema = {:x=>{:type=>x}}
       m = @c.new
       m.x = ''
-      m.x.must_equal nil
+      m.x.must_be_nil
     end
    [:string, :blob].each do |x|
       @c.db_schema = {:x=>{:type=>x}}
@@ -1826,7 +1826,7 @@ describe Sequel::Model, "typecasting" do
     @c.db_schema[:x][:allow_null] = true
     m = @c.new
     m.x = nil
-    m.x.must_equal nil
+    m.x.must_be_nil
   end
 
   it "should raise an error if attempting to typecast nil and NULLs are not allowed" do
@@ -1840,7 +1840,7 @@ describe Sequel::Model, "typecasting" do
     @c.db_schema[:x][:allow_null] = false
     m = @c.new
     m.x = nil
-    m.x.must_equal nil
+    m.x.must_be_nil
   end
 
   it "should not raise when typecasting nil to NOT NULL column but raise_on_typecast_failure is off" do
@@ -1848,9 +1848,9 @@ describe Sequel::Model, "typecasting" do
     @c.typecast_on_assignment = true
     m = @c.new
     m.x = ''
-    m.x.must_equal nil
+    m.x.must_be_nil
     m.x = nil
-    m.x.must_equal nil
+    m.x.must_be_nil
   end
 
   it "should raise an error if invalid data is used in an integer field" do
@@ -1950,11 +1950,11 @@ describe Sequel::Model, "typecasting" do
     m.x = true
     m.x.must_equal true
     m.x = nil
-    m.x.must_equal nil
+    m.x.must_be_nil
     m.x = ''
-    m.x.must_equal nil
+    m.x.must_be_nil
     m.x = []
-    m.x.must_equal nil
+    m.x.must_be_nil
     m.x = 'f'
     m.x.must_equal false
     m.x = 'F'

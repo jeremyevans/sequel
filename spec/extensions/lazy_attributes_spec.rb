@@ -108,7 +108,7 @@ describe "Sequel::Plugins::LazyAttributes" do
   it "should not lazily load the attribute for a single model object if it is a new record" do
     m = @c.new
     m.values.must_equal({})
-    m.name.must_equal nil
+    m.name.must_be_nil
     @db.sqls.must_equal []
   end
 

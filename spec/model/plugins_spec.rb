@@ -291,7 +291,7 @@ describe Sequel::Plugins do
       end
     end
     @c.plugin m
-    @c.dataset.opts[:foo].must_equal nil
+    @c.dataset.opts[:foo].must_be_nil
     @c.set_dataset :blah
     @c.dataset.opts[:foo].must_equal 1
   end

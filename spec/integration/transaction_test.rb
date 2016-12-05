@@ -40,7 +40,7 @@ describe "Database transactions" do
     @db.transaction do
       @d << {:name => 'abc', :value => 1}
       raise Sequel::Rollback
-    end.must_equal nil
+    end.must_be_nil
 
     proc do
       @db.transaction(:rollback=>:reraise) do
@@ -235,30 +235,30 @@ describe "Database transactions" do
   it "should support after_rollback outside transactions" do
     c = nil
     @db.after_rollback{c = 1}
-    c.must_equal nil
+    c.must_be_nil
   end
 
   it "should support after_commit inside transactions" do
     c = nil
-    @db.transaction{@db.after_commit{c = 1}; c.must_equal nil}
+    @db.transaction{@db.after_commit{c = 1}; c.must_be_nil}
     c.must_equal 1
   end
 
   it "should support after_rollback inside transactions" do
     c = nil
-    @db.transaction{@db.after_rollback{c = 1}; c.must_equal nil}
-    c.must_equal nil
+    @db.transaction{@db.after_rollback{c = 1}; c.must_be_nil}
+    c.must_be_nil
   end
 
   it "should not call after_commit if the transaction rolls back" do
     c = nil
-    @db.transaction{@db.after_commit{c = 1}; c.must_equal nil; raise Sequel::Rollback}
-    c.must_equal nil
+    @db.transaction{@db.after_commit{c = 1}; c.must_be_nil; raise Sequel::Rollback}
+    c.must_be_nil
   end
 
   it "should call after_rollback if the transaction rolls back" do
     c = nil
-    @db.transaction{@db.after_rollback{c = 1}; c.must_equal nil; raise Sequel::Rollback}
+    @db.transaction{@db.after_rollback{c = 1}; c.must_be_nil; raise Sequel::Rollback}
     c.must_equal 1
   end
 
@@ -276,26 +276,26 @@ describe "Database transactions" do
 
   it "should support after_commit inside nested transactions" do
     c = nil
-    @db.transaction{@db.transaction{@db.after_commit{c = 1}}; c.must_equal nil}
+    @db.transaction{@db.transaction{@db.after_commit{c = 1}}; c.must_be_nil}
     c.must_equal 1
   end
 
   it "should support after_rollback inside nested transactions" do
     c = nil
-    @db.transaction{@db.transaction{@db.after_rollback{c = 1}}; c.must_equal nil; raise Sequel::Rollback}
+    @db.transaction{@db.transaction{@db.after_rollback{c = 1}}; c.must_be_nil; raise Sequel::Rollback}
     c.must_equal 1
   end
 
   if DB.supports_savepoints?
     it "should support after_commit inside savepoints" do
       c = nil
-      @db.transaction{@db.transaction(:savepoint=>true){@db.after_commit{c = 1}}; c.must_equal nil}
+      @db.transaction{@db.transaction(:savepoint=>true){@db.after_commit{c = 1}}; c.must_be_nil}
       c.must_equal 1
     end
 
     it "should support after_rollback inside savepoints" do
       c = nil
-      @db.transaction{@db.transaction(:savepoint=>true){@db.after_rollback{c = 1}}; c.must_equal nil; raise Sequel::Rollback}
+      @db.transaction{@db.transaction(:savepoint=>true){@db.after_rollback{c = 1}}; c.must_be_nil; raise Sequel::Rollback}
       c.must_equal 1
     end
   end

@@ -152,8 +152,8 @@ describe Sequel::Model, "#eager" do
     a = EagerAlbum.eager(:band).all
     DB.sqls.must_equal ['SELECT * FROM albums']
     a.must_equal [EagerAlbum.load(:id => 1, :band_id => nil)]
-    a.first.associations.fetch(:band).must_equal nil
-    a.first.band.must_equal nil
+    a.first.associations.fetch(:band).must_be_nil
+    a.first.band.must_be_nil
     DB.sqls.must_equal []
   end
   
@@ -430,7 +430,7 @@ describe Sequel::Model, "#eager" do
     ds = EagerAlbum.eager(:sgenres)
     ds.all
     eo[:key_hash].must_equal({})
-    eo[:id_map].must_equal nil
+    eo[:id_map].must_be_nil
   end
   
   it "should correctly handle a :select=>[] option to many_to_many" do
@@ -652,8 +652,8 @@ describe Sequel::Model, "#eager" do
     a = EagerAlbum.eager(:band).filter(:id=>101).all
     a.must_equal [EagerAlbum.load(:id => 101, :band_id => 101)]
     DB.sqls.must_equal ['SELECT * FROM albums WHERE (id = 101)', 'SELECT * FROM bands WHERE (bands.id IN (101))']
-    a.first.associations.fetch(:band, 2).must_equal nil
-    a.first.band.must_equal nil
+    a.first.associations.fetch(:band, 2).must_be_nil
+    a.first.band.must_be_nil
     DB.sqls.must_equal []
   end
   
@@ -1671,7 +1671,7 @@ describe Sequel::Model, "#eager_graph" do
     ds._fetch = {:id=>1, :band_id=>2, :band_id_0=>nil, :vocalist_id=>nil}
     a = ds.all
     a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
-    a.first.band.must_equal nil
+    a.first.band.must_be_nil
   end
 
   it "should handle no associated records for a single one_to_one association" do
@@ -1680,7 +1680,7 @@ describe Sequel::Model, "#eager_graph" do
     ds._fetch = {:id=>1, :band_id=>2, :track_id=>nil, :album_id=>nil}
     a = ds.all
     a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
-    a.first.track.must_equal nil
+    a.first.track.must_be_nil
   end
 
   it "should handle no associated records for a single one_to_many association" do
@@ -1698,7 +1698,7 @@ describe Sequel::Model, "#eager_graph" do
     ds._fetch = {:id=>1, :band_id=>2, :genres_id=>nil}
     a = ds.all
     a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
-    a.first.genre.must_equal nil
+    a.first.genre.must_be_nil
   end
 
   it "should handle no associated records for a single many_to_many association" do
@@ -1721,7 +1721,7 @@ describe Sequel::Model, "#eager_graph" do
     a.must_equal [GraphAlbum.load(:id => 1, :band_id => 2)]
     a = a.first
     a.tracks.must_equal [GraphTrack.load(:id => 3, :album_id => 1), GraphTrack.load(:id => 4, :album_id => 1), GraphTrack.load(:id => 5, :album_id => 1), GraphTrack.load(:id => 6, :album_id => 1)]
-    a.band.must_equal nil
+    a.band.must_be_nil
     a.genres.must_equal []
   end
 

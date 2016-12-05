@@ -45,7 +45,7 @@ describe "Sequel::Plugins::DelayAddAssociation" do
     @c.send(:define_method, :validate){|*| errors.add(:name, 'is b') if name == 'b'}
     @o = @c.new(:name=>'a')
     @o.add_c(@c.load(:id=>2, :name=>'b'))
-    @o.save.must_equal nil
+    @o.save.must_be_nil
     @o.errors[:cs].must_equal ["name is b"]
     @o.cs.first.errors[:name].must_equal ['is b']
   end

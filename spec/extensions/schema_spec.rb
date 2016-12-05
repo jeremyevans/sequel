@@ -67,9 +67,9 @@ describe Sequel::Model, "create_table and schema" do
   it "should return nil if no schema is present" do
     @model = Class.new(Sequel::Model)
     @model.plugin :schema
-    @model.schema.must_equal nil
+    @model.schema.must_be_nil
     @submodel = Class.new(@model)
-    @submodel.schema.must_equal nil
+    @submodel.schema.must_be_nil
   end
 end
 

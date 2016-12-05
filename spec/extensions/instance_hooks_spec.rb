@@ -28,10 +28,10 @@ describe "InstanceHooks plugin" do
     @o.after_create_hook{r 1}
     @o.before_create_hook{r false}
     @o.before_create_hook{r 4}
-    @o.save.must_equal nil
+    @o.save.must_be_nil
     @r.must_equal [4, false]
     @r.clear
-    @o.save.must_equal nil
+    @o.save.must_be_nil
     @r.must_equal [4, false]
   end
 
@@ -50,10 +50,10 @@ describe "InstanceHooks plugin" do
     @x.after_update_hook{r 1}
     @x.before_update_hook{r false}
     @x.before_update_hook{r 4}
-    @x.save.must_equal nil
+    @x.save.must_be_nil
     @r.must_equal [4, false]
     @r.clear
-    @x.save.must_equal nil
+    @x.save.must_be_nil
     @r.must_equal [4, false]
   end
 
@@ -80,17 +80,17 @@ describe "InstanceHooks plugin" do
     @x.after_save_hook{r 1}
     @x.before_save_hook{r false}
     @x.before_save_hook{r 4}
-    @x.save.must_equal nil
+    @x.save.must_be_nil
     @r.must_equal [4, false]
     @r.clear
     
     @x.after_save_hook{r 1}
     @x.before_save_hook{r false}
     @x.before_save_hook{r 4}
-    @x.save.must_equal nil
+    @x.save.must_be_nil
     @r.must_equal [4, false]
     @r.clear
-    @x.save.must_equal nil
+    @x.save.must_be_nil
     @r.must_equal [4, false]
   end
 
@@ -107,7 +107,7 @@ describe "InstanceHooks plugin" do
     @x.after_destroy_hook{r 1}
     @x.before_destroy_hook{r false}
     @x.before_destroy_hook{r 4}
-    @x.destroy.must_equal nil
+    @x.destroy.must_be_nil
     @r.must_equal [4, false]
   end
 
@@ -180,9 +180,9 @@ describe "InstanceHooks plugin" do
   it "should not clear validations hooks on successful save" do
     @x.after_validation_hook{@x.errors.add(:id, 'a') if @x.id == 1; r 1}
     @x.before_validation_hook{r 2}
-    @x.save.must_equal nil
+    @x.save.must_be_nil
     @r.must_equal [2, 1]
-    @x.save.must_equal nil
+    @x.save.must_be_nil
     @r.must_equal [2, 1, 2, 1]
     @x.id = 2
     @x.save.must_equal @x
@@ -237,7 +237,7 @@ describe "InstanceHooks plugin with transactions" do
   it "should support after_rollback_hook" do
     @or.after_rollback_hook{@db.execute('ar1')}
     @or.after_rollback_hook{@db.execute('ar2')}
-    @or.save.must_equal nil
+    @or.save.must_be_nil
     @db.sqls.must_equal ['BEGIN', 'as', 'ROLLBACK', 'ar1', 'ar2']
   end
   
@@ -251,7 +251,7 @@ describe "InstanceHooks plugin with transactions" do
   it "should support after_rollback_hook" do
     @or.after_destroy_rollback_hook{@db.execute('adr1')}
     @or.after_destroy_rollback_hook{@db.execute('adr2')}
-    @or.destroy.must_equal nil
+    @or.destroy.must_be_nil
     @db.sqls.must_equal ['BEGIN', "DELETE FROM items WHERE (id = 1)", 'ad', 'ROLLBACK', 'adr1', 'adr2']
   end
 

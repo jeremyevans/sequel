@@ -50,7 +50,7 @@ describe Sequel::Model, ".restricted_columns " do
   end
   
   it "should set the restricted columns correctly" do
-    @c.restricted_columns.must_equal nil
+    @c.restricted_columns.must_be_nil
     @c.set_restricted_columns :x
     @c.restricted_columns.must_equal [:x]
     @c.set_restricted_columns :x, :y

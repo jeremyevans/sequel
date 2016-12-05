@@ -78,7 +78,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:parent].must_equal @c.load(:id=>1, :name=>'A', :parent_id=>3)
     @o.associations[:parent].associations[:parent].must_equal @c.load(:id=>3, :name=>'?', :parent_id=>4)
     @o.associations[:parent].associations[:parent].associations[:parent].must_equal @c.load(:id=>4, :name=>'B', :parent_id=>nil)
-    @o.associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+    @o.associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_be_nil
   end
   
   it "should add all parent associations when lazily loading ancestors and giving options" do
@@ -88,7 +88,7 @@ describe Sequel::Model, "rcte_tree" do
     @o.associations[:p].must_equal @c.load(:i=>4, :name=>'A', :pi=>5)
     @o.associations[:p].associations[:p].must_equal @c.load(:i=>5, :name=>'?', :pi=>6)
     @o.associations[:p].associations[:p].associations[:p].must_equal @c.load(:i=>6, :name=>'B', :pi=>nil)
-    @o.associations[:p].associations[:p].associations[:p].associations.fetch(:p, 1).must_equal nil
+    @o.associations[:p].associations[:p].associations[:p].associations.fetch(:p, 1).must_be_nil
   end
   
   it "should add all parent and children associations when lazily loading descendants" do
@@ -315,7 +315,7 @@ describe Sequel::Model, "rcte_tree with composite keys" do
     @o.associations[:parent].must_equal @c.load(:id=>1, :id2=>6, :name=>'A', :parent_id=>3, :parent_id2=>5)
     @o.associations[:parent].associations[:parent].must_equal @c.load(:id=>3, :id2=>5, :name=>'?', :parent_id=>4, :parent_id2=>8)
     @o.associations[:parent].associations[:parent].associations[:parent].must_equal @c.load(:id=>4, :id2=>8, :name=>'B', :parent_id=>nil, :parent_id2=>nil)
-    @o.associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+    @o.associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_be_nil
   end
   
   it "should add all children associations when lazily loading descendants" do

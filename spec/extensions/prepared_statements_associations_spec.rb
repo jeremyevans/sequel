@@ -86,7 +86,7 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
 
   it "should not run query if no objects can be associated" do
     @Artist.new.albums.must_equal []
-    @Album.new.artist.must_equal nil
+    @Album.new.artist.must_be_nil
     @db.sqls.must_equal []
   end
 

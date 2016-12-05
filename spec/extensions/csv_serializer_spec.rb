@@ -95,7 +95,7 @@ describe "Sequel::Plugins::CsvSerializer" do
 
     @album = @Album.from_csv('2,AS', :headers=>[nil, 'name'])
     @album.name.must_equal 'AS'
-    @album.artist_id.must_equal nil
+    @album.artist_id.must_be_nil
   end
 
   it "#from_csv should support :headers to specify headers" do

@@ -597,7 +597,7 @@ describe "A MySQL database" do
     @db[:items].first.must_equal(:name => 'tutu', :value => 1234)
 
     @db << 'DELETE FROM items'
-    @db[:items].first.must_equal nil
+    @db[:items].first.must_be_nil
   end
 end  
 
@@ -1208,13 +1208,13 @@ if DB.adapter_scheme == :mysql
 
     it "should not use a nil value bad date/time is used and convert_invalid_date_time is nil or :nil" do
       DB.convert_invalid_date_time = nil
-      DB["SELECT CAST('0000-00-00' AS date)"].single_value.must_equal nil
-      DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.must_equal nil
-      DB["SELECT CAST('25:00:00' AS time)"].single_value.must_equal nil
+      DB["SELECT CAST('0000-00-00' AS date)"].single_value.must_be_nil
+      DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.must_be_nil
+      DB["SELECT CAST('25:00:00' AS time)"].single_value.must_be_nil
       DB.convert_invalid_date_time = :nil
-      DB["SELECT CAST('0000-00-00' AS date)"].single_value.must_equal nil
-      DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.must_equal nil
-      DB["SELECT CAST('25:00:00' AS time)"].single_value.must_equal nil
+      DB["SELECT CAST('0000-00-00' AS date)"].single_value.must_be_nil
+      DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.must_be_nil
+      DB["SELECT CAST('25:00:00' AS time)"].single_value.must_be_nil
     end
 
     it "should not use a nil value bad date/time is used and convert_invalid_date_time is :string" do

@@ -33,25 +33,25 @@ describe "ActiveModel plugin" do
   end
   
   it "#to_key should return a key array, or nil" do
-    @o.to_key.must_equal nil
+    @o.to_key.must_be_nil
     @o.id = 1
     @o.to_key.must_equal [1]
     @o.id = nil
-    @o.to_key.must_equal nil
+    @o.to_key.must_be_nil
 
     @c.set_primary_key [:id2, :id]
-    @o.to_key.must_equal nil
+    @o.to_key.must_be_nil
     @o.id = 1
     @o.id2 = 2
     @o.to_key.must_equal [2, 1]
     @o.destroy
     @o.to_key.must_equal [2, 1]
     @o.id = nil
-    @o.to_key.must_equal nil
+    @o.to_key.must_be_nil
   end
   
   it "#to_param should return a param string or nil" do
-    @o.to_param.must_equal nil
+    @o.to_param.must_be_nil
     @o.id = 1
     @o.to_param.must_equal '1'
     @c.set_primary_key [:id2, :id]
@@ -60,7 +60,7 @@ describe "ActiveModel plugin" do
     @o.meta_def(:to_param_joiner){'|'}
     @o.to_param.must_equal '2|1'
     @o.destroy
-    @o.to_param.must_equal nil
+    @o.to_param.must_be_nil
   end
 
   it "#persisted? should return true if the object exists and has not been destroyed" do

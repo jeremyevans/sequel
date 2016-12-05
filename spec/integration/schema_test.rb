@@ -106,7 +106,7 @@ describe "Database schema parser" do
 
   it "should parse defaults from the schema properly" do
     DB.create_table!(:items){Integer :number}
-    DB.schema(:items).first.last[:ruby_default].must_equal nil
+    DB.schema(:items).first.last[:ruby_default].must_be_nil
     DB.create_table!(:items){Integer :number, :default=>0}
     DB.schema(:items).first.last[:ruby_default].must_equal 0
     DB.create_table!(:items){String :a, :default=>"blah"}
@@ -115,7 +115,7 @@ describe "Database schema parser" do
 
   it "should make :default nil for a NULL default" do
     DB.create_table!(:items){Integer :number}
-    DB.schema(:items).first.last[:default].must_equal nil
+    DB.schema(:items).first.last[:default].must_be_nil
     DB.create_table!(:items){Integer :number, :default=>0}
     DB.schema(:items).first.last[:default].wont_equal nil
   end

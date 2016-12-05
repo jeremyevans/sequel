@@ -201,7 +201,7 @@ describe "Composition plugin" do
 
   it ":mapping option :composer should return nil if all values are nil" do
     @c.composition :date, :mapping=>[:year, :month, :day]
-    @c.new.date.must_equal nil
+    @c.new.date.must_be_nil
   end
 
   it ":mapping option :decomposer should set all related fields to nil if nil" do

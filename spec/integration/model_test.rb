@@ -17,7 +17,7 @@ describe "Sequel::Model basic support" do
 
   it ".find should return first matching item" do
     Item.all.must_equal []
-    Item.find(:name=>'J').must_equal nil
+    Item.find(:name=>'J').must_be_nil
     Item.create(:name=>'J')
     Item.find(:name=>'J').must_equal Item.load(:id=>1, :name=>'J')
   end
@@ -25,7 +25,7 @@ describe "Sequel::Model basic support" do
   it ".finder should create method that returns first matching item" do
     def Item.by_name(name) where(:name=>name) end
     Item.finder :by_name
-    Item.first_by_name('J').must_equal nil
+    Item.first_by_name('J').must_be_nil
     Item.create(:name=>'J')
     Item.first_by_name('J').must_equal Item.load(:id=>1, :name=>'J')
     Item.first_by_name(['J', 'K']).must_equal Item.load(:id=>1, :name=>'J')
@@ -34,7 +34,7 @@ describe "Sequel::Model basic support" do
   it ".prepared_finder should create method that returns first matching item" do
     def Item.by_name(name) where(:name=>name) end
     Item.prepared_finder :by_name
-    Item.first_by_name('J').must_equal nil
+    Item.first_by_name('J').must_be_nil
     Item.create(:name=>'J')
     Item.first_by_name('J').must_equal Item.load(:id=>1, :name=>'J')
   end
@@ -83,7 +83,7 @@ describe "Sequel::Model basic support" do
     def i.after_save
       raise Sequel::Rollback
     end
-    i.save.must_equal nil
+    i.save.must_be_nil
   end
 
   it "#should respect after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks" do
@@ -118,12 +118,12 @@ describe "Sequel::Model basic support" do
     end
     i.name = 'K'
     i.rb = true
-    i.save.must_equal nil
+    i.save.must_be_nil
     i.reload.name.must_equal 'J'
     i.hooks.must_equal [:as, :ar]
 
     i.rb = true
-    i.destroy.must_equal nil
+    i.destroy.must_be_nil
     i.exists?.must_equal true
     i.hooks.must_equal [:ad, :adr]
 

@@ -63,7 +63,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
   it "should not override a given value" do
     @pr.call(2)
     @c.new('a'=>3).a.must_equal 3
-    @c.new('a'=>nil).a.must_equal nil
+    @c.new('a'=>nil).a.must_be_nil
   end
 
   it "should work correctly when subclassing" do
@@ -90,7 +90,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
   it "should have procs that set default values set them to nil" do
     @pr.call(2)
     @c.default_values[:a] = proc{nil}
-    @c.new.a.must_equal nil
+    @c.new.a.must_be_nil
   end
 
   it "should work correctly on a model without a dataset" do

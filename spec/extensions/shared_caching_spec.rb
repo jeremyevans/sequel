@@ -28,7 +28,7 @@ describe "Shared caching behavior" do
       @c.load(:id=>3, :caching_model_id=>2, :caching_model_id2=>1).caching_model2.must_be_same_as(@cm21)
       @db.sqls.must_equal []
       @db.fetch = []
-      @c.load(:id=>4, :caching_model_id=>2, :caching_model_id2=>2).caching_model2.must_equal nil
+      @c.load(:id=>4, :caching_model_id=>2, :caching_model_id2=>2).caching_model2.must_be_nil
     end
   end
 
@@ -40,7 +40,7 @@ describe "Shared caching behavior" do
       @c.load(:id=>4, :caching_model_id=>2).caching_model.must_be_same_as(@cm2)
       @db.sqls.must_equal []
       @db.fetch = []
-      @c.load(:id=>4, :caching_model_id=>3).caching_model.must_equal nil
+      @c.load(:id=>4, :caching_model_id=>3).caching_model.must_be_nil
     end
 
     it "should not use a simple primary key lookup if the assocation has a nil :key option" do

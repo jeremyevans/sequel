@@ -56,7 +56,7 @@ describe "List plugin" do
   end
 
   it "should be able to access the scope proc as a class attribute" do
-    @c.scope_proc.must_equal nil
+    @c.scope_proc.must_be_nil
     @sc.scope_proc[@sc.new(:scope_id=>4)].sql.must_equal 'SELECT * FROM items WHERE (scope_id = 4) ORDER BY scope_id, position'
   end
 

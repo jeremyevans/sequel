@@ -280,17 +280,17 @@ describe "pg_range extension" do
     it "should have #begin return the beginning of the range" do
       @r1.begin.must_equal 1
       @r2.begin.must_equal 3
-      @r3.begin.must_equal nil
+      @r3.begin.must_be_nil
     end
 
     it "should have #end return the end of the range" do
       @r1.end.must_equal 2
-      @r2.end.must_equal nil
+      @r2.end.must_be_nil
       @r3.end.must_equal 4
     end
 
     it "should have #db_type return the range's database type" do
-      @r1.db_type.must_equal nil
+      @r1.db_type.must_be_nil
       @r2.db_type.must_equal 'int4range'
       @r3.db_type.must_equal 'int8range'
     end

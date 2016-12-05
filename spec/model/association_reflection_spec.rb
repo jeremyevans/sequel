@@ -208,10 +208,10 @@ describe Sequel::Model::Associations::AssociationReflection, "#select" do
   it "should be blank if :select is not present for a many_to_one and one_to_many associaiton" do
     @c.one_to_many :cs, :class=>'ParParent'
     @c.association_reflection(:cs).keys.wont_include(:select)
-    @c.association_reflection(:cs).select.must_equal nil
+    @c.association_reflection(:cs).select.must_be_nil
     @c.many_to_one :c, :class=>'ParParent'
     @c.association_reflection(:c).keys.wont_include(:select)
-    @c.association_reflection(:c).select.must_equal nil
+    @c.association_reflection(:c).select.must_be_nil
   end
 end
 
@@ -319,11 +319,11 @@ describe Sequel::Model::Associations::AssociationReflection, "#filter_by_associa
 
   it "should be nil by default for *_one associations" do
     @c.many_to_one :c, :class=>@c
-    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_equal nil
+    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_be_nil
     @c.one_to_one :c, :class=>@c
-    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_equal nil
+    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_be_nil
     @c.one_through_one :c, :class=>@c
-    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_equal nil
+    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_be_nil
   end
 
   it "should be :correlated_subquery by default for one_to_many and one_to_one with :order associations" do
@@ -342,11 +342,11 @@ describe Sequel::Model::Associations::AssociationReflection, "#filter_by_associa
 
   it "should be nil for many_to_one associations even if :eager_limit_strategy or :filter_limit_strategy is used" do
     @c.many_to_one :c, :class=>@c, :eager_limit_strategy=>true
-    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_equal nil
+    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_be_nil
     @c.many_to_one :c, :class=>@c, :eager_limit_strategy=>:distinct_on
-    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_equal nil
+    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_be_nil
     @c.many_to_one :c, :class=>@c, :filter_limit_strategy=>true
-    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_equal nil
+    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_be_nil
   end
 
   it "should be a symbol for other associations if given a symbol" do
@@ -422,7 +422,7 @@ describe Sequel::Model::Associations::AssociationReflection, "#filter_by_associa
   it "should ignore Model.default_eager_limit_strategy for one_to_one associations" do
     @c.default_eager_limit_strategy = :window_function
     @c.one_to_one :c, :class=>@c
-    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_equal nil
+    @c.association_reflection(:c).send(:filter_by_associations_limit_strategy).must_be_nil
   end
 end
 
@@ -459,7 +459,7 @@ describe Sequel::Model, " association reflection methods" do
   end
 
   it "#association_reflection should return nil for nonexistent association" do
-    @c1.association_reflection(:blah).must_equal nil
+    @c1.association_reflection(:blah).must_be_nil
   end
 
   it "#association_reflection should return association reflection hash if association exists" do

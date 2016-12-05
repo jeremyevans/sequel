@@ -21,7 +21,7 @@ describe Sequel::Model, "single table inheritance plugin" do
 
   it "should have simple_table = nil" do
     StiTest.simple_table.must_equal "sti_tests"
-    StiTestSub1.simple_table.must_equal nil
+    StiTestSub1.simple_table.must_be_nil
   end
   
   it "should allow changing the inheritance column via a plugin :single_table_inheritance call" do
@@ -147,8 +147,8 @@ describe Sequel::Model, "single table inheritance plugin" do
     c2[obj2.id]
     c2.cache_get_pk(obj2.id).values.must_equal StiTest.cache_get_pk(obj2.id).values
     obj2.save
-    c2.cache_get_pk(obj2.id).must_equal nil
-    StiTest.cache_get_pk(obj2.id).must_equal nil
+    c2.cache_get_pk(obj2.id).must_be_nil
+    StiTest.cache_get_pk(obj2.id).must_be_nil
   end
 
   describe "with custom options" do
@@ -214,7 +214,7 @@ describe Sequel::Model, "single table inheritance plugin" do
       StiTest4.create.kind.must_equal 6
 
       class ::StiTest5 < ::StiTest4; end
-      StiTest5.create.kind.must_equal nil
+      StiTest5.create.kind.must_be_nil
     end
 
     it "should infer key_map from model_map if provided as a hash" do

@@ -27,7 +27,7 @@ describe Sequel::Schema::Generator do
     @columns.first[:name].must_equal :id
     @columns.first[:primary_key].must_equal true
     @columns[3][:name].must_equal :parent_id
-    @columns[3][:primary_key].must_equal nil
+    @columns[3][:primary_key].must_be_nil
   end
   
   it "should respect existing column order if primary_key :keep_order is used" do
@@ -40,7 +40,7 @@ describe Sequel::Schema::Generator do
     columns.last[:name].must_equal :id
     columns.last[:primary_key].must_equal true
     columns.first[:name].must_equal :title
-    columns.first[:primary_key].must_equal nil
+    columns.first[:primary_key].must_be_nil
   end
   
   it "should handle SQL::Identifier and SQL::QualifiedIdentifier as foreign_key arguments" do
@@ -85,7 +85,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "uses table for foreign key columns, if specified" do
-    @columns[3][:table].must_equal nil
+    @columns[3][:table].must_be_nil
     @columns[4][:table].must_equal :nodes
     @constraints[3][:table].must_equal :nodes_props
   end
@@ -98,7 +98,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "creates constraints" do
-    @constraints[0][:name].must_equal nil
+    @constraints[0][:name].must_be_nil
     @constraints[0][:type].must_equal :check
     @constraints[0][:check].must_equal ['price > 100']
 

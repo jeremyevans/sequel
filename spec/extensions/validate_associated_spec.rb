@@ -16,7 +16,7 @@ describe "ValidatesAssociated plugin" do
     @c.send(:define_method, :validate){|*| errors.add(:name, 'is b') if name == 'b'}
     o = @c.load(:id=>2, :name=>'b')
     @o.send(:delay_validate_associated_object, @c.association_reflection(:cs), o)
-    @o.save.must_equal nil
+    @o.save.must_be_nil
     @o.errors[:cs].must_equal ["name is b"]
     o.errors[:name].must_equal ['is b']
   end

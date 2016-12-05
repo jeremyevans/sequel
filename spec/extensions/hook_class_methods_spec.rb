@@ -197,14 +197,14 @@ describe "Model#before_create && Model#after_create" do
   it ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
     @c.before_create{false}
     @c.raise_on_save_failure = false
-    @c.create(:x => 2).must_equal nil
+    @c.create(:x => 2).must_be_nil
     DB.sqls.must_equal []
   end
 
   it ".create should cancel the save and return nil if before_create calls cancel_action and raise_on_save_failure is false" do
     @c.before_create{cancel_action}
     @c.raise_on_save_failure = false
-    @c.create(:x => 2).must_equal nil
+    @c.create(:x => 2).must_be_nil
     DB.sqls.must_equal []
   end
 end
@@ -234,7 +234,7 @@ describe "Model#before_update && Model#after_update" do
   it "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
     @c.before_update{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_equal nil
+    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 end
@@ -272,7 +272,7 @@ describe "Model#before_save && Model#after_save" do
   it "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
     @c.before_save{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_equal nil
+    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 end
@@ -302,7 +302,7 @@ describe "Model#before_destroy && Model#after_destroy" do
   it "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
     @c.before_destroy{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).destroy.must_equal nil
+    @c.load(:id => 2233).destroy.must_be_nil
     DB.sqls.must_equal []
   end
 end
@@ -343,7 +343,7 @@ describe "Model#before_validation && Model#after_validation" do
     DB.sqls.clear
     m = @c.load(:id => 22)
     m.raise_on_save_failure = false
-    m.save.must_equal nil
+    m.save.must_be_nil
     DB.sqls.must_equal ['BLAH before', 'BLAH after']
   end
 
@@ -356,7 +356,7 @@ describe "Model#before_validation && Model#after_validation" do
   it "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
     @c.before_validation{false}
     @c.raise_on_save_failure = false
-    @c.load(:id => 2233).save.must_equal nil
+    @c.load(:id => 2233).save.must_be_nil
     DB.sqls.must_equal []
   end
 end

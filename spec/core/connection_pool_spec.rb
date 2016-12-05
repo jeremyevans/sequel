@@ -192,7 +192,7 @@ describe "A connection pool with a max size of 1" do
     
     cc.must_equal 'herro'
     c1.must_equal 'herro'
-    c2.must_equal nil
+    c2.must_be_nil
     
     @pool.available_connections.must_be :empty?
     @pool.allocated.must_equal(t1=>cc)
@@ -357,9 +357,9 @@ ThreadedConnectionPoolSpecs = shared_description do
     threads[6].must_be :alive?
     threads[7].must_be :alive?
     cc.size.must_equal 5
-    cc[5].must_equal nil
-    cc[6].must_equal nil
-    cc[7].must_equal nil
+    cc[5].must_be_nil
+    cc[6].must_be_nil
+    cc[7].must_be_nil
     
     5.times{q.push nil}
     5.times{|i| threads[i].join}
@@ -614,12 +614,12 @@ describe "A connection pool with multiple servers" do
     pool.hold(:server1) do
       pool.allocated.length.must_equal 0
       pool.allocated(:server1).length.must_equal 1
-      pool.allocated(:server2).must_equal nil
-      pool.allocated(:server3).must_equal nil
+      pool.allocated(:server2).must_be_nil
+      pool.allocated(:server3).must_be_nil
       pool.available_connections.length.must_equal 1
       pool.available_connections(:server1).length.must_equal 0
-      pool.available_connections(:server2).must_equal nil
-      pool.available_connections(:server3).must_equal nil
+      pool.available_connections(:server2).must_be_nil
+      pool.available_connections(:server3).must_be_nil
 
       pool.add_servers([:server2, :server3])
       pool.hold(:server2){}
@@ -717,8 +717,8 @@ describe "A connection pool with multiple servers" do
     pool.available_connections(:server1).must_equal []
     pool.allocated(:server1).must_equal({})
     pool.remove_servers([:server1])
-    pool.available_connections(:server1).must_equal nil
-    pool.allocated(:server1).must_equal nil
+    pool.available_connections(:server1).must_be_nil
+    pool.allocated(:server1).must_be_nil
   end
   
   it "#remove_servers should not allow the removal of the default server" do
@@ -832,7 +832,7 @@ describe "A single threaded pool with multiple servers" do
     @pool.hold(:read_only){|c| c.must_equal :read_only}
     @pool.conn(:read_only).must_equal :read_only
     @pool.remove_servers([:read_only])
-    @pool.conn(:read_only).must_equal nil
+    @pool.conn(:read_only).must_be_nil
     @pool.hold{}
     @pool.conn(:read_only).must_equal :default
   end
@@ -885,8 +885,8 @@ describe "A single threaded pool with multiple servers" do
     @pool.conn(:read_only).must_equal :read_only
     @pool.disconnect
     @max_size.must_equal 4
-    @pool.conn.must_equal nil
-    @pool.conn(:read_only).must_equal nil
+    @pool.conn.must_be_nil
+    @pool.conn(:read_only).must_be_nil
   end
 
   it ":disconnection_proc option should set the disconnection proc to use" do
@@ -1041,7 +1041,7 @@ AllConnectionPoolClassesSpecs = shared_description do
     x = nil
     c = @class.new(mock_db.call(proc{|c1| x = c1}){123})
     c.hold{}
-    x.must_equal nil
+    x.must_be_nil
     c.disconnect
     x.must_equal 123
   end

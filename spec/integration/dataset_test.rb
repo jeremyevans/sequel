@@ -455,7 +455,7 @@ describe Sequel::Dataset do
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
     @d.count.must_equal 3
-    @d.truncate.must_equal nil
+    @d.truncate.must_be_nil
     @d.count.must_equal 0
   end
 
@@ -1484,10 +1484,10 @@ describe "Sequel::Dataset DSL support" do
     unless Sequel.guarded?(:mssql, :oracle, :db2, :sqlanywhere)
       # Some databases don't like boolean results in the select list
       pr = proc{|r| r.is_a?(Integer) ? (r != 0) : r}
-      pr[@ds.get(Sequel.expr(:a=>[]))].must_equal nil
-      pr[@ds.get(~Sequel.expr(:a=>[]))].must_equal nil
-      pr[@ds.get(Sequel.expr([:a, :b]=>[]))].must_equal nil
-      pr[@ds.get(~Sequel.expr([:a, :b]=>[]))].must_equal nil
+      pr[@ds.get(Sequel.expr(:a=>[]))].must_be_nil
+      pr[@ds.get(~Sequel.expr(:a=>[]))].must_be_nil
+      pr[@ds.get(Sequel.expr([:a, :b]=>[]))].must_be_nil
+      pr[@ds.get(~Sequel.expr([:a, :b]=>[]))].must_be_nil
     end
   end
   
@@ -1806,7 +1806,7 @@ describe "Emulated functions" do
   end
   
   it "Sequel.char_length should return the length of characters in the string" do
-    @ds.get(Sequel.char_length(:a)).must_equal nil
+    @ds.get(Sequel.char_length(:a)).must_be_nil
     @ds.insert(:a=>'foo')
     @ds.get(Sequel.char_length(:a)).must_equal 3
     # Check behavior with leading/trailing blanks
@@ -1815,7 +1815,7 @@ describe "Emulated functions" do
   end
   
   it "Sequel.trim should return the string with spaces trimmed from both sides" do
-    @ds.get(Sequel.trim(:a)).must_equal nil
+    @ds.get(Sequel.trim(:a)).must_be_nil
     @ds.insert(:a=>'foo')
     @ds.get(Sequel.trim(:a)).must_equal 'foo'
     # Check behavior with leading/trailing blanks

@@ -60,7 +60,7 @@ describe "pg_json extension" do
       @m.parse_json("'a'").must_equal 'a'
       @m.parse_json('true').must_equal true
       @m.parse_json('false').must_equal false
-      @m.parse_json('null').must_equal nil
+      @m.parse_json('null').must_be_nil
       proc{@m.parse_json('o')}.must_raise(Sequel::InvalidValue)
     ensure
       Sequel.instance_eval do

@@ -100,8 +100,8 @@ describe Sequel::Model do
     atts = nil
     o.values.clear
     o.valid?.must_equal true
-    vals.must_equal nil
-    atts.must_equal nil
+    vals.must_be_nil
+    atts.must_be_nil
   end
   
   it "should overwrite existing validation with the same tag and attribute" do
@@ -175,7 +175,7 @@ describe Sequel::Model do
     @o.score = 86
     @o.wont_be :valid?
     @o.errors[:score].must_equal ['too low']
-    @o.errors.on(:blah).must_equal nil
+    @o.errors.on(:blah).must_be_nil
   end
 end
 
@@ -620,7 +620,7 @@ describe "Superclass validations" do
   end
   
   it "should have skip_superclass_validations? return whether superclass validations were skipped" do
-    @c2.skip_superclass_validations?.must_equal nil
+    @c2.skip_superclass_validations?.must_be_nil
     @c2.skip_superclass_validations
     @c2.skip_superclass_validations?.must_equal true
   end
@@ -1022,6 +1022,6 @@ describe "Model#save" do
   
   it "should return nil if validations fail and raise_on_save_faiure is false" do
     @m.raise_on_save_failure = false
-    @m.save.must_equal nil
+    @m.save.must_be_nil
   end
 end

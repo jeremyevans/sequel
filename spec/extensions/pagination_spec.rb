@@ -35,11 +35,11 @@ describe "A paginated dataset" do
   
   it "should return the next page number or nil if we're on the last" do
     @paginated.next_page.must_equal 2
-    @d.paginate(4, 50).next_page.must_equal nil
+    @d.paginate(4, 50).next_page.must_be_nil
   end
   
   it "should return the previous page number or nil if we're on the first" do
-    @paginated.prev_page.must_equal nil
+    @paginated.prev_page.must_be_nil
     @d.paginate(4, 50).prev_page.must_equal 3
   end
   

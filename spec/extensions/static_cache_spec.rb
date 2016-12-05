@@ -25,10 +25,10 @@ describe "Sequel::Plugins::StaticCache" do
     it "should make .[] method with primary key use the cache" do
       @c[1].must_equal @c1
       @c[2].must_equal @c2
-      @c[3].must_equal nil
-      @c[[1, 2]].must_equal nil
-      @c[nil].must_equal nil
-      @c[].must_equal nil
+      @c[3].must_be_nil
+      @c[[1, 2]].must_be_nil
+      @c[nil].must_be_nil
+      @c[].must_be_nil
       @db.sqls.must_equal []
     end
 
@@ -41,7 +41,7 @@ describe "Sequel::Plugins::StaticCache" do
     it "should support cache_get_pk" do
       @c.cache_get_pk(1).must_equal @c1
       @c.cache_get_pk(2).must_equal @c2
-      @c.cache_get_pk(3).must_equal nil
+      @c.cache_get_pk(3).must_be_nil
       @db.sqls.must_equal []
     end
 
@@ -341,7 +341,7 @@ describe "Sequel::Plugins::StaticCache" do
       @db.autoid = 3
       @db.fetch = [[{:id=>1}, {:id=>2}, {:id=>3}], [{:id=>3}]]
       o.save
-      @c[3].must_equal nil
+      @c[3].must_be_nil
     end
 
     it "should not automatically update the cache when updating model objects" do

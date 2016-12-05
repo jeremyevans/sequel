@@ -371,7 +371,7 @@ describe "Bound Argument Types" do
   cspecify "should handle blob type with nil values", [:oracle], [:tinytds], [:jdbc, :mssql] do
     @ds.delete
     @ds.prepare(:insert, :ps_blob, {:file=>:$x}).call(:x=>nil)
-    @ds.get(:file).must_equal nil
+    @ds.get(:file).must_be_nil
   end
 
   cspecify "should handle blob type with embedded zeros", [:odbc] do
@@ -412,10 +412,10 @@ describe "Dataset#unbind" do
   it "should unbind values assigned to equality and inequality statements" do
     @ct[Integer, 10]
     @u[@ds.filter(:c=>10)].must_equal(:c=>10)
-    @u[@ds.exclude(:c=>10)].must_equal nil
-    @u[@ds.filter{c < 10}].must_equal nil
+    @u[@ds.exclude(:c=>10)].must_be_nil
+    @u[@ds.filter{c < 10}].must_be_nil
     @u[@ds.filter{c <= 10}].must_equal(:c=>10)
-    @u[@ds.filter{c > 10}].must_equal nil
+    @u[@ds.filter{c > 10}].must_be_nil
     @u[@ds.filter{c >= 10}].must_equal(:c=>10)
   end
 
@@ -456,12 +456,12 @@ describe "Dataset#unbind" do
     end
     @ds.insert(:a=>2, :b=>0, :c=>3, :d=>5)
     @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>4)=>1}, 0) => 1)].must_equal(:a=>2, :b=>0, :c=>3, :d=>5)
-    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>5)=>1}, 0) => 1)].must_equal nil
+    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>5)=>1}, 0) => 1)].must_be_nil
   end
 
   it "should handle case where the same variable has the same value in multiple places " do
     @ct[Integer, 1]
     @u[@ds.filter{c > 1}.or{c < 1}.invert].must_equal(:c=>1)
-    @u[@ds.filter{c > 1}.or{c < 1}].must_equal nil
+    @u[@ds.filter{c > 1}.or{c < 1}].must_be_nil
   end
 end    

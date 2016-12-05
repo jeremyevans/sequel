@@ -11,19 +11,19 @@ describe "Sequel::Plugins::Dirty" do
   dirty_plugin_specs = shared_description do
     it "initial_value should be the current value if value has not changed" do
       @o.initial_value(:initial).must_equal 'i'
-      @o.initial_value(:missing).must_equal nil
+      @o.initial_value(:missing).must_be_nil
     end
 
     it "initial_value should be the intial value if value has changed" do
       @o.initial_value(:initial_changed).must_equal 'ic'
-      @o.initial_value(:missing_changed).must_equal nil
+      @o.initial_value(:missing_changed).must_be_nil
     end
 
     it "initial_value should handle case where initial value is reassigned later" do
       @o.initial_changed = 'ic'
       @o.initial_value(:initial_changed).must_equal 'ic'
       @o.missing_changed = nil
-      @o.initial_value(:missing_changed).must_equal nil
+      @o.initial_value(:missing_changed).must_be_nil
     end
 
     it "changed_columns should handle case where initial value is reassigned later" do
@@ -40,8 +40,8 @@ describe "Sequel::Plugins::Dirty" do
     end
 
     it "column_change should be nil if no change has been made" do
-      @o.column_change(:initial).must_equal nil
-      @o.column_change(:missing).must_equal nil
+      @o.column_change(:initial).must_be_nil
+      @o.column_change(:missing).must_be_nil
     end
 
     it "column_changed? should return whether the column has changed" do
@@ -76,9 +76,9 @@ describe "Sequel::Plugins::Dirty" do
       @o.reset_column(:initial_changed)
       @o.initial_changed.must_equal 'ic'
       @o.reset_column(:missing)
-      @o.missing.must_equal nil
+      @o.missing.must_be_nil
       @o.reset_column(:missing_changed)
-      @o.missing_changed.must_equal nil
+      @o.missing_changed.must_be_nil
     end
 
     it "reset_column should remove missing values from the values" do
@@ -124,11 +124,18 @@ describe "Sequel::Plugins::Dirty" do
     end
 
     it "should have #dup duplicate structures" do
+      was_new = @o.new?
+      @o.update(:missing=>'m2')
       @o.dup.initial_values.must_equal @o.initial_values
       @o.dup.initial_values.wont_be_same_as(@o.initial_values)
       @o.dup.instance_variable_get(:@missing_initial_values).must_equal @o.instance_variable_get(:@missing_initial_values)
       @o.dup.instance_variable_get(:@missing_initial_values).wont_be_same_as(@o.instance_variable_get(:@missing_initial_values))
-      @o.dup.previous_changes.must_equal @o.previous_changes
+      if was_new
+        @o.previous_changes.must_be_nil
+        @o.dup.previous_changes.must_be_nil
+      else
+        @o.dup.previous_changes.must_equal @o.previous_changes
+      end
       @o.dup.previous_changes.wont_be_same_as(@o.previous_changes) if @o.previous_changes
     end
   end

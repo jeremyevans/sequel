@@ -606,7 +606,7 @@ describe Sequel::Model, "pg_array_associations" do
 
     v = @c1.load(:id=>1)
     v.remove_tag(@c2.load(:id=>4))
-    v.tag_ids.must_equal nil
+    v.tag_ids.must_be_nil
     @db.sqls.must_equal []
     v.save_changes
     @db.sqls.must_equal []
@@ -616,7 +616,7 @@ describe Sequel::Model, "pg_array_associations" do
 
     v = @c1.load(:id=>1)
     v.remove_all_tags
-    v.tag_ids.must_equal nil
+    v.tag_ids.must_be_nil
     @db.sqls.must_equal []
     v.save_changes
     @db.sqls.must_equal []
@@ -720,17 +720,17 @@ describe Sequel::Model, "pg_array_associations" do
     t = @c2.load(:id=>2)
     def a.validate() errors.add(:id, 'foo') end
     a.associations[:tags] = []
-    a.add_tag(t).must_equal nil
+    a.add_tag(t).must_be_nil
     a.tags.must_equal []
     a.associations[:tags] = [t]
-    a.remove_tag(t).must_equal nil
+    a.remove_tag(t).must_be_nil
     a.tags.must_equal [t]
 
     t.associations[:artists] = []
-    t.add_artist(a).must_equal nil
+    t.add_artist(a).must_be_nil
     t.artists.must_equal []
     t.associations[:artists] = [a]
-    t.remove_artist(a).must_equal nil
+    t.remove_artist(a).must_be_nil
     t.artists.must_equal [a]
   end
 end

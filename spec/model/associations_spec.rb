@@ -118,7 +118,7 @@ describe Sequel::Model, "associate" do
       klass.association_reflection(:par)[:eager_block].call.must_equal 1
       klass.association_reflection(:par1s)[:limit].must_equal 10
       klass.association_reflection(:par1s)[:order].must_equal :b
-      klass.association_reflection(:par1s)[:block].must_equal nil
+      klass.association_reflection(:par1s)[:block].must_be_nil
       klass.association_reflection(:par2s)[:after_load].length.must_equal 1
       klass.association_reflection(:par2s)[:order].must_equal :c
       klass.association_reflection(:par2s)[:block].call.must_equal 3
@@ -297,7 +297,7 @@ describe Sequel::Model, "many_to_one" do
   
   it "should not issue query if not all keys have values" do
     @c2.many_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>[:parent_id, :id]
-    @c2.new(:id => 1, :parent_id => nil).parent.must_equal nil
+    @c2.new(:id => 1, :parent_id => nil).parent.must_be_nil
     DB.sqls.must_equal []
   end
   
@@ -334,7 +334,7 @@ describe Sequel::Model, "many_to_one" do
 
   it "should return nil if key value is nil" do
     @c2.many_to_one :parent, :class => @c2
-    @c2.new(:id => 1).parent.must_equal nil
+    @c2.new(:id => 1).parent.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -343,9 +343,9 @@ describe Sequel::Model, "many_to_one" do
     @c2.dataset._fetch = []
     d = @c2.new(:id => 1, :parent_id=>555)
     DB.sqls.must_equal []
-    d.parent.must_equal nil
+    d.parent.must_be_nil
     DB.sqls.must_equal ['SELECT * FROM nodes WHERE id = 555']
-    d.parent.must_equal nil
+    d.parent.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -410,7 +410,7 @@ describe Sequel::Model, "many_to_one" do
 
     d = @c2.load(:id => 1)
     d.parent_id = 234
-    d.associations[:parent].must_equal nil
+    d.associations[:parent].must_be_nil
     @c2.dataset._fetch = {:id=>234}
     e = d.parent 
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
@@ -422,7 +422,7 @@ describe Sequel::Model, "many_to_one" do
 
     d = @c2.create(:id => 1)
     DB.reset
-    d.associations[:parent].must_equal nil
+    d.associations[:parent].must_be_nil
     d.parent = @c2.new(:id => 234)
     e = d.parent 
     d.associations[:parent].must_equal e
@@ -507,13 +507,13 @@ describe Sequel::Model, "many_to_one" do
     d.parent = e
     e.child.must_equal d
     d.parent = nil
-    e.child.must_equal nil
+    e.child.must_be_nil
     d.parent = e
     e.child.must_equal d
 
     f = @c2.new(:id => 3)
     d.parent = nil
-    e.child.must_equal nil
+    e.child.must_be_nil
     e.associations[:child] = f
     d.parent = e
     e.child.must_equal d
@@ -684,7 +684,7 @@ describe Sequel::Model, "many_to_one" do
     def p._parent=; raise; end
     proc{p.parent = c}.must_raise(Sequel::HookFailed)
     
-    p.parent.must_equal nil
+    p.parent.must_be_nil
     p.associations[:parent] = c
     p.parent.must_equal c
     proc{p.parent = nil}.must_raise(Sequel::HookFailed)
@@ -699,7 +699,7 @@ describe Sequel::Model, "many_to_one" do
     def p._parent=; raise; end
     proc{p.parent = c}.must_raise(Sequel::HookFailed)
     
-    p.parent.must_equal nil
+    p.parent.must_be_nil
     p.associations[:parent] = c
     p.parent.must_equal c
     proc{p.parent = nil}.must_raise(Sequel::HookFailed)
@@ -880,7 +880,7 @@ describe Sequel::Model, "one_to_one" do
   
   it "should not issue query if not all keys have values" do
     @c2.one_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>[:parent_id, :id]
-    @c2.new(:id => 1, :parent_id => nil).parent.must_equal nil
+    @c2.new(:id => 1, :parent_id => nil).parent.must_be_nil
     DB.sqls.must_equal []
   end
   
@@ -918,7 +918,7 @@ describe Sequel::Model, "one_to_one" do
   it "should return nil if primary_key value is nil" do
     @c2.one_to_one :parent, :class => @c2, :primary_key=>:node_id
 
-    @c2.new(:id => 1).parent.must_equal nil
+    @c2.new(:id => 1).parent.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -927,9 +927,9 @@ describe Sequel::Model, "one_to_one" do
     @c2.dataset._fetch = []
     d = @c2.new(:id => 555)
     DB.sqls.must_equal []
-    d.parent.must_equal nil
+    d.parent.must_be_nil
     DB.sqls.must_equal ['SELECT * FROM nodes WHERE (nodes.node_id = 555) LIMIT 1']
-    d.parent.must_equal nil
+    d.parent.must_be_nil
     DB.sqls.must_equal []
   end
 
@@ -958,7 +958,7 @@ describe Sequel::Model, "one_to_one" do
     @c2.one_to_one :parent, :class => @c2
 
     d = @c2.load(:id => 1)
-    d.associations[:parent].must_equal nil
+    d.associations[:parent].must_be_nil
     @c2.dataset._fetch = {:id=>234}
     e = d.parent 
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
@@ -971,7 +971,7 @@ describe Sequel::Model, "one_to_one" do
     @c2.one_to_one :parent, :class => @c2
 
     d = @c2.load(:id => 1)
-    d.associations[:parent].must_equal nil
+    d.associations[:parent].must_be_nil
     e = @c2.load(:id => 234)
     d.parent = e
     f = d.parent 
@@ -1006,7 +1006,7 @@ describe Sequel::Model, "one_to_one" do
     DB.sqls.must_equal ["UPDATE nodes SET parent_id = NULL WHERE ((parent_id = 1) AND (id != 2))",
       "UPDATE nodes SET parent_id = 1 WHERE (id = 2)"]
     d.parent = nil
-    e.child.must_equal nil
+    e.child.must_be_nil
     DB.sqls.must_equal ["UPDATE nodes SET parent_id = NULL WHERE (parent_id = 1)"]
   end
 
@@ -1018,15 +1018,15 @@ describe Sequel::Model, "one_to_one" do
     d = @c2.load(:id => 1)
     e = @c2.load(:id => 2)
     f = @c2.load(:id => 3)
-    e.child.must_equal nil
-    f.child.must_equal nil
+    e.child.must_be_nil
+    f.child.must_be_nil
     d.parent = e
     e.child.must_equal d
     d.parent = f
     f.child.must_equal d
-    e.child.must_equal nil
+    e.child.must_be_nil
     d.parent = nil
-    f.child.must_equal nil
+    f.child.must_be_nil
   end
 
   it "should have the setter not modify the reciprocal if set to same value as current" do
@@ -1125,7 +1125,7 @@ describe Sequel::Model, "one_to_one" do
     def p._parent=; raise; end
     proc{p.parent = c}.must_raise(Sequel::HookFailed)
     
-    p.associations[:parent].must_equal nil
+    p.associations[:parent].must_be_nil
     p.associations[:parent] = c
     p.parent.must_equal c
     proc{p.parent = nil}.must_raise(Sequel::HookFailed)
@@ -1435,9 +1435,9 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.new(:id => 2345)
     def a.validate() errors.add(:id, 'foo') end
     n.associations[:attributes] = []
-    n.add_attribute(a).must_equal nil
+    n.add_attribute(a).must_be_nil
     n.associations[:attributes].must_equal []
-    n.remove_attribute(a).must_equal nil
+    n.remove_attribute(a).must_be_nil
     n.associations[:attributes].must_equal []
   end
 
@@ -1591,7 +1591,7 @@ describe Sequel::Model, "one_to_many" do
     att.associations[:node] = n
     att.node.must_equal n
     n.remove_attribute(att)
-    att.node.must_equal nil
+    att.node.must_be_nil
   end
 
   it "should not create the add_, remove_, or remove_all_ methods if :read_only option is used" do
@@ -1691,7 +1691,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "remove_all should return nil if the cache is not populated" do
     @c2.one_to_many :attributes, :class => @c1
-    @c2.new(:id => 1234).remove_all_attributes.must_equal nil
+    @c2.new(:id => 1234).remove_all_attributes.must_be_nil
   end
 
   it "remove_all should remove the current item from all reciprocal association caches if they are populated" do
@@ -1702,11 +1702,11 @@ describe Sequel::Model, "one_to_many" do
     attrib = @c1.new(:id=>3)
     node = @c2.load(:id => 1234)
     node.attributes.must_equal []
-    attrib.node.must_equal nil
+    attrib.node.must_be_nil
     node.add_attribute(attrib)
     attrib.associations[:node].must_equal node 
     node.remove_all_attributes
-    attrib.associations.fetch(:node, 2).must_equal nil
+    attrib.associations.fetch(:node, 2).must_be_nil
   end
 
   it "should call an _add_ method internally to add attributes" do
@@ -1879,11 +1879,11 @@ describe Sequel::Model, "one_to_many" do
     def p._add_attribute; raise; end
     def p._remove_attribute; raise; end
     p.associations[:attributes] = []
-    p.add_attribute(c).must_equal nil
+    p.add_attribute(c).must_be_nil
     p.attributes.must_equal []
     p.associations[:attributes] = [c]
     def p.br(c) false end
-    p.remove_attribute(c).must_equal nil
+    p.remove_attribute(c).must_be_nil
     p.attributes.must_equal [c]
   end
 
@@ -1912,11 +1912,11 @@ describe Sequel::Model, "one_to_many" do
     def p._add_attribute; raise; end
     def p._remove_attribute; raise; end
     p.associations[:attributes] = []
-    p.add_attribute(c).must_equal nil
+    p.add_attribute(c).must_be_nil
     p.attributes.must_equal []
     p.associations[:attributes] = [c]
     def p.br(o); cancel_action; end
-    p.remove_attribute(c).must_equal nil
+    p.remove_attribute(c).must_be_nil
     p.attributes.must_equal [c]
   end
 
@@ -2523,7 +2523,7 @@ describe Sequel::Model, "many_to_many" do
 
   it "remove_all should return nil if the cached instance variable does not exist" do
     @c2.many_to_many :attributes, :class => @c1
-    @c2.new(:id => 1234).remove_all_attributes.must_equal nil
+    @c2.new(:id => 1234).remove_all_attributes.must_be_nil
   end
 
   it "remove_all should remove the current item from all reciprocal instance varaibles if it cached instance variable exists" do
@@ -2722,11 +2722,11 @@ describe Sequel::Model, "many_to_many" do
     def p._add_attribute; raise; end
     def p._remove_attribute; raise; end
     p.associations[:attributes] = []
-    p.add_attribute(c).must_equal nil
+    p.add_attribute(c).must_be_nil
     p.attributes.must_equal []
     p.associations[:attributes] = [c]
     def p.br(c) false end
-    p.remove_attribute(c).must_equal nil
+    p.remove_attribute(c).must_be_nil
     p.attributes.must_equal [c]
   end
 
@@ -2756,11 +2756,11 @@ describe Sequel::Model, "many_to_many" do
     def p._add_attribute; raise; end
     def p._remove_attribute; raise; end
     p.associations[:attributes] = []
-    p.add_attribute(c).must_equal nil
+    p.add_attribute(c).must_be_nil
     p.attributes.must_equal []
     p.associations[:attributes] = [c]
     def p.br(o) cancel_action end
-    p.remove_attribute(c).must_equal nil
+    p.remove_attribute(c).must_be_nil
     p.attributes.must_equal [c]
   end
 
@@ -2873,7 +2873,7 @@ describe Sequel::Model, "one_through_one" do
   
   it "should not issue query if not all keys have values" do
     @c2.one_through_one :attribute, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
-    @c2.load(:id => 1234, :x=>nil).attribute.must_equal nil
+    @c2.load(:id => 1234, :x=>nil).attribute.must_be_nil
     DB.sqls.must_equal []
   end
   
@@ -4495,7 +4495,7 @@ describe "Model#freeze" do
   it "should not break associations getters" do
     Album::B.dataset._fetch = {:album_id=>1, :id=>2}
     @o.b.must_equal Album::B.load(:id=>2, :album_id=>1)
-    @o.associations[:b].must_equal nil
+    @o.associations[:b].must_be_nil
 
     @o = @o.dup
     @o.b.must_equal Album::B.load(:id=>2, :album_id=>1)
@@ -4505,7 +4505,7 @@ describe "Model#freeze" do
   it "should not break reciprocal associations" do
     b = Album::B.load(:id=>2, :album_id=>nil)
     b.album = @o
-    @o.associations[:b].must_equal nil
+    @o.associations[:b].must_be_nil
 
     @o = @o.dup
     b = Album::B.load(:id=>2, :album_id=>nil)

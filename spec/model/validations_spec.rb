@@ -27,7 +27,7 @@ describe Sequel::Model::Errors do
   end
   
   it "should return nil using #on if there are no errors for that attribute" do
-    @errors.on(:blah).must_equal nil
+    @errors.on(:blah).must_be_nil
   end
   
   it "should accept errors using #add" do
@@ -75,9 +75,9 @@ describe Sequel::Model::Errors do
   end
 
   it "should return nil if there are no error messages for a given attribute using #on" do
-    @errors.on(:a).must_equal nil
+    @errors.on(:a).must_be_nil
     @errors.add(:b, 'b')
-    @errors.on(:a).must_equal nil
+    @errors.on(:a).must_be_nil
   end
 end
 
@@ -108,7 +108,7 @@ describe Sequel::Model do
     @o.score = 86
     @o.wont_be :valid?
     @o.errors[:score].must_equal ['too low']
-    @o.errors.on(:blah).must_equal nil
+    @o.errors.on(:blah).must_be_nil
   end
   
   it "should allow raising of ValidationFailed with a Model instance with errors" do
@@ -128,7 +128,7 @@ describe Sequel::Model do
       raise Sequel::ValidationFailed, @o.errors
     rescue Sequel::ValidationFailed => e
     end
-    e.model.must_equal nil
+    e.model.must_be_nil
     e.errors.must_be_same_as(@o.errors)
     e.message.must_equal 'score is too low'
   end
@@ -188,6 +188,6 @@ describe "Model#save" do
 
   it "should return nil if validations fail and raise_on_save_faiure is false" do
     @m.raise_on_save_failure = false
-    @m.save.must_equal nil
+    @m.save.must_be_nil
   end
 end

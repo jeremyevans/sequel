@@ -18,7 +18,7 @@ describe "Dataset" do
     d1.wont_equal @dataset
     d1.db.must_be_same_as(@dataset.db)
     d1.opts[:from].must_equal [:test]
-    @dataset.opts[:from].must_equal nil
+    @dataset.opts[:from].must_be_nil
     
     d2 = d1.clone(:order => [:name])
     d2.class.must_equal @dataset.class
@@ -27,7 +27,7 @@ describe "Dataset" do
     d2.db.must_be_same_as(@dataset.db)
     d2.opts[:from].must_equal [:test]
     d2.opts[:order].must_equal [:name]
-    d1.opts[:order].must_equal nil
+    d1.opts[:order].must_be_nil
   end
   
   it "should include Enumerable" do
@@ -148,7 +148,7 @@ describe "Dataset#clone" do
 
     clone.opts.must_equal @dataset.opts
     @dataset.filter!(:a => 'b')
-    clone.opts[:filter].must_equal nil
+    clone.opts[:filter].must_be_nil
 
     clone = @dataset.clone(:from => [:other])
     @dataset.opts[:from].must_equal [:items]
@@ -1474,7 +1474,9 @@ describe "Dataset#with_sql" do
   end
 
   it "should keep row_proc" do
-    @dataset.with_sql('SELECT 1 FROM test').row_proc.must_equal @dataset.row_proc
+    @dataset.with_sql('SELECT 1 FROM test').row_proc.must_be_nil
+    p = lambda{}
+    @dataset.with_row_proc(p).with_sql('SELECT 1 FROM test').row_proc.must_equal p
   end
 
   it "should work with method symbols and arguments" do
@@ -1713,7 +1715,7 @@ describe "Dataset#with_row_proc" do
     d = Sequel.mock.dataset
     l = lambda{|r| r}
     d.with_row_proc(l).row_proc.must_equal l
-    assert_equal nil, d.row_proc
+    d.row_proc.must_be_nil
     ds = d.freeze.with_row_proc(l)
     ds.frozen?.must_equal true
     ds.row_proc.must_equal l
@@ -1724,8 +1726,8 @@ describe "Dataset#naked" do
   it "should returned clone dataset without row_proc" do
     d = Sequel.mock.dataset
     d.row_proc = Proc.new{|r| r}
-    d.naked.row_proc.must_equal nil
-    refute_equal nil, d.row_proc
+    d.naked.row_proc.must_be_nil
+    d.row_proc.wont_be_nil
   end
 end
 
@@ -1733,8 +1735,8 @@ describe "Dataset#naked!" do
   it "should remove any existing row_proc" do
     d = Sequel.mock.dataset
     d.row_proc = Proc.new{|r| r}
-    d.naked!.row_proc.must_equal nil
-    d.row_proc.must_equal nil
+    d.naked!.row_proc.must_be_nil
+    d.row_proc.must_be_nil
   end
 end
 
@@ -2596,7 +2598,7 @@ describe "Dataset #first and #last" do
   end
 
   it "should return nil if no records match" do
-    Sequel.mock[:t].first.must_equal nil
+    Sequel.mock[:t].first.must_be_nil
   end
   
   it "#last should raise if no order is given" do
@@ -2786,7 +2788,7 @@ describe "Dataset#single_record" do
   end
   
   it "should return nil if no record is present" do
-    @db[:test].single_record.must_equal nil
+    @db[:test].single_record.must_be_nil
     @db.sqls.must_equal ['SELECT * FROM test LIMIT 1']
   end
 end
@@ -2803,7 +2805,7 @@ describe "Dataset#single_record!" do
   end
   
   it "should return nil if no record is present" do
-    @db[:test].single_record!.must_equal nil
+    @db[:test].single_record!.must_be_nil
     @db.sqls.must_equal ['SELECT * FROM test']
   end
 end
@@ -2820,7 +2822,7 @@ describe "Dataset#single_value" do
   end
   
   it "should return nil if no records" do
-    @db[:test].single_value.must_equal nil
+    @db[:test].single_value.must_be_nil
     @db.sqls.must_equal ['SELECT * FROM test LIMIT 1']
   end
   
@@ -2844,7 +2846,7 @@ describe "Dataset#single_value!" do
   end
   
   it "should return nil if no records" do
-    @db[:test].single_value!.must_equal nil
+    @db[:test].single_value!.must_be_nil
     @db.sqls.must_equal ['SELECT * FROM test']
   end
 end
@@ -2917,8 +2919,8 @@ describe "Dataset#get" do
 
   it "should handle cases where no rows are returned" do
     @d._fetch = []
-    @d.get(:n).must_equal nil
-    @d.get([:n, :a]).must_equal nil
+    @d.get(:n).must_be_nil
+    @d.get([:n, :a]).must_be_nil
     @d.db.sqls.must_equal ['SELECT n FROM test LIMIT 1', 'SELECT n, a FROM test LIMIT 1']
   end
 end
@@ -3036,7 +3038,7 @@ describe "Dataset#import" do
   end
   
   it "should return nil without a query if no values" do
-    @ds.import(['x', 'y'], []).must_equal nil
+    @ds.import(['x', 'y'], []).must_be_nil
     @db.sqls.must_equal []
   end
 
@@ -3164,7 +3166,7 @@ describe "Dataset#multi_insert" do
   end
   
   it "should return nil without a query if no values" do
-    @ds.multi_insert([]).must_equal nil
+    @ds.multi_insert([]).must_be_nil
     @db.sqls.must_equal []
   end
 
@@ -3529,7 +3531,7 @@ describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #ex
   end
   
   it "#truncate should execute truncate SQL" do
-    @ds.truncate.must_equal nil
+    @ds.truncate.must_be_nil
     @db.sqls.must_equal ["TRUNCATE TABLE items"]
   end
   
@@ -3596,7 +3598,7 @@ describe "Dataset#with_sql_*" do
 
   it "#with_sql_first should return nil if no rows returned" do
     @db.fetch = []
-    @ds.with_sql_first('SELECT * FROM foo').must_equal nil
+    @ds.with_sql_first('SELECT * FROM foo').must_be_nil
     @db.sqls.must_equal ["SELECT * FROM foo -- read_only"]
   end
 
@@ -3607,7 +3609,7 @@ describe "Dataset#with_sql_*" do
 
   it "#with_sql_single_value should return nil if no rows returned" do
     @db.fetch = []
-    @ds.with_sql_single_value('SELECT * FROM foo').must_equal nil
+    @ds.with_sql_single_value('SELECT * FROM foo').must_be_nil
     @db.sqls.must_equal ["SELECT * FROM foo -- read_only"]
   end
 end
@@ -4280,9 +4282,9 @@ describe "Sequel timezone support" do
   end
 
   it "should have Sequel.default_timezone= should set all other timezones" do
-    Sequel.database_timezone.must_equal nil
-    Sequel.application_timezone.must_equal nil
-    Sequel.typecast_timezone.must_equal nil
+    Sequel.database_timezone.must_be_nil
+    Sequel.application_timezone.must_be_nil
+    Sequel.typecast_timezone.must_be_nil
     Sequel.default_timezone = :utc
     Sequel.database_timezone.must_equal :utc
     Sequel.application_timezone.must_equal :utc
@@ -4743,7 +4745,7 @@ describe "Dataset extensions" do
     Sequel::Dataset.register_extension(:bar, proc{|ds| ds.identifier_input_method = nil})
     ds = @ds.extension(:foo, :bar)
     ds.quote_identifiers?.must_equal true
-    ds.identifier_input_method.must_equal nil
+    ds.identifier_input_method.must_be_nil
   end
 
   it "should have #extension not modify the receiver" do
@@ -5107,7 +5109,7 @@ describe "Dataset mutation methods" do
 
     dsc.server!(:a)
     dsc.opts[:server].must_equal :a
-    dsc.graph!(dsc, {:b=>:c}, :table_alias=>:foo).ungraphed!.opts[:graph].must_equal nil
+    dsc.graph!(dsc, {:b=>:c}, :table_alias=>:foo).ungraphed!.opts[:graph].must_be_nil
   end
 end
 
@@ -5212,12 +5214,12 @@ describe "#unqualified_column_for" do
   end
 
   it "should return nil for other objects" do
-    @ds.unqualified_column_for(Object.new).must_equal nil
-    @ds.unqualified_column_for('a').must_equal nil
+    @ds.unqualified_column_for(Object.new).must_be_nil
+    @ds.unqualified_column_for('a').must_be_nil
   end
 
   it "should return nil for other objects inside SQL::AliasedExpressions" do
-    @ds.unqualified_column_for(Sequel.as(Object.new, 'a')).must_equal nil
-    @ds.unqualified_column_for(Sequel.as('a', 'b')).must_equal nil
+    @ds.unqualified_column_for(Sequel.as(Object.new, 'a')).must_be_nil
+    @ds.unqualified_column_for(Sequel.as('a', 'b')).must_be_nil
   end
 end

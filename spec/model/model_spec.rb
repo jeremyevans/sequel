@@ -880,7 +880,7 @@ describe Sequel::Model, "attribute accessors" do
       o.methods.collect{|z| z.to_s}.must_include(x)
     end
 
-    o.x.must_equal nil
+    o.x.must_be_nil
     o.x = 34
     o.x.must_equal 34
   end
@@ -931,7 +931,7 @@ describe Sequel::Model, ".[]" do
 
   it "should have #[] return nil if no rows match" do
     @c.dataset._fetch = []
-    @c[1].must_equal nil
+    @c[1].must_be_nil
     DB.sqls.must_equal ["SELECT * FROM items WHERE id = 1"]
   end
 
@@ -1061,7 +1061,7 @@ describe "Model.db_schema" do
     @c.primary_key.must_equal :id
     @c.dataset = ds
     @c.db_schema.must_equal(:x=>{:primary_key=>false}, :y=>{:primary_key=>false})
-    @c.primary_key.must_equal nil
+    @c.primary_key.must_be_nil
   end
   
   it "should automatically set primary key for dataset selecting table.*" do

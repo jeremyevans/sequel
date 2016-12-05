@@ -71,7 +71,7 @@ describe "Sequel::Plugins::Timestamps" do
   end
 
   it "should not update the update timestamp on creation" do
-    @c.create.updated_at.must_equal nil
+    @c.create.updated_at.must_be_nil
   end
 
   it "should use the same value for the creation and update timestamps when creating if the :update_on_create option is given" do
@@ -161,7 +161,7 @@ describe "Sequel::Plugins::Timestamps" do
     c = Class.new(@c)
     o = c.create
     o.created_at.must_equal '2009-08-01'
-    o.updated_at.must_equal nil
+    o.updated_at.must_be_nil
     o = c.load(:id=>1).save
     o.updated_at.must_equal '2009-08-01'
     c.db.sqls.must_equal ["INSERT INTO t (created_at) VALUES ('2009-08-01')", "UPDATE t SET updated_at = '2009-08-01' WHERE (id = 1)"]

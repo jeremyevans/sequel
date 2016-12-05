@@ -71,10 +71,10 @@ describe "class_table_inheritance plugin" do
   end
 
   it "should have simple_table = nil for all subclasses" do
-    Manager.simple_table.must_equal nil
-    Executive.simple_table.must_equal nil
-    Ceo.simple_table.must_equal nil
-    Staff.simple_table.must_equal nil
+    Manager.simple_table.must_be_nil
+    Executive.simple_table.must_be_nil
+    Ceo.simple_table.must_be_nil
+    Staff.simple_table.must_be_nil
   end
   
   it "should have working row_proc if using set_dataset in subclass to remove columns" do
@@ -361,9 +361,9 @@ describe "class_table_inheritance plugin without sti_key" do
   end
 
   it "should have simple_table = nil for all subclasses" do
-    Manager.simple_table.must_equal nil
-    Executive.simple_table.must_equal nil
-    Staff.simple_table.must_equal nil
+    Manager.simple_table.must_be_nil
+    Executive.simple_table.must_be_nil
+    Staff.simple_table.must_be_nil
   end
   
   it "should have working row_proc if using set_dataset in subclass to remove columns" do

@@ -333,7 +333,7 @@ describe "Model.primary_key" do
   
   it "should use nil for no primary key" do
     @c.no_primary_key
-    @c.primary_key.must_equal nil
+    @c.primary_key.must_be_nil
   end
 end
 
@@ -392,7 +392,7 @@ describe "Model.db" do
     Sequel::DATABASES.clear
   end
   after do
-    Sequel::Model.instance_variable_get(:@db).must_equal nil
+    Sequel::Model.instance_variable_get(:@db).must_be_nil
     Sequel::DATABASES.replace(@databases)
     Sequel::Model.db = @model_db
   end
@@ -470,7 +470,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
   end
   
   it "should set the allowed columns correctly" do
-    @c.allowed_columns.must_equal nil
+    @c.allowed_columns.must_be_nil
     @c.set_allowed_columns :x
     @c.allowed_columns.must_equal [:x]
     @c.set_allowed_columns :x, :y
@@ -608,9 +608,9 @@ describe Sequel::Model, ".[] optimization" do
 
   it "should have simple_pk be blank if compound or no primary key" do
     @c.no_primary_key
-    @c.simple_pk.must_equal nil
+    @c.simple_pk.must_be_nil
     @c.set_primary_key [:b, :a]
-    @c.simple_pk.must_equal nil
+    @c.simple_pk.must_be_nil
   end
 
   it "should have simple table set if passed a Symbol to set_dataset" do
@@ -645,11 +645,11 @@ describe Sequel::Model, ".[] optimization" do
 
   it "should have simple_table = nil if passed a non-simple select all dataset to set_dataset" do
     @c.set_dataset @c.db[:a].filter(:active)
-    @c.simple_table.must_equal nil
+    @c.simple_table.must_be_nil
   end
 
   it "should have simple_table inherit superclass's setting" do
-    Class.new(@c).simple_table.must_equal nil
+    Class.new(@c).simple_table.must_be_nil
     @c.set_dataset :a
     Class.new(@c).simple_table.must_equal '"a"'
   end
@@ -722,7 +722,7 @@ describe "Model datasets #with_pk with #with_pk!" do
 
   it "should have with_pk return nil and with_pk! raise if no rows match" do
     @ds._fetch = []
-    @ds.with_pk(1).must_equal nil
+    @ds.with_pk(1).must_be_nil
     DB.sqls.must_equal ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
     proc{@ds.with_pk!(1)}.must_raise(Sequel::NoMatchingRow)
     DB.sqls.must_equal ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
@@ -730,7 +730,7 @@ describe "Model datasets #with_pk with #with_pk!" do
 
   it "should have with_pk return nil and with_pk! raise if no rows match when calling the class method" do
     @ds._fetch = []
-    @c.with_pk(1).must_equal nil
+    @c.with_pk(1).must_be_nil
     DB.sqls.must_equal ["SELECT * FROM a WHERE id = 1"]
     proc{@c.with_pk!(1)}.must_raise(Sequel::NoMatchingRow)
     DB.sqls.must_equal ["SELECT * FROM a WHERE id = 1"]

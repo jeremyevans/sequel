@@ -199,12 +199,12 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
     @ds.insert(10, 11, 3, true)
     proc{@ds.insert(1, 3, 4)}.must_raise Sequel::UniqueConstraintViolation
     proc{@ds.insert(11, 12, 3, true)}.must_raise Sequel::UniqueConstraintViolation
-    @ds.insert_ignore.insert(1, 3, 4).must_equal nil
-    @ds.insert_conflict.insert(1, 3, 4).must_equal nil
-    @ds.insert_conflict.insert(11, 12, 3, true).must_equal nil
-    @ds.insert_conflict(:target=>:a).insert(1, 3, 4).must_equal nil
-    @ds.insert_conflict(:target=>:c, :conflict_where=>:c_is_unique).insert(11, 12, 3, true).must_equal nil
-    @ds.insert_conflict(:constraint=>:ic_test_a_uidx).insert(1, 3, 4).must_equal nil
+    @ds.insert_ignore.insert(1, 3, 4).must_be_nil
+    @ds.insert_conflict.insert(1, 3, 4).must_be_nil
+    @ds.insert_conflict.insert(11, 12, 3, true).must_be_nil
+    @ds.insert_conflict(:target=>:a).insert(1, 3, 4).must_be_nil
+    @ds.insert_conflict(:target=>:c, :conflict_where=>:c_is_unique).insert(11, 12, 3, true).must_be_nil
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx).insert(1, 3, 4).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>2, :c=>3, :c_is_unique=>false}, {:a=>10, :b=>11, :c=>3, :c_is_unique=>true}]
   end
 
@@ -221,15 +221,15 @@ describe "PostgreSQL", 'INSERT ON CONFLICT' do
 
   it "Dataset#insert_conflict should handle upserts" do
     @ds.insert(1, 2, 3)
-    @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).insert(1, 3, 4).must_equal nil
+    @ds.insert_conflict(:target=>:a, :update=>{:b=>3}).insert(1, 3, 4).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>3, :c=>3, :c_is_unique=>false}]
-    @ds.insert_conflict(:target=>[:b, :c], :update=>{:c=>5}).insert(5, 3, 3).must_equal nil
+    @ds.insert_conflict(:target=>[:b, :c], :update=>{:c=>5}).insert(5, 3, 3).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>3, :c=>5, :c_is_unique=>false}]
-    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>4}).insert(1, 3).must_equal nil
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>4}).insert(1, 3).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>4, :c=>5, :c_is_unique=>false}]
-    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>5}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_equal nil
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>5}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
-    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_equal nil
+    @ds.insert_conflict(:constraint=>:ic_test_a_uidx, :update=>{:b=>6}, :update_where=>{Sequel[:ic_test][:b]=>4}).insert(1, 3, 4).must_be_nil
     @ds.all.must_equal [{:a=>1, :b=>5, :c=>5, :c_is_unique=>false}]
   end
 
@@ -284,12 +284,12 @@ describe "A PostgreSQL database" do
   it "should support disable_insert_returning" do
     ds = @db[Sequel[:public][:testfk]].disable_insert_returning
     ds.delete
-    ds.insert.must_equal nil
+    ds.insert.must_be_nil
     id = ds.max(:id)
     ds.select_order_map([:id, :i]).must_equal [[id, nil]]
-    ds.insert(:i=>id).must_equal nil
+    ds.insert(:i=>id).must_be_nil
     ds.select_order_map([:id, :i]).must_equal [[id, nil], [id+1, id]]
-    ds.insert_select(:i=>ds.max(:id)).must_equal nil
+    ds.insert_select(:i=>ds.max(:id)).must_be_nil
     ds.select_order_map([:id, :i]).must_equal [[id, nil], [id+1, id]]
     c = Class.new(Sequel::Model(ds))
     c.class_eval do
@@ -510,8 +510,8 @@ describe "A PostgreSQL dataset" do
     info[:schema].must_equal 'public'
     info[:table].must_equal 'atest'
     info[:constraint].must_equal 'f'
-    info[:column].must_equal nil
-    info[:type].must_equal nil
+    info[:column].must_be_nil
+    info[:type].must_be_nil
 
     begin
       @db[:atest].insert(0, nil)
@@ -521,9 +521,9 @@ describe "A PostgreSQL dataset" do
     info = @db.error_info(e.wrapped_exception)
     info[:schema].must_equal 'public'
     info[:table].must_equal 'atest'
-    info[:constraint].must_equal nil
+    info[:constraint].must_be_nil
     info[:column].must_equal 't2'
-    info[:type].must_equal nil
+    info[:type].must_be_nil
   end if DB.server_version >= 90300 && DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
 
   it "should support Database#do for executing anonymous code blocks" do
@@ -667,8 +667,8 @@ describe "A PostgreSQL dataset" do
   end
 
   it "#lock should return nil" do
-    @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.must_equal nil
-    @db.transaction{@d.lock('EXCLUSIVE').must_equal nil; @d.insert(:name=>'a')}
+    @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.must_be_nil
+    @db.transaction{@d.lock('EXCLUSIVE').must_be_nil; @d.insert(:name=>'a')}
   end
 
   it "should raise an error if attempting to update a joined dataset with a single FROM table" do
@@ -817,13 +817,13 @@ describe "A PostgreSQL dataset with a timestamp field" do
     it "should handle infinite timestamps if convert_infinite_timestamps is set" do
       @d << {:time=>Sequel.cast('infinity', DateTime)}
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:time).must_equal nil
+      @db[:test3].get(:time).must_be_nil
       @db.convert_infinite_timestamps = :string
       @db[:test3].get(:time).must_equal 'infinity'
       @db.convert_infinite_timestamps = :float
       @db[:test3].get(:time).must_equal 1.0/0.0
       @db.convert_infinite_timestamps = 'nil'
-      @db[:test3].get(:time).must_equal nil
+      @db[:test3].get(:time).must_be_nil
       @db.convert_infinite_timestamps = 'string'
       @db[:test3].get(:time).must_equal 'infinity'
       @db.convert_infinite_timestamps = 'float'
@@ -842,7 +842,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
       @d.update(:time=>Sequel.cast('-infinity', DateTime))
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:time).must_equal nil
+      @db[:test3].get(:time).must_be_nil
       @db.convert_infinite_timestamps = :string
       @db[:test3].get(:time).must_equal '-infinity'
       @db.convert_infinite_timestamps = :float
@@ -861,7 +861,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
     it "should handle infinite dates if convert_infinite_timestamps is set" do
       @d << {:date=>Sequel.cast('infinity', Date)}
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:date).must_equal nil
+      @db[:test3].get(:date).must_be_nil
       @db.convert_infinite_timestamps = :string
       @db[:test3].get(:date).must_equal 'infinity'
       @db.convert_infinite_timestamps = :float
@@ -869,7 +869,7 @@ describe "A PostgreSQL dataset with a timestamp field" do
 
       @d.update(:date=>Sequel.cast('-infinity', :timestamp))
       @db.convert_infinite_timestamps = :nil
-      @db[:test3].get(:date).must_equal nil
+      @db[:test3].get(:date).must_be_nil
       @db.convert_infinite_timestamps = :string
       @db[:test3].get(:date).must_equal '-infinity'
       @db.convert_infinite_timestamps = :float
@@ -975,7 +975,7 @@ describe "A PostgreSQL database" do
 
   it "should not raise an error if attempting to resetting the primary key sequence for a table without a primary key" do
     @db.create_table(:posts){Integer :a}
-    @db.reset_primary_key_sequence(:posts).must_equal nil
+    @db.reset_primary_key_sequence(:posts).must_be_nil
   end
 
   it "should support opclass specification" do
@@ -1138,8 +1138,8 @@ describe "Postgres::Dataset#insert" do
   end
 
   it "should work with static SQL" do
-    @ds.with_sql('INSERT INTO test5 (value) VALUES (10)').insert.must_equal nil
-    @db['INSERT INTO test5 (value) VALUES (20)'].insert.must_equal nil
+    @ds.with_sql('INSERT INTO test5 (value) VALUES (10)').insert.must_be_nil
+    @db['INSERT INTO test5 (value) VALUES (20)'].insert.must_be_nil
     @ds.all.must_equal [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}]
   end
 
@@ -1185,7 +1185,7 @@ describe "Postgres::Dataset#insert" do
   it "should return nil if the table has no primary key" do
     @db.create_table!(:test5){String :name; Integer :value}
     @ds.delete
-    @ds.insert(:name=>'a').must_equal nil
+    @ds.insert(:name=>'a').must_be_nil
   end
 end
 
@@ -1202,14 +1202,14 @@ describe "Postgres::Database schema qualified tables" do
 
   it "should be able to create, drop, select and insert into tables in a given schema" do
     @db.create_table(Sequel[:schema_test][:schema_test]){primary_key :i}
-    @db[Sequel[:schema_test][:schema_test]].first.must_equal nil
+    @db[Sequel[:schema_test][:schema_test]].first.must_be_nil
     @db[Sequel[:schema_test][:schema_test]].insert(:i=>1).must_equal 1
     @db[Sequel[:schema_test][:schema_test]].first.must_equal(:i=>1)
     @db.from(Sequel.lit('schema_test.schema_test')).first.must_equal(:i=>1)
     @db.drop_table(Sequel[:schema_test][:schema_test])
     @db.create_table(Sequel.qualify(:schema_test, :schema_test)){integer :i}
-    @db[Sequel[:schema_test][:schema_test]].first.must_equal nil
-    @db.from(Sequel.lit('schema_test.schema_test')).first.must_equal nil
+    @db[Sequel[:schema_test][:schema_test]].first.must_be_nil
+    @db.from(Sequel.lit('schema_test.schema_test')).first.must_be_nil
     @db.drop_table(Sequel.qualify(:schema_test, :schema_test))
   end
 
@@ -1994,30 +1994,30 @@ if DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG && DB.server_versio
           called2 = true
           break
         end
-      end.must_equal nil
+      end.must_be_nil
       called.must_equal true
       called2.must_equal true
       i.must_equal 1
     end
 
     it "should accept a :timeout option in listen" do
-      @db.listen('foo2', :timeout=>0.001).must_equal nil
+      @db.listen('foo2', :timeout=>0.001).must_be_nil
       called = false
-      @db.listen('foo2', :timeout=>0.001){|ev, pid, payload| called = true}.must_equal nil
+      @db.listen('foo2', :timeout=>0.001){|ev, pid, payload| called = true}.must_be_nil
       called.must_equal false
       i = 0
-      @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_equal nil
+      @db.listen('foo2', :timeout=>0.001, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_be_nil
       i.must_equal 4
 
       called = false
       i = 0
-      @db.listen('foo2', :timeout=>proc{i+=1; 0.001}){|ev, pid, payload| called = true}.must_equal nil
+      @db.listen('foo2', :timeout=>proc{i+=1; 0.001}){|ev, pid, payload| called = true}.must_be_nil
       called.must_equal false
       i.must_equal 1
 
 	  i = 0
       t = 0
-      @db.listen('foo2', :timeout=>proc{t+=1; 0.001}, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_equal nil
+      @db.listen('foo2', :timeout=>proc{t+=1; 0.001}, :loop=>proc{i+=1; throw :stop if i > 3}){|ev, pid, payload| called = true}.must_be_nil
       called.must_equal false
       t.must_equal 4
 
@@ -2366,7 +2366,7 @@ describe 'PostgreSQL array handling' do
     @ds.call(:insert, {:i=>[1,2]}, {:i=>:$i})
     @ds.get(:i).must_equal [1, 2]
     @ds.filter(:i=>:$i).call(:first, :i=>[1,2]).must_equal(:i=>[1,2])
-    @ds.filter(:i=>:$i).call(:first, :i=>[1,3]).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>[1,3]).must_be_nil
 
     # NULL values
     @ds.delete
@@ -2380,7 +2380,7 @@ describe 'PostgreSQL array handling' do
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a))
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
-    @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>['', nil, nil, 'a']).must_be_nil
 
     @db.create_table!(:items) do
       column :i, 'date[]'
@@ -2389,7 +2389,7 @@ describe 'PostgreSQL array handling' do
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'date'))
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Date.today-1], 'date')).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Date.today-1], 'date')).must_be_nil
 
     @db.create_table!(:items) do
       column :i, 'timestamp[]'
@@ -2398,7 +2398,7 @@ describe 'PostgreSQL array handling' do
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'timestamp'))
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([a.first-1], 'timestamp')).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([a.first-1], 'timestamp')).must_be_nil
 
     @db.create_table!(:items) do
       column :i, 'boolean[]'
@@ -2407,7 +2407,7 @@ describe 'PostgreSQL array handling' do
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'boolean'))
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([false, true], 'boolean')).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([false, true], 'boolean')).must_be_nil
 
     @db.create_table!(:items) do
       column :i, 'bytea[]'
@@ -2416,7 +2416,7 @@ describe 'PostgreSQL array handling' do
     @ds.call(:insert, {:i=>:$i}, :i=>Sequel.pg_array(a, 'bytea'))
     @ds.get(:i).must_equal a
     @ds.filter(:i=>:$i).call(:first, :i=>a).must_equal(:i=>a)
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.blob("b\0")], 'bytea')).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.pg_array([Sequel.blob("b\0")], 'bytea')).must_be_nil
   end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'with models' do
@@ -2594,7 +2594,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.call(:insert, {:i=>Sequel.hstore(@h)}, {:i=>:$i})
     @ds.get(:i).must_equal @h
     @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore(@h)).must_equal(:i=>@h)
-    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore({})).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>Sequel.hstore({})).must_be_nil
 
     @ds.delete
     @ds.call(:insert, {:i=>Sequel.hstore('a'=>nil)}, {:i=>:$i})
@@ -2604,7 +2604,7 @@ describe 'PostgreSQL hstore handling' do
     @ds.call(:insert, {:i=>@h}, {:i=>:$i})
     @ds.get(:i).must_equal @h
     @ds.filter(:i=>:$i).call(:first, :i=>@h).must_equal(:i=>@h)
-    @ds.filter(:i=>:$i).call(:first, :i=>{}).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>{}).must_be_nil
   end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
   it 'with models and associations' do
@@ -2712,7 +2712,7 @@ describe 'PostgreSQL hstore handling' do
     h3 = Sequel.hstore(:h3)
     
     @ds.get(h1['a']).must_equal 'b'
-    @ds.get(h1['d']).must_equal nil
+    @ds.get(h1['d']).must_be_nil
 
     @ds.get(h2.concat(h3).keys.length).must_equal 2
     @ds.get(h1.concat(h3).keys.length).must_equal 3
@@ -2735,9 +2735,9 @@ describe 'PostgreSQL hstore handling' do
     @ds.get(h1.defined('c')).must_equal false
     @ds.get(h1.defined('d')).must_equal false
 
-    @ds.get(h1.delete('a')['c']).must_equal nil
-    @ds.get(h1.delete(%w'a d')['c']).must_equal nil
-    @ds.get(h1.delete(h2)['c']).must_equal nil
+    @ds.get(h1.delete('a')['c']).must_be_nil
+    @ds.get(h1.delete(%w'a d')['c']).must_be_nil
+    @ds.get(h1.delete(h2)['c']).must_be_nil
 
     @ds.from(Sequel.hstore('a'=>'b', 'c'=>nil).op.each).order(:key).all.must_equal [{:key=>'a', :value=>'b'}, {:key=>'c', :value=>nil}]
 
@@ -2766,7 +2766,7 @@ describe 'PostgreSQL hstore handling' do
 
     @ds.get(h1.slice(%w'a c').keys.length).must_equal 2
     @ds.get(h1.slice(%w'd c').keys.length).must_equal 1
-    @ds.get(h1.slice(%w'd e').keys.length).must_equal nil
+    @ds.get(h1.slice(%w'd e').keys.length).must_be_nil
 
     @ds.from(Sequel.hstore('t'=>'s', 'a'=>'b').op.svals.as(:s)).select_order_map(:s).must_equal %w'b s'
 
@@ -3056,7 +3056,7 @@ describe 'PostgreSQL inet/cidr types' do
     @ds.get(:i).must_equal @ipv4
     @ds.get(:c).must_equal @ipv4nm
     @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).must_equal(:i=>@ipv4, :c=>@ipv4nm)
-    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).must_equal nil
+    @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).must_be_nil
     @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv4, :c=>@ipv4nm).must_equal 1
 
     unless ipv6_broken
@@ -3064,14 +3064,14 @@ describe 'PostgreSQL inet/cidr types' do
       @ds.get(:i).must_equal @ipv6
       @ds.get(:c).must_equal @ipv6nm
       @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv6, :c=>@ipv6nm).must_equal(:i=>@ipv6, :c=>@ipv6nm)
-      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).must_equal nil
+      @ds.filter(:i=>:$i, :c=>:$c).call(:first, :i=>@ipv4, :c=>@ipv4nm).must_be_nil
       @ds.filter(:i=>:$i, :c=>:$c).call(:delete, :i=>@ipv6, :c=>@ipv6nm).must_equal 1
     end
 
     @db.create_table!(:items){column :i, 'inet[]'; column :c, 'cidr[]'; column :m, 'macaddr[]'}
     @ds.call(:insert, {:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']}, {:i=>:$i, :c=>:$c, :m=>:$m})
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).must_equal(:i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab'])
-    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[], :c=>[], :m=>[]).must_equal nil
+    @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:first, :i=>[], :c=>[], :m=>[]).must_be_nil
     @ds.filter(:i=>:$i, :c=>:$c, :m=>:$m).call(:delete, :i=>[@ipv4], :c=>[@ipv4nm], :m=>['12:34:56:78:90:ab']).must_equal 1
   end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
@@ -3226,7 +3226,7 @@ describe 'PostgreSQL range types' do
     @ds.first.must_be :==, @r
     @ds.filter(h).call(:first, @r).must_be :==, @r
     @ds.filter(h).call(:first, @pgr).must_be :==, @r
-    @ds.filter(h).call(:first, r2).must_equal nil
+    @ds.filter(h).call(:first, r2).must_be_nil
     @ds.filter(h).call(:delete, @r).must_equal 1
 
     @db.create_table!(:items){column :i4, 'int4range[]'; column :i8, 'int8range[]'; column :n, 'numrange[]'; column :d, 'daterange[]'; column :t, 'tsrange[]'; column :tz, 'tstzrange[]'}
@@ -3234,7 +3234,7 @@ describe 'PostgreSQL range types' do
     @ds.call(:insert, @ra, h)
     @ds.filter(h).call(:first, @ra).each{|k, v| v.must_be :==, @ra[k].to_a}
     @ds.filter(h).call(:first, @pgra).each{|k, v| v.must_be :==, @ra[k].to_a}
-    @ds.filter(h).call(:first, r2).must_equal nil
+    @ds.filter(h).call(:first, r2).must_be_nil
     @ds.filter(h).call(:delete, @ra).must_equal 1
   end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
@@ -3409,13 +3409,13 @@ describe 'PostgreSQL interval types' do
     @ds.call(:insert, {:i=>d}, {:i=>:$i})
     @ds.get(:i).must_equal d
     @ds.filter(:i=>:$i).call(:first, :i=>d).must_equal(:i=>d)
-    @ds.filter(:i=>Sequel.cast(:$i, :interval)).call(:first, :i=>'0').must_equal nil
+    @ds.filter(:i=>Sequel.cast(:$i, :interval)).call(:first, :i=>'0').must_be_nil
     @ds.filter(:i=>:$i).call(:delete, :i=>d).must_equal 1
 
     @db.create_table!(:items){column :i, 'interval[]'}
     @ds.call(:insert, {:i=>[d]}, {:i=>:$i})
     @ds.filter(:i=>:$i).call(:first, :i=>[d]).must_equal(:i=>[d])
-    @ds.filter(:i=>:$i).call(:first, :i=>[]).must_equal nil
+    @ds.filter(:i=>:$i).call(:first, :i=>[]).must_be_nil
     @ds.filter(:i=>:$i).call(:delete, :i=>[d]).must_equal 1
   end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
@@ -3529,7 +3529,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.call(:insert, {:address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])}, {:address=>:$address, :id=>1})
     @ds.get(:address).must_equal(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345')
     @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345']))[:id].must_equal 1
-    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])).must_equal nil
+    @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])).must_be_nil
 
     @ds.delete
     @ds.call(:insert, {:address=>Sequel.pg_row([nil, nil, nil])}, {:address=>:$address, :id=>1})
@@ -3541,7 +3541,7 @@ describe 'PostgreSQL row-valued/composite types' do
     @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])])}, {:employees=>:$employees, :id=>1})
     @ds.get(:company).must_equal(:id=>1, :employees=>[{:id=>1, :address=>{:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12345'}}])
     @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12345'])])]))[:id].must_equal 1
-    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).must_equal nil
+    @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).must_be_nil
 
     @ds.delete
     @ds.call(:insert, {:employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row([nil, nil, nil])])])}, {:employees=>:$employees, :id=>1})
@@ -3671,7 +3671,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @ds.call(:insert, {:address=>@a}, {:address=>:$address, :id=>1})
       @ds.get(:address).must_equal @a
       @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>@a)[:id].must_equal 1
-      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12356')).must_equal nil
+      @ds.filter(:address=>Sequel.cast(:$address, :address)).call(:first, :address=>Address.new(:street=>'123 Sesame St', :city=>'Somewhere', :zip=>'12356')).must_be_nil
     end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
     it 'use arrays of model objects in bound variables' do
@@ -3679,7 +3679,7 @@ describe 'PostgreSQL row-valued/composite types' do
       @ds.call(:insert, {:employees=>@es}, {:employees=>:$employees, :id=>1})
       @ds.get(:company).must_equal Company.new(:id=>1, :employees=>@es)
       @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>@es)[:id].must_equal 1
-      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).must_equal nil
+      @ds.filter(:employees=>Sequel.cast(:$employees, 'person[]')).call(:first, :employees=>Sequel.pg_array([@db.row_type(:person, [1, Sequel.pg_row(['123 Sesame St', 'Somewhere', '12356'])])])).must_be_nil
     end if (DB.adapter_scheme == :postgres && SEQUEL_POSTGRES_USES_PG) || DB.adapter_scheme == :jdbc
 
     it 'model typecasting' do
@@ -3822,7 +3822,7 @@ describe "PostgreSQL stored procedures for datasets" do
 
   it "should correctly call stored procedure for inserting record" do
     result = @ds.call_sproc(:insert, :insert_item, 100)
-    result.must_equal nil
+    result.must_be_nil
 
     @ds.call(:all).must_equal [{:id=>1, :numb=>100}]
   end

@@ -103,7 +103,7 @@ describe "Eagerly loading a tree structure" do
     nodes.length.must_equal 2
     nodes.collect{|x| x.pk}.must_equal [3, 7]
     nodes.first.parent.pk.must_equal 1
-    nodes.first.parent.parent.must_equal nil
+    nodes.first.parent.parent.must_be_nil
     node = nodes.last
     node.parent.pk.must_equal 6
     node = node.parent
@@ -114,7 +114,7 @@ describe "Eagerly loading a tree structure" do
     node.parent.pk.must_equal 2
     node = node.parent
     node.parent.pk.must_equal 1
-    node.parent.parent.must_equal nil
+    node.parent.parent.must_be_nil
   end
 end
 
@@ -291,7 +291,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     firm.must_equal @firm1
     @invoice1.client.must_equal @client1
     @invoice1.client.firm.must_equal @firm1
-    firm.associations[:clients].must_equal nil
+    firm.associations[:clients].must_be_nil
   end
 
   it "should eagerly load has_one :through belongs_to records for multiple objects" do
@@ -300,23 +300,23 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     invs[0].firm.must_equal @firm1
     invs[0].client.must_equal @client1
     invs[0].client.firm.must_equal @firm1
-    invs[0].firm.associations[:clients].must_equal nil
+    invs[0].firm.associations[:clients].must_be_nil
     invs[1].firm.must_equal @firm1
     invs[1].client.must_equal @client1
     invs[1].client.firm.must_equal @firm1
-    invs[1].firm.associations[:clients].must_equal nil
+    invs[1].firm.associations[:clients].must_be_nil
     invs[2].firm.must_equal @firm1
     invs[2].client.must_equal @client2
     invs[2].client.firm.must_equal @firm1
-    invs[2].firm.associations[:clients].must_equal nil
+    invs[2].firm.associations[:clients].must_be_nil
     invs[3].firm.must_equal @firm2
     invs[3].client.must_equal @client3
     invs[3].client.firm.must_equal @firm2
-    invs[3].firm.associations[:clients].must_equal nil
+    invs[3].firm.associations[:clients].must_be_nil
     invs[4].firm.must_equal @firm2
     invs[4].client.must_equal @client3
     invs[4].client.firm.must_equal @firm2
-    invs[4].firm.associations[:clients].must_equal nil
+    invs[4].firm.associations[:clients].must_be_nil
   end
 end
 
@@ -415,9 +415,9 @@ describe "Polymorphic Associations" do
     @asset2.attachable_id.must_equal @post.pk
     @asset2.attachable_type.must_equal 'Post'
     @asset1.attachable = nil
-    @asset1.attachable.must_equal nil
-    @asset1.attachable_id.must_equal nil
-    @asset1.attachable_type.must_equal nil
+    @asset1.attachable.must_be_nil
+    @asset1.attachable_id.must_be_nil
+    @asset1.attachable_type.must_be_nil
   end
 
   it "should add items correctly" do
@@ -433,16 +433,16 @@ describe "Polymorphic Associations" do
     @note.assets.must_equal [@asset2]
     @note.remove_asset(@asset2)
     @note.assets.must_equal []
-    @asset2.attachable.must_equal nil
-    @asset2.attachable_id.must_equal nil
-    @asset2.attachable_type.must_equal nil
+    @asset2.attachable.must_be_nil
+    @asset2.attachable_id.must_be_nil
+    @asset2.attachable_type.must_be_nil
   end
 
   it "should remove all items correctly" do
     @post.remove_all_assets
     @note.remove_all_assets
-    @asset1.reload.attachable.must_equal nil
-    @asset2.reload.attachable.must_equal nil
+    @asset1.reload.attachable.must_be_nil
+    @asset2.reload.attachable.must_be_nil
   end
 end
 
@@ -543,7 +543,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
     @invoice1.client.must_equal @client2
     @invoice1.client_name.must_equal 'Y'
     @invoice1.client = nil
-    @invoice1.client_name.must_equal nil
+    @invoice1.client_name.must_be_nil
   end
 
   it "should add the associated object correctly" do
@@ -552,7 +552,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
     @client2.invoices.must_equal [@invoice1]
     @invoice1.client_name.must_equal 'Y'
     @invoice1.client = nil
-    @invoice1.client_name.must_equal nil
+    @invoice1.client_name.must_be_nil
   end
 
   it "should remove the associated object correctly" do
@@ -560,16 +560,16 @@ describe "many_to_one/one_to_many not referencing primary key" do
     invs.must_equal [@invoice1, @invoice2]
     @client1.remove_invoice(@invoice1)
     @client1.invoices.must_equal [@invoice2]
-    @invoice1.client_name.must_equal nil
-    @invoice1.client.must_equal nil
+    @invoice1.client_name.must_be_nil
+    @invoice1.client.must_be_nil
   end
 
   it "should remove all associated objects correctly" do
     @client1.remove_all_invoices
-    @invoice1.refresh.client.must_equal nil
-    @invoice1.client_name.must_equal nil
-    @invoice2.refresh.client.must_equal nil
-    @invoice2.client_name.must_equal nil
+    @invoice1.refresh.client.must_be_nil
+    @invoice1.client_name.must_be_nil
+    @invoice2.refresh.client.must_be_nil
+    @invoice2.client_name.must_be_nil
   end
 end
 

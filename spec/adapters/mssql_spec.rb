@@ -352,14 +352,14 @@ describe "MSSSQL::Dataset#insert" do
   end
 
   it "should have insert_select return nil if disable_insert_output is used" do
-    @ds.disable_insert_output.insert_select(:value=>10).must_equal nil
+    @ds.disable_insert_output.insert_select(:value=>10).must_be_nil
   end
   
   it "should have insert_select return nil if the server version is not 2005+" do
     @ds = @ds.with_extend(Module.new do
       def server_version() 8000760 end
     end)
-    @ds.insert_select(:value=>10).must_equal nil
+    @ds.insert_select(:value=>10).must_be_nil
   end
 
   it "should have insert_select insert the record and return the inserted record" do

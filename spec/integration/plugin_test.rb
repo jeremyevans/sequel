@@ -70,27 +70,27 @@ describe "Class Table Inheritance Plugin" do
   end
   
   it "should lazily load columns in subclass tables" do
-    Employee[@i2][:manager_id].must_equal nil
+    Employee[@i2][:manager_id].must_be_nil
     Employee[@i2].manager_id.must_equal @i4
-    Employee[@i3][:num_staff].must_equal nil
+    Employee[@i3][:num_staff].must_be_nil
     Employee[@i3].num_staff.must_equal 7
-    Employee[@i4][:num_staff].must_equal nil
+    Employee[@i4][:num_staff].must_be_nil
     Employee[@i4].num_staff.must_equal 5
-    Employee[@i4][:num_managers].must_equal nil
+    Employee[@i4][:num_managers].must_be_nil
     Employee[@i4].num_managers.must_equal 6
-    Employee[@i5][:num_managers].must_equal nil
+    Employee[@i5][:num_managers].must_be_nil
     Employee[@i5].num_managers.must_equal 1
   end
   
   it "should eagerly load columns in subclass tables when retrieving multiple objects" do
     a = Employee.order(:id).all
-    a[1][:manager_id].must_equal nil
+    a[1][:manager_id].must_be_nil
     a[1].manager_id.must_equal @i4
-    a[2][:num_staff].must_equal nil
+    a[2][:num_staff].must_be_nil
     a[2].num_staff.must_equal 7
     a[3][:num_staff].must_equal 5 # eagerly loaded by previous call
     a[3].num_staff.must_equal 5
-    a[3][:num_managers].must_equal nil
+    a[3][:num_managers].must_be_nil
     a[3].num_managers.must_equal 6
     a[4][:num_managers].must_equal 1
     a[4].num_managers.must_equal 1
@@ -117,9 +117,9 @@ describe "Class Table Inheritance Plugin" do
     i = e.id
     e.staff_members_dataset.destroy
     e.destroy
-    @db[:executives][:id=>i].must_equal nil
-    @db[:managers][:id=>i].must_equal nil
-    @db[:employees][:id=>i].must_equal nil
+    @db[:executives][:id=>i].must_be_nil
+    @db[:managers][:id=>i].must_be_nil
+    @db[:employees][:id=>i].must_be_nil
   end
   
   it "should handle associations only defined in subclasses" do
@@ -563,7 +563,7 @@ describe "Touch plugin" do
 
   it "should update the timestamp column when touching the record" do
     Album.plugin :touch
-    @album.updated_at.must_equal nil
+    @album.updated_at.must_be_nil
     @album.touch
     @album.updated_at.to_i.must_be_close_to Time.now.to_i, 2
   end
@@ -571,7 +571,7 @@ describe "Touch plugin" do
   cspecify "should update the timestamp column for many_to_one associated records when the record is updated or destroyed", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
     Album.many_to_one :artist
     Album.plugin :touch, :associations=>:artist
-    @artist.updated_at.must_equal nil
+    @artist.updated_at.must_be_nil
     @album.update(:name=>'B')
     ua = @artist.reload.updated_at
     if ua.is_a?(Time)
@@ -591,7 +591,7 @@ describe "Touch plugin" do
   cspecify "should update the timestamp column for one_to_many associated records when the record is updated", [:do, :sqlite], [:jdbc, :sqlite], [:swift] do
     Artist.one_to_many :albums
     Artist.plugin :touch, :associations=>:albums
-    @album.updated_at.must_equal nil
+    @album.updated_at.must_be_nil
     @artist.update(:name=>'B')
     ua = @album.reload.updated_at
     if ua.is_a?(Time)
@@ -605,7 +605,7 @@ describe "Touch plugin" do
     Artist.many_to_many :albums
     Artist.plugin :touch, :associations=>:albums
     @artist.add_album(@album)
-    @album.updated_at.must_equal nil
+    @album.updated_at.must_be_nil
     @artist.update(:name=>'B')
     ua = @album.reload.updated_at
     if ua.is_a?(Time)
@@ -717,7 +717,7 @@ describe "Composition plugin" do
 
   it "should return a composed object if the underlying columns have a value" do
     @e1.date.must_equal Date.civil(2010, 2, 15)
-    @e2.date.must_equal nil
+    @e2.date.must_be_nil
   end
 
   it "should decompose the object when saving the record" do
@@ -755,8 +755,8 @@ describe "RcteTree Plugin" do
       @aaab.children.must_equal []
       @aaaaa.children.must_equal []
       
-      @a.parent.must_equal nil
-      @b.parent.must_equal nil
+      @a.parent.must_be_nil
+      @b.parent.must_be_nil
       @aa.parent.must_equal @a
       @ab.parent.must_equal @a
       @ba.parent.must_equal @b
@@ -891,28 +891,28 @@ describe "RcteTree Plugin" do
     
     it "should populate all :parent associations when eagerly loading ancestors for a dataset" do
       nodes = @Node.filter(@Node.primary_key=>[@a.pk, @ba.pk, @aaa.pk, @aaaaa.pk]).order(:name).eager(:ancestors).all
-      nodes[0].associations.fetch(:parent, 1).must_equal nil
+      nodes[0].associations.fetch(:parent, 1).must_be_nil
       nodes[1].associations[:parent].must_equal @aa
       nodes[1].associations[:parent].associations[:parent].must_equal @a
-      nodes[1].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+      nodes[1].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_be_nil
       nodes[2].associations[:parent].must_equal @aaaa
       nodes[2].associations[:parent].associations[:parent].must_equal @aaa
       nodes[2].associations[:parent].associations[:parent].associations[:parent].must_equal @aa
       nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].must_equal @a
-      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_be_nil
       nodes[3].associations[:parent].must_equal @b
-      nodes[3].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+      nodes[3].associations[:parent].associations.fetch(:parent, 1).must_be_nil
     end
     
     it "should populate all :parent associations when lazily loading ancestors" do
       @a.reload
       @a.ancestors
-      @a.associations[:parent].must_equal nil
+      @a.associations[:parent].must_be_nil
       
       @ba.reload
       @ba.ancestors
       @ba.associations[:parent].must_equal @b
-      @ba.associations[:parent].associations.fetch(:parent, 1).must_equal nil
+      @ba.associations[:parent].associations.fetch(:parent, 1).must_be_nil
       
       @ba.reload
       @aaaaa.ancestors
@@ -920,7 +920,7 @@ describe "RcteTree Plugin" do
       @aaaaa.associations[:parent].associations[:parent].must_equal @aaa
       @aaaaa.associations[:parent].associations[:parent].associations[:parent].must_equal @aa
       @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].must_equal @a
-      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_equal nil
+      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).must_be_nil
     end
   end
 
@@ -1528,12 +1528,12 @@ describe "List plugin without a scope" do
 
   it "should define prev and next" do
     i = @c[:name => "abc"]
-    i.prev.must_equal nil
+    i.prev.must_be_nil
     i = @c[:name => "def"]
     i.prev.must_equal @c[:name => "abc"]
     i.next.must_equal @c[:name => "hig"]
     i = @c[:name => "hig"]
-    i.next.must_equal nil
+    i.next.must_be_nil
   end
 
   it "should define move_to" do
@@ -1623,10 +1623,10 @@ describe "List plugin with a scope" do
     @c[:name => "P3"].prev(2).name.must_equal 'P1'
     @c[:name => "P2"].prev(-1).name.must_equal 'P3'
 
-    @c[:name => "Ps"].prev.must_equal nil
-    @c[:name => "Au"].next.must_equal nil
-    @c[:name => "P1"].prev.must_equal nil
-    @c[:name => "P3"].next.must_equal nil
+    @c[:name => "Ps"].prev.must_be_nil
+    @c[:name => "Au"].next.must_be_nil
+    @c[:name => "P1"].prev.must_be_nil
+    @c[:name => "P3"].next.must_be_nil
   end
 
   it "should define move_to" do
@@ -1833,31 +1833,31 @@ describe "Sequel::Plugins::PreparedStatements" do
   it "should work with looking up using Model.[]" do 
     @c[@foo.id].must_equal @foo
     @c[@bar.id].must_equal @bar
-    @c[0].must_equal nil
-    @c[nil].must_equal nil
+    @c[0].must_be_nil
+    @c[nil].must_be_nil
   end
 
   it "should work with looking up using Dataset#with_pk" do 
     @c.dataset.with_pk(@foo.id).must_equal @foo
     @c.dataset.with_pk(@bar.id).must_equal @bar
-    @c.dataset.with_pk(0).must_equal nil
-    @c.dataset.with_pk(nil).must_equal nil
+    @c.dataset.with_pk(0).must_be_nil
+    @c.dataset.with_pk(nil).must_be_nil
 
-    @c.dataset.filter(:i=>0).with_pk(@foo.id).must_equal nil
+    @c.dataset.filter(:i=>0).with_pk(@foo.id).must_be_nil
     @c.dataset.filter(:i=>10).with_pk(@foo.id).must_equal @foo
     @c.dataset.filter(:i=>20).with_pk(@bar.id).must_equal @bar
-    @c.dataset.filter(:i=>10).with_pk(nil).must_equal nil
+    @c.dataset.filter(:i=>10).with_pk(nil).must_be_nil
     @c.dataset.filter(:name=>'foo').with_pk(@foo.id).must_equal @foo
     @c.dataset.filter(:name=>'bar').with_pk(@bar.id).must_equal @bar
-    @c.dataset.filter(:name=>'baz').with_pk(@bar.id).must_equal nil
-    @c.dataset.filter(:name=>'bar').with_pk(nil).must_equal nil
+    @c.dataset.filter(:name=>'baz').with_pk(@bar.id).must_be_nil
+    @c.dataset.filter(:name=>'bar').with_pk(nil).must_be_nil
   end
 
   it "should work with Model#destroy" do 
     @foo.destroy
     @bar.destroy
-    @c[@foo.id].must_equal nil
-    @c[@bar.id].must_equal nil
+    @c[@foo.id].must_be_nil
+    @c[@bar.id].must_be_nil
   end
 
   it "should work with Model#update" do 
@@ -1952,8 +1952,8 @@ describe "Caching plugins" do
     it "should work with looking up using Model.[]" do 
       @Artist[1].must_be_same_as(@Artist[1])
       @Artist[:id=>1].must_equal @Artist[1]
-      @Artist[0].must_equal nil
-      @Artist[nil].must_equal nil
+      @Artist[0].must_be_nil
+      @Artist[nil].must_be_nil
     end
 
     it "should work with lookup up many_to_one associated objects" do 

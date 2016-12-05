@@ -48,7 +48,7 @@ describe Sequel::Model, "tree plugin" do
   end
 
   it "should have tree_order give the order of the association" do
-    @c.tree_order.must_equal nil
+    @c.tree_order.must_be_nil
     klass(:order=>:name).tree_order.must_equal :name
     klass(:order=>[:parent_id, :name]).tree_order.must_equal [:parent_id, :name]
   end

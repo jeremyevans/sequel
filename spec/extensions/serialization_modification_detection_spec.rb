@@ -42,12 +42,12 @@ describe "serialization_modification_detection plugin" do
     @o2.changed_columns.must_equal [:h]
 
     @o3.changed_columns.must_equal []
-    @o3.h.must_equal nil
+    @o3.h.must_be_nil
     @o3.h = {}
     @o3.changed_columns.must_equal [:h]
 
     @o4.changed_columns.must_equal []
-    @o4.h.must_equal nil
+    @o4.h.must_be_nil
     @o4.h = {}
     @o4.changed_columns.must_equal [:h]
   end

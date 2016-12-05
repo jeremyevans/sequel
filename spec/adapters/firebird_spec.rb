@@ -381,7 +381,7 @@ describe "Postgres::Dataset#insert" do
   it "should return nil if the table has no primary key" do
     ds = DB[:test]
     ds.delete
-    ds.insert(:name=>'a').must_equal nil
+    ds.insert(:name=>'a').must_be_nil
   end
 end
 

@@ -17,12 +17,12 @@ describe "null_dataset extension" do
   end
 
   it "should make fetch_rows be a noop" do
-    @ds.fetch_rows("SELECT 1", &@pr).must_equal nil
+    @ds.fetch_rows("SELECT 1", &@pr).must_be_nil
     @i.must_equal 0
   end
 
   it "should make insert be a noop" do
-    @ds.insert(1).must_equal nil
+    @ds.insert(1).must_be_nil
   end
 
   it "should make update be a noop" do
@@ -34,14 +34,14 @@ describe "null_dataset extension" do
   end
 
   it "should make truncate be a noop" do
-    @ds.truncate.must_equal nil
+    @ds.truncate.must_be_nil
   end
 
   it "should make execute_* be a noop" do
-    @ds.send(:execute_ddl,'FOO').must_equal nil
-    @ds.send(:execute_insert,'FOO').must_equal nil
-    @ds.send(:execute_dui,'FOO').must_equal nil
-    @ds.send(:execute,'FOO').must_equal nil
+    @ds.send(:execute_ddl,'FOO').must_be_nil
+    @ds.send(:execute_insert,'FOO').must_be_nil
+    @ds.send(:execute_dui,'FOO').must_be_nil
+    @ds.send(:execute,'FOO').must_be_nil
   end
 
   it "should have working columns" do
@@ -59,7 +59,7 @@ describe "null_dataset extension" do
   end
 
   it "should make import a noop" do
-    @ds.import([:id], [[1], [2], [3]]).must_equal nil
+    @ds.import([:id], [[1], [2], [3]]).must_be_nil
   end
 
   it "should have nullify method returned modified receiver" do

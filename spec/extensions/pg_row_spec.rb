@@ -14,7 +14,7 @@ describe "pg_row extension" do
     a.to_a.must_be_kind_of(Array)
     a[0].must_equal 'a'
     a.must_equal %w'a b c'
-    a.db_type.must_equal nil
+    a.db_type.must_be_nil
     @db.literal(a).must_equal "ROW('a', 'b', 'c')"
   end
 
@@ -24,7 +24,7 @@ describe "pg_row extension" do
     as.each do |a|
       a.class.must_equal(@m::ArrayRow)
       a.to_a.must_be_kind_of(Array)
-      a.db_type.must_equal nil
+      a.db_type.must_be_nil
     end
     @db.literal(as).must_equal "ARRAY[ROW('a', 'b', 'c'),ROW('d', 'e', 'f')]::record[]"
   end

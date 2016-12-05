@@ -96,46 +96,46 @@ describe "A new Database" do
     Sequel.identifier_input_method = nil
     Sequel::Database.identifier_input_method.must_equal false
     db = Sequel::Database.new(:identifier_input_method=>nil)
-    db.identifier_input_method.must_equal nil
+    db.identifier_input_method.must_be_nil
     db.identifier_input_method = :downcase
     db.identifier_input_method.must_equal :downcase
     db = Sequel::Database.new(:identifier_input_method=>:upcase)
     db.identifier_input_method.must_equal :upcase
     db.identifier_input_method = nil
-    db.identifier_input_method.must_equal nil
+    db.identifier_input_method.must_be_nil
     Sequel.identifier_input_method = :downcase
     Sequel::Database.identifier_input_method.must_equal :downcase
     db = Sequel::Database.new(:identifier_input_method=>nil)
-    db.identifier_input_method.must_equal nil
+    db.identifier_input_method.must_be_nil
     db.identifier_input_method = :upcase
     db.identifier_input_method.must_equal :upcase
     db = Sequel::Database.new(:identifier_input_method=>:upcase)
     db.identifier_input_method.must_equal :upcase
     db.identifier_input_method = nil
-    db.identifier_input_method.must_equal nil
+    db.identifier_input_method.must_be_nil
   end
   
   it "should respect the :identifier_output_method option" do
     Sequel.identifier_output_method = nil
     Sequel::Database.identifier_output_method.must_equal false
     db = Sequel::Database.new(:identifier_output_method=>nil)
-    db.identifier_output_method.must_equal nil
+    db.identifier_output_method.must_be_nil
     db.identifier_output_method = :downcase
     db.identifier_output_method.must_equal :downcase
     db = Sequel::Database.new(:identifier_output_method=>:upcase)
     db.identifier_output_method.must_equal :upcase
     db.identifier_output_method = nil
-    db.identifier_output_method.must_equal nil
+    db.identifier_output_method.must_be_nil
     Sequel.identifier_output_method = :downcase
     Sequel::Database.identifier_output_method.must_equal :downcase
     db = Sequel::Database.new(:identifier_output_method=>nil)
-    db.identifier_output_method.must_equal nil
+    db.identifier_output_method.must_be_nil
     db.identifier_output_method = :upcase
     db.identifier_output_method.must_equal :upcase
     db = Sequel::Database.new(:identifier_output_method=>:upcase)
     db.identifier_output_method.must_equal :upcase
     db.identifier_output_method = nil
-    db.identifier_output_method.must_equal nil
+    db.identifier_output_method.must_be_nil
   end
 
   it "should use the default Sequel.quote_identifiers value" do
@@ -384,7 +384,7 @@ describe "Database#uri" do
   end
   
   it "should return nil if a connection uri was not used" do
-    Sequel.mock.uri.must_equal nil
+    Sequel.mock.uri.must_be_nil
   end
   
   it "should be aliased as #url" do
@@ -394,7 +394,7 @@ end
 
 describe "Database.adapter_scheme and #adapter_scheme" do
   it "should return the database scheme" do
-    Sequel::Database.adapter_scheme.must_equal nil
+    Sequel::Database.adapter_scheme.must_be_nil
 
     @c = Class.new(Sequel::Database) do
       set_adapter_scheme :mau
@@ -565,7 +565,7 @@ describe "Database#run" do
   end
   
   it "should return nil" do
-    @db.run("DELETE FROM items").must_equal nil
+    @db.run("DELETE FROM items").must_be_nil
   end
   
   it "should accept options passed to execute_ddl" do
@@ -609,7 +609,7 @@ describe "Database#synchronize" do
     c1.must_equal 12345
     t2 = Thread.new{@db.synchronize{|c| c2 = c; q2.push nil}}
     @db.pool.available_connections.must_be :empty?
-    c2.must_equal nil
+    c2.must_be_nil
     q1.push nil
     q.pop
     q2.pop
@@ -841,13 +841,13 @@ DatabaseTransactionSpecs = shared_description do
     rbc = nil
     @db.transaction do 
       rbc = @db.rollback_checker
-      rbc.call.must_equal nil
+      rbc.call.must_be_nil
     end
     rbc.call.must_equal false
 
     @db.transaction(:rollback=>:always) do 
       rbc = @db.rollback_checker
-      rbc.call.must_equal nil
+      rbc.call.must_be_nil
     end
     rbc.call.must_equal true
 
@@ -864,7 +864,7 @@ DatabaseTransactionSpecs = shared_description do
   end
   
   it "should return nil if Sequel::Rollback is called in the transaction" do
-    @db.transaction{raise Sequel::Rollback}.must_equal nil
+    @db.transaction{raise Sequel::Rollback}.must_be_nil
   end
   
   it "should reraise Sequel::Rollback errors when using :rollback=>:reraise option is given" do
@@ -879,7 +879,7 @@ DatabaseTransactionSpecs = shared_description do
   it "should always rollback if :rollback=>:always option is given" do
     proc {@db.transaction(:rollback=>:always){raise ArgumentError}}.must_raise(ArgumentError)
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
-    @db.transaction(:rollback=>:always){raise Sequel::Rollback}.must_equal nil
+    @db.transaction(:rollback=>:always){raise Sequel::Rollback}.must_be_nil
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
     @db.transaction(:rollback=>:always){1}.must_equal 1
     @db.sqls.must_equal ['BEGIN', 'ROLLBACK']
@@ -1158,7 +1158,7 @@ describe "Sequel.transaction" do
   end
   
   it "should handle Sequel::Rollback exceptions raised by the block to rollback on all databases" do
-    Sequel.transaction([@db1, @db2, @db3]){raise Sequel::Rollback}.must_equal nil
+    Sequel.transaction([@db1, @db2, @db3]){raise Sequel::Rollback}.must_be_nil
     @sqls.must_equal ['BEGIN -- 1', 'BEGIN -- 2', 'BEGIN -- 3', 'ROLLBACK -- 3', 'ROLLBACK -- 2', 'ROLLBACK -- 1']
   end
   
@@ -1465,7 +1465,7 @@ end
 
 describe "Sequel::Database.load_adapter" do
   it "should not raise an error if subadapter does not exist" do
-    Sequel::Database.load_adapter(:foo, :subdir=>'bar').must_equal nil
+    Sequel::Database.load_adapter(:foo, :subdir=>'bar').must_be_nil
   end
 end
 
@@ -1950,7 +1950,7 @@ describe "Database#typecast_value" do
     @db.typecast_value(:boolean, '1').must_equal true
     @db.typecast_value(:boolean, 't').must_equal true
     @db.typecast_value(:boolean, 'true').must_equal true
-    @db.typecast_value(:boolean, '').must_equal nil
+    @db.typecast_value(:boolean, '').must_be_nil
   end
 
   it "should typecast date values to Date" do
@@ -2435,7 +2435,7 @@ describe "Database#column_schema_to_ruby_default" do
   it "should handle converting many default formats" do
     db = Sequel::Database.new
     p = lambda{|d,t| db.send(:column_schema_to_ruby_default, d, t)}
-    p[nil, :integer].must_equal nil
+    p[nil, :integer].must_be_nil
     p[1, :integer].must_equal 1
     p['1', :integer].must_equal 1
     p['-1', :integer].must_equal(-1)
@@ -2471,7 +2471,7 @@ describe "Database#column_schema_to_ruby_default" do
     p["'2009-10-29T10:20:30-07:00'", :datetime].must_equal DateTime.parse('2009-10-29T10:20:30-07:00')
     p["'2009-10-29 10:20:30'", :datetime].must_equal DateTime.parse('2009-10-29 10:20:30')
     p["'10:20:30'", :time].must_equal Time.parse('10:20:30')
-    p["NaN", :float].must_equal nil
+    p["NaN", :float].must_be_nil
 
     db = Sequel.mock(:host=>'postgres')
     p["''::text", :string].must_equal ""
@@ -2553,7 +2553,7 @@ describe "Database extensions" do
     Sequel::Database.register_extension(:bar, proc{|db| db.identifier_input_method = nil})
     @db.extension(:foo, :bar)
     @db.quote_identifiers?.must_equal true
-    @db.identifier_input_method.must_equal nil
+    @db.identifier_input_method.must_be_nil
   end
 
   it "should return the receiver" do
