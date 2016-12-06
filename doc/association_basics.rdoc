@@ -962,7 +962,10 @@ In both cases an array of symbols can be used for a composite key association:
 
 The conditions to use to filter the association, can be any argument passed to +where+.
 If you use a hash or an array of two element arrays, this will also be used as a
-filter when using eager_graph to load the association.
+filter when using eager_graph or association_join to load the association.  If you
+do not use a hash or array of two element arrays, consider also using the :graph_block
+option to specifying a similar condition if you plan to use this association with
+eager_graph or association_join.
 
   Artist.one_to_many :good_albums, :class=>:Album, :conditions=>{:good=>true}
   @artist.good_albums

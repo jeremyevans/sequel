@@ -1,5 +1,7 @@
 === HEAD
 
+* Warn if :conditions option may be unexpectedly ignored during eager_graph/association_join (jeremyevans) (#1272)
+
 * Cache SELECT SQL for most frozen datasets (jeremyevans)
 
 * Freeze most SQL::Expression objects and internal state by default (jeremyevans)

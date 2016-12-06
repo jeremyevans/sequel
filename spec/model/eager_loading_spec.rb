@@ -1470,6 +1470,14 @@ describe Sequel::Model, "#eager_graph" do
   
   it "should correctly handle an aliased join table in many_to_many and one_through_one" do
     c = Class.new(GraphAlbum)
+    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga, :conditions=>'true', :ignore_conditions_warning=> true
+    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ga.genre_id)'
+    c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga, :conditions=>'true', :graph_block => proc{true}
+    c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON ((genres.id = ga.genre_id) AND \'t\')'
+  end
+
+  it "should correctly handle an aliased join table in many_to_many and one_through_one" do
+    c = Class.new(GraphAlbum)
     c.many_to_many :genres, :clone=>:genres, :join_table=>:ag___ga
     c.eager_graph(:genres).sql.must_equal 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag AS ga ON (ga.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ga.genre_id)'
 

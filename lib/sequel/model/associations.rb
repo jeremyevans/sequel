@@ -1507,6 +1507,10 @@ module Sequel
         #           the given association.  Can be used to DRY up a bunch of similar associations that
         #           all share the same options such as :class and :key, while changing the order and block used.
         # :conditions :: The conditions to use to filter the association, can be any argument passed to where.
+        #                This option is not respected when using eager_graph or association_join, unless it
+        #                is hash or array of two element arrays.  Consider also specifying the :graph_block
+        #                option if the value for this option is not a hash or array of two element arrays
+        #                and you plan to use this association in eager_graph or association_join.
         # :dataset :: A proc that is instance_execed to get the base dataset to use (before the other
         #             options are applied).  If the proc accepts an argument, it is passed the related
         #             association reflection.
@@ -2743,6 +2747,11 @@ END
           end
           local_opts = ds.opts[:eager_graph][:local]
           limit_strategy = r.eager_graph_limit_strategy(local_opts[:limit_strategy])
+
+          if r[:conditions] && !Sequel.condition_specifier?(r[:conditions]) && !r[:orig_opts][:graph_conditions] && !r[:orig_opts][:graph_only_conditions] && !r[:graph_block]
+            warn("Ignoring :conditions for #{r[:model]} #{r[:name]} association during eager_graph/association_join, consider specifying :graph_block") unless r[:ignore_conditions_warning]
+          end
+
           ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :join_only=>local_opts[:join_only], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
           if r[:order_eager_graph] && (order = r.fetch(:graph_order, r[:order]))
             ds = ds.order_more(*qualified_expression(order, assoc_table_alias))
