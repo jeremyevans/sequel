@@ -287,8 +287,6 @@ module Sequel
     # threads can reference the dataset.
     attr_reader :cache
 
-    private
-
     # Retreive a value from the dataset's cache in a thread safe manner.
     def cache_get(k)
       Sequel.synchronize{@cache[k]}
@@ -299,6 +297,8 @@ module Sequel
       Sequel.synchronize{@cache[k] = v}
     end
 
+    private
+
     # Set the columns for the current dataset.
     def columns=(v)
       cache_set(:columns, v)
@@ -308,7 +308,7 @@ module Sequel
     def initialize_copy(c)
       @db = c.db
       @opts = Hash[c.opts]
-      if cols = c.cache[:columns]
+      if cols = c.cache_get(:columns)
         @cache = {:columns=>cols}
       else
         @cache = {}
