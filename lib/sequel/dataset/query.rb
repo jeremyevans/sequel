@@ -652,7 +652,12 @@ module Sequel
     #   ds.all # => [{2=>:id}]
     #   ds.naked.all # => [{:id=>2}]
     def naked
-      with_row_proc(nil)
+      unless ds = cache_get(:naked_ds)
+        ds = with_row_proc(nil)
+        cache_set(:naked_ds, ds) if frozen?
+      end
+
+      ds
     end
 
     # Returns a copy of the dataset with a specified order. Can be safely combined with limit.
