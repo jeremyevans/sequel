@@ -198,12 +198,13 @@ module Sequel
     #            being an array of symbol/strings for the appropriate branch.
     def self.def_sql_method(mod, type, clauses)
       priv = type == :update || type == :insert
+      cacheable = type == :select || type == :delete
 
       lines = []
       lines << 'private' if priv
       lines << "def #{'_' if priv}#{type}_sql"
       lines << 'if sql = opts[:sql]; return static_sql(sql) end' unless priv
-      lines << 'if sql = cache_get(:select_sql); return sql end' if type == :select
+      lines << "if sql = cache_get(:#{type}_sql); return sql end" if cacheable
       lines << 'check_modification_allowed!' if type == :delete
       lines << 'sql = @opts[:append_sql] || sql_string_origin'
 
@@ -217,7 +218,7 @@ module Sequel
         lines.concat(clause_methods(type, clauses).map{|x| "#{x}(sql)"})
       end
 
-      lines << 'cache_set(:select_sql, sql) if cache_select_sql?' if type == :select
+      lines << "cache_set(:#{type}_sql, sql) if cache_#{type}_sql?" if cacheable
       lines << 'sql'
       lines << 'end'
 
@@ -913,6 +914,7 @@ module Sequel
     def cache_select_sql?
       frozen? && !@opts[:no_cache_sql] && !cache_get(:no_cache_sql)
     end
+    alias cache_delete_sql? cache_select_sql?
 
     # Raise an InvalidOperation exception if deletion is not allowed
     # for this dataset
