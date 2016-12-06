@@ -51,6 +51,7 @@ module Sequel
           @recorder = recorder
           @pos = pos
           @transformer = transformer
+          freeze
         end
 
         # Record the SQL query offset, argument position, and transforming block where the
@@ -125,13 +126,21 @@ module Sequel
         @fragments = fragments
         @final_sql = final_sql
         @arity = arity
+        freeze
+      end
+
+      # Freeze the fragments and final SQL when freezing the literalizer.
+      def freeze
+        @fragments.freeze
+        @final_sql.freeze
+        super
       end
 
       # Return a new PlaceholderLiteralizer with a modified dataset.  This yields the
       # receiver's dataset to the block, and the block should return the new dataset
       # to use.
       def with_dataset
-        dup.instance_exec{@dataset = yield @dataset; self}
+        dup.instance_exec{@dataset = yield @dataset; self}.freeze
       end
 
       # Return an array of all objects by running the SQL query for the given arguments.

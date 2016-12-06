@@ -1,5 +1,7 @@
 === HEAD
 
+* Freeze Dataset::PlaceholderLiteralizer and Dataset::PlaceholderLiteralizer::Argument Instances (jeremyevans)
+
 * Freeze most dataset opts values to avoid unintentional modification (jeremyevans)
 
 * Add Dataset#with_convert_smallint_to_bool on DB2, returning a clone with convert_smallint_to_bool set (jeremyevans)
