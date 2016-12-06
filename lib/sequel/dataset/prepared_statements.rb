@@ -66,42 +66,19 @@ module Sequel
 
       # Set the bind arguments based on the hash and call super.
       def call(bind_vars={}, &block)
-        ps = bind(bind_vars)
-        ps.prepared_sql
+        sql = prepared_sql
         prepared_args.freeze
-        ps.clone(:bind_arguments=>ps.map_to_prepared_args(ps.opts[:bind_vars])).run(&block)
+        ps = bind(bind_vars)
+        ps.clone(:bind_arguments=>ps.map_to_prepared_args(ps.opts[:bind_vars]), :sql=>sql, :prepared_sql=>sql).run(&block)
       end
         
       # Override the given *_sql method based on the type, and
       # cache the result of the sql.
       def prepared_sql
-        if sql = cache_get(:sql)
+        if sql = @opts[:prepared_sql] || cache_get(:sql)
           return sql
         end
         cache_set(:sql, super)
-      end
-
-      def clone(opts=OPTS)
-        c = super
-        c.cache[:prepared_args] = cache_get(:prepared_args)
-        c.cache[:sql] = cache_get(:sql)
-        c
-      end
-
-      def select_sql
-        cache_get(:sql) || super
-      end
-
-      def delete_sql
-        cache_get(:sql) || super
-      end
-
-      def insert_sql(*)
-        cache_get(:sql) || super
-      end
-
-      def update_sql(*)
-        cache_get(:sql) || super
       end
     end
 
