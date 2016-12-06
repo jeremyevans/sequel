@@ -32,7 +32,7 @@ module Sequel
         # Don't call #all when attempting to load the columns.
         def columns!
           if use_eager_all?
-            clone(:all_called=>true).columns
+            clone(:all_called=>true).columns!
           else
             super
           end

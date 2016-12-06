@@ -58,9 +58,13 @@ describe "Sequel::Plugins::EagerEach" do
     @c.first.must_equal @c.load(:id=>1, :parent_id=>nil)
   end
 
+  it "should get columns normally columns" do
+    @c.dataset.columns!.must_equal [:id, :parent_id]
+  end
+
   it "should not attempt to eager load when getting the columns" do
     ds = @c.eager(:children)
     def ds.all; raise; end
-    ds.columns!
+    ds.columns!.must_equal [:id, :parent_id]
   end
 end
