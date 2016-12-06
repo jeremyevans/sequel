@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache SELECT SQL for most frozen datasets (jeremyevans)
+
 * Freeze most SQL::Expression objects and internal state by default (jeremyevans)
 
 * Freeze Dataset::PlaceholderLiteralizer and Dataset::PlaceholderLiteralizer::Argument instances (jeremyevans)

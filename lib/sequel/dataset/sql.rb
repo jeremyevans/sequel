@@ -203,6 +203,7 @@ module Sequel
       lines << 'private' if priv
       lines << "def #{'_' if priv}#{type}_sql"
       lines << 'if sql = opts[:sql]; return static_sql(sql) end' unless priv
+      lines << 'if sql = cache_get(:select_sql); return sql end' if type == :select
       lines << 'check_modification_allowed!' if type == :delete
       lines << 'sql = @opts[:append_sql] || sql_string_origin'
 
@@ -216,6 +217,7 @@ module Sequel
         lines.concat(clause_methods(type, clauses).map{|x| "#{x}(sql)"})
       end
 
+      lines << 'cache_set(:select_sql, sql) if cache_select_sql?' if type == :select
       lines << 'sql'
       lines << 'end'
 
@@ -522,6 +524,11 @@ module Sequel
     # Append literalization of delayed evaluation to SQL string,
     # causing the delayed evaluation proc to be evaluated.
     def delayed_evaluation_sql_append(sql, delay)
+      # Delayed evaluations are used specifically so the SQL
+      # can differ in subsequent calls, so we definitely don't
+      # want to cache the sql in this case.
+      cache_set(:no_cache_sql, true)
+
       if recorder = @opts[:placeholder_literalizer]
         recorder.use(sql, lambda{delay.call(self)}, nil)
       else
@@ -901,6 +908,12 @@ module Sequel
       end
     end
     
+    # Only allow caching the select SQL if the dataset is frozen and hasn't
+    # specifically been marked as not allowing SQL caching.
+    def cache_select_sql?
+      frozen? && !@opts[:no_cache_sql] && !cache_get(:no_cache_sql)
+    end
+
     # Raise an InvalidOperation exception if deletion is not allowed
     # for this dataset
     def check_modification_allowed!
@@ -1250,6 +1263,10 @@ module Sequel
     # calls +sql_literal+ if object responds to it, otherwise raises an error.
     # If a database specific type is allowed, this should be overriden in a subclass.
     def literal_other_append(sql, v)
+      # We can't be sure if v will always literalize to the same SQL, so
+      # don't cache SQL for a dataset that uses this.
+      cache_set(:no_cache_sql, true)
+
       if v.respond_to?(:sql_literal_append)
         v.sql_literal_append(self, sql)
       elsif v.respond_to?(:sql_literal)

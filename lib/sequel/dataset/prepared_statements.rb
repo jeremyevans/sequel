@@ -339,7 +339,7 @@ module Sequel
     # PreparedStatementMethods, setting the type and modify values.
     def to_prepared_statement(type, values=nil)
       bind.
-        clone(:prepared_type=>type, :prepared_modify_values=>values, :orig_dataset=>self, :prepared_args=>@opts[:prepared_args]||[]).
+        clone(:prepared_type=>type, :prepared_modify_values=>values, :orig_dataset=>self, :no_cache_sql=>true, :prepared_args=>@opts[:prepared_args]||[]).
         with_extend(PreparedStatementMethods)
     end
 
