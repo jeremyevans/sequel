@@ -656,7 +656,11 @@ module Sequel
     #   DB[:test].single_record # SELECT * FROM test LIMIT 1
     #   # => {:column_name=>'value'}
     def single_record
-      clone(:limit=>1).single_record!
+      unless ds = cache_get(:single_record_ds)
+        ds = clone(:limit=>1)
+        cache_set(:single_record_ds, ds) if frozen?
+      end
+      ds.single_record!
     end
 
     # Returns the first record in dataset, without limiting the dataset. Returns nil if
