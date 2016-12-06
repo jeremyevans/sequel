@@ -24,4 +24,10 @@ describe "sql_comments extension" do
     ds = @ds.comment("Some\nComment\r\n Here")
     ds.where(:id=>ds).select_sql.must_equal "SELECT * FROM t WHERE (id IN (SELECT * FROM t -- Some Comment Here\n)) -- Some Comment Here\n"
   end
+
+  it "should handle frozen SQL strings" do
+    @ds = Sequel.mock[:t].with_extend(Module.new{def select_sql; super.freeze; end}).extension(:sql_comments)
+    ds = @ds.comment("Some\nComment\r\n Here")
+    ds.select_sql.must_equal "SELECT * FROM t -- Some Comment Here\n"
+  end
 end

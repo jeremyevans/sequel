@@ -3767,6 +3767,11 @@ describe "Dataset prepared statements and bound variables " do
     @ds.call(:a=>1)
     @db.sqls.must_equal ["foo"]
   end
+
+  it "should support log_sql option" do
+    @ds.prepare(:select, :foo).log_sql.must_be_nil
+    @ds.clone(:log_sql=>true).prepare(:select, :foo).log_sql.must_equal true
+  end
 end
 
 describe Sequel::Dataset::UnnumberedArgumentMapper do

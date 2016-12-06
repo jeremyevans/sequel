@@ -53,7 +53,7 @@ describe "pg_json extension" do
       Sequel.instance_eval do
         alias pj parse_json
         def parse_json(v)
-          {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new}.fetch(v){pj(v)}
+          {'1'=>1, "'a'"=>'a', 'true'=>true, 'false'=>false, 'null'=>nil, 'o'=>Object.new, '[one]'=>[1]}.fetch(v){pj(v)}
         end
       end
       @m.parse_json('1').must_equal 1
@@ -62,6 +62,8 @@ describe "pg_json extension" do
       @m.parse_json('false').must_equal false
       @m.parse_json('null').must_be_nil
       proc{@m.parse_json('o')}.must_raise(Sequel::InvalidValue)
+      @m.db_parse_json('one').must_equal 1
+      @m.db_parse_jsonb('one').must_equal 1
     ensure
       Sequel.instance_eval do
         alias parse_json pj

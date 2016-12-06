@@ -46,7 +46,9 @@ describe "null_dataset extension" do
 
   it "should have working columns" do
     @skip_check = true
-    @ds.columns.must_equal [:id]
+    2.times do
+      @ds.columns.must_equal [:id]
+    end
     @db.sqls.must_equal ['SELECT * FROM table LIMIT 1']
   end
 
