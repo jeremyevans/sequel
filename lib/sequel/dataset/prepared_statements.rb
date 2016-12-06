@@ -75,7 +75,7 @@ module Sequel
       # Override the given *_sql method based on the type, and
       # cache the result of the sql.
       def prepared_sql
-        if sql = cache_get(:prepared_sql)
+        if sql = cache_get(:sql)
           return sql
         end
         cache_set(:sql, super)

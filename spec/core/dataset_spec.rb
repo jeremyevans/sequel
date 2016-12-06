@@ -3813,7 +3813,8 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
     ps = @ds.prepare(:select_all, :s)
     ps.extend(Sequel::Dataset::ArgumentMapper)  # Work around for old rbx
     ps.extend(Sequel::Dataset::UnnumberedArgumentMapper)
-    ps.prepared_sql
+    sql = ps.prepared_sql
+    ps.prepared_sql.must_be_same_as(sql)
     ps.call(:n=>1)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (num = ?) -- args: [1]"]
   end
