@@ -32,7 +32,10 @@ module Sequel
     attr_writer :db
 
     # The hash of options for this dataset, keys are symbols.
-    attr_writer :opts
+    def opts=(v)
+      @opts = v
+      @cache = {}
+    end
 
     # Update all records matching the conditions with the values specified.
     # Returns the number of rows affected.
