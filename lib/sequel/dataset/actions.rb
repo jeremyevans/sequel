@@ -152,8 +152,11 @@ module Sequel
     #   DB[:table].empty? # SELECT 1 AS one FROM table LIMIT 1
     #   # => false
     def empty?
-      ds = @opts[:order] ? unordered : self
-      ds.get(Sequel::SQL::AliasedExpression.new(1, :one)).nil?
+      unless ds = cache_get(:empty_ds)
+        ds = single_value_ds.unordered.select(Sequel::SQL::AliasedExpression.new(1, :one))
+        cache_set(:empty_ds, ds) if frozen?
+      end
+      ds.single_value!.nil?
     end
 
     # If a integer argument is given, it is interpreted as a limit, and then returns all 

@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache intermediate dataset used in Dataset#empty? for frozen datasets (jeremyevans)
+
 * Cache intermediate dataset used in Dataset#count for frozen datasets (jeremyevans)
 
 * Warn if :conditions option may be unexpectedly ignored during eager_graph/association_join (jeremyevans) (#1272)
