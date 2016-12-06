@@ -429,8 +429,11 @@ describe "Blockless Ruby Filters" do
   end
 
   it "should raise an error if trying to literalize an invalid complex expression" do
-    ce = Sequel.+(:x, 1)
-    ce.instance_variable_set(:@op, :BANG)
+    ce = Sequel::SQL::ComplexExpression.allocate
+    ce.instance_eval do
+      @op = :BANG
+      @args = [:x, 1]
+    end
     proc{@d.lit(ce)}.must_raise(Sequel::InvalidOperation)
   end
 

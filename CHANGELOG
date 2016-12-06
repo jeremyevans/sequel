@@ -1,6 +1,8 @@
 === HEAD
 
-* Freeze Dataset::PlaceholderLiteralizer and Dataset::PlaceholderLiteralizer::Argument Instances (jeremyevans)
+* Freeze most SQL::Expression objects and internal state by default (jeremyevans)
+
+* Freeze Dataset::PlaceholderLiteralizer and Dataset::PlaceholderLiteralizer::Argument instances (jeremyevans)
 
 * Freeze most dataset opts values to avoid unintentional modification (jeremyevans)
 

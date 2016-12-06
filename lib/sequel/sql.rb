@@ -252,7 +252,8 @@ module Sequel
           raise(Error, "Invalid operator #{op}")
         end
         @op = op
-        @args = args
+        @args = args.freeze
+        freeze
       end
       
       to_s_method :complex_expression_sql, '@op, @args'
@@ -1035,6 +1036,7 @@ module Sequel
         @expression = expression
         @aliaz = aliaz
         @columns = columns
+        freeze
       end
 
       to_s_method :aliased_expression_sql
@@ -1174,7 +1176,11 @@ module Sequel
       # all conditions represent their own boolean expression.
       def initialize(conditions, default, expression=(no_expression=true; nil))
         raise(Sequel::Error, 'CaseExpression conditions must be a hash or array of all two pairs') unless Sequel.condition_specifier?(conditions)
-        @conditions, @default, @expression, @no_expression = conditions.to_a, default, expression, no_expression
+        @conditions = conditions.to_a.dup.freeze
+        @default = default
+        @expression = expression
+        @no_expression = no_expression
+        freeze
       end
 
       # Whether to use an expression for this CASE expression.
@@ -1208,6 +1214,7 @@ module Sequel
       def initialize(expr, type)
         @expr = expr
         @type = type
+        freeze
       end
 
       to_s_method :cast_sql, '@expr, @type'
@@ -1221,6 +1228,7 @@ module Sequel
       # Create an object with the given table
       def initialize(table)
         @table = table
+        freeze
       end
 
       to_s_method :column_all_sql
@@ -1257,6 +1265,7 @@ module Sequel
       # Create an constant with the given value
       def initialize(constant)
         @constant = constant
+        freeze
       end
       
       to_s_method :constant_sql, '@constant'
@@ -1303,6 +1312,7 @@ module Sequel
       # Set the callable object
       def initialize(callable)
         @callable = callable
+        freeze
       end
 
       # Call the underlying callable and return the result.  If the
@@ -1337,15 +1347,11 @@ module Sequel
 
       # Set the name and args for the function
       def initialize(name, *args)
-        @name = name
-        @args = args
-        @opts = OPTS
+        _initialize(name, args, OPTS)
       end
 
       def self.new!(name, args, opts)
-        f = new(name, *args)
-        f.instance_variable_set(:@opts, opts)
-        f
+        allocate.send(:_initialize, name, args, opts)
       end
 
       # If no arguments are given, return a new function with the wildcard prepended to the arguments.
@@ -1372,7 +1378,12 @@ module Sequel
       #
       #   Sequel.function(:foo, :col).filter(:a=>1) # foo(col) FILTER (WHERE a = 1)
       def filter(*args, &block)
-        args = args.first if args.length == 1
+        if args.length == 1
+          args = args.first
+        else
+          args.freeze
+        end
+
         with_opts(:filter=>args, :filter_block=>block)
       end
 
@@ -1388,7 +1399,7 @@ module Sequel
       #
       #   Sequel.function(:foo, :a).order(:a, Sequel.desc(:b)) # foo(a ORDER BY a, b DESC)
       def order(*args)
-        with_opts(:order=>args)
+        with_opts(:order=>args.freeze)
       end
 
       # Return a new function with an OVER clause (making it a window function).
@@ -1430,12 +1441,20 @@ module Sequel
       #   Sequel.function(:rank, :a).within_group(:b, :c)
       #   # rank(a) WITHIN GROUP (ORDER BY b, c)
       def within_group(*expressions)
-        with_opts(:within_group=>expressions)
+        with_opts(:within_group=>expressions.freeze)
       end
 
       to_s_method :function_sql
 
       private
+
+      # Set args and opts
+      def _initialize(name, args, opts)
+        @name = name
+        @args = args.freeze
+        @opts = opts.freeze
+        freeze
+      end
 
       # Return a new function call with the given opts merged into the current opts.
       def with_opts(opts)
@@ -1468,6 +1487,7 @@ module Sequel
       # Set the value to the given argument
       def initialize(value)
         @value = value
+        freeze
       end
 
       # Create a Function using this identifier as the functions name, with
@@ -1492,6 +1512,7 @@ module Sequel
       def initialize(join_type, table_expr)
         @join_type = join_type
         @table_expr = table_expr
+        freeze
       end
 
       # The table/set related to the JOIN, without any alias.
@@ -1545,8 +1566,8 @@ module Sequel
 
       # Create an object with the given USING conditions and call super
       # with the remaining args.
-      def initialize(using, *args)
-        @using = using
+      def initialize(cols, *args)
+        @using = cols 
         super(*args)
       end
 
@@ -1617,7 +1638,10 @@ module Sequel
       #
       # :nulls :: Can be :first/:last for NULLS FIRST/LAST.
       def initialize(expression, descending = true, opts=OPTS)
-        @expression, @descending, @nulls = expression, descending, opts[:nulls]
+        @expression = expression
+        @descending = descending
+        @nulls = opts[:nulls]
+        freeze
       end
 
       # Return a copy that is ordered ASC
@@ -1652,6 +1676,7 @@ module Sequel
       def initialize(table, column)
         @table = convert_identifier(table)
         @column = convert_identifier(column)
+        freeze
       end
       
       # Create a Function using this identifier as the functions name, with
@@ -1746,7 +1771,9 @@ module Sequel
 
       # Set the array column and subscripts to the given arguments
       def initialize(f, sub)
-        @f, @sub = f, sub
+        @f = f
+        @sub = sub
+        freeze
       end
 
       # Create a new +Subscript+ appending the given subscript(s)
@@ -1869,6 +1896,10 @@ module Sequel
         END
       end
 
+      def initialize
+        freeze
+      end
+
       # Return a literal string created with the given string.
       def `(s)
         Sequel::LiteralString.new(s)
@@ -1924,7 +1955,8 @@ module Sequel
 
       # Set the options to the options given
       def initialize(opts=OPTS)
-        @opts = opts
+        @opts = opts.frozen? ? opts : Hash[opts].freeze
+        freeze
       end
 
       to_s_method :window_sql, '@opts'
@@ -1939,6 +1971,7 @@ module Sequel
       # Set the value wrapped by the object.
       def initialize(value)
         @value = value
+        freeze
       end
 
       to_s_method :literal, '@value'
