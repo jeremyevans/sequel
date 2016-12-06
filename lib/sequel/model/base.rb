@@ -2453,7 +2453,16 @@ module Sequel
       #   # SELECT * FROM albums ORDER BY id DESC LIMIT 1
       def last(*a, &block)
         if opts[:order].nil? && model && (pk = model.primary_key)
-          order(*pk).last(*a, &block)
+          if a.empty? && !block
+            unless ds = cache_get(:pk_last_ds)
+              ds = reverse(*pk).clone(:limit=>1)
+              cache_set(:pk_last_ds, ds) if frozen?
+            end
+
+            ds.single_record!
+          else
+            order(*pk).last(*a, &block)
+          end
         else
           super
         end
