@@ -102,7 +102,11 @@ module Sequel
           arg = Sequel.virtual_row(&block)
           aggregate_dataset.get{count(arg).as(:count)}
         else
-          aggregate_dataset.get{count{}.*.as(:count)}.to_i
+          unless ds = cache_get(:count_ds)
+            ds = aggregate_dataset.select{count{}.*.as(:count)}.single_value_ds
+            cache_set(:count_ds, ds) if frozen?
+          end
+          ds.single_value!.to_i
         end
       elsif block
         raise Error, 'cannot provide both argument and block to Dataset#count'
@@ -671,9 +675,10 @@ module Sequel
     #   DB[:test].single_value # SELECT * FROM test LIMIT 1
     #   # => 'value'
     def single_value
-      if r = ungraphed.naked.single_record
+      single_value_ds.each do |r|
         r.each{|_, v| return v}
       end
+      nil
     end
 
     # Returns the first value of the first record in the dataset, without limiting the dataset.
@@ -902,6 +907,11 @@ module Sequel
       map{|r| r.values.first}
     end
   
+    # A dataset for returning single values from the current dataset.
+    def single_value_ds
+      clone(:limit=>1).ungraphed.naked
+    end
+    
     private
     
     # Internals of all and with_sql_all
