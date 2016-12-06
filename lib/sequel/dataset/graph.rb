@@ -20,7 +20,7 @@ module Sequel
         raise Error, "cannot call add_graph_aliases on a dataset that has not been called with graph or set_graph_aliases"
       end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      select_more(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases))
+      select_more(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases).freeze)
     end
 
     # Similar to Dataset#join_table, but uses unambiguous aliases for selected
@@ -200,7 +200,8 @@ module Sequel
           select.push(identifier)
         end
       end
-      ds = ds.clone(:graph=>graph)
+      [:column_aliases, :table_aliases, :column_alias_num].each{|k| graph[k].freeze}
+      ds = ds.clone(:graph=>graph.freeze)
       add_columns ? ds.select(*select) : ds
     end
 
@@ -229,9 +230,7 @@ module Sequel
     #   # SELECT artists.name, albums.name AS album_name, 42 AS forty_two ...
     def set_graph_aliases(graph_aliases)
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      ds = select(*columns)
-      ds.opts[:graph_aliases] = graph_aliases
-      ds
+      select(*columns).clone(:graph_aliases=>graph_aliases.freeze)
     end
 
     # Remove the splitting of results into subhashes, and all metadata

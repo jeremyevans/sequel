@@ -122,7 +122,7 @@ module Sequel
     def distinct(*args, &block)
       virtual_row_columns(args, block)
       raise(InvalidOperation, "DISTINCT ON not supported") if !args.empty? && !supports_distinct_on?
-      clone(:distinct => args)
+      clone(:distinct => args.freeze)
     end
 
     # Adds an EXCEPT clause using a second dataset object.
@@ -240,8 +240,8 @@ module Sequel
           s
         end
       end
-      o = {:from=>source.empty? ? nil : source}
-      o[:with] = (opts[:with] || []) + ctes if ctes
+      o = {:from=>source.empty? ? nil : source.freeze}
+      o[:with] = ((opts[:with] || []) + ctes).freeze if ctes
       o[:num_dataset_sources] = table_alias_num if table_alias_num > 0
       clone(o)
     end
@@ -325,7 +325,7 @@ module Sequel
     #   DB[:items].group{[a, sum(b)]} # SELECT * FROM items GROUP BY a, sum(b)
     def group(*columns, &block)
       virtual_row_columns(columns, block)
-      clone(:group => (columns.compact.empty? ? nil : columns))
+      clone(:group => (columns.compact.empty? ? nil : columns.freeze))
     end
 
     # Alias of group
@@ -572,7 +572,7 @@ module Sequel
         SQL::JoinOnClause.new(expr, type, table_expr)
       end
 
-      opts = {:join => (@opts[:join] || []) + [join]}
+      opts = {:join => ((@opts[:join] || []) + [join]).freeze}
       opts[:last_joined_table] = table_name unless options[:reset_implicit_qualifier] == false
       opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
@@ -698,7 +698,7 @@ module Sequel
     #   DB[:items].order(nil) # SELECT * FROM items
     def order(*columns, &block)
       virtual_row_columns(columns, block)
-      clone(:order => (columns.compact.empty?) ? nil : columns)
+      clone(:order => (columns.compact.empty?) ? nil : columns.freeze)
     end
     
     # Alias of order_more, for naming consistency with order_prepend.
@@ -745,7 +745,7 @@ module Sequel
       (o.keys & QUALIFY_KEYS).each do |k|
         h[k] = qualified_expression(o[k], table)
       end
-      h[:select] = [SQL::ColumnAll.new(table)] if !o[:select] || o[:select].empty?
+      h[:select] = [SQL::ColumnAll.new(table)].freeze if !o[:select] || o[:select].empty?
       clone(h)
     end
 
@@ -759,7 +759,7 @@ module Sequel
     #   DB[:items].returning(:id, :name) # RETURNING id, name
     def returning(*values)
       raise Error, "RETURNING is not supported on #{db.database_type}" unless supports_returning?(:insert)
-      clone(:returning=>values)
+      clone(:returning=>values.freeze)
     end
 
     # Returns a copy of the dataset with the order reversed. If no order is
@@ -771,7 +771,7 @@ module Sequel
     #   DB[:items].order(:id).reverse(Sequel.desc(:name)) # SELECT * FROM items ORDER BY name ASC
     def reverse(*order, &block)
       virtual_row_columns(order, block)
-      order(*invert_order(order.empty? ? @opts[:order] : order))
+      order(*invert_order(order.empty? ? @opts[:order] : order.freeze))
     end
 
     # Alias of +reverse+
@@ -788,7 +788,7 @@ module Sequel
     #   DB[:items].select{[a, sum(b)]} # SELECT a, sum(b) FROM items
     def select(*columns, &block)
       virtual_row_columns(columns, block)
-      clone(:select => columns)
+      clone(:select => columns.freeze)
     end
     
     # Returns a copy of the dataset selecting the wildcard if no arguments
@@ -802,7 +802,7 @@ module Sequel
       if tables.empty?
         clone(:select => nil)
       else
-        select(*tables.map{|t| i, a = split_alias(t); a || i}.map{|t| SQL::ColumnAll.new(t)})
+        select(*tables.map{|t| i, a = split_alias(t); a || i}.map!{|t| SQL::ColumnAll.new(t)}.freeze)
       end
     end
     
@@ -1007,7 +1007,7 @@ module Sequel
         s, ds = hoist_cte(dataset)
         s.with(name, ds, opts)
       else
-        clone(:with=>(@opts[:with]||[]) + [Hash[opts].merge!(:name=>name, :dataset=>dataset)])
+        clone(:with=>((@opts[:with]||[]) + [Hash[opts].merge!(:name=>name, :dataset=>dataset)]).freeze)
       end
     end
 
@@ -1036,7 +1036,7 @@ module Sequel
         s, ds = hoist_cte(recursive)
         s.with_recursive(name, nonrecursive, ds, opts)
       else
-        clone(:with=>(@opts[:with]||[]) + [Hash[opts].merge!(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
+        clone(:with=>((@opts[:with]||[]) + [Hash[opts].merge!(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))]).freeze)
       end
     end
     
@@ -1097,7 +1097,7 @@ module Sequel
         s, ds = hoist_cte(dataset)
         return s.compound_clone(type, ds, opts)
       end
-      ds = compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map(&:dup) + [[type, dataset.compound_from_self, opts[:all]]])
+      ds = compound_from_self.clone(:compounds=>(Array(@opts[:compounds]).map(&:dup) + [[type, dataset.compound_from_self, opts[:all]].freeze]).freeze)
       opts[:from_self] == false ? ds : ds.from_self(opts)
     end
 
@@ -1199,7 +1199,7 @@ module Sequel
     # clause from the given dataset added to it, and the second a clone of
     # the given dataset with the WITH clause removed.
     def hoist_cte(ds)
-      [clone(:with => (opts[:with] || []) + ds.opts[:with]), ds.clone(:with => nil)]
+      [clone(:with => ((opts[:with] || []) + ds.opts[:with]).freeze), ds.clone(:with => nil)]
     end
 
     # Whether CTEs need to be hoisted from the given ds into the current ds.

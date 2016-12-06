@@ -308,7 +308,17 @@ module Sequel
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
     def bind(bind_vars={})
-      clone(:bind_vars=>@opts[:bind_vars] ? Hash[@opts[:bind_vars]].merge!(bind_vars) : bind_vars)
+      bind_vars = if bv = @opts[:bind_vars]
+        Hash[bv].merge!(bind_vars).freeze
+      else
+        if bind_vars.frozen?
+          bind_vars
+        else
+          Hash[bind_vars]
+        end
+      end
+
+      clone(:bind_vars=>bind_vars)
     end
     
     # For the given type (:select, :first, :insert, :insert_select, :update, or :delete),
