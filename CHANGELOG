@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache intermediate dataset used in Dataset#last (no args) for frozen datasets (jeremyevans)
+
 * Cache intermediate dataset used in Dataset#first (no args) and #single_record for frozen datasets (jeremyevans)
 
 * Cache intermediate dataset used in Dataset#empty? for frozen datasets (jeremyevans)

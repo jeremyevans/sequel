@@ -368,8 +368,18 @@ module Sequel
     #   DB[:table].order(Sequel.desc(:id)).last(2) # SELECT * FROM table ORDER BY id ASC LIMIT 2
     #   # => [{:id=>1}, {:id=>2}]
     def last(*args, &block)
-      raise(Error, 'No order specified') unless @opts[:order]
-      reverse.first(*args, &block)
+      if args.empty? && !block
+        unless ds = cache_get(:last_ds)
+          raise(Error, 'No order specified') unless @opts[:order]
+          ds = reverse.clone(:limit=>1)
+          cache_set(:last_ds, ds) if frozen?
+        end
+
+        ds.single_record!
+      else
+        raise(Error, 'No order specified') unless @opts[:order]
+        reverse.first(*args, &block)
+      end
     end
     
     # Maps column values for each record in the dataset (if a column name is
