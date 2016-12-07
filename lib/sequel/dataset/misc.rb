@@ -284,7 +284,8 @@ module Sequel
 
     # Access the cache for the current dataset.  Should be used with caution,
     # as access to the cache is not thread safe without a mutex if other
-    # threads can reference the dataset.
+    # threads can reference the dataset.  Symbol keys prefixed with an
+    # underscore are reserved for internal use.
     attr_reader :cache
 
     # Retreive a value from the dataset's cache in a thread safe manner.
@@ -297,19 +298,44 @@ module Sequel
       Sequel.synchronize{@cache[k] = v}
     end
 
+    # Clear the columns hash for the current dataset.  This is not a
+    # thread safe operation, so it should only be used if the dataset
+    # could not be used by another thread (such as one that was just
+    # created via clone).
+    def clear_columns_cache
+      @cache.delete(:_columns)
+    end
+
+    # The cached columns for the current dataset.
+    def _columns
+      cache_get(:_columns)
+    end
+
     private
+
+    # Check the cache for the given key, returning the value.
+    # Otherwise, yield to get the dataset, and if the current dataset
+    # is frozen, cache the dataset under the given key.
+    def cached_dataset(key)
+      unless ds = cache_get(key)
+        ds = yield
+        cache_set(key, ds) if frozen?
+      end
+
+      ds
+    end
 
     # Set the columns for the current dataset.
     def columns=(v)
-      cache_set(:columns, v)
+      cache_set(:_columns, v)
     end
 
     # Set the db, opts, and cache for the copy of the dataset.
     def initialize_copy(c)
       @db = c.db
       @opts = Hash[c.opts]
-      if cols = c.cache_get(:columns)
-        @cache = {:columns=>cols}
+      if cols = c.cache_get(:_columns)
+        @cache = {:_columns=>cols}
       else
         @cache = {}
       end

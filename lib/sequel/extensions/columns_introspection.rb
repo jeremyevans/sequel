@@ -28,7 +28,7 @@ module Sequel
     # Symbols, SQL::Identifiers, SQL::QualifiedIdentifiers, and
     # SQL::AliasedExpressions.
     def columns
-      if cols = cache_get(:columns)
+      if cols = _columns
         return cols
       end
       if (pcs = probable_columns) && pcs.all?

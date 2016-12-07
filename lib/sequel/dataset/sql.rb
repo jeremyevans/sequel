@@ -204,7 +204,7 @@ module Sequel
       lines << 'private' if priv
       lines << "def #{'_' if priv}#{type}_sql"
       lines << 'if sql = opts[:sql]; return static_sql(sql) end' unless priv
-      lines << "if sql = cache_get(:#{type}_sql); return sql end" if cacheable
+      lines << "if sql = cache_get(:_#{type}_sql); return sql end" if cacheable
       lines << 'check_modification_allowed!' if type == :delete
       lines << 'sql = @opts[:append_sql] || sql_string_origin'
 
@@ -218,7 +218,7 @@ module Sequel
         lines.concat(clause_methods(type, clauses).map{|x| "#{x}(sql)"})
       end
 
-      lines << "cache_set(:#{type}_sql, sql) if cache_#{type}_sql?" if cacheable
+      lines << "cache_set(:_#{type}_sql, sql) if cache_sql?" if cacheable
       lines << 'sql'
       lines << 'end'
 
@@ -528,7 +528,7 @@ module Sequel
       # Delayed evaluations are used specifically so the SQL
       # can differ in subsequent calls, so we definitely don't
       # want to cache the sql in this case.
-      cache_set(:no_cache_sql, true)
+      disable_sql_caching!
 
       if recorder = @opts[:placeholder_literalizer]
         recorder.use(sql, lambda{delay.call(self)}, nil)
@@ -911,10 +911,9 @@ module Sequel
     
     # Only allow caching the select SQL if the dataset is frozen and hasn't
     # specifically been marked as not allowing SQL caching.
-    def cache_select_sql?
-      frozen? && !@opts[:no_cache_sql] && !cache_get(:no_cache_sql)
+    def cache_sql?
+      frozen? && !@opts[:no_cache_sql] && !cache_get(:_no_cache_sql)
     end
-    alias cache_delete_sql? cache_select_sql?
 
     # Raise an InvalidOperation exception if deletion is not allowed
     # for this dataset
@@ -1006,6 +1005,11 @@ module Sequel
         sql << FROM
         source_list_append(sql, f)
       end
+    end
+
+    # Disable caching of SQL for the current dataset
+    def disable_sql_caching!
+      cache_set(:_no_cache_sql, true)
     end
 
     # An SQL FROM clause to use in SELECT statements where the dataset has
@@ -1267,7 +1271,7 @@ module Sequel
     def literal_other_append(sql, v)
       # We can't be sure if v will always literalize to the same SQL, so
       # don't cache SQL for a dataset that uses this.
-      cache_set(:no_cache_sql, true)
+      disable_sql_caching!
 
       if v.respond_to?(:sql_literal_append)
         v.sql_literal_append(self, sql)

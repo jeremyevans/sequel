@@ -71,7 +71,7 @@ module Sequel
     #   DB[:table].columns
     #   # => [:id, :name]
     def columns
-      cache_get(:columns) || columns!
+      _columns || columns!
     end
         
     # Ignore any cached column information and perform a query to retrieve
@@ -82,7 +82,12 @@ module Sequel
     def columns!
       ds = clone(COLUMNS_CLONE_OPTIONS)
       ds.each{break}
-      cache_set(:columns, ds.cache[:columns]) || []
+
+      if cols = ds.cache[:_columns]
+        self.columns = cols
+      else
+        []
+      end
     end
     
     # Returns the number of records in the dataset. If an argument is provided,
@@ -102,11 +107,9 @@ module Sequel
           arg = Sequel.virtual_row(&block)
           aggregate_dataset.get{count(arg).as(:count)}
         else
-          unless ds = cache_get(:count_ds)
-            ds = aggregate_dataset.select{count{}.*.as(:count)}.single_value_ds
-            cache_set(:count_ds, ds) if frozen?
-          end
-          ds.single_value!.to_i
+          cached_dataset(:_count_ds) do
+            aggregate_dataset.select{count{}.*.as(:count)}.single_value_ds
+          end.single_value!.to_i
         end
       elsif block
         raise Error, 'cannot provide both argument and block to Dataset#count'
@@ -152,11 +155,9 @@ module Sequel
     #   DB[:table].empty? # SELECT 1 AS one FROM table LIMIT 1
     #   # => false
     def empty?
-      unless ds = cache_get(:empty_ds)
-        ds = single_value_ds.unordered.select(Sequel::SQL::AliasedExpression.new(1, :one))
-        cache_set(:empty_ds, ds) if frozen?
-      end
-      ds.single_value!.nil?
+      cached_dataset(:_empty_ds) do
+        single_value_ds.unordered.select(Sequel::SQL::AliasedExpression.new(1, :one))
+      end.single_value!.nil?
     end
 
     # If a integer argument is given, it is interpreted as a limit, and then returns all 
@@ -369,13 +370,10 @@ module Sequel
     #   # => [{:id=>1}, {:id=>2}]
     def last(*args, &block)
       if args.empty? && !block
-        unless ds = cache_get(:last_ds)
+        cached_dataset(:_last_ds) do
           raise(Error, 'No order specified') unless @opts[:order]
-          ds = reverse.clone(:limit=>1)
-          cache_set(:last_ds, ds) if frozen?
-        end
-
-        ds.single_record!
+          reverse.clone(:limit=>1)
+        end.single_record!
       else
         raise(Error, 'No order specified') unless @opts[:order]
         reverse.first(*args, &block)
@@ -666,11 +664,7 @@ module Sequel
     #   DB[:test].single_record # SELECT * FROM test LIMIT 1
     #   # => {:column_name=>'value'}
     def single_record
-      unless ds = cache_get(:single_record_ds)
-        ds = clone(:limit=>1)
-        cache_set(:single_record_ds, ds) if frozen?
-      end
-      ds.single_record!
+      cached_dataset(:_single_record_ds){clone(:limit=>1)}.single_record!
     end
 
     # Returns the first record in dataset, without limiting the dataset. Returns nil if

@@ -88,8 +88,8 @@ module Sequel
       def clone(opts = OPTS)
         c = super(:freeze=>false)
         c.opts.merge!(opts)
-        if (cols = @cache[:columns]) && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
-          c.cache.delete(:columns)
+        unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
+          c.clear_columns_cache
         end
         c.freeze if frozen?
         c
@@ -100,8 +100,8 @@ module Sequel
       def clone(opts = OPTS)
         c = super()
         c.opts.merge!(opts)
-        if (cols = @cache[:columns]) && !opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
-          c.cache.delete(:columns)
+        unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
+          c.clear_columns_cache
         end
         c.freeze if frozen?
         c
@@ -652,12 +652,7 @@ module Sequel
     #   ds.all # => [{2=>:id}]
     #   ds.naked.all # => [{:id=>2}]
     def naked
-      unless ds = cache_get(:naked_ds)
-        ds = with_row_proc(nil)
-        cache_set(:naked_ds, ds) if frozen?
-      end
-
-      ds
+      cached_dataset(:_naked_ds){with_row_proc(nil)}
     end
 
     # Returns a copy of the dataset with a specified order. Can be safely combined with limit.

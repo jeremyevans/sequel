@@ -1291,12 +1291,12 @@ module Sequel
         end
 
         def prepared_sql
-          if sql = cache_get(:sql)
+          if sql = cache_get(:_prepared_sql)
             return sql
           end
 
           if prepared_type == :insert && !@opts.has_key?(:returning)
-            return cache_set(:sql, clone(:returning => insert_pk, :returning_pk => true).prepared_sql)
+            return cache_set(:_prepared_sql, clone(:returning => insert_pk, :returning_pk => true).prepared_sql)
           end
 
           super

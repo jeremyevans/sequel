@@ -2454,12 +2454,7 @@ module Sequel
       def last(*a, &block)
         if opts[:order].nil? && model && (pk = model.primary_key)
           if a.empty? && !block
-            unless ds = cache_get(:pk_last_ds)
-              ds = reverse(*pk).clone(:limit=>1)
-              cache_set(:pk_last_ds, ds) if frozen?
-            end
-
-            ds.single_record!
+            cached_dataset(:_pk_last_ds){reverse(*pk).clone(:limit=>1)}.single_record!
           else
             order(*pk).last(*a, &block)
           end
