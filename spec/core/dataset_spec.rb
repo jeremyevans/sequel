@@ -3622,7 +3622,7 @@ describe "Dataset prepared statements and bound variables " do
   end
   
   it "#call should take a type and bind hash and interpolate it" do
-    @ds.filter(:num=>:$n).call(:each, :n=>1)
+    @ds.filter(:num=>:$n).bind({:n=>1}.freeze).call(:each)
     @ds.filter(:num=>:$n).call(:select, :n=>1)
     @ds.filter(:num=>:$n).call([:map, :a], :n=>1)
     @ds.filter(:num=>:$n).call([:to_hash, :a, :b], :n=>1)
