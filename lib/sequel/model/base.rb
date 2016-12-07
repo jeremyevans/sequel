@@ -286,25 +286,41 @@ module Sequel
       # Returns the module given or the anonymous module created.
       #
       #   # Usage with existing module
-      #   Artist.dataset_module Sequel::ColumnsIntrospection
+      #   Album.dataset_module Sequel::ColumnsIntrospection
       #
       #   # Usage with anonymous module
-      #   Artist.dataset_module do
+      #   Album.dataset_module do
       #     def foo
       #       :bar
       #     end
       #   end
-      #   Artist.dataset.foo
+      #   Album.dataset.foo
       #   # => :bar
-      #   Artist.foo
+      #   Album.foo
       #   # => :bar
       #
       # Any anonymous modules created are actually instances of Sequel::Model::DatasetModule
-      # (a Module subclass), which allows you to call the subset method on them:
+      # (a Module subclass), which allows you to call the subset method on them, which
+      # defines a dataset method that adds a filter.  There are also a number of other
+      # methods with the same names as the dataset methods, which can use to define
+      # named dataset methods:
       #
-      #   Artist.dataset_module do
-      #     subset :released, Sequel.identifier(release_date) > Sequel::CURRENT_DATE
+      #   Album.dataset_module do
+      #     subset :released, Sequel.identifier(release_date) <= Sequel::CURRENT_DATE
+      #     order :by_release_date, :release_date
+      #     select :for_select_options, :id, :name, :release_date
       #   end
+      #   Album.released.sql
+      #   # => "SELECT * FROM artists WHERE (release_date <= CURRENT_DATE)"
+      #   Album.by_release_date.sql
+      #   # => "SELECT * FROM artists ORDER BY release_date"
+      #   Album.for_select_options.sql
+      #   # => "SELECT id, name, release_date FROM artists"
+      #   Album.released.by_release_date.for_select_options.sql
+      #   # => "SELECT id, name, release_date FROM artists WHERE (release_date <= CURRENT_DATE) ORDER BY release_date"
+      #
+      # The following methods are supported: distinct, grep, group, group_and_count, group_append, limit,
+      # offset, order, order_append, order_prepend, select, select_all, select_append, select_group, and server.
       #
       # Any public methods in the dataset module will have class methods created that
       # call the method on the dataset, assuming that the class method is not already
@@ -388,9 +404,10 @@ module Sequel
       # If a block is not given, just define a class method on the model for each argument
       # that calls the dataset method of the same argument name.
       #
-      # It is recommended that you define methods inside a block passed to #dataset_module
-      # instead of using this method, as #dataset_module allows you to use normal
-      # ruby def syntax.
+      # Using dataset_module is recommended over using this method.  In addition to allowing
+      # more natural ruby syntax for defining methods manually, it also offers numerous
+      # helper methods that make defining common dataset methods more easily, as well as
+      # supporting dataset caching (assuming the arguments allow it).
       #
       #   # Add new dataset method and class method that calls it
       #   Artist.def_dataset_method(:by_name){order(:name)}

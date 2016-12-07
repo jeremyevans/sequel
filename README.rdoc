@@ -791,26 +791,39 @@ The recommended way to implement table-wide logic by defining methods on the dat
 
   class Post < Sequel::Model
     dataset_module do
-      def posts_with_few_comments
+      def with_few_comments
         where{num_comments < 30}
       end
 
-      def clean_posts_with_few_comments
-        posts_with_few_comments.delete
+      def clean_boring
+        with_few_comments.delete
       end
     end
   end
 
 This allows you to have access to your model API from filtered datasets as well:
 
-  Post.where(:category => 'ruby').clean_posts_with_few_comments
+  Post.where(:category => 'ruby').clean_boring
+  # DELETE FROM posts WHERE ((category = 'ruby') AND (num_comments < 30))
 
-Sequel models also provide a +subset+ class method that creates a dataset method with a simple filter:
+Inside +dataset_module+ blocks, there are numerous methods that support easy creation of dataset methods.
+Most of these methods are named after the dataset methods themselves, such as +select+, +order+, and
++group+, and there is also a method named +subset+ which uses a filter:
 
   class Post < Sequel::Model
-    subset(:posts_with_few_comments){num_comments < 30}
-    subset :invisible, Sequel.~(:visible)
+    dataset_module do
+      subset(:with_few_comments){num_comments < 30}
+      select :with_title_and_date, :id, :title, :post_date
+      order :by_post_date, :post_date
+      limit :top10, 10
+    end
   end
+
+  Post.with_few_comments.with_title_and_date.by_post_date.top10
+  # SELECT id, title, post_date
+  # FROM posts
+  # ORDER BY post_date
+  # LIMIT 10
 
 === Model Validations
 

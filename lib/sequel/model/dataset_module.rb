@@ -20,6 +20,25 @@ module Sequel
         @model.subset(name, *args, &block)
       end
 
+      meths = (<<-METHS).split.map(&:to_sym)
+        distinct grep group group_and_count group_append 
+        limit offset order order_append order_prepend 
+        select select_all select_append select_group server
+      METHS
+
+      meths.each do |meth|
+        define_method(meth) do |name, *args, &block|
+          if block
+            @model.def_dataset_method(name){send(meth, *args, &block)}
+          else
+            key = :"_#{meth}_#{name}_ds"
+            @model.def_dataset_method(name) do
+              cached_dataset(key){send(meth, *args)}
+            end
+          end
+        end
+      end
+
       private
 
       # Add a class method to the related model that

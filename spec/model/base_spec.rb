@@ -279,7 +279,98 @@ describe Sequel::Model, ".dataset_module" do
     @c.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE (foo AND released)'
   end
 
-  it "should raise error if called with both an argument and ablock" do
+  it "should have dataset_module support a distinct method" do
+    @c.dataset = @c.dataset.with_extend(Module.new{def supports_distinct_on?; true end})
+    @c.dataset_module{distinct :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT DISTINCT ON (baz) * FROM items'
+    @c.where(:bar).foo.sql.must_equal 'SELECT DISTINCT ON (baz) * FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a grep method" do
+    @c.dataset_module{grep :foo, :baz, 'quux%'}
+    @c.foo.sql.must_equal 'SELECT * FROM items WHERE ((baz LIKE \'quux%\' ESCAPE \'\\\'))'
+    @c.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE (bar AND ((baz LIKE \'quux%\' ESCAPE \'\\\')))'
+  end
+
+  it "should have dataset_module support a group method" do
+    @c.dataset_module{group :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT * FROM items GROUP BY baz'
+    @c.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar GROUP BY baz'
+  end
+
+  it "should have dataset_module support a group_and_count method" do
+    @c.dataset_module{group_and_count :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT baz, count(*) AS count FROM items GROUP BY baz'
+    @c.where(:bar).foo.sql.must_equal 'SELECT baz, count(*) AS count FROM items WHERE bar GROUP BY baz'
+  end
+
+  it "should have dataset_module support a group_append method" do
+    @c.dataset_module{group_append :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT * FROM items GROUP BY baz'
+    @c.group(:bar).foo.sql.must_equal 'SELECT * FROM items GROUP BY bar, baz'
+  end
+
+  it "should have dataset_module support a limit method" do
+    @c.dataset_module{limit :foo, 1}
+    @c.foo.sql.must_equal 'SELECT * FROM items LIMIT 1'
+    @c.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar LIMIT 1'
+  end
+
+  it "should have dataset_module support a offset method" do
+    @c.dataset_module{offset :foo, 1}
+    @c.foo.sql.must_equal 'SELECT * FROM items OFFSET 1'
+    @c.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar OFFSET 1'
+  end
+
+  it "should have dataset_module support a order method" do
+    @c.dataset_module{order(:foo){:baz}}
+    @c.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz'
+    @c.where(:bar).foo.sql.must_equal 'SELECT * FROM items WHERE bar ORDER BY baz'
+  end
+
+  it "should have dataset_module support a order_append method" do
+    @c.dataset_module{order_append :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz'
+    @c.order(:bar).foo.sql.must_equal 'SELECT * FROM items ORDER BY bar, baz'
+  end
+
+  it "should have dataset_module support a order_prepend method" do
+    @c.dataset_module{order_prepend :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT * FROM items ORDER BY baz'
+    @c.order(:bar).foo.sql.must_equal 'SELECT * FROM items ORDER BY baz, bar'
+  end
+
+  it "should have dataset_module support a select method" do
+    @c.dataset_module{select :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT baz FROM items'
+    @c.where(:bar).foo.sql.must_equal 'SELECT baz FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a select_all method" do
+    @c.dataset_module{select_all :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT baz.* FROM items'
+    @c.where(:bar).foo.sql.must_equal 'SELECT baz.* FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a select_append method" do
+    @c.dataset_module{select_append :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT *, baz FROM items'
+    @c.where(:bar).foo.sql.must_equal 'SELECT *, baz FROM items WHERE bar'
+  end
+
+  it "should have dataset_module support a select_group method" do
+    @c.dataset_module{select_group :foo, :baz}
+    @c.foo.sql.must_equal 'SELECT baz FROM items GROUP BY baz'
+    @c.where(:bar).foo.sql.must_equal 'SELECT baz FROM items WHERE bar GROUP BY baz'
+  end
+
+  it "should have dataset_module support a server method" do
+    @c.dataset_module{server :foo, :baz}
+    @c.foo.opts[:server].must_equal :baz
+    @c.where(:bar).foo.opts[:server].must_equal :baz
+  end
+
+  it "should raise error if called with both an argument and a block" do
     proc{@c.dataset_module(Module.new{def return_3() 3 end}){}}.must_raise(Sequel::Error)
   end
 end
