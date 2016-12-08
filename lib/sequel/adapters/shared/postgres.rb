@@ -1281,26 +1281,6 @@ module Sequel
             super
           end
         end
-
-        def prepare(type, *a)
-          if type == :insert && opts.has_key?(:returning)
-            clone(:returning=>insert_pk, :returning_pk=>true).prepare(type, *a)
-          else
-            super
-          end
-        end
-
-        def prepared_sql
-          if sql = cache_get(:_prepared_sql)
-            return sql
-          end
-
-          if prepared_type == :insert && !@opts.has_key?(:returning)
-            return cache_set(:_prepared_sql, clone(:returning => insert_pk, :returning_pk => true).prepared_sql)
-          end
-
-          super
-        end
       end
 
       # Return the results of an EXPLAIN ANALYZE query as a string
@@ -1827,6 +1807,14 @@ module Sequel
       # PostgreSQL supports quoted function names.
       def supports_quoted_function_names?
         true
+      end
+
+      def to_prepared_statement(type, *a)
+        if type == :insert && !@opts.has_key?(:returning)
+          clone(:returning=>insert_pk, :returning_pk=>true).send(:to_prepared_statement, type, *a)
+        else
+          super
+        end
       end
 
       # Concatenate the expressions with a space in between

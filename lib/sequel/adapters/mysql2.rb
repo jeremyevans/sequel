@@ -236,19 +236,6 @@ module Sequel
           "sql = self; opts = Hash[opts]; opts[:arguments] = bind_arguments",
           Sequel::Dataset::UnnumberedArgumentMapper,
           %w"execute execute_dui execute_insert")
-
-        # Create a named prepared statement that is stored in the
-        # database (and connection) for reuse.
-        def prepare(type, name=nil, *values)
-          ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
-
-          if name
-            ps = ps.clone(:prepared_statement_name=>name)
-            db.set_prepared_statement(name, ps)
-          end
-
-          ps
-        end
       end
 
       # Yield all rows matching this dataset.
@@ -295,6 +282,16 @@ module Sequel
         opts[:type] = :select
         opts[:stream] = @opts[:stream]
         super
+      end
+
+      if NativePreparedStatements
+        def bound_variable_modules
+          [PreparedStatementMethods]
+        end
+
+        def prepared_statement_modules
+          [PreparedStatementMethods]
+        end
       end
 
       # Handle correct quoting of strings using ::Mysql2::Client#escape.

@@ -241,8 +241,9 @@ module Sequel
       # support and using the same argument hash so that you can use
       # bind variables/prepared arguments in subselects.
       def subselect_sql_append(sql, ds)
-        ps = ds.clone(:append_sql=>sql, :prepared_args=>prepared_args, :bind_vars=>@opts[:bind_vars]).prepare(:select)
-        ps.prepared_sql
+        ds.clone(:append_sql=>sql, :prepared_args=>prepared_args, :bind_vars=>@opts[:bind_vars]).
+          send(:to_prepared_statement, :select, nil, :extend=>prepared_statement_modules).
+          prepared_sql
       end
     end
     
@@ -306,7 +307,7 @@ module Sequel
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
     def call(type, bind_variables={}, *values, &block)
-      prepare(type, nil, *values).call(bind_variables, &block)
+      to_prepared_statement(type, values, :extend=>bound_variable_modules).call(bind_variables, &block)
     end
     
     # Prepare an SQL statement for later execution.  Takes a type similar to #call,
@@ -328,8 +329,15 @@ module Sequel
     #
     #   DB.call(:select_by_name, :name=>'Blah') # Same thing
     def prepare(type, name=nil, *values)
-      ps = to_prepared_statement(type, values)
-      db.set_prepared_statement(name, ps) if name
+      ps = to_prepared_statement(type, values, :name=>name, :extend=>prepared_statement_modules)
+
+      if name
+        ps.prepared_sql
+        db.set_prepared_statement(name, ps)
+      else
+        Sequel::Deprecation.deprecate("Dataset#prepare will change to requiring a name argument in Sequel 5, please update your code.") unless name
+      end
+
       ps
     end
     
@@ -337,10 +345,13 @@ module Sequel
     
     # Return a cloned copy of the current dataset extended with
     # PreparedStatementMethods, setting the type and modify values.
-    def to_prepared_statement(type, values=nil)
+    def to_prepared_statement(type, values=nil, opts=OPTS)
+      mods = opts[:extend] || []
+      mods += [PreparedStatementMethods]
+
       bind.
-        clone(:prepared_type=>type, :prepared_modify_values=>values, :orig_dataset=>self, :no_cache_sql=>true, :prepared_args=>@opts[:prepared_args]||[]).
-        with_extend(PreparedStatementMethods)
+        clone(:prepared_statement_name=>opts[:name], :prepared_type=>type, :prepared_modify_values=>values, :orig_dataset=>self, :no_cache_sql=>true, :prepared_args=>@opts[:prepared_args]||[]).
+        with_extend(*mods)
     end
 
     private
@@ -348,6 +359,14 @@ module Sequel
     # Don't allow preparing prepared statements by default.
     def allow_preparing_prepared_statements?
       false
+    end
+
+    def bound_variable_modules
+      prepared_statement_modules
+    end
+
+    def prepared_statement_modules
+      []
     end
 
     # The argument placeholder.  Most databases used unnumbered

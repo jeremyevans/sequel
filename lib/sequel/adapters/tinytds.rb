@@ -243,25 +243,16 @@ module Sequel
         self
       end
       
-      # Create a named prepared statement that is stored in the
-      # database (and connection) for reuse.
-      def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
-
-        if name
-          ps = ps.clone(:prepared_statement_name=>name)
-          db.set_prepared_statement(name, ps)
-        end
-
-        ps
-      end
-      
       private
       
       # Properly escape the given string +v+.
       def literal_string_append(sql, v)
         sql << (mssql_unicode_strings ? UNICODE_STRING_START : APOS)
         sql << db.synchronize(@opts[:server]){|c| c.escape(v)}.gsub(BACKSLASH_CRLF_RE, BACKSLASH_CRLF_REPLACE) << APOS
+      end
+
+      def prepared_statement_modules
+        [PreparedStatementMethods]
       end
     end
   end

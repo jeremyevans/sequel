@@ -367,13 +367,6 @@ module Sequel
       
       PreparedStatementMethods = prepared_statements_module(:prepare_bind, Sequel::Dataset::UnnumberedArgumentMapper)
 
-      # Emulate support of bind arguments in called statements.
-      def call(type, bind_arguments={}, *values, &block)
-        to_prepared_statement(type, values).
-          with_extend(CallableStatementMethods).
-          call(bind_arguments, &block)
-      end
-
       # Override the default IBMDB.convert_smallint_to_bool setting for this dataset.
       def convert_smallint_to_bool=(v)
         @opts[:convert_smallint_to_bool] = v
@@ -419,17 +412,14 @@ module Sequel
         self
       end
 
-      # Store the given type of prepared statement in the associated database
-      # with the given name.
-      def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
+      private
 
-        if name
-          ps = ps.clone(:prepared_statement_name=>name)
-          db.set_prepared_statement(name, ps)
-        end
+      def bound_variable_modules
+        [CallableStatementMethods]
+      end
 
-        ps
+      def prepared_statement_modules
+        [PreparedStatementMethods]
       end
     end
   end

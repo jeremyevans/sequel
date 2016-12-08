@@ -355,13 +355,6 @@ module Sequel
       BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)
       PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods)
 
-      # Execute the given type of statement with the hash of values.
-      def call(type, bind_vars={}, *values, &block)
-        to_prepared_statement(type, values).
-          with_extend(BindArgumentMethods).
-          call(bind_vars, &block)
-      end
-      
       def fetch_rows(sql)
         execute(sql) do |cursor|
           cps = db.conversion_procs
@@ -378,20 +371,6 @@ module Sequel
         self
       end
 
-      # Prepare the given type of query with the given name and store
-      # it in the database.  Note that a new native prepared statement is
-      # created on each call to this prepared statement.
-      def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
-
-        if name
-          ps = ps.clone(:prepared_statement_name=>name)
-          db.set_prepared_statement(name, ps)
-        end
-
-        ps
-      end
-      
       # Oracle requires type specifiers for placeholders, at least
       # if you ever want to use a nil/NULL value as the value for
       # the placeholder.
@@ -415,6 +394,14 @@ module Sequel
 
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER
+      end
+
+      def bound_variable_modules
+        [BindArgumentMethods]
+      end
+
+      def prepared_statement_modules
+        [PreparedStatementMethods]
       end
     end
   end

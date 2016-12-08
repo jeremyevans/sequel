@@ -739,19 +739,6 @@ module Sequel
         self
       end
       
-      # Create a named prepared statement that is stored in the
-      # database (and connection) for reuse.
-      def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
-
-        if name
-          ps = ps.clone(:prepared_statement_name=>name)
-          db.set_prepared_statement(name, ps)
-        end
-
-        ps
-      end
-
       # Set the fetch size on JDBC ResultSets created from this dataset.
       def with_fetch_size(size)
         clone(:fetch_size=>size)
@@ -783,6 +770,10 @@ module Sequel
       # override the methods separately.
       def basic_type_convertor(map, meta, type, i)
         map[type]
+      end
+
+      def prepared_statement_modules
+        [PreparedStatementMethods]
       end
 
       # Split out from fetch rows to allow processing of JDBC result sets

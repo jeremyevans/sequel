@@ -756,37 +756,18 @@ module Sequel
         end
 
         BindArgumentMethods = prepared_statements_module(:bind, [ArgumentMapper, ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods], %w'execute execute_dui')
-
-        PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods, %w'execute execute_dui') do
-          # Raise a more obvious error if you attempt to call a unnamed prepared statement.
-          def call(*)
-            raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
-            super
-          end
-        end
-        
-        # Execute the given type of statement with the hash of values.
-        def call(type, bind_vars=OPTS, *values, &block)
-          to_prepared_statement(type, values).
-            with_extend(BindArgumentMethods).
-            call(bind_vars, &block)
-        end
-
-        # Prepare the given type of statement with the given name, and store
-        # it in the database to be called later.
-        def prepare(type, name=nil, *values)
-          ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
-
-          if name
-            ps = ps.clone(:prepared_statement_name=>name)
-            db.set_prepared_statement(name, ps)
-          end
-
-          ps
-        end
+        PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods, %w'execute execute_dui')
         
         private
         
+        def bound_variable_modules
+          [BindArgumentMethods]
+        end
+
+        def prepared_statement_modules
+          [PreparedStatementMethods]
+        end
+
         # PostgreSQL uses $N for placeholders instead of ?, so use a $
         # as the placeholder.
         def prepared_arg_placeholder

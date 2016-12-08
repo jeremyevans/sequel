@@ -36,44 +36,22 @@ module Sequel
           # Extend given dataset with this module so subselects inside subselects in
           # prepared statements work.
           def subselect_sql_append(sql, ds)
-            ps = ds.to_prepared_statement(:select).clone(:append_sql=>sql, :prepared_args=>prepared_args).with_extend(CallableStatementMethods)
-            ps = ps.bind(@opts[:bind_vars]) if @opts[:bind_vars]
-            ps.prepared_sql
+            ds.clone(:append_sql=>sql, :prepared_args=>prepared_args, :bind_vars=>@opts[:bind_vars]).
+              send(:to_prepared_statement, :select, nil, :extend=>bound_variable_modules).
+              prepared_sql
           end
         end
         
-        PreparedStatementMethods = Sequel::Dataset.send(:prepared_statements_module,
-          :prepare_bind,
-          Sequel::Dataset::UnnumberedArgumentMapper) do
-            # Raise a more obvious error if you attempt to call a unnamed prepared statement.
-            def call(*)
-              raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
-              super
-            end
-        end
+        PreparedStatementMethods = Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, Sequel::Dataset::UnnumberedArgumentMapper)
         
-        # MySQL is different in that it supports prepared statements but not bound
-        # variables outside of prepared statements.  The default implementation
-        # breaks the use of subselects in prepared statements, so extend the
-        # temporary prepared statement that this creates with a module that
-        # fixes it.
-        def call(type, bind_arguments={}, *values, &block)
-          to_prepared_statement(type, values).
-            with_extend(CallableStatementMethods).
-            call(bind_arguments, &block)
+        private
+
+        def bound_variable_modules
+          [CallableStatementMethods]
         end
-        
-        # Store the given type of prepared statement in the associated database
-        # with the given name.
-        def prepare(type, name=nil, *values)
-          ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
 
-          if name
-            ps = ps.clone(:prepared_statement_name=>name)
-            db.set_prepared_statement(name, ps)
-          end
-
-          ps
+        def prepared_statement_modules
+          [PreparedStatementMethods]
         end
       end
     end

@@ -189,24 +189,15 @@ module Sequel
         include Sequel::Postgres::DatasetMethods
         APOS = Dataset::APOS
         
-        # Add the shared PostgreSQL prepared statement methods
-        def prepare(type, name=nil, *values)
-          ps = to_prepared_statement(type, values).
-            with_extend(::Sequel::Postgres::DatasetMethods::PreparedStatementMethods, JDBC::Dataset::PreparedStatementMethods)
-
-          if name
-            ps = ps.clone(:prepared_statement_name => name)
-            db.set_prepared_statement(name, ps)
-          end
-
-          ps
-        end
-
         private
         
         # Literalize strings similar to the native postgres adapter
         def literal_string_append(sql, v)
           sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
+        end
+
+        def prepared_statement_modules
+          [::Sequel::Postgres::DatasetMethods::PreparedStatementMethods] + super
         end
 
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR

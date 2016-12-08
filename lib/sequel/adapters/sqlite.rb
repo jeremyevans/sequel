@@ -310,13 +310,6 @@ module Sequel
       BindArgumentMethods = prepared_statements_module(:bind, ArgumentMapper)
       PreparedStatementMethods = prepared_statements_module(:prepare, BindArgumentMethods)
 
-      # Execute the given type of statement with the hash of values.
-      def call(type, bind_vars={}, *values, &block)
-        to_prepared_statement(type, values).
-          with_extend(BindArgumentMethods).
-          call(bind_vars, &block)
-      end
-      
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |result|
@@ -339,20 +332,6 @@ module Sequel
         end
       end
       
-      # Prepare the given type of query with the given name and store
-      # it in the database.  Note that a new native prepared statement is
-      # created on each call to this prepared statement.
-      def prepare(type, name=nil, *values)
-        ps = to_prepared_statement(type, values).with_extend(PreparedStatementMethods)
-
-        if name
-          ps = ps.clone(:prepared_statement_name=>name)
-          db.set_prepared_statement(name, ps)
-        end
-
-        ps
-      end
-      
       private
       
       # The base type name for a given type, without any parenthetical part.
@@ -363,6 +342,14 @@ module Sequel
       # Quote the string using the adapter class method.
       def literal_string_append(sql, v)
         sql << "'" << ::SQLite3::Database.quote(v) << "'"
+      end
+
+      def bound_variable_modules
+        [BindArgumentMethods]
+      end
+
+      def prepared_statement_modules
+        [PreparedStatementMethods]
       end
 
       # SQLite uses a : before the name of the argument as a placeholder.
