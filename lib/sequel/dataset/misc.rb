@@ -33,10 +33,10 @@ module Sequel
       @cache = {}
     end
 
-    # Define a hash value such that datasets with the same DB, opts, and SQL
+    # Define a hash value such that datasets with the same class, DB, and opts
     # will be considered equal.
     def ==(o)
-      o.is_a?(self.class) && db == o.db && opts == o.opts && sql == o.sql
+      o.is_a?(self.class) && db == o.db && opts == o.opts
     end
 
     # An object representing the current date or time, should be an instance
@@ -158,10 +158,10 @@ module Sequel
       end
     end
 
-    # Define a hash value such that datasets with the same DB, opts, and SQL
-    # will have the same hash value
+    # Define a hash value such that datasets with the same class, DB, and opts,
+    # will have the same hash value.
     def hash
-      [db, opts, sql].hash
+      [self.class, db, opts].hash
     end
     
     # The String instance method to call on identifiers before sending them to
