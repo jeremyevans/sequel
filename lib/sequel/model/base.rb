@@ -819,7 +819,7 @@ module Sequel
           @columns = superclass.instance_variable_get(:@columns)
           @db_schema = superclass.instance_variable_get(:@db_schema)
         else
-          @dataset = @dataset.with_extend(*@dataset_method_modules.reverse)
+          @dataset = @dataset.with_extend(*@dataset_method_modules.reverse) if @dataset_method_modules
           @db_schema = get_db_schema
         end
 
