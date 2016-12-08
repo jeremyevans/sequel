@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Dataset#with_extend to accept a block and create a module with that block that the object is extended with (jeremyevans)
+
 * Speed up repeated calls to with_pk on the same frozen model dataset using a cached placeholder literalizer (jeremyevans)
 
 * Add dataset_module methods such as select and order that define dataset methods which support caching for frozen datasets (jeremyevans)

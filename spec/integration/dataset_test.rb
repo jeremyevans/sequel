@@ -1531,7 +1531,7 @@ describe "SQL Extract Function" do
   
   it "should return the part of the datetime asked for" do
     t = Time.now
-    @ds = @ds.with_extend(Module.new do def supports_timestamp_timezones?() false end end)
+    @ds = @ds.with_extend{def supports_timestamp_timezones?() false end}
     @ds.insert(t)
     @ds.get{a.extract(:year)}.must_equal t.year
     @ds.get{a.extract(:month)}.must_equal t.month

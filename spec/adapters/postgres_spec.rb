@@ -1724,11 +1724,11 @@ if DB.adapter_scheme == :postgres
     end
 
     it "should handle returning inside block" do
-      ds = @ds.with_extend(Module.new do
+      ds = @ds.with_extend do
         def check_return
           use_cursor.each{|r| return}
         end
-      end)
+      end
       ds.check_return
       ds.all.must_equal ds.use_cursor.all
     end

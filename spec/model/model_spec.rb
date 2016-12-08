@@ -977,11 +977,11 @@ describe "Model.db_schema" do
     def @db.schema(table, opts = {})
       raise Sequel::Error
     end
-    @dataset = @dataset.with_extend(Module.new do
+    @dataset = @dataset.with_extend do
       def columns
         [:x, :y]
       end
-    end)
+    end
 
     @c.dataset = @dataset
     @c.db_schema.must_equal(:x=>{}, :y=>{})

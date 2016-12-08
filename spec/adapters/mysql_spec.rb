@@ -150,10 +150,10 @@ if [:mysql, :mysql2].include?(DB.adapter_scheme)
 
     it "should allow disabling the conversion on a per-dataset basis" do
       @db.convert_tinyint_to_bool = true
-      ds = @ds.with_extend(Module.new do
+      ds = @ds.with_extend do
         def cast_tinyint_integer?(f) true end #mysql
         def convert_tinyint_to_bool?() false end #mysql2
-      end)
+      end
       ds.delete
       ds << {:b=>true, :i=>10}
       ds.all.must_equal [{:b=>1, :i=>10}]

@@ -280,7 +280,7 @@ describe Sequel::Model, ".dataset_module" do
   end
 
   it "should have dataset_module support a distinct method" do
-    @c.dataset = @c.dataset.with_extend(Module.new{def supports_distinct_on?; true end})
+    @c.dataset = @c.dataset.with_extend{def supports_distinct_on?; true end}
     @c.dataset_module{distinct :foo, :baz}
     @c.foo.sql.must_equal 'SELECT DISTINCT ON (baz) * FROM items'
     @c.where(:bar).foo.sql.must_equal 'SELECT DISTINCT ON (baz) * FROM items WHERE bar'

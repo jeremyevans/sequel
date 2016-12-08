@@ -356,9 +356,9 @@ describe "MSSSQL::Dataset#insert" do
   end
   
   it "should have insert_select return nil if the server version is not 2005+" do
-    @ds = @ds.with_extend(Module.new do
+    @ds = @ds.with_extend do
       def server_version() 8000760 end
-    end)
+    end
     @ds.insert_select(:value=>10).must_be_nil
   end
 

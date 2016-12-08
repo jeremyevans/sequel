@@ -1700,13 +1700,17 @@ end
 describe "Dataset#with_extend" do
   it "should returned clone dataset extended with given modules" do
     d = Sequel.mock.dataset
-    m1 = Module.new{def a; 1; end}
-    m2 = Module.new{def b; a+2; end}
-    d.with_extend(m1, m2).b.must_equal 3
-    d.respond_to?(:b).must_equal false
-    ds = d.freeze.with_extend(m1, m2)
-    ds.b.must_equal 3
+    m1 = Module.new{def a; 2**super end}
+    m2 = Module.new{def a; 3 end}
+    d.with_extend(m1, m2){def a; 4**super end}.a.must_equal 65536
+    d.respond_to?(:a).must_equal false
+    ds = d.freeze.with_extend(m1, m2){def a; 4**super end}
+    ds.a.must_equal 65536
     ds.frozen?.must_equal true
+  end
+
+  it "should work with just a block" do
+    Sequel.mock.dataset.with_extend{def a; 1 end}.a.must_equal 1
   end
 end
 

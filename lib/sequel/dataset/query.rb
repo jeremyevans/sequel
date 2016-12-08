@@ -1042,18 +1042,24 @@ module Sequel
     
     if TRUE_FREEZE
       # Return a clone of the dataset extended with the given modules.
-      def with_extend(*mods)
+      # Note that like Object#extend, when multiple modules are provided
+      # as arguments the cloned dataset is extended with the modules in reverse
+      # order.  If a block is provided, a module is created using the block and
+      # the clone is extended with that module after any modules given as arguments.
+      def with_extend(*mods, &block)
         c = _clone(:freeze=>false)
-        c.extend(*mods)
+        c.extend(*mods) unless mods.empty?
+        c.extend(Module.new(&block)) if block
         c.freeze if frozen?
         c
       end
     else
       # :nocov:
       # :nodoc:
-      def with_extend(*mods)
+      def with_extend(*mods, &block)
         c = clone
-        c.extend(*mods)
+        c.extend(*mods) unless mods.empty?
+        c.extend(Module.new(&block)) if block
         c
       end
       # :nocov:
