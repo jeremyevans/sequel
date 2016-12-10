@@ -1263,18 +1263,6 @@ module Sequel
       Dataset.def_sql_method(self, :select, [['if opts[:values]', %w'values order limit'], ['elsif server_version >= 80400', %w'with select distinct columns from join where group having window compounds order limit lock'], ['else', %w'select distinct columns from join where group having compounds order limit lock']])
       Dataset.def_sql_method(self, :update, [['if server_version >= 90100', %w'with update table set from where returning'], ['else', %w'update table set from where returning']])
 
-      # Shared methods for prepared statements when used with PostgreSQL databases.
-      module PreparedStatementMethods
-        # Override insert action to use RETURNING if the server supports it.
-        def run
-          if prepared_type == :insert && (opts[:returning_pk] || !opts[:returning])
-            fetch_rows(prepared_sql){|r| return r.values.first}
-          else
-            super
-          end
-        end
-      end
-
       # Return the results of an EXPLAIN ANALYZE query as a string
       def analyze
         explain(:analyze=>true)
@@ -1803,7 +1791,7 @@ module Sequel
 
       def to_prepared_statement(type, *a)
         if type == :insert && !@opts.has_key?(:returning)
-          clone(:returning=>insert_pk, :returning_pk=>true).send(:to_prepared_statement, type, *a)
+          returning(insert_pk).send(:to_prepared_statement, :insert_pk, *a)
         else
           super
         end

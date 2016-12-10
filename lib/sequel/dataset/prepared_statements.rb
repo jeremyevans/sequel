@@ -151,7 +151,7 @@ module Sequel
           clone(:limit=>1).select_sql
         when :insert_select
           insert_select_sql(*prepared_modify_values)
-        when :insert
+        when :insert, :insert_pk
           insert_sql(*prepared_modify_values)
         when :update
           update_sql(*prepared_modify_values)
@@ -209,6 +209,8 @@ module Sequel
           else
             send(prepared_type, *prepared_modify_values)
           end
+        when :insert_pk
+          fetch_rows(prepared_sql){|r| return r.values.first}
         when Array
           case prepared_type.at(0)
           when :map, :to_hash, :to_hash_groups

@@ -195,10 +195,6 @@ module Sequel
           sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
         end
 
-        def prepared_statement_modules
-          [::Sequel::Postgres::DatasetMethods::PreparedStatementMethods] + super
-        end
-
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
         PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]
