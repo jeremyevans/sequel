@@ -492,7 +492,9 @@ describe "Blockless Ruby Filters" do
   end
 
   it "should handled emulated function where only name is emulated" do
-    dsc = Class.new(Sequel::Dataset)
+    db = Sequel.mock
+    db.extend_datasets{}
+    dsc = db.dataset_class
     efm = dsc::EMULATED_FUNCTION_MAP.dup
     dsc::EMULATED_FUNCTION_MAP[:trim] = :foo
     dsc.new(@d.db).literal(Sequel.trim(:a)).must_equal 'foo(a)'

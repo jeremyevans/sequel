@@ -39,7 +39,6 @@ module Sequel
     module SqlAnywhere
       # Database instance methods for Sybase databases accessed via JDBC.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::SqlAnywhere::DatabaseMethods
         include Sequel::JDBC::Transactions
 

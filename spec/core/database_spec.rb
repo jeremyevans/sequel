@@ -2523,7 +2523,7 @@ describe "Database extensions" do
     end
   end
   before do
-    @db = Sequel.mock
+    @db = Sequel.mock(:identifier_mangling=>false)
   end
   after do
     Sequel::Database.instance_variable_set(:@initialize_hook, Proc.new {|db| })
@@ -2535,25 +2535,21 @@ describe "Database extensions" do
   end
 
   it "should be able to register an extension with a block and have Database#extension call the block" do
-    @db.quote_identifiers = false
-    Sequel::Database.register_extension(:foo){|db| db.quote_identifiers = true}
-    @db.extension(:foo).quote_identifiers?.must_equal true
+    Sequel::Database.register_extension(:foo){|db| db.opts[:foo] = 1}
+    @db.extension(:foo).opts[:foo].must_equal 1
   end
 
   it "should be able to register an extension with a callable and Database#extension call the callable" do
-    @db.quote_identifiers = false
-    Sequel::Database.register_extension(:foo, proc{|db| db.quote_identifiers = true})
-    @db.extension(:foo).quote_identifiers?.must_equal true
+    Sequel::Database.register_extension(:foo, proc{|db| db.opts[:foo] = 1})
+    @db.extension(:foo).opts[:foo].must_equal 1
   end
 
   it "should be able to load multiple extensions in the same call" do
-    @db.quote_identifiers = false
-    @db.identifier_input_method = :downcase
-    Sequel::Database.register_extension(:foo, proc{|db| db.quote_identifiers = true})
-    Sequel::Database.register_extension(:bar, proc{|db| db.identifier_input_method = nil})
-    @db.extension(:foo, :bar)
-    @db.quote_identifiers?.must_equal true
-    @db.identifier_input_method.must_be_nil
+    a = []
+    Sequel::Database.register_extension(:foo, proc{|db| a << db.opts[:foo] = 1})
+    Sequel::Database.register_extension(:bar, proc{|db| a << db.opts[:bar] = 2})
+    @db.extension(:foo, :bar).opts.values_at(:foo, :bar).must_equal [1, 2]
+    a.must_equal [1, 2]
   end
 
   it "should return the receiver" do
@@ -2575,8 +2571,8 @@ describe "Database extensions" do
     Sequel::Database.extension(:foo, :bar)
     @db.wont_respond_to(:a)
     @db.wont_respond_to(:b)
-    Sequel.mock.a.must_equal 1
-    Sequel.mock.b.must_equal 2
+    Sequel.mock(:identifier_mangling=>false).a.must_equal 1
+    Sequel.mock(:identifier_mangling=>false).b.must_equal 2
   end
 end
 

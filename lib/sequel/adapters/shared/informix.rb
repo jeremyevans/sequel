@@ -5,8 +5,6 @@ module Sequel
     Sequel::Database.set_shared_adapter_scheme(:informix, self)
 
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
-
       TEMPORARY = 'TEMP '.freeze
 
       # Informix uses the :informix database type
@@ -33,6 +31,10 @@ module Sequel
       SKIP = " SKIP ".freeze
 
       Dataset.def_sql_method(self, :select, %w'select limit distinct columns from join where having group compounds order')
+
+      def quote_identifiers?
+        @opts.fetch(:quote_identifiers, false)
+      end
 
       # Informix does not support INTERSECT or EXCEPT
       def supports_intersect_except?

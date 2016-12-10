@@ -164,18 +164,6 @@ module Sequel
       [self.class, db, opts].hash
     end
     
-    # The String instance method to call on identifiers before sending them to
-    # the database.
-    def identifier_input_method
-      @opts.fetch(:identifier_input_method, db.identifier_input_method)
-    end
-    
-    # The String instance method to call on identifiers before sending them to
-    # the database.
-    def identifier_output_method
-      @opts.fetch(:identifier_output_method, db.identifier_output_method)
-    end
-    
     # Returns a string representation of the dataset including the class name 
     # and the corresponding SQL select statement.
     def inspect
@@ -269,17 +257,7 @@ module Sequel
     def with_quote_identifiers(v)
       clone(:quote_identifiers=>v, :skip_symbol_cache=>true)
     end
-    
-    # Return a modified dataset with identifier_input_method set.
-    def with_identifier_input_method(meth)
-      clone(:identifier_input_method=>meth, :skip_symbol_cache=>true)
-    end
-    
-    # Return a modified dataset with identifier_output_method set.
-    def with_identifier_output_method(meth)
-      clone(:identifier_output_method=>meth)
-    end
-
+      
     protected
 
     # Access the cache for the current dataset.  Should be used with caution,

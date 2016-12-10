@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel.require 'adapters/utils/unmodified_identifiers'
+
 module Sequel
   module Mock
     # Connection class for Sequel's mock adapter.
@@ -259,6 +261,11 @@ module Sequel
           end
         end
 
+        unless @shared_adapter
+          extend UnmodifiedIdentifiers::DatabaseMethods
+          extend_datasets UnmodifiedIdentifiers::DatasetMethods
+        end
+
         self.autoid = opts[:autoid]
         self.columns = opts[:columns]
         self.fetch = opts[:fetch]
@@ -288,14 +295,6 @@ module Sequel
 
       def quote_identifiers_default
         shared_adapter? ? super : false
-      end
-
-      def identifier_input_method_default
-        shared_adapter? ? super : nil
-      end
-
-      def identifier_output_method_default
-        shared_adapter? ? super : nil
       end
 
       def shared_adapter?
@@ -329,6 +328,10 @@ module Sequel
 
       def fetch_rows(sql, &block)
         execute(sql, &block)
+      end
+
+      def quote_identifiers?
+        @opts.fetch(:quote_identifiers, db.send(:quote_identifiers_default))
       end
 
       private

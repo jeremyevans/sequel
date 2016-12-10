@@ -18,7 +18,6 @@ module Sequel
     # support via JDBC.
     module JTDS
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::JDBC::MSSQL::DatabaseMethods
 
         private

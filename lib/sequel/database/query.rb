@@ -287,13 +287,16 @@ module Sequel
       (ds || dataset).method(:input_identifier)
     end
     
+    # Uncached version of metadata_dataset, designed for overriding.
+    def _metadata_dataset
+      dataset
+    end
+
     # Return a dataset that uses the default identifier input and output methods
     # for this database.  Used when parsing metadata so that column symbols are
     # returned as expected.
     def metadata_dataset
-      @metadata_dataset ||= dataset.
-        with_identifier_input_method(identifier_input_method_default).
-        with_identifier_output_method(identifier_output_method_default)
+      @metadata_dataset ||= _metadata_dataset
     end
 
     # Return a Method object for the dataset's output_identifier_method.

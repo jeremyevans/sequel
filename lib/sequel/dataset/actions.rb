@@ -1073,11 +1073,10 @@ module Sequel
       Sequel.|(*cond)
     end
 
-    # Modify the identifier returned from the database based on the
-    # identifier_output_method.
+    # Downcase identifiers by default when outputing them from the database.
     def output_identifier(v)
       v = 'untitled' if v == ''
-      (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
+      v.to_s.downcase.to_sym
     end
     
     # This is run inside .all, after all of the records have been loaded

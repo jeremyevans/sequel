@@ -10,7 +10,7 @@ module Sequel
     
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
-      @opts.fetch(:quote_identifiers, db.quote_identifiers?)
+      @opts.fetch(:quote_identifiers, true)
     end
     
     # Whether this dataset will provide accurate number of rows matched for

@@ -13,8 +13,6 @@ module Sequel
     end
 
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
-
       attr_reader :conversion_procs
 
       # Override the default SqlAnywhere.convert_smallint_to_bool setting for this database.

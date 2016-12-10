@@ -10,7 +10,6 @@ module Sequel
     module MySQL
       # Database instance methods for MySQL databases accessed via Swift.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::MySQL::DatabaseMethods
         
         private

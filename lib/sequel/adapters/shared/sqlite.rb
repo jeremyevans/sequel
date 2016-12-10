@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/utils/replace'
+Sequel.require %w'replace unmodified_identifiers', 'adapters/utils'
 
 module Sequel
   module SQLite
@@ -16,7 +16,7 @@ module Sequel
     # can be used to set PRAGMAs on connections in a thread-safe manner:
     # :auto_vacuum, :foreign_keys, :synchronous, and :temp_store.
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
+      include UnmodifiedIdentifiers::DatabaseMethods
 
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
@@ -442,16 +442,6 @@ module Sequel
         a
       end
 
-      # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
-      def identifier_input_method_default
-        nil
-      end
-      
-      # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
-      def identifier_output_method_default
-        nil
-      end
-      
       # Does the reverse of on_delete_clause, eg. converts strings like +'SET NULL'+
       # to symbols +:set_null+.
       def on_delete_sql_to_sym str
@@ -511,6 +501,7 @@ module Sequel
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
       include Dataset::Replace
+      include UnmodifiedIdentifiers::DatasetMethods
 
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
       EMULATED_FUNCTION_MAP = {:char_length=>'length'.freeze}

@@ -357,11 +357,6 @@ describe "Simple dataset operations with nasty table names" do
   before do
     @db = DB
     @table = :"i`t' [e]\"m\\s" 
-    @qi = @db.quote_identifiers?
-    @db.quote_identifiers = true
-  end
-  after do
-    @db.quote_identifiers = @qi
   end
 
   cspecify "should work correctly", :oracle, :sqlanywhere, [:jdbc, :mssql] do
@@ -378,7 +373,7 @@ describe "Simple dataset operations with nasty table names" do
     @ds.count.must_equal 0
     @db.drop_table?(@table)
   end 
-end
+end if DB.dataset.quote_identifiers?
 
 describe Sequel::Dataset do
   before do
@@ -1435,7 +1430,6 @@ describe "Sequel::Dataset DSL support" do
   
   it "should work with multiple value arrays" do
     @ds.insert(20, 10)
-    @ds = @ds.with_quote_identifiers(false)
     @ds.filter([:a, :b]=>[[20, 10]]).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter([:a, :b]=>[[10, 20]]).all.must_equal []
     @ds.filter([:a, :b]=>[[20, 10], [1, 2]]).all.must_equal [{:a=>20, :b=>10}]
@@ -1449,7 +1443,7 @@ describe "Sequel::Dataset DSL support" do
 
   it "should work with IN/NOT in with datasets" do
     @ds.insert(20, 10)
-    ds = @ds.unordered.with_quote_identifiers(false)
+    ds = @ds.unordered
 
     @ds.filter(:a=>ds.select(:a)).all.must_equal [{:a=>20, :b=>10}]
     @ds.filter(:a=>ds.select(:a).where(:a=>15)).all.must_equal []
@@ -1725,7 +1719,7 @@ describe "Dataset identifier methods" do
   it "should work when not quoting identifiers" do
     @ds.with_quote_identifiers(false).first.must_equal(:ab=>1)
   end
-end
+end if IDENTIFIER_MANGLING
 
 describe "Dataset defaults and overrides" do
   before(:all) do

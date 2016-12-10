@@ -1,50 +1,54 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Database schema parser" do
-  before do
-    @iom = DB.identifier_output_method
-    @iim = DB.identifier_input_method
-    @qi = DB.quote_identifiers?
-  end
   after do
-    DB.identifier_output_method = @iom
-    DB.identifier_input_method = @iim
-    DB.quote_identifiers = @qi
     DB.drop_table?(:items)
   end
 
-  it "should handle a database with a identifier methods" do
-    DB.identifier_output_method = :reverse
-    DB.identifier_input_method = :reverse
-    DB.quote_identifiers = true
-    DB.create_table!(:items){Integer :number}
-    begin
-      DB.schema(:items, :reload=>true).must_be_kind_of(Array)
-      DB.schema(:items, :reload=>true).first.first.must_equal :number
-    ensure 
-      DB.drop_table(:items)
+  describe "with identifier mangling" do
+    before do
+      @iom = DB.identifier_output_method
+      @iim = DB.identifier_input_method
+      @qi = DB.quote_identifiers?
     end
-  end
+    after do
+      DB.identifier_output_method = @iom
+      DB.identifier_input_method = @iim
+      DB.quote_identifiers = @qi
+    end
 
-  it "should handle a dataset with identifier methods different than the database's" do
-    DB.identifier_output_method = :reverse
-    DB.identifier_input_method = :reverse
-    DB.quote_identifiers = true
-    DB.create_table!(:items){Integer :number}
-    DB.identifier_output_method = @iom
-    DB.identifier_input_method = @iim
-    ds = DB[:items].
-      with_identifier_output_method(:reverse).
-      with_identifier_input_method(:reverse)
-    begin
-      DB.schema(ds, :reload=>true).must_be_kind_of(Array)
-      DB.schema(ds, :reload=>true).first.first.must_equal :number
-    ensure 
+    it "should handle a database with a identifier methods" do
       DB.identifier_output_method = :reverse
       DB.identifier_input_method = :reverse
-      DB.drop_table(:items)
+      DB.quote_identifiers = true
+      DB.create_table!(:items){Integer :number}
+      begin
+        DB.schema(:items, :reload=>true).must_be_kind_of(Array)
+        DB.schema(:items, :reload=>true).first.first.must_equal :number
+      ensure 
+      end
     end
-  end
+
+    it "should handle a dataset with identifier methods different than the database's" do
+      DB.identifier_output_method = :reverse
+      DB.identifier_input_method = :reverse
+      DB.quote_identifiers = true
+      DB.create_table!(:items){Integer :number}
+      DB.identifier_output_method = @iom
+      DB.identifier_input_method = @iim
+      ds = DB[:items].
+        with_identifier_output_method(:reverse).
+        with_identifier_input_method(:reverse)
+      begin
+        DB.schema(ds, :reload=>true).must_be_kind_of(Array)
+        DB.schema(ds, :reload=>true).first.first.must_equal :number
+      ensure 
+        DB.identifier_output_method = :reverse
+        DB.identifier_input_method = :reverse
+        DB.drop_table(:items)
+      end
+    end
+  end if IDENTIFIER_MANGLING
 
   it "should not issue an sql query if the schema has been loaded unless :reload is true" do
     DB.create_table!(:items){Integer :number}
@@ -796,12 +800,8 @@ describe "Database#tables and #views" do
     @db.drop_table?(:sequel_test_table)
     @db.create_table(:sequel_test_table){Integer :a}
     @db.create_view :sequel_test_view, @db[:sequel_test_table]
-    @iom = @db.identifier_output_method
-    @iim = @db.identifier_input_method
   end
   after do
-    @db.identifier_output_method = @iom
-    @db.identifier_input_method = @iim
     @db.drop_view :sequel_test_view
     @db.drop_table :sequel_test_table
   end
@@ -814,12 +814,6 @@ describe "Database#tables and #views" do
     ts.wont_include(:sequel_test_view)
   end if DB.supports_table_listing?
 
-  it "#tables should respect the database's identifier_output_method" do
-    @db.identifier_output_method = :xxxxx
-    @db.identifier_input_method = :xxxxx
-    @db.tables.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
-  end if DB.supports_table_listing?
-
   it "#views should return an array of symbols" do
     ts = @db.views
     ts.must_be_kind_of(Array)
@@ -828,9 +822,26 @@ describe "Database#tables and #views" do
     ts.must_include(:sequel_test_view)
   end if DB.supports_view_listing?
 
-  it "#views should respect the database's identifier_output_method" do
-    @db.identifier_output_method = :xxxxx
-    @db.identifier_input_method = :xxxxx
-    @db.views.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
-  end if DB.supports_view_listing?
+  describe "with identifier mangling" do
+    before do
+      @iom = @db.identifier_output_method
+      @iim = @db.identifier_input_method
+    end
+    after do
+      @db.identifier_output_method = @iom
+      @db.identifier_input_method = @iim
+    end
+
+    it "#tables should respect the database's identifier_output_method" do
+      @db.identifier_output_method = :xxxxx
+      @db.identifier_input_method = :xxxxx
+      @db.tables.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
+    end if DB.supports_table_listing?
+
+    it "#views should respect the database's identifier_output_method" do
+      @db.identifier_output_method = :xxxxx
+      @db.identifier_input_method = :xxxxx
+      @db.views.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
+    end if DB.supports_view_listing?
+  end if IDENTIFIER_MANGLING
 end

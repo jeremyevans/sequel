@@ -19,7 +19,6 @@ module Sequel
     module Progress
       # Database instance methods for Progress databases accessed via JDBC.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Progress::DatabaseMethods
         include Sequel::JDBC::Transactions
 

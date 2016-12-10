@@ -1,5 +1,7 @@
 === HEAD
 
+* Move identifier mangling code to identifier_mangling extension, load by default unless using :identifier_mangling=>false Database option (jeremyevans)
+
 * Allow Dataset#with_extend to accept a block and create a module with that block that the object is extended with (jeremyevans)
 
 * Speed up repeated calls to with_pk on the same frozen model dataset using a cached placeholder literalizer (jeremyevans)

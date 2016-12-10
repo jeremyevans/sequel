@@ -241,11 +241,7 @@ module Sequel
       # Yield all rows matching this dataset.
       def fetch_rows(sql)
         execute(sql) do |r|
-          self.columns = if identifier_output_method
-            r.fields.map!{|c| output_identifier(c.to_s)}
-          else
-            r.fields
-          end
+          self.columns = r.fields.map!{|c| output_identifier(c.to_s)}
           r.each(:cast_booleans=>convert_tinyint_to_bool?){|h| yield h}
         end
         self

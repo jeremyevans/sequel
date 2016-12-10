@@ -13,8 +13,6 @@ module Sequel
     end
 
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
-
       AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
       SERVER_VERSION_RE = /^(\d+)\.(\d+)\.(\d+)/.freeze
       SERVER_VERSION_SQL = "SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)".freeze
@@ -404,7 +402,7 @@ module Sequel
       end
 
       # Always quote identifiers in the metadata_dataset, so schema parsing works.
-      def metadata_dataset
+      def _metadata_dataset
         super.with_quote_identifiers(true)
       end
       

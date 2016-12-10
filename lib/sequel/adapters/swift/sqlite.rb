@@ -10,7 +10,6 @@ module Sequel
     module SQLite
       # Database instance methods for SQLite databases accessed via Swift.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::SQLite::DatabaseMethods
 
         DATABASE_ERROR_REGEXPS = {

@@ -3420,13 +3420,13 @@ describe "Dataset#inspect" do
   end
 
   it "should include the class name and the corresponding SQL statement" do
-    Sequel::Dataset.new(Sequel.mock).from(:blah).inspect.must_equal '#<Sequel::Dataset: "SELECT * FROM blah">'
-    InspectDataset.new(Sequel.mock).from(:blah).inspect.must_equal '#<InspectDataset: "SELECT * FROM blah">'
+    Sequel::Dataset.new(Sequel.mock).from(:blah).inspect.must_equal '#<Sequel::Dataset: "SELECT * FROM \\"BLAH\\"">'
+    InspectDataset.new(Sequel.mock).from(:blah).inspect.must_equal '#<InspectDataset: "SELECT * FROM \\"BLAH\\"">'
   end
 
   it "should skip anonymous classes" do
-    Class.new(Class.new(Sequel::Dataset)).new(Sequel.mock).from(:blah).inspect.must_equal '#<Sequel::Dataset: "SELECT * FROM blah">'
-    Class.new(InspectDataset).new(Sequel.mock).from(:blah).inspect.must_equal '#<InspectDataset: "SELECT * FROM blah">'
+    Class.new(Class.new(Sequel::Dataset)).new(Sequel.mock).from(:blah).inspect.must_equal '#<Sequel::Dataset: "SELECT * FROM \\"BLAH\\"">'
+    Class.new(InspectDataset).new(Sequel.mock).from(:blah).inspect.must_equal '#<InspectDataset: "SELECT * FROM \\"BLAH\\"">'
   end
 end
 

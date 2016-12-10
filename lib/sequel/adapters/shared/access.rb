@@ -1,13 +1,13 @@
 # frozen-string-literal: true
 
-module Sequel
-  require 'adapters/utils/emulate_offset_with_reverse_and_count'
+Sequel.require %w'emulate_offset_with_reverse_and_count unmodified_identifiers', 'adapters/utils'
 
+module Sequel
   module Access
     Sequel::Database.set_shared_adapter_scheme(:access, self)
 
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
+      include UnmodifiedIdentifiers::DatabaseMethods
 
       # Access uses type :access as the database_type
       def database_type
@@ -61,14 +61,6 @@ module Sequel
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
       
-      def identifier_input_method_default
-        nil
-      end
-      
-      def identifier_output_method_default
-        nil
-      end
-      
       # Access doesn't have a 64-bit integer type, so use integer and hope
       # the user isn't using more than 32 bits.
       def type_literal_generic_bignum_symbol(column)
@@ -91,6 +83,7 @@ module Sequel
         Dataset.def_sql_method(self, :select, %w'select distinct limit columns into from join where group order having compounds')
       end)
       include EmulateOffsetWithReverseAndCount
+      include UnmodifiedIdentifiers::DatasetMethods
 
       DATE_FORMAT = '#%Y-%m-%d#'.freeze
       TIMESTAMP_FORMAT = '#%Y-%m-%d %H:%M:%S#'.freeze

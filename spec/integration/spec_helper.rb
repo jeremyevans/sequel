@@ -25,8 +25,12 @@ Sequel.cache_anonymous_models = false
 
 require './spec/guards_helper'
 
+IDENTIFIER_MANGLING = !ENV['SEQUEL_NO_MANGLE'] unless defined?(IDENTIFIER_MANGLING)
+
 unless defined?(DB)
-  DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'])
+  opts = {}
+  opts[:identifier_mangling] = false unless IDENTIFIER_MANGLING
+  DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'], opts)
   DB.extension(:freeze_datasets) if ENV['SEQUEL_FREEZE_DATASETS']
 end
 

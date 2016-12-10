@@ -5,8 +5,6 @@ module Sequel
     Sequel::Database.set_shared_adapter_scheme(:firebird, self)
 
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
-
       AUTO_INCREMENT = ''.freeze
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
 

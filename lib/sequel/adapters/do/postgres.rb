@@ -20,7 +20,6 @@ module Sequel
       # Methods to add to Database instances that access PostgreSQL via
       # DataObjects.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::Postgres::DatabaseMethods
         
         # Add the primary_keys and primary_key_sequences instance variables,

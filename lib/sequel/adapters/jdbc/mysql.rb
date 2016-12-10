@@ -18,7 +18,6 @@ module Sequel
     module MySQL
       # Database instance methods for MySQL databases accessed via JDBC.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::MySQL::DatabaseMethods
         LAST_INSERT_ID = 'SELECT LAST_INSERT_ID()'.freeze
         

@@ -39,10 +39,14 @@ class Minitest::HooksSpec
   end
 end
 
+IDENTIFIER_MANGLING = !ENV['SEQUEL_NO_MANGLE'] unless defined?(IDENTIFIER_MANGLING)
+
 unless defined?(DB)
   env_var = "SEQUEL_#{SEQUEL_ADAPTER_TEST.to_s.upcase}_URL"
   env_var = ENV.has_key?(env_var) ? env_var : 'SEQUEL_INTEGRATION_URL'
-  DB = Sequel.connect(ENV[env_var])
+  opts = {}
+  opts[:identifier_mangling] = false unless IDENTIFIER_MANGLING
+  DB = Sequel.connect(ENV[env_var], opts)
   DB.extension(:freeze_datasets) if ENV['SEQUEL_FREEZE_DATASETS']
 end
 

@@ -30,7 +30,10 @@ module Sequel
     # included in the database, the identifier mangling defaults are reset correctly.
     module ResetIdentifierMangling
       def extended(obj)
-        obj.send(:reset_identifier_mangling)
+        # :nocov:
+        Sequel::Deprecation.deprecate("Sequel::Database::ResetIdentifierMangling is no longer needed and will be removed in Sequel 5.  Please update your adapter.")
+        obj.send(:reset_identifier_mangling) if obj.respond_to?(:reset_identifier_mangling)
+        # :nocov:
       end
     end
 
@@ -104,8 +107,7 @@ module Sequel
     #
     # Accepts the following options:
     # :default_string_column_size :: The default size of string columns, 255 by default.
-    # :identifier_input_method :: A string method symbol to call on identifiers going into the database.
-    # :identifier_output_method :: A string method symbol to call on identifiers coming from the database.
+    # :identifier_mangling :: Whether to support non-default identifier mangling for the current database.
     # :logger :: A specific logger to use.
     # :loggers :: An array of loggers to use.
     # :name :: A name to use for the Database object.
@@ -131,9 +133,6 @@ module Sequel
       @transactions = {}
       @symbol_literal_cache = {}
 
-      @identifier_input_method = nil
-      @identifier_output_method = nil
-      @quote_identifiers = nil
       @timezone = nil
 
       @dataset_class = dataset_class_default
@@ -147,8 +146,11 @@ module Sequel
 
       @pool = ConnectionPool.get_pool(self, @opts)
 
-      reset_identifier_mangling
+      reset_default_dataset
       adapter_initialize
+      if typecast_value_boolean(@opts.fetch(:identifier_mangling, true))
+        extension(:identifier_mangling)
+      end
 
       unless typecast_value_boolean(@opts[:keep_reference]) == false
         Sequel.synchronize{::Sequel::DATABASES.push(self)}

@@ -427,7 +427,6 @@ end
 
 describe "MSSQL::Database#rename_table" do
   it "should work on non-schema bound tables which need escaping" do
-    DB.quote_identifiers = true
     DB.create_table! :'foo bar' do
       text :name
     end

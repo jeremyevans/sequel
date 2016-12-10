@@ -1118,10 +1118,9 @@ module Sequel
       end
     end
 
-    # Modify the identifier returned from the database based on the
-    # identifier_output_method.
+    # Upcase identifiers by default when inputting them into the database.
     def input_identifier(v)
-      (i = identifier_input_method) ? v.to_s.send(i) : v.to_s
+      v.to_s.upcase
     end
 
     def insert_into_sql(sql)

@@ -513,7 +513,6 @@ describe "Sequel::TimestampMigrator" do
     end
     dbc = Class.new(Sequel::Mock::Database) do
       self::Tables = tables= {}
-      define_method(:dataset){|*a| dsc.new(self, *a)}
       def create_table(name, *args, &block)
         super
         self.class::Tables[name.to_sym] = true
@@ -522,6 +521,7 @@ describe "Sequel::TimestampMigrator" do
       define_method(:table_exists?){|name| super(name); tables.has_key?(name.to_sym)}
     end
     @db = dbc.new
+    @db.dataset_class = dsc
     @m = Sequel::Migrator
   end
 

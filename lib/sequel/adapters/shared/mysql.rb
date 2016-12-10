@@ -1,7 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/utils/split_alter_table'
-Sequel.require 'adapters/utils/replace'
+Sequel.require %w'replace split_alter_table unmodified_identifiers', 'adapters/utils'
 
 module Sequel
   module MySQL
@@ -38,7 +37,7 @@ module Sequel
     # Methods shared by Database instances that connect to MySQL,
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
+      include UnmodifiedIdentifiers::DatabaseMethods
 
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
@@ -418,16 +417,6 @@ module Sequel
         metadata_dataset.with_sql('SHOW FULL TABLES').server(opts[:server]).map{|r| m.call(r.values.first) if r.delete(:Table_type) == type}.compact
       end
 
-      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
-      def identifier_input_method_default
-        nil
-      end
-      
-      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
-      def identifier_output_method_default
-        nil
-      end
-
       # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
         index_name = quote_identifier(index[:name] || default_index_name(table_name, index[:columns]))
@@ -627,6 +616,7 @@ module Sequel
       Dataset.def_sql_method(self, :update, %w'update ignore table set where order limit')
 
       include Sequel::Dataset::Replace
+      include UnmodifiedIdentifiers::DatasetMethods
 
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.

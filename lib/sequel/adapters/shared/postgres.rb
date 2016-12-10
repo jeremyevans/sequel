@@ -1,6 +1,6 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/utils/pg_types'
+Sequel.require %w'pg_types unmodified_identifiers', 'adapters/utils'
 
 module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes
@@ -109,7 +109,7 @@ module Sequel
 
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
+      include UnmodifiedIdentifiers::DatabaseMethods
 
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
@@ -1005,16 +1005,6 @@ module Sequel
         procs
       end
 
-      # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
-      def identifier_input_method_default
-        nil
-      end
-
-      # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
-      def identifier_output_method_default
-        nil
-      end
-
       # PostgreSQL specific index SQL.
       def index_definition_sql(table_name, index)
         cols = index[:columns]
@@ -1226,6 +1216,8 @@ module Sequel
 
     # Instance methods for datasets that connect to a PostgreSQL database.
     module DatasetMethods
+      include UnmodifiedIdentifiers::DatasetMethods
+
       ACCESS_SHARE = 'ACCESS SHARE'.freeze
       ACCESS_EXCLUSIVE = 'ACCESS EXCLUSIVE'.freeze
       BOOL_FALSE = 'false'.freeze

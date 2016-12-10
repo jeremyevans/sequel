@@ -308,7 +308,7 @@ module Sequel
       # dataset, since the DB2 metadata does not use
       # boolean columns, and some smallint columns are
       # accidently treated as booleans.
-      def metadata_dataset
+      def _metadata_dataset
         super.with_convert_smallint_to_bool(false)
       end
 

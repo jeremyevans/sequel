@@ -115,6 +115,12 @@ module Sequel
       true
     end
 
+    # Whether this dataset considers unquoted identifiers as uppercase. True
+    # by default as that is the SQL standard
+    def folds_unquoted_identifiers_to_uppercase?
+      true
+    end
+    
     # Whether the database supports combining multiple alter table
     # operations into a single query, false by default.
     def supports_combining_alter_table_ops?

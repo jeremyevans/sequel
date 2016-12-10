@@ -1,15 +1,14 @@
 # frozen-string-literal: true
 
-Sequel.require 'adapters/utils/split_alter_table'
+Sequel.require %w'split_alter_table unmodified_identifiers', 'adapters/utils'
 
 module Sequel
   module Cubrid
     Sequel::Database.set_shared_adapter_scheme(:cubrid, self)
 
     module DatabaseMethods
-      extend Sequel::Database::ResetIdentifierMangling
-
       include Sequel::Database::SplitAlterTable
+      include UnmodifiedIdentifiers::DatabaseMethods
 
       AUTOINCREMENT = 'AUTO_INCREMENT'.freeze
       COLUMN_DEFINITION_ORDER = [:auto_increment, :default, :null, :unique, :primary_key, :references]
@@ -143,16 +142,6 @@ module Sequel
         DATABASE_ERROR_REGEXPS
       end
 
-      # CUBRID is case insensitive, so don't modify identifiers
-      def identifier_input_method_default
-        nil
-      end
-
-      # CUBRID is case insensitive, so don't modify identifiers
-      def identifier_output_method_default
-        nil
-      end
-
       # CUBRID does not support named column constraints.
       def supports_named_column_constraints?
         false
@@ -175,6 +164,8 @@ module Sequel
     end
     
     module DatasetMethods
+      include UnmodifiedIdentifiers::DatasetMethods
+
       COMMA = Sequel::Dataset::COMMA
       LIMIT = Sequel::Dataset::LIMIT
       BOOL_FALSE = '0'.freeze

@@ -18,7 +18,6 @@ module Sequel
     module AS400
       # Instance methods for AS400 Database objects accessed via JDBC.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::JDBC::Transactions
 
         TRANSACTION_BEGIN = 'Transaction.begin'.freeze

@@ -19,7 +19,6 @@ module Sequel
     module SQLServer
       # Database instance methods for SQLServer databases accessed via JDBC.
       module DatabaseMethods
-        extend Sequel::Database::ResetIdentifierMangling
         include Sequel::JDBC::MSSQL::DatabaseMethods
 
         # Work around a bug in SQL Server JDBC Driver 3.0, where the metadata
@@ -48,11 +47,11 @@ module Sequel
           end
         end
         
-        def metadata_dataset
+        private
+
+        def _metadata_dataset
           super.extend(MetadataDatasetMethods)
         end
-
-        private
 
         def disconnect_error?(exception, opts)
           super || (exception.message =~ /connection is closed/)

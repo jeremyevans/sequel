@@ -458,7 +458,7 @@ describe "SQLite dataset" do
   
   it "should have #explain work when identifier_output_method is modified" do
     DB[:test].with_identifier_output_method(:upcase).explain.must_be_kind_of(String)
-  end
+  end if IDENTIFIER_MANGLING
 end
 
 describe "A SQLite database" do
@@ -584,7 +584,6 @@ describe "A SQLite database" do
   end
   
   it "should handle quoted tables when dropping or renaming columns" do
-    @db.quote_identifiers = true
     table_name = "T T"
     @db.drop_table?(table_name)
     @db.create_table! table_name do

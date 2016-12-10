@@ -41,19 +41,6 @@ module Sequel
       self
     end
 
-    # Set the method to call on identifiers going into the database for this dataset
-    def identifier_input_method=(v)
-      raise_if_frozen!
-      skip_symbol_cache!
-      @opts[:identifier_input_method] = v
-    end
-    
-    # Set the method to call on identifiers coming the database for this dataset
-    def identifier_output_method=(v)
-      raise_if_frozen!
-      @opts[:identifier_output_method] = v
-    end
-
     # Remove the row_proc from the current dataset.
     def naked!
       raise_if_frozen!
