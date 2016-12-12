@@ -35,6 +35,8 @@
 
 module Sequel
   module DuplicateColumnsHandler
+    CALLER_ARGS = RUBY_VERSION >= '2.0' ? [0,1] : [0]
+
     # Customize handling of duplicate columns for this dataset.
     def on_duplicate_columns(handler = (raise Error, "Must provide either an argument or a block to on_duplicate_columns" unless block_given?; nil), &block)
       raise Error, "Cannot provide both an argument and a block to on_duplicate_columns" if handler && block
@@ -54,7 +56,7 @@ module Sequel
 
     # Invoke the appropriate behavior when duplicate columns are present.
     def handle_duplicate_columns(cols)
-      message = "One or more duplicate columns present in #{cols.inspect}"
+      message = "#{caller(*CALLER_ARGS).first}: One or more duplicate columns present in #{cols.inspect}"
 
       case duplicate_columns_handler_type(cols)
       when :raise

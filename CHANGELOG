@@ -1,5 +1,7 @@
 === HEAD
 
+* Using :on_duplicate_columns=>:warn Database option with duplicate_columns_handler now prepends file/line to the warning message (jeremyevans)
+
 * Move identifier mangling code to identifier_mangling extension, load by default unless using :identifier_mangling=>false Database option (jeremyevans)
 
 * Allow Dataset#with_extend to accept a block and create a module with that block that the object is extended with (jeremyevans)

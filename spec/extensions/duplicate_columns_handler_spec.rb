@@ -9,7 +9,7 @@ mod = shared_description do
     @warned.must_be_nil
 
     check(:warn, @cols)
-    @warned.must_equal("One or more duplicate columns present in #{@cols.inspect}")
+    @warned.must_include("One or more duplicate columns present in #{@cols.inspect}")
 
     proc{check(:raise, @cols)}.must_raise(Sequel::DuplicateColumnError)
 
@@ -29,7 +29,7 @@ mod = shared_description do
 
     cols = nil
     check(proc{|cs| cols = cs; :warn}, @cols)
-    @warned.must_equal("One or more duplicate columns present in #{@cols.inspect}")
+    @warned.must_include("One or more duplicate columns present in #{@cols.inspect}")
     cols.must_equal @cols
 
     check(:raise, nil)
@@ -98,7 +98,7 @@ describe "Sequel::DuplicateColumnsHandler Dataset configuration" do
 
   it "should warn by defaul if there is no database or dataset handler" do
     @ds.send(:columns=, @cols)
-    @warned.must_equal("One or more duplicate columns present in #{@cols.inspect}")
+    @warned.must_include("One or more duplicate columns present in #{@cols.inspect}")
   end
 
   it "should fallback to database setting if there is no dataset-level handler" do
