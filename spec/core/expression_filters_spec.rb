@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 describe "Blockless Ruby Filters" do
   before do
-    db = Sequel::Database.new
+    db = Sequel.mock
     @d = db[:items]
     def @d.l(*args, &block)
       literal(filter_expr(*args, &block))
@@ -514,9 +514,7 @@ end
 
 describe Sequel::SQL::VirtualRow do
   before do
-    db = Sequel::Database.new
-    db.quote_identifiers = true
-    @d = db[:items]
+    @d = Sequel.mock[:items].with_quote_identifiers(true)
     meta_def(@d, :supports_window_functions?){true}
     def @d.l(*args, &block)
       literal(filter_expr(*args, &block))
@@ -739,9 +737,8 @@ end
 
 describe "Sequel core extension replacements" do
   before do
-    @db = Sequel::Database.new
-    @ds = @db.dataset 
-    def @ds.supports_regexp?; true end
+    @db = Sequel.mock
+    @ds = @db.dataset.with_extend{def supports_regexp?; true end}
     @o = Object.new
     def @o.sql_literal(ds) 'foo' end
   end

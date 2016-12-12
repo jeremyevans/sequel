@@ -3,6 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::Plugins::UnlimitedUpdate" do
   before do
     @db = Sequel.mock(:host=>'mysql', :numrows=>1)
+    @db.extend_datasets{def quote_identifiers?; false end}
     @c = Class.new(Sequel::Model(@db[:test]))
     @c.columns :id, :name
     @o = @c.load(:id=>1, :name=>'a')

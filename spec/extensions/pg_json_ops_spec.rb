@@ -4,7 +4,8 @@ Sequel.extension :pg_array, :pg_array_ops, :pg_json, :pg_json_ops
 
 describe "Sequel::Postgres::JSONOp" do
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @j = Sequel.pg_json_op(:j)
     @jb = Sequel.pg_jsonb_op(:j)
     @l = proc{|o| @db.literal(o)}

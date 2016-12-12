@@ -3,6 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_loose_count extension" do
   before do
     @db = Sequel.mock(:host=>'postgres', :fetch=>{:v=>1}).extension(:pg_loose_count)
+    @db.extend_datasets{def quote_identifiers?; false end}
   end
 
   it "should add loose_count method getting fast count for entire table using table statistics" do

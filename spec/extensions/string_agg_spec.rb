@@ -30,39 +30,40 @@ describe "string_agg extension" do
   end
 
   it "should correctly literalize on Postgres" do
-    db = dbf.call(:postgres)
-    db.literal(@sa1).must_equal "string_agg(c, ',')"
-    db.literal(@sa2).must_equal "string_agg(c, '-')"
-    db.literal(@sa3).must_equal "string_agg(c, '-' ORDER BY o)"
-    db.literal(@sa4).must_equal "string_agg(DISTINCT c, ',' ORDER BY o)"
+    ds = dbf.call(:postgres).dataset.with_quote_identifiers(false)
+    ds.literal(@sa1).must_equal "string_agg(c, ',')"
+    ds.literal(@sa2).must_equal "string_agg(c, '-')"
+    ds.literal(@sa3).must_equal "string_agg(c, '-' ORDER BY o)"
+    ds.literal(@sa4).must_equal "string_agg(DISTINCT c, ',' ORDER BY o)"
   end
 
   it "should correctly literalize on SQLAnywhere" do
-    db = dbf.call(:sqlanywhere)
-    db.literal(@sa1).must_equal "list(c, ',')"
-    db.literal(@sa2).must_equal "list(c, '-')"
-    db.literal(@sa3).must_equal "list(c, '-' ORDER BY o)"
-    db.literal(@sa4).must_equal "list(DISTINCT c, ',' ORDER BY o)"
+    ds = dbf.call(:sqlanywhere).dataset.with_quote_identifiers(false).with_extend{def input_identifier(v) v.to_s end}
+    ds.literal(@sa1).must_equal "list(c, ',')"
+    ds.literal(@sa2).must_equal "list(c, '-')"
+    ds.literal(@sa3).must_equal "list(c, '-' ORDER BY o)"
+    ds.literal(@sa4).must_equal "list(DISTINCT c, ',' ORDER BY o)"
   end
 
   it "should correctly literalize on MySQL, H2, HSQLDB, CUBRID" do
     [:mysql, :h2, :hsqldb, :cubrid].each do |type|
       db = dbf.call(type)
       db.meta_def(:database_type){type}
-      db.literal(@sa1).must_equal "GROUP_CONCAT(c SEPARATOR ',')"
-      db.literal(@sa2).must_equal "GROUP_CONCAT(c SEPARATOR '-')"
-      db.literal(@sa3).must_equal "GROUP_CONCAT(c ORDER BY o SEPARATOR '-')"
-      db.literal(@sa4).must_equal "GROUP_CONCAT(DISTINCT c ORDER BY o SEPARATOR ',')"
+      ds = db.dataset.with_quote_identifiers(false).with_extend{def input_identifier(v) v.to_s end}
+      ds.literal(@sa1).upcase.must_equal "GROUP_CONCAT(C SEPARATOR ',')"
+      ds.literal(@sa2).upcase.must_equal "GROUP_CONCAT(C SEPARATOR '-')"
+      ds.literal(@sa3).upcase.must_equal "GROUP_CONCAT(C ORDER BY O SEPARATOR '-')"
+      ds.literal(@sa4).upcase.must_equal "GROUP_CONCAT(DISTINCT C ORDER BY O SEPARATOR ',')"
     end
   end
 
   it "should correctly literalize on Oracle and DB2" do
     [:oracle, :db2].each do |type|
-      db = dbf.call(type)
-      db.literal(@sa1).must_equal "listagg(c, ',') WITHIN GROUP (ORDER BY 1)"
-      db.literal(@sa2).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY 1)"
-      db.literal(@sa3).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY o)"
-      proc{db.literal(@sa4)}.must_raise Sequel::Error
+      ds = dbf.call(type).dataset.with_quote_identifiers(false).with_extend{def input_identifier(v) v.to_s end}
+      ds.literal(@sa1).must_equal "listagg(c, ',') WITHIN GROUP (ORDER BY 1)"
+      ds.literal(@sa2).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY 1)"
+      ds.literal(@sa3).must_equal "listagg(c, '-') WITHIN GROUP (ORDER BY o)"
+      proc{ds.literal(@sa4)}.must_raise Sequel::Error
     end
   end
 
@@ -72,18 +73,18 @@ describe "string_agg extension" do
 
   it "should handle order without arguments" do
     db = dbf.call(:postgres)
-    db.literal(@sa1.order).must_equal "string_agg(c, ',')"
+    db.dataset.with_quote_identifiers(false).literal(@sa1.order).must_equal "string_agg(c, ',')"
   end
 
   it "should handle operations on object" do
-    db = dbf.call(:postgres)
-    db.literal(@sa1 + 'b').must_equal "(string_agg(c, ',') || 'b')"
-    db.literal(@sa1.like('b')).must_equal "(string_agg(c, ',') LIKE 'b' ESCAPE '\\')"
-    db.literal(@sa1 < 'b').must_equal "(string_agg(c, ',') < 'b')"
-    db.literal(@sa1.as(:b)).must_equal "string_agg(c, ',') AS b"
-    db.literal(@sa1.cast(:b)).must_equal "CAST(string_agg(c, ',') AS b)"
-    db.literal(@sa1.desc).must_equal "string_agg(c, ',') DESC"
-    db.literal(@sa1 =~ /a/).must_equal "(string_agg(c, ',') ~ 'a')"
-    db.literal(@sa1.sql_subscript(1)).must_equal "string_agg(c, ',')[1]"
+    ds = dbf.call(:postgres).dataset.with_quote_identifiers(false)
+    ds.literal(@sa1 + 'b').must_equal "(string_agg(c, ',') || 'b')"
+    ds.literal(@sa1.like('b')).must_equal "(string_agg(c, ',') LIKE 'b' ESCAPE '\\')"
+    ds.literal(@sa1 < 'b').must_equal "(string_agg(c, ',') < 'b')"
+    ds.literal(@sa1.as(:b)).must_equal "string_agg(c, ',') AS b"
+    ds.literal(@sa1.cast(:b)).must_equal "CAST(string_agg(c, ',') AS b)"
+    ds.literal(@sa1.desc).must_equal "string_agg(c, ',') DESC"
+    ds.literal(@sa1 =~ /a/).must_equal "(string_agg(c, ',') ~ 'a')"
+    ds.literal(@sa1.sql_subscript(1)).must_equal "string_agg(c, ',')[1]"
   end
 end

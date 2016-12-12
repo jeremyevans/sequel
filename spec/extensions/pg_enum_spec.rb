@@ -4,7 +4,8 @@ Sequel.extension :migration
 
 describe "pg_enum extension" do
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @db.extend(Module.new do
       def schema_parse_table(*)
         [[:a, {:oid=>1}]]

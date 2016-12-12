@@ -3,7 +3,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 describe "MSSSQL optimistic locking plugin" do
   before do
     @db = Sequel.mock(:host=>'mssql')
-    @c = Class.new(Sequel::Model(@db[:items]))
+    @ds = @db[:items].with_quote_identifiers(false).with_extend{def input_identifier(v); v.to_s end}
+    @c = Class.new(Sequel::Model(@ds))
     @c.columns :id, :name, :timestamp
     @c.plugin :mssql_optimistic_locking
     @o = @c.load(:id=>1, :name=>'a', :timestamp=>'1234')
@@ -49,7 +50,7 @@ describe "MSSSQL optimistic locking plugin" do
   end
 
   it "should allow changing the lock column via model.lock_column=" do
-    @c = Class.new(Sequel::Model(@db[:items]))
+    @c = Class.new(Sequel::Model(@ds))
     @c.columns :id, :name, :lv
     @c.plugin :mssql_optimistic_locking
     @c.lock_column = :lv
@@ -66,7 +67,7 @@ describe "MSSSQL optimistic locking plugin" do
   end
 
   it "should allow changing the lock column via plugin option" do
-    @c = Class.new(Sequel::Model(@db[:items]))
+    @c = Class.new(Sequel::Model(@ds))
     @c.columns :id, :name, :lv
     @c.plugin :mssql_optimistic_locking, :lock_column=>:lv
     @o = @c.load(:id=>1, :name=>'a', :lv=>'1234')

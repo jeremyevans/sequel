@@ -4,7 +4,8 @@ Sequel.extension :pg_array, :pg_array_ops, :pg_row, :pg_row_ops
 
 describe "Sequel::Postgres::PGRowOp" do
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @a = Sequel.pg_row_op(:a)
   end
 

@@ -3,6 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model, "pg_array_associations" do
   before do
     @db = Sequel.mock(:numrows=>1)
+    @db.extend_datasets{def quote_identifiers?; false end}
     class ::Artist < Sequel::Model(@db)
       attr_accessor :yyy
       columns :id, :tag_ids

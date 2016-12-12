@@ -3,7 +3,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "pg_inet extension" do
   ipv6_broken = (IPAddr.new('::1'); false) rescue true
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @db.extension(:pg_array, :pg_inet)
   end
 

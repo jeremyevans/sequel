@@ -41,90 +41,6 @@ describe "Dataset" do
     ds.each{|a| called = true; a.must_equal(:x=>1)}
     called.must_equal true
   end
-  
-  it "should get quote_identifiers default from database" do
-    db = Sequel::Database.new(:quote_identifiers=>true)
-    db[:a].quote_identifiers?.must_equal true
-    db = Sequel::Database.new(:quote_identifiers=>false)
-    db[:a].quote_identifiers?.must_equal false
-  end
-
-  it "should get identifier_input_method default from database" do
-    db = Sequel::Database.new(:identifier_input_method=>:upcase)
-    db[:a].identifier_input_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_input_method=>:downcase)
-    db[:a].identifier_input_method.must_equal :downcase
-  end
-
-  it "should get identifier_output_method default from database" do
-    db = Sequel::Database.new(:identifier_output_method=>:upcase)
-    db[:a].identifier_output_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_output_method=>:downcase)
-    db[:a].identifier_output_method.must_equal :downcase
-  end
-  
-  it "should have quote_identifiers= method which changes literalization of identifiers" do
-    @dataset.quote_identifiers = true
-    @dataset.literal(:a).must_equal '"a"'
-    @dataset.quote_identifiers = false
-    @dataset.literal(:a).must_equal 'a'
-  end
-  
-  it "should have identifier_input_method= method which changes literalization of identifiers" do
-    @dataset.identifier_input_method = :upcase
-    @dataset.literal(:a).must_equal 'A'
-    @dataset.identifier_input_method = :downcase
-    @dataset.literal(:A).must_equal 'a'
-    @dataset.identifier_input_method = :reverse
-    @dataset.literal(:at_b).must_equal 'b_ta'
-  end
-  
-  it "should have identifier_output_method= method which changes identifiers returned from the database" do
-    @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
-    @dataset.identifier_output_method = :upcase
-    @dataset.send(:output_identifier, "at_b_C").must_equal :AT_B_C
-    @dataset.identifier_output_method = :downcase
-    @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_c
-    @dataset.identifier_output_method = :reverse
-    @dataset.send(:output_identifier, "at_b_C").must_equal :C_b_ta
-  end
-  
-  it "should have with_quote_identifiers method which returns cloned dataset with changed literalization of identifiers" do
-    @dataset.with_quote_identifiers(true).literal(:a).must_equal '"a"'
-    @dataset.with_quote_identifiers(false).literal(:a).must_equal 'a'
-    ds = @dataset.freeze.with_quote_identifiers(false)
-    ds.literal(:a).must_equal 'a'
-    ds.frozen?.must_equal true
-  end
-  
-  it "should have with_identifier_input_method method which returns cloned dataset with changed literalization of identifiers" do
-    @dataset.with_identifier_input_method(:upcase).literal(:a).must_equal 'A'
-    @dataset.with_identifier_input_method(:downcase).literal(:A).must_equal 'a'
-    @dataset.with_identifier_input_method(:reverse).literal(:at_b).must_equal 'b_ta'
-    ds = @dataset.freeze.with_identifier_input_method(:reverse)
-    ds.frozen?.must_equal true
-    ds.literal(:at_b).must_equal 'b_ta'
-  end
-  
-  it "should have with_identifier_output_method method which returns cloned dataset with changed identifiers returned from the database" do
-    @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
-    @dataset.with_identifier_output_method(:upcase).send(:output_identifier, "at_b_C").must_equal :AT_B_C
-    @dataset.with_identifier_output_method(:downcase).send(:output_identifier, "at_b_C").must_equal :at_b_c
-    @dataset.with_identifier_output_method(:reverse).send(:output_identifier, "at_b_C").must_equal :C_b_ta
-    ds = @dataset.freeze.with_identifier_output_method(:reverse)
-    ds.send(:output_identifier, "at_b_C").must_equal :C_b_ta
-    ds.frozen?.must_equal true
-  end
-  
-  it "should have output_identifier handle empty identifiers" do
-    @dataset.send(:output_identifier, "").must_equal :untitled
-    @dataset.identifier_output_method = :upcase
-    @dataset.send(:output_identifier, "").must_equal :UNTITLED
-    @dataset.identifier_output_method = :downcase
-    @dataset.send(:output_identifier, "").must_equal :untitled
-    @dataset.identifier_output_method = :reverse
-    @dataset.send(:output_identifier, "").must_equal :deltitnu
-  end
 end
 
 describe "Dataset#clone" do
@@ -936,7 +852,7 @@ end
 
 describe "Dataset#literal" do
   before do
-    @ds = Sequel::Database.new.dataset
+    @ds = Sequel.mock.dataset
   end
   
   it "should convert qualified symbol notation into dot notation" do
@@ -972,7 +888,7 @@ end
 
 describe "Dataset#literal" do
   before do
-    @dataset = Sequel::Database.new.from(:test)
+    @dataset = Sequel.mock[:test]
   end
   
   it "should escape strings properly" do
@@ -3855,7 +3771,7 @@ end
 
 describe "Sequel::Dataset#qualify" do
   before do
-    @ds = Sequel::Database.new[:t]
+    @ds = Sequel.mock[:t]
   end
 
   it "should qualify to the table if one is given" do
@@ -3968,7 +3884,7 @@ end
 
 describe "Sequel::Dataset#unbind" do
   before do
-    @ds = Sequel::Database.new[:t]
+    @ds = Sequel.mock[:t]
     @u = proc{|ds| ds, bv = ds.unbind; [ds.sql, bv]}
   end
 
@@ -4047,7 +3963,7 @@ end
 
 describe "Sequel::Dataset #with and #with_recursive" do
   before do
-    @db = Sequel::Database.new
+    @db = Sequel.mock
     @ds = @db[:t]
     def @ds.supports_cte?(*) true end
   end
@@ -4687,9 +4603,10 @@ end
 
 describe "Dataset emulating bitwise operator support" do
   before do
-    @ds = Sequel::Database.new.dataset.with_quote_identifiers(true)
-    def @ds.complex_expression_sql_append(sql, op, args)
-      complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(:bitand, a, b)}
+    @ds = Sequel.mock.dataset.with_quote_identifiers(true).with_extend do
+      def complex_expression_sql_append(sql, op, args)
+        complex_expression_arg_pairs_append(sql, args){|a, b| Sequel.function(:bitand, a, b)}
+      end
     end
   end
 
@@ -4748,12 +4665,11 @@ describe "Dataset extensions" do
   end
 
   it "should be able to load multiple extensions in the same call" do
-    @ds = @ds.with_quote_identifiers(false).with_identifier_input_method(:downcase)
-    Sequel::Dataset.register_extension(:foo, proc{|ds| ds.quote_identifiers = true})
-    Sequel::Dataset.register_extension(:bar, proc{|ds| ds.identifier_input_method = nil})
-    ds = @ds.extension(:foo, :bar)
-    ds.quote_identifiers?.must_equal true
-    ds.identifier_input_method.must_be_nil
+    a = []
+    Sequel::Dataset.register_extension(:foo, proc{|ds| a << ds.opts[:foo] = 1})
+    Sequel::Dataset.register_extension(:bar, proc{|ds| a << ds.opts[:bar] = 2})
+    @ds.extension(:foo, :bar).opts.values_at(:foo, :bar).must_equal [1,2]
+    a.must_equal [1,2]
   end
 
   it "should have #extension not modify the receiver" do
@@ -5040,9 +4956,6 @@ describe "Frozen Datasets" do
 
   it "should raise an error when calling mutation methods" do
     proc{@ds.select!(:a)}.must_raise RuntimeError
-    proc{@ds.identifier_input_method = :a}.must_raise RuntimeError
-    proc{@ds.identifier_output_method = :a}.must_raise RuntimeError
-    proc{@ds.quote_identifiers = false}.must_raise RuntimeError
     proc{@ds.row_proc = proc{}}.must_raise RuntimeError
     proc{@ds.extension! :query}.must_raise RuntimeError
     proc{@ds.naked!}.must_raise RuntimeError

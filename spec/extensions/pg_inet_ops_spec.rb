@@ -4,7 +4,8 @@ Sequel.extension :pg_inet_ops
 
 describe "Sequel::Postgres::InetOp" do
   before do
-    db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    db = Sequel.connect('mock://postgres')
+    db.extend_datasets{def quote_identifiers?; false end}
     db.extension :pg_inet
     @ds = db.dataset
     @h = Sequel.pg_inet_op(:h)

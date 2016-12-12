@@ -7,7 +7,8 @@ rescue LoadError => exc
 else
 describe "pg_interval extension" do
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @db.extension(:pg_array, :pg_interval)
   end
 

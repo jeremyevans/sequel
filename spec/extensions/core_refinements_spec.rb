@@ -6,7 +6,7 @@ using Sequel::CoreRefinements
 
 describe "Core refinements" do
   before do
-    db = Sequel::Database.new
+    db = Sequel.mock
     @d = db[:items]
     def @d.supports_regexp?; true end
     def @d.l(*args, &block)
@@ -184,7 +184,7 @@ end
 
 describe "String#lit" do
   before do
-    @ds = Sequel::Database.new[:t]
+    @ds = Sequel.mock[:t]
   end
 
   it "should return an LiteralString object" do
@@ -200,16 +200,14 @@ describe "String#lit" do
     a = 'DISTINCT ?'.lit(:a)
     a.must_be_kind_of(Sequel::SQL::PlaceholderLiteralString)
     @ds.literal(a).must_equal 'DISTINCT a'
-    @ds.quote_identifiers = true
-    @ds.literal(a).must_equal 'DISTINCT "a"'
+    @ds.with_quote_identifiers(true).literal(a).must_equal 'DISTINCT "a"'
   end
   
   it "should handle named placeholders if given a single argument hash" do
     a = 'DISTINCT :b'.lit(:b=>:a)
     a.must_be_kind_of(Sequel::SQL::PlaceholderLiteralString)
     @ds.literal(a).must_equal 'DISTINCT a'
-    @ds.quote_identifiers = true
-    @ds.literal(a).must_equal 'DISTINCT "a"'
+    @ds.with_quote_identifiers(true).literal(a).must_equal 'DISTINCT "a"'
   end
 
   it "should treat placeholder literal strings as generic expressions" do
@@ -285,7 +283,7 @@ end
 
 describe "Column references" do
   before do
-    @ds = Sequel::Database.new.dataset
+    @ds = Sequel.mock.dataset
     def @ds.quoted_identifier_append(sql, c)
       sql << "`#{c}`"
     end
@@ -349,30 +347,28 @@ end
 
 describe "Symbol" do
   before do
-    @ds = Sequel.mock.dataset
-    @ds.quote_identifiers = true
-    @ds.identifier_input_method = :upcase
+    @ds = Sequel.mock.dataset.with_quote_identifiers(true)
   end
 
   it "#identifier should format an identifier" do
-    @ds.literal(:xyz__abc.identifier).must_equal '"XYZ__ABC"'
+    @ds.literal(:xyz__abc.identifier).must_equal '"xyz__abc"'
   end
 
   it "#qualify should format a qualified column" do
-    @ds.literal(:xyz.qualify(:abc)).must_equal '"ABC"."XYZ"'
+    @ds.literal(:xyz.qualify(:abc)).must_equal '"abc"."xyz"'
   end
 
   it "#qualify should work on QualifiedIdentifiers" do
-    @ds.literal(:xyz.qualify(:abc).qualify(:def)).must_equal '"DEF"."ABC"."XYZ"'
+    @ds.literal(:xyz.qualify(:abc).qualify(:def)).must_equal '"def"."abc"."xyz"'
   end
 
   it "should be able to qualify an identifier" do
-    @ds.literal(:xyz.identifier.qualify(:xyz__abc)).must_equal '"XYZ"."ABC"."XYZ"'
+    @ds.literal(:xyz.identifier.qualify(:xyz__abc)).must_equal '"xyz"."abc"."xyz"'
   end
 
   it "should be able to specify a schema.table.column" do
-    @ds.literal(:column.qualify(:table.qualify(:schema))).must_equal '"SCHEMA"."TABLE"."COLUMN"'
-    @ds.literal(:column.qualify(:table__name.identifier.qualify(:schema))).must_equal '"SCHEMA"."TABLE__NAME"."COLUMN"'
+    @ds.literal(:column.qualify(:table.qualify(:schema))).must_equal '"schema"."table"."column"'
+    @ds.literal(:column.qualify(:table__name.identifier.qualify(:schema))).must_equal '"schema"."table__name"."column"'
   end
 
   it "should be able to specify order" do
@@ -387,13 +383,13 @@ describe "Symbol" do
   it "should work correctly with objects" do
     o = Object.new
     def o.sql_literal(ds) "(foo)" end
-    @ds.literal(:column.qualify(o)).must_equal '(foo)."COLUMN"'
+    @ds.literal(:column.qualify(o)).must_equal '(foo)."column"'
   end
 end
 
 describe "Symbol" do
   before do
-    @ds = Sequel::Database.new.dataset
+    @ds = Sequel.mock.dataset
   end
   
   it "should support sql_function method" do

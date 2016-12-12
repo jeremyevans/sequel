@@ -4,7 +4,9 @@ Sequel.extension :pg_array, :pg_array_ops, :pg_hstore, :pg_hstore_ops
 
 describe "Sequel::Postgres::HStoreOp" do
   before do
-    @ds = Sequel.connect('mock://postgres', :quote_identifiers=>false).dataset
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
+    @ds = @db.dataset
     @h = Sequel.hstore_op(:h)
   end
 

@@ -11,9 +11,13 @@ describe "pg_range extension" do
   end
 
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
     @R = Sequel::Postgres::PGRange
-    @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
+    @db.extend_datasets do
+      def supports_timestamp_timezones?; false end
+      def supports_timestamp_usecs?; false end
+      def quote_identifiers?; false end
+    end
     @db.extension(:pg_array, :pg_range)
   end
 

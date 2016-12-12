@@ -2,7 +2,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "pg_row extension" do
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @db.extension(:pg_array, :pg_row)
     @m = Sequel::Postgres::PGRow
     @db.sqls
@@ -136,6 +137,7 @@ describe "pg_row extension" do
 
   it "should reload registered row types when reseting conversion procs" do
     db = Sequel.mock(:host=>'postgres')
+    db.extend_datasets{def quote_identifiers?; false end}
     db.extension(:pg_row)
     db.conversion_procs[4] = proc{|s| s.to_i}
     db.conversion_procs[5] = proc{|s| s * 2}

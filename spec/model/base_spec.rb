@@ -682,19 +682,19 @@ end
 describe Sequel::Model, ".[] optimization" do
   before do
     @db = Sequel.mock
-    @db.quote_identifiers = true
     def @db.schema(*) [[:id, {:primary_key=>true}]] end
     def @db.supports_schema_parsing?() true end
     @c = Class.new(Sequel::Model(@db))
+    @ds = @db.dataset.with_quote_identifiers(true)
   end
 
   it "should set simple_pk to the literalized primary key column name if a single primary key" do
     @c.set_primary_key :id
-    @c.simple_pk.must_equal '"id"'
+    @c.simple_pk.must_equal 'id'
     @c.set_primary_key :b
-    @c.simple_pk.must_equal '"b"'
+    @c.simple_pk.must_equal 'b'
     @c.set_primary_key Sequel.identifier(:b__a)
-    @c.simple_pk.must_equal '"b__a"'
+    @c.simple_pk.must_equal 'b__a'
   end
 
   it "should have simple_pk be blank if compound or no primary key" do
@@ -706,32 +706,20 @@ describe Sequel::Model, ".[] optimization" do
 
   it "should have simple table set if passed a Symbol to set_dataset" do
     @c.set_dataset :a
-    @c.simple_table.must_equal '"a"'
+    @c.simple_table.must_equal 'a'
     @c.set_dataset :b
-    @c.simple_table.must_equal '"b"'
+    @c.simple_table.must_equal 'b'
     @c.set_dataset :b__a
-    @c.simple_table.must_equal '"b"."a"'
+    @c.simple_table.must_equal 'b.a'
   end
 
   it "should have simple_table set if passed a simple select all dataset to set_dataset" do
-    @c.set_dataset @db[:a]
+    @c.set_dataset @ds.from(:a)
     @c.simple_table.must_equal '"a"'
-    @c.set_dataset @db[:b]
+    @c.set_dataset @ds.from(:b)
     @c.simple_table.must_equal '"b"'
-    @c.set_dataset @db[:b__a]
+    @c.set_dataset @ds.from(:b__a)
     @c.simple_table.must_equal '"b"."a"'
-  end
-
-  it "should have simple_pk and simple_table respect dataset's identifier input methods" do
-    ds = @db[:ab]
-    ds.identifier_input_method = :reverse
-    @c.set_dataset ds
-    @c.simple_table.must_equal '"ba"'
-    @c.set_primary_key :cd
-    @c.simple_pk.must_equal '"dc"'
-
-    @c.set_dataset ds.from(:ef__gh)
-    @c.simple_table.must_equal '"fe"."hg"'
   end
 
   it "should have simple_table = nil if passed a non-simple select all dataset to set_dataset" do
@@ -742,21 +730,21 @@ describe Sequel::Model, ".[] optimization" do
   it "should have simple_table inherit superclass's setting" do
     Class.new(@c).simple_table.must_be_nil
     @c.set_dataset :a
-    Class.new(@c).simple_table.must_equal '"a"'
+    Class.new(@c).simple_table.must_equal 'a'
   end
 
   it "should use Dataset#with_sql if simple_table and simple_pk are true" do
     @c.set_dataset :a
     @c.instance_dataset._fetch = @c.dataset._fetch = {:id => 1}
     @c[1].must_equal @c.load(:id=>1)
-    @db.sqls.must_equal ['SELECT * FROM "a" WHERE "id" = 1']
+    @db.sqls.must_equal ['SELECT * FROM a WHERE id = 1']
   end
 
   it "should not use Dataset#with_sql if either simple_table or simple_pk is nil" do
     @c.set_dataset @db[:a].filter(:active)
     @c.dataset._fetch = {:id => 1}
     @c[1].must_equal @c.load(:id=>1)
-    @db.sqls.must_equal ['SELECT * FROM "a" WHERE ("active" AND ("id" = 1)) LIMIT 1']
+    @db.sqls.must_equal ['SELECT * FROM a WHERE (active AND (id = 1)) LIMIT 1']
   end
 end
 

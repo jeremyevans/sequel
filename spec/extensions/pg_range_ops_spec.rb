@@ -4,7 +4,9 @@ Sequel.extension :pg_array, :pg_range, :pg_range_ops
 
 describe "Sequel::Postgres::RangeOp" do
   before do
-    @ds = Sequel.connect('mock://postgres', :quote_identifiers=>false).dataset
+    db = Sequel.connect('mock://postgres')
+    db.extend_datasets{def quote_identifiers?; false end}
+    @ds = db.dataset
     @h = Sequel.pg_range_op(:h)
   end
 

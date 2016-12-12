@@ -39,6 +39,7 @@ describe "Sequel Mock Adapter" do
   end
 
   it "should have constructor accept no arguments" do
+    Sequel.require 'adapters/mock'
     Sequel::Mock::Database.new.must_be_kind_of(Sequel::Mock::Database)
   end
 
@@ -340,9 +341,8 @@ describe "Sequel Mock Adapter" do
     db.server_version.must_equal 80102
   end
 
-  it "should not have identifier input/output methods by default" do
-    Sequel.mock.send(:identifier_input_method_default).must_be_nil
-    Sequel.mock.send(:identifier_output_method_default).must_be_nil
+  it "should not fold to uppercase by default" do
+    Sequel.mock.send(:folds_unquoted_identifiers_to_uppercase?).must_equal false
   end
 
   it "should keep a record of all executed SQL in #sqls" do
@@ -449,29 +449,17 @@ describe "Sequel Mock Adapter" do
   end
 
   it "should be able to load dialects based on the database name" do
-    begin
-      qi = class Sequel::Database; @quote_identifiers; end
-      ii = class Sequel::Database; @identifier_input_method; end
-      io = class Sequel::Database; @identifier_output_method; end
-      Sequel.quote_identifiers = nil
-      class Sequel::Database; @identifier_input_method=nil; end
-      class Sequel::Database; @identifier_output_method=nil; end
-      Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.must_equal 'SELECT #2011-12-13#'
-      Sequel.mock(:host=>'cubrid').from(:a).offset(1).sql.must_equal 'SELECT * FROM "a" LIMIT 1,4294967295'
-      Sequel.mock(:host=>'db2').select(1).sql.must_equal 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
-      Sequel.mock(:host=>'firebird')[:a].distinct.limit(1, 2).sql.must_equal 'SELECT DISTINCT FIRST 1 SKIP 2 * FROM "A"'
-      Sequel.mock(:host=>'informix')[:a].distinct.limit(1, 2).sql.must_equal 'SELECT SKIP 2 FIRST 1 DISTINCT * FROM A'
-      Sequel.mock(:host=>'mssql')[:a].full_text_search(:b, 'c').sql.must_equal "SELECT * FROM [A] WHERE (CONTAINS ([B], 'c'))"
-      Sequel.mock(:host=>'mysql')[:a].full_text_search(:b, 'c').sql.must_equal "SELECT * FROM `a` WHERE (MATCH (`b`) AGAINST ('c'))"
-      Sequel.mock(:host=>'oracle')[:a].limit(1).sql.must_equal 'SELECT * FROM (SELECT * FROM "A") "T1" WHERE (ROWNUM <= 1)'
-      Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').sql.must_equal "SELECT * FROM \"a\" WHERE (to_tsvector(CAST('simple' AS regconfig), (COALESCE(\"b\", ''))) @@ to_tsquery(CAST('simple' AS regconfig), 'c'))"
-      Sequel.mock(:host=>'sqlanywhere').from(:a).offset(1).sql.must_equal 'SELECT TOP 2147483647 START AT (1 + 1) * FROM "A"'
-      Sequel.mock(:host=>'sqlite')[:a___b].sql.must_equal "SELECT * FROM `a` AS 'b'"
-    ensure
-      Sequel.quote_identifiers = qi
-      Sequel::Database.send(:instance_variable_set, :@identifier_input_method, ii)
-      Sequel::Database.send(:instance_variable_set, :@identifier_output_method, io)
-    end
+    Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.must_equal 'SELECT #2011-12-13#'
+    Sequel.mock(:host=>'cubrid').from(:a).offset(1).with_quote_identifiers(false).sql.must_equal 'SELECT * FROM a LIMIT 1,4294967295'
+    Sequel.mock(:host=>'db2').select(1).sql.must_equal 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
+    Sequel.mock(:host=>'firebird')[:A].distinct.limit(1, 2).with_quote_identifiers(false).sql.must_equal 'SELECT DISTINCT FIRST 1 SKIP 2 * FROM A'
+    Sequel.mock(:host=>'informix')[:a].distinct.limit(1, 2).sql.upcase.must_equal 'SELECT SKIP 2 FIRST 1 DISTINCT * FROM A'
+    Sequel.mock(:host=>'mssql')[:A].full_text_search(:B, 'C').with_quote_identifiers(false).sql.must_equal "SELECT * FROM A WHERE (CONTAINS (B, 'C'))"
+    Sequel.mock(:host=>'mysql')[:a].full_text_search(:b, 'c').with_quote_identifiers(false).sql.must_equal "SELECT * FROM a WHERE (MATCH (b) AGAINST ('c'))"
+    Sequel.mock(:host=>'oracle')[:a].limit(1).with_quote_identifiers(false).sql.upcase.must_equal 'SELECT * FROM (SELECT * FROM A) T1 WHERE (ROWNUM <= 1)'
+    Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').with_quote_identifiers(false).sql.must_equal "SELECT * FROM a WHERE (to_tsvector(CAST('simple' AS regconfig), (COALESCE(b, ''))) @@ to_tsquery(CAST('simple' AS regconfig), 'c'))"
+    Sequel.mock(:host=>'sqlanywhere').from(:A).offset(1).with_quote_identifiers(false).sql.must_equal 'SELECT TOP 2147483647 START AT (1 + 1) * FROM A'
+    Sequel.mock(:host=>'sqlite')[:a___b].with_quote_identifiers(false).sql.must_equal "SELECT * FROM a AS 'b'"
   end
 
   it "should automatically set version for adapters needing versions" do

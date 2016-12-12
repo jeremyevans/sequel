@@ -2,7 +2,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::PgRow" do
   before(:all) do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @db.extension(:pg_array)
     @c = Class.new(Sequel::Model(@db[:address]))
     @c.columns :street, :city

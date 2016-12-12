@@ -12,8 +12,12 @@ describe "pg_array extension" do
   end
 
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
-    @db.extend_datasets(Module.new{def supports_timestamp_timezones?; false; end; def supports_timestamp_usecs?; false; end})
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets(Module.new do
+      def supports_timestamp_timezones?; false end
+      def supports_timestamp_usecs?; false; end
+      def quote_identifiers?; false end
+    end)
     @db.extension(:pg_array)
     @m = Sequel::Postgres
     @converter = @m::PG_TYPES

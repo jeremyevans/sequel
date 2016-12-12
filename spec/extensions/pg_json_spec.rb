@@ -12,7 +12,8 @@ describe "pg_json extension" do
     @bac = m::JSONBArray
   end
   before do
-    @db = Sequel.connect('mock://postgres', :quote_identifiers=>false)
+    @db = Sequel.connect('mock://postgres')
+    @db.extend_datasets{def quote_identifiers?; false end}
     @db.extension(:pg_array, :pg_json)
   end
 

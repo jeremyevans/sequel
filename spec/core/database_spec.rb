@@ -79,127 +79,6 @@ describe "A new Database" do
     db.pool.must_be_kind_of(Sequel::ConnectionPool)
   end
 
-  it "should respect the :quote_identifiers option" do
-    db = Sequel::Database.new(:quote_identifiers=>false)
-    db.quote_identifiers?.must_equal false
-    db = Sequel::Database.new(:quote_identifiers=>true)
-    db.quote_identifiers?.must_equal true
-  end
-
-  it "should upcase on input and downcase on output by default" do
-    db = Sequel::Database.new
-    db.send(:identifier_input_method_default).must_equal :upcase
-    db.send(:identifier_output_method_default).must_equal :downcase
-  end
-
-  it "should respect the :identifier_input_method option" do
-    Sequel.identifier_input_method = nil
-    Sequel::Database.identifier_input_method.must_equal false
-    db = Sequel::Database.new(:identifier_input_method=>nil)
-    db.identifier_input_method.must_be_nil
-    db.identifier_input_method = :downcase
-    db.identifier_input_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_input_method=>:upcase)
-    db.identifier_input_method.must_equal :upcase
-    db.identifier_input_method = nil
-    db.identifier_input_method.must_be_nil
-    Sequel.identifier_input_method = :downcase
-    Sequel::Database.identifier_input_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_input_method=>nil)
-    db.identifier_input_method.must_be_nil
-    db.identifier_input_method = :upcase
-    db.identifier_input_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_input_method=>:upcase)
-    db.identifier_input_method.must_equal :upcase
-    db.identifier_input_method = nil
-    db.identifier_input_method.must_be_nil
-  end
-  
-  it "should respect the :identifier_output_method option" do
-    Sequel.identifier_output_method = nil
-    Sequel::Database.identifier_output_method.must_equal false
-    db = Sequel::Database.new(:identifier_output_method=>nil)
-    db.identifier_output_method.must_be_nil
-    db.identifier_output_method = :downcase
-    db.identifier_output_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_output_method=>:upcase)
-    db.identifier_output_method.must_equal :upcase
-    db.identifier_output_method = nil
-    db.identifier_output_method.must_be_nil
-    Sequel.identifier_output_method = :downcase
-    Sequel::Database.identifier_output_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_output_method=>nil)
-    db.identifier_output_method.must_be_nil
-    db.identifier_output_method = :upcase
-    db.identifier_output_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_output_method=>:upcase)
-    db.identifier_output_method.must_equal :upcase
-    db.identifier_output_method = nil
-    db.identifier_output_method.must_be_nil
-  end
-
-  it "should use the default Sequel.quote_identifiers value" do
-    Sequel.quote_identifiers = true
-    Sequel::Database.new({}).quote_identifiers?.must_equal true
-    Sequel.quote_identifiers = false
-    Sequel::Database.new({}).quote_identifiers?.must_equal false
-    Sequel::Database.quote_identifiers = true
-    Sequel::Database.new({}).quote_identifiers?.must_equal true
-    Sequel::Database.quote_identifiers = false
-    Sequel::Database.new({}).quote_identifiers?.must_equal false
-  end
-
-  it "should use the default Sequel.identifier_input_method value" do
-    Sequel.identifier_input_method = :downcase
-    Sequel::Database.new({}).identifier_input_method.must_equal :downcase
-    Sequel.identifier_input_method = :upcase
-    Sequel::Database.new({}).identifier_input_method.must_equal :upcase
-    Sequel::Database.identifier_input_method = :downcase
-    Sequel::Database.new({}).identifier_input_method.must_equal :downcase
-    Sequel::Database.identifier_input_method = :upcase
-    Sequel::Database.new({}).identifier_input_method.must_equal :upcase
-  end
-  
-  it "should use the default Sequel.identifier_output_method value" do
-    Sequel.identifier_output_method = :downcase
-    Sequel::Database.new({}).identifier_output_method.must_equal :downcase
-    Sequel.identifier_output_method = :upcase
-    Sequel::Database.new({}).identifier_output_method.must_equal :upcase
-    Sequel::Database.identifier_output_method = :downcase
-    Sequel::Database.new({}).identifier_output_method.must_equal :downcase
-    Sequel::Database.identifier_output_method = :upcase
-    Sequel::Database.new({}).identifier_output_method.must_equal :upcase
-  end
-
-  it "should respect the quote_indentifiers_default method if Sequel.quote_identifiers = nil" do
-    Sequel.quote_identifiers = nil
-    Sequel::Database.new({}).quote_identifiers?.must_equal true
-    x = Class.new(Sequel::Database){def quote_identifiers_default; false end}
-    x.new({}).quote_identifiers?.must_equal false
-    y = Class.new(Sequel::Database){def quote_identifiers_default; true end}
-    y.new({}).quote_identifiers?.must_equal true
-  end
-  
-  it "should respect the identifier_input_method_default method" do
-    class Sequel::Database
-      @identifier_input_method = nil
-    end
-    x = Class.new(Sequel::Database){def identifier_input_method_default; :downcase end}
-    x.new({}).identifier_input_method.must_equal :downcase
-    y = Class.new(Sequel::Database){def identifier_input_method_default; :camelize end}
-    y.new({}).identifier_input_method.must_equal :camelize
-  end
-  
-  it "should respect the identifier_output_method_default method if Sequel.identifier_output_method is not called" do
-    class Sequel::Database
-      @identifier_output_method = nil
-    end
-    x = Class.new(Sequel::Database){def identifier_output_method_default; :upcase end}
-    x.new({}).identifier_output_method.must_equal :upcase
-    y = Class.new(Sequel::Database){def identifier_output_method_default; :underscore end}
-    y.new({}).identifier_output_method.must_equal :underscore
-  end
-
   it "should just use a :uri option for jdbc with the full connection string" do
     db = Sequel::Database.stub(:adapter_class, Sequel::Database) do
       Sequel.connect('jdbc:test://host/db_name')
@@ -407,7 +286,7 @@ end
 
 describe "Database#dataset" do
   before do
-    @db = Sequel::Database.new
+    @db = Sequel.mock
     @ds = @db.dataset
   end
   
@@ -516,8 +395,11 @@ describe "Database#extend_datasets" do
   end
 
   it "should be able to override methods defined in the original Dataset class" do
-    @db.extend_datasets(Module.new{def select(*a, &block) super.order(*a, &block) end})
-    @db[:t].select(:a, :b).sql.must_equal 'SELECT a, b FROM t ORDER BY a, b'
+    @db.extend_datasets do
+      def select(*a, &block) super.order(*a, &block) end
+      def input_identifier(v) v.to_s end
+    end
+    @db[:t].with_quote_identifiers(false).select(:a, :b).sql.must_equal 'SELECT a, b FROM t ORDER BY a, b'
   end
 
   it "should reapply settings if dataset_class is changed" do
@@ -2402,32 +2284,6 @@ end
 describe "Database#supports_transaction_isolation_levels?" do
   it "should be false by default" do
     Sequel::Database.new.supports_transaction_isolation_levels?.must_equal false
-  end
-end
-
-describe "Database#input_identifier_meth" do
-  it "should be the input_identifer method of a default dataset for this database" do
-    db = Sequel::Database.new
-    db.send(:input_identifier_meth).call(:a).must_equal 'a'
-    db.identifier_input_method = :upcase
-    db.send(:input_identifier_meth).call(:a).must_equal 'A'
-  end
-end
-
-describe "Database#output_identifier_meth" do
-  it "should be the output_identifer method of a default dataset for this database" do
-    db = Sequel::Database.new
-    db.send(:output_identifier_meth).call('A').must_equal :A
-    db.identifier_output_method = :downcase
-    db.send(:output_identifier_meth).call('A').must_equal :a
-  end
-end
-
-describe "Database#metadata_dataset" do
-  it "should be a dataset with the default settings for identifier_input_method and identifier_output_method" do
-    ds = Sequel::Database.new.send(:metadata_dataset)
-    ds.literal(:a).must_equal 'A'
-    ds.send(:output_identifier, 'A').must_equal :a
   end
 end
 
