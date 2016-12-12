@@ -831,11 +831,13 @@ describe "A PostgreSQL dataset with a timestamp field" do
       @db.convert_infinite_timestamps = 't'
       @db[:test3].get(:time).must_equal 1.0/0.0
       @db.convert_infinite_timestamps = 'f'
-      proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
-      @db.convert_infinite_timestamps = nil
-      proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
-      @db.convert_infinite_timestamps = false
-      proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
+      if RUBY_VERSION >= '1.9'
+        proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
+        @db.convert_infinite_timestamps = nil
+        proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
+        @db.convert_infinite_timestamps = false
+        proc{@db[:test3].get(:time)}.must_raise ArgumentError, Sequel::InvalidValue
+      end
 
       @d.update(:time=>Sequel.cast('-infinity', DateTime))
       @db.convert_infinite_timestamps = :nil
