@@ -391,8 +391,12 @@ describe Sequel::Dataset do
     @d.count.must_equal 0
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-    @d.count.must_equal 3
+    @d << {:name => 'def', :value => nil}
+    5.times do
+      @d.count.must_equal 3
+      @d.count(:name).must_equal 3
+      @d.count(:value).must_equal 2
+    end
   end
 
   it "should handle functions with identifier names correctly" do

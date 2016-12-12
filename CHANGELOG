@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up repeated calls to Dataset#count with an argument or block for frozen datasets using a cached placeholder literalizer (jeremyevans)
+
 * Using :on_duplicate_columns=>:warn Database option with duplicate_columns_handler now prepends file/line to the warning message (jeremyevans)
 
 * Move identifier mangling code to identifier_mangling extension, load by default unless using :identifier_mangling=>false Database option (jeremyevans)

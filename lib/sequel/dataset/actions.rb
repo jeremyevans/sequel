@@ -102,22 +102,27 @@ module Sequel
     #   DB[:table].count{foo(column)} # SELECT count(foo(column)) AS count FROM table LIMIT 1
     #   # => 1
     def count(arg=(no_arg=true), &block)
-      if no_arg
-        if block
-          arg = Sequel.virtual_row(&block)
-          aggregate_dataset.get{count(arg).as(:count)}
-        else
-          cached_dataset(:_count_ds) do
-            aggregate_dataset.select{count{}.*.as(:count)}.single_value_ds
-          end.single_value!.to_i
-        end
-      elsif block
-        raise Error, 'cannot provide both argument and block to Dataset#count'
+      if no_arg && !block
+        cached_dataset(:_count_ds) do
+          aggregate_dataset.select{count{}.*.as(:count)}.single_value_ds
+        end.single_value!.to_i
       else
-        aggregate_dataset.get{count(arg).as(:count)}
+        if block
+          if no_arg
+            arg = Sequel.virtual_row(&block)
+          else
+            raise Error, 'cannot provide both argument and block to Dataset#count'
+          end
+        end
+
+        if loader = _count_loader
+          loader.get(arg)
+        else
+          aggregate_dataset.get{count(arg).as(:count)}
+        end
       end
     end
-    
+
     # Deletes the records in the dataset.  The returned value should be 
     # number of records deleted, but that is adapter dependent.
     #
@@ -932,6 +937,13 @@ module Sequel
       post_load(a)
       a.each(&block) if block
       a
+    end
+    
+    # Cached placeholder literalizer for count with an argument or block.
+    def _count_loader
+      cached_placeholder_literalizer(:_count_loader) do |pl|
+        aggregate_dataset.select{count(pl.arg).as(:count)}
+      end
     end
     
     # Internals of +select_hash+ and +select_hash_groups+

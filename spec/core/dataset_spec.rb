@@ -1871,23 +1871,31 @@ describe "Dataset#count" do
   end
   
   it "should format SQL properly" do
-    @dataset.count.must_equal 1
-    @db.sqls.must_equal ['SELECT count(*) AS count FROM test LIMIT 1']
+    5.times do
+      @dataset.count.must_equal 1
+      @db.sqls.must_equal ['SELECT count(*) AS count FROM test LIMIT 1']
+    end
   end
   
   it "should accept an argument" do
-    @dataset.count(:foo).must_equal 1
-    @db.sqls.must_equal ['SELECT count(foo) AS count FROM test LIMIT 1']
+    5.times do
+      @dataset.count(:foo).must_equal 1
+      @db.sqls.must_equal ['SELECT count(foo) AS count FROM test LIMIT 1']
+    end
   end
   
   it "should work with a nil argument" do
-    @dataset.count(nil).must_equal 1
-    @db.sqls.must_equal ['SELECT count(NULL) AS count FROM test LIMIT 1']
+    5.times do
+      @dataset.count(nil).must_equal 1
+      @db.sqls.must_equal ['SELECT count(NULL) AS count FROM test LIMIT 1']
+    end
   end
   
   it "should accept a virtual row block" do
-    @dataset.count{foo(bar)}.must_equal 1
-    @db.sqls.must_equal ['SELECT count(foo(bar)) AS count FROM test LIMIT 1']
+    5.times do 
+      @dataset.count{foo(bar)}.must_equal 1
+      @db.sqls.must_equal ['SELECT count(foo(bar)) AS count FROM test LIMIT 1']
+    end
   end
   
   it "should raise an Error if given an argument and a block" do
