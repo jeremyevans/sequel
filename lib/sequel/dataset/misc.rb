@@ -303,6 +303,30 @@ module Sequel
       ds
     end
 
+    # Return a cached placeholder literalizer for the given key if there
+    # is one for this dataset.  If there isn't one, increment the counter
+    # for the number of calls for the key, and if the counter is at least
+    # three, then create a placeholder literalizer by yielding to the block,
+    # and cache it.
+    def cached_placeholder_literalizer(key)
+      if loader = cache_get(key)
+        return loader unless loader.is_a?(Integer)
+        loader += 1
+
+        if loader >= 3
+          loader = Sequel::Dataset::PlaceholderLiteralizer.loader(self){|pl, _| yield pl}
+          cache_set(key, loader)
+        else
+          cache_set(key, loader + 1)
+          loader = nil
+        end
+      elsif cache_sql?
+        cache_set(key, 1)
+      end
+
+      loader
+    end
+
     # Set the columns for the current dataset.
     def columns=(v)
       cache_set(:_columns, v)

@@ -2531,41 +2531,36 @@ module Sequel
       #   Artist.dataset.with_pk([1, 2])
       #   # SELECT * FROM artists WHERE ((artists.id1 = 1) AND (artists.id2 = 2)) LIMIT 1
       def with_pk(pk)
-        if loader = cache_get(:_with_pk_loader)
-          return loader.first(*pk)
+        if loader = _with_pk_loader
+          loader.first(*pk)
+        else
+          first(model.qualified_primary_key_hash(pk))
         end
-
-        if cache_sql?
-          num_calls = (cache_get(:_with_pk_calls) || 0) + 1
-          cache_set(:_with_pk_calls, num_calls)
-
-          if num_calls >= 3
-            loader = Sequel::Dataset::PlaceholderLiteralizer.loader(self) do |pl, ds|
-              table = model.table_name
-              cond = case primary_key = model.primary_key
-              when Array
-                primary_key.map{|key| [SQL::QualifiedIdentifier.new(table, key), pl.arg]}
-              when Symbol
-                {SQL::QualifiedIdentifier.new(table, primary_key)=>pl.arg}
-              else
-                raise(Error, "#{model} does not have a primary key")
-              end
-
-              ds.where(cond).limit(1)
-            end
-
-            cache_set(:_with_pk_loader, loader)
-            return loader.first(*pk)
-          end
-        end
-
-        first(model.qualified_primary_key_hash(pk))
       end
 
       # Same as with_pk, but raises NoMatchingRow instead of returning nil if no
       # row matches.
       def with_pk!(pk)
         with_pk(pk) || raise(NoMatchingRow.new(self))
+      end
+
+      private
+
+      # A cached placeholder literalizer, if one exists for the current dataset.
+      def _with_pk_loader
+        cached_placeholder_literalizer(:_with_pk_loader) do |pl|
+          table = model.table_name
+          cond = case primary_key = model.primary_key
+          when Array
+            primary_key.map{|key| [SQL::QualifiedIdentifier.new(table, key), pl.arg]}
+          when Symbol
+            {SQL::QualifiedIdentifier.new(table, primary_key)=>pl.arg}
+          else
+            raise(Error, "#{model} does not have a primary key")
+          end
+
+          where(cond).limit(1)
+        end
       end
     end
 
