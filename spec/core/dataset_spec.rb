@@ -3604,6 +3604,7 @@ describe "Dataset prepared statements and bound variables " do
     @ds.filter(:num=>:$n).call(:delete, :n=>1)
     @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
     @ds.call(:insert, {:n=>1}, :num=>:$n)
+    @ds.call(:insert_pk, {:n=>1}, :num=>:$n)
     @ds.call(:insert_select, {:n=>1}, :num=>:$n)
     @db.sqls.must_equal [
       'SELECT * FROM items WHERE (num = 1)',
@@ -3614,6 +3615,7 @@ describe "Dataset prepared statements and bound variables " do
       'SELECT * FROM items WHERE (num = 1) LIMIT 1',
       'DELETE FROM items WHERE (num = 1)',
       'UPDATE items SET num = 2 WHERE (num = 1)',
+      'INSERT INTO items (num) VALUES (1)',
       'INSERT INTO items (num) VALUES (1)',
       'INSERT INTO items (num) VALUES (1) RETURNING *']
   end
@@ -5199,5 +5201,13 @@ describe "#unqualified_column_for" do
   it "should return nil for other objects inside SQL::AliasedExpressions" do
     @ds.unqualified_column_for(Sequel.as(Object.new, 'a')).must_be_nil
     @ds.unqualified_column_for(Sequel.as('a', 'b')).must_be_nil
+  end
+end
+
+describe "Dataset#output_identifier" do
+  it "should handle empty identifiers and uppercase identifiers" do
+    meth = Sequel::Database.new(:identifier_mangling=>false).dataset.method(:output_identifier)
+    meth.call('').must_equal :untitled
+    meth.call('A').must_equal :a
   end
 end

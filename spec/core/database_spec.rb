@@ -2516,3 +2516,9 @@ describe "Database#execute_{dui,ddl,insert}" do
     @db.sqls.must_equal ["DELETE FROM table", "SET foo", "INSERT INTO table DEFAULT VALUES"]
   end
 end
+
+describe "Dataset identifier folding" do
+  it "should fold to uppercase by default, as per SQL" do
+    Sequel::Database.new(:identifier_mangling=>false).send(:folds_unquoted_identifiers_to_uppercase?).must_equal true
+  end
+end

@@ -454,12 +454,16 @@ describe "Sequel Mock Adapter" do
     Sequel.mock(:host=>'db2').select(1).sql.must_equal 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
     Sequel.mock(:host=>'firebird')[:A].distinct.limit(1, 2).with_quote_identifiers(false).sql.must_equal 'SELECT DISTINCT FIRST 1 SKIP 2 * FROM A'
     Sequel.mock(:host=>'informix')[:a].distinct.limit(1, 2).sql.upcase.must_equal 'SELECT SKIP 2 FIRST 1 DISTINCT * FROM A'
-    Sequel.mock(:host=>'mssql')[:A].full_text_search(:B, 'C').with_quote_identifiers(false).sql.must_equal "SELECT * FROM A WHERE (CONTAINS (B, 'C'))"
+    Sequel.mock(:host=>'mssql', :identifier_mangling=>false)[:A].full_text_search(:B, 'C').with_quote_identifiers(false).sql.must_equal "SELECT * FROM A WHERE (CONTAINS (B, 'C'))"
     Sequel.mock(:host=>'mysql')[:a].full_text_search(:b, 'c').with_quote_identifiers(false).sql.must_equal "SELECT * FROM a WHERE (MATCH (b) AGAINST ('c'))"
     Sequel.mock(:host=>'oracle')[:a].limit(1).with_quote_identifiers(false).sql.upcase.must_equal 'SELECT * FROM (SELECT * FROM A) T1 WHERE (ROWNUM <= 1)'
     Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').with_quote_identifiers(false).sql.must_equal "SELECT * FROM a WHERE (to_tsvector(CAST('simple' AS regconfig), (COALESCE(b, ''))) @@ to_tsquery(CAST('simple' AS regconfig), 'c'))"
     Sequel.mock(:host=>'sqlanywhere').from(:A).offset(1).with_quote_identifiers(false).sql.must_equal 'SELECT TOP 2147483647 START AT (1 + 1) * FROM A'
     Sequel.mock(:host=>'sqlite')[:a___b].with_quote_identifiers(false).sql.must_equal "SELECT * FROM a AS 'b'"
+  end
+
+  it "should be able to mock schema calls" do
+    Sequel.mock(:host=>'mysql', :fetch=>{:Field=>'a'}).schema(:a).first.first.must_equal :a
   end
 
   it "should automatically set version for adapters needing versions" do
