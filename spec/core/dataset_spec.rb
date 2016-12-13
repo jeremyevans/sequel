@@ -4562,7 +4562,9 @@ describe "Dataset#skip_locked" do
     def @ds.supports_skip_locked?; true end
     def @ds.select_lock_sql(sql) super; sql << " SKIP LOCKED" if @opts[:skip_locked] end
     @ds.sql.must_equal "SELECT * FROM t FOR UPDATE"
-    @ds.skip_locked.sql.must_equal "SELECT * FROM t FOR UPDATE SKIP LOCKED"
+    3.times do
+      @ds.skip_locked.sql.must_equal "SELECT * FROM t FOR UPDATE SKIP LOCKED"
+    end
   end
 end
   

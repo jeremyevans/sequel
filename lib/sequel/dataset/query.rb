@@ -897,8 +897,10 @@ module Sequel
 
     # Skip locked rows when returning results from this dataset.
     def skip_locked
-      raise(Error, 'This dataset does not support skipping locked rows') unless supports_skip_locked?
-      clone(:skip_locked=>true)
+      cached_dataset(:_skip_locked_ds) do
+        raise(Error, 'This dataset does not support skipping locked rows') unless supports_skip_locked?
+        clone(:skip_locked=>true)
+      end
     end
 
     # Unbind bound variables from this dataset's filter and return an array of two
