@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache dataset returned by Dataset#un{filtered,grouped,limited,ordered} for frozen datasets (jeremyevans)
+
 * Cache dataset returned by Dataset#reverse (no args) for frozen datasets (jeremyevans)
 
 * Cache dataset returned by Dataset#invert for frozen datasets (jeremyevans)

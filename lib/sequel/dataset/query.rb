@@ -922,7 +922,7 @@ module Sequel
     #   DB[:items].group(:a).having(:a=>1).where(:b).unfiltered
     #   # SELECT * FROM items GROUP BY a
     def unfiltered
-      clone(:where => nil, :having => nil)
+      cached_dataset(:_unfiltered_ds){clone(:where => nil, :having => nil)}
     end
 
     # Returns a copy of the dataset with no grouping (GROUP or HAVING clause) applied.
@@ -930,7 +930,7 @@ module Sequel
     #   DB[:items].group(:a).having(:a=>1).where(:b).ungrouped
     #   # SELECT * FROM items WHERE b
     def ungrouped
-      clone(:group => nil, :having => nil)
+      cached_dataset(:_ungrouped_ds){clone(:group => nil, :having => nil)}
     end
 
     # Adds a UNION clause using a second dataset object.
@@ -957,14 +957,14 @@ module Sequel
     # 
     #   DB[:items].limit(10, 20).unlimited # SELECT * FROM items
     def unlimited
-      clone(:limit=>nil, :offset=>nil)
+      cached_dataset(:_unlimited_ds){clone(:limit=>nil, :offset=>nil)}
     end
 
     # Returns a copy of the dataset with no order.
     # 
     #   DB[:items].order(:a).unordered # SELECT * FROM items
     def unordered
-      order(nil)
+      cached_dataset(:_unordered_ds){clone(:order=>nil)}
     end
     
     # Returns a copy of the dataset with the given WHERE conditions imposed upon it.  

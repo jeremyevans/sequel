@@ -1352,25 +1352,37 @@ end
 
 describe "Dataset#unfiltered" do
   it "should remove filtering from the dataset" do
-    Sequel.mock.dataset.from(:test).filter(:score=>1).unfiltered.sql.must_equal 'SELECT * FROM test'
+    ds = Sequel.mock.dataset.from(:test).filter(:score=>1)
+    3.times do
+      ds.unfiltered.sql.must_equal 'SELECT * FROM test'
+    end
   end
 end
 
 describe "Dataset#unlimited" do
   it "should remove limit and offset from the dataset" do
-    Sequel.mock.dataset.from(:test).limit(1, 2).unlimited.sql.must_equal 'SELECT * FROM test'
+    ds = Sequel.mock.dataset.from(:test).limit(1, 2)
+    3.times do
+      ds.unlimited.sql.must_equal 'SELECT * FROM test'
+    end
   end
 end
 
 describe "Dataset#ungrouped" do
   it "should remove group and having clauses from the dataset" do
-    Sequel.mock.dataset.from(:test).group(:a).having(:b).ungrouped.sql.must_equal 'SELECT * FROM test'
+    ds = Sequel.mock.dataset.from(:test).group(:a).having(:b)
+    3.times do
+      ds.ungrouped.sql.must_equal 'SELECT * FROM test'
+    end
   end
 end
 
 describe "Dataset#unordered" do
   it "should remove ordering from the dataset" do
-    Sequel.mock.dataset.from(:test).order(:name).unordered.sql.must_equal 'SELECT * FROM test'
+    ds = Sequel.mock.dataset.from(:test).order(:name)
+    3.times do
+      ds.unordered.sql.must_equal 'SELECT * FROM test'
+    end
   end
 end
 
