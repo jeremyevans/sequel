@@ -687,7 +687,9 @@ describe "Dataset#invert" do
   end
 
   it "should return a dataset that selects no rows if dataset is not filtered" do
-    @d.invert.sql.must_equal "SELECT * FROM test WHERE 'f'"
+    3.times do
+      @d.invert.sql.must_equal "SELECT * FROM test WHERE 'f'"
+    end
   end
 
   it "should invert current filter if dataset is filtered" do

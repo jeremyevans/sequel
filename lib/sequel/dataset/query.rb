@@ -449,14 +449,16 @@ module Sequel
     # See documentation for exclude for how inversion is handled in regards
     # to SQL 3-valued boolean logic.
     def invert
-      having, where = @opts.values_at(:having, :where)
-      if having.nil? && where.nil?
-        where(false)
-      else
-        o = {}
-        o[:having] = SQL::BooleanExpression.invert(having) if having
-        o[:where] = SQL::BooleanExpression.invert(where) if where
-        clone(o)
+      cached_dataset(:_invert_ds) do
+        having, where = @opts.values_at(:having, :where)
+        if having.nil? && where.nil?
+          where(false)
+        else
+          o = {}
+          o[:having] = SQL::BooleanExpression.invert(having) if having
+          o[:where] = SQL::BooleanExpression.invert(where) if where
+          clone(o)
+        end
       end
     end
 
