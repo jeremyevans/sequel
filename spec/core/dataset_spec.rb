@@ -1473,42 +1473,42 @@ describe "Dataset#order_prepend" do
   end
 end
 
-describe "Dataset#reverse_order" do
+describe "Dataset#reverse" do
   before do
     @dataset = Sequel.mock.dataset.from(:test)
   end
   
   it "should use DESC as default order" do
-    @dataset.reverse_order(:name).sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
+    @dataset.reverse(:name).sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
   end
   
   it "should invert the order given" do
-    @dataset.reverse_order(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM test ORDER BY name ASC'
+    @dataset.reverse(Sequel.desc(:name)).sql.must_equal 'SELECT * FROM test ORDER BY name ASC'
   end
   
   it "should invert the order for ASC expressions" do
-    @dataset.reverse_order(Sequel.asc(:name)).sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
+    @dataset.reverse(Sequel.asc(:name)).sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
   end
   
   it "should accept multiple arguments" do
-    @dataset.reverse_order(:name, Sequel.desc(:price)).sql.must_equal 'SELECT * FROM test ORDER BY name DESC, price ASC'
+    @dataset.reverse(:name, Sequel.desc(:price)).sql.must_equal 'SELECT * FROM test ORDER BY name DESC, price ASC'
   end
 
   it "should handles NULLS ordering correctly when reversing" do
-    @dataset.reverse_order(Sequel.asc(:name, :nulls=>:first), Sequel.desc(:price, :nulls=>:last)).sql.must_equal 'SELECT * FROM test ORDER BY name DESC NULLS LAST, price ASC NULLS FIRST'
+    @dataset.reverse(Sequel.asc(:name, :nulls=>:first), Sequel.desc(:price, :nulls=>:last)).sql.must_equal 'SELECT * FROM test ORDER BY name DESC NULLS LAST, price ASC NULLS FIRST'
   end
 
   it "should reverse a previous ordering if no arguments are given" do
-    @dataset.order(:name).reverse_order.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
-    @dataset.order(Sequel.desc(:clumsy), :fool).reverse_order.sql.must_equal 'SELECT * FROM test ORDER BY clumsy ASC, fool DESC'
+    @dataset.order(:name).reverse.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
+    @dataset.order(Sequel.desc(:clumsy), :fool).reverse.sql.must_equal 'SELECT * FROM test ORDER BY clumsy ASC, fool DESC'
   end
   
   it "should return an unordered dataset for a dataset with no order" do
-    @dataset.unordered.reverse_order.sql.must_equal 'SELECT * FROM test'
+    @dataset.unordered.reverse.sql.must_equal 'SELECT * FROM test'
   end
   
-  it "should have #reverse alias" do
-    @dataset.order(:name).reverse.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
+  it "should have #reverse_order alias" do
+    @dataset.order(:name).reverse_order.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
   end
 
   it "should accept a block" do
