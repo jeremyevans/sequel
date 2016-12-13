@@ -156,6 +156,22 @@ module Sequel
     #   
     #   DB[:items].exclude(:category => 'software', :id=>3)
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
+    #
+    # Also note that SQL uses 3-valued boolean logic (+true+, +false+, +NULL+), so
+    # the inverse of a true condition is a false condition, and will still
+    # not match rows that were NULL originally.  If you take the earlier
+    # example:
+    #
+    #   DB[:items].exclude(:category => 'software')
+    #   # SELECT * FROM items WHERE (category != 'software')
+    #
+    # Note that this does not match rows where +category+ is +NULL+.  This
+    # is because +NULL+ is an unknown value, and you do not know whether
+    # or not the +NULL+ category is +software+.  You can explicitly
+    # specify how to handle +NULL+ values if you want:
+    #
+    #   DB[:items].exclude(Sequel.~(:category=>nil) & {:category => 'software'})
+    #   # SELECT * FROM items WHERE ((category IS NULL) OR (category != 'software'))
     def exclude(*cond, &block)
       _filter_or_exclude(true, :where, *cond, &block)
     end
@@ -164,6 +180,9 @@ module Sequel
     #
     #   DB[:items].select_group(:name).exclude_having{count(name) < 2}
     #   # SELECT name FROM items GROUP BY name HAVING (count(name) >= 2)
+    #
+    # See documentation for exclude for how inversion is handled in regards
+    # to SQL 3-valued boolean logic.
     def exclude_having(*cond, &block)
       _filter_or_exclude(true, :having, *cond, &block)
     end
@@ -426,6 +445,9 @@ module Sequel
     #
     #   DB[:items].where(:category => 'software', :id=>3).invert
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
+    #
+    # See documentation for exclude for how inversion is handled in regards
+    # to SQL 3-valued boolean logic.
     def invert
       having, where = @opts.values_at(:having, :where)
       if having.nil? && where.nil?
