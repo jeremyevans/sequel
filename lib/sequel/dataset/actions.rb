@@ -272,10 +272,27 @@ module Sequel
         column = ds.opts[:select]
         column = nil if column.is_a?(Array) && column.length < 2
       else
-        ds = if column.is_a?(Array)
-          ds.select(*column)
+        case column
+        when Array
+          ds = ds.select(*column)
+        when LiteralString, Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression
+          if loader = cached_placeholder_literalizer(:_get_loader) do |pl|
+              ds.single_value_ds.select(pl.arg)
+            end
+
+            return loader.get(column)
+          end
+
+          ds = ds.select(column)
         else
-          ds.select(auto_alias_expression(column))
+          if loader = cached_placeholder_literalizer(:_get_alias_loader) do |pl|
+              ds.single_value_ds.select(Sequel.as(pl.arg, :v))
+            end
+
+            return loader.get(column)
+          end
+
+          ds = ds.select(Sequel.as(column, :v))
         end
       end
 

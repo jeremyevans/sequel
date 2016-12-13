@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up repeated calls to Dataset#get with a single argument for frozen datasets using a cached placeholder literalizer (jeremyevans)
+
 * Speed up repeated calls to Dataset#{first,last} with arguments/blocks for frozen datasets using a cached placeholder literalizer (jeremyevans)
 
 * Speed up repeated calls to Dataset#{avg,min,max,sum} for frozen datasets using a cached placeholder literalizer (jeremyevans)
