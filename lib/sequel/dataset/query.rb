@@ -222,7 +222,7 @@ module Sequel
     #
     #   DB[:table].for_update # SELECT * FROM table FOR UPDATE
     def for_update
-      lock_style(:update)
+      cached_dataset(:_for_update_ds){lock_style(:update)}
     end
 
     # Returns a copy of the dataset with the source changed. If no

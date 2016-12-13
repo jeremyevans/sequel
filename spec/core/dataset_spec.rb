@@ -4535,7 +4535,9 @@ describe "Dataset#lock_style and for_update" do
   end
   
   it "#for_update should use FOR UPDATE" do
-    @ds.for_update.sql.must_equal "SELECT * FROM t FOR UPDATE"
+    3.times do
+      @ds.for_update.sql.must_equal "SELECT * FROM t FOR UPDATE"
+    end
   end
   
   it "#lock_style should accept symbols" do
