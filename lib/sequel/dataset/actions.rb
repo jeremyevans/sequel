@@ -402,7 +402,15 @@ module Sequel
     #   DB[:table].interval{function(column)} # SELECT (max(function(column)) - min(function(column))) FROM table LIMIT 1
     #   # => 7
     def interval(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{(max(column) - min(column)).as(:interval)}
+      if loader = cached_placeholder_literalizer(:_interval_loader) do |pl|
+          arg = pl.arg
+          aggregate_dataset.limit(1).select((SQL::Function.new(:max, arg) - SQL::Function.new(:min, arg)).as(:interval))
+        end
+
+        loader.get(column)
+      else
+        aggregate_dataset.get{(max(column) - min(column)).as(:interval)}
+      end
     end
 
     # Reverses the order and then runs #first with the given arguments and block.  Note that this
@@ -607,7 +615,17 @@ module Sequel
     #   DB[:table].interval{function(column)} # SELECT max(function(column)) AS v1, min(function(column)) AS v2 FROM table LIMIT 1
     #   # => 0..7
     def range(column=Sequel.virtual_row(&Proc.new))
-      if r = aggregate_dataset.select{[min(column).as(v1), max(column).as(v2)]}.first
+      r = if loader = cached_placeholder_literalizer(:_range_loader) do |pl|
+            arg = pl.arg
+            aggregate_dataset.limit(1).select(SQL::Function.new(:min, arg).as(:v1), SQL::Function.new(:max, arg).as(:v2))
+          end
+
+        loader.first(column)
+      else
+        aggregate_dataset.select{[min(column).as(v1), max(column).as(v2)]}.first
+      end
+
+      if r
         (r[:v1]..r[:v2])
       end
     end

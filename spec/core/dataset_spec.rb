@@ -2462,19 +2462,23 @@ end
 describe "Dataset#range" do
   before do
     @db = Sequel.mock(:fetch=>{:v1 => 1, :v2 => 10})
-    @ds = @db[:test]
+    @ds = @db[:test].freeze
   end
   
   it "should generate a correct SQL statement" do
-    @ds.range(:stamp)
-    @db.sqls.must_equal ["SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test LIMIT 1"]
+    5.times do
+      @ds.range(:stamp)
+      @db.sqls.must_equal ["SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test LIMIT 1"]
+    end
 
     @ds.filter(Sequel.expr(:price) > 100).range(:stamp)
     @db.sqls.must_equal ["SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test WHERE (price > 100) LIMIT 1"]
   end
   
   it "should return a range object" do
-    @ds.range(:tryme).must_equal(1..10)
+    5.times do
+      @ds.range(:tryme).must_equal(1..10)
+    end
   end
   
   it "should use a subselect for the same conditions as count" do
@@ -2483,33 +2487,42 @@ describe "Dataset#range" do
   end
   
   it "should accept virtual row blocks" do
-    @ds.range{a(b)}
-    @db.sqls.must_equal ["SELECT min(a(b)) AS v1, max(a(b)) AS v2 FROM test LIMIT 1"]
+    5.times do
+      @ds.range{a(b)}
+      @db.sqls.must_equal ["SELECT min(a(b)) AS v1, max(a(b)) AS v2 FROM test LIMIT 1"]
+    end
   end
 end
 
 describe "Dataset#interval" do
   before do
     @db = Sequel.mock(:fetch=>{:v => 1234})
-    @ds = @db[:test]
+    @ds = @db[:test].freeze
   end
   
   it "should generate the correct SQL statement" do
-    @ds.interval(:stamp)
-    @db.sqls.must_equal ["SELECT (max(stamp) - min(stamp)) AS interval FROM test LIMIT 1"]
+    5.times do
+      @ds.interval(:stamp)
+      @db.sqls.must_equal ["SELECT (max(stamp) - min(stamp)) AS interval FROM test LIMIT 1"]
+    end
 
     @ds.filter(Sequel.expr(:price) > 100).interval(:stamp)
     @db.sqls.must_equal ["SELECT (max(stamp) - min(stamp)) AS interval FROM test WHERE (price > 100) LIMIT 1"]
   end
   
   it "should use a subselect for the same conditions as count" do
-    @ds.order(:stamp).limit(5).interval(:stamp).must_equal 1234
-    @db.sqls.must_equal ['SELECT (max(stamp) - min(stamp)) AS interval FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1']
+    ds = @ds.order(:stamp).limit(5)
+    5.times do
+      ds.interval(:stamp).must_equal 1234
+      @db.sqls.must_equal ['SELECT (max(stamp) - min(stamp)) AS interval FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1']
+    end
   end
 
   it "should accept virtual row blocks" do
-    @ds.interval{a(b)}
-    @db.sqls.must_equal ["SELECT (max(a(b)) - min(a(b))) AS interval FROM test LIMIT 1"]
+    5.times do
+      @ds.interval{a(b)}
+      @db.sqls.must_equal ["SELECT (max(a(b)) - min(a(b))) AS interval FROM test LIMIT 1"]
+    end
   end
 end
 
