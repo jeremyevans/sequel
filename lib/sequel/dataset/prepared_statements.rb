@@ -337,7 +337,9 @@ module Sequel
         ps.prepared_sql
         db.set_prepared_statement(name, ps)
       else
+        # :nocov:
         Sequel::Deprecation.deprecate("Dataset#prepare will change to requiring a name argument in Sequel 5, please update your code.") unless name
+        # :nocov:
       end
 
       ps
