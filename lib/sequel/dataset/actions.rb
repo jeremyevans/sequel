@@ -57,8 +57,8 @@ module Sequel
     #   # => 3
     #   DB[:table].avg{function(column)} # SELECT avg(function(column)) FROM table LIMIT 1
     #   # => 1
-    def avg(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{avg(column).as(:avg)}
+    def avg(arg=Sequel.virtual_row(&Proc.new))
+      _aggregate(:avg, arg)
     end
   
     # Returns the columns in the result set in order as an array of symbols.
@@ -115,11 +115,7 @@ module Sequel
           end
         end
 
-        if loader = _count_loader
-          loader.get(arg)
-        else
-          aggregate_dataset.get{count(arg).as(:count)}
-        end
+        _aggregate(:count, arg)
       end
     end
 
@@ -420,8 +416,8 @@ module Sequel
     #   # => 10
     #   DB[:table].max{function(column)} # SELECT max(function(column)) FROM table LIMIT 1
     #   # => 7
-    def max(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{max(column).as(:max)}
+    def max(arg=Sequel.virtual_row(&Proc.new))
+      _aggregate(:max, arg)
     end
 
     # Returns the minimum value for the given column/expression.
@@ -431,8 +427,8 @@ module Sequel
     #   # => 1
     #   DB[:table].min{function(column)} # SELECT min(function(column)) FROM table LIMIT 1
     #   # => 0
-    def min(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{min(column).as(:min)}
+    def min(arg=Sequel.virtual_row(&Proc.new))
+      _aggregate(:min, arg)
     end
 
     # This is a front end for import that allows you to submit an array of
@@ -716,8 +712,8 @@ module Sequel
     #   # => 55
     #   DB[:table].sum{function(column)} # SELECT sum(function(column)) FROM table LIMIT 1
     #   # => 10
-    def sum(column=Sequel.virtual_row(&Proc.new))
-      aggregate_dataset.get{sum(column).as(:sum)}
+    def sum(arg=Sequel.virtual_row(&Proc.new))
+      _aggregate(:sum, arg)
     end
 
     # Returns a hash with one column used as key and another used as value.
@@ -939,10 +935,14 @@ module Sequel
       a
     end
     
-    # Cached placeholder literalizer for count with an argument or block.
-    def _count_loader
-      cached_placeholder_literalizer(:_count_loader) do |pl|
-        aggregate_dataset.select{count(pl.arg).as(:count)}
+    # Cached placeholder literalizer for methods that return values using aggregate functions.
+    def _aggregate(function, arg)
+      if loader = cached_placeholder_literalizer(:"_#{function}_loader") do |pl|
+            aggregate_dataset.limit(1).select(SQL::Function.new(function, pl.arg).as(function))
+          end
+        loader.get(arg)
+      else
+        aggregate_dataset.get(SQL::Function.new(function, arg).as(function))
       end
     end
     

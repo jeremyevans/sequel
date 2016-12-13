@@ -1885,7 +1885,7 @@ end
 describe "Dataset#count" do
   before do
     @db = Sequel.mock(:fetch=>{:count=>1})
-    @dataset = @db.from(:test).columns(:count)
+    @dataset = @db.from(:test).columns(:count).freeze
   end
   
   it "should format SQL properly" do
@@ -1926,8 +1926,7 @@ describe "Dataset#count" do
   end
   
   it "should count properly for datasets with fixed sql" do
-    @dataset.opts[:sql] = "select abc from xyz"
-    @dataset.count.must_equal 1
+    @dataset.with_sql("select abc from xyz").count.must_equal 1
     @db.sqls.must_equal ["SELECT count(*) AS count FROM (select abc from xyz) AS t1 LIMIT 1"]
   end
 
@@ -1951,9 +1950,7 @@ describe "Dataset#count" do
   end
   
   it "should work on a graphed_dataset" do
-    def @dataset.columns
-      [:a]
-    end
+    ds = @dataset.with_extend{ def columns; [:a] end}
     @dataset.graph(@dataset, [:a], :table_alias=>:test2).count.must_equal 1
     @db.sqls.must_equal ['SELECT count(*) AS count FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1']
   end
@@ -2409,42 +2406,56 @@ end
 
 describe "Dataset aggregate methods" do
   before do
-    @d = Sequel.mock(:fetch=>proc{|s| {1=>s}})[:test]
+    @d = Sequel.mock(:fetch=>proc{|s| {1=>s}})[:test].freeze
   end
   
   it "should include min" do
-    @d.min(:a).must_equal 'SELECT min(a) AS min FROM test LIMIT 1'
+    5.times do
+      @d.min(:a).must_equal 'SELECT min(a) AS min FROM test LIMIT 1'
+    end
   end
   
   it "should include max" do
-    @d.max(:b).must_equal 'SELECT max(b) AS max FROM test LIMIT 1'
+    5.times do
+      @d.max(:b).must_equal 'SELECT max(b) AS max FROM test LIMIT 1'
+    end
   end
   
   it "should include sum" do
-    @d.sum(:c).must_equal 'SELECT sum(c) AS sum FROM test LIMIT 1'
+    5.times do
+      @d.sum(:c).must_equal 'SELECT sum(c) AS sum FROM test LIMIT 1'
+    end
   end
   
   it "should include avg" do
-    @d.avg(:d).must_equal 'SELECT avg(d) AS avg FROM test LIMIT 1'
+    5.times do
+      @d.avg(:d).must_equal 'SELECT avg(d) AS avg FROM test LIMIT 1'
+    end
   end
   
   it "should accept qualified columns" do
-    @d.avg(:test__bc).must_equal 'SELECT avg(test.bc) AS avg FROM test LIMIT 1'
+    5.times do
+      @d.avg(:test__bc).must_equal 'SELECT avg(test.bc) AS avg FROM test LIMIT 1'
+    end
   end
   
   it "should use a subselect for the same conditions as count" do
     d = @d.order(:a).limit(5)
-    d.avg(:a).must_equal 'SELECT avg(a) AS avg FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
-    d.sum(:a).must_equal 'SELECT sum(a) AS sum FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
-    d.min(:a).must_equal 'SELECT min(a) AS min FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
-    d.max(:a).must_equal 'SELECT max(a) AS max FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    5.times do
+      d.avg(:a).must_equal 'SELECT avg(a) AS avg FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+      d.sum(:a).must_equal 'SELECT sum(a) AS sum FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+      d.min(:a).must_equal 'SELECT min(a) AS min FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+      d.max(:a).must_equal 'SELECT max(a) AS max FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    end
   end
   
   it "should accept virtual row blocks" do
-    @d.avg{a(b)}.must_equal 'SELECT avg(a(b)) AS avg FROM test LIMIT 1'
-    @d.sum{a(b)}.must_equal 'SELECT sum(a(b)) AS sum FROM test LIMIT 1'
-    @d.min{a(b)}.must_equal 'SELECT min(a(b)) AS min FROM test LIMIT 1'
-    @d.max{a(b)}.must_equal 'SELECT max(a(b)) AS max FROM test LIMIT 1'
+    5.times do
+      @d.avg{a(b)}.must_equal 'SELECT avg(a(b)) AS avg FROM test LIMIT 1'
+      @d.sum{a(b)}.must_equal 'SELECT sum(a(b)) AS sum FROM test LIMIT 1'
+      @d.min{a(b)}.must_equal 'SELECT min(a(b)) AS min FROM test LIMIT 1'
+      @d.max{a(b)}.must_equal 'SELECT max(a(b)) AS max FROM test LIMIT 1'
+    end
   end
 end
 
