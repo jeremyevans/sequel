@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up repeated calls to Dataset#{first,last} with arguments/blocks for frozen datasets using a cached placeholder literalizer (jeremyevans)
+
 * Speed up repeated calls to Dataset#{avg,min,max,sum} for frozen datasets using a cached placeholder literalizer (jeremyevans)
 
 * Cache dataset returned by Dataset#skip_locked for frozen datasets (jeremyevans)
@@ -26,7 +28,7 @@
 
 * Cache subset datasets if they don't use blocks or procs for frozen model datasets (jeremyevans)
 
-* Cache intermediate dataset used in Dataset#last (no args) for frozen model datasets without an order (jeremyevans)
+* Cache intermediate dataset used in Dataset#{last,paged_each} for frozen model datasets without an order (jeremyevans)
 
 * Cache dataset returned by Dataset#naked for frozen datasets (jeremyevans)
 

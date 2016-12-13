@@ -2476,12 +2476,8 @@ module Sequel
       #   Album.last
       #   # SELECT * FROM albums ORDER BY id DESC LIMIT 1
       def last(*a, &block)
-        if opts[:order].nil? && model && (pk = model.primary_key)
-          if a.empty? && !block
-            cached_dataset(:_pk_last_ds){reverse(*pk).clone(:limit=>1)}.single_record!
-          else
-            order(*pk).last(*a, &block)
-          end
+        if ds = _primary_key_order
+          ds.last(*a, &block)
         else
           super
         end
@@ -2496,8 +2492,8 @@ module Sequel
       #   # SELECT * FROM albums ORDER BY id LIMIT 1000 OFFSET 2000
       #   # ...
       def paged_each(*a, &block)
-        if opts[:order].nil? && model && (pk = model.primary_key)
-          order(*pk).paged_each(*a, &block)
+        if ds = _primary_key_order
+          ds.paged_each(*a, &block)
         else
           super
         end
@@ -2545,6 +2541,14 @@ module Sequel
       end
 
       private
+
+      # If the dataset is not already ordered, and the model has a primary key,
+      # return a clone ordered by the primary key.
+      def _primary_key_order
+        if @opts[:order].nil? && model && (pk = model.primary_key)
+          cached_dataset(:_pk_order_ds){order(*pk)}
+        end
+      end
 
       # A cached placeholder literalizer, if one exists for the current dataset.
       def _with_pk_loader

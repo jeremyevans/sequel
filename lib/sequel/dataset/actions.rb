@@ -197,17 +197,46 @@ module Sequel
     #   DB[:table].first(2){id < 2} # SELECT * FROM table WHERE (id < 2) LIMIT 2
     #   # => [{:id=>1}]
     def first(*args, &block)
-      ds = block ? filter(&block) : self
-
-      if args.empty?
-        ds.single_record
-      else
-        args = (args.size == 1) ? args.first : args
-        if args.is_a?(Integer)
-          ds.limit(args).all
-        else
-          ds.filter(args).single_record
+      case args.length
+      when 0
+        unless block
+          return single_record
         end
+      when 1
+        arg = args[0]
+        if arg.is_a?(Integer)
+          res = if block
+            if loader = cached_placeholder_literalizer(:_first_integer_cond_loader) do |pl|
+                where(pl.arg).limit(pl.arg)
+              end
+
+              loader.all(filter_expr(&block), arg)
+            else
+              where(&block).limit(arg).all
+            end
+          else
+            if loader = cached_placeholder_literalizer(:_first_integer_loader) do |pl|
+               limit(pl.arg)
+              end
+
+              loader.all(arg)
+            else
+              limit(arg).all
+            end
+          end
+
+          return res
+        end
+        args = arg
+      end
+
+      if loader = cached_placeholder_literalizer(:_first_cond_loader) do |pl|
+          _single_record_ds.where(pl.arg)
+        end
+
+        loader.first(filter_expr(args, &block))
+      else
+        _single_record_ds.where(args, &block).single_record!
       end
     end
 
@@ -370,15 +399,8 @@ module Sequel
     #   DB[:table].order(Sequel.desc(:id)).last(2) # SELECT * FROM table ORDER BY id ASC LIMIT 2
     #   # => [{:id=>1}, {:id=>2}]
     def last(*args, &block)
-      if args.empty? && !block
-        cached_dataset(:_last_ds) do
-          raise(Error, 'No order specified') unless @opts[:order]
-          reverse.clone(:limit=>1)
-        end.single_record!
-      else
-        raise(Error, 'No order specified') unless @opts[:order]
-        reverse.first(*args, &block)
-      end
+      raise(Error, 'No order specified') unless @opts[:order]
+      reverse.first(*args, &block)
     end
     
     # Maps column values for each record in the dataset (if a column name is
@@ -665,7 +687,7 @@ module Sequel
     #   DB[:test].single_record # SELECT * FROM test LIMIT 1
     #   # => {:column_name=>'value'}
     def single_record
-      cached_dataset(:_single_record_ds){clone(:limit=>1)}.single_record!
+      _single_record_ds.single_record!
     end
 
     # Returns the first record in dataset, without limiting the dataset. Returns nil if
@@ -964,6 +986,11 @@ module Sequel
       else
         ds.select(auto_alias_expression(select_cols.first))._select_map_single
       end
+    end
+
+    # A cached dataset for a single record for this dataset.
+    def _single_record_ds
+      cached_dataset(:_single_record_ds){clone(:limit=>1)}
     end
 
     # Automatically alias the given expression if it does not have an identifiable alias.

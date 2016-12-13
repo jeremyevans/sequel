@@ -2519,39 +2519,55 @@ describe "Dataset #first and #last" do
   end
   
   it "should return a single record if no argument is given" do
-    @d.order(:a).first.must_equal(:s=>'SELECT * FROM test ORDER BY a LIMIT 1')
-    @d.order(:a).last.must_equal(:s=>'SELECT * FROM test ORDER BY a DESC LIMIT 1')
+    ds = @d.order(:a).freeze
+    3.times do
+      ds.first.must_equal(:s=>'SELECT * FROM test ORDER BY a LIMIT 1')
+      ds.last.must_equal(:s=>'SELECT * FROM test ORDER BY a DESC LIMIT 1')
+    end
   end
 
   it "should return the first/last matching record if argument is not an Integer" do
-    @d.order(:a).first(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a LIMIT 1')
-    @d.order(:a).first('z = ?', 15).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a LIMIT 1')
-    @d.order(:a).last(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a DESC LIMIT 1')
-    @d.order(:a).last('z = ?', 15).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a DESC LIMIT 1')
+    ds = @d.order(:a).freeze
+    5.times do
+      ds.first(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a LIMIT 1')
+      ds.first('z = ?', 15).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a LIMIT 1')
+      ds.last(:z => 26).must_equal(:s=>'SELECT * FROM test WHERE (z = 26) ORDER BY a DESC LIMIT 1')
+      ds.last('z = ?', 15).must_equal(:s=>'SELECT * FROM test WHERE (z = 15) ORDER BY a DESC LIMIT 1')
+    end
   end
   
   it "should set the limit and return an array of records if the given number is > 1" do
-    i = rand(10) + 10
-    r = @d.order(:a).first(i).must_equal [{:s=>"SELECT * FROM test ORDER BY a LIMIT #{i}"}]
-    i = rand(10) + 10
-    r = @d.order(:a).last(i).must_equal [{:s=>"SELECT * FROM test ORDER BY a DESC LIMIT #{i}"}]
+    ds = @d.order(:a).freeze
+    5.times do
+      i = rand(10) + 10
+      ds.first(i).must_equal [{:s=>"SELECT * FROM test ORDER BY a LIMIT #{i}"}]
+      ds.last(i).must_equal [{:s=>"SELECT * FROM test ORDER BY a DESC LIMIT #{i}"}]
+    end
   end
   
   it "should return the first matching record if a block is given without an argument" do
-    @d.first{z > 26}.must_equal(:s=>'SELECT * FROM test WHERE (z > 26) LIMIT 1')
-    @d.order(:name).last{z > 26}.must_equal(:s=>'SELECT * FROM test WHERE (z > 26) ORDER BY name DESC LIMIT 1')
+    ds = @d.order(:name).freeze
+    5.times do
+      @d.first{z > 26}.must_equal(:s=>'SELECT * FROM test WHERE (z > 26) LIMIT 1')
+      ds.last{z > 26}.must_equal(:s=>'SELECT * FROM test WHERE (z > 26) ORDER BY name DESC LIMIT 1')
+    end
   end
   
   it "should combine block and standard argument filters if argument is not an Integer" do
-    @d.first(:y=>25){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((z > 26) AND (y = 25)) LIMIT 1')
-    @d.order(:name).last('y = ?', 16){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((z > 26) AND (y = 16)) ORDER BY name DESC LIMIT 1')
+    ds = @d.order(:name).freeze
+    5.times do
+      @d.first(:y=>25){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 25) AND (z > 26)) LIMIT 1')
+      ds.last('y = ?', 16){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 16) AND (z > 26)) ORDER BY name DESC LIMIT 1')
+    end
   end
   
   it "should filter and return an array of records if an Integer argument is provided and a block is given" do
-    i = rand(10) + 10
-    r = @d.order(:a).first(i){z > 26}.must_equal [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"}]
-    i = rand(10) + 10
-    r = @d.order(:a).last(i){z > 26}.must_equal [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a DESC LIMIT #{i}"}]
+    ds = @d.order(:a).freeze
+    5.times do
+      i = rand(10) + 10
+      ds.first(i){z > 26}.must_equal [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"}]
+      ds.last(i){z > 26}.must_equal [{:s=>"SELECT * FROM test WHERE (z > 26) ORDER BY a DESC LIMIT #{i}"}]
+    end
   end
 
   it "should return nil if no records match" do
@@ -2598,7 +2614,7 @@ describe "Dataset #first!" do
   end
   
   it "should combine block and standard argument filters if argument is not an Integer" do
-    @d.first!(:y=>25){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((z > 26) AND (y = 25)) LIMIT 1')
+    @d.first!(:y=>25){z > 26}.must_equal(:s=>'SELECT * FROM test WHERE ((y = 25) AND (z > 26)) LIMIT 1')
   end
   
   it "should filter and return an array of records if an Integer argument is provided and a block is given" do

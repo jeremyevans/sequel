@@ -105,7 +105,7 @@ describe Sequel::Model::DatasetMethods  do
     @c.last.must_be_kind_of(@c)
     @c.db.sqls.must_equal ['SELECT * FROM items ORDER BY id DESC LIMIT 1']
     @c.where(:id=>2).last(:foo=>2){{bar=>3}}.must_be_kind_of(@c)
-    @c.db.sqls.must_equal ['SELECT * FROM items WHERE ((id = 2) AND (bar = 3) AND (foo = 2)) ORDER BY id DESC LIMIT 1']
+    @c.db.sqls.must_equal ['SELECT * FROM items WHERE ((id = 2) AND (foo = 2) AND (bar = 3)) ORDER BY id DESC LIMIT 1']
   end
 
   it "#last should use existing order if there is one" do
