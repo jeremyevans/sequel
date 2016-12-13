@@ -794,8 +794,12 @@ module Sequel
     #   DB[:items].order(:id).reverse # SELECT * FROM items ORDER BY id DESC
     #   DB[:items].order(:id).reverse(Sequel.desc(:name)) # SELECT * FROM items ORDER BY name ASC
     def reverse(*order, &block)
-      virtual_row_columns(order, block)
-      order(*invert_order(order.empty? ? @opts[:order] : order.freeze))
+      if order.empty? && !block
+        cached_dataset(:_reverse_ds){order(*invert_order(@opts[:order]))}
+      else
+        virtual_row_columns(order, block)
+        order(*invert_order(order.empty? ? @opts[:order] : order.freeze))
+      end
     end
 
     # Alias of +reverse+

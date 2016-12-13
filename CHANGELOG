@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache dataset returned by Dataset#reverse (no args) for frozen datasets (jeremyevans)
+
 * Cache dataset returned by Dataset#invert for frozen datasets (jeremyevans)
 
 * Speed up repeated calls to Dataset#count with an argument or block for frozen datasets using a cached placeholder literalizer (jeremyevans)

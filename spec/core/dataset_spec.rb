@@ -1499,8 +1499,12 @@ describe "Dataset#reverse" do
   end
 
   it "should reverse a previous ordering if no arguments are given" do
-    @dataset.order(:name).reverse.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
-    @dataset.order(Sequel.desc(:clumsy), :fool).reverse.sql.must_equal 'SELECT * FROM test ORDER BY clumsy ASC, fool DESC'
+    ds1 = @dataset.order(:name)
+    ds2 = @dataset.order(Sequel.desc(:clumsy), :fool)
+    3.times do
+      ds1.reverse.sql.must_equal 'SELECT * FROM test ORDER BY name DESC'
+      ds2.reverse.sql.must_equal 'SELECT * FROM test ORDER BY clumsy ASC, fool DESC'
+    end
   end
   
   it "should return an unordered dataset for a dataset with no order" do
