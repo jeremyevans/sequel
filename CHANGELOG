@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#{db,opts}= in the sequel_3_dataset_methods extension raise for frozen datasets (jeremyevans)
+
 * Speed up repeated calls to Dataset#{interval,range} for frozen datasets using a cached placeholder literalizer (jeremyevans)
 
 * Speed up repeated calls to Dataset#get with a single argument for frozen datasets using a cached placeholder literalizer (jeremyevans)

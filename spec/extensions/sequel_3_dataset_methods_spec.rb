@@ -65,6 +65,11 @@ describe "Dataset#db=" do
     ds.db.must_equal db2
     ds.db.wont_equal db
   end
+
+  it "should raise error for frozen datasets" do
+    ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
+    proc{ds.db = ds.db}.must_raise RuntimeError
+  end
 end
 
 describe "Dataset#opts=" do
@@ -75,6 +80,11 @@ describe "Dataset#opts=" do
     ds.opts = {}
     ds.sql.must_equal 'SELECT *'
     ds.opts.must_equal({})
+  end
+
+  it "should raise error for frozen datasets" do
+    ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
+    proc{ds.opts = {}}.must_raise RuntimeError
   end
 end
 

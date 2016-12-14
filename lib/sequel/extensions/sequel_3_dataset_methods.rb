@@ -27,12 +27,16 @@
 module Sequel
   module Sequel3DatasetMethods
     COMMA = Dataset::COMMA
-    # The database related to this dataset.  This is the Database instance that
-    # will execute all of this dataset's queries.
-    attr_writer :db
+    # Change the database for this dataset.
+    def db=(v)
+      raise_if_frozen!
+      @db = v
+      @cache = {}
+    end
 
-    # The hash of options for this dataset, keys are symbols.
+    # Change the options for this dataset.
     def opts=(v)
+      raise_if_frozen!
       @opts = v
       @cache = {}
     end
