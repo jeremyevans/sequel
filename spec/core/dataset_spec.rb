@@ -5117,6 +5117,13 @@ describe "Dataset mutation methods" do
     dsc.opts[:server].must_equal :a
     dsc.graph!(dsc, {:b=>:c}, :table_alias=>:foo).ungraphed!.opts[:graph].must_be_nil
   end
+
+  it "should clear the cache" do
+    ds = Sequel.mock[:a]
+    ds.columns
+    ds.send(:cache_set, :columns, [:a])
+    ds.select!(:foo, :bar).send(:cache_get, :columns).must_be_nil
+  end
 end
 
 describe "Dataset emulated complex expression operators" do

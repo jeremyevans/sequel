@@ -82,6 +82,7 @@ module Sequel
     def mutation_method(meth, *args, &block)
       raise_if_frozen!
       @opts = send(meth, *args, &block).opts
+      @cache = {}
       self
     end
 
