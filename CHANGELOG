@@ -1,5 +1,7 @@
 === HEAD
 
+* Make looser_typecasting extension handle the strict BigDecimal parsing introduced in ruby 2.4rc1 (jeremyevans)
+
 * Make Database#{db,opts}= in the sequel_3_dataset_methods extension raise for frozen datasets (jeremyevans)
 
 * Speed up repeated calls to Dataset#{interval,range} for frozen datasets using a cached placeholder literalizer (jeremyevans)

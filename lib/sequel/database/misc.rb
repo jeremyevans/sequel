@@ -430,15 +430,15 @@ module Sequel
     def typecast_value_datetime(value)
       Sequel.typecast_to_application_timestamp(value)
     end
-
-    # Typecast the value to a BigDecimal
-    def typecast_value_decimal(value)
-      case value
-      when BigDecimal
-        value
-      when Numeric
-        BigDecimal.new(value.to_s)
-      when String
+    
+    if RUBY_VERSION >= '2.4'
+      # Typecast a string to a BigDecimal
+      def _typecast_value_string_to_decimal(value)
+        BigDecimal.new(value)
+      end
+    else
+      # :nocov:
+      def _typecast_value_string_to_decimal(value)
         d = BigDecimal.new(value)
         if d.zero?
           # BigDecimal parsing is loose by default, returning a 0 value for
@@ -451,6 +451,19 @@ module Sequel
           end
         end
         d
+      end
+      # :nocov:
+    end
+
+    # Typecast the value to a BigDecimal
+    def typecast_value_decimal(value)
+      case value
+      when BigDecimal
+        value
+      when Numeric
+        BigDecimal.new(value.to_s)
+      when String
+        _typecast_value_string_to_decimal(value)
       else
         raise InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
       end
