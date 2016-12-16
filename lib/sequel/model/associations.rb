@@ -2707,7 +2707,7 @@ END
         def ungraphed
           ds = super.clone(:eager_graph=>nil)
           if (eg = @opts[:eager_graph]) && (rp = eg[:row_proc])
-            ds.row_proc = rp
+            ds = ds.with_row_proc(rp)
           end
           ds
         end

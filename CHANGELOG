@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#ungraphed work on a frozen model dataset (jeremyevans)
+
 * Add Dataset#with_{autoid,fetch,numrows} to the mock adapter, returning cloned datasets with the setting changed (jeremyevans)
 
 * Make looser_typecasting extension handle the strict BigDecimal parsing introduced in ruby 2.4rc1 (jeremyevans)
