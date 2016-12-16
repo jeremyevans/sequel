@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Model#set_server work when using a frozen model dataset (jeremyevans)
+
 * Make Dataset#ungraphed work on a frozen model dataset (jeremyevans)
 
 * Add Dataset#with_{autoid,fetch,numrows} to the mock adapter, returning cloned datasets with the setting changed (jeremyevans)

@@ -1814,7 +1814,7 @@ module Sequel
       # Set the shard that this object is tied to.  Returns self.
       def set_server(s)
         @server = s
-        @this.opts[:server] = s if @this
+        @this = @this.server(s) if @this
         self
       end
 
