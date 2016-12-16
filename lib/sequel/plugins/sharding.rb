@@ -111,7 +111,7 @@ module Sequel
         def server(s)
           ds = super
           if rp = row_proc
-            ds.row_proc = proc{|r| rp.call(r).set_server(s)}
+            ds = ds.with_row_proc(proc{|r| rp.call(r).set_server(s)})
           end
           ds
         end
