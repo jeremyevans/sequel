@@ -1,5 +1,7 @@
 === HEAD
 
+* Have Dataset#nullify in the null_dataset extension work on frozen datasets (jeremyevans)
+
 * Make Model#set_server work when using a frozen model dataset (jeremyevans)
 
 * Make Dataset#ungraphed work on a frozen model dataset (jeremyevans)
