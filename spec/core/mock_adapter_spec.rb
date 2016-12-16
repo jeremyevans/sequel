@@ -150,13 +150,13 @@ describe "Sequel Mock Adapter" do
     proc{db[:t].all}.must_raise(Sequel::DatabaseError)
   end
 
-  it "should be able to set the rows returned by each on a per dataset basis using _fetch" do
+  it "should be able to set the rows returned by each on a per dataset basis using with_fetch" do
     rs = []
     db = Sequel.mock(:fetch=>{:a=>1})
     ds = db[:t]
     ds.each{|r| rs << r}
     rs.must_equal [{:a=>1}]
-    ds._fetch = {:b=>2}
+    ds = ds.with_fetch(:b=>2)
     ds.each{|r| rs << r}
     rs.must_equal [{:a=>1}, {:b=>2}]
   end
@@ -223,7 +223,7 @@ describe "Sequel Mock Adapter" do
     ds = db[:t]
     ds.update(:a=>1).must_equal 2
     ds.delete.must_equal 2
-    ds.numrows = 3
+    ds = ds.with_numrows(3)
     ds.update(:a=>1).must_equal 3
     ds.delete.must_equal 3
   end
@@ -289,7 +289,7 @@ describe "Sequel Mock Adapter" do
     db = Sequel.mock(:autoid=>1)
     ds = db[:t]
     ds.insert(:a=>1).must_equal 1
-    ds.autoid = 5
+    ds = ds.with_autoid(5)
     ds.insert(:a=>1).must_equal 5
     ds.insert(:a=>1).must_equal 6
     db[:t].insert(:a=>1).must_equal 2

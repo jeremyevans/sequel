@@ -136,7 +136,7 @@ module Sequel
         case v
         when Integer
           if ds
-            ds.autoid += 1 if ds.autoid.is_a?(Integer)
+            ds.send(:cache_set, :autoid, ds.autoid + 1) if ds.autoid.is_a?(Integer)
           else
             @autoid += 1
           end
@@ -305,14 +305,38 @@ module Sequel
     class Dataset < Sequel::Dataset
       Database::DatasetClass = self
 
+      # The autoid setting for this dataset, if it has been overridden
+      def autoid
+        cache_get(:autoid) || @opts[:autoid]
+      end
+
       # Override the databases's autoid setting for this dataset
-      attr_accessor :autoid
+      def autoid=(v)
+        cache_set(:autoid, nil)
+        @opts[:autoid] = v
+      end
+
+      # The fetch setting for this dataset, if it has been overridden
+      def _fetch
+        cache_get(:fetch) || @opts[:fetch]
+      end
 
       # Override the databases's fetch setting for this dataset
-      attr_accessor :_fetch
+      def _fetch=(v)
+        cache_set(:fetch, nil)
+        @opts[:fetch] = v
+      end
+
+      # The numrows setting for this dataset, if it has been overridden
+      def numrows
+        cache_get(:numrows) || @opts[:numrows]
+      end
 
       # Override the databases's numrows setting for this dataset
-      attr_accessor :numrows
+      def numrows=(v)
+        cache_set(:numrows, nil)
+        @opts[:numrows] = v
+      end
 
       # If arguments are provided, use them to set the columns
       # for this dataset and return self.  Otherwise, use the
@@ -332,6 +356,21 @@ module Sequel
 
       def quote_identifiers?
         @opts.fetch(:quote_identifiers, db.send(:quote_identifiers_default))
+      end
+
+      # Return cloned dataset with the autoid setting modified
+      def with_autoid(autoid)
+        clone(:autoid=>autoid)
+      end
+
+      # Return cloned dataset with the fetch setting modified
+      def with_fetch(fetch)
+        clone(:fetch=>fetch)
+      end
+
+      # Return cloned dataset with the numrows setting modified
+      def with_numrows(numrows)
+        clone(:numrows=>numrows)
       end
 
       private
