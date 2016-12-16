@@ -342,6 +342,7 @@ module Sequel
         @cache = {}
       end
     end
+    alias initialize_clone initialize_copy
 
     # Internal recursive version of unqualified_column_for, handling Strings inside
     # of other objects.
