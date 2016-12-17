@@ -20,25 +20,15 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph_each should handle graph using currently selected columns as the basis for the selected columns in a new graph" do
-    ds = @ds1.select(:id).graph(@ds2, :x=>:id)
-    ds._fetch = {:id=>1, :lines_id=>2, :x=>3, :y=>4, :graph_id=>5}
-    ds.all.must_equal [{:points=>{:id=>1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+    @ds1.select(:id).graph(@ds2, :x=>:id).with_fetch(:id=>1, :lines_id=>2, :x=>3, :y=>4, :graph_id=>5).all.must_equal [{:points=>{:id=>1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
 
-    ds = @ds1.select(:id, :x).graph(@ds2, :x=>:id)
-    ds._fetch = {:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5}
-    ds.all.must_equal [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+    @ds1.select(:id, :x).graph(@ds2, :x=>:id).with_fetch(:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5).all.must_equal [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
 
-    ds = @ds1.select(Sequel.identifier(:id), Sequel.qualify(:points, :x)).graph(@ds2, :x=>:id)
-    ds._fetch = {:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5}
-    ds.all.must_equal [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+    @ds1.select(Sequel.identifier(:id), Sequel.qualify(:points, :x)).graph(@ds2, :x=>:id).with_fetch(:id=>1, :x=>-1, :lines_id=>2, :lines_x=>3, :y=>4, :graph_id=>5).all.must_equal [{:points=>{:id=>1, :x=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
 
-    ds = @ds1.select(Sequel.identifier(:id).qualify(:points), Sequel.identifier(:x).as(:y)).graph(@ds2, :x=>:id)
-    ds._fetch = {:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5}
-    ds.all.must_equal [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+    @ds1.select(Sequel.identifier(:id).qualify(:points), Sequel.identifier(:x).as(:y)).graph(@ds2, :x=>:id).with_fetch(:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5).all.must_equal [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
 
-    ds = @ds1.select(:id, Sequel.identifier(:x).qualify(Sequel.identifier(:points)).as(Sequel.identifier(:y))).graph(@ds2, :x=>:id)
-    ds._fetch = {:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5}
-    ds.all.must_equal [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
+    @ds1.select(:id, Sequel.identifier(:x).qualify(Sequel.identifier(:points)).as(Sequel.identifier(:y))).graph(@ds2, :x=>:id).with_fetch(:id=>1, :y=>-1, :lines_id=>2, :x=>3, :lines_y=>4, :graph_id=>5).all.must_equal [{:points=>{:id=>1, :y=>-1}, :lines=>{:id=>2, :x=>3, :y=>4, :graph_id=>5}}]
   end
 
   it "#graph_each should split the result set into component tables" do
@@ -111,10 +101,8 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph_each should run the row_proc for graphed datasets" do
-    @ds1.row_proc = proc{|h| h.keys.each{|k| h[k] *= 2}; h}
-    @ds2.row_proc = proc{|h| h.keys.each{|k| h[k] *= 3}; h}
     @db.fetch = {:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}
-    @ds1.graph(@ds2, :x=>:id).all.must_equal [{:points=>{:id=>2, :x=>4, :y=>6}, :lines=>{:id=>12, :x=>15, :y=>18, :graph_id=>21}}]
+    @ds1.with_row_proc(proc{|h| h.keys.each{|k| h[k] *= 2}; h}).graph(@ds2.with_row_proc(proc{|h| h.keys.each{|k| h[k] *= 3}; h}), :x=>:id).all.must_equal [{:points=>{:id=>2, :x=>4, :y=>6}, :lines=>{:id=>12, :x=>15, :y=>18, :graph_id=>21}}]
   end
 
   it "#with_sql_each should work normally if the dataset is not graphed" do

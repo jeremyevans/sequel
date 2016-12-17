@@ -326,7 +326,7 @@ describe "NestedAttributes plugin" do
     ar.set(:albums_attributes=>[{:id=>10, :_remove=>'t'}])
     ar.associations[:albums].must_equal []
     @db.sqls.must_equal []
-    @Album.dataset._fetch = {:id=>1}
+    @Album.dataset = @Album.dataset.with_fetch(:id=>1)
     ar.save
     check_sql_array("SELECT 1 AS one FROM albums WHERE ((albums.artist_id = 20) AND (id = 10)) LIMIT 1",
       ["UPDATE albums SET artist_id = NULL, name = 'Al' WHERE (id = 10)", "UPDATE albums SET name = 'Al', artist_id = NULL WHERE (id = 10)"],
@@ -350,7 +350,7 @@ describe "NestedAttributes plugin" do
     ar.associations[:concerts] = [co]
     ar.set(:concerts_attributes=>[{:tour=>'To', :date=>'2004-04-05', :_remove=>'t'}])
     @db.sqls.must_equal []
-    @Concert.dataset._fetch = {:id=>1}
+    @Concert.dataset = @Concert.dataset.with_fetch(:id=>1)
     ar.save
     check_sql_array(["SELECT 1 AS one FROM concerts WHERE ((concerts.artist_id = 10) AND (tour = 'To') AND (date = '2004-04-05')) LIMIT 1", "SELECT 1 AS one FROM concerts WHERE ((concerts.artist_id = 10) AND (date = '2004-04-05') AND (tour = 'To')) LIMIT 1"],
       ["UPDATE concerts SET artist_id = NULL, playlist = 'Pl' WHERE ((tour = 'To') AND (date = '2004-04-05'))", "UPDATE concerts SET playlist = 'Pl', artist_id = NULL WHERE ((tour = 'To') AND (date = '2004-04-05'))", "UPDATE concerts SET artist_id = NULL, playlist = 'Pl' WHERE ((date = '2004-04-05') AND (tour = 'To'))", "UPDATE concerts SET playlist = 'Pl', artist_id = NULL WHERE ((date = '2004-04-05') AND (tour = 'To'))"],

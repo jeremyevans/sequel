@@ -16,7 +16,6 @@ describe "Sequel::Plugins::Timestamps" do
       def _save_refresh(*) end
       db.reset
     end
-    @c.dataset.autoid = nil
   end 
   after do
     Sequel.datetime_class = Time

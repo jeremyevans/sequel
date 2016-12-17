@@ -3,21 +3,18 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "sharding plugin" do
   before do
     @db = Sequel.mock(:numrows=>1, :autoid=>proc{1}, :servers=>{:s1=>{}, :s2=>{}, :s3=>{}, :s4=>{}})
-    @Artist = Class.new(Sequel::Model(@db[:artists]))
+    @Artist = Class.new(Sequel::Model(@db[:artists].with_fetch(:id=>2, :name=>'YJM')))
     @Artist.class_eval do
-      instance_dataset._fetch = dataset._fetch = {:id=>2, :name=>'YJM'}
       columns :id, :name
       plugin :sharding
     end
-    @Album = Class.new(Sequel::Model(@db[:albums]))
+    @Album = Class.new(Sequel::Model(@db[:albums].with_fetch(:id=>1, :name=>'RF', :artist_id=>2)))
     @Album.class_eval do
-      instance_dataset._fetch = dataset._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
       columns :id, :artist_id, :name
       plugin :sharding
     end
-    @Tag = Class.new(Sequel::Model(@db[:tags]))
+    @Tag = Class.new(Sequel::Model(@db[:tags].with_fetch(:id=>3, :name=>'M')))
     @Tag.class_eval do
-      instance_dataset._fetch = dataset._fetch = {:id=>3, :name=>'M'}
       columns :id, :name
       plugin :sharding
     end
@@ -67,7 +64,7 @@ describe "sharding plugin" do
   end 
 
   it "should not use current dataset's shard when eager loading if eagerly loaded dataset has its own shard" do
-    @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
+    @Artist.dataset = @Artist.dataset.server(:s2)
     albums = @Album.server(:s1).eager(:artist).all
     @db.sqls.must_equal ["SELECT * FROM albums -- s1", "SELECT * FROM artists WHERE (artists.id IN (2)) -- s2"]
     albums.length.must_equal 1
@@ -76,9 +73,7 @@ describe "sharding plugin" do
   end 
 
   it "should use current dataset's shard when eager graphing if eagerly graphed dataset doesn't have its own shard" do
-    ds = @Album.server(:s1).eager_graph(:artist)
-    ds._fetch = {:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'}
-    albums = ds.all
+    albums = @Album.server(:s1).eager_graph(:artist).with_fetch(:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM').all
     @db.sqls.must_equal ["SELECT albums.id, albums.artist_id, albums.name, artist.id AS artist_id_0, artist.name AS artist_name FROM albums LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id) -- s1"]
     albums.length.must_equal 1
     albums.first.artist.save
@@ -86,10 +81,8 @@ describe "sharding plugin" do
   end 
 
   it "should not use current dataset's shard when eager graphing if eagerly graphed dataset has its own shard" do
-    @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
-    ds = @Album.server(:s1).eager_graph(:artist)
-    ds._fetch = {:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'}
-    albums = ds.all
+    @Artist.dataset = @Artist.dataset.server(:s2)
+    albums = @Album.server(:s1).eager_graph(:artist).with_fetch(:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM').all
     @db.sqls.must_equal ["SELECT albums.id, albums.artist_id, albums.name, artist.id AS artist_id_0, artist.name AS artist_name FROM albums LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id) -- s1"]
     albums.length.must_equal 1
     albums.first.artist.save
@@ -97,10 +90,8 @@ describe "sharding plugin" do
   end 
 
   it "should use eagerly graphed dataset shard for eagerly graphed objects even if current dataset does not have a shard" do
-    @Artist.instance_dataset.opts[:server] = @Artist.dataset.opts[:server] = :s2
-    ds = @Album.eager_graph(:artist)
-    ds._fetch = {:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'}
-    albums = ds.all
+    @Artist.dataset = @Artist.dataset.server(:s2)
+    albums = @Album.eager_graph(:artist).with_fetch(:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM').all
     @db.sqls.must_equal ["SELECT albums.id, albums.artist_id, albums.name, artist.id AS artist_id_0, artist.name AS artist_name FROM albums LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id)"]
     albums.length.must_equal 1
     albums.first.artist.save

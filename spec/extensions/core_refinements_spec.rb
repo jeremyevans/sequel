@@ -7,13 +7,14 @@ using Sequel::CoreRefinements
 describe "Core refinements" do
   before do
     db = Sequel.mock
-    @d = db[:items]
-    def @d.supports_regexp?; true end
-    def @d.l(*args, &block)
-      literal(filter_expr(*args, &block))
-    end
-    def @d.lit(*args)
-      literal(*args)
+    @d = db[:items].with_extend do
+      def supports_regexp?; true end
+      def l(*args, &block)
+        literal(filter_expr(*args, &block))
+      end
+      def lit(*args)
+        literal(*args)
+      end
     end
   end
   
@@ -283,11 +284,7 @@ end
 
 describe "Column references" do
   before do
-    @ds = Sequel.mock.dataset
-    def @ds.quoted_identifier_append(sql, c)
-      sql << "`#{c}`"
-    end
-    @ds.quote_identifiers = true
+    @ds = Sequel.mock.dataset.with_quote_identifiers(true).with_extend{def quoted_identifier_append(sql, c) sql << "`#{c}`" end}
   end
   
   it "should be quoted properly" do

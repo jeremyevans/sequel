@@ -64,7 +64,7 @@ describe Sequel::Model, ".restricted_columns " do
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.must_equal(:x => 4, :y => 5)
 
-    @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 7}
+    @c.dataset = @c.dataset.with_fetch(:x => 7)
     i = @c.new
     i.update(:x => 7, :z => 9)
     i.values.must_equal(:x => 7)
@@ -79,7 +79,7 @@ describe Sequel::Model, ".restricted_columns " do
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.must_equal(:x => 4, :y => 5)
 
-    @c.instance_dataset._fetch = @c.dataset._fetch = {:y => 7}
+    @c.dataset = @c.dataset.with_fetch(:y => 7)
     i = @c.new
     i.update(:y => 7, :z => 9)
     i.values.must_equal(:y => 7)

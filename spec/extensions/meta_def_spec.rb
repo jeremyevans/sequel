@@ -11,9 +11,14 @@ describe "Sequel::Metaprogramming" do
     o = Sequel::Database.new
     o.meta_def(:foo){4}
     o.foo.must_equal 4
+    
     o = o[:a]
-    o.meta_def(:foo){5}
-    o.foo.must_equal 5
+    # SEQUEL5: Remove
+    unless o.frozen?
+      o.meta_def(:foo){5}
+      o.foo.must_equal 5
+    end
+
     o = Sequel::Model.new
     o.meta_def(:foo){6}
     o.foo.must_equal 6

@@ -4,11 +4,12 @@ describe "Sequel::Plugins::SkipCreateRefresh" do
   it "should skip the refresh after saving a new object" do
     c = Class.new(Sequel::Model(:a))
     c.columns :id, :x
+    c.dataset = c.dataset.with_autoid(2)
     c.db.reset
-    c.instance_dataset.meta_def(:insert){|*a| super(*a); 2}
     c.create(:x=>1)
     c.db.sqls.must_equal ['INSERT INTO a (x) VALUES (1)', 'SELECT * FROM a WHERE (id = 2) LIMIT 1']
 
+    c.dataset = c.dataset.with_autoid(2)
     c.plugin :skip_create_refresh
     c.db.reset
     c.create(:x=>3).values.must_equal(:id=>2, :x=>3)

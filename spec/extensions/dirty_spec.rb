@@ -155,8 +155,10 @@ describe "Sequel::Plugins::Dirty" do
     end
 
     it "save_changes should clear the cached initial values" do
-      def (@c.instance_dataset).supports_insert_select?() true end
-      def (@c.instance_dataset).insert_select(*) {:id=>1} end
+      @c.dataset = @c.dataset.with_extend do
+        def supports_insert_select?; true end
+        def insert_select(*) {:id=>1} end
+      end
       @o.save
       @o.column_changes.must_equal({})
     end

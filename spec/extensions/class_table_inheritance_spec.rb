@@ -79,7 +79,7 @@ describe "class_table_inheritance plugin" do
   
   it "should have working row_proc if using set_dataset in subclass to remove columns" do
     Manager.set_dataset(Manager.dataset.select(*(Manager.columns - [:blah])))
-    Manager.dataset._fetch = {:id=>1, :kind=>'Ceo'}
+    Manager.dataset = Manager.dataset.with_fetch(:id=>1, :kind=>'Ceo')
     Manager[1].must_equal Ceo.load(:id=>1, :kind=>'Ceo')
   end
 
@@ -92,18 +92,16 @@ describe "class_table_inheritance plugin" do
   end
   
   it "should return rows with the correct class based on the polymorphic_key value" do
-    @ds._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}]
-    Employee.all.collect{|x| x.class}.must_equal [Employee, Manager, Executive, Ceo, Staff]
+    @ds.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}]).all.collect{|x| x.class}.must_equal [Employee, Manager, Executive, Ceo, Staff]
   end 
   
   it "should return rows with the correct class based on the polymorphic_key value for subclasses" do
-    Manager.dataset._fetch = [{:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}]
-    Manager.all.collect{|x| x.class}.must_equal [Manager, Executive, Ceo]
+    Manager.dataset.with_fetch([{:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}]).all.collect{|x| x.class}.must_equal [Manager, Executive, Ceo]
   end
   
   it "should have refresh return all columns in subclass after loading from superclass" do
-    Employee.dataset._fetch = [{:id=>1, :name=>'A', :kind=>'Ceo'}]
-    Ceo.instance_dataset._fetch = [{:id=>1, :name=>'A', :kind=>'Ceo', :num_staff=>3, :num_managers=>2}]
+    Employee.dataset = Employee.dataset.with_fetch([{:id=>1, :name=>'A', :kind=>'Ceo'}])
+    Ceo.dataset = Ceo.dataset.with_fetch([{:id=>1, :name=>'A', :kind=>'Ceo', :num_staff=>3, :num_managers=>2}])
     a = Employee.first
     a.class.must_equal Ceo
     a.values.must_equal(:id=>1, :name=>'A', :kind=>'Ceo')
@@ -114,8 +112,7 @@ describe "class_table_inheritance plugin" do
   
   it "should return rows with the current class if cti_key is nil" do
     Employee.plugin(:class_table_inheritance)
-    Employee.dataset._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}]
-    Employee.all.collect{|x| x.class}.must_equal [Employee, Employee, Employee, Employee, Employee]
+    Employee.dataset.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Staff'}]).all.map{|x| x.class}.must_equal [Employee, Employee, Employee, Employee, Employee]
   end
   
   it "should return rows with the current class if cti_key is nil in subclasses" do
@@ -124,8 +121,7 @@ describe "class_table_inheritance plugin" do
     Object.send(:remove_const, :Manager)
     class ::Manager < Employee; end 
     class ::Executive < Manager; end 
-    Manager.dataset._fetch = [{:kind=>'Manager'}, {:kind=>'Executive'}]
-    Manager.all.collect{|x| x.class}.must_equal [Manager, Manager]
+    Manager.dataset.with_fetch([{:kind=>'Manager'}, {:kind=>'Executive'}]).all.map{|x| x.class}.must_equal [Manager, Manager]
   end
   
   it "should handle a model map with integer values" do
@@ -136,20 +132,18 @@ describe "class_table_inheritance plugin" do
     class ::Manager < Employee; end 
     class ::Executive < Manager; end 
     class ::Ceo < Executive; end 
-    Employee.dataset._fetch = [{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}, {:kind=>3}]
+    Employee.dataset = Employee.dataset.with_fetch([{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}, {:kind=>3}])
     Employee.all.collect{|x| x.class}.must_equal [Employee, Employee, Manager, Executive, Ceo]
-    Manager.dataset._fetch = [{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}, {:kind=>3}]
+    Manager.dataset = Manager.dataset.with_fetch([{:kind=>nil},{:kind=>0},{:kind=>1}, {:kind=>2}, {:kind=>3}])
     Manager.all.collect{|x| x.class}.must_equal [Manager, Employee, Manager, Executive, Ceo]
   end
   
   it "should fallback to the main class if the given class does not exist" do
-    @ds._fetch = [{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Blah'}, {:kind=>'Staff'}]
-    Employee.all.collect{|x| x.class}.must_equal [Employee, Manager, Employee, Staff]
+    @ds.with_fetch([{:kind=>'Employee'}, {:kind=>'Manager'}, {:kind=>'Blah'}, {:kind=>'Staff'}]).all.map{|x| x.class}.must_equal [Employee, Manager, Employee, Staff]
   end
   
   it "should fallback to the main class if the given class does not exist in subclasses" do
-    Manager.dataset._fetch = [{:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Blah'}]
-    Manager.all.collect{|x| x.class}.must_equal [Manager, Executive, Ceo, Manager]
+    Manager.dataset.with_fetch([{:kind=>'Manager'}, {:kind=>'Executive'}, {:kind=>'Ceo'}, {:kind=>'Blah'}]).all.map{|x| x.class}.must_equal [Manager, Executive, Ceo, Manager]
   end
 
   it "should sets the model class name for the key when creating new parent class records" do
@@ -194,7 +188,7 @@ describe "class_table_inheritance plugin" do
   end
 
   it "should lazily load attributes for columns in subclass tables" do
-    Manager.instance_dataset._fetch = Manager.dataset._fetch = {:id=>1, :name=>'J', :kind=>'Ceo', :num_staff=>2}
+    Manager.dataset = Manager.dataset.with_fetch(:id=>1, :name=>'J', :kind=>'Ceo', :num_staff=>2)
     m = Manager[1]
     @db.sqls.must_equal ['SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 1) LIMIT 1']
     @db.fetch = {:num_managers=>3}
@@ -205,8 +199,8 @@ describe "class_table_inheritance plugin" do
   end
 
   it "should lazily load columns in middle classes correctly when loaded from parent class" do
-    Employee.dataset._fetch = {:id=>1, :kind=>'Ceo'}
-    Manager.dataset._fetch = {:num_staff=>2}
+    Employee.dataset = Employee.dataset.with_fetch(:id=>1, :kind=>'Ceo')
+    @db.fetch = [[:num_staff=>2]]
     e = Employee[1]
     e.must_be_kind_of(Ceo)
     @db.sqls.must_equal ["SELECT * FROM employees WHERE (id = 1) LIMIT 1"]
@@ -215,9 +209,8 @@ describe "class_table_inheritance plugin" do
   end
 
   it "should eagerly load lazily columns in subclasses when loaded from parent class" do
-    Employee.dataset._fetch = {:id=>1, :kind=>'Ceo'}
-    Manager.dataset._fetch = {:id=>1, :num_staff=>2}
-    @db.fetch = {:id=>1, :num_managers=>3}
+    Employee.dataset = Employee.dataset.with_fetch(:id=>1, :kind=>'Ceo')
+    @db.fetch = [[{:id=>1, :num_staff=>2}], [{:id=>1, :num_managers=>3}]]
     e = Employee.all.first
     e.must_be_kind_of(Ceo)
     @db.sqls.must_equal ["SELECT * FROM employees"]
@@ -267,13 +260,15 @@ describe "class_table_inheritance plugin" do
     sqls[2].must_match(/INSERT INTO executives \((num_managers|id), (num_managers|id)\) VALUES \([13], [13]\)/)
   end
     
-  it "should insert the correct rows into all tables when inserting when insert select is important" do
-    [Ceo, Manager, Employee].each do |klass|
-      def (klass.cti_instance_dataset).supports_insert_select?; true; end
-      def (klass.cti_instance_dataset).insert_select(v)
-        db.run(insert_sql(v) + " RETURNING *")
-        v.merge(:id=>1)
-      end
+  it "should insert the correct rows into all tables when inserting when insert_select is supported" do
+    [Executive, Manager, Employee].each do |klass|
+      klass.instance_variable_set(:@cti_instance_dataset, klass.cti_instance_dataset.with_extend do
+        def supports_insert_select?; true; end
+        def insert_select(v)
+          db.run(insert_sql(v) + " RETURNING *")
+          v.merge(:id=>1)
+        end
+      end)
     end
     Ceo.create(:num_managers=>3, :num_staff=>2, :name=>'E')
     sqls = @db.sqls
@@ -300,13 +295,13 @@ describe "class_table_inheritance plugin" do
   end
 
   it "should handle many_to_one relationships correctly" do
-    Manager.dataset._fetch = {:id=>3, :name=>'E', :kind=>'Ceo', :num_managers=>3}
+    Manager.dataset = Manager.dataset.with_fetch(:id=>3, :name=>'E', :kind=>'Ceo', :num_managers=>3)
     Staff.load(:manager_id=>3).manager.must_equal Ceo.load(:id=>3, :name=>'E', :kind=>'Ceo', :num_managers=>3)
     @db.sqls.must_equal ['SELECT employees.id, employees.name, employees.kind, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 3) LIMIT 1']
   end
   
   it "should handle one_to_many relationships correctly" do
-    Staff.dataset._fetch = {:id=>1, :name=>'S', :kind=>'Staff', :manager_id=>3}
+    Staff.dataset = Staff.dataset.with_fetch(:id=>1, :name=>'S', :kind=>'Staff', :manager_id=>3)
     Ceo.load(:id=>3).staff_members.must_equal [Staff.load(:id=>1, :name=>'S', :kind=>'Staff', :manager_id=>3)]
     @db.sqls.must_equal ['SELECT employees.id, employees.name, employees.kind, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id) WHERE (staff.manager_id = 3)']
   end
@@ -368,7 +363,7 @@ describe "class_table_inheritance plugin without sti_key" do
   
   it "should have working row_proc if using set_dataset in subclass to remove columns" do
     Manager.set_dataset(Manager.dataset.select(*(Manager.columns - [:blah])))
-    Manager.dataset._fetch = {:id=>1}
+    Manager.dataset = Manager.dataset.with_fetch(:id=>1)
     Manager[1].must_equal Manager.load(:id=>1)
   end
 
@@ -381,7 +376,7 @@ describe "class_table_inheritance plugin without sti_key" do
   
   it "should return rows with the current class if cti_key is nil" do
     Employee.plugin(:class_table_inheritance)
-    Employee.dataset._fetch = [{}]
+    Employee.dataset = Employee.dataset.with_fetch([{}])
     Employee.first.class.must_equal Employee
   end
   
@@ -442,13 +437,13 @@ describe "class_table_inheritance plugin without sti_key" do
   end
 
   it "should handle many_to_one relationships correctly" do
-    Manager.dataset._fetch = {:id=>3, :name=>'E',  :num_staff=>3}
+    Manager.dataset = Manager.dataset.with_fetch(:id=>3, :name=>'E',  :num_staff=>3)
     Staff.load(:manager_id=>3).manager.must_equal Manager.load(:id=>3, :name=>'E', :num_staff=>3)
     @db.sqls.must_equal ['SELECT employees.id, employees.name, managers.num_staff FROM employees INNER JOIN managers ON (managers.id = employees.id) WHERE (managers.id = 3) LIMIT 1']
   end
   
   it "should handle one_to_many relationships correctly" do
-    Staff.dataset._fetch = {:id=>1, :name=>'S', :manager_id=>3}
+    Staff.dataset = Staff.dataset.with_fetch(:id=>1, :name=>'S', :manager_id=>3)
     Executive.load(:id=>3).staff_members.must_equal [Staff.load(:id=>1, :name=>'S', :manager_id=>3)]
     @db.sqls.must_equal ['SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id) WHERE (staff.manager_id = 3)']
   end

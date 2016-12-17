@@ -93,8 +93,7 @@ describe "Shared caching behavior" do
     end
 
     it "should not use a simple primary key lookup if the prepared_statements_associations method is being used" do
-      c2 = Class.new(Sequel::Model(@db[:not_caching_model]))
-      c2.dataset._fetch = {:id=>1}
+      c2 = Class.new(Sequel::Model(@db[:not_caching_model].with_fetch(:id=>1)))
       c = Class.new(Sequel::Model(@db[:lookup_model]))
       c.class_eval do
         plugin :prepared_statements_associations

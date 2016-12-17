@@ -3,12 +3,13 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 describe "Blockless Ruby Filters" do
   before do
     db = Sequel.mock
-    @d = db[:items]
-    def @d.l(*args, &block)
-      literal(filter_expr(*args, &block))
-    end
-    def @d.lit(*args)
-      literal(*args)
+    @d = db[:items].with_extend do
+      def l(*args, &block)
+        literal(filter_expr(*args, &block))
+      end
+      def lit(*args)
+        literal(*args)
+      end
     end
   end
   
@@ -62,7 +63,7 @@ describe "Blockless Ruby Filters" do
   end
 
   it "should use = 't' and != 't' OR IS NULL if IS TRUE is not supported" do
-    meta_def(@d, :supports_is_true?){false}
+    @d = @d.with_extend{def supports_is_true?; false end}
     @d.l(:x => true).must_equal "(x = 't')"
     @d.l(~Sequel.expr(:x => true)).must_equal "((x != 't') OR (x IS NULL))"
     @d.l(:x => false).must_equal "(x = 'f')"
@@ -94,7 +95,7 @@ describe "Blockless Ruby Filters" do
     @d.l{(x + y) =~ (1...5)}.must_equal '(((x + y) >= 1) AND ((x + y) < 5))'
     @d.l{(x + y) =~ [1,2,3]}.must_equal '((x + y) IN (1, 2, 3))'
 
-    def @d.supports_regexp?; true end
+    @d = @d.with_extend{def supports_regexp?; true end}
     @d.l{x =~ /blah/}.must_equal '(x ~ \'blah\')'
     @d.l{(x + y) =~ /blah/}.must_equal '((x + y) ~ \'blah\')'
   end
@@ -117,19 +118,19 @@ describe "Blockless Ruby Filters" do
       @d.l{(x + y) !~ (1...5)}.must_equal '(((x + y) < 1) OR ((x + y) >= 5))'
       @d.l{(x + y) !~ [1,2,3]}.must_equal '((x + y) NOT IN (1, 2, 3))'
 
-      def @d.supports_regexp?; true end
+      @d = @d.with_extend{def supports_regexp?; true end}
       @d.l{x !~ /blah/}.must_equal '(x !~ \'blah\')'
       @d.l{(x + y) !~ /blah/}.must_equal '((x + y) !~ \'blah\')'
     end
   end
   
   it "should support ~ via Hash and Regexp (if supported by database)" do
-    def @d.supports_regexp?; true end
+    @d = @d.with_extend{def supports_regexp?; true end}
     @d.l(:x => /blah/).must_equal '(x ~ \'blah\')'
   end
   
   it "should support !~ via inverted Hash and Regexp" do
-    def @d.supports_regexp?; true end
+    @d = @d.with_extend{def supports_regexp?; true end}
     @d.l(~Sequel.expr(:x => /blah/)).must_equal '(x !~ \'blah\')'
   end
   
@@ -265,7 +266,7 @@ describe "Blockless Ruby Filters" do
   end
   
   it "should emulate multiple column in if not supported" do
-    meta_def(@d, :supports_multiple_column_in?){false}
+    @d = @d.with_extend{def supports_multiple_column_in?; false end}
     @d.l([:x, :y]=>Sequel.value_list([[1,2], [3,4]])).must_equal '(((x = 1) AND (y = 2)) OR ((x = 3) AND (y = 4)))'
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).must_equal '(((x = 1) AND (y = 2) AND (z = 5)) OR ((x = 3) AND (y = 4) AND (z = 6)))'
   end
@@ -514,10 +515,11 @@ end
 
 describe Sequel::SQL::VirtualRow do
   before do
-    @d = Sequel.mock[:items].with_quote_identifiers(true)
-    meta_def(@d, :supports_window_functions?){true}
-    def @d.l(*args, &block)
-      literal(filter_expr(*args, &block))
+    @d = Sequel.mock[:items].with_quote_identifiers(true).with_extend do
+      def supports_window_functions?; true end
+      def l(*args, &block)
+        literal(filter_expr(*args, &block))
+      end
     end
   end
 
@@ -629,9 +631,7 @@ describe Sequel::SQL::VirtualRow do
   end
 
   it "should raise an error if window functions are not supported" do
-    class << @d; remove_method :supports_window_functions? end
-    meta_def(@d, :supports_window_functions?){false}
-    proc{@d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.must_raise(Sequel::Error)
+    proc{@d.with_extend{def supports_window_functions?; false end}.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.must_raise(Sequel::Error)
     proc{Sequel.mock.dataset.filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.must_raise(Sequel::Error)
   end
   
@@ -673,19 +673,19 @@ describe Sequel::SQL::VirtualRow do
   end
 
   it "should handle quoted function names" do
-    def @d.supports_quoted_function_names?; true; end
+    @d = @d.with_extend{def supports_quoted_function_names?; true end}
     @d.l{rank.function}.must_equal '"rank"()' 
     @d.l{sch__rank.function}.must_equal '"sch"."rank"()' 
   end
 
   it "should quote function names if a quoted function is used and database supports quoted function names" do
-    def @d.supports_quoted_function_names?; true; end
+    @d = @d.with_extend{def supports_quoted_function_names?; true end}
     @d.l{rank{}.quoted}.must_equal '"rank"()' 
     @d.l{sch__rank{}.quoted}.must_equal '"sch__rank"()' 
   end
 
   it "should not quote function names if an unquoted function is used" do
-    def @d.supports_quoted_function_names?; true; end
+    @d = @d.with_extend{def supports_quoted_function_names?; true end}
     @d.l{rank.function.unquoted}.must_equal 'rank()' 
     @d.l{sch__rank.function.unquoted}.must_equal 'sch.rank()' 
   end

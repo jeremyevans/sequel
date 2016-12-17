@@ -30,7 +30,7 @@ describe Sequel::Model, "single table inheritance plugin" do
     Object.send(:remove_const, :StiTestSub2)
     class ::StiTestSub1 < StiTest; end 
     class ::StiTestSub2 < StiTest; end 
-    StiTest.dataset._fetch = [{:blah=>'StiTest'}, {:blah=>'StiTestSub1'}, {:blah=>'StiTestSub2'}]
+    StiTest.dataset = StiTest.dataset.with_fetch([{:blah=>'StiTest'}, {:blah=>'StiTestSub1'}, {:blah=>'StiTestSub2'}])
     StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTestSub1, StiTestSub2]
     StiTest.dataset.sql.must_equal "SELECT * FROM sti_tests"
     StiTestSub1.dataset.sql.must_equal "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub1'))"
@@ -38,23 +38,23 @@ describe Sequel::Model, "single table inheritance plugin" do
   end 
   
   it "should return rows with the correct class based on the polymorphic_key value" do
-    @ds._fetch = [{:kind=>'StiTest'}, {:kind=>'StiTestSub1'}, {:kind=>'StiTestSub2'}]
+    StiTest.dataset = StiTest.dataset.with_fetch([{:kind=>'StiTest'}, {:kind=>'StiTestSub1'}, {:kind=>'StiTestSub2'}])
     StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTestSub1, StiTestSub2]
   end 
 
   it "should return rows with the correct class based on the polymorphic_key value when retreiving by primary key" do
-    @ds._fetch = [{:kind=>'StiTestSub1'}]
+    StiTest.dataset = StiTest.dataset.with_fetch([{:kind=>'StiTestSub1'}])
     StiTest[1].class.must_equal StiTestSub1
   end 
 
   it "should return rows with the correct class for subclasses based on the polymorphic_key value" do
     class ::StiTestSub1Sub < StiTestSub1; end 
-    StiTestSub1.dataset._fetch = [{:kind=>'StiTestSub1'}, {:kind=>'StiTestSub1Sub'}]
+    StiTestSub1.dataset = StiTestSub1.dataset.with_fetch([{:kind=>'StiTestSub1'}, {:kind=>'StiTestSub1Sub'}])
     StiTestSub1.all.collect{|x| x.class}.must_equal [StiTestSub1, StiTestSub1Sub]
   end 
 
   it "should fallback to the main class if the given class does not exist" do
-    @ds._fetch = {:kind=>'StiTestSub3'}
+    StiTest.dataset = StiTest.dataset.with_fetch(:kind=>'StiTestSub3')
     StiTest.all.collect{|x| x.class}.must_equal [StiTest]
   end
 
@@ -65,7 +65,7 @@ describe Sequel::Model, "single table inheritance plugin" do
       Object
     end
     StiTest.plugin :single_table_inheritance, :kind
-    StiTest.dataset._fetch = [{:kind=>''}, {:kind=>nil}]
+    StiTest.dataset = StiTest.dataset.with_fetch([{:kind=>''}, {:kind=>nil}])
     StiTest.all.collect{|x| x.class}.must_equal [StiTest, StiTest]
     called.must_equal false
   end
@@ -170,7 +170,7 @@ describe Sequel::Model, "single table inheritance plugin" do
         set_dataset(dataset.select(*(columns - [:blah])))
       end
       class ::StiTest4 < ::StiTest3; end
-      StiTest3.dataset._fetch = {:id=>1, :kind=>'StiTest4'}
+      StiTest3.dataset = StiTest3.dataset.with_fetch(:id=>1, :kind=>'StiTest4')
       StiTest3[1].must_equal StiTest4.load(:id=>1, :kind=>'StiTest4')
     end
 

@@ -57,7 +57,7 @@ describe "Model#save" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x, :y
     end
-    @c.instance_dataset.autoid = @c.dataset.autoid = 13
+    @c.dataset = @c.dataset.with_autoid(13)
     DB.reset
   end
   
@@ -69,16 +69,16 @@ describe "Model#save" do
 
   it "should raise if the object can't be refreshed after save" do
     o = @c.new(:x => 1)
-    @c.instance_dataset._fetch =@c.dataset._fetch = []
+    @c.dataset = @c.dataset.with_fetch([])
     proc{o.save}.must_raise(Sequel::NoExistingObject)
   end
 
   it "should use dataset's insert_select method if present" do
-    ds = @c.instance_dataset
-    ds._fetch = {:y=>2}
-    def ds.supports_insert_select?() true end
-    def ds.insert_select(hash)
-      with_sql_first("INSERT INTO items (y) VALUES (2) RETURNING *")
+    @c.dataset = @c.dataset.with_fetch(:y=>2).with_extend do
+      def supports_insert_select?; true end
+      def insert_select(hash)
+        with_sql_first("INSERT INTO items (y) VALUES (2) RETURNING *")
+      end
     end
     o = @c.new(:x => 1)
     o.save
@@ -88,21 +88,19 @@ describe "Model#save" do
   end
 
   it "should not use dataset's insert_select method if specific columns are selected" do
-    ds = @c.dataset = @c.dataset.select(:y)
-    def ds.insert_select(*) raise; end
+    ds = @c.dataset = @c.dataset.select(:y).with_extend{def insert_select(*) raise; end}
     @c.new(:x => 1).save
   end
 
   it "should use dataset's insert_select method if the dataset uses returning, even if specific columns are selected" do
-    def (@c.dataset).supports_returning?(_) true end
-    ds = @c.dataset = @c.dataset.select(:y).returning(:y)
+    ds = @c.dataset = @c.dataset.select(:y).with_fetch(:y=>2).with_extend do
+      def supports_returning?(_) true end
+      def supports_insert_select?; true end
+      def insert_select(hash)
+        with_sql_first("INSERT INTO items (y) VALUES (2) RETURNING y")
+      end
+    end.returning(:y)
     DB.reset
-    ds = @c.instance_dataset
-    ds._fetch = {:y=>2}
-    def ds.supports_insert_select?() true end
-    def ds.insert_select(hash)
-      with_sql_first("INSERT INTO items (y) VALUES (2) RETURNING y")
-    end
     o = @c.new(:x => 1)
     o.save
     
@@ -149,19 +147,19 @@ describe "Model#save" do
   end
   
   it "should raise a NoExistingObject exception if the dataset update call doesn't return 1, unless require_modification is false" do
+    i = 0
+    @c.dataset = @c.dataset.with_extend{define_method(:numrows){i}}
     o = @c.load(:id => 3, :x => 1)
-    t = o.this
-    t.numrows = 0
     proc{o.save}.must_raise(Sequel::NoExistingObject)
-    t.numrows = 2
+    i = 2
     proc{o.save}.must_raise(Sequel::NoExistingObject)
-    t.numrows = 1
+    i = 1
     o.save
     
     o.require_modification = false
-    t.numrows = 0
+    i = 0
     o.save
-    t.numrows = 2
+    i = 2
     o.save
   end
   
@@ -190,7 +188,7 @@ describe "Model#save" do
   end
   
   it "should mark all columns as not changed if this is a new record and insert_select was used" do
-    def (@c.dataset).insert_select(h) h.merge(:id=>1) end
+    ds = @c.dataset = @c.dataset.with_extend{def insert_select(h) h.merge(:id=>1) end}
     o = @c.new(:x => 1, :y => nil)
     o.x = 4
     o.changed_columns.must_equal [:x]
@@ -499,11 +497,13 @@ describe "Model#dup" do
   end
 
   it "should not copy frozen status" do
-    @o.freeze.dup.wont_be :frozen?
-    @o.freeze.dup.values.wont_be :frozen?
-    @o.freeze.dup.changed_columns.wont_be :frozen?
-    @o.freeze.dup.errors.wont_be :frozen?
-    @o.freeze.dup.this.wont_be :frozen?
+    this_frozen = @o.this.frozen?
+    d = @o.freeze.dup
+    d.wont_be :frozen?
+    d.values.wont_be :frozen?
+    d.changed_columns.wont_be :frozen?
+    d.errors.wont_be :frozen?
+    d.this.frozen?.must_equal this_frozen
   end
 end
 
@@ -1345,17 +1345,18 @@ describe Sequel::Model, "#destroy with filtered dataset" do
   end
 
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
-    def (@instance.this).execute_dui(*a) 0 end
+    i = 0
+    @model.dataset = @model.dataset.with_extend{define_method(:execute_dui){|*| i}}
     proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
-    def (@instance.this).execute_dui(*a) 2 end
+    i = 2
     proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
-    def (@instance.this).execute_dui(*a) 1 end
+    i = 1
     @instance.delete
     
     @instance.require_modification = false
-    def (@instance.this).execute_dui(*a) 0 end
+    i = 0
     @instance.delete
-    def (@instance.this).execute_dui(*a) 2 end
+    i = 2
     @instance.delete
   end
 
@@ -1379,17 +1380,18 @@ describe Sequel::Model, "#destroy" do
   end
   
   it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
-    def (@model.dataset).execute_dui(*a) 0 end
+    i = 0
+    @model.dataset = @model.dataset.with_extend{define_method(:execute_dui){|*| i}}
     proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
-    def (@model.dataset).execute_dui(*a) 2 end
+    i = 2
     proc{@instance.delete}.must_raise(Sequel::NoExistingObject)
-    def (@model.dataset).execute_dui(*a) 1 end
+    i = 1
     @instance.delete
     
     @instance.require_modification = false
-    def (@model.dataset).execute_dui(*a) 0 end
+    i = 0
     @instance.delete
-    def (@model.dataset).execute_dui(*a) 2 end
+    i = 2
     @instance.delete
   end
 
@@ -1428,7 +1430,7 @@ end
 describe Sequel::Model, "#exists?" do
   before do
     @model = Class.new(Sequel::Model(:items))
-    @model.instance_dataset._fetch = @model.dataset._fetch = proc{|sql| {:x=>1} if sql =~ /id = 1/}
+    @model.dataset = @model.dataset.with_fetch(proc{|sql| {:x=>1} if sql =~ /id = 1/})
     DB.reset
   end
 
@@ -1736,7 +1738,7 @@ describe Sequel::Model, "#refresh" do
   it "should reload the instance values from the database" do
     @m = @c.new(:id => 555)
     @m[:x] = 'blah'
-    @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 'kaboom', :id => 555}
+    @c.dataset = @c.dataset.with_fetch(:x => 'kaboom', :id => 555)
     @m.refresh
     @m[:x].must_equal 'kaboom'
     DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
@@ -1744,14 +1746,14 @@ describe Sequel::Model, "#refresh" do
   
   it "should raise if the instance is not found" do
     @m = @c.new(:id => 555)
-    @c.instance_dataset._fetch =@c.dataset._fetch = []
+    @c.dataset = @c.dataset.with_fetch([])
     proc {@m.refresh}.must_raise(Sequel::NoExistingObject)
     DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
   end
   
   it "should be aliased by #reload" do
     @m = @c.new(:id => 555)
-    @c.instance_dataset._fetch =@c.dataset._fetch = {:x => 'kaboom', :id => 555}
+    @c.dataset = @c.dataset.with_fetch(:x => 'kaboom', :id => 555)
     @m.reload
     @m[:x].must_equal 'kaboom'
     DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
@@ -2123,7 +2125,7 @@ describe "Model#lock!" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id
     end
-    @c.dataset._fetch = {:id=>1}
+    @c.dataset = @c.dataset.with_fetch(:id=>1)
     DB.reset
   end
   

@@ -2,9 +2,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "A paginated dataset" do
   before do
-    @d = Sequel.mock.dataset.extension(:pagination)
-    @d.meta_def(:count) {153}
-    
+    count = @count = [153]
+    @d = Sequel.mock.dataset.extension(:pagination).with_extend{define_method(:count){count.first}}
     @paginated = @d.paginate(1, 20)
   end
   
@@ -24,7 +23,7 @@ describe "A paginated dataset" do
     @paginated.page_count.must_equal 8
     @d.paginate(1, 50).page_count.must_equal 4
 
-    @d.meta_def(:count) {0}
+    @count[0] = 0
     @d.paginate(1, 50).page_count.must_equal 1
   end
   
@@ -67,7 +66,7 @@ describe "A paginated dataset" do
     @d.paginate(5, 30).last_page?.must_equal false
     @d.paginate(6, 30).last_page?.must_equal true
 
-    @d.meta_def(:count) {0}
+    @count[0] = 0
     @d.paginate(1, 30).last_page?.must_equal true
     @d.paginate(2, 30).last_page?.must_equal false
   end
@@ -80,15 +79,14 @@ describe "A paginated dataset" do
 
   it "should work with fixed sql" do
     ds = @d.clone(:sql => 'select * from blah')
-    ds.meta_def(:count) {150}
+    @count[0] = 150
     ds.paginate(2, 50).sql.must_equal 'SELECT * FROM (select * from blah) AS t1 LIMIT 50 OFFSET 50'
   end
 end
 
 describe "Dataset#each_page" do
   before do
-    @d = Sequel.mock.dataset.from(:items).extension(:pagination)
-    @d.meta_def(:count) {153}
+    @d = Sequel.mock[:items].extension(:pagination).with_extend{def count; 153 end}
   end
   
   it "should raise an error if the dataset already has a limit" do

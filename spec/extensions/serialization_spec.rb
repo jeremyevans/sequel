@@ -94,7 +94,7 @@ describe "Serialization plugin" do
   it "should translate values to and from yaml serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
-    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
 
     o = @c.first
     o.id.must_equal 1
@@ -114,7 +114,7 @@ describe "Serialization plugin" do
   it "should translate values to and from marshal serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :marshal, :abc, :def
-    @c.dataset._fetch = [:id => 1, :abc =>[Marshal.dump(1)].pack('m'), :def =>[Marshal.dump('hello')].pack('m')]
+    @c.dataset = @c.dataset.with_fetch([:id => 1, :abc =>[Marshal.dump(1)].pack('m'), :def =>[Marshal.dump('hello')].pack('m')])
 
     o = @c.first
     o.id.must_equal 1
@@ -134,7 +134,7 @@ describe "Serialization plugin" do
   it "should handle old non-base-64 encoded marshal serialization format" do
     @c.set_primary_key :id
     @c.plugin :serialization, :marshal, :abc, :def
-    @c.dataset._fetch = [:id => 1, :abc =>Marshal.dump(1), :def =>Marshal.dump('hello')]
+    @c.dataset = @c.dataset.with_fetch([:id => 1, :abc =>Marshal.dump(1), :def =>Marshal.dump('hello')])
 
     o = @c.first
     o.abc.must_equal 1
@@ -144,7 +144,7 @@ describe "Serialization plugin" do
   it "should raise exception for bad marshal data" do
     @c.set_primary_key :id
     @c.plugin :serialization, :marshal, :abc, :def
-    @c.dataset._fetch = [:id => 1, :abc =>'foo', :def =>'bar']
+    @c.dataset = @c.dataset.with_fetch([:id => 1, :abc =>'foo', :def =>'bar'])
 
     o = @c.first
     proc{o.abc}.must_raise TypeError, ArgumentError
@@ -154,7 +154,7 @@ describe "Serialization plugin" do
   it "should translate values to and from json serialization format using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, :json, :abc, :def
-    @c.dataset._fetch = {:id => 1, :abc => [1].to_json, :def => ["hello"].to_json}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => [1].to_json, :def => ["hello"].to_json)
     
     o = @c.first
     o.id.must_equal 1
@@ -175,7 +175,7 @@ describe "Serialization plugin" do
   it "should translate values to and from arbitrary callables using accessor methods" do
     @c.set_primary_key :id
     @c.plugin :serialization, [proc{|s| s.reverse}, proc{|s| s.reverse}], :abc, :def
-    @c.dataset._fetch = {:id => 1, :abc => 'cba', :def => 'olleh'}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => 'cba', :def => 'olleh')
     
     o = @c.first
     o.id.must_equal 1
@@ -198,7 +198,7 @@ describe "Serialization plugin" do
     require 'sequel/plugins/serialization'
     Sequel::Plugins::Serialization.register_format(:reverse, proc{|s| s.reverse}, proc{|s| s.reverse})
     @c.plugin :serialization, :reverse, :abc, :def
-    @c.dataset._fetch = {:id => 1, :abc => 'cba', :def => 'olleh'}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => 'cba', :def => 'olleh')
     
     o = @c.first
     o.id.must_equal 1
@@ -219,7 +219,7 @@ describe "Serialization plugin" do
   it "should copy serialization formats and columns to subclasses" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
-    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
 
     o = Class.new(@c).first
     o.id.must_equal 1
@@ -259,8 +259,10 @@ describe "Serialization plugin" do
   it "should not clear the deserialized columns when refreshing after saving a new object with insert_select" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
-    def (@c.instance_dataset).supports_insert_select?() true end
-    def (@c.instance_dataset).insert_select(*) {:id=>1} end
+    @c.dataset = @c.dataset.with_extend do
+      def supports_insert_select?; true end
+      def insert_select(*) {:id=>1} end
+    end
     o = @c.new(:abc => "--- 1\n", :def => "--- hello\n")
     o.deserialized_values.length.must_equal 2
     o.save
@@ -301,7 +303,7 @@ describe "Serialization plugin" do
   it "should work correctly with frozen instances" do
     @c.set_primary_key :id
     @c.plugin :serialization, :yaml, :abc, :def
-    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
 
     o = @c.first
     o.freeze
@@ -322,7 +324,7 @@ describe "Serialization plugin" do
 
   it "should have changed_columns include serialized columns if those columns have changed" do
     @c.plugin :serialization, :yaml, :abc, :def
-    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
     o = @c.first
     o.changed_columns.must_equal []
     o.abc = 1
@@ -342,7 +344,7 @@ describe "Serialization plugin" do
   it "should update column_changes if the dirty plugin is used" do
     @c.plugin :serialization, :yaml, :abc, :def
     @c.plugin :dirty
-    @c.dataset._fetch = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    @c.dataset = @c.dataset.with_fetch(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
     o = @c.first
     o.column_changes.must_equal({})
     o.abc = 1

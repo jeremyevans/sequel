@@ -75,9 +75,12 @@ describe "null_dataset extension" do
 
   it "should have nullify! method modify receiver" do
     ds = @db[:table]
-    ds.nullify!.must_be_same_as(ds)
-    ds.each(&@pr)
-    @i.must_equal 0
+    # SEQUEL5: Remove
+    unless ds.frozen?
+      ds.nullify!.must_be_same_as(ds)
+      ds.each(&@pr)
+      @i.must_equal 0
+    end
   end
 
   it "should work with method chaining" do

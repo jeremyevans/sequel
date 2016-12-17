@@ -6,7 +6,7 @@ describe "optimistic_locking plugin" do
     end
     h = {1=>{:id=>1, :name=>'John', :lock_version=>2}}
     lv = @lv = "lock_version".dup
-    @c.instance_dataset.numrows = @c.dataset.numrows = proc do |sql|
+    @c.dataset = @c.dataset.with_numrows(proc do |sql|
       case sql
       when /UPDATE people SET (name|#{lv}) = ('Jim'|'Bob'|\d+), (?:name|#{lv}) = ('Jim'|'Bob'|\d+) WHERE \(\(id = (\d+)\) AND \(#{lv} = (\d+)\)\)/
         name, nlv = $1 == 'name' ? [$2, $3] : [$3, $2]
@@ -36,13 +36,12 @@ describe "optimistic_locking plugin" do
       else
         puts sql
       end
-    end
-    @c.instance_dataset._fetch = @c.dataset._fetch = proc do |sql|
+    end).with_fetch(proc do |sql|
       m = h[1].dup
       v = m.delete(:lock_version)
       m[lv.to_sym] = v
       m
-    end
+    end)
     @c.columns :id, :name, :lock_version
     @c.plugin :optimistic_locking
   end
@@ -118,7 +117,7 @@ describe "optimistic_locking plugin" do
   end
 
   it "should not increment the lock column when the update fails" do
-    @c.instance_dataset.meta_def(:update) {|_| raise }
+    @c.dataset = @c.dataset.with_extend{def update(_) raise end}
     p1 = @c[1]
     p1.modified!
     lv = p1.lock_version

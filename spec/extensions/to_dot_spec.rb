@@ -25,8 +25,7 @@ END
   end
 
   it "should handle WITH" do
-    def @ds.supports_cte?(*) true end
-    a = dot(@ds.with(:a, @ds))
+    a = dot(@ds.with_extend{def supports_cte?(*) true end}.with(:a, @ds))
     a[0..3].must_equal ["1 -> 2 [label=\"with\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Hash\"];"]
     [["3 -> 4 [label=\"dataset\"];", "4 [label=\"Dataset\"];", "3 -> 5 [label=\"name\"];", "5 [label=\":a\"];"],
      ["3 -> 4 [label=\"name\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"dataset\"];", "5 [label=\"Dataset\"];"]].must_include(a[4..-1])

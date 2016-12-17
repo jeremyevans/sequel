@@ -9,7 +9,7 @@ describe Sequel::Model::DatasetMethods, "#destroy"  do
       end
     end
     @d = @c.dataset
-    @d._fetch = [{:id=>1}, {:id=>2}]
+    @d = @d.with_fetch([{:id=>1}, {:id=>2}])
     DB.reset
   end
 
@@ -20,7 +20,7 @@ describe Sequel::Model::DatasetMethods, "#destroy"  do
 
   it "should return the number of records destroyed" do
     @d.destroy.must_equal 2
-    @d._fetch = [[{:i=>1}], []]
+    @d = @d.with_fetch([[{:id=>1}], []])
     @d.destroy.must_equal 1
     @d.destroy.must_equal 0
   end
@@ -47,7 +47,7 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
   end
 
   it "should result in a hash with primary key value keys and model object values" do
-    @d._fetch = [{:name=>1}, {:name=>2}]
+    @d = @d.with_fetch([{:name=>1}, {:name=>2}])
     h = @d.to_hash
     h.must_be_kind_of(Hash)
     a = h.to_a
@@ -56,7 +56,7 @@ describe Sequel::Model::DatasetMethods, "#to_hash"  do
   end
 
   it "should result in a hash with given value keys and model object values" do
-    @d._fetch = [{:name=>1, :number=>3}, {:name=>2, :number=>4}]
+    @d = @d.with_fetch([{:name=>1, :number=>3}, {:name=>2, :number=>4}])
     h = @d.to_hash(:number)
     h.must_be_kind_of(Hash)
     a = h.to_a

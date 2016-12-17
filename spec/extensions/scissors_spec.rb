@@ -19,8 +19,7 @@ describe "scissors plugin" do
   end
 
   it "Model.destory each instance in the dataset" do
-    @m.dataset._fetch = {:id=>1}
-    @m.destroy
+    @m.dataset.with_fetch(:id=>1).destroy
     @m.db.sqls.must_equal ['BEGIN', 'SELECT * FROM items', 'DELETE FROM items WHERE id = 1', 'COMMIT']
   end
 end

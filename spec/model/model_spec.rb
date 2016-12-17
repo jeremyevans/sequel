@@ -278,8 +278,7 @@ describe Sequel::Model do
     ds = @model.set_dataset(ds).dataset
     ds.must_respond_to(:destroy)
     DB.sqls
-    ds._fetch = [{:id=>1}, {:id=>2}]
-    ds.destroy.must_equal 2
+    ds.with_fetch([{:id=>1}, {:id=>2}]).destroy.must_equal 2
     DB.sqls.must_equal ["SELECT * FROM foo", "DELETE FROM foo WHERE id = 1", "DELETE FROM foo WHERE id = 2"]
   end
 
@@ -468,8 +467,7 @@ describe Sequel::Model, "new" do
   end
 
   it "should use the last inserted id as primary key if not in values" do
-    @m.instance_dataset._fetch = @m.dataset._fetch = {:x => 1, :id => 1234}
-    @m.instance_dataset.autoid = @m.dataset.autoid = 1234
+    @m.dataset = @m.dataset.with_fetch(:x => 1, :id => 1234).with_autoid(1234)
 
     o = @m.new(:x => 1)
     o.save
@@ -514,7 +512,7 @@ end
 describe Sequel::Model, ".find" do
   before do
     @c = Class.new(Sequel::Model(:items))
-    @c.dataset._fetch = {:name => 'sharon', :id => 1}
+    @c.dataset = @c.dataset.with_fetch(:name => 'sharon', :id => 1)
     DB.reset
   end
   
@@ -918,7 +916,7 @@ end
 describe Sequel::Model, ".[]" do
   before do
     @c = Class.new(Sequel::Model(:items))
-    @c.dataset._fetch = {:name => 'sharon', :id => 1}
+    @c.dataset = @c.dataset.with_fetch(:name => 'sharon', :id => 1)
     DB.reset
   end
 
@@ -930,7 +928,7 @@ describe Sequel::Model, ".[]" do
   end
 
   it "should have #[] return nil if no rows match" do
-    @c.dataset._fetch = []
+    @c.dataset = @c.dataset.with_fetch([])
     @c[1].must_be_nil
     DB.sqls.must_equal ["SELECT * FROM items WHERE id = 1"]
   end

@@ -49,7 +49,7 @@ describe "prepared_statements plugin" do
           true
         end
         def insert_select(h)
-          self._fetch = {:id=>1, :name=>'foo', :i => 2}
+          cache_set(:fetch, :id=>1, :name=>'foo', :i => 2)
           server(:default).with_sql_first(insert_select_sql(h))
         end
         def insert_select_sql(*v)
@@ -80,7 +80,7 @@ describe "prepared_statements plugin" do
 
   describe " with placeholder type specifiers" do 
     before do
-      @ds.meta_def(:requires_placeholder_type_specifiers?){true}
+      @ds = @ds.with_extend{def requires_placeholder_type_specifiers?; true end}
     end
 
     it "should correctly handle without schema type" do
@@ -90,17 +90,18 @@ describe "prepared_statements plugin" do
 
     it "should correctly handle with schema type" do
       @c.db_schema[:id][:type] = :integer
-      ds = @c.send(:prepared_lookup)
-      def ds.literal_symbol_append(sql, v)
-        if @opts[:bind_vars] and match = /\A\$(.*)\z/.match(v.to_s)
-          s = match[1].split('__')[0].to_sym
-          if prepared_arg?(s)
-            literal_append(sql, prepared_arg(s))
+      ds = @c.send(:prepared_lookup).with_extend do
+        def literal_symbol_append(sql, v)
+          if @opts[:bind_vars] and match = /\A\$(.*)\z/.match(v.to_s)
+            s = match[1].split('__')[0].to_sym
+            if prepared_arg?(s)
+              literal_append(sql, prepared_arg(s))
+            else
+              sql << v.to_s
+            end
           else
-            sql << v.to_s
+            super
           end
-        else
-          super
         end
       end
       @c[1].must_equal @p

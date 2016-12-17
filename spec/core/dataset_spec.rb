@@ -35,8 +35,7 @@ describe "Dataset" do
   end
   
   it "should yield rows to each" do
-    ds = Sequel.mock[:t]
-    ds._fetch = {:x=>1}
+    ds = Sequel.mock[:t].with_fetch(:x=>1)
     called = false
     ds.each{|a| called = true; a.must_equal(:x=>1)}
     called.must_equal true
@@ -49,23 +48,16 @@ describe "Dataset#clone" do
   end
   
   it "should create an exact copy of the dataset" do
-    @dataset.row_proc = Proc.new{|r| r}
+    @dataset = @dataset.with_row_proc(Proc.new{|r| r})
     clone = @dataset.clone
 
     clone.object_id.wont_equal @dataset.object_id
     clone.class.must_equal @dataset.class
     clone.db.must_equal @dataset.db
     clone.opts.must_equal @dataset.opts
-    clone.row_proc.must_equal @dataset.row_proc
   end
   
   it "should copy the dataset opts" do
-    clone = @dataset.clone
-
-    clone.opts.must_equal @dataset.opts
-    @dataset.filter!(:a => 'b')
-    clone.opts[:filter].must_be_nil
-
     clone = @dataset.clone(:from => [:other])
     @dataset.opts[:from].must_equal [:items]
     clone.opts[:from].must_equal [:other]
@@ -85,8 +77,7 @@ describe "Dataset#clone" do
     m = Module.new do
       def __xyz__; "xyz"; end
     end
-    @dataset.extend(m)
-    @dataset.clone({}).must_respond_to(:__xyz__)
+    @dataset.with_extend(m).clone({}).must_respond_to(:__xyz__)
   end
 end
 
@@ -158,8 +149,7 @@ describe "A simple dataset" do
   end
   
   it "should format a truncate statement with multiple tables if supported" do
-    meta_def(@dataset, :check_truncation_allowed!){}
-    @dataset.from(:test, :test2).truncate_sql.must_equal 'TRUNCATE TABLE test, test2'
+    @dataset.with_extend{def check_truncation_allowed!; end}.from(:test, :test2).truncate_sql.must_equal 'TRUNCATE TABLE test, test2'
   end
   
   it "should format an insert statement with default values" do
@@ -167,9 +157,10 @@ describe "A simple dataset" do
   end
   
   it "should use a single column with a default value when the dataset doesn't support using insert statement with default values" do
-    meta_def(@dataset, :insert_supports_empty_values?){false}
-    meta_def(@dataset, :columns){[:a, :b]}
-    @dataset.insert_sql.must_equal 'INSERT INTO test (b) VALUES (DEFAULT)'
+    @dataset.with_extend do
+      def insert_supports_empty_values?; false end
+      def columns; [:a, :b] end
+    end.insert_sql.must_equal 'INSERT INTO test (b) VALUES (DEFAULT)'
   end
   
   it "should format an insert statement with hash" do
@@ -437,7 +428,7 @@ describe "Dataset#where" do
   end
 
   it "should handle IN/NOT IN queries with multiple columns and an array where the database doesn't support it" do
-    meta_def(@dataset, :supports_multiple_column_in?){false}
+    @dataset = @dataset.with_extend{def supports_multiple_column_in?; false end}
     @dataset.filter([:id1, :id2] => [[1, 2], [3,4]]).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]]).sql.must_equal "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
     @dataset.filter([:id1, :id2] => Sequel.value_list([[1, 2], [3,4]])).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
@@ -445,7 +436,7 @@ describe "Dataset#where" do
   end
 
   it "should handle IN/NOT IN queries with multiple columns and a dataset where the database doesn't support it" do
-    meta_def(@dataset, :supports_multiple_column_in?){false}
+    @dataset = @dataset.with_extend{def supports_multiple_column_in?; false end}
     db = Sequel.mock(:fetch=>[{:id1=>1, :id2=>2}, {:id1=>3, :id2=>4}])
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
     @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
@@ -455,7 +446,7 @@ describe "Dataset#where" do
   end
   
   it "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it" do
-    meta_def(@dataset, :supports_multiple_column_in?){false}
+    @dataset = @dataset.with_extend{def supports_multiple_column_in?; false end}
     db = Sequel.mock
     d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
     @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
@@ -465,10 +456,9 @@ describe "Dataset#where" do
   end
   
   it "should handle IN/NOT IN queries for datasets with row_procs" do
-    meta_def(@dataset, :supports_multiple_column_in?){false}
+    @dataset = @dataset.with_extend{def supports_multiple_column_in?; false end}
     db = Sequel.mock(:fetch=>[{:id1=>1, :id2=>2}, {:id1=>3, :id2=>4}])
-    d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2)
-    d1.row_proc = proc{|h| Object.new}
+    d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia').columns(:id1, :id2).with_row_proc(proc{|h| Object.new})
     @dataset.filter([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
     db.sqls.must_equal ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
     @dataset.exclude([:id1, :id2] => d1).sql.must_equal "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
@@ -501,7 +491,7 @@ describe "Dataset#where" do
   end
 
   it "should use boolean expression if dataset does not support where true/false" do
-    def @dataset.supports_where_true?() false end
+    @dataset = @dataset.with_extend{def supports_where_true?() false end}
     @dataset.filter(true).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
     @dataset.filter(Sequel::SQLTRUE).sql.must_equal "SELECT * FROM test WHERE (1 = 1)"
     @dataset.filter(false).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
@@ -795,25 +785,25 @@ describe "Dataset#group_by" do
   end
 
   it "should support a #group_rollup method if the database supports it" do
-    meta_def(@dataset, :supports_group_rollup?){true}
+    @dataset = @dataset.with_extend{def supports_group_rollup?; true end}
     @dataset.group(:type_id).group_rollup.select_sql.must_equal "SELECT * FROM test GROUP BY ROLLUP(type_id)"
     @dataset.group(:type_id, :b).group_rollup.select_sql.must_equal "SELECT * FROM test GROUP BY ROLLUP(type_id, b)"
-    meta_def(@dataset, :uses_with_rollup?){true}
+    @dataset = @dataset.with_extend{def uses_with_rollup?; true end}
     @dataset.group(:type_id).group_rollup.select_sql.must_equal "SELECT * FROM test GROUP BY type_id WITH ROLLUP"
     @dataset.group(:type_id, :b).group_rollup.select_sql.must_equal "SELECT * FROM test GROUP BY type_id, b WITH ROLLUP"
   end
 
   it "should support a #group_cube method if the database supports it" do
-    meta_def(@dataset, :supports_group_cube?){true}
+    @dataset = @dataset.with_extend{def supports_group_cube?; true end}
     @dataset.group(:type_id).group_cube.select_sql.must_equal "SELECT * FROM test GROUP BY CUBE(type_id)"
     @dataset.group(:type_id, :b).group_cube.select_sql.must_equal "SELECT * FROM test GROUP BY CUBE(type_id, b)"
-    meta_def(@dataset, :uses_with_rollup?){true}
+    @dataset = @dataset.with_extend{def uses_with_rollup?; true end}
     @dataset.group(:type_id).group_cube.select_sql.must_equal "SELECT * FROM test GROUP BY type_id WITH CUBE"
     @dataset.group(:type_id, :b).group_cube.select_sql.must_equal "SELECT * FROM test GROUP BY type_id, b WITH CUBE"
   end
 
   it "should support a #grouping_sets method if the database supports it" do
-    meta_def(@dataset, :supports_grouping_sets?){true}
+    @dataset = @dataset.with_extend{def supports_grouping_sets?; true end}
     @dataset.group(:type_id).grouping_sets.select_sql.must_equal "SELECT * FROM test GROUP BY GROUPING SETS((type_id))"
     @dataset.group([:type_id, :b], :type_id, []).grouping_sets.select_sql.must_equal "SELECT * FROM test GROUP BY GROUPING SETS((type_id, b), (type_id), ())"
   end
@@ -937,10 +927,7 @@ describe "Dataset#literal" do
         "not called #{ds.blah}"
       end
     end
-    def @dataset.blah
-      "ds"
-    end
-    @dataset.literal(@a.new).must_equal "called ds"
+    @dataset.with_extend{def blah; "ds" end}.literal(@a.new).must_equal "called ds"
   end
   
   it "should call sql_literal with dataset on type if not natively supported and the object responds to it" do
@@ -949,10 +936,7 @@ describe "Dataset#literal" do
         "called #{ds.blah}"
       end
     end
-    def @dataset.blah
-      "ds"
-    end
-    @dataset.literal(@a.new).must_equal "called ds"
+    @dataset.with_extend{def blah; "ds" end}.literal(@a.new).must_equal "called ds"
   end
   
   it "should literalize datasets as subqueries" do
@@ -967,7 +951,7 @@ describe "Dataset#literal" do
   end
   
   it "should literalize times properly for databases supporting millisecond precision" do
-    meta_def(@dataset, :timestamp_precision){3}
+    @dataset = @dataset.with_extend{def timestamp_precision; 3 end}
     @dataset.literal(Sequel::SQLTime.create(1, 2, 3, 500000)).must_equal "'01:02:03.500'"
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500'"
@@ -987,18 +971,18 @@ describe "Dataset#literal" do
   end
 
   it "should literalize Time, DateTime, Date properly if SQL standard format is required" do
-    meta_def(@dataset, :requires_sql_standard_datetimes?){true}
+    @dataset = @dataset.with_extend{def requires_sql_standard_datetimes?; true end}
     @dataset.literal(Time.local(2010, 1, 2, 3, 4, 5, 500000)).must_equal "TIMESTAMP '2010-01-02 03:04:05.500000'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "TIMESTAMP '2010-01-02 03:04:05.500000'"
     @dataset.literal(Date.new(2010, 1, 2)).must_equal "DATE '2010-01-02'"
   end
   
   it "should literalize Time and DateTime properly if the database support timezones in timestamps" do
-    meta_def(@dataset, :supports_timestamp_timezones?){true}
+    @dataset = @dataset.with_extend{def supports_timestamp_timezones?; true end}
     @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5, 500000)).must_equal "'2010-01-02 03:04:05.500000+0000'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, Rational(55, 10))).must_equal "'2010-01-02 03:04:05.500000+0000'"
 
-    meta_def(@dataset, :supports_timestamp_usecs?){false}
+    @dataset = @dataset.with_extend{def supports_timestamp_usecs?; false end}
     @dataset.literal(Time.utc(2010, 1, 2, 3, 4, 5)).must_equal "'2010-01-02 03:04:05+0000'"
     @dataset.literal(DateTime.new(2010, 1, 2, 3, 4, 5)).must_equal "'2010-01-02 03:04:05+0000'"
   end
@@ -1089,7 +1073,7 @@ describe "Dataset#from" do
   end
 
   it "should automatically use a default from table if no from table is present" do
-    def @dataset.empty_from_sql; ' FROM DEFFROM'; end
+    @dataset = @dataset.with_extend{def empty_from_sql; ' FROM DEFFROM'; end}
     @dataset.select_sql.must_equal "SELECT * FROM DEFFROM"
   end
 
@@ -1110,8 +1094,10 @@ describe "Dataset#from" do
   end
 
   it "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
-    meta_def(@dataset, :supports_cte?){true}
-    meta_def(@dataset, :supports_cte_in_subselect?){false}
+    @dataset = @dataset.with_extend do
+      def supports_cte?; true end
+      def supports_cte_in_subselect?; false end
+    end
     @dataset.from(@dataset.from(:a).with(:a, @dataset.from(:b))).sql.must_equal 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
     @dataset.from(@dataset.from(:a).with(:a, @dataset.from(:b)), @dataset.from(:c).with(:c, @dataset.from(:d))).sql.must_equal 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a) AS t1, (SELECT * FROM c) AS t2'
   end
@@ -1156,8 +1142,8 @@ describe "Dataset#select" do
   end
 
   it "should override the previous select option" do
-    @d.select!(:a, :b, :c).select.sql.must_equal 'SELECT * FROM test'
-    @d.select!(:price).select(:name).sql.must_equal 'SELECT name FROM test'
+    @d.select(:a, :b, :c).select.sql.must_equal 'SELECT * FROM test'
+    @d.select(:price).select(:name).sql.must_equal 'SELECT name FROM test'
   end
   
   it "should accept arbitrary objects and literalize them correctly" do
@@ -1212,7 +1198,7 @@ describe "Dataset#select_all" do
   end
   
   it "should override the previous select option" do
-    @d.select!(:a, :b, :c).select_all.sql.must_equal 'SELECT * FROM test'
+    @d.select(:a, :b, :c).select_all.sql.must_equal 'SELECT * FROM test'
   end
 
   it "should select all columns in a table if given an argument" do
@@ -1294,7 +1280,7 @@ describe "Dataset#select_append" do
   end
 
   it "should select from all from and join tables if SELECT *, column not supported" do
-    meta_def(@d, :supports_select_all_and_column?){false}
+    @d = @d.with_extend{def supports_select_all_and_column?; false end}
     @d.select_append(:b).sql.must_equal 'SELECT test.*, b FROM test'
     @d.from(:test, :c).select_append(:b).sql.must_equal 'SELECT test.*, c.*, b FROM test, c'
     @d.cross_join(:c).select_append(:b).sql.must_equal 'SELECT test.*, c.*, b FROM test CROSS JOIN c'
@@ -1574,8 +1560,7 @@ describe "Dataset#limit" do
   end
   
   it "should work with fixed sql datasets" do
-    @dataset.opts[:sql] = 'select * from cccc'
-    @dataset.limit(6, 10).sql.must_equal 'SELECT * FROM (select * from cccc) AS t1 LIMIT 6 OFFSET 10'
+    @dataset.with_sql('select * from cccc').limit(6, 10).sql.must_equal 'SELECT * FROM (select * from cccc) AS t1 LIMIT 6 OFFSET 10'
   end
   
   it "should raise an error if an invalid limit or offset is used" do
@@ -1662,19 +1647,9 @@ end
 
 describe "Dataset#naked" do
   it "should returned clone dataset without row_proc" do
-    d = Sequel.mock.dataset
-    d.row_proc = Proc.new{|r| r}
+    d = Sequel.mock.dataset.with_row_proc(Proc.new{|r| r})
     d.naked.row_proc.must_be_nil
     d.row_proc.wont_be_nil
-  end
-end
-
-describe "Dataset#naked!" do
-  it "should remove any existing row_proc" do
-    d = Sequel.mock.dataset
-    d.row_proc = Proc.new{|r| r}
-    d.naked!.row_proc.must_be_nil
-    d.row_proc.must_be_nil
   end
 end
 
@@ -1720,13 +1695,13 @@ describe "Dataset#map" do
   end
   
   it "should not call the row_proc if an argument is given" do
-    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
     @d.map(:a).must_equal [1, 3, 5]
     @d.map([:a, :b]).must_equal [[1, 2], [3, 4], [5, 6]]
   end
 
   it "should call the row_proc if no argument is given" do
-    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
     @d.map{|n| n[:a] + n[:b]}.must_equal [6, 14, 22]
   end
   
@@ -1762,7 +1737,7 @@ describe "Dataset#to_hash" do
   end
 
   it "should not call the row_proc if two arguments are given" do
-    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
     @d.to_hash(:a, :b).must_equal(1 => 2, 3 => 4, 5 => 6)
     @d.to_hash(:b, :a).must_equal(2 => 1, 4 => 3, 6 => 5)
     @d.to_hash([:a, :b], :b).must_equal([1, 2] => 2, [3, 4] => 4, [5, 6] => 6)
@@ -1771,21 +1746,21 @@ describe "Dataset#to_hash" do
   end
 
   it "should call the row_proc if only a single argument is given" do
-    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
     @d.to_hash(:a).must_equal(2 => {:a => 2, :b => 4}, 6 => {:a => 6, :b => 8}, 10 => {:a => 10, :b => 12})
     @d.to_hash(:b).must_equal(4 => {:a => 2, :b => 4}, 8 => {:a => 6, :b => 8}, 12 => {:a => 10, :b => 12})
     @d.to_hash([:a, :b]).must_equal([2, 4] => {:a => 2, :b => 4}, [6, 8] => {:a => 6, :b => 8}, [10, 12] => {:a => 10, :b => 12})
   end
 
   it "should handle a single composite key when using a row_proc" do
-    c = @d.row_proc = Class.new do
+    c = Class.new do
       def self.call(h); new(h); end
       def initialize(h); @h = h; end
       def [](k) @h[k]; end
       def h; @h; end
       def ==(o) @h == o.h; end
     end
-    @d.to_hash([:a, :b]).must_equal([1, 2] => c.call(:a => 1, :b => 2), [3, 4] => c.call(:a => 3, :b => 4), [5, 6] => c.call(:a => 5, :b => 6))
+    @d.with_row_proc(c).to_hash([:a, :b]).must_equal([1, 2] => c.call(:a => 1, :b => 2), [3, 4] => c.call(:a => 3, :b => 4), [5, 6] => c.call(:a => 5, :b => 6))
   end
 end
 
@@ -1817,13 +1792,12 @@ describe "Dataset#to_hash_groups" do
 
   it "should accept an :all option to use all into which entries can be merged" do
     called = false
-    meta_def(@d, :post_load){|_| called = true}
-    @d.to_hash_groups(:a, :b, :all=>true)
+    @d.with_extend{define_method(:post_load){|_| called = true}}.to_hash_groups(:a, :b, :all=>true)
     called.must_equal true
   end
 
   it "should not call the row_proc if two arguments are given" do
-    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
     @d.to_hash_groups(:a, :b).must_equal(1 => [2, 6], 3 => [4], 7 => [4])
     @d.to_hash_groups(:b, :a).must_equal(2 => [1], 4=>[3, 7], 6=>[1])
     @d.to_hash_groups([:a, :b], :b).must_equal([1, 2] => [2], [3, 4] => [4], [1, 6] => [6], [7, 4]=>[4])
@@ -1832,21 +1806,21 @@ describe "Dataset#to_hash_groups" do
   end
 
   it "should call the row_proc if only a single argument is given" do
-    @d.row_proc = proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h}
+    @d = @d.with_row_proc(proc{|r| h = {}; r.keys.each{|k| h[k] = r[k] * 2}; h})
     @d.to_hash_groups(:a).must_equal(2 => [{:a => 2, :b => 4}, {:a => 2, :b => 12}], 6 => [{:a => 6, :b => 8}], 14 => [{:a => 14, :b => 8}])
     @d.to_hash_groups(:b).must_equal(4 => [{:a => 2, :b => 4}], 8 => [{:a => 6, :b => 8}, {:a => 14, :b => 8}], 12 => [{:a => 2, :b => 12}])
     @d.to_hash_groups([:a, :b]).must_equal([2, 4] => [{:a => 2, :b => 4}], [6, 8] => [{:a => 6, :b => 8}], [2, 12] => [{:a => 2, :b => 12}], [14, 8] => [{:a => 14, :b => 8}])
   end
 
   it "should handle a single composite key when using a row_proc" do
-    c = @d.row_proc = Class.new do
+    c = Class.new do
       def self.call(h); new(h); end
       def initialize(h); @h = h; end
       def [](k) @h[k]; end
       def h; @h; end
       def ==(o) @h == o.h; end
     end
-    @d.to_hash_groups([:a, :b]).must_equal([1, 2] => [c.call(:a => 1, :b => 2)], [3, 4] => [c.call(:a => 3, :b => 4)], [1, 6] => [c.call(:a => 1, :b => 6)], [7, 4] => [c.call(:a => 7, :b => 4)])
+    @d.with_row_proc(c).to_hash_groups([:a, :b]).must_equal([1, 2] => [c.call(:a => 1, :b => 2)], [3, 4] => [c.call(:a => 3, :b => 4)], [1, 6] => [c.call(:a => 1, :b => 6)], [7, 4] => [c.call(:a => 7, :b => 4)])
   end
 end
 
@@ -1866,13 +1840,13 @@ describe "Dataset#distinct" do
   end
   
   it "should use DISTINCT ON if columns are given and DISTINCT ON is supported" do
-    meta_def(@dataset, :supports_distinct_on?){true}
+    @dataset = @dataset.with_extend{def supports_distinct_on?; true end}
     @dataset.distinct(:a, :b).sql.must_equal 'SELECT DISTINCT ON (a, b) name FROM test'
     @dataset.distinct(Sequel.cast(:stamp, :integer), :node_id=>nil).sql.must_equal 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
   end
 
   it "should use DISTINCT ON if columns are given in a virtual row block and DISTINCT ON is supported" do
-    meta_def(@dataset, :supports_distinct_on?){true}
+    @dataset = @dataset.with_extend{def supports_distinct_on?; true end}
     @dataset.distinct{func(:id)}.sql.must_equal 'SELECT DISTINCT ON (func(id)) name FROM test'
   end
 
@@ -2106,15 +2080,12 @@ describe "Dataset#from_self" do
 
   it "should hoist WITH clauses in current dataset if dataset doesn't support WITH in subselect" do
     ds = Sequel.mock.dataset
-    meta_def(ds, :supports_cte?){true}
-    meta_def(ds, :supports_cte_in_subselect?){false}
+    ds = ds.with_extend do
+      def supports_cte?; true end
+      def supports_cte_in_subselect?; false end
+    end
     ds.from(:a).with(:a, ds.from(:b)).from_self.sql.must_equal 'WITH a AS (SELECT * FROM b) SELECT * FROM (SELECT * FROM a) AS t1'
     ds.from(:a, :c).with(:a, ds.from(:b)).with(:c, ds.from(:d)).from_self.sql.must_equal 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a, c) AS t1'
-  end
-
-  it "should have working mutation method" do
-    @ds.from_self!
-    @ds.sql.must_equal 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS t1'
   end
 end
 
@@ -2240,7 +2211,7 @@ describe "Dataset#join_table" do
   end
   
   it "should default :qualify option to default_join_table_qualification" do
-    def @d.default_join_table_qualification; false; end
+    @d = @d.with_extend{def default_join_table_qualification; false end}
     @d.from('stats').join(:players, :id => :player_id).sql.must_equal 'SELECT * FROM "stats" INNER JOIN "players" ON ("id" = "player_id")'
   end
   
@@ -2270,7 +2241,7 @@ describe "Dataset#join_table" do
   it "should support joining datasets" do
     ds = Sequel.mock.dataset.from(:categories)
     @d.join_table(:left_outer, ds, :item_id => :id).sql.must_equal 'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "t1" ON ("t1"."item_id" = "items"."id")'
-    ds.filter!(:active => true)
+    ds = ds.where(:active => true)
     @d.join_table(:left_outer, ds, :item_id => :id).sql.must_equal 'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active IS TRUE)) AS "t1" ON ("t1"."item_id" = "items"."id")'
     @d.from_self.join_table(:left_outer, ds, :item_id => :id).sql.must_equal 'SELECT * FROM (SELECT * FROM "items") AS "t1" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active IS TRUE)) AS "t2" ON ("t2"."item_id" = "t1"."id")'
   end
@@ -2315,16 +2286,17 @@ describe "Dataset#join_table" do
   end
 
   it "should emulate JOIN USING (poorly) if the dataset doesn't support it" do
-    meta_def(@d, :supports_join_using?){false}
+    @d = @d.with_extend{def supports_join_using?; false end}
     @d.join(:categories, [:id]).sql.must_equal 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."id" = "items"."id")'
   end
 
   it "should hoist WITH clauses from subqueries if the dataset doesn't support CTEs in subselects" do
-    meta_def(@d, :supports_cte?){true}
-    meta_def(@d, :supports_cte_in_subselect?){false}
+    @d = @d.with_extend do
+      def supports_cte?; true end
+      def supports_cte_in_subselect?; false end
+    end
     ds = Sequel.mock.dataset.from(:categories)
-    meta_def(ds, :supports_cte?){true}
-    @d.join(ds.with(:a, Sequel.mock.dataset.from(:b)), [:id]).sql.must_equal 'WITH "a" AS (SELECT * FROM b) SELECT * FROM "items" INNER JOIN (SELECT * FROM categories) AS "t1" USING ("id")'
+    @d.join(ds.with_extend{def supports_cte?; true end}.with(:a, Sequel.mock.dataset.from(:b)), [:id]).sql.must_equal 'WITH "a" AS (SELECT * FROM b) SELECT * FROM "items" INNER JOIN (SELECT * FROM categories) AS "t1" USING ("id")'
   end
 
   it "should raise an error if using an array of symbols with a block" do
@@ -2689,7 +2661,7 @@ describe "Dataset compound operations" do
   end
 
   it "should raise an InvalidOperation if INTERSECT or EXCEPT is used and they are not supported" do
-    meta_def(@a, :supports_intersect_except?){false}
+    @a = @a.with_extend{def supports_intersect_except?; false end}
     proc{@a.intersect(@b)}.must_raise(Sequel::InvalidOperation)
     proc{@a.intersect(@b,:all=> true)}.must_raise(Sequel::InvalidOperation)
     proc{@a.except(@b)}.must_raise(Sequel::InvalidOperation)
@@ -2697,7 +2669,7 @@ describe "Dataset compound operations" do
   end
     
   it "should raise an InvalidOperation if INTERSECT ALL or EXCEPT ALL is used and they are not supported" do
-    meta_def(@a, :supports_intersect_except_all?){false}
+    @a = @a.with_extend{def supports_intersect_except_all?; false end}
     @a.intersect(@b)
     proc{@a.intersect(@b, :all=>true)}.must_raise(Sequel::InvalidOperation)
     @a.except(@b)
@@ -2739,8 +2711,10 @@ describe "Dataset compound operations" do
 
   it "should hoist WITH clauses in given dataset if dataset doesn't support WITH in subselect" do
     ds = Sequel.mock.dataset
-    meta_def(ds, :supports_cte?){true}
-    meta_def(ds, :supports_cte_in_subselect?){false}
+    ds = ds.with_extend do
+      def supports_cte?; true end
+      def supports_cte_in_subselect?; false end
+    end
     ds.from(:a).union(ds.from(:c).with(:c, ds.from(:d)), :from_self=>false).sql.must_equal 'WITH c AS (SELECT * FROM d) SELECT * FROM a UNION SELECT * FROM c'
     ds.from(:a).except(ds.from(:c).with(:c, ds.from(:d))).sql.must_equal 'WITH c AS (SELECT * FROM d) SELECT * FROM (SELECT * FROM a EXCEPT SELECT * FROM c) AS t1'
     ds.from(:a).with(:a, ds.from(:b)).intersect(ds.from(:c).with(:c, ds.from(:d)), :from_self=>false).sql.must_equal 'WITH a AS (SELECT * FROM b), c AS (SELECT * FROM d) SELECT * FROM a INTERSECT SELECT * FROM c'
@@ -2883,7 +2857,7 @@ describe "Dataset#get" do
   end
 
   it "should support an array of expressions to get an array of results" do
-    @d._fetch = {:name=>1, :abc=>2}
+    @d = @d.with_fetch(:name=>1, :abc=>2)
     @d.get([:name, :abc]).must_equal [1, 2]
     @d.db.sqls.must_equal ['SELECT name, abc FROM test LIMIT 1']
   end
@@ -2893,31 +2867,30 @@ describe "Dataset#get" do
   end
   
   it "should handle an array with aliases" do
-    @d._fetch = {:name=>1, :abc=>2}
+    @d = @d.with_fetch(:name=>1, :abc=>2)
     @d.get([:n___name, Sequel.as(:a, :abc)]).must_equal [1, 2]
     @d.db.sqls.must_equal ['SELECT n AS name, a AS abc FROM test LIMIT 1']
   end
   
   it "should raise an Error if an alias cannot be determined" do
-    @d._fetch = {:name=>1, :abc=>2}
-    proc{@d.get([Sequel.+(:a, 1), :a])}.must_raise(Sequel::Error)
+    proc{@d.with_fetch(:name=>1, :abc=>2).get([Sequel.+(:a, 1), :a])}.must_raise(Sequel::Error)
   end
   
   it "should support an array of expressions in a virtual row" do
-    @d._fetch = {:name=>1, :abc=>2}
+    @d = @d.with_fetch(:name=>1, :abc=>2)
     @d.get{[name, n__abc]}.must_equal [1, 2]
     @d.db.sqls.must_equal ['SELECT name, n.abc FROM test LIMIT 1']
   end
   
   it "should work with static SQL" do
     @d.with_sql('SELECT foo').get(:name).must_equal "SELECT foo"
-    @d._fetch = {:name=>1, :abc=>2}
+    @d = @d.with_fetch(:name=>1, :abc=>2)
     @d.with_sql('SELECT foo').get{[name, n__abc]}.must_equal [1, 2]
     @d.db.sqls.must_equal ['SELECT foo'] * 2
   end
 
   it "should handle cases where no rows are returned" do
-    @d._fetch = []
+    @d = @d.with_fetch([])
     @d.get(:n).must_be_nil
     @d.get([:n, :a]).must_be_nil
     @d.db.sqls.must_equal ['SELECT n FROM test LIMIT 1', 'SELECT n, a FROM test LIMIT 1']
@@ -2927,8 +2900,7 @@ end
 describe "Dataset#set_row_proc" do
   before do
     @db = Sequel.mock(:fetch=>[{:a=>1}, {:a=>2}])
-    @dataset = @db[:items]
-    @dataset.row_proc = proc{|h| h[:der] = h[:a] + 2; h}
+    @dataset = @db[:items].with_row_proc(proc{|h| h[:der] = h[:a] + 2; h})
   end
   
   it "should cause dataset to pass all rows through the filter" do
@@ -3014,7 +2986,7 @@ describe "Dataset#columns" do
   
   it "should ignore any filters, orders, or DISTINCT clauses" do
     @dataset.db.columns = [:a]
-    @dataset.filter!(:b=>100).order!(:b).distinct!
+    @dataset = @dataset.where(:b=>100).order(:b).distinct
     @dataset.columns.must_equal [:a]
     @dataset.db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
   end
@@ -3067,7 +3039,7 @@ describe "Dataset#import" do
   end
 
   it "should slice based on the default_import_slice option" do
-    def @ds.default_import_slice; 2 end
+    @ds = @ds.with_extend{def default_import_slice; 2 end}
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
     @db.sqls.must_equal ['BEGIN',
       "INSERT INTO items (x, y) VALUES (1, 2)",
@@ -3108,7 +3080,7 @@ describe "Dataset#import" do
   end
 
   it "should use correct sql for :values strategy" do
-    def @ds.multi_insert_sql_strategy; :values end
+    @ds = @ds.with_extend{def multi_insert_sql_strategy; :values end}
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
     @db.sqls.must_equal ['BEGIN',
       "INSERT INTO items (x, y) VALUES (1, 2), (3, 4), (5, 6)",
@@ -3124,7 +3096,7 @@ describe "Dataset#import" do
   end
 
   it "should use correct sql for :union strategy" do
-    def @ds.multi_insert_sql_strategy; :union end
+    @ds = @ds.with_extend{def multi_insert_sql_strategy; :union end}
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
     @db.sqls.must_equal ['BEGIN',
       "INSERT INTO items (x, y) SELECT 1, 2 UNION ALL SELECT 3, 4 UNION ALL SELECT 5, 6",
@@ -3140,8 +3112,10 @@ describe "Dataset#import" do
   end
 
   it "should use correct sql for :union strategy when FROM is required" do
-    def @ds.empty_from_sql; ' FROM foo' end
-    def @ds.multi_insert_sql_strategy; :union end
+    @ds = @ds.with_extend do
+      def empty_from_sql; ' FROM foo' end
+      def multi_insert_sql_strategy; :union end
+    end
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]])
     @db.sqls.must_equal ['BEGIN',
       "INSERT INTO items (x, y) SELECT 1, 2 FROM foo UNION ALL SELECT 3, 4 FROM foo UNION ALL SELECT 5, 6 FROM foo",
@@ -3267,51 +3241,6 @@ describe "Dataset#multi_insert" do
   it "should not do anything if no hashes are provided" do
     @ds.multi_insert([])
     @db.sqls.must_equal []
-  end
-end
-
-describe "Dataset" do
-  before do
-    @d = Sequel.mock.dataset.from(:x)
-  end
-
-  it "should support self-changing select!" do
-    @d.select!(:y)
-    @d.sql.must_equal "SELECT y FROM x"
-  end
-  
-  it "should support self-changing from!" do
-    @d.from!(:y)
-    @d.sql.must_equal "SELECT * FROM y"
-  end
-
-  it "should support self-changing order!" do
-    @d.order!(:y)
-    @d.sql.must_equal "SELECT * FROM x ORDER BY y"
-  end
-  
-  it "should support self-changing filter!" do
-    @d.filter!(:y => 1)
-    @d.sql.must_equal "SELECT * FROM x WHERE (y = 1)"
-  end
-
-  it "should support self-changing filter! with block" do
-    @d.filter!{y < 2}
-    @d.sql.must_equal "SELECT * FROM x WHERE (y < 2)"
-  end
-  
-  it "should raise for ! methods that don't return a dataset" do
-    proc {@d.opts!}.must_raise(NoMethodError)
-  end
-  
-  it "should raise for missing methods" do
-    proc {@d.xuyz}.must_raise(NoMethodError)
-    proc {@d.xyz!}.must_raise(NoMethodError)
-    proc {@d.xyz?}.must_raise(NoMethodError)
-  end
-  
-  it "should support chaining of bang methods" do
-      @d.order!(:y).filter!(:y => 1).sql.must_equal "SELECT * FROM x WHERE (y = 1) ORDER BY y"
   end
 end
 
@@ -3498,7 +3427,7 @@ describe "Dataset#grep" do
   end
 
   it "should support regexps if the database supports it" do
-    def @ds.supports_regexp?; true end
+    @ds = @ds.with_extend{def supports_regexp?; true end}
     @ds.grep(:title, /ruby/).sql.must_equal "SELECT * FROM posts WHERE ((title ~ 'ruby'))"
     @ds.grep(:title, [/^ruby/, 'ruby']).sql.must_equal "SELECT * FROM posts WHERE ((title ~ '^ruby') OR (title LIKE 'ruby' ESCAPE '\\'))"
   end
@@ -3616,8 +3545,7 @@ end
 describe "Dataset prepared statements and bound variables " do
   before do
     @db = Sequel.mock
-    @ds = @db[:items]
-    meta_def(@ds, :insert_select_sql){|*v| "#{insert_sql(*v)} RETURNING *" }
+    @ds = @db[:items].with_extend{def insert_select_sql(*v) "#{insert_sql(*v)} RETURNING *" end}
   end
   
   it "#call should take a type and bind hash and interpolate it" do
@@ -3684,10 +3612,12 @@ describe "Dataset prepared statements and bound variables " do
   end
     
   it "#call and #prepare should handle returning" do
-    meta_def(@ds, :supports_returning?){|_| true}
-    meta_def(@ds, :insert_sql){|*v| "#{super(*v)} RETURNING *" }
-    meta_def(@ds, :update_sql){|*v| "#{super(*v)} RETURNING *" }
-    meta_def(@ds, :delete_sql){"#{super()} RETURNING *" }
+    @ds = @ds.with_extend do
+      def supports_returning?(_) true end
+      def insert_sql(*v) "#{super(*v)} RETURNING *" end
+      def update_sql(*v) "#{super(*v)} RETURNING *" end
+      def delete_sql; "#{super()} RETURNING *" end
+    end
     @ds = @ds.returning
     @ds.call(:insert, {:n=>1}, :num=>:$n)
     @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
@@ -3708,8 +3638,7 @@ describe "Dataset prepared statements and bound variables " do
   end
 
   it "PreparedStatement#prepare should not raise an error if preparing prepared statements is allowed" do
-    ps = @ds.prepare(:select, :select_n)
-    def ps.allow_preparing_prepared_statements?; true end
+    ps = @ds.prepare(:select, :select_n).with_extend{def allow_preparing_prepared_statements?; true end}
     ps.prepare(:select, :select_n2).call
     @db.sqls.must_equal ["SELECT * FROM items"]
   end
@@ -3731,7 +3660,7 @@ describe "Dataset prepared statements and bound variables " do
     
   it "should handle columns on prepared statements correctly" do
     @db.columns = [:num]
-    meta_def(@ds, :select_where_sql){|sql| super(sql); sql << " OR #{columns.first} = 1" if opts[:where]}
+    @ds = @ds.with_extend{def select_where_sql(sql) super(sql); sql << " OR #{columns.first} = 1" if opts[:where] end}
     @ds.filter(:num=>:$n).prepare(:select, :sn).sql.must_equal 'SELECT * FROM items WHERE (num = $n) OR num = 1'
     @db.sqls.must_equal ['SELECT * FROM items LIMIT 1']
   end
@@ -3762,7 +3691,7 @@ describe "Dataset prepared statements and bound variables " do
   end
 
   it "should handle usage with Dataset.prepared_statements_module" do
-    @ds.extend(Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, [Sequel::Dataset::ArgumentMapper, Sequel::Dataset::PreparedStatementMethods]){def foo; :bar; end})
+    @ds = @ds.with_extend(Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, [Sequel::Dataset::ArgumentMapper, Sequel::Dataset::PreparedStatementMethods]){def foo; :bar; end})
     @ds.foo.must_equal :bar
     @ds = @ds.clone(:prepared_statement_name => 'foo')
     @ds.call(:a=>1)
@@ -3778,15 +3707,16 @@ end
 describe Sequel::Dataset::UnnumberedArgumentMapper do
   before do
     @db = Sequel.mock
-    @ds = @db[:items].filter(:num=>:$n)
-    def @ds.execute(sql, opts={}, &block)
-      super(sql, opts.merge({:arguments=>bind_arguments}), &block)
-    end
-    def @ds.execute_dui(sql, opts={}, &block)
-      super(sql, opts.merge({:arguments=>bind_arguments}), &block)
-    end
-    def @ds.execute_insert(sql, opts={}, &block)
-      super(sql, opts.merge({:arguments=>bind_arguments}), &block)
+    @ds = @db[:items].filter(:num=>:$n).with_extend do
+      def execute(sql, opts={}, &block)
+        super(sql, opts.merge({:arguments=>bind_arguments}), &block)
+      end
+      def execute_dui(sql, opts={}, &block)
+        super(sql, opts.merge({:arguments=>bind_arguments}), &block)
+      end
+      def execute_insert(sql, opts={}, &block)
+        super(sql, opts.merge({:arguments=>bind_arguments}), &block)
+      end
     end
     @ps = []
     @ps << @ds.prepare(:select, :s)
@@ -3795,8 +3725,8 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
     @ps << @ds.prepare(:delete, :d)
     @ps << @ds.prepare(:insert, :i, :num=>:$n)
     @ps << @ds.prepare(:update, :u, :num=>:$n)
-    @ps.each do |p|
-      p.extend(Sequel::Dataset::UnnumberedArgumentMapper)
+    @ps.map! do |p|
+      p.with_extend(Sequel::Dataset::UnnumberedArgumentMapper)
     end
   end
 
@@ -3816,7 +3746,7 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
 
   it "should handle unrecognized statement types as :all" do
     ps = @ds.prepare(:select_all, :s)
-    ps.extend(Sequel::Dataset::UnnumberedArgumentMapper)
+    ps = ps.with_extend(Sequel::Dataset::UnnumberedArgumentMapper)
     sql = ps.prepared_sql
     ps.prepared_sql.must_be_same_as(sql)
     ps.call(:n=>1)
@@ -3933,7 +3863,7 @@ describe "Sequel::Dataset#qualify" do
   end
 
   it "should handle SQL::Functions with windows" do
-    meta_def(@ds, :supports_window_functions?){true}
+    @ds = @ds.with_extend{def supports_window_functions?; true end}
     @ds.select{sum(:a).over(:partition=>:b, :order=>:c)}.qualify.sql.must_equal 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
   end
 
@@ -4045,8 +3975,7 @@ end
 describe "Sequel::Dataset #with and #with_recursive" do
   before do
     @db = Sequel.mock
-    @ds = @db[:t]
-    def @ds.supports_cte?(*) true end
+    @ds = @db[:t].with_extend{def supports_cte?(*) true end}
   end
   
   it "#with should take a name and dataset and use a WITH clause" do
@@ -4079,24 +4008,27 @@ describe "Sequel::Dataset #with and #with_recursive" do
   end
 
   it "#with and #with_recursive should raise an error unless the dataset supports CTEs" do
-    meta_def(@ds, :supports_cte?){false}
+    @ds = @ds.with_extend{def supports_cte?; false end}
     proc{@ds.with(:t, @db[:x], :args=>[:b])}.must_raise(Sequel::Error)
     proc{@ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c])}.must_raise(Sequel::Error)
   end
 
   it "#with should work on insert, update, and delete statements if they support it" do
-    sc = class << @ds; self; end
-    Sequel::Dataset.def_sql_method(sc, :delete, %w'with delete from where')
-    Sequel::Dataset.def_sql_method(sc, :insert, %w'with insert into columns values')
-    Sequel::Dataset.def_sql_method(sc, :update, %w'with update table set where')
+    @ds = @ds.with_extend do
+      Sequel::Dataset.def_sql_method(self, :delete, %w'with delete from where')
+      Sequel::Dataset.def_sql_method(self, :insert, %w'with insert into columns values')
+      Sequel::Dataset.def_sql_method(self, :update, %w'with update table set where')
+    end
     @ds.with(:t, @db[:x]).insert_sql(1).must_equal 'WITH t AS (SELECT * FROM x) INSERT INTO t VALUES (1)'
     @ds.with(:t, @db[:x]).update_sql(:foo=>1).must_equal 'WITH t AS (SELECT * FROM x) UPDATE t SET foo = 1'
     @ds.with(:t, @db[:x]).delete_sql.must_equal 'WITH t AS (SELECT * FROM x) DELETE FROM t'
   end
 
   it "should hoist WITH clauses in given dataset(s) if dataset doesn't support WITH in subselect" do
-    meta_def(@ds, :supports_cte?){true}
-    meta_def(@ds, :supports_cte_in_subselect?){false}
+    @ds = @ds.with_extend do
+      def supports_cte?; true end
+      def supports_cte_in_subselect?; false end
+    end
     @ds.with(:t, @ds.from(:s).with(:s, @ds.from(:r))).sql.must_equal 'WITH s AS (SELECT * FROM r), t AS (SELECT * FROM s) SELECT * FROM t'
     @ds.with_recursive(:t, @ds.from(:s).with(:s, @ds.from(:r)), @ds.from(:q).with(:q, @ds.from(:p))).sql.must_equal 'WITH s AS (SELECT * FROM r), q AS (SELECT * FROM p), t AS (SELECT * FROM s UNION ALL SELECT * FROM q) SELECT * FROM t'
   end
@@ -4150,9 +4082,10 @@ end
 describe "Sequel timezone support" do
   before do
     @db = Sequel::Database.new
-    @dataset = @db.dataset
-    meta_def(@dataset, :supports_timestamp_timezones?){true}
-    meta_def(@dataset, :supports_timestamp_usecs?){false}
+    @dataset = @db.dataset.with_extend do
+      def supports_timestamp_timezones?; true end
+      def supports_timestamp_usecs?; false end
+    end
     @utc_time = Time.utc(2010, 1, 2, 3, 4, 5)
     @local_time = Time.local(2010, 1, 2, 3, 4, 5)
     @offset = sprintf("%+03i%02i", *(@local_time.utc_offset/60).divmod(60))
@@ -4569,8 +4502,7 @@ end
 
 describe "Modifying joined datasets" do
   before do
-    @ds = Sequel.mock.from(:b, :c).join(:d, [:id]).where(:id => 2)
-    meta_def(@ds, :supports_modifying_joins?){true}
+    @ds = Sequel.mock.from(:b, :c).join(:d, [:id]).where(:id => 2).with_extend{def supports_modifying_joins?; true end}
   end
 
   it "should allow deleting from joined datasets" do
@@ -4614,8 +4546,10 @@ describe "Dataset#skip_locked" do
   end
   
   it "should skipped locked rows if supported" do
-    def @ds.supports_skip_locked?; true end
-    def @ds.select_lock_sql(sql) super; sql << " SKIP LOCKED" if @opts[:skip_locked] end
+    @ds = @ds.with_extend do
+      def supports_skip_locked?; true end
+      def select_lock_sql(sql) super; sql << " SKIP LOCKED" if @opts[:skip_locked] end
+    end
     @ds.sql.must_equal "SELECT * FROM t FOR UPDATE"
     3.times do
       @ds.skip_locked.sql.must_equal "SELECT * FROM t FOR UPDATE SKIP LOCKED"
@@ -4642,10 +4576,11 @@ describe "Dataset#returning" do
     @db.extend_datasets{def supports_returning?(type) true end}
     @ds = @db[:t].returning(:foo)
     @pr = proc do
-      sc = class << @ds; self; end
-      Sequel::Dataset.def_sql_method(sc, :delete, %w'delete from where returning')
-      Sequel::Dataset.def_sql_method(sc, :insert, %w'insert into columns values returning')
-      Sequel::Dataset.def_sql_method(sc, :update, %w'update table set where returning')
+      @ds = @ds.with_extend do
+        Sequel::Dataset.def_sql_method(self, :delete, %w'delete from where returning')
+        Sequel::Dataset.def_sql_method(self, :insert, %w'insert into columns values returning')
+        Sequel::Dataset.def_sql_method(self, :update, %w'update table set where returning')
+      end
     end
   end
   
@@ -4729,7 +4664,7 @@ describe "Dataset extensions" do
     end
   end
   before do
-    @ds = Sequel.mock.dataset
+    @ds = Sequel.mock(:identifier_mangling=>false).dataset
   end
 
   it "should be able to register an extension with a module Database#extension extend the module" do
@@ -4738,23 +4673,19 @@ describe "Dataset extensions" do
   end
 
   it "should be able to register an extension with a block and Database#extension call the block" do
-    @ds = @ds.with_quote_identifiers(false)
-    Sequel::Dataset.register_extension(:foo){|db| db.quote_identifiers = true}
-    @ds.extension(:foo).quote_identifiers?.must_equal true
+    Sequel::Dataset.register_extension(:foo){|ds| ds.extend(Module.new{def a; 1; end})}
+    @ds.extension(:foo).a.must_equal 1
   end
 
   it "should be able to register an extension with a callable and Database#extension call the callable" do
-    @ds = @ds.with_quote_identifiers(false)
-    Sequel::Dataset.register_extension(:foo, proc{|db| db.quote_identifiers = true})
-    @ds.extension(:foo).quote_identifiers?.must_equal true
+    Sequel::Dataset.register_extension(:foo, proc{|ds| ds.extend(Module.new{def a; 1; end})})
+    @ds.extension(:foo).a.must_equal 1
   end
 
   it "should be able to load multiple extensions in the same call" do
-    a = []
-    Sequel::Dataset.register_extension(:foo, proc{|ds| a << ds.opts[:foo] = 1})
-    Sequel::Dataset.register_extension(:bar, proc{|ds| a << ds.opts[:bar] = 2})
-    @ds.extension(:foo, :bar).opts.values_at(:foo, :bar).must_equal [1,2]
-    a.must_equal [1,2]
+    Sequel::Dataset.register_extension(:foo, proc{|ds| ds.send(:cache_set, :_columns, ds.columns + [:a])})
+    Sequel::Dataset.register_extension(:bar, proc{|ds| ds.send(:cache_set, :_columns, ds.columns + [:b])})
+    @ds.extension(:foo, :bar).columns.must_equal [:a, :b]
   end
 
   it "should have #extension not modify the receiver" do
@@ -4764,7 +4695,7 @@ describe "Dataset extensions" do
   end
 
   it "should have #extension not return a cloned dataset" do
-    @ds.extend(Module.new{def b; 2; end})
+    @ds = @ds.with_extend(Module.new{def b; 2; end})
     Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
     v = @ds.extension(:foo)
     v.must_equal(@ds)
@@ -4772,20 +4703,9 @@ describe "Dataset extensions" do
     v.b.must_equal 2
   end
 
-  it "should have #extension! modify the receiver" do
-    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
-    @ds.extension!(:foo)
-    @ds.a.must_equal 1
-  end
-
-  it "should have #extension! return the receiver" do
-    Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
-    @ds.extension!(:foo).must_be_same_as(@ds)
-  end
-
   it "should register a Database extension for modifying all datasets when registering with a module" do
     Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
-    Sequel.mock.extension(:foo).dataset.a.must_equal 1
+    Sequel.mock(:identifier_mangling=>false).extension(:foo).dataset.a.must_equal 1
   end
 
   it "should raise an Error if registering with both a module and a block" do
@@ -4863,9 +4783,8 @@ end
 
 describe "Dataset#paged_each" do
   before do
-    @ds = Sequel.mock[:test].order(:x)
     @db = (0...10).map{|i| {:x=>i}}
-    @ds._fetch = @db
+    @ds = Sequel.mock[:test].order(:x).with_fetch(@db)
     @rows = []
     @proc = lambda{|row| @rows << row}
   end
@@ -4881,7 +4800,7 @@ describe "Dataset#paged_each" do
   end
 
   it "should respect the row_proc" do
-    @ds.row_proc = lambda{|row| {:x=>row[:x]*2}}
+    @ds = @ds.with_row_proc(lambda{|row| {:x=>row[:x]*2}})
     @ds.paged_each(&@proc)
     @rows.must_equal @db.map{|row| {:x=>row[:x]*2}}
   end
@@ -4899,7 +4818,7 @@ describe "Dataset#paged_each" do
   end
 
   it "should accept a :rows_per_fetch option to change the number of rows per fetch" do
-    @ds._fetch = @db.each_slice(3).to_a
+    @ds = @ds.with_fetch(@db.each_slice(3).to_a)
     @ds.paged_each(:rows_per_fetch=>3, &@proc)
     @rows.must_equal @db
     @ds.db.sqls[1...-1].must_equal ['SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 0',
@@ -4909,7 +4828,7 @@ describe "Dataset#paged_each" do
   end
 
   it "should handle cases where the last query returns nothing" do
-    @ds._fetch = @db.each_slice(5).to_a
+    @ds = @ds.with_fetch(@db.each_slice(5).to_a)
     @ds.paged_each(:rows_per_fetch=>5, &@proc)
     @rows.must_equal @db
     @ds.db.sqls[1...-1].must_equal ['SELECT * FROM test ORDER BY x LIMIT 5 OFFSET 0',
@@ -4919,7 +4838,7 @@ describe "Dataset#paged_each" do
 
   it "should respect an existing server option to use" do
     @ds = Sequel.mock(:servers=>{:foo=>{}})[:test].order(:x)
-    @ds._fetch = @db
+    @ds = @ds.with_fetch(@db)
     @ds.server(:foo).paged_each(&@proc)
     @rows.must_equal @db
     @ds.db.sqls.must_equal ["BEGIN -- foo", "SELECT * FROM test ORDER BY x LIMIT 1000 OFFSET 0 -- foo", "COMMIT -- foo"]
@@ -4930,28 +4849,28 @@ describe "Dataset#paged_each" do
   end
 
   it "should handle an existing limit and/or offset" do
-    @ds._fetch = @db.each_slice(3).to_a
+    @ds = @ds.with_fetch(@db.each_slice(3).to_a)
     @ds.limit(5).paged_each(:rows_per_fetch=>3, &@proc)
     @ds.db.sqls[1...-1].must_equal ["SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 0", "SELECT * FROM test ORDER BY x LIMIT 2 OFFSET 3"]
 
-    @ds._fetch = @db.each_slice(3).to_a
+    @ds = @ds.with_fetch(@db.each_slice(3).to_a)
     @ds.limit(5, 2).paged_each(:rows_per_fetch=>3, &@proc)
     @ds.db.sqls[1...-1].must_equal ["SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 2", "SELECT * FROM test ORDER BY x LIMIT 2 OFFSET 5"]
 
-    @ds._fetch = @db.each_slice(3).to_a
+    @ds = @ds.with_fetch(@db.each_slice(3).to_a)
     @ds.limit(nil, 2).paged_each(:rows_per_fetch=>3, &@proc)
     @ds.db.sqls[1...-1].must_equal ["SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 2", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 5", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 8", "SELECT * FROM test ORDER BY x LIMIT 3 OFFSET 11"]
   end
 
   it "should support :strategy=>:filter" do
-    @ds._fetch = @db.each_slice(5).to_a
+    @ds = @ds.with_fetch(@db.each_slice(5).to_a)
     @ds.paged_each(:rows_per_fetch=>5, :strategy=>:filter, &@proc)
     @ds.db.sqls[1...-1].must_equal ["SELECT * FROM test ORDER BY x LIMIT 5", "SELECT * FROM test WHERE (x > 4) ORDER BY x LIMIT 5", "SELECT * FROM test WHERE (x > 9) ORDER BY x LIMIT 5"]
     @rows.must_equal @db
 
     @rows = []
     db = @db.map{|h| h[:y] = h[:x] % 5; h[:z] = h[:x] % 9; h}.sort_by{|h| [h[:z], -h[:y], h[:x]]}
-    @ds._fetch = db.each_slice(5).to_a
+    @ds = @ds.with_fetch(db.each_slice(5).to_a)
     @ds.order(Sequel.identifier(:z), Sequel.desc(Sequel.qualify(:test, :y)), Sequel.asc(:x)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, &@proc)
     @ds.db.sqls[1...-1].must_equal ["SELECT * FROM test ORDER BY z, test.y DESC, x ASC LIMIT 5",
       "SELECT * FROM test WHERE ((z > 3) OR ((z = 3) AND (test.y < 3)) OR ((z = 3) AND (test.y = 3) AND (x > 3))) ORDER BY z, test.y DESC, x ASC LIMIT 5",
@@ -4961,7 +4880,7 @@ describe "Dataset#paged_each" do
 
   it "should support :strategy=>:filter with :filter_values option" do
     db = @db.map{|h| h[:y] = h[:x] % 5; h[:z] = h[:x] % 9; h}.sort_by{|h| [h[:z], -h[:y], h[:x]]}
-    @ds._fetch = db.each_slice(5).to_a
+    @ds = @ds.with_fetch(db.each_slice(5).to_a)
     @ds.order(Sequel.identifier(:z), Sequel.desc(Sequel.qualify(:test, :y) * 2), Sequel.asc(:x)).paged_each(:rows_per_fetch=>5, :strategy=>:filter, :filter_values=>proc{|row, expr| [row[expr[0].value], row[expr[1].args.first.column] * expr[1].args.last, row[expr[2]]]}, &@proc)
     @ds.db.sqls[1...-1].must_equal ["SELECT * FROM test ORDER BY z, (test.y * 2) DESC, x ASC LIMIT 5",
       "SELECT * FROM test WHERE ((z > 3) OR ((z = 3) AND ((test.y * 2) < 6)) OR ((z = 3) AND ((test.y * 2) = 6) AND (x > 3))) ORDER BY z, (test.y * 2) DESC, x ASC LIMIT 5",
@@ -5035,106 +4954,21 @@ describe "Frozen Datasets" do
     @ds.must_equal @ds.db[:test]
   end
 
-  it "should have dups not be frozen" do
-    @ds.dup.wont_be :frozen?
-  end
-
-  it "should raise an error when calling mutation methods" do
-    proc{@ds.select!(:a)}.must_raise RuntimeError
-    proc{@ds.row_proc = proc{}}.must_raise RuntimeError
-    proc{@ds.extension! :query}.must_raise RuntimeError
-    proc{@ds.naked!}.must_raise RuntimeError
-    proc{@ds.from_self!}.must_raise RuntimeError
-  end
-
   it "should not raise an error when calling query methods" do
     @ds.select(:a).sql.must_equal 'SELECT a FROM test'
   end
 end
 
-describe "Dataset mutation methods" do
-  def m(&block)
-    ds = Sequel.mock[:t]
-    def ds.supports_cte?(*) true end
-    ds.instance_exec(&block)
-    ds.sql
-  end
-
-  it "should modify the dataset in place" do
-    dsc = Sequel.mock[:u]
-    dsc.send(:columns=, [:v])
-
-    m{and!(:a=>1).or!(:b=>2)}.must_equal "SELECT * FROM t WHERE ((a = 1) OR (b = 2))"
-    m{select!(:f).graph!(dsc, :b=>:c).set_graph_aliases!(:e=>[:m, :n]).add_graph_aliases!(:d=>[:g, :c])}.must_equal "SELECT m.n AS e, g.c AS d FROM t LEFT OUTER JOIN u ON (u.b = t.c)"
-    m{cross_join!(:a)}.must_equal "SELECT * FROM t CROSS JOIN a"
-    m{distinct!}.must_equal "SELECT DISTINCT * FROM t"
-    m{except!(dsc)}.must_equal "SELECT * FROM (SELECT * FROM t EXCEPT SELECT * FROM u) AS t1"
-    m{exclude!(:a=>1)}.must_equal "SELECT * FROM t WHERE (a != 1)"
-    m{exclude_having!(:a=>1)}.must_equal "SELECT * FROM t HAVING (a != 1)"
-    m{exclude_where!(:a=>1)}.must_equal "SELECT * FROM t WHERE (a != 1)"
-    m{filter!(:a=>1)}.must_equal "SELECT * FROM t WHERE (a = 1)"
-    m{for_update!}.must_equal "SELECT * FROM t FOR UPDATE"
-    m{from!(:p)}.must_equal "SELECT * FROM p"
-    m{full_join!(:a, [:b])}.must_equal "SELECT * FROM t FULL JOIN a USING (b)"
-    m{full_outer_join!(:a, [:b])}.must_equal "SELECT * FROM t FULL OUTER JOIN a USING (b)"
-    m{grep!(:a, 'b')}.must_equal "SELECT * FROM t WHERE ((a LIKE 'b' ESCAPE '\\'))"
-    m{group!(:a)}.must_equal "SELECT * FROM t GROUP BY a"
-    m{group_and_count!(:a)}.must_equal "SELECT a, count(*) AS count FROM t GROUP BY a"
-    m{group_by!(:a)}.must_equal "SELECT * FROM t GROUP BY a"
-    m{having!(:a)}.must_equal "SELECT * FROM t HAVING a"
-    m{inner_join!(:a, [:b])}.must_equal "SELECT * FROM t INNER JOIN a USING (b)"
-    m{intersect!(dsc)}.must_equal "SELECT * FROM (SELECT * FROM t INTERSECT SELECT * FROM u) AS t1"
-    m{where!(:a).invert!}.must_equal "SELECT * FROM t WHERE NOT a"
-    m{join!(:a, [:b])}.must_equal "SELECT * FROM t INNER JOIN a USING (b)"
-    m{join_table!(:inner, :a, [:b])}.must_equal "SELECT * FROM t INNER JOIN a USING (b)"
-    m{left_join!(:a, [:b])}.must_equal "SELECT * FROM t LEFT JOIN a USING (b)"
-    m{left_outer_join!(:a, [:b])}.must_equal "SELECT * FROM t LEFT OUTER JOIN a USING (b)"
-    m{limit!(1)}.must_equal "SELECT * FROM t LIMIT 1"
-    m{lock_style!(:update)}.must_equal "SELECT * FROM t FOR UPDATE"
-    m{natural_full_join!(:a)}.must_equal "SELECT * FROM t NATURAL FULL JOIN a"
-    m{natural_join!(:a)}.must_equal "SELECT * FROM t NATURAL JOIN a"
-    m{natural_left_join!(:a)}.must_equal "SELECT * FROM t NATURAL LEFT JOIN a"
-    m{natural_right_join!(:a)}.must_equal "SELECT * FROM t NATURAL RIGHT JOIN a"
-    m{offset!(1)}.must_equal "SELECT * FROM t OFFSET 1"
-    m{order!(:a).reverse_order!}.must_equal "SELECT * FROM t ORDER BY a DESC"
-    m{order_by!(:a).order_more!(:b).order_append!(:c).order_prepend!(:d).reverse!}.must_equal "SELECT * FROM t ORDER BY d DESC, a DESC, b DESC, c DESC"
-    m{qualify!}.must_equal "SELECT t.* FROM t"
-    m{right_join!(:a, [:b])}.must_equal "SELECT * FROM t RIGHT JOIN a USING (b)"
-    m{right_outer_join!(:a, [:b])}.must_equal "SELECT * FROM t RIGHT OUTER JOIN a USING (b)"
-    m{select!(:a)}.must_equal "SELECT a FROM t"
-    m{select_all!(:t).select_more!(:b).select_append!(:c)}.must_equal "SELECT t.*, b, c FROM t"
-    m{select_group!(:a)}.must_equal "SELECT a FROM t GROUP BY a"
-    m{where!(:a).unfiltered!}.must_equal "SELECT * FROM t"
-    m{group!(:a).ungrouped!}.must_equal "SELECT * FROM t"
-    m{limit!(1).unlimited!}.must_equal "SELECT * FROM t"
-    m{order!(:a).unordered!}.must_equal "SELECT * FROM t"
-    m{union!(dsc)}.must_equal "SELECT * FROM (SELECT * FROM t UNION SELECT * FROM u) AS t1"
-    m{with!(:a, dsc)}.must_equal "WITH a AS (SELECT * FROM u) SELECT * FROM t"
-    m{with_recursive!(:a, dsc, dsc)}.must_equal "WITH a AS (SELECT * FROM u UNION ALL SELECT * FROM u) SELECT * FROM t"
-    m{with_sql!('SELECT foo')}.must_equal "SELECT foo"
-
-    dsc.server!(:a)
-    dsc.opts[:server].must_equal :a
-    dsc.graph!(dsc, {:b=>:c}, :table_alias=>:foo).ungraphed!.opts[:graph].must_be_nil
-  end
-
-  it "should clear the cache" do
-    ds = Sequel.mock[:a]
-    ds.columns
-    ds.send(:cache_set, :columns, [:a])
-    ds.select!(:foo, :bar).send(:cache_get, :columns).must_be_nil
-  end
-end
-
 describe "Dataset emulated complex expression operators" do
   before do
-    @ds = Sequel.mock[:test]
-    def @ds.complex_expression_sql_append(sql, op, args)
-      case op
-      when :&, :|, :^, :%, :<<, :>>, :'B~'
-        complex_expression_emulate_append(sql, op, args)
-      else
-        super
+    @ds = Sequel.mock[:test].with_extend do
+      def complex_expression_sql_append(sql, op, args)
+        case op
+        when :&, :|, :^, :%, :<<, :>>, :'B~'
+          complex_expression_emulate_append(sql, op, args)
+        else
+          super
+        end
       end
     end
     @n = Sequel.expr(:x).sql_number

@@ -181,30 +181,33 @@ describe "Dataset" do
     db[:a].identifier_output_method.must_equal :downcase
   end
   
-  it "should have quote_identifiers= method which changes literalization of identifiers" do
-    @dataset.quote_identifiers = true
-    @dataset.literal(:a).must_equal '"a"'
-    @dataset.quote_identifiers = false
-    @dataset.literal(:a).must_equal 'a'
-  end
-  
-  it "should have identifier_input_method= method which changes literalization of identifiers" do
-    @dataset.identifier_input_method = :upcase
-    @dataset.literal(:a).must_equal 'A'
-    @dataset.identifier_input_method = :downcase
-    @dataset.literal(:A).must_equal 'a'
-    @dataset.identifier_input_method = :reverse
-    @dataset.literal(:at_b).must_equal 'b_ta'
-  end
-  
-  it "should have identifier_output_method= method which changes identifiers returned from the database" do
-    @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
-    @dataset.identifier_output_method = :upcase
-    @dataset.send(:output_identifier, "at_b_C").must_equal :AT_B_C
-    @dataset.identifier_output_method = :downcase
-    @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_c
-    @dataset.identifier_output_method = :reverse
-    @dataset.send(:output_identifier, "at_b_C").must_equal :C_b_ta
+  # SEQUEL5: Remove
+  unless Sequel.mock(:identifier_mangling=>true).dataset.frozen?
+    it "should have quote_identifiers= method which changes literalization of identifiers" do
+      @dataset.quote_identifiers = true
+      @dataset.literal(:a).must_equal '"a"'
+      @dataset.quote_identifiers = false
+      @dataset.literal(:a).must_equal 'a'
+    end
+    
+    it "should have identifier_input_method= method which changes literalization of identifiers" do
+      @dataset.identifier_input_method = :upcase
+      @dataset.literal(:a).must_equal 'A'
+      @dataset.identifier_input_method = :downcase
+      @dataset.literal(:A).must_equal 'a'
+      @dataset.identifier_input_method = :reverse
+      @dataset.literal(:at_b).must_equal 'b_ta'
+    end
+    
+    it "should have identifier_output_method= method which changes identifiers returned from the database" do
+      @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
+      @dataset.identifier_output_method = :upcase
+      @dataset.send(:output_identifier, "at_b_C").must_equal :AT_B_C
+      @dataset.identifier_output_method = :downcase
+      @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_c
+      @dataset.identifier_output_method = :reverse
+      @dataset.send(:output_identifier, "at_b_C").must_equal :C_b_ta
+    end
   end
   
   it "should have with_quote_identifiers method which returns cloned dataset with changed literalization of identifiers" do
@@ -236,12 +239,9 @@ describe "Dataset" do
   
   it "should have output_identifier handle empty identifiers" do
     @dataset.send(:output_identifier, "").must_equal :untitled
-    @dataset.identifier_output_method = :upcase
-    @dataset.send(:output_identifier, "").must_equal :UNTITLED
-    @dataset.identifier_output_method = :downcase
-    @dataset.send(:output_identifier, "").must_equal :untitled
-    @dataset.identifier_output_method = :reverse
-    @dataset.send(:output_identifier, "").must_equal :deltitnu
+    @dataset.with_identifier_output_method(:upcase).send(:output_identifier, "").must_equal :UNTITLED
+    @dataset.with_identifier_output_method(:downcase).send(:output_identifier, "").must_equal :untitled
+    @dataset.with_identifier_output_method(:reverse).send(:output_identifier, "").must_equal :deltitnu
   end
 end
 
@@ -295,8 +295,7 @@ describe Sequel::Model, ".[] optimization" do
   end
 
   it "should have simple_pk and simple_table respect dataset's identifier input methods" do
-    ds = @db.from(:ab)
-    ds.identifier_input_method = :reverse
+    ds = @db.from(:ab).with_identifier_input_method(:reverse)
     @c.set_dataset ds
     @c.simple_table.must_equal '"ba"'
     @c.set_primary_key :cd

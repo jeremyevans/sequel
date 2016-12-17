@@ -22,8 +22,8 @@ describe Sequel::Model, "pg_array_associations" do
     end
     @c1 = Artist
     @c2 = Tag
-    @c1.dataset._fetch = {:id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
-    @c2.dataset._fetch = {:id=>2}
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :tag_ids=>Sequel.pg_array([1,2,3]))
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2)
     @o1 = @c1.first
     @o2 = @c2.first
     @n1 = @c1.new
@@ -224,8 +224,8 @@ describe Sequel::Model, "pg_array_associations" do
   it "should support a :uniq option that removes duplicates from the association" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :uniq=>true
     @c2.many_to_pg_array :artists, :clone=>:artists, :uniq=>true
-    @c1.dataset._fetch = [{:id=>20}, {:id=>30}, {:id=>20}, {:id=>30}]
-    @c2.dataset._fetch = [{:id=>20}, {:id=>30}, {:id=>20}, {:id=>30}]
+    @c1.dataset = @c1.dataset.with_fetch([{:id=>20}, {:id=>30}, {:id=>20}, {:id=>30}])
+    @c2.dataset = @c1.dataset.with_fetch([{:id=>20}, {:id=>30}, {:id=>20}, {:id=>30}])
     @o1.tags.must_equal [@c2.load(:id=>20), @c2.load(:id=>30)]
     @o2.artists.must_equal [@c1.load(:id=>20), @c1.load(:id=>30)]
   end
@@ -313,8 +313,8 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags2, :clone=>:tags, :eager_graph=>:artists, :key=>:tag_ids
     @c2.many_to_pg_array :artists2, :clone=>:artists, :eager_graph=>:tags
 
-    @c2.dataset._fetch = {:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
-    @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3]))
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]))
 
     @o1.tags2.must_equal [@o2]
     @db.sqls.first.must_match(/SELECT tags\.id, artists\.id AS artists_id, artists\.tag_ids FROM tags LEFT OUTER JOIN artists ON \(artists.tag_ids @> ARRAY\[tags.id\]\) WHERE \(tags\.id IN \([123], [123], [123]\)\)/)
@@ -326,8 +326,8 @@ describe Sequel::Model, "pg_array_associations" do
     @o2.artists2.first.tags.must_equal [@o2]
     @db.sqls.must_equal []
 
-    @c2.dataset._fetch = {:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
-    @c1.dataset._fetch = {:id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3]))
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :tag_ids=>Sequel.pg_array([1,2,3]))
 
     a = @c1.eager(:tags2).all
     sqls = @db.sqls
@@ -338,8 +338,8 @@ describe Sequel::Model, "pg_array_associations" do
     a.first.tags2.first.artists.must_equal [@o1]
     @db.sqls.must_equal []
 
-    @c2.dataset._fetch = {:id=>2}
-    @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2)
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]))
 
     a = @c2.eager(:artists2).all
     @db.sqls.must_equal ["SELECT * FROM tags", "SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) WHERE (artists.tag_ids && ARRAY[2]::integer[])"]
@@ -350,7 +350,7 @@ describe Sequel::Model, "pg_array_associations" do
   end
   
   it "should respect the :limit option when eager loading" do
-    @c2.dataset._fetch = [{:id=>1},{:id=>2}, {:id=>3}]
+    @c2.dataset = @c2.dataset.with_fetch([{:id=>1},{:id=>2}, {:id=>3}])
 
     @c1.pg_array_to_many :tags, :clone=>:tags, :limit=>2
     a = @c1.eager(:tags).all
@@ -379,8 +379,8 @@ describe Sequel::Model, "pg_array_associations" do
     a.first.tags.must_equal [@c2.load(:id=>2), @c2.load(:id=>3)]
     @db.sqls.length.must_equal 0
 
-    @c2.dataset._fetch = [{:id=>2}]
-    @c1.dataset._fetch = [{:id=>5, :tag_ids=>Sequel.pg_array([1,2,3])},{:id=>6, :tag_ids=>Sequel.pg_array([2,3])}, {:id=>7, :tag_ids=>Sequel.pg_array([1,2])}]
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2)
+    @c1.dataset = @c1.dataset.with_fetch([{:id=>5, :tag_ids=>Sequel.pg_array([1,2,3])},{:id=>6, :tag_ids=>Sequel.pg_array([2,3])}, {:id=>7, :tag_ids=>Sequel.pg_array([1,2])}])
 
     @c2.many_to_pg_array :artists, :clone=>:artists, :limit=>2
     a = @c2.eager(:artists).all
@@ -415,8 +415,8 @@ describe Sequel::Model, "pg_array_associations" do
   end
 
   it "should eagerly graph associations" do
-    @c2.dataset._fetch = {:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3])}
-    @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3]))
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]))
 
     a = @c1.eager_graph(:tags).all
     @db.sqls.must_equal ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"]
@@ -432,8 +432,8 @@ describe Sequel::Model, "pg_array_associations" do
   end
 
   it "should allow cascading of eager graphing for associations of associated models" do
-    @c2.dataset._fetch = {:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3]), :tags_0_id=>2}
-    @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]), :artists_0_id=>1, :artists_0_tag_ids=>Sequel.pg_array([1,2,3])}
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3]), :tags_0_id=>2)
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]), :artists_0_id=>1, :artists_0_tag_ids=>Sequel.pg_array([1,2,3]))
 
     a = @c1.eager_graph(:tags=>:artists).all
     @db.sqls.must_equal ["SELECT artists.id, artists.tag_ids, tags.id AS tags_id, artists_0.id AS artists_0_id, artists_0.tag_ids AS artists_0_tag_ids FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id]) LEFT OUTER JOIN artists AS artists_0 ON (artists_0.tag_ids @> ARRAY[tags.id])"]
@@ -455,8 +455,8 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :primary_key=>Sequel.*(:id, 3), :primary_key_method=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
     @c2.many_to_pg_array :artists, :clone=>:artists, :primary_key=>:id3, :key=>:tag3_ids, :key_column=>Sequel.pg_array(:tag_ids)[1..2]
 
-    @c2.dataset._fetch = {:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3]), :tags_0_id=>2}
-    @c1.dataset._fetch = {:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]), :artists_0_id=>1, :artists_0_tag_ids=>Sequel.pg_array([1,2,3])}
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2, :artists_id=>1, :tag_ids=>Sequel.pg_array([1,2,3]), :tags_0_id=>2)
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :tags_id=>2, :tag_ids=>Sequel.pg_array([1,2,3]), :artists_0_id=>1, :artists_0_tag_ids=>Sequel.pg_array([1,2,3]))
 
     a = @c1.eager_graph(:tags).all
     a.must_equal [@o1]
@@ -475,8 +475,8 @@ describe Sequel::Model, "pg_array_associations" do
     @c1.pg_array_to_many :tags, :clone=>:tags, :graph_select=>:id2
     @c2.many_to_pg_array :artists, :clone=>:artists, :graph_select=>:id
 
-    @c2.dataset._fetch = {:id=>2, :artists_id=>1}
-    @c1.dataset._fetch = {:id=>1, :id2=>2, :tag_ids=>Sequel.pg_array([1,2,3])}
+    @c2.dataset = @c2.dataset.with_fetch(:id=>2, :artists_id=>1)
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1, :id2=>2, :tag_ids=>Sequel.pg_array([1,2,3]))
 
     a = @c1.eager_graph(:tags).all
     @db.sqls.must_equal ["SELECT artists.id, artists.tag_ids, tags.id2 FROM artists LEFT OUTER JOIN tags ON (artists.tag_ids @> ARRAY[tags.id])"]

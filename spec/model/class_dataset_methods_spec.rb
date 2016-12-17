@@ -3,12 +3,8 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model, "class dataset methods"  do
   before do
     @db = Sequel.mock
-    @c = Class.new(Sequel::Model(@db[:items]))
+    @c = Class.new(Sequel::Model(@db[:items].with_extend{def supports_cte?(*) true end}.with_fetch(:id=>1).with_autoid(1).with_numrows(0)))
     @d = @c.dataset
-    def @d.supports_cte?(*) true end
-    @d._fetch = {:id=>1}
-    @d.autoid = 1
-    @d.numrows = 0
     @db.sqls
   end
 
@@ -134,7 +130,8 @@ describe Sequel::Model, "class dataset methods"  do
     sc.set_dataset(@d.where(:a).order(:a).select(:a).group(:a).limit(2))
     @db.sqls
     sc.invert.sql.must_equal 'SELECT a FROM items WHERE NOT a GROUP BY a ORDER BY a LIMIT 2'
-    sc.dataset._fetch = {:v1=>1, :v2=>2}
+    sc.dataset = sc.dataset.with_fetch(:v1=>1, :v2=>2)
+    @db.sqls
     sc.range(:a).must_equal(1..2)
     @db.sqls.must_equal ["SELECT min(a) AS v1, max(a) AS v2 FROM (SELECT a FROM items WHERE a GROUP BY a ORDER BY a LIMIT 2) AS t1 LIMIT 1"]
     sc.reverse.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a ORDER BY a DESC LIMIT 2'
@@ -144,7 +141,6 @@ describe Sequel::Model, "class dataset methods"  do
     sc.ungrouped.sql.must_equal 'SELECT a FROM items WHERE a ORDER BY a LIMIT 2'
     sc.unordered.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a LIMIT 2'
     sc.unlimited.sql.must_equal 'SELECT a FROM items WHERE a GROUP BY a ORDER BY a'
-    sc.dataset.graph!(:a)
-    sc.dataset.ungraphed.opts[:graph].must_be_nil
+    sc.dataset.graph(:a).ungraphed.opts[:graph].must_be_nil
   end
 end

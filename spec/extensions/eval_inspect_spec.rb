@@ -4,9 +4,10 @@ Sequel.extension :eval_inspect
 
 describe "eval_inspect extension" do
   before do
-    @ds = Sequel.mock.dataset
-    @ds.meta_def(:supports_window_functions?){true}
-    @ds.meta_def(:literal_blob_append){|sql, s| sql << "X'#{s}'"}
+    @ds = Sequel.mock.dataset.with_extend do
+      def supports_window_functions?; true end
+      def literal_blob_append(sql, s) sql << "X'#{s}'" end
+    end
   end
 
   it "should make eval(obj.inspect) == obj for all Sequel::SQL::Expression subclasses" do

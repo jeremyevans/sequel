@@ -284,16 +284,15 @@ describe Sequel::Plugins do
     m = Module.new do
       module self::ClassMethods
         Sequel::Plugins.after_set_dataset(self, :one)
+        def foo; dataset.send(:cache_get, :foo) end
         private
-        def one
-          dataset.opts[:foo] = 1
-        end
+        def one; dataset.send(:cache_set, :foo, 1) end
       end
     end
     @c.plugin m
-    @c.dataset.opts[:foo].must_be_nil
+    @c.foo.must_be_nil
     @c.set_dataset :blah
-    @c.dataset.opts[:foo].must_equal 1
+    @c.foo.must_equal 1
   end
 end
   

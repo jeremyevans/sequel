@@ -365,14 +365,14 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset DB[:items]
     @c.set_validations{validates_unique(:username)}
-    @c.dataset._fetch = proc do |sql|
+    @c.dataset = @c.dataset.with_fetch(proc do |sql|
       case sql
       when /count.*username = '0records'/
         {:v => 0}
       when /count.*username = '1record'/
         {:v => 1}
       end
-    end
+    end)
     
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.must_be :valid?
@@ -403,14 +403,14 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset DB[:items]
     @c.set_validations{validates_unique([:username, :password])}
-    @c.dataset._fetch = proc do |sql|
+    @c.dataset = @c.dataset.with_fetch(proc do |sql|
       case sql
       when /count.*username = '0records'/
         {:v => 0}
       when /count.*username = '1record'/
         {:v => 1}
       end
-    end
+    end)
     
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.must_be :valid?
@@ -448,7 +448,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset DB[:items]
     @c.set_validations{validates_unique(:username){|ds| ds.filter(:active)}}
-    @c.dataset._fetch = {:v=>0}
+    @c.dataset = @c.dataset.with_fetch(:v=>0)
     
     DB.reset
     @c.new(:username => "0records", :password => "anothertest").must_be :valid?
@@ -461,7 +461,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset DB[:items]
     @c.set_validations{validates_unique(:username, :where=>proc{|ds, obj, cols| ds.where(cols.map{|c| [Sequel.function(:lower, c), obj.send(c).downcase]})})}
-    @c.dataset._fetch = {:v=>0}
+    @c.dataset = @c.dataset.with_fetch(:v=>0)
     
     DB.reset
     @c.new(:username => "0RECORDS", :password => "anothertest").must_be :valid?
@@ -475,7 +475,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.set_dataset DB[:items]
     c = @c
     @c.set_validations{validates_unique(:username, :dataset=>c.where(:a=>[1,2,3]))}
-    @c.dataset._fetch = {:v=>0}
+    @c.dataset = @c.dataset.with_fetch(:v=>0)
     
     DB.reset
     @c.new(:username => "0records", :password => "anothertest").must_be :valid?
@@ -489,7 +489,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.set_dataset DB[:items]
     c = @c
     @c.set_validations{validates_unique(:username, :dataset=>c.cross_join(:a))}
-    @c.dataset._fetch = {:v=>0}
+    @c.dataset = @c.dataset.with_fetch(:v=>0)
     
     DB.reset
     @c.new(:username => "0records", :password => "anothertest").must_be :valid?
@@ -502,7 +502,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset DB[:items]
     @c.set_validations{validates_unique([:username, :password], :only_if_modified=>true)}
-    @c.dataset._fetch = {:v=>0}
+    @c.dataset = @c.dataset.with_fetch(:v=>0)
     
     DB.reset
     @c.new(:username => "0records", :password => "anothertest").must_be :valid?
@@ -531,7 +531,7 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.columns(:id, :username, :password)
     @c.set_dataset DB[:items]
     @c.set_validations{errors.add(:username, 'foo'); validates_unique([:username, :password])}
-    @c.dataset._fetch = {:v=>0}
+    @c.dataset = @c.dataset.with_fetch(:v=>0)
     
     DB.reset
     m = @c.new(:username => "1", :password => "anothertest")

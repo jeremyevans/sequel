@@ -10,9 +10,10 @@ describe "pg_enum extension" do
       def schema_parse_table(*)
         [[:a, {:oid=>1}]]
       end
+      def _metadata_dataset
+        super.with_fetch([[{:v=>1, :enumlabel=>'a'}, {:v=>1, :enumlabel=>'b'}, {:v=>1, :enumlabel=>'c'}], [{:typname=>'enum1', :v=>212389}]])
+      end
     end)
-    @db.send(:metadata_dataset)._fetch = [[{:v=>1, :enumlabel=>'a'}, {:v=>1, :enumlabel=>'b'}, {:v=>1, :enumlabel=>'c'}],
-      [{:typname=>'enum1', :v=>212389}]]
     @db.extension(:pg_array, :pg_enum)
     @db.sqls
   end

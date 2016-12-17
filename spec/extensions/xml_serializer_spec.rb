@@ -19,7 +19,11 @@ describe "Sequel::Plugins::XmlSerializer" do
       attr_accessor :blah
       plugin :xml_serializer
       columns :id, :name, :artist_id
-      @db_schema = {:id=>{:type=>:integer}, :name=>{:type=>:string}, :artist_id=>{:type=>:integer}}
+      @db_schema2 = @db_schema = {:id=>{:type=>:integer}, :name=>{:type=>:string}, :artist_id=>{:type=>:integer}}
+      def self.set_dataset(*)
+        super
+        @db_schema = @db_schema2
+      end
       many_to_one :artist
     end
     @artist = Artist.load(:id=>2, :name=>'YJM')
@@ -142,7 +146,7 @@ describe "Sequel::Plugins::XmlSerializer" do
 
   it "should support an :array_root_name option when serializing arrays" do
     artist = @artist
-    Artist.dataset.meta_def(:all){[artist]}
+    Artist.dataset = Artist.dataset.with_extend{define_method(:all){[artist]}}
     ["<?xml version=\"1.0\"?><ars><ar><id>2</id><name>YJM</name></ar></ars>",
      "<?xml version=\"1.0\"?><ars><ar><name>YJM</name><id>2</id></ar></ars>"].must_include(Artist.to_xml(:array_root_name=>'ars', :root_name=>'ar').gsub(/\n */m, ''))
   end
@@ -154,7 +158,7 @@ describe "Sequel::Plugins::XmlSerializer" do
 
   it "should support a to_xml class and dataset method" do
     album = @album
-    Album.dataset.meta_def(:all){[album]}
+    Album.dataset = Album.dataset.with_extend{define_method(:all){[album]}}
     Album.array_from_xml(Album.to_xml).must_equal [@album]
     Album.array_from_xml(Album.to_xml(:include=>:artist), :associations=>:artist).map{|x| x.artist}.must_equal [@artist]
     Album.array_from_xml(Album.dataset.to_xml(:only=>:name)).must_equal [Album.load(:name=>@album.name)]

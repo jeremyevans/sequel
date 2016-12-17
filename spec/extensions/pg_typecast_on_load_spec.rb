@@ -24,7 +24,7 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
   end
 
   it "should call the database conversion proc with value when automatically reloading the object on creation via insert_select" do
-    @c.dataset.meta_def(:insert_select){|h| insert(h); first}
+    @c.dataset = @c.dataset.with_extend{def insert_select(h) insert(h); first end}
     @c.create.values.must_equal(:id=>1, :b=>true, :y=>0)
   end
 

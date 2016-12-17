@@ -252,15 +252,13 @@ describe "Sequel::IntegerMigrator" do
       end
       
       def dataset
-        ds = super
-        ds.extend(Module.new do
+        super.with_extend do
           def count; 1; end
           def columns; db.columns_created end
           def insert(h); db.versions.merge!(h); db.run insert_sql(h) end
           def update(h); db.versions.merge!(h); db.run update_sql(h) end
           def fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
-        end)
-        ds
+        end
       end
 
       def table_exists?(name)

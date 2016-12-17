@@ -83,13 +83,13 @@ describe "force_encoding plugin" do
   
   it "should work when saving new model instances" do
     o = @c.new
-    ds = DB[:a]
-    def ds.first
-      s = 'blah'.dup
-      s.force_encoding('US-ASCII')
-      {:id=>1, :x=>s}
+    @c.dataset = DB[:a].with_extend do
+      def first
+        s = 'blah'.dup
+        s.force_encoding('US-ASCII')
+        {:id=>1, :x=>s}
+      end
     end
-    @c.dataset = ds
     o.save
     o.x.must_equal 'blah'
     o.x.encoding.must_equal @e1
@@ -97,13 +97,13 @@ describe "force_encoding plugin" do
   
   it "should work when refreshing model instances" do
     o = @c.load(:id=>1, :x=>'as'.dup)
-    ds = DB[:a]
-    def ds.first
-      s = 'blah'.dup
-      s.force_encoding('US-ASCII')
-      {:id=>1, :x=>s}
+    @c.dataset = DB[:a].with_extend do
+      def first
+        s = 'blah'.dup
+        s.force_encoding('US-ASCII')
+        {:id=>1, :x=>s}
+      end
     end
-    @c.dataset = ds
     o.refresh
     o.x.must_equal 'blah'
     o.x.encoding.must_equal @e1

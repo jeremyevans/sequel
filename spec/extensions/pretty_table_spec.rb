@@ -23,7 +23,7 @@ describe "Dataset#print" do
   end
 
   it "should default to the dataset's columns" do
-    @dataset.meta_def(:columns) {[:a, :b]}
+    @dataset.columns(:a, :b)
     @dataset.print
     @output.rewind
     @output.read.must_equal \

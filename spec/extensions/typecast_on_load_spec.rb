@@ -40,7 +40,7 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
 
   it "should call setter method with value when automatically reloading the object on creation via insert_select" do
     @c.plugin :typecast_on_load, :b
-    @c.dataset.meta_def(:insert_select){|h| insert(h); first}
+    @c.dataset = @c.dataset.with_extend{def insert_select(h) insert(h); first end}
     o = @c.new(:b=>"1", :y=>"0")
     o.save.values.must_equal(:id=>1, :b=>1, :y=>"0")
     o.bset.must_equal true

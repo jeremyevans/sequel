@@ -21,7 +21,7 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
       columns :id, :parent_id
       many_to_one :parent, :class=>self
       one_to_many :children, :class=>self, :key=>:parent_id
-      dataset._fetch = proc do |sql|
+      set_dataset dataset.with_fetch(proc do |sql|
         if sql !~ /WHERE/
           [{:id=>1, :parent_id=>101}, {:id=>2, :parent_id=>102}, {:id=>101, :parent_id=>nil}, {:id=>102, :parent_id=>nil}]
         elsif sql =~ /WHERE.*\bid = (\d+)/
@@ -31,7 +31,7 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
         elsif sql =~ /WHERE.*\bparent_id IN \(([\d, ]*)\)/
           $1.split(', ').map{|x| {:id=>x.to_i - 100, :parent_id=>x.to_i} if x.to_i > 100}.compact
         end
-      end
+      end)
     end
     @c = ::TacticalEagerLoadingModel
     @ds = TacticalEagerLoadingModel.dataset
@@ -63,7 +63,7 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
   it "association getter methods should not eagerly load the association if the association is cached" do
     ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
     sql_match(/\ASELECT \* FROM t WHERE \(t\.id IN \(10[12], 10[12]\)\)\z/)
-    def @ds.eager_load(*) raise end
+    @c.dataset = @c.dataset.with_extend{def eager_load(*) raise end}
     ts.map{|x| x.parent}.must_equal [ts[2], ts[3], nil, nil]
   end
 
@@ -113,8 +113,7 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
   it "should handle case where an association is valid on an instance, but not on all instances" do
     c = Class.new(@c)
     c.many_to_one :parent2, :class=>@c, :key=>:parent_id
-    @c.dataset.row_proc = proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}
-    @c.all{|x| x.parent2 if x.is_a?(c)}
+    @c.dataset.with_row_proc(proc{|r| (r[:parent_id] == 101 ? c : @c).call(r)}).all{|x| x.parent2 if x.is_a?(c)}
     sql_match('SELECT * FROM t', 'SELECT * FROM t WHERE id = 101')
   end
 

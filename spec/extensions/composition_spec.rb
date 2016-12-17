@@ -123,8 +123,10 @@ describe "Composition plugin" do
   end
 
   it "should not clear compositions cache when saving with insert_select" do
-    def (@c.instance_dataset).supports_insert_select?() true end
-    def (@c.instance_dataset).insert_select(*) {:id=>1} end
+    @c.dataset = @c.dataset.with_extend do
+      def supports_insert_select?; true end
+      def insert_select(*) {:id=>1} end
+    end
     @c.composition :date, :composer=>proc{}, :decomposer=>proc{}
     @c.create(:date=>Date.new(3, 4, 5)).compositions.must_equal(:date=>Date.new(3, 4, 5))
   end

@@ -160,7 +160,7 @@ describe Sequel::Model, ".def_dataset_method" do
     @c.def_dataset_method(:return_3, :return_4)
     proc{@c.return_3}.must_raise(NoMethodError)
     proc{@c.return_4}.must_raise(NoMethodError)
-    @c.dataset.instance_eval do
+    @c.dataset = @c.dataset.with_extend do
       def return_3; 3; end
       def return_4; 4; end
     end
@@ -575,7 +575,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i.set(:x => 4, :y => 5, :z => 6)
     i.values.must_equal(:x => 4, :y => 5)
 
-    @c.instance_dataset._fetch = @c.dataset._fetch = {:x => 7}
+    @c.dataset = @c.dataset.with_fetch(:x => 7)
     i = @c.new
     i.update(:x => 7, :z => 9)
     i.values.must_equal(:x => 7)
@@ -654,10 +654,8 @@ end
 
 describe Sequel::Model, ".require_modification" do
   before do
-    @ds1 = DB[:items]
-    def @ds1.provides_accurate_rows_matched?() false end
-    @ds2 = DB[:items]
-    def @ds2.provides_accurate_rows_matched?() true end
+    @ds1 = DB[:items].with_extend{def provides_accurate_rows_matched?; false end}
+    @ds2 = DB[:items].with_extend{def provides_accurate_rows_matched?; true end}
   end
   after do
     Sequel::Model.require_modification = nil
@@ -734,15 +732,13 @@ describe Sequel::Model, ".[] optimization" do
   end
 
   it "should use Dataset#with_sql if simple_table and simple_pk are true" do
-    @c.set_dataset :a
-    @c.instance_dataset._fetch = @c.dataset._fetch = {:id => 1}
+    @c.set_dataset @db[:a].with_fetch(:id=>1)
     @c[1].must_equal @c.load(:id=>1)
     @db.sqls.must_equal ['SELECT * FROM a WHERE id = 1']
   end
 
   it "should not use Dataset#with_sql if either simple_table or simple_pk is nil" do
-    @c.set_dataset @db[:a].filter(:active)
-    @c.dataset._fetch = {:id => 1}
+    @c.set_dataset @db[:a].where(:active).with_fetch(:id=>1)
     @c[1].must_equal @c.load(:id=>1)
     @db.sqls.must_equal ['SELECT * FROM a WHERE (active AND (id = 1)) LIMIT 1']
   end
@@ -751,8 +747,7 @@ end
 describe "Model datasets #with_pk with #with_pk!" do
   before do
     @c = Class.new(Sequel::Model(:a))
-    @ds = @c.dataset
-    @ds._fetch = {:id=>1}
+    @ds = @c.dataset = @c.dataset.with_fetch(:id=>1)
     DB.reset
   end
 
@@ -820,7 +815,7 @@ describe "Model datasets #with_pk with #with_pk!" do
   end
 
   it "should have with_pk return nil and with_pk! raise if no rows match" do
-    @ds._fetch = []
+    @ds = @ds.with_fetch([])
     @ds.with_pk(1).must_be_nil
     DB.sqls.must_equal ["SELECT * FROM a WHERE (a.id = 1) LIMIT 1"]
     proc{@ds.with_pk!(1)}.must_raise(Sequel::NoMatchingRow)
@@ -828,7 +823,7 @@ describe "Model datasets #with_pk with #with_pk!" do
   end
 
   it "should have with_pk return nil and with_pk! raise if no rows match when calling the class method" do
-    @ds._fetch = []
+    @c.dataset = @c.dataset.with_fetch([])
     @c.with_pk(1).must_be_nil
     DB.sqls.must_equal ["SELECT * FROM a WHERE id = 1"]
     proc{@c.with_pk!(1)}.must_raise(Sequel::NoMatchingRow)

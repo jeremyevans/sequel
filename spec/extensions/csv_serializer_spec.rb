@@ -109,8 +109,10 @@ describe "Sequel::Plugins::CsvSerializer" do
   end
 
   it "should support a to_csv class and dataset method" do
-    @Album.dataset._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
-    @Artist.dataset._fetch = {:id=>2, :name=>'YJM'}
+    @Album.dataset = @Album.dataset.with_fetch(:id=>1, :name=>'RF', :artist_id=>2)
+    @Artist.dataset = @Artist.dataset.with_fetch(:id=>2, :name=>'YJM')
+    @Album.columns(:id, :name, :artist_id)
+    @Album.db_schema.replace(:id=>{:type=>:integer}, :artist_id=>{:type=>:integer})
     @Album.array_from_csv(@Album.to_csv).must_equal [@album]
     @Album.array_from_csv(@Album.dataset.to_csv(:only=>:name), :only=>:name).must_equal [@Album.load(:name=>@album.name)]
   end
@@ -167,8 +169,7 @@ describe "Sequel::Plugins::CsvSerializer" do
     columns = [:id]
     ds = @Artist.select(*columns).limit(1)
     ds.send(:columns=, columns)
-    ds._fetch = [:id => 10]
-    ds.to_csv(:write_headers => true).must_equal "id\n10\n"
+    ds.with_fetch(:id => 10).to_csv(:write_headers => true).must_equal "id\n10\n"
   end
 
   it "should pass all the examples from the documentation" do

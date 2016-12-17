@@ -49,9 +49,7 @@ describe Sequel::Model, "caching" do
     end    
 
     [@c, @c2, @c3, @c4].each do |c|
-      ds = c.dataset
-      ds._fetch = {:name => 'sharon'.dup, :id => 1}
-      ds.numrows = 1
+      c.dataset = c.dataset.with_fetch(:name => 'sharon'.dup, :id => 1).with_numrows(1)
     end
 
     @c.db.reset
@@ -236,6 +234,7 @@ describe Sequel::Model, "caching" do
   
   it "should rescue an exception if cache_store is memcached and ignore_exception is enabled" do
     @c4[1].values.must_equal(:name => 'sharon', :id => 1)
+    @c4.dataset = @c4.dataset.with_fetch(:name => 'sharon', :id => 1, :x=>1)
     m = @c4.new.save
     m.update({:name=>'blah'})
     m.values.must_equal(:name => 'blah', :id => 1, :x => 1)

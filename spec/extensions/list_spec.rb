@@ -67,17 +67,16 @@ describe "List plugin" do
   end
 
   it "should have at_position return the model object at the given position" do
-    @c.dataset._fetch = {:id=>1, :position=>1}
+    @c.dataset = @c.dataset.with_fetch(:id=>1, :position=>1)
     @o.at_position(10).must_equal @c.load(:id=>1, :position=>1)
-    @sc.dataset._fetch = {:id=>2, :position=>2, :scope_id=>5}
+    @sc.dataset = @sc.dataset.with_fetch(:id=>2, :position=>2, :scope_id=>5)
     @so.at_position(20).must_equal @sc.load(:id=>2, :position=>2, :scope_id=>5)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 10) ORDER BY position LIMIT 1",
       "SELECT * FROM items WHERE ((scope_id = 5) AND (position = 20)) ORDER BY scope_id, position LIMIT 1"]
   end
 
   it "should have position field set to max+1 when creating if not already set" do
-    @c.instance_dataset._fetch = @c.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :position=>2}]]
-    @c.instance_dataset.autoid = @c.dataset.autoid = 1
+    @c.dataset = @c.dataset.with_autoid(1).with_fetch([[{:pos=>nil}], [{:id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :position=>2}]])
     @c.create.values.must_equal(:id=>1, :position=>1)
     @c.create.values.must_equal(:id=>2, :position=>2)
     @db.sqls.must_equal ["SELECT max(position) AS max FROM items LIMIT 1",
@@ -89,8 +88,7 @@ describe "List plugin" do
   end
 
   it "should have position field set to max+1 in scope when creating if not already set" do
-    @sc.instance_dataset._fetch = @sc.dataset._fetch = [[{:pos=>nil}], [{:id=>1, :scope_id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :scope_id=>1, :position=>2}], [{:pos=>nil}], [{:id=>3, :scope_id=>2, :position=>1}]]
-    @sc.instance_dataset.autoid = @sc.dataset.autoid = 1
+    @sc.dataset = @sc.dataset.with_autoid(1).with_fetch([[{:pos=>nil}], [{:id=>1, :scope_id=>1, :position=>1}], [{:pos=>1}], [{:id=>2, :scope_id=>1, :position=>2}], [{:pos=>nil}], [{:id=>3, :scope_id=>2, :position=>1}]])
     @sc.create(:scope_id=>1).values.must_equal(:id=>1, :scope_id=>1, :position=>1)
     @sc.create(:scope_id=>1).values.must_equal(:id=>2, :scope_id=>1, :position=>2)
     @sc.create(:scope_id=>2).values.must_equal(:id=>3, :scope_id=>2, :position=>1)
@@ -112,9 +110,9 @@ describe "List plugin" do
   end
 
   it "should have last_position return the last position in the list" do
-    @c.dataset._fetch  = {:max=>10}
+    @c.dataset = @c.dataset.with_fetch(:max=>10)
     @o.last_position.must_equal 10
-    @sc.dataset._fetch = {:max=>20}
+    @sc.dataset = @sc.dataset.with_fetch(:max=>20)
     @so.last_position.must_equal 20
     @db.sqls.must_equal ["SELECT max(position) AS max FROM items LIMIT 1",
       "SELECT max(position) AS max FROM items WHERE (scope_id = 5) LIMIT 1"]
@@ -129,7 +127,7 @@ describe "List plugin" do
   end
 
   it "should have move_down without an argument move down a single position" do
-    @c.dataset._fetch = {:max=>10}
+    @c.dataset = @c.dataset.with_fetch(:max=>10)
     @o.move_down.must_equal @o
     @o.position.must_equal 4
     @db.sqls.must_equal ["SELECT max(position) AS max FROM items LIMIT 1",
@@ -138,7 +136,7 @@ describe "List plugin" do
   end
 
   it "should have move_down with an argument move down the given number of positions" do
-    @c.dataset._fetch = {:max=>10}
+    @c.dataset = @c.dataset.with_fetch(:max=>10)
     @o.move_down(3).must_equal @o
     @o.position.must_equal 6
     @db.sqls.must_equal ["SELECT max(position) AS max FROM items LIMIT 1",
@@ -156,7 +154,7 @@ describe "List plugin" do
   it "should have move_to handle out of range targets" do
     @o.move_to(0)
     @o.position.must_equal 1
-    @c.dataset._fetch = {:max=>10}
+    @c.dataset = @c.dataset.with_fetch(:max=>10)
     @o.move_to(11)
     @o.position.must_equal 10
   end
@@ -183,13 +181,13 @@ describe "List plugin" do
   end
 
   it "should have move to shift entries correctly between current and target if moving down" do
-    @c.dataset._fetch = {:max=>10}
+    @c.dataset = @c.dataset.with_fetch(:max=>10)
     @o.move_to(4)
     @db.sqls[1].must_equal "UPDATE items SET position = (position - 1) WHERE ((position >= 4) AND (position <= 4))"
   end
 
   it "should have move_to_bottom move the item to the last position" do
-    @c.dataset._fetch = {:max=>10}
+    @c.dataset = @c.dataset.with_fetch(:max=>10)
     @o.move_to_bottom
     @db.sqls.must_equal ["SELECT max(position) AS max FROM items LIMIT 1",
       "UPDATE items SET position = (position - 1) WHERE ((position >= 4) AND (position <= 10))",
@@ -217,7 +215,7 @@ describe "List plugin" do
   end
 
   it "should have move_up with a negative argument move down the given number of positions" do
-    @c.dataset._fetch = {:max=>10}
+    @c.dataset = @c.dataset.with_fetch(:max=>10)
     @o.move_up(-1).must_equal @o
     @o.position.must_equal 4
     @db.sqls.must_equal ["SELECT max(position) AS max FROM items LIMIT 1",
@@ -226,19 +224,19 @@ describe "List plugin" do
   end
 
   it "should have next return the next entry in the list if not given an argument" do
-    @c.dataset._fetch = {:id=>9, :position=>4}
+    @c.dataset = @c.dataset.with_fetch(:id=>9, :position=>4)
     @o.next.must_equal @c.load(:id=>9, :position=>4)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 4) ORDER BY position LIMIT 1"]
   end
 
   it "should have next return the entry the given number of positions below the instance if given an argument" do
-    @c.dataset._fetch = {:id=>9, :position=>5}
+    @c.dataset = @c.dataset.with_fetch(:id=>9, :position=>5)
     @o.next(2).must_equal @c.load(:id=>9, :position=>5)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 5) ORDER BY position LIMIT 1"]
   end
 
   it "should have next return a previous entry if given a negative argument" do
-    @c.dataset._fetch = {:id=>9, :position=>2}
+    @c.dataset = @c.dataset.with_fetch(:id=>9, :position=>2)
     @o.next(-1).must_equal @c.load(:id=>9, :position=>2)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 2) ORDER BY position LIMIT 1"]
   end
@@ -248,19 +246,19 @@ describe "List plugin" do
   end
 
   it "should have prev return the previous entry in the list if not given an argument" do
-    @c.dataset._fetch = {:id=>9, :position=>2}
+    @c.dataset = @c.dataset.with_fetch(:id=>9, :position=>2)
     @o.prev.must_equal @c.load(:id=>9, :position=>2)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 2) ORDER BY position LIMIT 1"]
   end
 
   it "should have prev return the entry the given number of positions above the instance if given an argument" do
-    @c.dataset._fetch = {:id=>9, :position=>1}
+    @c.dataset = @c.dataset.with_fetch(:id=>9, :position=>1)
     @o.prev(2).must_equal @c.load(:id=>9, :position=>1)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 1) ORDER BY position LIMIT 1"]
   end
 
   it "should have prev return a following entry if given a negative argument" do
-    @c.dataset._fetch = {:id=>9, :position=>4}
+    @c.dataset = @c.dataset.with_fetch(:id=>9, :position=>4)
     @o.prev(-1).must_equal @c.load(:id=>9, :position=>4)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (position = 4) ORDER BY position LIMIT 1"]
   end

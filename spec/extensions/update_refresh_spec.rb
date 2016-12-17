@@ -45,7 +45,7 @@ describe "Sequel::Plugins::UpdateRefresh" do
     @c.dataset = @db[:test].select(:id, :name)
     @db.sqls
     o = @c.load(:id=>1, :name=>'a')
-    o.this.opts[:returning] = [:id, :name]
+    o.instance_variable_set(:@this, o.this.returning(:id, :name))
     o.save
     @db.sqls.must_equal ["UPDATE test SET name = 'a' WHERE (id = 1) RETURNING id, name"]
     o.name.must_equal 'b'

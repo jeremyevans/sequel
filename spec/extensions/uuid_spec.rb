@@ -14,7 +14,6 @@ describe "Sequel::Plugins::Uuid" do
       end
       db.reset
     end
-    @c.dataset.autoid = nil
   end
   
   it "should handle validations on the uuid field for new objects" do

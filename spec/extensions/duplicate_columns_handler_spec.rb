@@ -48,13 +48,10 @@ describe "Sequel::DuplicateColumnsHandler Database configuration" do
   before do
     @db = Sequel.mock
     @db.extension(:duplicate_columns_handler)
-    @ds = @db[:things]
     @cols = [:id, :name, :id]
     @warned = nil
     set_warned = @set_warned = proc{|m| @warned = m}
-    @ds.meta_def(:warn) do |message|
-      set_warned.call(message)
-    end
+    @ds = @db[:things].with_extend{define_method(:warn){|message| set_warned.call(message)}}
   end
 
   def check(handler, cols)
@@ -68,13 +65,10 @@ end
 
 describe "Sequel::DuplicateColumnsHandler Dataset configuration" do
   before do
-    @ds = Sequel.mock[:things].extension!(:duplicate_columns_handler)
     @cols = [:id, :name, :id]
     @warned = nil
     set_warned = @set_warned = proc{|m| @warned = m}
-    @ds.meta_def(:warn) do |message|
-      set_warned.call(message)
-    end
+    @ds = Sequel.mock[:things].extension(:duplicate_columns_handler).with_extend{define_method(:warn){|message| set_warned.call(message)}}
   end
 
   def check(handler, cols)

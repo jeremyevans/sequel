@@ -1499,7 +1499,7 @@ describe "Database#fetch" do
     ds.select_sql.must_equal 'select * from xyz'
     ds.sql.must_equal 'select * from xyz'
     
-    ds.filter!{price.sql_number < 100}
+    ds = ds.where{price.sql_number < 100}
     ds.select_sql.must_equal 'select * from xyz'
     ds.sql.must_equal 'select * from xyz'
   end

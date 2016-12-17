@@ -234,7 +234,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad'}}
     c.constraint_validations.must_equal [[:validates_unique, [:name], {:message=>'is bad'}]]
     c.constraint_validation_reflections.must_equal(:name=>[[:unique, {:message=>'is bad'}]])
-    c.dataset._fetch = {:count=>1}
+    c.dataset = c.dataset.with_fetch(:count=>1)
     o = c.new(:name=>'a')
     o.valid?.must_equal false
     o.errors.full_messages.must_equal ['name is bad']
@@ -245,7 +245,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     c.plugin :constraint_validations, :validation_options=>{:unique=>{:message=>'is bad'}}
     c.constraint_validations.must_equal [[:validates_unique, [:name], {:message=>'is bad', :allow_nil=>true}]]
     c.constraint_validation_reflections.must_equal(:name=>[[:unique, {:message=>'is bad', :allow_nil=>true}]])
-    c.dataset._fetch = {:count=>1}
+    c.dataset = c.dataset.with_fetch(:count=>1)
     o = c.new(:name=>'a')
     o.valid?.must_equal false
     o.errors.full_messages.must_equal ['name is bad']
@@ -258,7 +258,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     sc.plugin :constraint_validations, :validation_options=>{:unique=>{:allow_missing=>true, :allow_nil=>false}}
     sc.constraint_validations.must_equal [[:validates_unique, [:name], {:message=>'is bad', :allow_missing=>true, :allow_nil=>false}]]
     sc.constraint_validation_reflections.must_equal(:name=>[[:unique, {:message=>'is bad', :allow_missing=>true, :allow_nil=>false}]])
-    sc.dataset._fetch = {:count=>1}
+    sc.dataset = sc.dataset.with_fetch(:count=>1)
     o = sc.new(:name=>'a')
     o.valid?.must_equal false
     o.errors.full_messages.must_equal ['name is bad']

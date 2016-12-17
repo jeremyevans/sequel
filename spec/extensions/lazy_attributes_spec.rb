@@ -12,7 +12,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       meta_def(:columns){[:id, :name]}
       lazy_attributes :name
       meta_def(:columns){[:id]}
-      instance_dataset._fetch = dataset._fetch = proc do |sql|
+      set_dataset dataset.with_fetch(proc do |sql|
         if sql !~ /WHERE/
           if sql =~ /name/
             [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
@@ -32,7 +32,7 @@ describe "Sequel::Plugins::LazyAttributes" do
             end
           end
         end
-      end
+      end)
     end
     @c = ::LazyAttributesModel
     @ds = LazyAttributesModel.dataset
@@ -148,7 +148,7 @@ describe "Sequel::Plugins::LazyAttributes" do
 
   it "should work with the serialization plugin" do
     @c.plugin :serialization, :yaml, :name
-    @c.instance_dataset._fetch = @ds._fetch = [[{:id=>1}, {:id=>2}], [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}], [{:id=>1}], [{:name=>"--- 3\n"}]]
+    @ds = @c.dataset = @ds.with_fetch([[{:id=>1}, {:id=>2}], [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}], [{:id=>1}], [{:name=>"--- 3\n"}]])
     ms = @ds.all
     ms.map{|m| m.values}.must_equal [{:id=>1}, {:id=>2}]
     ms.map{|m| m.name}.must_equal [3,6]

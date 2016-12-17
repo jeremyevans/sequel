@@ -50,9 +50,7 @@ describe "column_conflicts plugin" do
   end
 
   it "should work correctly for dataset changes" do
-    ds = @db[:test]
-    def ds.columns; [:object_id] end
-    @c.dataset = ds
+    @c.dataset = @db[:test].with_extend{def columns; [:object_id] end}
     o = @c.load(:object_id=>3)
     o.get_column_value(:object_id).must_equal 3
     o.object_id.wont_equal 3

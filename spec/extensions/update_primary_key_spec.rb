@@ -5,6 +5,10 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
     @c = Class.new(Sequel::Model(:a))
     @c.plugin :update_primary_key
     @c.columns :a, :b
+    def @c.set_dataset(*)
+      super
+      set_primary_key :a
+    end
     @c.set_primary_key :a
     @c.unrestrict_primary_key
     @ds = @c.dataset
@@ -12,7 +16,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
   end
 
   it "should handle regular updates" do
-    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>1, :b=>4}], [{:a=>1, :b=>4}], [{:a=>1, :b=>5}], [{:a=>1, :b=>5}], [{:a=>1, :b=>6}], [{:a=>1, :b=>6}]]
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>1, :b=>4}], [{:a=>1, :b=>4}], [{:a=>1, :b=>5}], [{:a=>1, :b=>5}], [{:a=>1, :b=>6}], [{:a=>1, :b=>6}]])
     @c.first.update(:b=>4)
     @c.all.must_equal [@c.load(:a=>1, :b=>4)]
     DB.sqls.must_equal ["SELECT * FROM a LIMIT 1", "UPDATE a SET b = 4 WHERE (a = 1)", "SELECT * FROM a"]
@@ -25,7 +29,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
   end
 
   it "should handle updating the primary key field with another field" do
-    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]]
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]])
     @c.first.update(:a=>2, :b=>4)
     @c.all.must_equal [@c.load(:a=>2, :b=>4)]
     sqls = DB.sqls
@@ -34,7 +38,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
   end
 
   it "should handle updating just the primary key field when saving changes" do
-    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>2, :b=>3}], [{:a=>2, :b=>3}], [{:a=>3, :b=>3}]]
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>3}], [{:a=>2, :b=>3}], [{:a=>3, :b=>3}]])
     @c.first.update(:a=>2)
     @c.all.must_equal [@c.load(:a=>2, :b=>3)]
     DB.sqls.must_equal ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 2 WHERE (a = 1)", "SELECT * FROM a"]
@@ -44,7 +48,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
   end
 
   it "should handle saving after modifying the primary key field with another field" do
-    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]]
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]])
     @c.first.set(:a=>2, :b=>4).save
     @c.all.must_equal [@c.load(:a=>2, :b=>4)]
     sqls = DB.sqls
@@ -53,7 +57,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
   end
 
   it "should handle saving after modifying just the primary key field" do
-    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>2, :b=>3}]]
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>3}]])
     @c.first.set(:a=>2).save
     @c.all.must_equal [@c.load(:a=>2, :b=>3)]
     sqls = DB.sqls
@@ -62,7 +66,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
   end
 
   it "should handle saving after updating the primary key" do
-    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>2, :b=>5}]]
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>5}]])
     @c.first.update(:a=>2).update(:b=>4).set(:b=>5).save
     @c.all.must_equal [@c.load(:a=>2, :b=>5)]
     DB.sqls.must_equal ["SELECT * FROM a LIMIT 1", "UPDATE a SET a = 2 WHERE (a = 1)", "UPDATE a SET b = 4 WHERE (a = 2)", "UPDATE a SET b = 5 WHERE (a = 2)", "SELECT * FROM a"]
@@ -70,7 +74,7 @@ describe "Sequel::Plugins::UpdatePrimaryKey" do
 
   it "should work correctly when using the prepared_statements plugin" do
     @c.plugin :prepared_statements
-    @ds._fetch = [[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]]
+    @c.dataset = @c.dataset.with_fetch([[{:a=>1, :b=>3}], [{:a=>2, :b=>4}]])
     o = @c.first
     o.update(:a=>2, :b=>4)
     @c.all.must_equal [@c.load(:a=>2, :b=>4)]

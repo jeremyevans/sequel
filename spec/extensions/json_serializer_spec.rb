@@ -174,16 +174,15 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   it "should support a to_json class and dataset method" do
-    Album.dataset._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
-    Artist.dataset._fetch = {:id=>2, :name=>'YJM'}
+    Album.dataset = Album.dataset.with_fetch(:id=>1, :name=>'RF', :artist_id=>2)
+    Artist.dataset = Artist.dataset.with_fetch(:id=>2, :name=>'YJM')
     Album.array_from_json(Album.to_json).must_equal [@album]
     Album.array_from_json(Album.to_json(:include=>:artist), :associations=>:artist).map{|x| x.artist}.must_equal [@artist]
     Album.array_from_json(Album.dataset.to_json(:only=>:name)).must_equal [Album.load(:name=>@album.name)]
   end
 
   it "should have dataset to_json method work with naked datasets" do
-    ds = Album.dataset.naked
-    ds._fetch = {:id=>1, :name=>'RF', :artist_id=>2}
+    ds = Album.dataset.naked.with_fetch(:id=>1, :name=>'RF', :artist_id=>2)
     Sequel.parse_json(ds.to_json).must_equal [@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}]
   end
 
@@ -227,7 +226,7 @@ describe "Sequel::Plugins::JsonSerializer" do
       end
     end
     Namespace::Album.new({}).to_json(:root=>true).to_s.must_equal '{"album":{}}'
-    Namespace::Album.dataset._fetch = [{}]
+    Namespace::Album.dataset = Namespace::Album.dataset.with_fetch([{}])
     Namespace::Album.dataset.to_json(:root=>:collection).to_s.must_equal '{"albums":[{}]}'
     Namespace::Album.dataset.to_json(:root=>:both).to_s.must_equal '{"albums":[{"album":{}}]}'
     Object.send(:remove_const, :Namespace)
@@ -239,25 +238,23 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
   
   it "should handle the :root=>:both option to qualify a dataset of records" do
-    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
-    Album.dataset.to_json(:root=>:both, :only => :id).to_s.must_equal '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
+    Album.dataset.with_fetch([{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]).to_json(:root=>:both, :only => :id).to_s.must_equal '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
   end
 
   it "should handle the :root=>:collection option to qualify just the collection" do
-    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
-    Album.dataset.to_json(:root=>:collection, :only => :id).to_s.must_equal '{"albums":[{"id":1},{"id":1}]}'
-    Album.dataset.to_json(:root=>true, :only => :id).to_s.must_equal '{"albums":[{"id":1},{"id":1}]}'
+    ds = Album.dataset.with_fetch([{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}])
+    ds.to_json(:root=>:collection, :only => :id).to_s.must_equal '{"albums":[{"id":1},{"id":1}]}'
+    ds.to_json(:root=>true, :only => :id).to_s.must_equal '{"albums":[{"id":1},{"id":1}]}'
   end
 
   it "should handle the :root=>:instance option to qualify just the instances" do
-    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
-    Album.dataset.to_json(:root=>:instance, :only => :id).to_s.must_equal '[{"album":{"id":1}},{"album":{"id":1}}]'
+    Album.dataset.with_fetch([{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]).to_json(:root=>:instance, :only => :id).to_s.must_equal '[{"album":{"id":1}},{"album":{"id":1}}]'
   end
 
   it "should handle the :root=>string option to qualify just the collection using the string as the key" do
-    Album.dataset._fetch = [{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}]
-    Album.dataset.to_json(:root=>"foos", :only => :id).to_s.must_equal '{"foos":[{"id":1},{"id":1}]}'
-    Album.dataset.to_json(:root=>"bars", :only => :id).to_s.must_equal '{"bars":[{"id":1},{"id":1}]}'
+    ds = Album.dataset.with_fetch([{:id=>1, :name=>'RF'}, {:id=>1, :name=>'RF'}])
+    ds.to_json(:root=>"foos", :only => :id).to_s.must_equal '{"foos":[{"id":1},{"id":1}]}'
+    ds.to_json(:root=>"bars", :only => :id).to_s.must_equal '{"bars":[{"id":1},{"id":1}]}'
   end
 
   it "should use an alias for an included asscociation to qualify an association" do

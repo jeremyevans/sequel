@@ -829,7 +829,7 @@ describe Sequel::Model, "Validations" do
         uniqueness_of :username
       end
     end
-    User.dataset._fetch = proc do |sql|
+    User.dataset = User.dataset.with_fetch(proc do |sql|
       case sql
       when /count.*username = '0records'/
         {:v => 0}
@@ -840,7 +840,7 @@ describe Sequel::Model, "Validations" do
       when /username = '1record'/
         {:id => 3, :username => "1record", :password => "test"}
       end
-    end
+    end)
     
     @user = User.new(:username => "2records", :password => "anothertest")
     @user.wont_be :valid?
@@ -876,7 +876,7 @@ describe Sequel::Model, "Validations" do
         uniqueness_of [:username, :password]
       end
     end
-    User.dataset._fetch = proc do |sql|
+    User.dataset = User.dataset.with_fetch(proc do |sql|
       case sql
       when /count.*username = '0records'/
         {:v => 0}
@@ -891,7 +891,7 @@ describe Sequel::Model, "Validations" do
           {:id => 4, :username => "1record", :password => "test"}
         end
       end
-    end
+    end)
     
     @user = User.new(:username => "2records", :password => "anothertest")
     @user.wont_be :valid?

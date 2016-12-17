@@ -25,10 +25,13 @@ describe "Sequel::Dataset #set_defaults" do
     @ds.update_sql('y = 2').must_equal "UPDATE items SET y = 2"
   end
 
-  it "should have working mutation method" do
-    @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides)
-    @ds.set_defaults!(:x=>1)
-    @ds.insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
+  # SEQUEL5: Remove
+  unless Sequel.mock.dataset.frozen?
+    it "should have working mutation method" do
+      @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides)
+      @ds.set_defaults!(:x=>1)
+      @ds.insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
+    end
   end
 end
 
@@ -53,10 +56,13 @@ describe "Sequel::Dataset #set_overrides" do
     @ds.set_overrides(:x=>2).update_sql.must_equal "UPDATE items SET x = 1"
   end
 
-  it "should have working mutation method" do
-    @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides)
-    @ds.set_overrides!(:x=>1)
-    @ds.insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
+  # SEQUEL5: Remove
+  unless Sequel.mock.dataset.frozen?
+    it "should have working mutation method" do
+      @ds = Sequel.mock.dataset.from(:items).extension(:set_overrides)
+      @ds.set_overrides!(:x=>1)
+      @ds.insert_sql.must_equal "INSERT INTO items (x) VALUES (1)"
+    end
   end
 
   it "should consider dataset with select overrides and default a simple select all" do

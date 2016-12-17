@@ -3,7 +3,6 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "instance_filters plugin" do
   before do
     @c = Class.new(Sequel::Model(:people))
-    @c.dataset.quote_identifiers = false
     @c.columns :id, :name, :num
     @c.plugin :instance_filters
     @p = @c.load(:id=>1, :name=>'John', :num=>1)
@@ -14,7 +13,7 @@ describe "instance_filters plugin" do
     @p.update(:name=>'Bob')
     DB.sqls.must_equal ["UPDATE people SET name = 'Bob' WHERE (id = 1)"]
     @p.instance_filter(:name=>'Jim')
-    @p.this.numrows = 0
+    @p.instance_variable_set(:@this, @p.this.with_numrows(0))
     proc{@p.update(:name=>'Joe')}.must_raise(Sequel::Plugins::InstanceFilters::Error)
     DB.sqls.must_equal ["UPDATE people SET name = 'Joe' WHERE ((id = 1) AND (name = 'Jim'))"]
   end 
@@ -23,7 +22,7 @@ describe "instance_filters plugin" do
     @p.destroy
     DB.sqls.must_equal ["DELETE FROM people WHERE id = 1"]
     @p.instance_filter(:name=>'Jim')
-    @p.this.numrows = 0
+    @p.instance_variable_set(:@this, @p.this.with_numrows(0))
     proc{@p.destroy}.must_raise(Sequel::Plugins::InstanceFilters::Error)
     DB.sqls.must_equal ["DELETE FROM people WHERE ((id = 1) AND (name = 'Jim'))"]
   end 
@@ -34,16 +33,16 @@ describe "instance_filters plugin" do
     @p.update(:name=>'Bob')
     DB.sqls.must_equal ["UPDATE people SET name = 'Bob' WHERE (id = 1)"]
     @p.instance_filter(:name=>'Jim')
-    @p.this.numrows = 0
+    @p.instance_variable_set(:@this, @p.this.with_numrows(0))
     proc{@p.update(:name=>'Joe')}.must_raise(Sequel::Plugins::InstanceFilters::Error)
     DB.sqls.must_equal ["UPDATE people SET name = 'Joe' WHERE ((id = 1) AND (name = 'Jim'))"]
 
     @p = @c.load(:id=>1, :name=>'John', :num=>1)
-    @p.this.numrows = 1
+    @p.instance_variable_set(:@this, @p.this.with_numrows(1))
     @p.destroy
     DB.sqls.must_equal ["DELETE FROM people WHERE (id = 1)"]
     @p.instance_filter(:name=>'Jim')
-    @p.this.numrows = 0
+    @p.instance_variable_set(:@this, @p.this.with_numrows(0))
     proc{@p.destroy}.must_raise(Sequel::Plugins::InstanceFilters::Error)
     DB.sqls.must_equal ["DELETE FROM people WHERE ((id = 1) AND (name = 'Jim'))"]
     

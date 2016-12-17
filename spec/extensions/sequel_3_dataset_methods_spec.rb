@@ -56,35 +56,38 @@ describe "Dataset#insert_multiple" do
   end
 end
 
-describe "Dataset#db=" do
-  it "should change the dataset's database" do
-    db = Sequel.mock
-    ds = db[:items].extension(:sequel_3_dataset_methods)
-    db2 = Sequel.mock
-    ds.db = db2
-    ds.db.must_equal db2
-    ds.db.wont_equal db
+# SEQUEL5: Remove
+unless Sequel.mock.dataset.frozen?
+  describe "Dataset#db=" do
+    it "should change the dataset's database" do
+      db = Sequel.mock
+      ds = db[:items].extension(:sequel_3_dataset_methods)
+      db2 = Sequel.mock
+      ds.db = db2
+      ds.db.must_equal db2
+      ds.db.wont_equal db
+    end
+
+    it "should raise error for frozen datasets" do
+      ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
+      proc{ds.db = ds.db}.must_raise RuntimeError
+    end
   end
 
-  it "should raise error for frozen datasets" do
-    ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
-    proc{ds.db = ds.db}.must_raise RuntimeError
-  end
-end
+  describe "Dataset#opts=" do
+    it "should change the dataset's opts" do
+      db = Sequel.mock
+      ds = db[:items].extension(:sequel_3_dataset_methods)
+      ds.sql.must_equal 'SELECT * FROM items'
+      ds.opts = {}
+      ds.sql.must_equal 'SELECT *'
+      ds.opts.must_equal({})
+    end
 
-describe "Dataset#opts=" do
-  it "should change the dataset's opts" do
-    db = Sequel.mock
-    ds = db[:items].extension(:sequel_3_dataset_methods)
-    ds.sql.must_equal 'SELECT * FROM items'
-    ds.opts = {}
-    ds.sql.must_equal 'SELECT *'
-    ds.opts.must_equal({})
-  end
-
-  it "should raise error for frozen datasets" do
-    ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
-    proc{ds.opts = {}}.must_raise RuntimeError
+    it "should raise error for frozen datasets" do
+      ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
+      proc{ds.opts = {}}.must_raise RuntimeError
+    end
   end
 end
 

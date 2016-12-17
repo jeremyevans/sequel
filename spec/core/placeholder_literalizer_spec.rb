@@ -87,7 +87,7 @@ describe "Dataset::PlaceholderLiteralizer" do
   end
   
   it "should handle dataset with row procs" do
-    @ds.row_proc = proc{|r| {:foo=>r[:id]+1}}
+    @ds = @ds.with_row_proc(proc{|r| {:foo=>r[:id]+1}})
     loader = @c.loader(@ds){|pl, ds| ds.where(:a=>pl.arg)}
     loader.first(1).must_equal(:foo=>2)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (a = 1)"]
@@ -124,9 +124,7 @@ describe "Dataset::PlaceholderLiteralizer" do
   it "should support modifying dataset used on per-call basis with #run" do
     loader = @c.loader(@ds){|pl, ds| ds.where(:a=>pl.arg)}
     loader.with_dataset do |ds|
-      ds = ds.clone
-      ds.row_proc = lambda{|row| [row]}
-      ds
+      ds.with_row_proc(lambda{|row| [row]})
     end.all(1).must_equal [[@h]]
     @db.sqls.must_equal ["SELECT * FROM items WHERE (a = 1)"]
   end

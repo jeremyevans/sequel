@@ -34,13 +34,14 @@ end
 describe "Core extensions" do
   before do
     db = Sequel.mock
-    @d = db[:items]
-    def @d.supports_regexp?; true end
-    def @d.l(*args, &block)
-      literal(filter_expr(*args, &block))
-    end
-    def @d.lit(*args)
-      literal(*args)
+    @d = db[:items].with_extend do
+      def supports_regexp?; true end
+      def l(*args, &block)
+        literal(filter_expr(*args, &block))
+      end
+      def lit(*args)
+        literal(*args)
+      end
     end
   end
   
@@ -332,16 +333,14 @@ describe "String#lit" do
     a = 'DISTINCT ?'.lit(:a)
     a.must_be_kind_of(Sequel::SQL::PlaceholderLiteralString)
     @ds.literal(a).must_equal 'DISTINCT a'
-    @ds.quote_identifiers = true
-    @ds.literal(a).must_equal 'DISTINCT "a"'
+    @ds.with_quote_identifiers(true).literal(a).must_equal 'DISTINCT "a"'
   end
   
   it "should handle named placeholders if given a single argument hash" do
     a = 'DISTINCT :b'.lit(:b=>:a)
     a.must_be_kind_of(Sequel::SQL::PlaceholderLiteralString)
     @ds.literal(a).must_equal 'DISTINCT a'
-    @ds.quote_identifiers = true
-    @ds.literal(a).must_equal 'DISTINCT "a"'
+    @ds.with_quote_identifiers(true).literal(a).must_equal 'DISTINCT "a"'
   end
 
   it "should treat placeholder literal strings as generic expressions" do
@@ -445,12 +444,7 @@ end
 
 describe "Column references" do
   before do
-    @ds = Sequel.mock.dataset.with_extend do
-      def quoted_identifier_append(sql, c)
-        sql << "`#{c}`"
-      end
-    end
-    @ds.quote_identifiers = true
+    @ds = Sequel.mock.dataset.with_quote_identifiers(true).with_extend{def quoted_identifier_append(sql, c) sql << "`#{c}`" end}
   end
   
   it "should be quoted properly" do
