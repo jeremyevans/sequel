@@ -49,7 +49,7 @@ describe "prepared_statements plugin" do
           true
         end
         def insert_select(h)
-          cache_set(:fetch, :id=>1, :name=>'foo', :i => 2)
+          cache_set(:_fetch, :id=>1, :name=>'foo', :i => 2)
           server(:default).with_sql_first(insert_select_sql(h))
         end
         def insert_select_sql(*v)
