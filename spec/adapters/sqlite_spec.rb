@@ -297,7 +297,7 @@ end if DB.adapter_scheme == :sqlite
 
 describe "An SQLite dataset" do
   before do
-    @d = DB[:items]
+    @d = DB.dataset
   end
   
   it "should raise errors if given a regexp pattern match" do
@@ -346,6 +346,9 @@ describe "SQLite::Dataset#delete" do
     @d << {:name => 'abc', :value => 1.23}
     @d << {:name => 'def', :value => 4.56}
     @d << {:name => 'ghi', :value => 7.89}
+  end
+  after do
+    DB.drop_table?(:items)
   end
   
   it "should return the number of records affected when filtered" do
@@ -470,7 +473,7 @@ describe "A SQLite database" do
     end
   end
   after do
-    @db.drop_table?(:test2)
+    @db.drop_table?(:test, :test2, :test3, :test3_backup0, :test3_backup1, :test3_backup2)
   end
 
   it "should support add_column operations" do
@@ -547,8 +550,6 @@ describe "A SQLite database" do
 
       @db[:test].filter(:name => 'foo').update(:id=>100)
       @db[:test3][:name => 'abc'][:test_id].must_equal 100
-
-      @db.drop_table? :test, :test3
     end
   end
 
@@ -654,7 +655,6 @@ describe "A SQLite database" do
     @db[:test3_backup1].columns.must_equal [:k]
     @db[:test3_backup2].columns.must_equal [:l]
     @db.loggers.delete(l)
-    @db.drop_table?(:test3, :test3_backup0, :test3_backup1, :test3_backup2)
   end
   
   it "should support add_index" do
@@ -668,12 +668,12 @@ describe "A SQLite database" do
   end
 
   it "should keep applicable indexes when emulating schema methods" do
-    @db.create_table!(:a){Integer :a; Integer :b}
-    @db.add_index :a, :a
-    @db.add_index :a, :b
-    @db.add_index :a, [:b, :a]
-    @db.drop_column :a, :b
-    @db.indexes(:a).must_equal(:a_a_index=>{:unique=>false, :columns=>[:a]})
+    @db.create_table!(:test3){Integer :a; Integer :b}
+    @db.add_index :test3, :a
+    @db.add_index :test3, :b
+    @db.add_index :test3, [:b, :a]
+    @db.drop_column :test3, :b
+    @db.indexes(:test3).must_equal(:test3_a_index=>{:unique=>false, :columns=>[:a]})
   end
 
   it "should have support for various #transaction modes" do
