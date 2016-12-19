@@ -374,7 +374,7 @@ module Sequel
     #   # SELECT substr(first_name, 1, 1) AS initial, count(*) AS count FROM items GROUP BY substr(first_name, 1, 1)
     #   # => [{:initial=>'a', :count=>1}, ...]
     def group_and_count(*columns, &block)
-      select_group(*columns, &block).select_more(COUNT_OF_ALL_AS_COUNT)
+      select_group(*columns, &block).select_append(COUNT_OF_ALL_AS_COUNT)
     end
 
     # Returns a copy of the dataset with the given columns added to the list of
@@ -845,7 +845,7 @@ module Sequel
       cur_sel = @opts[:select]
       if !cur_sel || cur_sel.empty?
         unless supports_select_all_and_column?
-          return select_all(*(Array(@opts[:from]) + Array(@opts[:join]))).select_more(*columns, &block)
+          return select_all(*(Array(@opts[:from]) + Array(@opts[:join]))).select_append(*columns, &block)
         end
         cur_sel = [WILDCARD]
       end

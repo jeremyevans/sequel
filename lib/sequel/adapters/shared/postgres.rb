@@ -352,7 +352,7 @@ module Sequel
         # entry is schema qualified as well.
         if schema
           ref_ds = ref_ds.join(Sequel[:pg_namespace].as(:nsp2), :oid=>Sequel[:cl2][:relnamespace]).
-            select_more{nsp2[:nspname].as(:schema)}
+            select_append{nsp2[:nspname].as(:schema)}
         end
 
         h = {}

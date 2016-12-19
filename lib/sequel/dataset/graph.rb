@@ -11,7 +11,7 @@ module Sequel
     
     # Adds the given graph aliases to the list of graph aliases to use,
     # unlike +set_graph_aliases+, which replaces the list (the equivalent
-    # of +select_more+ when graphing).  See +set_graph_aliases+.
+    # of +select_append+ when graphing).  See +set_graph_aliases+.
     #
     #   DB[:table].add_graph_aliases(:some_alias=>[:table, :column])
     #   # SELECT ..., table.column AS some_alias
@@ -20,7 +20,7 @@ module Sequel
         raise Error, "cannot call add_graph_aliases on a dataset that has not been called with graph or set_graph_aliases"
       end
       columns, graph_aliases = graph_alias_columns(graph_aliases)
-      select_more(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases).freeze)
+      select_append(*columns).clone(:graph_aliases => Hash[ga].merge!(graph_aliases).freeze)
     end
 
     # Similar to Dataset#join_table, but uses unambiguous aliases for selected
