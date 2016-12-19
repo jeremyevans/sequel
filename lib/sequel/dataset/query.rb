@@ -725,9 +725,14 @@ module Sequel
       clone(:order => (columns.compact.empty?) ? nil : columns.freeze)
     end
     
-    # Alias of order_more, for naming consistency with order_prepend.
+    # Returns a copy of the dataset with the order columns added
+    # to the end of the existing order.
+    #
+    #   DB[:items].order(:a).order(:b) # SELECT * FROM items ORDER BY b
+    #   DB[:items].order(:a).order_append(:b) # SELECT * FROM items ORDER BY a, b
     def order_append(*columns, &block)
-      order_more(*columns, &block)
+      columns = @opts[:order] + columns if @opts[:order]
+      order(*columns, &block)
     end
 
     # Alias of order
@@ -735,14 +740,9 @@ module Sequel
       order(*columns, &block)
     end
 
-    # Returns a copy of the dataset with the order columns added
-    # to the end of the existing order.
-    #
-    #   DB[:items].order(:a).order(:b) # SELECT * FROM items ORDER BY b
-    #   DB[:items].order(:a).order_more(:b) # SELECT * FROM items ORDER BY a, b
+    # Alias of order_append.
     def order_more(*columns, &block)
-      columns = @opts[:order] + columns if @opts[:order]
-      order(*columns, &block)
+      order_append(*columns, &block)
     end
     
     # Returns a copy of the dataset with the order columns added
@@ -752,7 +752,7 @@ module Sequel
     #   DB[:items].order(:a).order_prepend(:b) # SELECT * FROM items ORDER BY b, a
     def order_prepend(*columns, &block)
       ds = order(*columns, &block)
-      @opts[:order] ? ds.order_more(*@opts[:order]) : ds
+      @opts[:order] ? ds.order_append(*@opts[:order]) : ds
     end
     
     # Qualify to the given table, or first source if no table is given.

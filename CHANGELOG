@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#order_append the primary method, and #order_more the alias, for similarity to #select_append and #select_more (jeremyevans)
+
 * Replace internal uses of Dataset#filter with Dataset#where to save a method call (jeremyevans)
 
 * Do not set :auto_increment in the schema information for integer columns that are part of a composite primary key on SQLite (jeremyevans)

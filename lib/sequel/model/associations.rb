@@ -2754,7 +2754,7 @@ END
 
           ds = loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>(ta == ds.opts[:eager_graph][:master]) ? first_source : qualifier_from_alias_symbol(ta, first_source), :callback=>callback, :join_type=>local_opts[:join_type], :join_only=>local_opts[:join_only], :limit_strategy=>limit_strategy, :from_self_alias=>ds.opts[:eager_graph][:master])
           if r[:order_eager_graph] && (order = r.fetch(:graph_order, r[:order]))
-            ds = ds.order_more(*qualified_expression(order, assoc_table_alias))
+            ds = ds.order_append(*qualified_expression(order, assoc_table_alias))
           end
           eager_graph = ds.opts[:eager_graph]
           eager_graph[:requirements][assoc_table_alias] = requirements.dup
