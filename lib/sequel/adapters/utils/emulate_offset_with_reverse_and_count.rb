@@ -45,7 +45,7 @@ module Sequel
       reverse_offset = row_count - o
       ds = if reverse_offset > 0
         ds.limit(reverse_offset).
-          reverse_order(*order).
+          reverse(*order).
           from_self(:alias=>dsa1).
           limit(@opts[:limit]).
           order(*order)

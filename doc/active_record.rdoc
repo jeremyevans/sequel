@@ -569,7 +569,7 @@ If you are using <tt>find(:last, ...)</tt>, you need to specify an order in Sequ
 
   Album.where(:artist_id=>1).order(:name).last
   # You could also do:
-  Album.where(:artist_id=>1).reverse_order(:name).first
+  Album.where(:artist_id=>1).reverse(:name).first
 
 If you are using <tt>find(:all, ...)</tt>, you use a method chain instead of passing the options, and end it with +all+:
 

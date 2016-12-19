@@ -113,9 +113,9 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Ordering
 
-  dataset.order(:kind)
-  dataset.reverse_order(:kind)
-  dataset.order(Sequel.desc(:kind), :name)
+  dataset.order(:kind) # kind
+  dataset.reverse(:kind) # kind DESC
+  dataset.order(Sequel.desc(:kind), :name) # kind DESC, name
 
 == Limit/Offset
 
