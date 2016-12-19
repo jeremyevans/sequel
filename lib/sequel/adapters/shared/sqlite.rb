@@ -279,7 +279,7 @@ module Sequel
         when :drop_constraint
           case op[:type]
           when :primary_key
-            duplicate_table(table){|columns| columns.each{|s| s[:primary_key] = nil}}
+            duplicate_table(table){|columns| columns.each{|s| s[:primary_key] = s[:auto_increment] = nil}}
           when :foreign_key
             if op[:columns]
               duplicate_table(table, :skip_foreign_key_columns=>op[:columns])
@@ -323,16 +323,6 @@ module Sequel
       # Surround default with parens to appease SQLite
       def column_definition_default_sql(sql, column)
         sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
-      end
-    
-      # Add null/not null SQL fragment to column creation SQL.
-      def column_definition_null_sql(sql, column)
-        column = column.merge(:null=>false) if column[:primary_key]
-        super(sql, column)
-      end
-
-      def column_definition_auto_increment_sql(sql, column)
-        sql << " #{auto_increment_sql}" if column[:auto_increment] && column[:primary_key]
       end
     
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
@@ -388,6 +378,8 @@ module Sequel
         old_columns = def_columns.map{|c| c[:name]}
         opts[:old_columns_proc].call(old_columns) if opts[:old_columns_proc]
 
+        yield def_columns if block_given?
+
         constraints = (opts[:constraints] || []).dup
         pks = []
         def_columns.each{|c| pks << c[:name] if c[:primary_key]}
@@ -395,8 +387,6 @@ module Sequel
           constraints << {:type=>:primary_key, :columns=>pks}
           def_columns.each{|c| c[:primary_key] = false if c[:primary_key]}
         end
-
-        yield def_columns if block_given?
 
         # If dropping a foreign key constraint, drop all foreign key constraints,
         # as there is no way to determine which one to drop.
@@ -470,18 +460,32 @@ module Sequel
 
       # Parse the output of the table_info pragma
       def parse_pragma(table_name, opts)
-        metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth(opts[:dataset]).call(table_name)).map do |row|
+        pks = 0
+        sch = metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth(opts[:dataset]).call(table_name)).map do |row|
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
           row[:default] = nil if blank_object?(row[:default]) || row[:default] == 'NULL'
           row[:db_type] = row.delete(:type)
           if row[:primary_key] = row.delete(:pk).to_i > 0
+            pks += 1
+            # Guess that an integer primary key uses auto increment,
+            # since that is Sequel's default and SQLite does not provide
+            # a way to introspect whether it is actually autoincrementing.
             row[:auto_increment] = row[:db_type].downcase == 'integer'
           end
           row[:type] = schema_column_type(row[:db_type])
           row
         end
+
+        if pks > 1
+          # SQLite does not allow use of auto increment for tables
+          # with composite primary keys, so remove auto_increment
+          # if composite primary keys are detected.
+          sch.each{|r| r.delete(:auto_increment)}
+        end
+
+        sch
       end
       
       # SQLite supports schema parsing using the table_info PRAGMA, so
