@@ -325,6 +325,16 @@ module Sequel
         sql << " DEFAULT (#{literal(column[:default])})" if column.include?(:default)
       end
     
+      # Add null/not null SQL fragment to column creation SQL.
+      def column_definition_null_sql(sql, column)
+        column = column.merge(:null=>false) if column[:primary_key]
+        super(sql, column)
+      end
+
+      def column_definition_auto_increment_sql(sql, column)
+        sql << " #{auto_increment_sql}" if column[:auto_increment] && column[:primary_key]
+      end
+    
       # Array of PRAGMA SQL statements based on the Database options that should be applied to
       # new connections.
       def connection_pragmas
@@ -365,7 +375,6 @@ module Sequel
         cols.each do |c|
           c[:default] = LiteralString.new(c[:default]) if c[:default]
           c[:type] = c[:db_type]
-          c.delete(:auto_increment)
         end
         cols
       end
@@ -379,8 +388,6 @@ module Sequel
         old_columns = def_columns.map{|c| c[:name]}
         opts[:old_columns_proc].call(old_columns) if opts[:old_columns_proc]
 
-        yield def_columns if block_given?
-
         constraints = (opts[:constraints] || []).dup
         pks = []
         def_columns.each{|c| pks << c[:name] if c[:primary_key]}
@@ -388,6 +395,8 @@ module Sequel
           constraints << {:type=>:primary_key, :columns=>pks}
           def_columns.each{|c| c[:primary_key] = false if c[:primary_key]}
         end
+
+        yield def_columns if block_given?
 
         # If dropping a foreign key constraint, drop all foreign key constraints,
         # as there is no way to determine which one to drop.

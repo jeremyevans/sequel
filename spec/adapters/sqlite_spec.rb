@@ -582,6 +582,26 @@ describe "A SQLite database" do
     @db[:test3].first[:t].must_equal 'a'
     @db[:test3].delete
   end
+
+  def assert_autoincrement(table, value)
+    id1 = table.insert(value)
+    table.delete
+    id2 = table.insert(value)
+    id2.must_be :>, id1
+  end
+
+  it "should preserve autoincrement" do
+    @db.create_table!(:testautoincrement) do
+      primary_key :id, :type => Integer
+      Integer :val, :null => false
+    end
+    t = @db[:testautoincrement]
+    assert_autoincrement(t, :val => 1)
+
+    @db.rename_column(:testautoincrement, :val, :value)
+
+    assert_autoincrement(t, :value => 1)
+  end
   
   it "should handle quoted tables when dropping or renaming columns" do
     table_name = "T T"
