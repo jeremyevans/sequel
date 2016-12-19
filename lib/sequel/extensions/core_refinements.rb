@@ -38,9 +38,9 @@ module Sequel::CoreRefinements
     # this array as a value in a filter, but may be necessary if you are using it as a
     # value with placeholder SQL:
     #
-    #   DB[:a].filter([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
-    #   DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
-    #   DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]].sql_value_list) # SQL: (a, b) IN ((1, 2), (3, 4))
+    #   DB[:a].where([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
+    #   DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
+    #   DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]].sql_value_list) # SQL: (a, b) IN ((1, 2), (3, 4))
     def sql_value_list
       ::Sequel::SQL::ValueList.new(self)
     end
@@ -167,10 +167,10 @@ module Sequel::CoreRefinements
     # Converts a string into a <tt>Sequel::LiteralString</tt>, in order to override string
     # literalization, e.g.:
     #
-    #   DB[:items].filter(:abc => 'def').sql #=>
+    #   DB[:items].where(:abc => 'def').sql #=>
     #     "SELECT * FROM items WHERE (abc = 'def')"
     #
-    #   DB[:items].filter(:abc => 'def'.lit).sql #=>
+    #   DB[:items].where(:abc => 'def'.lit).sql #=>
     #     "SELECT * FROM items WHERE (abc = def)"
     #
     # You can also provide arguments, to create a <tt>Sequel::SQL::PlaceholderLiteralString</tt>:

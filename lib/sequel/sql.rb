@@ -26,7 +26,7 @@ module Sequel
     # +Object+.  This allows the virtual row support to work with classes
     # without prefixing them with ::, such as:
     #
-    #   DB[:bonds].filter{maturity_date > Time.now}
+    #   DB[:bonds].where{maturity_date > Time.now}
     class BasicObject < ::BasicObject
       # Lookup missing constants in <tt>::Object</tt>
       def self.const_missing(name)
@@ -597,10 +597,10 @@ module Sequel
       # Converts a string into a <tt>Sequel::LiteralString</tt>, in order to override string
       # literalization, e.g.:
       #
-      #   DB[:items].filter(:abc => 'def').sql #=>
+      #   DB[:items].where(:abc => 'def').sql #=>
       #     "SELECT * FROM items WHERE (abc = 'def')"
       #
-      #   DB[:items].filter(:abc => Sequel.lit('def')).sql #=>
+      #   DB[:items].where(:abc => Sequel.lit('def')).sql #=>
       #     "SELECT * FROM items WHERE (abc = def)"
       #
       # You can also provide arguments, to create a <tt>Sequel::SQL::PlaceholderLiteralString</tt>:
@@ -683,9 +683,9 @@ module Sequel
       # this array as a value in a filter, but may be necessary if you are using it as a
       # value with placeholder SQL:
       #
-      #   DB[:a].filter([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
-      #   DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
-      #   DB[:a].filter('(a, b) IN ?', Sequel.value_list([[1, 2], [3, 4]])) # SQL: (a, b) IN ((1, 2), (3, 4))
+      #   DB[:a].where([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
+      #   DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
+      #   DB[:a].where('(a, b) IN ?', Sequel.value_list([[1, 2], [3, 4]])) # SQL: (a, b) IN ((1, 2), (3, 4))
       def value_list(arg)
         raise Error, 'argument to Sequel.value_list must be an array' unless arg.is_a?(Array)
         SQL::ValueList.new(arg)
@@ -1808,7 +1808,7 @@ module Sequel
     # the methods defined by Sequel, if you are running on ruby 1.9, or if you are not using the
     # core extensions.
     #
-    # An instance of this class is yielded to the block supplied to <tt>Dataset#filter</tt>, <tt>Dataset#order</tt>, and <tt>Dataset#select</tt>
+    # An instance of this class is yielded to the block supplied to <tt>Dataset#where</tt>, <tt>Dataset#order</tt>, and <tt>Dataset#select</tt>
     # (and the other methods that accept a block and pass it to one of those methods).
     # If the block doesn't take an argument, the block is instance_execed in the context of
     # an instance of this class.
@@ -1841,16 +1841,16 @@ module Sequel
     #   ds = DB[:t]
     #
     #   # Argument yielded to block
-    #   ds.filter{|r| r.name < 2} # SELECT * FROM t WHERE (name < 2)
+    #   ds.where{|r| r.name < 2} # SELECT * FROM t WHERE (name < 2)
     #
     #   # Block without argument (instance_eval)
-    #   ds.filter{name < 2} # SELECT * FROM t WHERE (name < 2)
+    #   ds.where{name < 2} # SELECT * FROM t WHERE (name < 2)
     #
     #   # Qualified identifiers
-    #   ds.filter{table__column + 1 < 2} # SELECT * FROM t WHERE ((table.column + 1) < 2)
+    #   ds.where{table__column + 1 < 2} # SELECT * FROM t WHERE ((table.column + 1) < 2)
     #
     #   # Functions
-    #   ds.filter{is_active(1, 'arg2')} # SELECT * FROM t WHERE is_active(1, 'arg2')
+    #   ds.where{is_active(1, 'arg2')} # SELECT * FROM t WHERE is_active(1, 'arg2')
     #   ds.select{version{}} # SELECT version() FROM t
     #   ds.select{count(:*){}} # SELECT count(*) FROM t
     #   ds.select{count(:distinct, col1){}} # SELECT count(DISTINCT col1) FROM t
@@ -1867,19 +1867,19 @@ module Sequel
     #   ds.select{|o| o./(4, :a).as(:b)} # SELECT (4 / a) AS b FROM t
     #
     #   # Boolean Operators
-    #   ds.filter{|o| o.&({:a=>1}, :b)}    # SELECT * FROM t WHERE ((a = 1) AND b)
-    #   ds.filter{|o| o.|({:a=>1}, :b)}    # SELECT * FROM t WHERE ((a = 1) OR b)
-    #   ds.filter{|o| o.~({:a=>1})}        # SELECT * FROM t WHERE (a != 1)
-    #   ds.filter{|o| o.~({:a=>1, :b=>2})} # SELECT * FROM t WHERE ((a != 1) OR (b != 2))
+    #   ds.where{|o| o.&({:a=>1}, :b)}    # SELECT * FROM t WHERE ((a = 1) AND b)
+    #   ds.where{|o| o.|({:a=>1}, :b)}    # SELECT * FROM t WHERE ((a = 1) OR b)
+    #   ds.where{|o| o.~({:a=>1})}        # SELECT * FROM t WHERE (a != 1)
+    #   ds.where{|o| o.~({:a=>1, :b=>2})} # SELECT * FROM t WHERE ((a != 1) OR (b != 2))
     #
     #   # Inequality Operators
-    #   ds.filter{|o| o.>(1, :a)}  # SELECT * FROM t WHERE (1 > a)
-    #   ds.filter{|o| o.<(2, :a)}  # SELECT * FROM t WHERE (2 < a)
-    #   ds.filter{|o| o.>=(3, :a)} # SELECT * FROM t WHERE (3 >= a)
-    #   ds.filter{|o| o.<=(4, :a)} # SELECT * FROM t WHERE (4 <= a)
+    #   ds.where{|o| o.>(1, :a)}  # SELECT * FROM t WHERE (1 > a)
+    #   ds.where{|o| o.<(2, :a)}  # SELECT * FROM t WHERE (2 < a)
+    #   ds.where{|o| o.>=(3, :a)} # SELECT * FROM t WHERE (3 >= a)
+    #   ds.where{|o| o.<=(4, :a)} # SELECT * FROM t WHERE (4 <= a)
     #
     #   # Literal Strings
-    #   ds.filter{{a=>`some SQL`}} # SELECT * FROM t WHERE (a = some SQL)
+    #   ds.where{{a=>`some SQL`}} # SELECT * FROM t WHERE (a = some SQL)
     #
     # For a more detailed explanation, see the {Virtual Rows guide}[rdoc-ref:doc/virtual_rows.rdoc].
     class VirtualRow < BasicObject

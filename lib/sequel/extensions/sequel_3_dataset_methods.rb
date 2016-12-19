@@ -47,7 +47,7 @@ module Sequel
     #   DB[:table][:id=>1] = {:id=>2} # UPDATE table SET id = 2 WHERE id = 1
     #   # => 1 # number of rows affected
     def []=(conditions, values)
-      filter(conditions).update(values)
+      where(conditions).update(values)
     end
 
     # Inserts multiple values. If a block is given it is invoked for each
@@ -78,7 +78,7 @@ module Sequel
     # given table. If no columns are currently selected, select all
     # columns of the given table.
     #
-    #   DB[:items].filter(:id=>1).qualify_to(:i)
+    #   DB[:items].where(:id=>1).qualify_to(:i)
     #   # SELECT i.* FROM items WHERE (i.id = 1)
     def qualify_to(table)
       qualify(table)
@@ -90,7 +90,7 @@ module Sequel
     # has columns with the same name as columns in the current dataset.
     # See +qualify_to+.
     #
-    #   DB[:items].filter(:id=>1).qualify_to_first_source
+    #   DB[:items].where(:id=>1).qualify_to_first_source
     #   # SELECT items.* FROM items WHERE (items.id = 1)
     def qualify_to_first_source
       qualify

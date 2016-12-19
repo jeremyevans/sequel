@@ -6,7 +6,7 @@
 #
 #   dataset = DB[:items].query do
 #     select :x, :y, :z
-#     filter{(x > 1) & (y > 2)}
+#     where{(x > 1) & (y > 2)}
 #     reverse :z
 #   end
 #
@@ -45,13 +45,13 @@ module Sequel
     #
     #   dataset = DB[:items].query do
     #     select :x, :y, :z
-    #     filter{(x > 1) & (y > 2)}
+    #     where{(x > 1) & (y > 2)}
     #     reverse :z
     #   end
     #
     # Which is the same as:
     #
-    #  dataset = DB[:items].select(:x, :y, :z).filter{(x > 1) & (y > 2)}.reverse(:z)
+    #  dataset = DB[:items].select(:x, :y, :z).where{(x > 1) & (y > 2)}.reverse(:z)
     def query(&block)
       query = Dataset::Query.new(self)
       query.instance_eval(&block)

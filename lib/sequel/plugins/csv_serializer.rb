@@ -31,7 +31,7 @@ module Sequel
     # all objects in the dataset:
     #
     #   Album.to_csv
-    #   Album.filter(:artist_id=>1).to_csv
+    #   Album.where(:artist_id=>1).to_csv
     #
     # If you have an existing array of model instance you want to convert to
     # CSV, you can call the class to_csv method with the :array option:
@@ -48,7 +48,7 @@ module Sequel
     # The array_from_csv class method exists to parse arrays of model instances
     # from CSV:
     #
-    #   csv = Album.filter(:artist_id=>1).to_csv
+    #   csv = Album.where(:artist_id=>1).to_csv
     #   albums = Album.array_from_csv(csv)
     #
     # These do not necessarily round trip, since doing so would let users

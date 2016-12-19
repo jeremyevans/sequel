@@ -500,7 +500,7 @@ module Sequel
       # Backbone of the tables and views support.
       def tables_and_views(filter, opts)
         m = output_identifier_meth
-        metadata_dataset.from(:sqlite_master).server(opts[:server]).filter(filter).map{|r| m.call(r[:name])}
+        metadata_dataset.from(:sqlite_master).server(opts[:server]).where(filter).map{|r| m.call(r[:name])}
       end
 
       # SQLite only supports AUTOINCREMENT on integer columns, not

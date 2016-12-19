@@ -1,5 +1,7 @@
 === HEAD
 
+* Replace internal uses of Dataset#filter with Dataset#where to save a method call (jeremyevans)
+
 * Do not set :auto_increment in the schema information for integer columns that are part of a composite primary key on SQLite (jeremyevans)
 
 * Use autoincrement setting on integer primary key columns when emulating table modification methods on SQLite (thenrio, jeremyevans) (#1277, #1278)

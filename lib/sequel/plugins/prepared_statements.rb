@@ -100,7 +100,7 @@ module Sequel
 
         # Return a prepared statement that can be used to refresh a row to get new column values after insertion.
         def prepared_refresh
-          cached_prepared_statement(:fixed, :refresh){prepare_explicit_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)).filter(prepared_statement_key_array(primary_key)), :first)}
+          cached_prepared_statement(:fixed, :refresh){prepare_explicit_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)).where(prepared_statement_key_array(primary_key)), :first)}
         end
 
         # Return an array of two element arrays with the column symbol as the first entry and the

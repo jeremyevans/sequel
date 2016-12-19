@@ -62,10 +62,10 @@ module Sequel
         model.scope_proc = case scope = opts[:scope]
         when Symbol
           model.dataset = model.dataset.order_prepend(scope)
-          proc{|obj| obj.model.filter(scope=>obj.send(scope))}
+          proc{|obj| obj.model.where(scope=>obj.send(scope))}
         when Array
           model.dataset = model.dataset.order_prepend(*scope)
-          proc{|obj| obj.model.filter(scope.map{|s| [s, obj.get_column_value(s)]})}
+          proc{|obj| obj.model.where(scope.map{|s| [s, obj.get_column_value(s)]})}
         else
           scope
         end
@@ -123,11 +123,11 @@ module Sequel
               ds = list_dataset
               op, ds = if target < current
                 target = 1 if target < 1
-                [:+, ds.filter(position_field=>target...current)]
+                [:+, ds.where(position_field=>target...current)]
               else
                 lp ||= last_position
                 target = lp if target > lp
-                [:-, ds.filter(position_field=>(current + 1)..target)]
+                [:-, ds.where(position_field=>(current + 1)..target)]
               end
               ds.update(position_field => Sequel::SQL::NumericExpression.new(op, position_field, 1))
               update(position_field => target)

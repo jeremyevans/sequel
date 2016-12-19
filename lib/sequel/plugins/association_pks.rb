@@ -71,11 +71,11 @@ module Sequel
             lambda do
               h = {}
               lk.zip(lpk).each{|k, pk| h[k] = get_column_value(pk)}
-              _join_table_dataset(opts).filter(h).select_map(rk)
+              _join_table_dataset(opts).where(h).select_map(rk)
             end
           else
             lambda do
-              _join_table_dataset(opts).filter(lk=>get_column_value(lpk)).select_map(rk)
+              _join_table_dataset(opts).where(lk=>get_column_value(lpk)).select_map(rk)
             end
           end
 
@@ -91,7 +91,7 @@ module Sequel
                   lpkv = get_column_value(lpk)
                   cond = {lk=>lpkv}
                 end
-                ds = _join_table_dataset(opts).filter(cond)
+                ds = _join_table_dataset(opts).where(cond)
                 ds.exclude(rk=>pks).delete
                 pks -= ds.select_map(rk)
                 lpkv = Array(lpkv)
@@ -139,7 +139,7 @@ module Sequel
 
               checked_transaction do
                 ds = send(opts.dataset_method)
-                ds.unfiltered.filter(pkh).update(h)
+                ds.unfiltered.where(pkh).update(h)
                 ds.exclude(pkh).update(nh)
               end
             end

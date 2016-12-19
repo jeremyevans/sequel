@@ -263,7 +263,7 @@ module Sequel
           pk = sch.select{|k, v| v[:primary_key]}
           @primary_key_sequences[table] = if pk.length == 1
             seq = "seq_#{table}_#{pk.first.first}"
-            seq.to_sym unless from(:user_sequences).filter(:sequence_name=>input_identifier_meth.call(seq)).empty?
+            seq.to_sym unless from(:user_sequences).where(:sequence_name=>input_identifier_meth.call(seq)).empty?
           end
         end
       end

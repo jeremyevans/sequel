@@ -12,7 +12,7 @@ module Sequel
     #     plugin :dataset_associations
     #     one_to_many :albums
     #   end
-    #   Artist.filter(id=>1..100).albums
+    #   Artist.where(id=>1..100).albums
     #   # SELECT * FROM albums
     #   # WHERE (albums.artist_id IN (
     #   #   SELECT id FROM artists
@@ -27,7 +27,7 @@ module Sequel
     # As the dataset methods return datasets, you can easily chain the
     # methods to get associated datasets of associated datasets:
     #
-    #   Artist.filter(id=>1..100).albums.filter{name < 'M'}.tags
+    #   Artist.where(id=>1..100).albums.where{name < 'M'}.tags
     #   # SELECT tags.* FROM tags
     #   # WHERE (tags.id IN (
     #   #   SELECT albums_tags.tag_id FROM albums
@@ -83,15 +83,15 @@ module Sequel
           sds = opts[:limit] ? self : unordered
           ds = case r[:type]
           when :many_to_one
-            ds.filter(r.qualified_primary_key=>sds.select(*Array(r[:qualified_key])))
+            ds.where(r.qualified_primary_key=>sds.select(*Array(r[:qualified_key])))
           when :one_to_one, :one_to_many
-            r.send(:apply_filter_by_associations_limit_strategy, ds.filter(r.qualified_key=>sds.select(*Array(r.qualified_primary_key))))
+            r.send(:apply_filter_by_associations_limit_strategy, ds.where(r.qualified_key=>sds.select(*Array(r.qualified_primary_key))))
           when :many_to_many, :one_through_one
             mds = r.associated_class.dataset.
               join(r[:join_table], r[:right_keys].zip(r.right_primary_keys)).
               select(*Array(r.qualified_right_key)).
               where(r.qualify(r.join_table_alias, r[:left_keys])=>sds.select(*r.qualify(model.table_name, r[:left_primary_key_columns])))
-            ds.filter(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
+            ds.where(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
           when :many_through_many, :one_through_many
             fe, *edges = r.edges
             edges << r.final_edge
@@ -109,11 +109,11 @@ module Sequel
               select(*Array(r.qualify(table, left))).
               where(r.qualify(fe[:table], fe[:right])=>sds.select(*r.qualify(model.table_name, r[:left_primary_key_columns])))
             edges.each{|e| mds = mds.join(e[:table], Array(e[:right]).zip(Array(e[:left])))}
-            ds.filter(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
+            ds.where(r.qualified_right_primary_key=>r.send(:apply_filter_by_associations_limit_strategy, mds))
           when :pg_array_to_many
-            ds.filter(Sequel[r.primary_key=>sds.select{Sequel.pg_array_op(r.qualify(r[:model].table_name, r[:key])).unnest}])
+            ds.where(Sequel[r.primary_key=>sds.select{Sequel.pg_array_op(r.qualify(r[:model].table_name, r[:key])).unnest}])
           when :many_to_pg_array
-            ds.filter(Sequel.function(:coalesce, Sequel.pg_array_op(r[:key]).overlaps(sds.select{array_agg(r.qualify(r[:model].table_name, r.primary_key))}), false))
+            ds.where(Sequel.function(:coalesce, Sequel.pg_array_op(r[:key]).overlaps(sds.select{array_agg(r.qualify(r[:model].table_name, r.primary_key))}), false))
           else
             raise Error, "unrecognized association type for association #{name.inspect}: #{r[:type].inspect}"
           end

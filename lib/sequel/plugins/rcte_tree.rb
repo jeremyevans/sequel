@@ -56,12 +56,12 @@ module Sequel
     #   
     #   # Eager loading - also populates the :parent and children associations
     #   # for all ancestors and descendants
-    #   Model.filter(:id=>[1, 2]).eager(:ancestors, :descendants).all
+    #   Model.where(:id=>[1, 2]).eager(:ancestors, :descendants).all
     #   
     #   # Eager loading children and grand children
-    #   Model.filter(:id=>[1, 2]).eager(:descendants=>2).all
+    #   Model.where(:id=>[1, 2]).eager(:descendants=>2).all
     #   # Eager loading children, grand children, and great grand children
-    #   Model.filter(:id=>[1, 2]).eager(:descendants=>3).all
+    #   Model.where(:id=>[1, 2]).eager(:descendants=>3).all
     #
     # = Options
     #
@@ -150,11 +150,11 @@ module Sequel
         a[:read_only] = true unless a.has_key?(:read_only)
         a[:eager_loader_key] = key
         a[:dataset] ||= proc do
-          base_ds = model.filter(prkey_array.zip(key_array.map{|k| get_column_value(k)}))
+          base_ds = model.where(prkey_array.zip(key_array.map{|k| get_column_value(k)}))
           recursive_ds = model.join(t, key_array.zip(prkey_array))
           if c = a[:conditions]
             (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
-              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
@@ -196,13 +196,13 @@ module Sequel
             obj.associations[parent] = nil
           end
           r = model.association_reflection(ancestors)
-          base_case = model.filter(prkey=>id_map.keys).
+          base_case = model.where(prkey=>id_map.keys).
            select(*ancestor_base_case_columns)
           recursive_case = model.join(t, key_array.zip(prkey_array)).
            select(*recursive_case_columns)
           if c = r[:conditions]
             (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
-              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
@@ -245,11 +245,11 @@ module Sequel
         d[:read_only] = true unless d.has_key?(:read_only)
         la = d[:level_alias] ||= :x_level_x
         d[:dataset] ||= proc do
-          base_ds = model.filter(key_array.zip(prkey_array.map{|k| get_column_value(k)}))
+          base_ds = model.where(key_array.zip(prkey_array.map{|k| get_column_value(k)}))
           recursive_ds = model.join(t, prkey_array.zip(key_array))
           if c = d[:conditions]
             (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
-              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
@@ -294,13 +294,13 @@ module Sequel
             obj.associations[childrena] = []
           end
           r = model.association_reflection(descendants)
-          base_case = model.filter(key=>id_map.keys).
+          base_case = model.where(key=>id_map.keys).
            select(*descendant_base_case_columns)
           recursive_case = model.join(t, prkey_array.zip(key_array)).
            select(*recursive_case_columns)
           if c = r[:conditions]
             (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
-              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.where(*c) : ds.where(c)
             end
           end
           if associations.is_a?(Integer)
@@ -308,7 +308,7 @@ module Sequel
             no_cache_level = level - 1
             associations = {}
             base_case = base_case.select_more(SQL::AliasedExpression.new(Sequel.cast(0, Integer), la))
-            recursive_case = recursive_case.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, la) + 1, la)).filter(SQL::QualifiedIdentifier.new(t, la) < level - 1)
+            recursive_case = recursive_case.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, la) + 1, la)).where(SQL::QualifiedIdentifier.new(t, la) < level - 1)
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           ds = model.from(SQL::AliasedExpression.new(t, table_alias)).

@@ -378,7 +378,7 @@ module Sequel
             a = Array(a)
             v = Array(v)
             next if v.empty? || !v.all?
-            ds = o.class.filter(a.zip(v))
+            ds = o.class.where(a.zip(v))
             num_dups = ds.count
             allow = if num_dups == 0
               # No unique value in the database

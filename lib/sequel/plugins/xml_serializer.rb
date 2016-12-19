@@ -63,7 +63,7 @@ module Sequel
     # of which return all objects in the dataset:
     #
     #   Album.to_xml
-    #   Album.filter(:artist_id=>1).to_xml(:include=>:tags)
+    #   Album.where(:artist_id=>1).to_xml(:include=>:tags)
     #
     # If you have an existing array of model instances you want to convert to
     # XML, you can call the class to_xml method with the :array option:
@@ -80,7 +80,7 @@ module Sequel
     # The array_from_xml class method exists to parse arrays of model instances
     # from xml:
     #
-    #   xml = Album.filter(:artist_id=>1).to_xml
+    #   xml = Album.where(:artist_id=>1).to_xml
     #   albums = Album.array_from_xml(xml)
     #
     # These does not necessarily round trip, since doing so would let users

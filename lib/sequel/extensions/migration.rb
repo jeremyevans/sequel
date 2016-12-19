@@ -687,7 +687,7 @@ module Sequel
         checked_transaction(m) do
           m.apply(db, direction)
           fi = f.downcase
-          direction == :up ? ds.insert(column=>fi) : ds.filter(column=>fi).delete
+          direction == :up ? ds.insert(column=>fi) : ds.where(column=>fi).delete
         end
         db.log_info("Finished applying migration #{f}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
       end

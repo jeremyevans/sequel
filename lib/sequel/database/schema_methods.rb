@@ -235,7 +235,7 @@ module Sequel
     # Creates a view, replacing a view with the same name if one already exists.
     #
     #   DB.create_or_replace_view(:some_items, "SELECT * FROM items WHERE price < 100")
-    #   DB.create_or_replace_view(:some_items, DB[:items].filter(:category => 'ruby'))
+    #   DB.create_or_replace_view(:some_items, DB[:items].where(:category => 'ruby'))
     #
     # For databases where replacing a view is not natively supported, support
     # is emulated by dropping a view with the same name before creating the view.

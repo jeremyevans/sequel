@@ -38,7 +38,7 @@ module Sequel
       end
 
       def sequences(opts=OPTS)
-        ds = self[:"rdb$generators"].server(opts[:server]).filter(:"rdb$system_flag" => 0).select(:"rdb$generator_name")
+        ds = self[:"rdb$generators"].server(opts[:server]).where(:"rdb$system_flag" => 0).select(:"rdb$generator_name")
         block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$generator_name"])}
       end
 
@@ -141,7 +141,7 @@ module Sequel
       end
 
       def tables_or_views(type, opts)
-        ds = self[:"rdb$relations"].server(opts[:server]).filter(:"rdb$relation_type" => type, Sequel::SQL::Function.new(:COALESCE, :"rdb$system_flag", 0) => 0).select(:"rdb$relation_name")
+        ds = self[:"rdb$relations"].server(opts[:server]).where(:"rdb$relation_type" => type, Sequel::SQL::Function.new(:COALESCE, :"rdb$system_flag", 0) => 0).select(:"rdb$relation_name")
         ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"].rstrip)}
       end
 

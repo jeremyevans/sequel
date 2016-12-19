@@ -397,7 +397,7 @@ module Sequel
         m = output_identifier_meth
         metadata_dataset.from(Sequel[:information_schema][:tables].as(:t)).
           select(:table_name).
-          filter(:table_type=>type, :table_schema=>(opts[:schema]||'dbo').to_s).
+          where(:table_type=>type, :table_schema=>(opts[:schema]||'dbo').to_s).
           map{|x| m.call(x[:table_name])}
       end
 
@@ -650,7 +650,7 @@ module Sequel
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = OPTS)
         terms = "\"#{terms.join('" OR "')}\"" if terms.is_a?(Array)
-        filter("CONTAINS (?, ?)", cols, terms)
+        where("CONTAINS (?, ?)", cols, terms)
       end
 
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.

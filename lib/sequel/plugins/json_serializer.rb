@@ -55,7 +55,7 @@ module Sequel
     # of which return all objects in the dataset:
     #
     #   Album.to_json
-    #   Album.filter(:artist_id=>1).to_json(:include=>:tags)
+    #   Album.where(:artist_id=>1).to_json(:include=>:tags)
     #
     # If you have an existing array of model instances you want to convert to
     # JSON, you can call the class to_json method with the :array option:
@@ -72,7 +72,7 @@ module Sequel
     # The array_from_json class method exists to parse arrays of model instances
     # from json:
     #
-    #   json = Album.filter(:artist_id=>1).to_json
+    #   json = Album.where(:artist_id=>1).to_json
     #   albums = Album.array_from_json(json)
     #
     # These does not necessarily round trip, since doing so would let users

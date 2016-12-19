@@ -204,7 +204,7 @@ module Sequel
         # must be unique. So if you are doing a soft delete of records, in which
         # the name must be unique, but only for active records:
         #
-        #   validates_unique(:name){|ds| ds.filter(:active)}
+        #   validates_unique(:name){|ds| ds.where(:active)}
         #
         # You should also add a unique index in the
         # database, as this suffers from a fairly obvious race condition.

@@ -195,7 +195,7 @@ Sequel keeps datasets in an abstract format, allowing for powerful capabilities.
 
 This isn't possible when you use an SQL string fragment.  Another case where using an SQL string fragment hurts you is when the SQL syntax cannot handle all cases:
 
-  Album.filter('id NOT IN ?', ids_array)
+  Album.where('id NOT IN ?', ids_array)
 
 That will work fine if +ids_array+ is not empty, but will not work correctly if it is empty.  With Sequel, you do:
 
@@ -205,11 +205,11 @@ That will handle cases where +ids_array+ is empty correctly.
 
 A third reason to not use SQL string fragments is database independence.  For example, if you want a case insensitive search that works on both PostgreSQL and MySQL, the following won't work:
 
-  Album.filter('name LIKE ?', 'A%')
+  Album.where('name LIKE ?', 'A%')
 
 This is because LIKE is case sensitive on PostgreSQL, but case insensitive on MySQL.  With Sequel, you would do:
 
-  Album.filter(Sequel.ilike(:name, 'A%'))
+  Album.where(Sequel.ilike(:name, 'A%'))
 
 This will do a case insensitive search on both databases.  If you want a case sensitive search on both, you can use +like+ instead of +ilike+.
 

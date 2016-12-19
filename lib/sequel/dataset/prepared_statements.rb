@@ -284,7 +284,7 @@ module Sequel
     # already been set for this dataset, they are updated with the contents
     # of bind_vars.
     #
-    #   DB[:table].filter(:id=>:$id).bind(:id=>1).call(:first)
+    #   DB[:table].where(:id=>:$id).bind(:id=>1).call(:first)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
     def bind(bind_vars={})
@@ -305,7 +305,7 @@ module Sequel
     # run the sql with the bind variables specified in the hash.  +values+ is a hash passed to
     # insert or update (if one of those types is used), which may contain placeholders.
     #
-    #   DB[:table].filter(:id=>:$id).call(:first, :id=>1)
+    #   DB[:table].where(:id=>:$id).call(:first, :id=>1)
     #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
     #   # => {:id=>1}
     def call(type, bind_variables={}, *values, &block)
@@ -323,7 +323,7 @@ module Sequel
     # the associated database, where it can be called by name.
     # The following usage is identical:
     #
-    #   ps = DB[:table].filter(:name=>:$name).prepare(:first, :select_by_name)
+    #   ps = DB[:table].where(:name=>:$name).prepare(:first, :select_by_name)
     #
     #   ps.call(:name=>'Blah')
     #   # SELECT * FROM table WHERE name = ? -- ('Blah')

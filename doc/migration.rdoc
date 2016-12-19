@@ -437,7 +437,7 @@ artist per album to multiple artists per album:
        having{artist_id >  0}.
        all do |r|
          self[:artists].
-          filter(:id=>r[:album_id]).
+          where(:id=>r[:album_id]).
           update(:artist_id=>r[:artist_id])
        end
 

@@ -8,7 +8,7 @@ module Sequel
   # Query results are always retrieved on demand, so a dataset can be kept
   # around and reused indefinitely (datasets never cache results):
   #
-  #   my_posts = DB[:posts].filter(:author => 'david') # no records are retrieved
+  #   my_posts = DB[:posts].where(:author => 'david') # no records are retrieved
   #   my_posts.all # records are retrieved
   #   my_posts.all # records are retrieved again
   #
@@ -16,9 +16,9 @@ module Sequel
   # reuse different datasets to access data:
   #
   #   posts = DB[:posts]
-  #   davids_posts = posts.filter(:author => 'david')
-  #   old_posts = posts.filter('stamp < ?', Date.today - 7)
-  #   davids_old_posts = davids_posts.filter('stamp < ?', Date.today - 7)
+  #   davids_posts = posts.where(:author => 'david')
+  #   old_posts = posts.where('stamp < ?', Date.today - 7)
+  #   davids_old_posts = davids_posts.where('stamp < ?', Date.today - 7)
   #
   # Datasets are Enumerable objects, so they can be manipulated using any
   # of the Enumerable methods, such as map, inject, etc.

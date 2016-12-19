@@ -332,8 +332,8 @@ Alternative: Sequel.or:
 
 Array#sql_value_list wraps the array in an array subclass, which Sequel will always treat as a value list and not a conditions specifier.  By default, Sequel treats arrays of two element arrays as a conditions specifier.
 
-  DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
-  DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]].sql_value_list) # SQL: (a, b) IN ((1, 2), (3, 4))
+  DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
+  DB[:a].where('(a, b) IN ?', [[1, 2], [3, 4]].sql_value_list) # SQL: (a, b) IN ((1, 2), (3, 4))
 
 Alternative: Sequel.value_list:
 

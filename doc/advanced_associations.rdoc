@@ -700,9 +700,9 @@ You can easily get a node's parent with node.parent, and a node's children with
 node.children.  You can even eager load the relationship up to a certain depth:
 
   # Eager load three generations of generations of children for a given node 
-  Node.filter(:id=>1).eager(:children=>{:children=>:children}).all.first
+  Node.where(:id=>1).eager(:children=>{:children=>:children}).all.first
   # Load parents and grandparents for a group of nodes
-  Node.filter{id < 10}.eager(:parent=>:parent).all
+  Node.where{id < 10}.eager(:parent=>:parent).all
 
 What if you want to get all ancestors up to the root node, or all descendents,
 without knowing the depth of the tree?

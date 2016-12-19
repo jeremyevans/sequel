@@ -64,7 +64,7 @@ may itself contain placeholders:
 Prepared statement support is similar to bound variable support, but you
 use <tt>Dataset#prepare</tt> with a name, and <tt>Dataset#call</tt> or <tt>Database#call</tt> later with the values:
 
-  ds = DB[:items].filter(:name=>:$n)
+  ds = DB[:items].where(:name=>:$n)
   ps = ds.prepare(:select, :select_by_name)
   ps.call(:n=>'Jim')
   DB.call(:select_by_name, :n=>'Jim') # same as above
@@ -76,7 +76,7 @@ and update queries, the hash to insert/update is passed to +prepare+:
   ps1 = DB[:items].prepare(:insert, :insert_with_name, :name=>:$n)
   ps1.call(:n=>'Jim')
   DB.call(:insert_with_name, :n=>'Jim') # same as above
-  ds = DB[:items].filter(:name=>:$n)
+  ds = DB[:items].where(:name=>:$n)
   ps2 = ds.prepare(:update, :update_name, :name=>:$new_n)
   ps2.call(:n=>'Jim', :new_n=>'Bob')
   DB.call(:update_name, :n=>'Jim', :new_n=>'Bob') # same as above

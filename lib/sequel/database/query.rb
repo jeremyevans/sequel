@@ -32,7 +32,7 @@ module Sequel
     # Call the prepared statement with the given name with the given hash
     # of arguments.
     #
-    #   DB[:items].filter(:id=>1).prepare(:first, :sa)
+    #   DB[:items].where(:id=>1).prepare(:first, :sa)
     #   DB.call(:sa) # SELECT * FROM items WHERE id = 1
     def call(ps_name, hash={}, &block)
       prepared_statement(ps_name).call(hash, &block)

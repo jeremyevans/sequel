@@ -137,11 +137,11 @@ module Sequel
   #
   # So it can handle cases like:
   #
-  #   DB.filter(:a=>1).exclude(:b=>2).where{c > 3}
+  #   DB.where(:a=>1).exclude(:b=>2).where{c > 3}
   #
   # But it cannot handle cases like:
   #
-  #   DB.filter(:a + 1 < 0)
+  #   DB.where(:a + 1 < 0)
   class Unbinder < ASTTransformer
     # The <tt>SQL::ComplexExpression<tt> operates that will be considered
     # for transformation.

@@ -83,7 +83,7 @@ Sequel uses the concept of datasets to retrieve data. A Dataset object encapsula
 
 For example, the following one-liner returns the average GDP for countries in the middle east region:
 
-  DB[:countries].filter(:region => 'Middle East').avg(:GDP)
+  DB[:countries].where(:region => 'Middle East').avg(:GDP)
   
 Which is equivalent to:
 
@@ -91,7 +91,7 @@ Which is equivalent to:
 
 Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes (or custom model objects), and are accessed using an +Enumerable+ interface:
 
-  middle_east = DB[:countries].filter(:region => 'Middle East')
+  middle_east = DB[:countries].where(:region => 'Middle East')
   middle_east.order(:name).each{|r| puts r[:name]}
   
 Sequel also offers convenience methods for extracting data from Datasets, such as an extended +map+ method:
@@ -404,7 +404,7 @@ and not raise an exception outside the block, you can raise the
 
   DB.transaction do
     posts.insert(:category => 'ruby', :author => 'david')
-    if posts.filter('stamp < ?', Date.today - 7).update(:state => 'archived') == 0
+    if posts.where('stamp < ?', Date.today - 7).update(:state => 'archived') == 0
       raise Sequel::Rollback
     end
   end

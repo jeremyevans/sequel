@@ -411,8 +411,8 @@ module Sequel
       #
       #   # Add new dataset method and class method that calls it
       #   Artist.def_dataset_method(:by_name){order(:name)}
-      #   Artist.filter(:name.like('A%')).by_name
-      #   Artist.by_name.filter(:name.like('A%'))
+      #   Artist.where(:name.like('A%')).by_name
+      #   Artist.by_name.where(:name.like('A%'))
       #
       #   # Just add a class method that calls an existing dataset method
       #   Artist.def_dataset_method(:server!)
@@ -441,7 +441,7 @@ module Sequel
           # Use optimized finder
           first_where(args.first)
         else
-          filter(*args, &block).first
+          where(*args, &block).first
         end
       end
       
@@ -724,7 +724,7 @@ module Sequel
       # plan to join other tables to this table and you want the column references
       # to be qualified.
       #
-      #   Artist.filter(Artist.qualified_primary_key_hash(1))
+      #   Artist.where(Artist.qualified_primary_key_hash(1))
       #   # SELECT * FROM artists WHERE (artists.id = 1)
       def qualified_primary_key_hash(value, qualifier=table_name)
         case key = @primary_key

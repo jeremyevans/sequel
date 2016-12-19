@@ -16,7 +16,7 @@ module Sequel
     #
     # Basically, this allows the following code to issue only two queries:
     #
-    #   Album.filter{id<100}.all do |a|
+    #   Album.where{id<100}.all do |a|
     #     a.artists
     #   end
     #   # SELECT * FROM albums WHERE (id < 100)
@@ -30,7 +30,7 @@ module Sequel
     # objects that the current object was retrieved with:
     #
     #   # SELECT * FROM albums WHERE (id < 100)
-    #   albums = Album.filter{id<100}.all
+    #   albums = Album.where{id<100}.all
     #
     #   # Eagerly load all artists for these albums
     #   # SELECT * FROM artists WHERE id IN (...)
@@ -45,7 +45,7 @@ module Sequel
     # You can also use the :eager option to specify dependent associations
     # to eager load:
     #
-    #  albums = Album.filter{id<100}.all
+    #  albums = Album.where{id<100}.all
     #
     #   # Eager load all artists for these albums, and all albums for those artists
     #   # SELECT * FROM artists WHERE id IN (...)
@@ -54,7 +54,7 @@ module Sequel
     #
     # You can also use :eager to specify an eager callback. For example:
     #
-    #   albums = Album.filter{id<100}.all
+    #   albums = Album.where{id<100}.all
     #
     #   # Eagerly load all artists whose name starts with A-M for these albums
     #   # SELECT * FROM artists WHERE name > 'N' AND id IN (...)

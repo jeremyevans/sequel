@@ -16,7 +16,7 @@ database tables.  Without associations, if you had classes such as:
 And you wanted to get all of the albums for a given artist (assuming each
 album was associated with only one artist):
 
-  Album.filter(:artist_id=>@artist.id).all
+  Album.where(:artist_id=>@artist.id).all
   
 Or maybe you want to add an album for a given artist:
 

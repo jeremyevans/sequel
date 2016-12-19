@@ -581,7 +581,7 @@ module Sequel
       # the database.
       def type_supported?(type)
         @supported_types ||= {}
-        @supported_types.fetch(type){@supported_types[type] = (from(:pg_type).filter(:typtype=>'b', :typname=>type.to_s).count > 0)}
+        @supported_types.fetch(type){@supported_types[type] = (from(:pg_type).where(:typtype=>'b', :typname=>type.to_s).count > 0)}
       end
 
       # Creates a dataset that uses the VALUES clause:
@@ -1038,7 +1038,7 @@ module Sequel
 
       # Backbone of the tables and views support.
       def pg_class_relname(type, opts)
-        ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
+        ds = metadata_dataset.from(:pg_class).where(:relkind=>type).select(:relname).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace)
         ds = filter_schema(ds, opts)
         m = output_identifier_meth
         if block_given?

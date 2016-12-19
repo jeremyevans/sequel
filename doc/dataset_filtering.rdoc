@@ -191,7 +191,7 @@ You can concatenate SQL strings using Sequel.join:
 
 Sequel.join also takes a join argument:
 
-  items.filter(Sequel.join([:name, :comment], ':').like('John:%nice%')).sql
+  items.where(Sequel.join([:name, :comment], ':').like('John:%nice%')).sql
   #=> "SELECT * FROM items WHERE ((name || ':' || comment) LIKE 'John:%nice%' ESCAPE '\')"
 
 == Filtering using sub-queries

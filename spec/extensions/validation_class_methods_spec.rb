@@ -203,7 +203,7 @@ describe Sequel::Model do
     @c = model_class.call Sequel::Model do
       columns :value
       
-      def self.filter(*args)
+      def self.where(*args)
         o = Object.new
         def o.count; 2; end
         o

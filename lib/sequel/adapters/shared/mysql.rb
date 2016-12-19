@@ -714,7 +714,7 @@ module Sequel
 
       # Adds full text filter
       def full_text_search(cols, terms, opts = OPTS)
-        filter(full_text_sql(cols, terms, opts))
+        where(full_text_sql(cols, terms, opts))
       end
       
       # MySQL specific full text search syntax.
