@@ -193,6 +193,23 @@ describe "Dataset#naked!" do
   end
 end
 
+describe "Dataset#row_proc=" do
+  it "should set the row_proc" do
+    d = Sequel.mock.dataset.with_row_proc(Proc.new{|r| r})
+    d.row_proc.wont_be_nil
+    d.row_proc = nil
+    d.row_proc.must_be_nil
+  end
+end
+
+describe "Dataset#quote_identifiers=" do
+  it "should change quote identifiers setting" do
+    d = Sequel.mock.dataset.with_quote_identifiers(true)
+    d.literal(:a).must_equal '"a"'
+    d.quote_identifiers = false
+    d.literal(:a).must_equal 'a'
+  end
+end
 
 describe "Dataset#from_self!" do
   it "should work" do
