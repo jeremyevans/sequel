@@ -279,6 +279,30 @@ describe Sequel::Model, ".dataset_module" do
     @c.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE (foo AND released)'
   end
 
+  it "should have dataset_module support a where method" do
+    @c.dataset_module{where :released, :released}
+    @c.released.sql.must_equal 'SELECT * FROM items WHERE released'
+    @c.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE (foo AND released)'
+  end
+
+  it "should have dataset_module support a having method" do
+    @c.dataset_module{having(:released){released}}
+    @c.released.sql.must_equal 'SELECT * FROM items HAVING released'
+    @c.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE foo HAVING released'
+  end
+
+  it "should have dataset_module support an exclude method" do
+    @c.dataset_module{exclude :released, :released}
+    @c.released.sql.must_equal 'SELECT * FROM items WHERE NOT released'
+    @c.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE (foo AND NOT released)'
+  end
+
+  it "should have dataset_module support an exclude_having method" do
+    @c.dataset_module{exclude_having :released, :released}
+    @c.released.sql.must_equal 'SELECT * FROM items HAVING NOT released'
+    @c.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE foo HAVING NOT released'
+  end
+
   it "should have dataset_module support a distinct method" do
     @c.dataset = @c.dataset.with_extend{def supports_distinct_on?; true end}
     @c.dataset_module{distinct :foo, :baz}

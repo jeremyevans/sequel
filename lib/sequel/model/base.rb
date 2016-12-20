@@ -319,8 +319,9 @@ module Sequel
       #   Album.released.by_release_date.for_select_options.sql
       #   # => "SELECT id, name, release_date FROM artists WHERE (release_date <= CURRENT_DATE) ORDER BY release_date"
       #
-      # The following methods are supported: distinct, grep, group, group_and_count, group_append, limit,
-      # offset, order, order_append, order_prepend, select, select_all, select_append, select_group, and server.
+      # The following methods are supported: distinct, exclude, exclude_having, grep, group, group_and_count,
+      # group_append, having, limit, offset, order, order_append, order_prepend, select, select_all,
+      # select_append, select_group, where, and server.
       #
       # Any public methods in the dataset module will have class methods created that
       # call the method on the dataset, assuming that the class method is not already

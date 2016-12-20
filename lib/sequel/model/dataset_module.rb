@@ -20,6 +20,24 @@ module Sequel
         @model.subset(name, *args, &block)
       end
 
+      # Alias for subset
+      def where(name, *args, &block)
+        subset(name, *args, &block)
+      end
+
+      %w'exclude exclude_having having'.map(&:to_sym).each do |meth|
+        define_method(meth) do |name, *args, &block|
+          if block || args.flatten.any?{|arg| arg.is_a?(Proc)}
+            @model.def_dataset_method(name){send(meth, *args, &block)}
+          else
+            key = :"_#{meth}_#{name}_ds"
+            @model.def_dataset_method(name) do
+              cached_dataset(key){send(meth, *args)}
+            end
+          end
+        end
+      end
+
       meths = (<<-METHS).split.map(&:to_sym)
         distinct grep group group_and_count group_append 
         limit offset order order_append order_prepend 
