@@ -7,7 +7,7 @@
 #
 # It allows creation of enum types using create_enum:
 #
-#   DB.create_enum(:type_name, %w'value1 value2 value3')
+#   DB.create_enum(:enum_type_name, %w'value1 value2 value3')
 #
 # You can also add values to existing enums via add_enum_value:
 #
@@ -15,7 +15,7 @@
 #
 # If you want to drop an enum type, you can use drop_enum:
 #
-#   DB.drop_enum(:type_name)
+#   DB.drop_enum(:enum_type_name)
 #
 # Just like any user-created type, after creating the type, you
 # can create tables that have a column of that type:
@@ -44,7 +44,7 @@
 #
 #   Sequel.migration do
 #     change do
-#       create_enum(:type_name, %w'value1 value2 value3')
+#       create_enum(:enum_type_name, %w'value1 value2 value3')
 #     end
 #   end
 #
