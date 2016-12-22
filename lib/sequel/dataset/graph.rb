@@ -196,7 +196,7 @@ module Sequel
             ident = SQL::QualifiedIdentifier.new(table_alias_qualifier, column)
             [column, ident]
           end
-          column_aliases[col_alias] = [table_alias, column]
+          column_aliases[col_alias] = [table_alias, column].freeze
           select.push(identifier)
         end
       end
@@ -268,7 +268,7 @@ module Sequel
       identifiers = graph_aliases.collect do |col_alias, tc| 
         table, column, value = Array(tc)
         column ||= col_alias
-        gas[col_alias] = [table, column]
+        gas[col_alias] = [table, column].freeze
         identifier = value || SQL::QualifiedIdentifier.new(table, column)
         identifier = SQL::AliasedExpression.new(identifier, col_alias) if value || column != col_alias
         identifier
