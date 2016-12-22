@@ -132,6 +132,32 @@ describe "Sequel::Plugins::Timestamps" do
     o.created_at.must_equal '2009-08-01'
   end
 
+  it "should set update timestamp to same timestamp as create timestamp when setting creating timestamp" do
+    i = 1
+    (class << (Sequel.datetime_class); self end).send(:define_method, :now){"2009-08-0#{i+=1}"}
+    @c.plugin :timestamps, :update_on_create=>true
+    o = @c.create
+    sqls = @c.db.sqls
+    sqls.length.must_equal 1
+    ["INSERT INTO t (created_at, updated_at) VALUES ('2009-08-02', '2009-08-02')",
+     "INSERT INTO t (updated_at, created_at) VALUES ('2009-08-02', '2009-08-02')"].must_include sqls.first
+    o.created_at.must_equal '2009-08-02'
+    o.updated_at.must_equal '2009-08-02'
+  end
+
+  it "should set update timestamp when using not overriding create timestamp" do
+    i = 1
+    (class << (Sequel.datetime_class); self end).send(:define_method, :now){"2009-08-0#{i+=1}"}
+    @c.plugin :timestamps, :update_on_create=>true
+    o = @c.create(:created_at=>'2009-08-10')
+    sqls = @c.db.sqls
+    sqls.length.must_equal 1
+    ["INSERT INTO t (created_at, updated_at) VALUES ('2009-08-10', '2009-08-02')",
+     "INSERT INTO t (updated_at, created_at) VALUES ('2009-08-02', '2009-08-10')"].must_include sqls.first
+    o.created_at.must_equal '2009-08-10'
+    o.updated_at.must_equal '2009-08-02'
+  end
+
   it "should have create_timestamp_field give the create timestamp field" do
     @c.create_timestamp_field.must_equal :created_at
     @c.plugin :timestamps, :create=>:c
