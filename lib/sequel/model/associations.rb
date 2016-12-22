@@ -2748,7 +2748,7 @@ END
           local_opts = ds.opts[:eager_graph][:local]
           limit_strategy = r.eager_graph_limit_strategy(local_opts[:limit_strategy])
 
-          if r[:conditions] && !Sequel.condition_specifier?(r[:conditions]) && !r[:orig_opts][:graph_conditions] && !r[:orig_opts][:graph_only_conditions] && !r[:graph_block]
+          if r[:conditions] && !Sequel.condition_specifier?(r[:conditions]) && !r[:orig_opts].has_key?(:graph_conditions) && !r[:orig_opts].has_key?(:graph_only_conditions) && !r.has_key?(:graph_block)
             Sequel::Deprecation.deprecate("Ignoring :conditions for #{r[:model]} #{r[:name]} association during eager_graph/association_join, consider specifying :graph_block") unless r[:ignore_conditions_warning]
           end
 
