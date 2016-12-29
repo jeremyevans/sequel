@@ -277,6 +277,7 @@ module Sequel
             strategy = true_eager_graph_limit_strategy if strategy == :union
             # Correlated subqueries are not supported for regular eager loading
             strategy = :ruby if strategy == :correlated_subquery
+            strategy = nil if strategy == :ruby && assign_singular?
             objects = apply_eager_limit_strategy(ds, strategy, eager_limit).all
           elsif strategy == :union
             objects = []

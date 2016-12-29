@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle eager load callbacks correctly for one_to_one associations with orders or offsets when window functions are not supported (jeremyevans)
+
 * Raise Sequel::Error if using an :eager_limit dataset option when eager loading a singular association (jeremyevans)
 
 * Replace internal uses of Dataset#select_more with #select_append to save a method call (jeremyevans)

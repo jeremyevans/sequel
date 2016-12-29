@@ -1179,6 +1179,15 @@ describe Sequel::Model, "#eager" do
     DB.sqls.must_equal ['SELECT * FROM albums']
   end
 
+  it "should raise error if using :eager_limit for a singular association" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id, :order=>:name
+    a = EagerAlbum.eager(:track=> proc{|ds| ds.order(:foo)}).all
+    DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1)) ORDER BY foo']
+    a = a.first
+    a.track.must_equal EagerTrack.load(:id => 3, :album_id => 1)
+    DB.sqls.must_equal []
+  end
+
 end
 
 describe Sequel::Model, "#eager_graph" do
