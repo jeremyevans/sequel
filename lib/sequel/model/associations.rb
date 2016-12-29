@@ -263,6 +263,7 @@ module Sequel
 
             eager_limit =
               if el = ds.opts[:eager_limit]
+                raise Error, "The :eager_limit dataset option is not supported for associations returning a single record" unless returns_array?
                 strategy ||= true_eager_graph_limit_strategy
                 if el.is_a?(Array)
                   el

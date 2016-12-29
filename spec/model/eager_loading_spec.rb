@@ -1172,6 +1172,13 @@ describe Sequel::Model, "#eager" do
     EagerAlbum.eager(:first_two_tracks=> proc{|ds| ds.clone(:eager_limit_strategy=>:window_function)}).all
     DB.sqls.must_equal ['SELECT * FROM albums', 'SELECT * FROM (SELECT *, row_number() OVER (PARTITION BY tracks.album_id) AS x_sequel_row_number_x FROM tracks WHERE (tracks.album_id IN (1))) AS t1 WHERE (x_sequel_row_number_x <= 2)']
   end
+
+  it "should raise error if using :eager_limit for a singular association" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id
+    proc{EagerAlbum.eager(:track=> proc{|ds| ds.clone(:eager_limit=>1)}).all}.must_raise Sequel::Error
+    DB.sqls.must_equal ['SELECT * FROM albums']
+  end
+
 end
 
 describe Sequel::Model, "#eager_graph" do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise Sequel::Error if using an :eager_limit dataset option when eager loading a singular association (jeremyevans)
+
 * Replace internal uses of Dataset#select_more with #select_append to save a method call (jeremyevans)
 
 * Make Dataset#order_append the primary method, and #order_more the alias, for similarity to #select_append and #select_more (jeremyevans)
