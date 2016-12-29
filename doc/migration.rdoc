@@ -635,3 +635,14 @@ database the migration is being run on, and operate accordingly:
       end
     end
   end
+
+== Adding Extensions
+
+When using the +sequel+ CLI it is possible to load the required extensions for a given migration into that migration. For example, to add +:pg_enum+ support you might do:
+
+  DB.extension :pg_enum
+
+  Sequel.migration do
+    # migration here
+  end
+
