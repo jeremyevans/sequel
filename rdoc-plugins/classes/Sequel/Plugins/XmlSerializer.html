@@ -59,7 +59,7 @@
             <p><code>to_xml</code> also exists as a class and dataset method, both of
             which return all objects in the dataset:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>(:<span class="ruby-identifier">include=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">tags</span>)</pre>
             
             <p>If you have an existing array of model instances you want to convert to
             XML, you can call the class to_xml method with the :array option:</p>
@@ -75,7 +75,7 @@
             <p>The array_from_xml class method exists to parse arrays of model instances
             from xml:</p>
             
-            <pre class="ruby"><span class="ruby-identifier">xml</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">array_from_xml</span>(<span class="ruby-identifier">xml</span>)</pre>
+            <pre class="ruby"><span class="ruby-identifier">xml</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">to_xml</span>&#x000A;<span class="ruby-identifier">albums</span> = <span class="ruby-constant">Album</span>.<span class="ruby-identifier">array_from_xml</span>(<span class="ruby-identifier">xml</span>)</pre>
             
             <p>These does not necessarily round trip, since doing so would let users
             create model objects with arbitrary values.  By default, from_xml will call

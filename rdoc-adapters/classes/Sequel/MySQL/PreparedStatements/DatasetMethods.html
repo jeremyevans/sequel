@@ -36,14 +36,6 @@
       <div id='content'>
         <div id='text'>
           <div id='description'></div>
-          <div id='method-list'>
-            <h2>Methods</h2>
-            <h3>Public Instance</h3>
-            <ol>
-              <li><a href="#method-i-call">call</a></li>
-              <li><a href="#method-i-prepare">prepare</a></li>
-            </ol>
-          </div>
           <div id='context'>
           </div>
           <div id='class-list'>
@@ -60,63 +52,11 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>PreparedStatementMethods</td>
                     <td>=</td>
-                    <td class='context-item-value'>
-                      Sequel::Dataset.send(:prepared_statements_module,
-                      :prepare_bind,
-                      Sequel::Dataset::UnnumberedArgumentMapper) do
-                      # Raise a more obvious error if you attempt to call a unnamed prepared statement.
-                      def call(*)
-                      raise Error, "Cannot call prepared statement without a name" if prepared_statement_name.nil?
-                      super
-                      end
-                      end
-                    </td>
+                    <td class='context-item-value'>Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, Sequel::Dataset::UnnumberedArgumentMapper)</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'></td>
                   </tr>
                 </table>
-              </div>
-            </div>
-            <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-call'>
-                <a name='method-i-call'></a>
-                <div class='synopsis'>
-                  <span class='name'>call</span>
-                  <span class='arguments'>(type, bind_arguments={}, *values, &block)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p><a href="../../MySQL.html">MySQL</a> is different in that it supports
-                  prepared statements but not bound variables outside of prepared statements.
-                  The default implementation breaks the use of subselects in prepared
-                  statements, so extend the temporary prepared statement that this creates
-                  with a module that fixes it.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-call-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">bind_arguments</span>={}, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">CallableStatementMethods</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">bind_arguments</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
-              </div>
-              <div class='method public-instance' id='method-method-i-prepare'>
-                <a name='method-i-prepare'></a>
-                <div class='synopsis'>
-                  <span class='name'>prepare</span>
-                  <span class='arguments'>(type, name=nil, *values)</span>
-                </div>
-                <div class='description'>
-                  
-                  <p>Store the given type of prepared statement in the associated database with
-                  the given name.</p>
-                </div>
-                <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-prepare-source'); return false">
-                    [show source]
-                  </a>
-                  <pre id='method-i-prepare-source'><span class="ruby-comment"># File lib/sequel/adapters/utils/mysql_prepared_statements.rb, line 69</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prepare</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">name</span>=<span class="ruby-keyword">nil</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span> = <span class="ruby-identifier">to_prepared_statement</span>(<span class="ruby-identifier">type</span>, <span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">extend</span>(<span class="ruby-constant">PreparedStatementMethods</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">ps</span>.<span class="ruby-identifier">prepared_statement_name</span> = <span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">db</span>.<span class="ruby-identifier">set_prepared_statement</span>(<span class="ruby-identifier">name</span>, <span class="ruby-identifier">ps</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">ps</span>&#x000A;<span class="ruby-keyword">end</span></pre>
-                </div>
               </div>
             </div>
           </div>

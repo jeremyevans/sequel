@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-02-11 15:50:14 -0800</span>
+          <span class='datetime'>2016-12-21 07:34:47 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -45,7 +45,7 @@
             
             <p>It allows creation of enum types using create_enum:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_enum</span>(:<span class="ruby-identifier">type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">create_enum</span>(:<span class="ruby-identifier">enum_type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)</pre>
             
             <p>You can also add values to existing enums via add_enum_value:</p>
             
@@ -53,7 +53,7 @@
             
             <p>If you want to drop an enum type, you can use drop_enum:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_enum</span>(:<span class="ruby-identifier">type_name</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">drop_enum</span>(:<span class="ruby-identifier">enum_type_name</span>)</pre>
             
             <p>Just like any user-created type, after creating the type, you can create
             tables that have a column of that type:</p>
@@ -73,7 +73,7 @@
             <p>If the migration extension is loaded before this one (the order is
             important), you can use create_enum in a reversible migration:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_enum</span>(:<span class="ruby-identifier">type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">migration</span> <span class="ruby-keyword">do</span>&#x000A;  <span class="ruby-identifier">change</span> <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-identifier">create_enum</span>(:<span class="ruby-identifier">enum_type_name</span>, <span class="ruby-node">%w&#39;value1 value2 value3&#39;</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>Finally, typecasting for enums is setup to cast to strings, which allows
             you to use symbols in your model code.  Similar, you can provide the enum

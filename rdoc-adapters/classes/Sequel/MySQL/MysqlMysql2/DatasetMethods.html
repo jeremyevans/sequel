@@ -54,7 +54,7 @@
                     <td>=</td>
                     <td class='context-item-value'>
                       Sequel::Dataset.send(:prepared_statements_module,
-                      "sql = @sproc_name; opts = Hash[opts]; opts[:args] = @sproc_args; opts[:sproc] = true",
+                      "sql = @opts[:sproc_name]; opts = Hash[opts]; opts[:args] = @opts[:sproc_args]; opts[:sproc] = true",
                       Sequel::Dataset::StoredProcedureMethods, %w'execute execute_dui')
                     </td>
                     <td>&nbsp;</td>

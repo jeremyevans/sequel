@@ -56,11 +56,11 @@
             
             <p>So it can handle cases like:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">c</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">exclude</span>(:<span class="ruby-identifier">b=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">c</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">3</span>}</pre>
             
             <p>But it cannot handle cases like:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">0</span>)</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2015-07-23 07:47:00 -0700</span>
+          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -94,17 +94,18 @@
             Only dataset methods that return or yield results will execute the code on
             the database:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># No SQL queries sent:</span>&#x000A;<span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}&#x000A;&#x000A;<span class="ruby-comment"># Until you call a method that returns results</span>&#x000A;<span class="ruby-identifier">results</span> = <span class="ruby-identifier">ds3</span>.<span class="ruby-identifier">all</span></pre>
+            <pre class="ruby"><span class="ruby-comment"># No SQL queries sent:</span>&#x000A;<span class="ruby-identifier">ds3</span> = <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}&#x000A;&#x000A;<span class="ruby-comment"># Until you call a method that returns results</span>&#x000A;<span class="ruby-identifier">results</span> = <span class="ruby-identifier">ds3</span>.<span class="ruby-identifier">all</span></pre>
             
             <p>One important consequence of this API style is that if you use a method
             chain that includes both methods that return modified copies and a method
             that executes the SQL, the method that executes the SQL should generally be
             the last method in the chain:</p>
             
-            <pre class="ruby"><span class="ruby-comment"># Good</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Bad</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}</pre>
+            <pre class="ruby"><span class="ruby-comment"># Good</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}.<span class="ruby-identifier">all</span>&#x000A;&#x000A;<span class="ruby-comment"># Bad</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span>.<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">where</span>{<span class="ruby-identifier">id</span> <span class="ruby-operator">&lt;</span> <span class="ruby-value">100</span>}</pre>
             
-            <p>This is because all will return an array of hashes, and select, order, and
-            filter are dataset methods, not array methods.</p>
+            <p>This is because all will return an array of hashes, and
+            <code>select</code>, <code>order</code>, and <code>where</code> are dataset
+            methods, not array methods.</p>
             
             <h2 id="label-Methods">Methods<span><a href="#label-Methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
             

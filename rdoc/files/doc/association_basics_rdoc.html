@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-11-14 12:48:12 -0800</span>
+          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -52,7 +52,7 @@
             <p>And you wanted to get all of the albums for a given artist (assuming each
             album was associated with only one artist):</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">id</span>).<span class="ruby-identifier">all</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">id</span>).<span class="ruby-identifier">all</span></pre>
             
             <p>Or maybe you want to add an album for a given artist:</p>
             
@@ -731,8 +731,11 @@
             
             <p>The conditions to use to filter the association, can be any argument passed
             to <code>where</code>. If you use a hash or an array of two element arrays,
-            this will also be used as a filter when using eager_graph to load the
-            association.</p>
+            this will also be used as a filter when using eager_graph or
+            association_join to load the association.  If you do not use a hash or
+            array of two element arrays, consider also using the :graph_block option to
+            specifying a similar condition if you plan to use this association with
+            eager_graph or association_join.</p>
             
             <pre class="ruby"><span class="ruby-constant">Artist</span>.<span class="ruby-identifier">one_to_many</span> :<span class="ruby-identifier">good_albums</span>, :<span class="ruby-keyword">class</span>=<span class="ruby-operator">&gt;</span>:<span class="ruby-constant">Album</span>, :<span class="ruby-identifier">conditions=</span><span class="ruby-operator">&gt;</span>{:<span class="ruby-identifier">good=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>}&#x000A;<span class="ruby-ivar">@artist</span>.<span class="ruby-identifier">good_albums</span>&#x000A;<span class="ruby-comment"># SELECT * FROM albums WHERE ((artist_id = 1) AND (good IS TRUE))</span></pre>
             

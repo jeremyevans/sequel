@@ -39,22 +39,22 @@
             
             <p>Holds methods that only relate to paginated datasets. Paginated dataset
             have pages starting at 1 (page 1 is offset 0, page 1 is offset <a
-            href="Pagination.html#attribute-i-page_size">#page_size</a>).</p>
+            href="Pagination.html#method-i-page_size">#page_size</a>).</p>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
-              <li><a href="#attribute-i-current_page">current_page</a></li>
+              <li><a href="#method-i-current_page">current_page</a></li>
               <li><a href="#method-i-current_page_record_count">current_page_record_count</a></li>
               <li><a href="#method-i-current_page_record_range">current_page_record_range</a></li>
               <li><a href="#method-i-first_page-3F">first_page?</a></li>
               <li><a href="#method-i-last_page-3F">last_page?</a></li>
               <li><a href="#method-i-next_page">next_page</a></li>
-              <li><a href="#attribute-i-page_count">page_count</a></li>
+              <li><a href="#method-i-page_count">page_count</a></li>
               <li><a href="#method-i-page_range">page_range</a></li>
-              <li><a href="#attribute-i-page_size">page_size</a></li>
-              <li><a href="#attribute-i-pagination_record_count">pagination_record_count</a></li>
+              <li><a href="#method-i-page_size">page_size</a></li>
+              <li><a href="#method-i-pagination_record_count">pagination_record_count</a></li>
               <li><a href="#method-i-prev_page">prev_page</a></li>
               <li><a href="#method-i-set_pagination_info">set_pagination_info</a></li>
             </ol>
@@ -62,58 +62,25 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='attribute-list'>
-              <h2 class='section-bar'>Attributes</h2>
-              <div class='name-list'>
-                <table>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-current_page'>current_page</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The current page of the dataset, starting at 1 and not 0.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-page_count'>page_count</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The number of pages in the dataset before pagination, of which this
-                      paginated dataset is one.  Empty datasets are considered to have a single
-                      page.</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-page_size'>page_size</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The number of records per page (the final page may have fewer than this
-                      number of records).</p>
-                    </td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>
-                      <a name='attribute-i-pagination_record_count'>pagination_record_count</a>
-                    </td>
-                    <td class='context-item-value'>[RW]</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>The total number of records in the dataset before pagination.</p>
-                    </td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-current_page'>
+                <a name='method-i-current_page'></a>
+                <div class='synopsis'>
+                  <span class='name'>current_page</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The current page of the dataset, starting at 1 and not 0.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-current_page-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-current_page-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 84</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_page</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:current_page</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-current_page_record_count'>
                 <a name='method-i-current_page_record_count'></a>
                 <div class='synopsis'>
@@ -128,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-current_page_record_count-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-current_page_record_count-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_page_record_count</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-value">0</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@current_page</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@page_count</span>&#x000A;  &#x000A;  <span class="ruby-identifier">a</span> = <span class="ruby-value">1</span> <span class="ruby-operator">+</span> (<span class="ruby-ivar">@current_page</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">*</span> <span class="ruby-ivar">@page_size</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@page_size</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-ivar">@pagination_record_count</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@pagination_record_count</span>&#x000A;  <span class="ruby-identifier">b</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-current_page_record_count-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 104</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_page_record_count</span>&#x000A;  <span class="ruby-keyword">return</span> <span class="ruby-value">0</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">current_page</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">page_count</span>&#x000A;  &#x000A;  <span class="ruby-identifier">a</span> = <span class="ruby-value">1</span> <span class="ruby-operator">+</span> (<span class="ruby-identifier">current_page</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">page_size</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">page_size</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-identifier">pagination_record_count</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">pagination_record_count</span>&#x000A;  <span class="ruby-identifier">b</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-current_page_record_range'>
@@ -145,7 +112,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-current_page_record_range-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-current_page_record_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_page_record_range</span>&#x000A;  <span class="ruby-keyword">return</span> (<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">0</span>) <span class="ruby-keyword">if</span> <span class="ruby-ivar">@current_page</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@page_count</span>&#x000A;  &#x000A;  <span class="ruby-identifier">a</span> = <span class="ruby-value">1</span> <span class="ruby-operator">+</span> (<span class="ruby-ivar">@current_page</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">*</span> <span class="ruby-ivar">@page_size</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@page_size</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-ivar">@pagination_record_count</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@pagination_record_count</span>&#x000A;  <span class="ruby-identifier">a</span><span class="ruby-operator">..</span><span class="ruby-identifier">b</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-current_page_record_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">current_page_record_range</span>&#x000A;  <span class="ruby-keyword">return</span> (<span class="ruby-value">0</span><span class="ruby-operator">..</span><span class="ruby-value">0</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">current_page</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">page_count</span>&#x000A;  &#x000A;  <span class="ruby-identifier">a</span> = <span class="ruby-value">1</span> <span class="ruby-operator">+</span> (<span class="ruby-identifier">current_page</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">*</span> <span class="ruby-identifier">page_size</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-identifier">a</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">page_size</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>&#x000A;  <span class="ruby-identifier">b</span> = <span class="ruby-identifier">pagination_record_count</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">b</span> <span class="ruby-operator">&gt;</span> <span class="ruby-identifier">pagination_record_count</span>&#x000A;  <span class="ruby-identifier">a</span><span class="ruby-operator">..</span><span class="ruby-identifier">b</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-first_page-3F'>
@@ -162,7 +129,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-first_page-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-first_page-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 99</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">first_page?</span>&#x000A;  <span class="ruby-ivar">@current_page</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-first_page-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">first_page?</span>&#x000A;  <span class="ruby-identifier">current_page</span> <span class="ruby-operator">==</span> <span class="ruby-value">1</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-last_page-3F'>
@@ -179,7 +146,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-last_page-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-last_page-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 104</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">last_page?</span>&#x000A;  <span class="ruby-ivar">@current_page</span> <span class="ruby-operator">==</span> <span class="ruby-ivar">@page_count</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-last_page-3F-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 119</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">last_page?</span>&#x000A;  <span class="ruby-identifier">current_page</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">page_count</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-next_page'>
@@ -196,7 +163,26 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-next_page-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-next_page-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">next_page</span>&#x000A;  <span class="ruby-identifier">current_page</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">page_count</span> <span class="ruby-operator">?</span> (<span class="ruby-identifier">current_page</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-next_page-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">next_page</span>&#x000A;  <span class="ruby-identifier">current_page</span> <span class="ruby-operator">&lt;</span> <span class="ruby-identifier">page_count</span> <span class="ruby-operator">?</span> (<span class="ruby-identifier">current_page</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-page_count'>
+                <a name='method-i-page_count'></a>
+                <div class='synopsis'>
+                  <span class='name'>page_count</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The number of pages in the dataset before pagination, of which this
+                  paginated dataset is one.  Empty datasets are considered to have a single
+                  page.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-page_count-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-page_count-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 79</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">page_count</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:page_count</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-page_range'>
@@ -213,7 +199,42 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-page_range-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-page_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 114</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">page_range</span>&#x000A;  <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-identifier">page_count</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-page_range-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 129</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">page_range</span>&#x000A;  <span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-identifier">page_count</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-page_size'>
+                <a name='method-i-page_size'></a>
+                <div class='synopsis'>
+                  <span class='name'>page_size</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The number of records per page (the final page may have fewer than this
+                  number of records).</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-page_size-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-page_size-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">page_size</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:page_size</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-pagination_record_count'>
+                <a name='method-i-pagination_record_count'></a>
+                <div class='synopsis'>
+                  <span class='name'>pagination_record_count</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>The total number of records in the dataset before pagination.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-pagination_record_count-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-pagination_record_count-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">pagination_record_count</span>&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:pagination_record_count</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-prev_page'>
@@ -230,7 +251,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-prev_page-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-prev_page-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 119</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prev_page</span>&#x000A;  <span class="ruby-identifier">current_page</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> (<span class="ruby-identifier">current_page</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-prev_page-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 134</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">prev_page</span>&#x000A;  <span class="ruby-identifier">current_page</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span> <span class="ruby-operator">?</span> (<span class="ruby-identifier">current_page</span> <span class="ruby-operator">-</span> <span class="ruby-value">1</span>) <span class="ruby-operator">:</span> <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-set_pagination_info'>
@@ -241,13 +262,13 @@
                 </div>
                 <div class='description'>
                   
-                  <p>Sets the pagination info for this paginated dataset, and returns self.</p>
+                  <p>SEQUEL5: Remove :nocov:</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-set_pagination_info-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-set_pagination_info-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 124</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_pagination_info</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>)&#x000A;  <span class="ruby-ivar">@current_page</span> = <span class="ruby-identifier">page_no</span>&#x000A;  <span class="ruby-ivar">@page_size</span> = <span class="ruby-identifier">page_size</span>&#x000A;  <span class="ruby-ivar">@pagination_record_count</span> = <span class="ruby-identifier">record_count</span>&#x000A;  <span class="ruby-ivar">@page_count</span> = (<span class="ruby-identifier">record_count</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">page_size</span>.<span class="ruby-identifier">to_f</span>).<span class="ruby-identifier">ceil</span>&#x000A;  <span class="ruby-ivar">@page_count</span> = <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-ivar">@page_count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-set_pagination_info-source'><span class="ruby-comment"># File lib/sequel/extensions/pagination.rb, line 140</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">set_pagination_info</span>(<span class="ruby-identifier">page_no</span>, <span class="ruby-identifier">page_size</span>, <span class="ruby-identifier">record_count</span>)&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-node">&quot;Dataset#set_pagination_info&quot;</span>, <span class="ruby-string">&quot;It should no longer be necessary to call this method.&quot;</span>)&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">current_page</span> = <span class="ruby-identifier">page_no</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">page_size</span> = <span class="ruby-identifier">page_size</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">pagination_record_count</span> = <span class="ruby-identifier">record_count</span>&#x000A;  <span class="ruby-identifier">page_count</span> = (<span class="ruby-identifier">record_count</span> <span class="ruby-operator">/</span> <span class="ruby-identifier">page_size</span>.<span class="ruby-identifier">to_f</span>).<span class="ruby-identifier">ceil</span>&#x000A;  <span class="ruby-identifier">page_count</span> = <span class="ruby-value">1</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">page_count</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>&#x000A;  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">page_count</span> = <span class="ruby-identifier">page_count</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

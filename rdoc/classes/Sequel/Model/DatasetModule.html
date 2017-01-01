@@ -56,6 +56,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-subset">subset</a></li>
+              <li><a href="#method-i-where">where</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -96,6 +97,23 @@
                     [show source]
                   </a>
                   <pre id='method-i-subset-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 18</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-where'>
+                <a name='method-i-where'></a>
+                <div class='synopsis'>
+                  <span class='name'>where</span>
+                  <span class='arguments'>(name, *args, &block)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Alias for subset</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-where-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-where-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 23</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">where</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">subset</span>(<span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

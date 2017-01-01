@@ -47,6 +47,20 @@
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>CALLER_ARGS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>RUBY_VERSION >= '2.0' ? [0,1] : [0]</td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-columns-3D'>
@@ -64,7 +78,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-columns-3D-source'><span class="ruby-comment"># File lib/sequel/extensions/duplicate_columns_handler.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns=</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">uniq</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">size</span>&#x000A;    <span class="ruby-identifier">handle_duplicate_columns</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-ivar">@columns</span> = <span class="ruby-identifier">cols</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-columns-3D-source'><span class="ruby-comment"># File lib/sequel/extensions/duplicate_columns_handler.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns=</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cols</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">uniq</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">cols</span>.<span class="ruby-identifier">size</span>&#x000A;    <span class="ruby-identifier">handle_duplicate_columns</span>(<span class="ruby-identifier">cols</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-on_duplicate_columns'>
@@ -81,7 +95,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-on_duplicate_columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-on_duplicate_columns-source'><span class="ruby-comment"># File lib/sequel/extensions/duplicate_columns_handler.rb, line 38</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">handler</span> = (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must provide either an argument or a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block_given?</span>; <span class="ruby-keyword">nil</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both an argument and a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">handler</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:on_duplicate_columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">handler</span><span class="ruby-operator">||</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-on_duplicate_columns-source'><span class="ruby-comment"># File lib/sequel/extensions/duplicate_columns_handler.rb, line 40</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">on_duplicate_columns</span>(<span class="ruby-identifier">handler</span> = (<span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Must provide either an argument or a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">block_given?</span>; <span class="ruby-keyword">nil</span>), <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span> <span class="ruby-constant">Error</span>, <span class="ruby-string">&quot;Cannot provide both an argument and a block to on_duplicate_columns&quot;</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">handler</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:on_duplicate_columns=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">handler</span><span class="ruby-operator">||</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>freeze_datasets.rb</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='file' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>freeze_datasets.rb</h1>
+        <div class='paths'>
+          lib/sequel/extensions/freeze_datasets.rb
+        </div>
+        <div class='last-update'>
+          Last Update:
+          <span class='datetime'>2016-12-21 14:50:31 -0800</span>
+        </div>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The freeze_datasets extension freezes a databases&#39;s datasets by
+            default, and makes it so the databases&#39;s datasets are always frozen. 
+            This makes sure you can never accidentally modify a dataset that may be
+            used elsewhere (such as a model class&#39;s dataset or the same dataset
+            being used in another thread). Frozen datasets can also perform caching for
+            many different methods that can significantly improve performance.</p>
+            
+            <p>In addition to the caching provided by frozen datasets, this also adds
+            caching of Database#from calls if the method is called with a single <a
+            href="../../../../classes/Symbol.html">Symbol</a> argument and not a block.
+            In addition to speeding up Dataset#from itself, because it returns a cached
+            dataset, all caching done by that dataset can also improve performance.</p>
+            
+            <p>Usage:</p>
+            
+            <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">extension</span>(:<span class="ruby-identifier">freeze_datasets</span>)</pre>
+            
+            <p>Related module: Sequel::FreezeDatasets</p>
+          </div>
+          <div id='context'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

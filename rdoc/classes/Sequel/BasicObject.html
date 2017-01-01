@@ -46,7 +46,7 @@
             constants are resolved in <code>Object</code>.  This allows the virtual row
             support to work with classes without prefixing them with ::, such as:</p>
             
-            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">bonds</span>].<span class="ruby-identifier">filter</span>{<span class="ruby-identifier">maturity_date</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}</pre>
+            <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">bonds</span>].<span class="ruby-identifier">where</span>{<span class="ruby-identifier">maturity_date</span> <span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>}</pre>
           </div>
           <div id='method-list'>
             <h2>Methods</h2>

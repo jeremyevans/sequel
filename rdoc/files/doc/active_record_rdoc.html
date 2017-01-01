@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
+          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -230,7 +230,7 @@
             where using an SQL string fragment hurts you is when the SQL syntax cannot
             handle all cases:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-string">&#39;id NOT IN ?&#39;</span>, <span class="ruby-identifier">ids_array</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;id NOT IN ?&#39;</span>, <span class="ruby-identifier">ids_array</span>)</pre>
             
             <p>That will work fine if <code>ids_array</code> is not empty, but will not
             work correctly if it is empty.  With <a
@@ -244,13 +244,13 @@
             For example, if you want a case insensitive search that works on both
             PostgreSQL and MySQL, the following won&#39;t work:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-string">&#39;name LIKE ?&#39;</span>, <span class="ruby-string">&#39;A%&#39;</span>)</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-string">&#39;name LIKE ?&#39;</span>, <span class="ruby-string">&#39;A%&#39;</span>)</pre>
             
             <p>This is because LIKE is case sensitive on PostgreSQL, but case insensitive
             on MySQL.  With <a href="../../classes/Sequel.html">Sequel</a>, you would
             do:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">filter</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>))</pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>))</pre>
             
             <p>This will do a case insensitive search on both databases.  If you want a
             case sensitive search on both, you can use <code>like</code> instead of
@@ -757,7 +757,7 @@
             order in <a href="../../classes/Sequel.html">Sequel</a>, but the same
             method chain approach is used, which you end with <code>last</code>:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># You could also do:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">reverse_order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">first</span></pre>
+            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">last</span>&#x000A;<span class="ruby-comment"># You could also do:</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">artist_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">reverse</span>(:<span class="ruby-identifier">name</span>).<span class="ruby-identifier">first</span></pre>
             
             <p>If you are using <code>find(:all, ...)</code>, you use a method chain
             instead of passing the options, and end it with <code>all</code>:</p>

@@ -29,12 +29,155 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-12-01 10:38:16 -0800</span>
+          <span class='datetime'>2016-12-31 20:40:57 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.42.0+-282017-01-01-29">4.42.0 (2017-01-01)<span><a href="#label-4.42.0+-282017-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Handle eager load callbacks correctly for one_to_one associations with
+            orders or offsets when window functions are not supported (jeremyevans)</p>
+            </li><li>
+            <p>Raise <a href="../classes/Sequel/Error.html">Sequel::Error</a> if using an
+            :eager_limit dataset option when eager loading a singular association
+            (jeremyevans)</p>
+            </li><li>
+            <p>Replace internal uses of Dataset#select_more with select_append to save a
+            method call (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#order_append the primary method, and order_more the alias, for
+            similarity to select_append and select_more (jeremyevans)</p>
+            </li><li>
+            <p>Replace internal uses of Dataset#filter with where to save a method call
+            (jeremyevans)</p>
+            </li><li>
+            <p>Do not set :auto_increment in the schema information for integer columns
+            that are part of a composite primary key on SQLite (jeremyevans)</p>
+            </li><li>
+            <p>Use autoincrement setting on integer primary key columns when emulating
+            table modification methods on SQLite (thenrio, jeremyevans) (#1277, #1278)</p>
+            </li><li>
+            <p>Make the pagination extension work on frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#server work for frozen model datasets using the sharding
+            plugin (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#nullify in the null_dataset extension work on frozen datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Model#set_server work when using a frozen model dataset (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#ungraphed work on a frozen model dataset (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_{autoid,fetch,numrows} to the mock adapter, returning
+            cloned datasets with the setting changed (jeremyevans)</p>
+            </li><li>
+            <p>Make looser_typecasting extension handle the strict BigDecimal parsing
+            introduced in ruby 2.4rc1 (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#{db,opts}= in the sequel_3_dataset_methods extension raise
+            for frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Speed up repeated calls to Dataset#{interval,range} for frozen datasets
+            using a cached placeholder literalizer (jeremyevans)</p>
+            </li><li>
+            <p>Speed up repeated calls to Dataset#get with a single argument for frozen
+            datasets using a cached placeholder literalizer (jeremyevans)</p>
+            </li><li>
+            <p>Speed up repeated calls to Dataset#{first,last} with arguments/blocks for
+            frozen datasets using a cached placeholder literalizer (jeremyevans)</p>
+            </li><li>
+            <p>Speed up repeated calls to Dataset#{avg,min,max,sum} for frozen datasets
+            using a cached placeholder literalizer (jeremyevans)</p>
+            </li><li>
+            <p>Cache dataset returned by Dataset#skip_locked for frozen datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Cache dataset returned by Dataset#for_update for frozen datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Cache dataset returned by Dataset#un{filtered,grouped,limited,ordered} for
+            frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Cache dataset returned by Dataset#reverse (no args) for frozen datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Cache dataset returned by Dataset#invert for frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Speed up repeated calls to Dataset#count with an argument or block for
+            frozen datasets using a cached placeholder literalizer (jeremyevans)</p>
+            </li><li>
+            <p>Using :on_duplicate_columns=&gt;:warn Database option with
+            duplicate_columns_handler now prepends file/line to the warning message
+            (jeremyevans)</p>
+            </li><li>
+            <p>Move identifier mangling code to identifier_mangling extension, load by
+            default unless using :identifier_mangling=&gt;false Database option
+            (jeremyevans)</p>
+            </li><li>
+            <p>Allow Dataset#with_extend to accept a block and create a module with that
+            block that the object is extended with (jeremyevans)</p>
+            </li><li>
+            <p>Speed up repeated calls to with_pk on the same frozen model dataset using a
+            cached placeholder literalizer (jeremyevans)</p>
+            </li><li>
+            <p>Add dataset_module methods such as select and order that define dataset
+            methods which support caching for frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Cache subset datasets if they don&#39;t use blocks or procs for frozen
+            model datasets (jeremyevans)</p>
+            </li><li>
+            <p>Cache intermediate dataset used in Dataset#{last,paged_each} for frozen
+            model datasets without an order (jeremyevans)</p>
+            </li><li>
+            <p>Cache dataset returned by Dataset#naked for frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Cache intermediate dataset used in Dataset#last (no args) for frozen
+            datasets (jeremyevans)</p>
+            </li><li>
+            <p>Cache intermediate dataset used in Dataset#first (no args) and
+            single_record for frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Cache intermediate dataset used in Dataset#empty? for frozen datasets
+            (jeremyevans)</p>
+            </li><li>
+            <p>Cache intermediate dataset used in Dataset#count (no args) for frozen
+            datasets (jeremyevans)</p>
+            </li><li>
+            <p>Warn if :conditions option may be unexpectedly ignored during
+            eager_graph/association_join (jeremyevans) (#1272)</p>
+            </li><li>
+            <p>Cache SELECT and DELETE SQL for most frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Freeze most SQL::Expression objects and internal state by default
+            (jeremyevans)</p>
+            </li><li>
+            <p>Freeze Dataset::PlaceholderLiteralizer and
+            Dataset::PlaceholderLiteralizer::Argument instances (jeremyevans)</p>
+            </li><li>
+            <p>Freeze most dataset opts values to avoid unintentional modification
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Dataset#with_convert_smallint_to_bool on DB2, returning a clone with
+            convert_smallint_to_bool set (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#freeze actually freeze the dataset on ruby 2.4+ (jeremyevans)</p>
+            </li><li>
+            <p>Avoid using instance variables other than @opts for dataset data storage
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add freeze_datasets extension, making all datasets for a given Database
+            frozen (jeremyevans)</p>
+            </li><li>
+            <p>Refactor prepared statement internals, using opts instead of instance
+            variables (jeremyevans)</p>
+            </li><li>
+            <p>Model.set_dataset now operates on a clone of the dataset given instead of
+            modifying it, so it works with frozen datasets (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.41.0+-282016-12-01-29">4.41.0 (2016-12-01)<span><a href="#label-4.41.0+-282016-12-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

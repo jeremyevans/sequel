@@ -319,7 +319,7 @@
                   must be unique. So if you are doing a soft delete of records, in which the
                   name must be unique, but only for active records:</p>
                   
-                  <pre class="ruby"><span class="ruby-identifier">validates_unique</span>(:<span class="ruby-identifier">name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">filter</span>(:<span class="ruby-identifier">active</span>)}</pre>
+                  <pre class="ruby"><span class="ruby-identifier">validates_unique</span>(:<span class="ruby-identifier">name</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">active</span>)}</pre>
                   
                   <p>You should also add a unique index in the database, as this suffers from a
                   fairly obvious race condition.</p>

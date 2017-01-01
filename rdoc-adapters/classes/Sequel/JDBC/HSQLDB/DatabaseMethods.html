@@ -105,7 +105,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-database_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:hsqldb</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-database_type-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 24</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">database_type</span>&#x000A;  <span class="ruby-value">:hsqldb</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-db_version'>
@@ -122,7 +122,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-db_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-db_version-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 36</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_version</span>&#x000A;  <span class="ruby-ivar">@db_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">get</span>{<span class="ruby-constant">DATABASE_VERSION</span>(){}}&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>&#x000A;      <span class="ruby-node">$1</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">10000</span> <span class="ruby-operator">+</span> <span class="ruby-node">$2</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">+</span> <span class="ruby-node">$3</span>.<span class="ruby-identifier">to_i</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-db_version-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">db_version</span>&#x000A;  <span class="ruby-ivar">@db_version</span> <span class="ruby-operator">||=</span> <span class="ruby-keyword">begin</span>&#x000A;    <span class="ruby-identifier">v</span> = <span class="ruby-identifier">get</span>{<span class="ruby-constant">DATABASE_VERSION</span>(){}}&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span> <span class="ruby-operator">=~</span> <span class="ruby-regexp">/(\d+)\.(\d+)\.(\d+)/</span>&#x000A;      <span class="ruby-node">$1</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">10000</span> <span class="ruby-operator">+</span> <span class="ruby-node">$2</span>.<span class="ruby-identifier">to_i</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span> <span class="ruby-operator">+</span> <span class="ruby-node">$3</span>.<span class="ruby-identifier">to_i</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-serial_primary_key_options'>
@@ -140,7 +140,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-serial_primary_key_options-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-serial_primary_key_options-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serial_primary_key_options</span>&#x000A;  {<span class="ruby-value">:primary_key</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:integer</span>, <span class="ruby-value">:identity=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:start_with=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-serial_primary_key_options-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 30</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">serial_primary_key_options</span>&#x000A;  {<span class="ruby-value">:primary_key</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword">true</span>, <span class="ruby-value">:type</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">:integer</span>, <span class="ruby-value">:identity=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>, <span class="ruby-value">:start_with=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_drop_table_if_exists-3F'>
@@ -157,7 +157,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_drop_table_if_exists-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_drop_table_if_exists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 46</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_drop_table_if_exists?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_drop_table_if_exists-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/jdbc/hsqldb.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_drop_table_if_exists?</span>&#x000A;  <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

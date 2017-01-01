@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-10-13 11:56:48 -0700</span>
+          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -113,7 +113,7 @@
             
             <h2 id="label-Ordering">Ordering<span><a href="#label-Ordering">&para;</a> <a href="#top">&uarr;</a></span></h2>
             
-            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">kind</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">reverse_order</span>(:<span class="ruby-identifier">kind</span>)&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">kind</span>), :<span class="ruby-identifier">name</span>)</pre>
+            <pre class="ruby"><span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">kind</span>) <span class="ruby-comment"># kind</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">reverse</span>(:<span class="ruby-identifier">kind</span>) <span class="ruby-comment"># kind DESC</span>&#x000A;<span class="ruby-identifier">dataset</span>.<span class="ruby-identifier">order</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">desc</span>(:<span class="ruby-identifier">kind</span>), :<span class="ruby-identifier">name</span>) <span class="ruby-comment"># kind DESC, name</span></pre>
             
             <h2 id="label-Limit-2FOffset">Limit/Offset<span><a href="#label-Limit-2FOffset">&para;</a> <a href="#top">&uarr;</a></span></h2>
             

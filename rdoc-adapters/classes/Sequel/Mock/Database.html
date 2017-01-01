@@ -226,7 +226,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-connect-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-constant">Connection</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">server</span>, <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-connect-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">connect</span>(<span class="ruby-identifier">server</span>)&#x000A;  <span class="ruby-constant">Connection</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">server</span>, <span class="ruby-identifier">server_opts</span>(<span class="ruby-identifier">server</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-disconnect_connection'>
@@ -242,7 +242,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-disconnect_connection-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-disconnect_connection-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 96</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-disconnect_connection-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">disconnect_connection</span>(<span class="ruby-identifier">c</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute'>
@@ -264,7 +264,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)} &#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 104</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">c</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)} &#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_dui'>
@@ -282,7 +282,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_dui-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 108</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:meth=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:numrows</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_dui-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 110</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_dui</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:meth=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:numrows</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-execute_insert'>
@@ -300,7 +300,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-execute_insert-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 113</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:meth=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:autoid</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 115</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:meth=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:autoid</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-sqls'>
@@ -318,7 +318,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-sqls-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-sqls-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 119</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sqls</span>&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-ivar">@sqls</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-ivar">@sqls</span>.<span class="ruby-identifier">clear</span>&#x000A;  <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-sqls-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">sqls</span>&#x000A;  <span class="ruby-identifier">s</span> = <span class="ruby-ivar">@sqls</span>.<span class="ruby-identifier">dup</span>&#x000A;  <span class="ruby-ivar">@sqls</span>.<span class="ruby-identifier">clear</span>&#x000A;  <span class="ruby-identifier">s</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-supports_savepoints-3F'>
@@ -335,7 +335,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-supports_savepoints-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 126</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-identifier">shared_adapter?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">super</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-supports_savepoints-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 128</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">supports_savepoints?</span>&#x000A;  <span class="ruby-identifier">shared_adapter?</span> <span class="ruby-operator">?</span> <span class="ruby-keyword">super</span> <span class="ruby-operator">:</span> <span class="ruby-keyword">true</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
