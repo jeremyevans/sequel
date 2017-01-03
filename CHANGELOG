@@ -1,3 +1,7 @@
+=== master
+
+* Make timestamp migrator handle key length limitations when using MySQL with InnoDB engine and utf8mb4 charset default (jeremyevans) (#1282)
+
 === 4.42.0 (2017-01-01)
 
 * Handle eager load callbacks correctly for one_to_one associations with orders or offsets when window functions are not supported (jeremyevans)

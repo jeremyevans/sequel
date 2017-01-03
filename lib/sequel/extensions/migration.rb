@@ -760,7 +760,18 @@ module Sequel
       c = column
       ds = db.from(table)
       if !db.table_exists?(table)
-        db.create_table(table){String c, :primary_key=>true}
+        begin
+          db.create_table(table){String c, :primary_key=>true}
+        rescue Sequel::DatabaseError => e
+          if db.database_type == :mysql && e.message =~ /max key length/
+            # Handle case where MySQL is used with utf8mb4 charset default, which
+            # only allows a maximum length of about 190 characters for string
+            # primary keys due to InnoDB limitations.
+            db.create_table(table){String c, :primary_key=>true, :size=>190}
+          else
+            raise e
+          end
+        end
         if db.table_exists?(:schema_info) and vha = db[:schema_info].all and vha.length == 1 and
            vha.first.keys == [:version] and vha.first.values.first.is_a?(Integer)
           convert_from_schema_info
