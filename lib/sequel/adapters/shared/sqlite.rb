@@ -359,9 +359,9 @@ module Sequel
         DATABASE_ERROR_REGEXPS
       end
 
+      # Recognize SQLite error codes if the exception provides access to them.
       def database_specific_error_class(exception, opts)
-        return super unless exception.respond_to?(:resultCode)
-        case exception.resultCode.code
+        case sqlite_error_code(exception)
         when 1299
           NotNullConstraintViolation
         when 2067
@@ -515,6 +515,11 @@ module Sequel
         end
       end
       
+      # Don't support SQLite error codes for exceptions by default.
+      def sqlite_error_code(exception)
+        nil
+      end
+
       # Backbone of the tables and views support.
       def tables_and_views(filter, opts)
         m = output_identifier_meth

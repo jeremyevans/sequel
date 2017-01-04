@@ -269,6 +269,14 @@ module Sequel
       def database_error_classes
         [SQLite3::Exception, ArgumentError]
       end
+
+      # Support SQLite exception codes if ruby-sqlite3 supports them.
+      # This is disabled by default because ruby-sqlite3 doesn't currently
+      # support them (returning nil), and even if it did, it doesn't support
+      # extended error codes, which would lead to worse behavior.
+      #def sqlite_error_code(exception)
+      #  exception.code if exception.respond_to?(:code)
+      #end
     end
     
     # Dataset class for SQLite datasets that use the ruby-sqlite3 driver.

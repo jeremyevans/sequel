@@ -90,6 +90,11 @@ module Sequel
             end
           end
         end
+
+        # The result code for the exception, if the jdbc driver supports result codes for exceptions.
+        def sqlite_error_code(exception)
+          exception.resultCode.code if exception.respond_to?(:resultCode)
+        end
       end
     end
   end
