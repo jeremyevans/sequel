@@ -359,6 +359,24 @@ module Sequel
         DATABASE_ERROR_REGEXPS
       end
 
+      def database_specific_error_class(exception, opts)
+        return super unless exception.respond_to?(:resultCode)
+        case exception.resultCode.code
+        when 1299
+          NotNullConstraintViolation
+        when 2067
+          UniqueConstraintViolation
+        when 787
+          ForeignKeyConstraintViolation
+        when 275
+          CheckConstraintViolation
+        when 19
+          ConstraintViolation
+        else
+          super
+        end
+      end
+
       # The array of column schema hashes for the current columns in the table
       def defined_columns_for(table)
         cols = parse_pragma(table, {})
