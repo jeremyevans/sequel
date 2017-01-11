@@ -190,6 +190,17 @@ module Sequel
       def commit_prepared_transaction(transaction_id, opts=OPTS)
         run("COMMIT PREPARED #{literal(transaction_id)}", opts)
       end
+      
+      # Creates the extension in the database. Arguments:
+      # * name: The name of the extension to be installed.
+      # * opts: Options hash:
+      #   * :if_not_exists : Do not throw an error if an extension with the same name already exists.
+      #   * :schema : The name of the schema in which to install the extension's objects.
+      #   * :version : The version of the extension to install.
+      #   * :old_version : Must be specified when, and only when, you are attempting to install an extension that replaces an "old style" module.
+      def create_extension(name, opts=OPTS)
+        self << create_extension_sql(name, opts)
+      end
 
       # Creates the function in the database.  Arguments:
       # name :: name of the function to create
@@ -263,6 +274,15 @@ module Sequel
       def do(code, opts=OPTS)
         language = opts[:language]
         run "DO #{"LANGUAGE #{literal(language.to_s)} " if language}#{literal(code)}"
+      end
+      
+      # Drops the extension from the database. Arguments:
+      # * name : The name of an installed extension.
+      # * opts : Options hash:
+      #   * :if_exists : Do not throw an error if the extension does not exist.
+      #   * :cascade : Automatically drop objects that depend on the extension.
+      def drop_extension(name, opts=OPTS)
+        self << drop_extension_sql(name, opts)
       end
 
       # Drops the function from the database. Arguments:
@@ -846,6 +866,11 @@ module Sequel
         end
       end
 
+      # SQL statement to create an extension.
+      def create_extension_sql(name, opts=OPTS)
+        "CREATE EXTENSION #{'IF NOT EXISTS ' if opts[:if_not_exists]}#{name}#{" SCHEMA #{quote_identifier(opts[:schema])}" if opts[:schema]}#{" VERSION #{quote_identifier(opts[:version])}" if opts[:version]}#{" FROM #{opts[:old_version]}" if opts[:old_version]}"
+      end
+
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts=OPTS)
         args = opts[:args]
@@ -948,6 +973,11 @@ module Sequel
       # The errors that the main adapters can raise, depends on the adapter being used
       def database_error_classes
         CONVERTED_EXCEPTIONS
+      end
+      
+      # SQL for dropping an extension from the database.
+      def drop_extension_sql(name, opts=OPTS)
+        "DROP EXTENSION#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
       end
 
       # SQL for dropping a function from the database.
