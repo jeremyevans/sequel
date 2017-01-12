@@ -1,4 +1,4 @@
-Sun, 01 Jan 2017 11:26:15 -0800
+Thu, 12 Jan 2017 12:03:07 -0800
 lib/sequel/extensions/_pretty_table.rb	Tue, 17 May 2016 14:34:25 -0700
 lib/sequel/extensions/arbitrary_servers.rb	Wed, 29 Jun 2016 13:36:28 -0700
 lib/sequel/extensions/blank.rb	Mon, 25 Jan 2016 14:10:57 -0800
@@ -25,7 +25,7 @@ lib/sequel/extensions/identifier_mangling.rb	Mon, 12 Dec 2016 13:44:49 -0800
 lib/sequel/extensions/inflector.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/looser_typecasting.rb	Thu, 15 Dec 2016 14:30:00 -0800
 lib/sequel/extensions/meta_def.rb	Thu, 11 Feb 2016 15:50:14 -0800
-lib/sequel/extensions/migration.rb	Mon, 19 Dec 2016 14:54:41 -0800
+lib/sequel/extensions/migration.rb	Thu, 12 Jan 2017 12:01:03 -0800
 lib/sequel/extensions/mssql_emulate_lateral_with_apply.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/named_timezones.rb	Thu, 11 Feb 2016 15:50:14 -0800
 lib/sequel/extensions/no_auto_literal_strings.rb	Tue, 13 Sep 2016 13:21:30 -0700
@@ -126,7 +126,7 @@ lib/sequel/plugins/scissors.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/serialization.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/serialization_modification_detection.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/sharding.rb	Fri, 16 Dec 2016 17:01:12 -0800
-lib/sequel/plugins/single_table_inheritance.rb	Mon, 19 Dec 2016 14:54:41 -0800
+lib/sequel/plugins/single_table_inheritance.rb	Thu, 12 Jan 2017 11:30:23 -0800
 lib/sequel/plugins/singular_table_names.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/skip_create_refresh.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/plugins/split_values.rb	Thu, 21 Jan 2016 12:21:53 -0800

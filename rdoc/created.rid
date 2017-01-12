@@ -1,6 +1,6 @@
-Sun, 01 Jan 2017 11:25:18 -0800
+Thu, 12 Jan 2017 12:02:11 -0800
 README.rdoc	Mon, 19 Dec 2016 14:54:41 -0800
-CHANGELOG	Sat, 31 Dec 2016 20:40:57 -0800
+CHANGELOG	Thu, 12 Jan 2017 12:01:03 -0800
 MIT-LICENSE	Sat, 09 Jan 2016 12:54:32 -0800
 lib/sequel.rb	Thu, 21 Jan 2016 12:21:52 -0800
 lib/sequel/ast_transformer.rb	Mon, 19 Dec 2016 14:54:41 -0800
@@ -14,7 +14,7 @@ lib/sequel/model.rb	Tue, 23 Aug 2016 16:07:25 -0700
 lib/sequel/no_core_ext.rb	Thu, 21 Jan 2016 12:21:53 -0800
 lib/sequel/sql.rb	Mon, 19 Dec 2016 14:54:41 -0800
 lib/sequel/timezones.rb	Thu, 21 Jan 2016 12:21:53 -0800
-lib/sequel/version.rb	Sat, 31 Dec 2016 20:40:57 -0800
+lib/sequel/version.rb	Thu, 12 Jan 2017 12:01:03 -0800
 lib/sequel/connection_pool/sharded_single.rb	Fri, 15 Jul 2016 14:07:44 -0700
 lib/sequel/connection_pool/sharded_threaded.rb	Fri, 15 Jul 2016 14:07:44 -0700
 lib/sequel/connection_pool/single.rb	Fri, 15 Jul 2016 14:07:44 -0700
@@ -186,4 +186,4 @@ doc/release_notes/4.6.0.txt	Thu, 02 Jan 2014 12:13:25 -0800
 doc/release_notes/4.7.0.txt	Fri, 31 Jan 2014 11:26:01 -0800
 doc/release_notes/4.8.0.txt	Fri, 28 Feb 2014 09:33:59 -0800
 doc/release_notes/4.9.0.txt	Tue, 01 Apr 2014 10:01:57 -0700
-lib/sequel/extensions/migration.rb	Mon, 19 Dec 2016 14:54:41 -0800
+lib/sequel/extensions/migration.rb	Thu, 12 Jan 2017 12:01:03 -0800
