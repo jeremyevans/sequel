@@ -28,4 +28,11 @@ describe "prepared_statements_with_pk plugin" do
     @c.dataset.filter{id > 2}[1].must_equal @p
     @c.db.sqls.must_equal ["SELECT * FROM people WHERE ((id > 2) AND (people.id = 1)) LIMIT 1 -- read_only"]
   end
+
+  it "should respect explicitly set server" do
+    @c.dataset.filter(:name=>'foo')[1].must_equal @p
+    @c.db.sqls.must_equal ["SELECT * FROM people WHERE ((name = 'foo') AND (people.id = 1)) LIMIT 1 -- read_only"]
+    @c.dataset.server(:default).filter(:name=>'foo')[1].must_equal @p
+    @c.db.sqls.must_equal ["SELECT * FROM people WHERE ((name = 'foo') AND (people.id = 1)) LIMIT 1"]
+  end
 end

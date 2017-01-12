@@ -51,7 +51,11 @@ module Sequel
             rescue UnbindDuplicate
               super
             else
-              model.send(:prepared_lookup_dataset, ds).call(bv)
+              ps = model.send(:prepared_lookup_dataset, ds)
+              if server = @opts[:server]
+                ps = ps.server(server)
+              end
+              ps.call(bv)
             end
           end
         end

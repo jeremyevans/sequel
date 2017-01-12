@@ -1,5 +1,7 @@
 === master
 
+* Make prepared_statements_with_pk plugin work correctly when dataset explicitly specifies server to use (jeremyevans)
+
 * Make prepared_statements plugin work correctly when model object explicitly specifies server to use (jeremyevans)
 
 * Make dataset_module inherited to subclasses when using the single_table_inheritance plugin (jeremyevans) (#1284)
