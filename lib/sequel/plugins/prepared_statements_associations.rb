@@ -85,7 +85,7 @@ module Sequel
         # Use a prepared statement if possible to load the associated object,
         # unless a dynamic callback is given.
         def _load_associated_object(opts, dynamic_opts)
-          if !dynamic_opts[:callback] && (bv = association_bound_variables(opts)) && (ps ||= association_prepared_statement(opts, bv))
+          if !dynamic_opts[:callback] && (bv = association_bound_variables(opts)) && (ps = association_prepared_statement(opts, bv))
             ps.call(bv)
           else
             super
@@ -95,7 +95,7 @@ module Sequel
         # Use a prepared statement if possible to load the associated object,
         # unless the associated model uses caching.
         def _load_associated_object_via_primary_key(opts)
-          if !opts.associated_class.respond_to?(:cache_get_pk) && (bv = association_bound_variables(opts)) && (ps ||= association_prepared_statement(opts, bv))
+          if !opts.associated_class.respond_to?(:cache_get_pk) && (bv = association_bound_variables(opts)) && (ps = association_prepared_statement(opts, bv))
             ps.call(bv)
           else
             super
@@ -105,7 +105,7 @@ module Sequel
         # Use a prepared statement if possible to load the associated objects,
         # unless a dynamic callback is given.
         def _load_associated_object_array(opts, dynamic_opts)
-          if !dynamic_opts[:callback] && (bv = association_bound_variables(opts)) && (ps ||= association_prepared_statement(opts, bv))
+          if !dynamic_opts[:callback] && (bv = association_bound_variables(opts)) && (ps = association_prepared_statement(opts, bv))
             ps.call(bv)
           else
             super
