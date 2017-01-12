@@ -416,8 +416,8 @@ module Sequel
       #   Artist.by_name.where(:name.like('A%'))
       #
       #   # Just add a class method that calls an existing dataset method
-      #   Artist.def_dataset_method(:server!)
-      #   Artist.server!(:server1)
+      #   Artist.def_dataset_method(:paginate)
+      #   Artist.paginate(2, 10)
       def def_dataset_method(*args, &block)
         raise(Error, "No arguments given") if args.empty?
 
