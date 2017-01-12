@@ -27,6 +27,12 @@ module Sequel
       module InstanceMethods
         private
 
+        # Mark that associated objects should use the same server.
+        def _associated_objects_use_same_server?
+          return super if defined?(super)
+          false
+        end
+
         # Return a bound variable hash that maps the keys in +ks+ (qualified by the +table+)
         # to the values of the results of sending the methods in +vs+.
         def association_bound_variable_hash(table, ks, vs)
@@ -53,7 +59,7 @@ module Sequel
         # instance.  Return false if such a prepared statement cannot be created.
         def association_prepared_statement(opts, assoc_bv)
           return unless model.cache_associations
-          opts.send(:cached_fetch, :prepared_statement) do
+          ps = opts.send(:cached_fetch, :prepared_statement) do
             unless opts[:instance_specific]
               ds, bv = _associated_dataset(opts, {}).unbind
 
@@ -80,6 +86,12 @@ module Sequel
               ds.clone(:log_sql=>true).prepare(opts.returns_array? ? :select : :first, :"smpsap_#{NEXT.call}")
             end
           end
+
+          if ps && @server && _associated_objects_use_same_server?
+            ps = ps.server(@server)
+          end
+
+          ps
         end
 
         # Use a prepared statement if possible to load the associated object,

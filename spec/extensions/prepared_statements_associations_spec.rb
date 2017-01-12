@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::PreparedStatementsAssociations" do
   before do
-    @db = Sequel.mock
+    @db = Sequel.mock(:servers=>{:foo=>{}})
     @db.extend_datasets do
       def select_sql
         sql = super
@@ -50,6 +50,32 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
 
     @Artist.load(:id=>1).tag
     @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) LIMIT 1 -- prepared"]
+  end
+
+  it "should run correct shard for associations when also using sharding plugin" do
+    @Artist.plugin :sharding
+    @Album.plugin :sharding
+
+    @Artist.load(:id=>1).set_server(:foo).albums
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) -- prepared -- foo"]
+
+    @Artist.load(:id=>1).set_server(:foo).album
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) LIMIT 1 -- prepared -- foo"]
+
+    @Album.load(:id=>1, :artist_id=>2).set_server(:foo).artist
+    @db.sqls.must_equal ["SELECT id, id2 FROM artists WHERE (artists.id = 2) LIMIT 1 -- prepared -- foo"]
+
+    @Album.load(:id=>1, :artist_id=>2).set_server(:foo).tags
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) -- prepared -- foo"]
+
+    @Album.load(:id=>1, :artist_id=>2).set_server(:foo).tag
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) WHERE (albums_tags.album_id = 1) LIMIT 1 -- prepared -- foo"]
+
+    @Artist.load(:id=>1).set_server(:foo).tags
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) -- prepared -- foo"]
+
+    @Artist.load(:id=>1).set_server(:foo).tag
+    @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) LIMIT 1 -- prepared -- foo"]
   end
 
   it "should run correct SQL for composite key associations" do

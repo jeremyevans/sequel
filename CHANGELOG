@@ -1,5 +1,7 @@
 === master
 
+* Make prepared_statements_associations plugin work correctly when model object explicitly specifies server to use when also using sharding plugin (jeremyevans)
+
 * Make prepared_statements_with_pk plugin work correctly when dataset explicitly specifies server to use (jeremyevans)
 
 * Make prepared_statements plugin work correctly when model object explicitly specifies server to use (jeremyevans)

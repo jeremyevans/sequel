@@ -83,6 +83,11 @@ module Sequel
           nil
         end
 
+        # Mark that associated objects should use the same server.
+        def _associated_objects_use_same_server?
+          true
+        end
+
         # Ensure that the join table for many_to_many associations uses the correct shard.
         def _join_table_dataset(opts)
           use_server(super)
