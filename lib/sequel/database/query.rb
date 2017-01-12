@@ -308,10 +308,8 @@ module Sequel
 
     # Remove the cached schema for the given schema name
     def remove_cached_schema(table)
-      if @schemas
-        k = quote_schema_table(table)
-        Sequel.synchronize{@schemas.delete(k)}
-      end
+      k = quote_schema_table(table)
+      Sequel.synchronize{@schemas.delete(k)}
     end
     
     # Match the database's column type to a ruby type via a
