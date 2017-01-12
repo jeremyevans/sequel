@@ -185,6 +185,13 @@ module Sequel
 
         private
 
+        # Extend the sti dataset with the module when extending the main
+        # dataset.
+        def dataset_extend(mod, opts=OPTS)
+          @sti_dataset = @sti_dataset.with_extend(mod)
+          super
+        end
+
         # If calling set_dataset manually, make sure to set the dataset
         # row proc to one that handles inheritance correctly.
         def set_dataset_row_proc(ds)

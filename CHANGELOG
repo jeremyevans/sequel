@@ -1,3 +1,7 @@
+=== 4.42.1 (2017-01-12)
+
+* Make dataset_module inherited to subclasses when using the single_table_inheritance plugin (jeremyevans) (#1284)
+
 === 4.42.0 (2017-01-01)
 
 * Handle eager load callbacks correctly for one_to_one associations with orders or offsets when window functions are not supported (jeremyevans)

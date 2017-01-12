@@ -58,6 +58,26 @@ describe Sequel::Model, "single table inheritance plugin" do
     StiTest.all.collect{|x| x.class}.must_equal [StiTest]
   end
 
+  it "should inherit dataset_modules correctly in subclass" do
+    StiTest.dataset_module{def foo; 1; end}
+    Object.send(:remove_const, :StiTestSub1)
+    Object.send(:remove_const, :StiTestSub2)
+    class ::StiTestSub1 < StiTest; end 
+    StiTestSub1.dataset_module{def bar; 2; end}
+    class ::StiTestSub2 < StiTestSub1; end 
+    StiTestSub2.dataset_module{def baz; 3; end}
+
+    StiTest.dataset.foo.must_equal 1
+    proc{StiTest.dataset.bar}.must_raise NoMethodError
+    proc{StiTest.dataset.baz}.must_raise NoMethodError
+    StiTestSub1.dataset.foo.must_equal 1
+    StiTestSub1.dataset.bar.must_equal 2
+    proc{StiTestSub1.dataset.baz}.must_raise NoMethodError
+    StiTestSub2.dataset.foo.must_equal 1
+    StiTestSub2.dataset.bar.must_equal 2
+    StiTestSub2.dataset.baz.must_equal 3
+  end
+
   it "should fallback to the main class if the sti_key field is empty or nil without calling constantize" do
     called = false
     StiTest.meta_def(:constantize) do |s|
