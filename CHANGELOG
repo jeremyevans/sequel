@@ -1,5 +1,7 @@
 === master
 
+* Make prepared_statements plugin work correctly when model object explicitly specifies server to use (jeremyevans)
+
 * Make dataset_module inherited to subclasses when using the single_table_inheritance plugin (jeremyevans) (#1284)
 
 * Support use of SQLite result codes in the jdbc-sqlite adapter, if the jdbc sqlite driver supports them (flash-gordon, jeremyevans) (#1283)

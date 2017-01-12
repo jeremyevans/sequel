@@ -72,6 +72,41 @@ describe "prepared_statements plugin" do
 
   include prepared_statements_spec
 
+  it "should correctly delete instance when specifying server" do
+    @p.set_server(:read_only).destroy.must_equal @p
+    @db.sqls.must_equal ["DELETE FROM people WHERE (id = 1) -- read_only"]
+  end
+
+  it "should correctly update instance when specifying server" do
+    @p.set_server(:read_only).update(:name=>'bar').must_equal @c.load(:id=>1, :name=>'bar', :i => 2)
+    @db.sqls.must_equal ["UPDATE people SET name = 'bar' WHERE (id = 1) -- read_only"]
+  end
+
+  it "should correctly create instance when specifying server" do
+    @c.new(:name=>'foo').set_server(:read_only).save.must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
+    @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo') -- read_only", "SELECT #{@columns} FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+  end
+
+  it "should correctly create instance if dataset supports insert_select when specifying server" do
+    @c.dataset_module do
+      def supports_insert_select?
+        true
+      end
+      def supports_returning?(type)
+        true
+      end
+      def insert_select(h)
+        cache_set(:_fetch, :id=>1, :name=>'foo', :i => 2)
+        server(:default).with_sql_first(insert_select_sql(h))
+      end
+      def insert_select_sql(*v)
+        "#{insert_sql(*v)} RETURNING #{(opts[:returning] && !opts[:returning].empty?) ? opts[:returning].map{|c| literal(c)}.join(', ') : '*'}"
+      end
+    end
+    @c.new(:name=>'foo').set_server(:read_only).save.must_equal @c.load(:id=>1, :name=>'foo', :i => 2)
+    @db.sqls.must_equal ["INSERT INTO people (name) VALUES ('foo') RETURNING #{@columns} -- read_only"]
+  end
+
   it "should work correctly when subclassing" do
     c = Class.new(@c)
     c[1].must_equal c.load(:id=>1, :name=>'foo', :i=>2)

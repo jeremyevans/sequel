@@ -156,7 +156,7 @@ module Sequel
         # Use a prepared statement to delete the row.
         def _delete_without_checking
           if use_prepared_statements_for?(:delete)
-            model.send(:prepared_delete).call(pk_hash)
+            _set_prepared_statement_server(model.send(:prepared_delete)).call(pk_hash)
           else
             super
           end
@@ -165,7 +165,7 @@ module Sequel
         # Use a prepared statement to insert the values into the model's dataset.
         def _insert_raw(ds)
           if use_prepared_statements_for?(:insert)
-            model.send(:prepared_insert, @values.keys).call(@values)
+            _set_prepared_statement_server(model.send(:prepared_insert, @values.keys)).call(@values)
           else
             super
           end
@@ -176,7 +176,7 @@ module Sequel
         def _insert_select_raw(ds)
           if use_prepared_statements_for?(:insert_select)
             if ps = model.send(:prepared_insert_select, @values.keys)
-              ps.call(@values)
+              _set_prepared_statement_server(ps).call(@values)
             end
           else
             super
@@ -186,7 +186,7 @@ module Sequel
         # Use a prepared statement to refresh this model's column values.
         def _refresh_get(ds)
           if use_prepared_statements_for?(:refresh)
-            model.send(:prepared_refresh).call(pk_hash)
+            _set_prepared_statement_server(model.send(:prepared_refresh)).call(pk_hash)
           else
             super
           end
@@ -195,9 +195,17 @@ module Sequel
         # Use a prepared statement to update this model's columns in the database.
         def _update_without_checking(columns)
           if use_prepared_statements_for?(:update)
-            model.send(:prepared_update, columns.keys).call(Hash[columns].merge!(pk_hash))
+            _set_prepared_statement_server(model.send(:prepared_update, columns.keys)).call(Hash[columns].merge!(pk_hash))
           else
             super
+          end
+        end
+
+        def _set_prepared_statement_server(ps)
+          if @server
+            ps.server(@server)
+          else
+            ps
           end
         end
       end
