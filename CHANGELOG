@@ -1,5 +1,7 @@
 === master
 
+* Make dataset_module inherited to subclasses when using the single_table_inheritance plugin (jeremyevans) (#1284)
+
 * Support use of SQLite result codes in the jdbc-sqlite adapter, if the jdbc sqlite driver supports them (flash-gordon, jeremyevans) (#1283)
 
 * Make timestamp migrator handle key length limitations when using MySQL with InnoDB engine and utf8mb4 charset default (jeremyevans) (#1282)
