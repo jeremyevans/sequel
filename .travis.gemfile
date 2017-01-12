@@ -31,7 +31,7 @@ else
 end
 
 if RUBY_VERSION < '2.0.0'
-  gem 'json', '<2'
+  gem 'json', '<1.8.5'
   gem 'rake', '<10.0.0'
 else
   gem 'json'
