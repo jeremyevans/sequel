@@ -47,7 +47,7 @@ module Sequel
         conn.query_options.merge!(:symbolize_keys=>true, :cache_rows=>false)
           
         if NativePreparedStatements
-          @default_query_options ||= conn.query_options.dup
+          conn.instance_variable_set(:@sequel_default_query_options, conn.query_options.dup)
         end
 
         sqls = mysql_connection_setting_sqls
@@ -158,7 +158,7 @@ module Sequel
           raise_error(e)
         ensure
           if stmt
-            conn.query_options.replace(@default_query_options)
+            conn.query_options.replace(conn.instance_variable_get(:@sequel_default_query_options))
             stmt.close if close_stmt
           end
         end

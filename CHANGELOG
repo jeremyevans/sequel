@@ -1,5 +1,7 @@
 === master
 
+* Handle sharding better when using mysql2 native prepared statements (jeremyevans)
+
 * Use thread-safe incrementor for mock adapter autoid handling (jeremyevans)
 
 * Make Model#freeze not freeze associations hash until after validating the model instance (jeremyevans)
