@@ -34,11 +34,10 @@ module Sequel
 
         # The version of the database, as an integer (e.g 2.2.5 -> 20205)
         def db_version
-          @db_version ||= begin
-            v = get{DATABASE_VERSION(){}}
-            if v =~ /(\d+)\.(\d+)\.(\d+)/
-              $1.to_i * 10000 + $2.to_i * 100 + $3.to_i
-            end
+          return @db_version if defined?(@db_version)
+          v = get{DATABASE_VERSION(){}}
+          @db_version = if v =~ /(\d+)\.(\d+)\.(\d+)/
+            $1.to_i * 10000 + $2.to_i * 100 + $3.to_i
           end
         end
         
