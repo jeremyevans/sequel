@@ -2264,7 +2264,7 @@ end
 describe "Sequel::Model pg_array_to_many" do
   before(:all) do
     @db = DB
-    @db.extension :pg_array
+    @db.extension :pg_array unless @db.frozen?
     Sequel.extension :pg_array_ops
     @db.drop_table?(:tags, :albums, :artists)
     @db.create_table(:artists) do
@@ -2345,7 +2345,7 @@ end if DB.database_type == :postgres && [:postgres, :jdbc].include?(DB.adapter_s
 describe "Sequel::Model many_to_pg_array" do
   before(:all) do
     @db = DB
-    @db.extension :pg_array
+    @db.extension :pg_array unless @db.frozen?
     Sequel.extension :pg_array_ops
     @db.drop_table?(:tags, :albums, :artists)
     @db.create_table(:artists) do

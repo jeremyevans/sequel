@@ -61,3 +61,9 @@ if dch = ENV['SEQUEL_DUPLICATE_COLUMNS_HANDLER']
   DB.extension :duplicate_columns_handler
   DB.opts[:on_duplicate_columns] = dch.to_sym unless dch.empty?
 end
+
+if ENV['SEQUEL_FREEZE_DATABASE']
+  DB.extension(:constraint_validations, :string_agg, :date_arithmetic)
+  DB.extension(:pg_array) if DB.database_type == :postgres
+  DB.freeze
+end

@@ -1825,11 +1825,7 @@ end
 describe "Dataset replace" do
   before do
     DB.create_table!(:items){Integer :id, :unique=>true; Integer :value}
-    sqls = []
-    DB.loggers << Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new
-
     @d = DB[:items]
-    sqls.clear
   end
 
   after do

@@ -48,7 +48,7 @@ describe "Database schema parser" do
         DB.drop_table(:items)
       end
     end
-  end if IDENTIFIER_MANGLING
+  end if IDENTIFIER_MANGLING && !DB.frozen?
 
   it "should not issue an sql query if the schema has been loaded unless :reload is true" do
     DB.create_table!(:items){Integer :number}
@@ -843,5 +843,5 @@ describe "Database#tables and #views" do
       @db.identifier_input_method = :xxxxx
       @db.views.each{|t| t.to_s.must_match(/\Ax{5}\d+\z/)}
     end if DB.supports_view_listing?
-  end if IDENTIFIER_MANGLING
+  end if IDENTIFIER_MANGLING && !DB.frozen?
 end

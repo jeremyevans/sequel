@@ -83,4 +83,4 @@ describe "Sequel timezone support" do
       o.must_equal t.utc_offset
     end
   end
-end
+end unless DB.frozen?

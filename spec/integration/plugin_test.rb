@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 describe "Class Table Inheritance Plugin" do
   before(:all) do
     @db = DB
-    @db.instance_variable_set(:@schemas, {})
+    @db.instance_variable_get(:@schemas).clear
     @db.drop_table?(:staff, :executives, :managers, :employees)
     @db.create_table(:employees) do
       primary_key :id
@@ -175,7 +175,7 @@ end
 describe "Many Through Many Plugin" do
   before(:all) do
     @db = DB
-    @db.instance_variable_set(:@schemas, {})
+    @db.instance_variable_get(:@schemas).clear
     @db.drop_table?(:albums_artists, :albums, :artists)
     @db.create_table(:albums) do
       primary_key :id
@@ -470,7 +470,7 @@ end
 describe "Tactical Eager Loading Plugin" do
   before(:all) do
     @db = DB
-    @db.instance_variable_set(:@schemas, {})
+    @db.instance_variable_get(:@schemas).clear
     @db.drop_table?(:albums_artists)
     @db.create_table!(:artists) do
       primary_key :id
@@ -1992,7 +1992,7 @@ end
 describe "Sequel::Plugins::ConstraintValidations" do
   before(:all) do
     @db = DB
-    @db.extension(:constraint_validations)
+    @db.extension(:constraint_validations) unless @db.frozen?
     @db.drop_table?(:sequel_constraint_validations)
     @db.create_constraint_validations_table
     @ds = @db[:cv_test]
@@ -2064,6 +2064,7 @@ describe "Sequel::Plugins::ConstraintValidations" do
     end
 
     it "should set up automatic validations inside the model" do 
+      skip if @db.frozen?
       c = Class.new(Sequel::Model(@ds))
       c.plugin :constraint_validations
       c.dataset.delete
@@ -2188,7 +2189,8 @@ describe "date_arithmetic extension" do
 
   before(:all) do
     @db = DB
-    @db.extension(:date_arithmetic)
+    @db.extension(:date_arithmetic) unless @db.frozen?
+    skip if @db.database_type == :sqlite && @db.frozen?
     if @db.database_type == :sqlite
       @db.use_timestamp_timezones = false
     end
@@ -2269,7 +2271,7 @@ end
 describe "string_agg extension" do
   before(:all) do
     @db = DB
-    @db.extension(:string_agg)
+    @db.extension(:string_agg) unless @db.frozen?
     @db.create_table!(:string_agg_test) do
       Integer :id
       String :s

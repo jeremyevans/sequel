@@ -2,7 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Eagerly loading a tree structure" do
   before(:all) do
-    DB.instance_variable_set(:@schemas, {})
+    DB.instance_variable_get(:@schemas).clear
     DB.create_table!(:nodes) do
       primary_key :id
       foreign_key :parent_id, :nodes
@@ -128,7 +128,7 @@ describe "Association Extensions" do
         first(:name=>name) || model.create(:name=>name, :author_id=>model_object.pk)
       end
     end
-    DB.instance_variable_set(:@schemas, {})
+    DB.instance_variable_get(:@schemas).clear
     DB.create_table!(:authors) do
       primary_key :id
     end
@@ -171,7 +171,7 @@ end
 
 describe "has_many :through has_many and has_one :through belongs_to" do
   before(:all) do
-    DB.instance_variable_set(:@schemas, {})
+    DB.instance_variable_get(:@schemas).clear
     DB.create_table!(:firms) do
       primary_key :id
     end
@@ -322,7 +322,7 @@ end
 
 describe "Polymorphic Associations" do
   before(:all) do
-    DB.instance_variable_set(:@schemas, {})
+    DB.instance_variable_get(:@schemas).clear
     DB.create_table!(:assets) do
       primary_key :id
       Integer :attachable_id
@@ -448,7 +448,7 @@ end
 
 describe "many_to_one/one_to_many not referencing primary key" do
   before(:all) do
-    DB.instance_variable_set(:@schemas, {})
+    DB.instance_variable_get(:@schemas).clear
     DB.create_table!(:clients) do
       primary_key :id
       String :name

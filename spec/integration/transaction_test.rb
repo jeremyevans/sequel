@@ -166,17 +166,17 @@ describe "Database transactions" do
   end
 
   it "should handle returning inside of the block by committing" do
-    def @db.ret_commit
-      transaction do
-        self[:items] << {:name => 'abc'}
+    def ret_commit
+      @db.transaction do
+        @db[:items] << {:name => 'abc'}
         return
       end
     end
 
     @d.count.must_equal 0
-    @db.ret_commit
+    ret_commit
     @d.count.must_equal 1
-    @db.ret_commit
+    ret_commit
     @d.count.must_equal 2
     proc do
       @db.transaction do
