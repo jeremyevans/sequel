@@ -26,7 +26,7 @@ module Sequel
       # Return the database version as a string.  Don't rely on this,
       # it may return an integer in the future.
       def db2_version
-        return @db2_version if @db2_version
+        return @db2_version if defined?(@db2_version)
         @db2_version = metadata_dataset.with_sql("select service_level from sysibmadm.env_inst_info").first[:service_level]
       end
       alias_method :server_version, :db2_version
