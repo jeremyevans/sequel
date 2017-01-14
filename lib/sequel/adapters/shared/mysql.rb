@@ -155,7 +155,8 @@ module Sequel
       # automatic initialization of datetime values wasn't supported to 5.6.5+,
       # and this is related to that.
       def supports_timestamp_usecs?
-        @supports_timestamp_usecs ||= server_version >= 50605 && typecast_value_boolean(opts[:fractional_seconds])
+        return @supports_timestamp_usecs if defined?(@supports_timestamp_usecs)
+        @supports_timestamp_usecs = server_version >= 50605 && typecast_value_boolean(opts[:fractional_seconds])
       end
 
       # MySQL supports transaction isolation levels
