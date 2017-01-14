@@ -48,7 +48,15 @@ module Sequel
       #         the value returned
       # Class :: Should be an Exception subclass, will create a new
       #          instance an raise it wrapped in a DatabaseError.
-      attr_writer :autoid
+      def autoid=(v)
+        @autoid = case v
+        when Integer
+          i = v - 1
+          proc{Sequel.synchronize{i+=1}}
+        else
+          v
+        end
+      end
 
       # Set the columns to set in the dataset when the dataset fetches
       # rows.  Argument types supported:
@@ -133,13 +141,8 @@ module Sequel
       private
 
       def _autoid(sql, v, ds=nil)
-        case v
-        when Integer
-          if ds
-            ds.send(:cache_set, :_autoid, ds.autoid + 1) if ds.autoid.is_a?(Integer)
-          else
-            @autoid += 1
-          end
+        if ds
+          ds.send(:cache_set, :_autoid, ds.autoid + 1) if ds.autoid.is_a?(Integer)
           v
         else
           _nextres(v, sql, nil)
