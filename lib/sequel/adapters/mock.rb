@@ -195,7 +195,7 @@ module Sequel
           if f < Exception
             raise f
           else
-            raise Error, "Invalid @autoid/@numrows attribute: #{v.inspect}"
+            raise Error, "Invalid @fetch attribute: #{v.inspect}"
           end
         when nil
           # nothing
