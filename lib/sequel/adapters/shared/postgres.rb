@@ -580,8 +580,9 @@ module Sequel
       # Check whether the given type name string/symbol (e.g. :hstore) is supported by
       # the database.
       def type_supported?(type)
-        @supported_types ||= {}
-        @supported_types.fetch(type){@supported_types[type] = (from(:pg_type).where(:typtype=>'b', :typname=>type.to_s).count > 0)}
+        Sequel.synchronize{return @supported_types[type] if @supported_types.has_key?(type)}
+        supported = from(:pg_type).where(:typtype=>'b', :typname=>type.to_s).count > 0
+        Sequel.synchronize{return @supported_types[type] = supported}
       end
 
       # Creates a dataset that uses the VALUES clause:
@@ -1032,6 +1033,7 @@ module Sequel
       def initialize_postgres_adapter
         @primary_keys = {}
         @primary_key_sequences = {}
+        @supported_types = {}
         @conversion_procs = PG_TYPES.dup
         reset_conversion_procs
       end

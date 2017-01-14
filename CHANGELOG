@@ -1,5 +1,7 @@
 === master
 
+* Handle Database#type_supported? thread-safely on PostgreSQL (jeremyevans)
+
 * Handle primary_key_sequences thread-safely on Oracle (jeremyevans)
 
 * Handle sharding better when using mysql2 native prepared statements (jeremyevans)
