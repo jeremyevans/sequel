@@ -237,7 +237,7 @@ module Sequel
       end
 
       def remove_cached_schema(table)
-        @primary_key_sequences.delete(table)
+        Sequel.synchronize{@primary_key_sequences.delete(table)}
         super
       end
       
@@ -253,19 +253,20 @@ module Sequel
     
       def sequence_for_table(table)
         return nil unless autosequence
-        @primary_key_sequences.fetch(table) do |key|
-          begin
-            sch = schema(table)
-          rescue Sequel::Error
-            return nil
-          end
+        Sequel.synchronize{return @primary_key_sequences[table] if @primary_key_sequences.has_key?(table)}
 
-          pk = sch.select{|k, v| v[:primary_key]}
-          @primary_key_sequences[table] = if pk.length == 1
-            seq = "seq_#{table}_#{pk.first.first}"
-            seq.to_sym unless from(:user_sequences).where(:sequence_name=>input_identifier_meth.call(seq)).empty?
-          end
+        begin
+          sch = schema(table)
+        rescue Sequel::Error
+          return nil
         end
+
+        pk = sch.select{|k, v| v[:primary_key]}
+        pks = if pk.length == 1
+          seq = "seq_#{table}_#{pk.first.first}"
+          seq.to_sym unless from(:user_sequences).where(:sequence_name=>input_identifier_meth.call(seq)).empty?
+        end
+        Sequel.synchronize{@primary_key_sequences[table] = pks}
       end
 
       # Oracle supports CREATE OR REPLACE VIEW.
