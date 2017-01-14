@@ -1,5 +1,7 @@
 === master
 
+* Freeze enum_labels in the pg_enum extension (jeremyevans)
+
 * Handle Database#type_supported? thread-safely on PostgreSQL (jeremyevans)
 
 * Handle primary_key_sequences thread-safely on Oracle (jeremyevans)

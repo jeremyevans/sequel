@@ -111,7 +111,8 @@ module Sequel
       def parse_enum_labels
         @enum_labels = metadata_dataset.from(:pg_enum).
           order(:enumtypid, :enumsortorder).
-          select_hash_groups(Sequel.cast(:enumtypid, Integer).as(:v), :enumlabel)
+          select_hash_groups(Sequel.cast(:enumtypid, Integer).as(:v), :enumlabel).freeze
+        @enum_labels.each_value(&:freeze)
 
         if respond_to?(:register_array_type)
           array_types = metadata_dataset.
