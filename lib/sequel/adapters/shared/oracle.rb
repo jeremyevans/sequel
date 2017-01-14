@@ -74,6 +74,13 @@ module Sequel
         fks.values
       end
 
+      def freeze
+        current_user
+        server_version
+        @conversion_procs.freeze
+        super
+      end
+
       # Oracle namespaces indexes per table.
       def global_index_namespace?
         false

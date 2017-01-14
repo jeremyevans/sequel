@@ -330,6 +330,11 @@ describe "pg_array extension" do
     @db.literal(Sequel::Postgres::PG_TYPES[3].call('{}')).must_equal "'{}'::blah[]"
   end
 
+  it "should not support registering custom array types on a per-Database basis for frozen databases" do
+    @db.freeze
+    proc{@db.register_array_type('banana', :oid=>7865){|s| s}}.must_raise RuntimeError, TypeError
+  end
+
   it "should support registering custom array types on a per-Database basis" do
     @db.register_array_type('banana', :oid=>7865){|s| s}
     @db.typecast_value(:banana_array, []).class.must_equal(Sequel::Postgres::PGArray)

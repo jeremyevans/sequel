@@ -98,6 +98,11 @@ module Sequel
         end
       end
 
+      def freeze
+        @conversion_procs.freeze
+        super
+      end
+
       private
 
       LAST_INSERT_ID = 'SELECT @@IDENTITY'.freeze

@@ -34,6 +34,11 @@ module Sequel
           :derby
         end
 
+        def freeze
+          svn_version
+          super
+        end
+
         # Derby uses an IDENTITY sequence for autoincrementing columns.
         def serial_primary_key_options
           {:primary_key => true, :type => :integer, :identity=>true, :start_with=>1}

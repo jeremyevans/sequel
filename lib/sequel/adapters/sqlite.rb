@@ -151,6 +151,11 @@ module Sequel
         _execute(:insert, sql, opts)
       end
       
+      def freeze
+        @conversion_procs.freeze
+        super
+      end
+
       # Handle Integer and Float arguments, since SQLite can store timestamps as integers and floats.
       def to_application_timestamp(s)
         case s

@@ -221,6 +221,12 @@ module Sequel
           end
         end
 
+        # Freeze the pg array schema types to prevent adding new ones.
+        def freeze
+          @pg_array_schema_types.freeze
+          super
+        end
+
         # Register a database specific array type.  This can be used to support
         # different array types per Database.  Use of this method does not
         # affect global state, unlike PGArray.register.  See PGArray.register for

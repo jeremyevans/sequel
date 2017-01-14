@@ -373,6 +373,13 @@ module Sequel
         h.values
       end
 
+      def freeze
+        server_version
+        supports_prepared_transactions?
+        @conversion_procs.freeze
+        super
+      end
+
       # Use the pg_* system tables to determine indexes on a table
       def indexes(table, opts=OPTS)
         m = output_identifier_meth

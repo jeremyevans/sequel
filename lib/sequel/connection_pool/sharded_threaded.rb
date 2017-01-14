@@ -103,6 +103,11 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     end
   end
   
+  def freeze
+    @servers.freeze
+    super
+  end
+  
   # Chooses the first available connection to the given server, or if none are
   # available, creates a new connection.  Passes the connection to the supplied
   # block:

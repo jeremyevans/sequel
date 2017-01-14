@@ -37,6 +37,12 @@ module Sequel
         :sqlanywhere
       end
 
+      def freeze
+        convert_smallint_to_bool
+        @conversion_procs.freeze
+        super
+      end
+
       def to_application_timestamp_sa(v)
         to_application_timestamp(v.to_s) if v
       end

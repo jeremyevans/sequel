@@ -109,6 +109,28 @@ describe "A new Database" do
   end if RUBY_VERSION >= '1.9.3'
 end
 
+describe "Database#freeze" do
+  before do
+    @db = Sequel.mock.freeze
+  end
+
+  it "should freeze internal structures" do
+    @db.instance_exec do
+      frozen?.must_equal true
+      opts.frozen?.must_equal true
+      pool.frozen?.must_equal true
+      loggers.frozen?.must_equal true
+      @dataset_class.frozen?.must_equal true
+      @dataset_modules.frozen?.must_equal true
+      @schema_type_classes.frozen?.must_equal true
+      from(:a).frozen?.must_equal  true
+      metadata_dataset.frozen?.must_equal true
+    end
+
+    proc{@db.extend_datasets{}}.must_raise RuntimeError, TypeError
+  end
+end
+
 describe "Database#disconnect" do
   it "should call pool.disconnect" do
     d = Sequel::Database.new

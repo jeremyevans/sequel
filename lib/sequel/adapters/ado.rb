@@ -127,6 +127,11 @@ module Sequel
         nil
       end
 
+      def freeze
+        @conversion_procs.freeze
+        super
+      end
+
       # Just execute so it doesn't attempt to return the number of rows modified.
       def execute_ddl(sql, opts=OPTS)
         execute(sql, opts)

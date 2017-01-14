@@ -31,6 +31,12 @@ module Sequel
       end
       alias_method :server_version, :db2_version
 
+      def freeze
+        db2_version
+        offset_strategy
+        super
+      end
+
       # Use SYSIBM.SYSCOLUMNS to get the information on the tables.
       def schema_parse_table(table, opts = OPTS)
         m = output_identifier_meth(opts[:dataset])

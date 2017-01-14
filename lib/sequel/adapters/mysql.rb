@@ -163,6 +163,12 @@ module Sequel
         execute(sql, opts){|c| return c.insert_id}
       end
 
+      def freeze
+        server_version
+        @conversion_procs.freeze
+        super
+      end
+
       # Return the version of the MySQL server two which we are connecting.
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_version if conn.respond_to?(:server_version)} || super)

@@ -283,6 +283,12 @@ module Sequel
         execute(sql, opts)
       end
 
+      def freeze
+        @type_convertor_map.freeze
+        @basic_type_convertor_map.freeze
+        super
+      end
+
       # Use the JDBC metadata to get a list of foreign keys for the table.
       def foreign_key_list(table, opts=OPTS)
         m = output_identifier_meth

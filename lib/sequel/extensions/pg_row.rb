@@ -411,6 +411,14 @@ module Sequel
           end
         end
 
+        # Freeze the row types and row schema types to prevent adding new ones.
+        def freeze
+          @row_types.freeze
+          @row_schema_types.freeze
+          @row_type_method_module.freeze
+          super
+        end
+
         # Register a new row type for the Database instance. db_type should be the type
         # symbol.  This parses the PostgreSQL system tables to get information the
         # composite type, and by default has the type return instances of a subclass

@@ -71,6 +71,11 @@ module Sequel
         _execute(:insert, sql, opts)
       end
 
+      def freeze
+        @conversion_procs.freeze
+        super
+      end
+
       private
 
       def _execute(type, sql, opts=OPTS, &block)

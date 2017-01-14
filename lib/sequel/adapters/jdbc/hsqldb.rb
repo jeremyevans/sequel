@@ -26,6 +26,11 @@ module Sequel
           :hsqldb
         end
 
+        def freeze
+          db_version
+          super
+        end
+
         # HSQLDB uses an IDENTITY sequence as the default value for primary
         # key columns.
         def serial_primary_key_options

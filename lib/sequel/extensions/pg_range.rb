@@ -269,6 +269,12 @@ module Sequel
           end
         end
 
+        # Freeze the pg range schema types to prevent adding new ones.
+        def freeze
+          @pg_range_schema_types.freeze
+          super
+        end
+
         # Register a database specific range type.  This can be used to support
         # different range types per Database.  Use of this method does not
         # affect global state, unlike PGRange.register.  See PGRange.register for

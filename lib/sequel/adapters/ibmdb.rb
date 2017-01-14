@@ -264,6 +264,11 @@ module Sequel
         end
       end
 
+      def freeze
+        @conversion_procs.freeze
+        super
+      end
+
       private
 
       # Execute the given SQL on the database.

@@ -162,6 +162,22 @@ module Sequel
       end
     end
 
+    # Freeze internal data structures for the Database instance.
+    def freeze
+      valid_connection_sql
+      metadata_dataset
+      @opts.freeze
+      @loggers.freeze
+      @pool.freeze
+      @dataset_class.freeze
+      @dataset_modules.freeze
+      @schema_type_classes.freeze
+      # SEQUEL5: Frozen by default, remove this
+      @default_dataset.freeze
+      metadata_dataset.freeze
+      super
+    end
+
     # Cast the given type to a literal type
     #
     #   DB.cast_type_literal(Float) # double precision

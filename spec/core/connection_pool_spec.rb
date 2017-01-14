@@ -905,6 +905,16 @@ describe "A single threaded pool with multiple servers" do
 end
 
 AllConnectionPoolClassesSpecs = shared_description do
+  it "should work correctly after being frozen" do
+    o = Object.new
+    db = mock_db.call{o}
+    cp = @class.new(db, {})
+    db.instance_variable_set(:@pool, cp)
+    db.freeze
+    cp.frozen?.must_equal true
+    db.synchronize{|c| c.must_be_same_as o}
+  end
+
   it "should have pool correctly handle disconnect errors not raised as DatabaseDisconnectError" do
     db = mock_db.call{Object.new}
     def db.dec; @dec ||= Class.new(StandardError) end

@@ -76,6 +76,11 @@ module Sequel
         execute(sql, opts){|c| return c.last_id}
       end
 
+      def freeze
+        server_version
+        super
+      end
+
       # Return the version of the MySQL server to which we are connecting.
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_info[:id]} || super)

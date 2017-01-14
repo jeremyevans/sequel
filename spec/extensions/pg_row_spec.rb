@@ -231,6 +231,15 @@ describe "pg_row extension" do
     @db.literal(p1.call('(1,b)')).must_equal "ROW(1, 'bb')::foo.bar"
   end
 
+  it "should not allow registering on a frozen database" do
+    @db.conversion_procs[4] = proc{|s| s.to_i}
+    @db.conversion_procs[5] = proc{|s| s * 2}
+    @db.fetch = [[], [{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
+    c = proc{|h| [h]}
+    @db.freeze
+    proc{@db.register_row_type(:foo, :converter=>c)}.must_raise RuntimeError, TypeError
+  end
+
   it "should allow registering with a custom converter" do
     @db.conversion_procs[4] = proc{|s| s.to_i}
     @db.conversion_procs[5] = proc{|s| s * 2}

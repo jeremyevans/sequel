@@ -10,6 +10,11 @@ module Sequel
       TRANSACTION_ROLLBACK_SP = 'Transaction.rollback_savepoint'.freeze
       TRANSACTION_SAVEPOINT= 'Transaction.savepoint'.freeze
 
+      def freeze
+        supports_savepoints?
+        super
+      end
+
       # Check the JDBC DatabaseMetaData for savepoint support
       def supports_savepoints?
         return @supports_savepoints if defined?(@supports_savepoints)

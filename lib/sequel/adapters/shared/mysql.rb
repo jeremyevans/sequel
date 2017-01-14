@@ -89,6 +89,12 @@ module Sequel
         h.values
       end
 
+      def freeze
+        server_version
+        supports_timestamp_usecs?
+        super
+      end
+
       # MySQL namespaces indexes per table.
       def global_index_namespace?
         false

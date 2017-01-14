@@ -89,6 +89,11 @@ module Sequel
         execute(sql, opts.merge(:type=>:insert))
       end
 
+      def freeze
+        server_version
+        super
+      end
+
       private
 
       def begin_transaction(conn, opts=OPTS)

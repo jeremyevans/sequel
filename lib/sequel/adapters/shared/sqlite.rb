@@ -101,6 +101,12 @@ module Sequel
         h.values
       end
 
+      def freeze
+        sqlite_version
+        use_timestamp_timezones?
+        super
+      end
+
       # Use the index_list and index_info PRAGMAs to determine the indexes on the table.
       def indexes(table, opts=OPTS)
         m = output_identifier_meth

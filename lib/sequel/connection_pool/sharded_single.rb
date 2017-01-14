@@ -43,6 +43,11 @@ class Sequel::ShardedSingleConnectionPool < Sequel::ConnectionPool
   def disconnect(opts=OPTS)
     (opts[:server] ? Array(opts[:server]) : servers).each{|s| disconnect_server(s)}
   end
+
+  def freeze
+    @servers.freeze
+    super
+  end
   
   # Yields the connection to the supplied block for the given server.
   # This method simulates the ConnectionPool#hold API.

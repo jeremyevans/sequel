@@ -170,6 +170,11 @@ describe "pg_range extension" do
     Sequel::Postgres::PG_TYPES[331].call('[1,3)').must_be_kind_of(@R)
   end
 
+  it "should not support registering custom range types on a per-Database basis for frozen databases" do
+    @db.freeze
+    proc{@db.register_range_type('banana', :oid=>7865){|s| s}}.must_raise RuntimeError, TypeError
+  end
+
   it "should support registering custom range types on a per-Database basis" do
     @db.register_range_type('banana', :oid=>7865){|s| s}
     @db.typecast_value(:banana, '[1,2]').class.must_equal(Sequel::Postgres::PGRange)

@@ -173,6 +173,11 @@ module Sequel
         h.values
       end
 
+      def freeze
+        server_version
+        super
+      end
+
       # Use the system tables to get index information
       def indexes(table, opts=OPTS)
         m = output_identifier_meth
