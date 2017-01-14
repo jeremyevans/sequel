@@ -4,22 +4,31 @@
 # It is just a wrapper around a single connection that uses the connection pool
 # API.
 class Sequel::SingleConnectionPool < Sequel::ConnectionPool  
+  def initialize(db, opts=OPTS)
+    super
+    @conn = []
+  end
+
   # Yield the connection if one has been made.
   def all_connections
-    yield @conn if @conn
+    yield @conn.first if @conn
   end
 
   # Disconnect the connection from the database.
   def disconnect(opts=nil)
     return unless @conn
-    disconnect_connection(@conn)
-    @conn = nil
+    disconnect_connection(@conn.first)
+    @conn.clear
+    nil
   end
-  
+
   # Yield the connection to the block.
   def hold(server=nil)
     begin
-      yield(@conn ||= make_new(DEFAULT_SERVER))
+      unless c = @conn.first
+        @conn.replace([c = make_new(DEFAULT_SERVER)])
+      end
+      yield c
     rescue Sequel::DatabaseDisconnectError, *@error_classes => e
       disconnect if disconnect_error?(e)
       raise
@@ -38,7 +47,7 @@ class Sequel::SingleConnectionPool < Sequel::ConnectionPool
   # The SingleConnectionPool always has a size of 1 if connected
   # and 0 if not.
   def size
-    @conn ? 1 : 0
+    @conn.empty? ? 0 : 1
   end
 
   private
