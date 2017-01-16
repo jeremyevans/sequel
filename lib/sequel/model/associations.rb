@@ -2119,8 +2119,10 @@ module Sequel
         # retrieving associations after freezing will still work in most cases,
         # but the associations will not be cached in the association cache.
         def freeze
-          associations.freeze
+          associations
           super
+          associations.freeze
+          self
         end
       
         private

@@ -4497,6 +4497,13 @@ describe "Model#freeze" do
     @o.associations.frozen?.must_equal true
   end
 
+  it "should freeze associations after validating" do
+    Album.send(:define_method, :validate){super(); b}
+    @o = Album.load(:id=>1)
+    @o.freeze
+    @o.associations.fetch(:b).id.must_equal 1
+  end
+
   it "should not break associations getters" do
     Album::B.dataset = Album::B.dataset.with_fetch(:album_id=>1, :id=>2)
     @o.b.must_equal Album::B.load(:id=>2, :album_id=>1)
