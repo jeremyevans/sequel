@@ -175,7 +175,7 @@ You can retrieve all records by using the +all+ method:
   posts.all
   # SELECT * FROM posts
 
-The all method returns an array of hashes, where each hash corresponds to a record.
+The +all+ method returns an array of hashes, where each hash corresponds to a record.
 
 You can also iterate through records one at a time using +each+:
 
@@ -318,7 +318,7 @@ You can also specify descending order:
 
 === Core Extensions
 
-Note the use of <tt>Sequel.desc(:stamp)</tt> in the above example.  Much of Sequel's DSL uses this style, calling methods on the Sequel module that return SQL expression objects.  Sequel also ships with a {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc]) that integrates Sequel's DSL better into the ruby language, allowing you to write:
+Note the use of <tt>Sequel.desc(:stamp)</tt> in the above example.  Much of Sequel's DSL uses this style, calling methods on the Sequel module that return SQL expression objects.  Sequel also ships with a {core_extensions extension}[rdoc-ref:doc/core_extensions.rdoc] that integrates Sequel's DSL better into the Ruby language, allowing you to write:
 
   :stamp.desc
 
@@ -749,7 +749,7 @@ Associations can be eagerly loaded via +eager+ and the <tt>:eager</tt> associati
 
 In addition to using +eager+, you can also use +eager_graph+, which will use a single query to get the object and all associated objects.  This may be necessary if you want to filter or order the result set based on columns in associated tables.  It works with cascading as well, the API is very similar.  Note that using +eager_graph+ to eagerly load multiple <tt>*_to_many</tt> associations will cause the result set to be a cartesian product, so you should be very careful with your filters when using it in that case.
 
-You can dynamically customize the eagerly loaded dataset by using using a proc.  This proc is passed the dataset used for eager loading, and should return a modified copy of that dataset:
+You can dynamically customize the eagerly loaded dataset by using a proc.  This proc is passed the dataset used for eager loading, and should return a modified copy of that dataset:
 
   # Eagerly load only replies containing 'foo'
   Post.eager(:replies=>proc{|ds| ds.where(Sequel.like(text, '%foo%'))}).all
@@ -765,7 +765,7 @@ You can dynamically customize eager loads for both +eager+ and +eager_graph+ whi
 
 === Joining with Associations
 
-You can use the association_join method to add a join to the model's dataset based on the assocation:
+You can use the +association_join+ method to add a join to the model's dataset based on the assocation:
 
   Post.association_join(:author)
   # SELECT * FROM posts
