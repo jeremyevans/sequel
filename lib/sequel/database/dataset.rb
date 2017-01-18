@@ -43,6 +43,9 @@ module Sequel
     # injection:
     #
     #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).all
+    #
+    # See caveats listed in Dataset#with_sql regarding datasets using custom
+    # SQL and the methods that can be called on them.
     def fetch(sql, *args, &block)
       ds = @default_dataset.with_sql(sql, *args)
       ds.each(&block) if block

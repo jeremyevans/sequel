@@ -1116,6 +1116,26 @@ module Sequel
     # You can also provide a method name and arguments to call to get the SQL:
     #
     #   DB[:items].with_sql(:insert_sql, :b=>1) # INSERT INTO items (b) VALUES (1)
+    #
+    # Note that datasets that specify custom SQL using this method will generally
+    # ignore future dataset methods that modify the SQL used, as specifying custom SQL
+    # overrides Sequel's SQL generator.  You should probably limit yourself to the following
+    # dataset methods when using this method:
+    #
+    # * each
+    # * all
+    # * single_record (if only one record could be returned)
+    # * single_value (if only one record could be returned, and a single column is selected)
+    # * map
+    # * to_hash
+    # * delete (if a DELETE statement)
+    # * update (if an UPDATE statement, with no arguments)
+    # * insert (if an INSERT statement, with no arguments)
+    # * truncate (if a TRUNCATE statement, with no arguments)
+    #
+    # If you want to use arbitrary dataset methods on a dataset that uses custom SQL, call
+    # from_self on the dataset, which wraps the custom SQL in a subquery, and allows normal
+    # dataset methods that modify the SQL to work.
     def with_sql(sql, *args)
       if sql.is_a?(Symbol)
         sql = send(sql, *args)
