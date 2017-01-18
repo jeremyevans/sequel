@@ -848,7 +848,6 @@ module Sequel
     # :hash :: The object into which the values will be placed.  If this is not
     #          given, an empty hash is used.  This can be used to use a hash with
     #          a default value or default proc.
-    # to start with a new, empty hash.
     def to_hash_groups(key_column, value_column = nil, opts = OPTS)
       h = opts[:hash] || {}
       meth = opts[:all] ? :all : :each
