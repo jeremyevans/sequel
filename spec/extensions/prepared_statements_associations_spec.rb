@@ -76,6 +76,17 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
 
     @Artist.load(:id=>1).set_server(:foo).tag
     @db.sqls.must_equal ["SELECT tags.id, tags.id2 FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) WHERE (albums.artist_id = 1) LIMIT 1 -- prepared -- foo"]
+
+    @Tag.plugin :sharding
+    @Tag.plugin :prepared_statements_associations
+    @Tag.many_to_many :albums, :class=>@Album, :join_table=>:albums_tags, :left_key=>:tag_id
+    @Tag.load(:id=>1).set_server(:foo).albums
+    @db.sqls.must_equal ["SELECT albums.id, albums.artist_id, albums.id2, albums.artist_id2 FROM albums INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) WHERE (albums_tags.tag_id = 1) -- prepared -- foo"]
+  end
+
+  it "should not override the shard for associations if not using the sharding plugin" do
+    @Artist.load(:id=>1).set_server(:foo).albums
+    @db.sqls.must_equal ["SELECT id, artist_id, id2, artist_id2 FROM albums WHERE (albums.artist_id = 1) -- prepared"]
   end
 
   it "should run correct SQL for composite key associations" do

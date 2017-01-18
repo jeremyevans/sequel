@@ -113,34 +113,34 @@ describe "prepared_statements plugin" do
     @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
-  describe " with placeholder type specifiers" do 
-    before do
-      @ds = @ds.with_extend{def requires_placeholder_type_specifiers?; true end}
-    end
+  it "should correctly handle without schema type when placeholder type specifiers are required" do
+    @c.dataset = @ds.with_extend{def requires_placeholder_type_specifiers?; true end}
+    @c[1].must_equal @p
+    @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+  end
 
-    it "should correctly handle without schema type" do
-      @c[1].must_equal @p
-      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
-    end
-
-    it "should correctly handle with schema type" do
-      @c.db_schema[:id][:type] = :integer
-      ds = @c.send(:prepared_lookup).with_extend do
-        def literal_symbol_append(sql, v)
-          if @opts[:bind_vars] and match = /\A\$(.*)\z/.match(v.to_s)
-            s = match[1].split('__')[0].to_sym
-            if prepared_arg?(s)
-              literal_append(sql, prepared_arg(s))
+  it "should correctly handle with schema type when placeholder type specifiers are required" do
+    @c.dataset = @ds.with_extend do
+      def requires_placeholder_type_specifiers?; true end
+      def prepare(*)
+        super.with_extend do 
+          def literal_symbol_append(sql, v)
+            if @opts[:bind_vars] && (match = /\A\$(.*)\z/.match(v.to_s))
+              s = match[1].split('__')[0].to_sym
+              if prepared_arg?(s)
+                literal_append(sql, prepared_arg(s))
+              else
+                sql << v.to_s
+              end
             else
-              sql << v.to_s
+              super
             end
-          else
-            super
           end
         end
       end
-      @c[1].must_equal @p
-      @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
-    end 
-  end
+    end
+    @c.db_schema[:id][:type] = :integer
+    @c[1].must_equal @p
+    @db.sqls.must_equal ["SELECT id, name, i FROM people WHERE (id = 1) LIMIT 1 -- read_only"]
+  end 
 end

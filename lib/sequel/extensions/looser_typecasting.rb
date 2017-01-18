@@ -41,9 +41,11 @@ module Sequel
         BigDecimal.new('0.0')
       end
     else
+      # :nocov:
       def _typecast_value_string_to_decimal(value)
         BigDecimal.new(value)
       end
+      # :nocov:
     end
   end
 

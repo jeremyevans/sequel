@@ -14,6 +14,13 @@ describe "identifier_mangling extension" do
     db.quote_identifiers?.must_equal true
   end
 
+  it "should respect the :quote_identifiers setting" do
+    db = Sequel::Database.new(:identifier_mangling=>true)
+    db.quote_identifiers?.must_equal false
+    db.quote_identifiers = true
+    db.quote_identifiers?.must_equal true
+  end
+
   it "should upcase on input and downcase on output by default" do
     db = Sequel::Database.new(:identifier_mangling=>true)
     db.send(:identifier_input_method_default).must_equal :upcase
