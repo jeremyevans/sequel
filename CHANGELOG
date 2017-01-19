@@ -1,5 +1,7 @@
 === master
 
+* Make Database#extension not attempt to load the same extension more than once (jeremyevans)
+
 * Implement Database#freeze such that it can be used in production (jeremyevans)
 
 * Freeze enum_labels in the pg_enum extension (jeremyevans)

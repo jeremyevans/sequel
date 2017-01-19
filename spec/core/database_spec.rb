@@ -2412,6 +2412,13 @@ describe "Database extensions" do
     @db.extension(:foo).a.must_equal 1
   end
 
+  it "should not call the block multiple times if extension loaded more than once" do
+    @db.opts[:foo] = []
+    Sequel::Database.register_extension(:foo){|db| db.opts[:foo] << 1}
+    @db.extension(:foo).opts[:foo].must_equal [1]
+    @db.extension(:foo).opts[:foo].must_equal [1]
+  end
+
   it "should be able to register an extension with a block and have Database#extension call the block" do
     Sequel::Database.register_extension(:foo){|db| db.opts[:foo] = 1}
     @db.extension(:foo).opts[:foo].must_equal 1

@@ -138,6 +138,7 @@ module Sequel
       @dataset_class = dataset_class_default
       @cache_schema = typecast_value_boolean(@opts.fetch(:cache_schema, true))
       @dataset_modules = []
+      @loaded_extensions = []
       @schema_type_classes = SCHEMA_TYPE_CLASSES.dup
 
       self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
@@ -172,6 +173,7 @@ module Sequel
       @dataset_class.freeze
       @dataset_modules.freeze
       @schema_type_classes.freeze
+      @loaded_extensions.freeze
       # SEQUEL5: Frozen by default, remove this
       @default_dataset.freeze
       metadata_dataset.freeze
@@ -195,7 +197,10 @@ module Sequel
       Sequel.extension(*exts)
       exts.each do |ext|
         if pr = Sequel.synchronize{EXTENSIONS[ext]}
-          pr.call(self)
+          unless Sequel.synchronize{@loaded_extensions.include?(ext)}
+            Sequel.synchronize{@loaded_extensions << ext}
+            pr.call(self)
+          end
         else
           raise(Error, "Extension #{ext} does not have specific support handling individual databases (try: Sequel.extension #{ext.inspect})")
         end
