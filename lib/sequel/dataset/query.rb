@@ -96,8 +96,7 @@ module Sequel
       end
     else
       # :nocov:
-      # :nodoc:
-      def clone(opts = OPTS)
+      def clone(opts = OPTS) # :nodoc:
         c = super()
         c.opts.merge!(opts)
         unless opts.each_key{|o| break if COLUMN_CHANGE_OPTS.include?(o)}
@@ -204,8 +203,7 @@ module Sequel
       end
     else
       # :nocov:
-      # :nodoc:
-      def extension(*exts)
+      def extension(*exts) # :nodoc:
         c = clone
         c.send(:_extension!, exts)
         c
@@ -1085,8 +1083,7 @@ module Sequel
       end
     else
       # :nocov:
-      # :nodoc:
-      def with_extend(*mods, &block)
+      def with_extend(*mods, &block) # :nodoc:
         c = clone
         c.extend(*mods) unless mods.empty?
         c.extend(Module.new(&block)) if block

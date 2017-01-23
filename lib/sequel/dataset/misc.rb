@@ -91,14 +91,12 @@ module Sequel
       end
     else
       # :nocov:
-      # :nodoc:
-      def freeze
+      def freeze # :nodoc:
         @opts.freeze
         self
       end
 
-      # :nodoc:
-      def frozen?
+      def frozen?  # :nodoc:
         @opts.frozen?
       end
       # :nocov:
