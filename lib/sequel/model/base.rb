@@ -32,6 +32,10 @@ module Sequel
       # model instances, or nil if the optimization should not be used. For internal use only.
       attr_reader :fast_instance_delete_sql
 
+      # SQL string fragment used for faster lookups by primary key, or nil if the optimization
+      # should not be used. For internal use only.
+      attr_reader :fast_pk_lookup_sql
+
       # The dataset that instance datasets (#this) are based on.  Generally a naked version of
       # the model's dataset limited to one row.  For internal use only.
       attr_reader :instance_dataset
@@ -2038,7 +2042,14 @@ module Sequel
 
       # Get the row of column data from the database.
       def _refresh_get(dataset)
-        dataset.first
+        if (sql = (m = model).fast_pk_lookup_sql) && !dataset.opts[:lock]
+          sql = sql.dup
+          ds = use_server(dataset)
+          ds.literal_append(sql, pk)
+          ds.with_sql_first(sql)
+        else
+          dataset.first
+        end
       end
       
       # Set the refreshed values after 

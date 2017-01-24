@@ -64,7 +64,7 @@ describe "Model#save" do
   it "should insert a record for a new model instance" do
     o = @c.new(:x => 1)
     o.save
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 13"]
   end
 
   it "should raise if the object can't be refreshed after save" do
@@ -111,8 +111,7 @@ describe "Model#save" do
   it "should use value returned by insert as the primary key and refresh the object" do
     o = @c.new(:x => 11)
     o.save
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)",
-      "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (11)", "SELECT * FROM items WHERE id = 13"]
   end
 
   it "should allow you to skip refreshing by overridding _save_refresh" do
@@ -1111,7 +1110,7 @@ describe Sequel::Model, "#update" do
   
   it "should filter the given params using the model columns" do
     @o1.update(:x => 1, :z => 2)
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
 
     DB.reset
     @o2.update(:y => 1, :abc => 2)
@@ -1121,12 +1120,12 @@ describe Sequel::Model, "#update" do
   it "should support virtual attributes" do
     @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.update(:blah => 333)
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE id = 10"]
   end
   
   it "should not modify the primary key" do
     @o1.update(:x => 1, :id => 2)
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
     DB.reset
     @o2.update('y'=> 1, 'id'=> 2)
     @o2.values.must_equal(:y => 1, :id=> 5)
@@ -1321,18 +1320,18 @@ describe Sequel::Model, "#(set|update)_(all|only)" do
 
   it "#update_all should update all attributes" do
     @c.new.update_all(:x => 1)
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
     @c.new.update_all(:y => 1)
-    DB.sqls.must_equal ["INSERT INTO items (y) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (y) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
     @c.new.update_all(:z => 1)
-    DB.sqls.must_equal ["INSERT INTO items (z) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (z) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
   end
 
   it "#update_only should only update given attributes" do
     @o1.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x])
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
     @c.new.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x)
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
   end
 end
 
@@ -1699,13 +1698,13 @@ describe Sequel::Model, ".create" do
   it "should be able to create rows in the associated table" do
     o = @c.create(:x => 1)
     o.class.must_equal @c
-    DB.sqls.must_equal ['INSERT INTO items (x) VALUES (1)', "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ['INSERT INTO items (x) VALUES (1)', "SELECT * FROM items WHERE id = 10"]
   end
 
   it "should be able to create rows without any values specified" do
     o = @c.create
     o.class.must_equal @c
-    DB.sqls.must_equal ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE id = 10"]
   end
 
   it "should accept a block and call it" do
@@ -1715,14 +1714,14 @@ describe Sequel::Model, ".create" do
     o1.must_be :===, o
     o3.must_be :===, o
     o2.must_equal :blah
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE id = 10"]
   end
   
   it "should create a row for a model with custom primary key" do
     @c.set_primary_key :x
     o = @c.create(:x => 30)
     o.class.must_equal @c
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (30)", "SELECT * FROM items WHERE (x = 30) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (30)", "SELECT * FROM items WHERE x = 30"]
   end
 end
 
@@ -1741,14 +1740,14 @@ describe Sequel::Model, "#refresh" do
     @c.dataset = @c.dataset.with_fetch(:x => 'kaboom', :id => 555)
     @m.refresh
     @m[:x].must_equal 'kaboom'
-    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM items WHERE id = 555"]
   end
   
   it "should raise if the instance is not found" do
     @m = @c.new(:id => 555)
     @c.dataset = @c.dataset.with_fetch([])
     proc {@m.refresh}.must_raise(Sequel::NoExistingObject)
-    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM items WHERE id = 555"]
   end
   
   it "should be aliased by #reload" do
@@ -1756,7 +1755,7 @@ describe Sequel::Model, "#refresh" do
     @c.dataset = @c.dataset.with_fetch(:x => 'kaboom', :id => 555)
     @m.reload
     @m[:x].must_equal 'kaboom'
-    DB.sqls.must_equal ["SELECT * FROM items WHERE (id = 555) LIMIT 1"]
+    DB.sqls.must_equal ["SELECT * FROM items WHERE id = 555"]
   end
 end
 

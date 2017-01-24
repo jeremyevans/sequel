@@ -57,7 +57,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
     o = c.new
     o.a = o.a
     o.save
-    @db.sqls.must_equal ["INSERT INTO foo (a) VALUES (CURRENT_TIMESTAMP)", "SELECT * FROM foo WHERE (id = 1) LIMIT 1"]
+    @db.sqls.must_equal ["INSERT INTO foo (a) VALUES (CURRENT_TIMESTAMP)", "SELECT * FROM foo WHERE id = 1"]
   end
 
   it "should not override a given value" do

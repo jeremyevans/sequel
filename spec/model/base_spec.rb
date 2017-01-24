@@ -603,7 +603,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
     i = @c.new
     i.update(:x => 7, :z => 9)
     i.values.must_equal(:x => 7)
-    DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
   end
 end
 

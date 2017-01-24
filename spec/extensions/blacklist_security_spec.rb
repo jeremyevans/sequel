@@ -31,9 +31,9 @@ describe Sequel::Model, "#(set|update)_except" do
 
   it "#update_except should not update given attributes" do
     @o1.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
     @c.new.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, :y, :z)
-    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE id = 10"]
   end
 end
 
@@ -68,7 +68,7 @@ describe Sequel::Model, ".restricted_columns " do
     i = @c.new
     i.update(:x => 7, :z => 9)
     i.values.must_equal(:x => 7)
-    DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO blahblah (x) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
   end
 
   it "should have allowed take precedence over restricted" do
@@ -83,6 +83,6 @@ describe Sequel::Model, ".restricted_columns " do
     i = @c.new
     i.update(:y => 7, :z => 9)
     i.values.must_equal(:y => 7)
-    DB.sqls.must_equal ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE (id = 10) LIMIT 1"]
+    DB.sqls.must_equal ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
   end
 end

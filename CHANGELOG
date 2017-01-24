@@ -1,5 +1,7 @@
 === master
 
+* Optimize Model#refresh similar to Model.with_pk (jeremyevans)
+
 * Make Database#extension not attempt to load the same extension more than once (jeremyevans)
 
 * Implement Database#freeze such that it can be used in production (jeremyevans)

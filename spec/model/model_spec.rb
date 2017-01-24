@@ -798,7 +798,7 @@ describe Sequel::Model, ".find_or_create" do
     @c.find_or_create(:x => 1).must_equal @c.load(:x=>1, :id=>1)
     @db.sqls.must_equal ["SELECT * FROM items WHERE (x = 1) LIMIT 1",
       "INSERT INTO items (x) VALUES (1)",
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+      "SELECT * FROM items WHERE id = 1"]
   end
 
   it "should pass the new record to be created to the block if no record is found" do
@@ -808,7 +808,7 @@ describe Sequel::Model, ".find_or_create" do
     sqls = @db.sqls
     sqls.first.must_equal "SELECT * FROM items WHERE (x = 1) LIMIT 1"
     ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].must_include(sqls[1])
-    sqls.last.must_equal "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+    sqls.last.must_equal "SELECT * FROM items WHERE id = 1"
   end
 end
 

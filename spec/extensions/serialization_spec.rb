@@ -108,7 +108,7 @@ describe "Serialization plugin" do
     DB.sqls.must_equal ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')",
-      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+      "SELECT * FROM items WHERE id = 10"]
   end
 
   it "should translate values to and from marshal serialization format using accessor methods" do
@@ -128,7 +128,7 @@ describe "Serialization plugin" do
     DB.sqls.must_equal ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{[Marshal.dump(23)].pack('m')}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[Marshal.dump([1, 2, 3])].pack('m')}')",
-      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+      "SELECT * FROM items WHERE id = 10"]
   end
   
   it "should handle old non-base-64 encoded marshal serialization format" do
@@ -169,7 +169,7 @@ describe "Serialization plugin" do
     DB.sqls.must_equal ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{[23].to_json}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1,2,3].to_json}')",
-      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+      "SELECT * FROM items WHERE id = 10"]
   end
 
   it "should translate values to and from arbitrary callables using accessor methods" do
@@ -190,7 +190,7 @@ describe "Serialization plugin" do
     DB.sqls.must_equal ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = 'oof' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('rab')",
-      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+      "SELECT * FROM items WHERE id = 10"]
   end
 
   it "should handle registration of custom serializer/deserializer pairs" do
@@ -213,7 +213,7 @@ describe "Serialization plugin" do
     DB.sqls.must_equal ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = 'oof' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('rab')",
-      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+      "SELECT * FROM items WHERE id = 10"]
   end
 
   it "should copy serialization formats and columns to subclasses" do
@@ -233,7 +233,7 @@ describe "Serialization plugin" do
     DB.sqls.must_equal ["SELECT * FROM items LIMIT 1",
       "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)",
       "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')",
-      "SELECT * FROM items WHERE (id = 10) LIMIT 1"]
+      "SELECT * FROM items WHERE id = 10"]
   end
 
   it "should clear the deserialized columns when refreshing" do

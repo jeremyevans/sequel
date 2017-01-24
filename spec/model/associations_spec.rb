@@ -762,7 +762,7 @@ describe Sequel::Model, "one_to_one" do
     sqls = DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
       'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].must_include(sqls.slice! 1)
-    sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
+    sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)', "SELECT * FROM attributes WHERE id = 3"]
 
     @c2.new(:id => 1234).attribute.must_equal attrib
     attrib = @c1.load(:id=>3)
@@ -801,7 +801,7 @@ describe Sequel::Model, "one_to_one" do
     sqls = DB.sqls
     ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
       'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].must_include(sqls.slice! 1)
-    sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 5)', "SELECT * FROM attributes WHERE (id = 3) LIMIT 1"]
+    sqls.must_equal ['UPDATE attributes SET node_id = NULL WHERE (node_id = 5)', "SELECT * FROM attributes WHERE id = 3"]
 
     @c2.new(:id => 321, :xxx=>5).attribute.must_equal attrib
     attrib = @c1.load(:id=>3)
@@ -947,7 +947,7 @@ describe Sequel::Model, "one_to_one" do
     sqls = DB.sqls
     ["INSERT INTO nodes (blah, id) VALUES (3, 4321)",
      "INSERT INTO nodes (id, blah) VALUES (4321, 3)"].must_include(sqls.slice! 1)
-    sqls.must_equal ["UPDATE nodes SET blah = NULL WHERE (blah = 3)", "SELECT * FROM nodes WHERE (id = 4321) LIMIT 1"]
+    sqls.must_equal ["UPDATE nodes SET blah = NULL WHERE (blah = 3)", "SELECT * FROM nodes WHERE id = 4321"]
   end
   
   it "should persist changes to associated object when the setter is called" do
@@ -1275,7 +1275,7 @@ describe Sequel::Model, "one_to_many" do
     a.must_equal n.add_attribute(a)
     sqls = DB.sqls
     sqls.shift.must_match(/INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/)
-    sqls.must_equal ["SELECT * FROM attributes WHERE (id = 234) LIMIT 1"]
+    sqls.must_equal ["SELECT * FROM attributes WHERE id = 234"]
     a.values.must_equal(:node_id => 1234, :id => 234)
   end
 
@@ -1307,7 +1307,7 @@ describe Sequel::Model, "one_to_many" do
     n.add_attribute(:id => 234).must_equal @c1.load(:node_id => 1234, :id => 234)
     sqls = DB.sqls
     sqls.shift.must_match(/INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/)
-    sqls.must_equal ["SELECT * FROM attributes WHERE (id = 234) LIMIT 1"]
+    sqls.must_equal ["SELECT * FROM attributes WHERE id = 234"]
   end
 
   it "should accept a primary key for the add_ method" do
@@ -2213,7 +2213,7 @@ describe Sequel::Model, "many_to_many" do
     ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 1)',
      'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (1, 1234)'
     ].must_include(sqls.pop)
-    sqls.must_equal ['INSERT INTO attributes (id) VALUES (1)', "SELECT * FROM attributes WHERE (id = 1) LIMIT 1"]
+    sqls.must_equal ['INSERT INTO attributes (id) VALUES (1)', "SELECT * FROM attributes WHERE id = 1"]
   end
 
   it "should define a remove_ method that works on existing records" do

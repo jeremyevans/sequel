@@ -7,7 +7,7 @@ describe "Sequel::Plugins::SkipCreateRefresh" do
     c.dataset = c.dataset.with_autoid(2)
     c.db.reset
     c.create(:x=>1)
-    c.db.sqls.must_equal ['INSERT INTO a (x) VALUES (1)', 'SELECT * FROM a WHERE (id = 2) LIMIT 1']
+    c.db.sqls.must_equal ['INSERT INTO a (x) VALUES (1)', 'SELECT * FROM a WHERE id = 2']
 
     c.dataset = c.dataset.with_autoid(2)
     c.plugin :skip_create_refresh

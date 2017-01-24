@@ -90,6 +90,7 @@ describe "force_encoding plugin" do
         {:id=>1, :x=>s}
       end
     end
+    @c.instance_variable_set(:@fast_pk_lookup_sql, nil)
     o.save
     o.x.must_equal 'blah'
     o.x.encoding.must_equal @e1
@@ -104,6 +105,7 @@ describe "force_encoding plugin" do
         {:id=>1, :x=>s}
       end
     end
+    @c.instance_variable_set(:@fast_pk_lookup_sql, nil)
     o.refresh
     o.x.must_equal 'blah'
     o.x.encoding.must_equal @e1
