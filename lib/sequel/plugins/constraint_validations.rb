@@ -72,13 +72,6 @@ module Sequel
         end
       end
 
-      module DatabaseMethods
-        # A hash of validation method call metadata for all tables in the database.
-        # The hash is keyed by table name string and contains arrays of validation
-        # method call arrays.
-        attr_accessor :constraint_validations
-      end
-
       module ClassMethods
         # An array of validation method call arrays.  Each array is an array that
         # is splatted to send to perform a validation via validation_helpers.
@@ -106,7 +99,7 @@ module Sequel
         # If this model has associated dataset, use the model's table name
         # to get the validations for just this model.
         def parse_constraint_validations
-          db.extend(DatabaseMethods)
+          db.extension(:_model_constraint_validations)
 
           unless hash = Sequel.synchronize{db.constraint_validations}
             hash = {}
