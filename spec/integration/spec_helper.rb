@@ -20,6 +20,10 @@ Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line 
 Sequel.split_symbols = false if ENV['SEQUEL_NO_SPLIT_SYMBOLS']
 Sequel::Database.extension :columns_introspection if ENV['SEQUEL_COLUMNS_INTROSPECTION']
 Sequel::Model.cache_associations = false if ENV['SEQUEL_NO_CACHE_ASSOCIATIONS']
+if ENV['SEQUEL_MODEL_PREPARED_STATEMENTS']
+  Sequel::Model.plugin :prepared_statements
+  Sequel::Model.plugin :prepared_statements_associations
+end
 Sequel::Model.use_transactions = false
 Sequel.cache_anonymous_models = false
 

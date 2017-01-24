@@ -158,6 +158,7 @@ SEQUEL_DUPLICATE_COLUMNS_HANDLER :: Use the duplicate columns handler extension 
 SEQUEL_ERROR_SQL :: Use the error_sql extension when running the specs
 SEQUEL_FREEZE_DATASETS :: Use the freeze_datasets extension when running the specs
 SEQUEL_FREEZE_DATABASE :: Freeze the database before running the integration specs
+SEQUEL_MODEL_PREPARED_STATEMENTS :: Use the prepared_statements and prepared_statements_associations plugins when running the specs
 SEQUEL_NO_AUTO_LITERAL_STRINGS :: Use the no_auto_string_literals extension when running the specs
 SEQUEL_NO_CACHE_ASSOCIATIONS :: Don't cache association metadata when running the specs
 SEQUEL_NO_CHECK_SQLS :: Don't check for specific SQL syntax when running the specs
