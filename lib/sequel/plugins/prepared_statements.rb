@@ -1,22 +1,11 @@
 # frozen-string-literal: true
 
 module Sequel
-  class Model
-    module InstanceMethods
-      # Whether prepared statements should be used for the given type of query
-      # (:insert, :insert_select, :refresh, :update, or :delete).  True by default,
-      # can be overridden in other plugins to disallow prepared statements for
-      # specific types of queries.
-      def use_prepared_statements_for?(type)
-        true
-      end
-    end
-  end
-
   module Plugins
     # The prepared_statements plugin modifies the model to use prepared statements for
-    # instance level deletes and saves, as well as class level lookups by
-    # primary key.
+    # instance level saves (inserts and updates).  It also will use prepared statements for
+    # deletes, refreshes, and class level lookups by primary key, if it thinks that using
+    # a prepared statement will be faster in such cases.
     #
     # Note that this plugin is unsafe in some circumstances, as it can allow up to
     # 2^N prepared statements to be created for each type of insert and update query, where
@@ -132,7 +121,7 @@ module Sequel
 
         # Use a prepared statement to query the database for the row matching the given primary key.
         def primary_key_lookup(pk)
-          return super if dataset.joined_dataset?
+          return super unless use_prepared_statements_for_pk_lookup?
           prepared_lookup.call(primary_key_hash(pk))
         end
 
@@ -147,6 +136,12 @@ module Sequel
           end
           ps = yield
           Sequel.synchronize{h[subtype] = ps}
+        end
+
+        # Whether to use prepared statements for lookups by primary key.  True if the default
+        # primary key lookup isn't optimized.
+        def use_prepared_statements_for_pk_lookup?
+          !@fast_pk_lookup_sql && !dataset.joined_dataset?
         end
       end
 
@@ -201,11 +196,39 @@ module Sequel
           end
         end
 
+        # If a server is set for the instance, return a prepared statement that will use that server.
         def _set_prepared_statement_server(ps)
           if @server
             ps.server(@server)
           else
             ps
+          end
+        end
+
+        # Whether prepared statements should be used for the given type of query
+        # (:insert, :insert_select, :refresh, :update, or :delete).  True by default,
+        # can be overridden in other plugins to disallow prepared statements for
+        # specific types of queries.
+        def use_prepared_statements_for?(type)
+          if defined?(super)
+            result = super
+            return result unless result.nil?
+          end
+
+          case type
+          when :insert, :insert_select, :update
+            true
+          when :delete
+            return true unless model.fast_instance_delete_sql
+
+            # Using deletes for prepared statements appears faster on Oracle and DB2,
+            # but not for most other database types if optimized SQL is used.
+            db_type = model.db.database_type
+            db_type == :oracle || db_type == :db2
+          when :refresh
+            !model.fast_pk_lookup_sql
+          else
+            raise Error, "unsupported type used: #{type.inspect}"
           end
         end
       end

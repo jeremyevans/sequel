@@ -124,7 +124,7 @@ module Sequel
           if (type == :update || type == :delete) && !instance_filters.empty?
             false
           else
-            super
+            super if defined?(super)
           end
         end
       end

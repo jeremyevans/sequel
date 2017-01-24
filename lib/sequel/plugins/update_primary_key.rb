@@ -63,7 +63,7 @@ module Sequel
           if type == :update
             false
           else
-            super
+            super if defined?(super)
           end
         end
       end

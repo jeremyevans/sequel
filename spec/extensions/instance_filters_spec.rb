@@ -39,6 +39,7 @@ describe "instance_filters plugin" do
 
     @p = @c.load(:id=>1, :name=>'John', :num=>1)
     @p.instance_variable_set(:@this, @p.this.with_numrows(1))
+    @c.instance_variable_set(:@fast_instance_delete_sql, nil)
     @p.destroy
     DB.sqls.must_equal ["DELETE FROM people WHERE (id = 1)"]
     @p.instance_filter(:name=>'Jim')

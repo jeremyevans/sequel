@@ -1,5 +1,7 @@
 === master
 
+* Make prepared_statements plugin not use prepared statements in cases where it is probably slower (jeremyevans)
+
 * Optimize Model#refresh similar to Model.with_pk (jeremyevans)
 
 * Make Database#extension not attempt to load the same extension more than once (jeremyevans)
