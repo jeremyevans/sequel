@@ -2,8 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 if RUBY_VERSION >= '1.9.0'
 describe "force_encoding plugin" do
   before do
-    @c = Class.new(Sequel::Model) do
-    end
+    @c = Class.new(Sequel::Model)
     @c.columns :id, :x
     @c.plugin :force_encoding, 'UTF-8'
     @e1 = Encoding.find('UTF-8')
