@@ -193,4 +193,11 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @Artist.load(:id=>1).oalbums
     @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
   end
+
+  it "should work correctly when using an instance specific association" do
+    tag = @Tag 
+    @Artist.many_to_one :tag, :key=>nil, :read_only=>true, :dataset=>proc{tag.where(:id=>id).limit(1)}, :reciprocal=>nil, :reciprocal_type=>nil
+    @Artist.load(:id=>1).tag.must_be_nil
+    @db.sqls.must_equal ["SELECT * FROM tags WHERE (id = 1) LIMIT 1"]
+  end
 end

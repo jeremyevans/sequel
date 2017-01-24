@@ -1,5 +1,7 @@
 === master
 
+* Make prepared_statements_associations plugin work correctly on some instance specific associations (jeremyevans)
+
 * Make prepared_statements plugin not use prepared statements in cases where it is probably slower (jeremyevans)
 
 * Optimize Model#refresh similar to Model.with_pk (jeremyevans)

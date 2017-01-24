@@ -42,6 +42,8 @@ module Sequel
         # Given an association reflection, return a bound variable hash for the given
         # association for this instance's values.
         def association_bound_variables(opts)
+          return if opts[:instance_specific]
+
           case opts[:type]
           when :many_to_one
             association_bound_variable_hash(opts.associated_class.table_name, opts.primary_keys, opts[:keys])
