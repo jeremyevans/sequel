@@ -14,6 +14,10 @@ module Sequel
     # service attack by allocating an arbitrary number of prepared statements.  You have been
     # warned.
     #
+    # Note that in most cases, this plugin will probably make things slower,
+    # so you should only use it if you really want to use prepared statements
+    # for Dataset#with_pk.
+    #
     # Usage:
     #
     #   # Make all model subclasses use prepared statements for Dataset#with_pk (called before loading subclasses)

@@ -8,6 +8,10 @@ module Sequel
     # statements for associations where it will not work, assuming you load the
     # plugin before defining the associations.
     #
+    # Note that in most cases, this plugin will probably make things slower,
+    # so you should only use it if you really want to use prepared statements
+    # to load associations.
+    #
     # Usage:
     #
     #   # Make all model subclasses more safe when using prepared statements (called before loading subclasses)
