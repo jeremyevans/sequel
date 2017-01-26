@@ -153,7 +153,7 @@ You can call simple methods such as:
     end
   end
 
-Other than +validates_unique+, which has it's own API, the methods defined by
+Other than +validates_unique+, which has its own API, the methods defined by
 +validation_helpers+ have one of the following two APIs:
 
 <tt>(atts, opts={})</tt>:: For methods such as +validates_presence+, which do not
