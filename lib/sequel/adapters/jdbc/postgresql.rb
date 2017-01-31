@@ -9,8 +9,8 @@ module Sequel
   module JDBC
     Sequel.synchronize do
       DATABASE_SETUP[:postgresql] = proc do |db|
-        db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
         db.dataset_class = Sequel::JDBC::Postgres::Dataset
+        db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
         org.postgresql.Driver
       end
     end

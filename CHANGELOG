@@ -1,5 +1,7 @@
 === master
 
+* Make jdbc/postgresql adapter work if pg_hstore extension is loaded first (jeremyevans) (#1296)
+
 * Make prepared_statements_associations plugin work correctly on some instance specific associations (jeremyevans)
 
 * Make prepared_statements plugin not use prepared statements in cases where it is probably slower (jeremyevans)
