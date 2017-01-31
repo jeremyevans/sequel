@@ -1,4 +1,4 @@
-=== master
+=== 4.43.0 (2017-02-01)
 
 * Make jdbc/postgresql adapter work if pg_hstore extension is loaded first (jeremyevans) (#1296)
 
