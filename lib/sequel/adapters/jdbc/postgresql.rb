@@ -43,13 +43,6 @@ module Sequel
       module DatabaseMethods
         include Sequel::Postgres::DatabaseMethods
 
-        # Add the primary_keys and primary_key_sequences instance variables,
-        # so we can get the correct return values for inserted rows.
-        def self.extended(db)
-          super
-          db.send(:initialize_postgres_adapter)
-        end
-
         # See Sequel::Postgres::Adapter#copy_into
         def copy_into(table, opts=OPTS)
           data = opts[:data]
@@ -128,7 +121,14 @@ module Sequel
         end
 
         private
-        
+
+        # Add the primary_keys and primary_key_sequences instance variables,
+        # so we can get the correct return values for inserted rows.
+        def initialize_subadapter
+          super
+          initialize_postgres_adapter
+        end
+
         # Clear oid convertor map cache when conversion procs are updated.
         def conversion_procs_updated
           super
