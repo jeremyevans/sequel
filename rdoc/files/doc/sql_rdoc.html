@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-10-17 10:57:05 -0700</span>
+          <span class='datetime'>2017-01-16 09:50:05 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -64,7 +64,8 @@
             <p><code>Database#fetch</code> will take the query you give it, execute it on
             the database, and yield a hash with column symbol keys for each row
             returned.  If you want to use some placeholder variables, you can set the
-            placeholders with ? and add the arguments to fetch:</p>
+            placeholders with ? and add the corresponding arguments to
+            <code>fetch</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;SELECT * FROM albums WHERE name LIKE ?&quot;</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">row</span>[:<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
             
@@ -73,14 +74,14 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;SELECT * FROM albums WHERE name LIKE :pattern&quot;</span>, :<span class="ruby-identifier">pattern=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;  <span class="ruby-identifier">puts</span> <span class="ruby-identifier">row</span>[:<span class="ruby-identifier">name</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>This can be helpful for long queries where it is difficult to match the ?
-            with the arguments.</p>
+            <p>This can be helpful for long queries where it is difficult to match the
+            question marks in the query with the arguments.</p>
             
             <p>What <a href="../../classes/Sequel.html">Sequel</a> actually does
             internally is two separate things.  It first creates a dataset representing
             the query, and then it executes the dataset&#39;s SQL code to retrieve the
             objects.  Often, you want to define a dataset at some point, but not
-            execute it till later.  You can do this by leaving off the block, and
+            execute it until later.  You can do this by leaving off the block, and
             storing the dataset in a variable:</p>
             
             <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-string">&quot;SELECT * FROM albums&quot;</span>)</pre>
@@ -97,8 +98,8 @@
             
             <p>However, note that <code>Database#[]</code> cannot take a block directly,
             you have to call <code>each</code> on the returned dataset.  There are
-            plenty of other methods besides <code>each</code>, one is <code>all</code>
-            which returns all records as an array:</p>
+            plenty of other methods besides <code>each</code>. For example, the
+            <code>all</code> method returns all records in the dataset as an array:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[<span class="ruby-string">&quot;SELECT * FROM albums&quot;</span>].<span class="ruby-identifier">all</span> <span class="ruby-comment"># [{:id=&gt;1, :name=&gt;&#39;RF&#39;, ...}, ...]</span></pre>
             
@@ -140,7 +141,7 @@
             <p>For a simpler way of creating literal strings, you can also use the <a
             href="core_extensions_rdoc.html">core_extensions extension</a>, which adds
             the <code>String#lit</code> method, and other methods that integrate
-            Sequel&#39;s DSL with the ruby language:</p>
+            Sequel&#39;s DSL with the Ruby language:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>(<span class="ruby-string">&#39;name&#39;</span>.<span class="ruby-identifier">lit</span>)</pre>
             
@@ -184,7 +185,7 @@
             <h3 id="label-Identifiers">Identifiers<span><a href="#label-Identifiers">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>In <a href="../../classes/Sequel.html">Sequel</a>, SQL identifiers are
-            usually specified as ruby symbols:</p>
+            usually specified as Ruby symbols:</p>
             
             <pre class="ruby">:<span class="ruby-identifier">column</span> <span class="ruby-comment"># &quot;column&quot;</span></pre>
             
@@ -197,9 +198,9 @@
             <p>A plain symbol is usually treated as an unqualified identifier.  However,
             if you are using multiple tables in a query, and you want to reference a
             column in one of the tables that has the same name as a column in another
-            one of the tables, you need to qualify that reference.  There&#39;s two
-            main ways in <a href="../../classes/Sequel.html">Sequel</a> to do that. 
-            The first is implicit qualification inside the symbol, using the double
+            one of the tables, you need to qualify that reference.  There are two main
+            ways in <a href="../../classes/Sequel.html">Sequel</a> to do that.  The
+            first is implicit qualification inside the symbol, using the double
             underscore:</p>
             
             <pre class="ruby">:<span class="ruby-identifier">table__column</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
@@ -216,10 +217,10 @@
             
             <pre class="ruby">:<span class="ruby-string">&quot;table.column&quot;</span> <span class="ruby-comment"># &quot;table.column&quot;</span></pre>
             
-            <p>A couple other ways two create a qualified identifier are to use
-            <code>Sequel.[]</code> to create an identifier, and call <code>[]</code> or
-            <code>qualify</code> on that, or to use the <code>Sequel.qualify</code>
-            with the table and column symbols:</p>
+            <p>The second way is to explicitly create a qualified identifier either by
+            using <code>Sequel.[]</code> to create an identifier and call
+            <code>[]</code> or <code>qualify</code> on that, or by using the
+            <code>Sequel.qualify</code> method with the table and column symbols:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]         <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>].<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">qualify</span>(:<span class="ruby-identifier">table</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot;</span></pre>
             
@@ -235,13 +236,13 @@
             
             <h3 id="label-Numbers">Numbers<span><a href="#label-Numbers">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>In general, ruby numbers map directly to SQL numbers:</p>
+            <p>In general, Ruby numbers map directly to SQL numbers:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Integers</span>&#x000A;<span class="ruby-value">1</span> <span class="ruby-comment"># 1</span>&#x000A;<span class="ruby-value">-1</span> <span class="ruby-comment"># -1</span>&#x000A;&#x000A;<span class="ruby-comment"># Floats</span>&#x000A;<span class="ruby-value">1.5</span> <span class="ruby-comment"># 1.5</span>&#x000A;&#x000A;<span class="ruby-comment"># BigDecimals</span>&#x000A;<span class="ruby-constant">BigDecimal</span>.<span class="ruby-identifier">new</span>(<span class="ruby-string">&#39;1000000.123091029&#39;</span>) <span class="ruby-comment"># 1000000.123091029</span></pre>
             
             <h3 id="label-Strings">Strings<span><a href="#label-Strings">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>In general, ruby strings map directly to SQL strings:</p>
+            <p>In general, Ruby strings map directly to SQL strings:</p>
             
             <pre class="ruby"><span class="ruby-string">&#39;name&#39;</span> <span class="ruby-comment"># &#39;name&#39;</span>&#x000A;<span class="ruby-string">&quot;name&quot;</span> <span class="ruby-comment"># &#39;name&#39;</span></pre>
             
@@ -256,7 +257,7 @@
             
             <pre class="ruby">:<span class="ruby-identifier">table__column___alias</span> <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; AS &quot;alias&quot;</span></pre>
             
-            <p>As with creating qualified identifiers via a double underscore, This works
+            <p>As with creating qualified identifiers via a double underscore, this works
             by default, but it is possible to turn off by setting
             <code>Sequel.split_symbols = false</code>.</p>
             
@@ -292,8 +293,8 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">sum</span>, :<span class="ruby-identifier">column</span>) <span class="ruby-comment"># sum(column)</span></pre>
             
-            <p>To use the DISTINCT modifier to an aggregate function, call the distinct
-            method on the function:</p>
+            <p>To use the DISTINCT modifier to an aggregate function, call the
+            <code>distinct</code> method on the function:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">sum</span>(:<span class="ruby-identifier">column</span>).<span class="ruby-identifier">distinct</span>} <span class="ruby-comment"># SELECT sum(DISTINCT column) FROM albums</span></pre>
             
@@ -312,7 +313,7 @@
             
             <p>If the database supports window functions, <a
             href="../../classes/Sequel.html">Sequel</a> can handle them by calling the
-            over method on a Function:</p>
+            <code>over</code> method on a Function:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>.<span class="ruby-identifier">function</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT function() OVER () FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">count</span>.<span class="ruby-identifier">function</span>.<span class="ruby-operator">*</span>.<span class="ruby-identifier">over</span>}&#x000A;<span class="ruby-comment"># SELECT count(*) OVER () FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">col1</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col2</span>, :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">col3</span>)}&#x000A;<span class="ruby-comment"># SELECT function(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">function</span>(<span class="ruby-identifier">c1</span>, <span class="ruby-identifier">c2</span>).<span class="ruby-identifier">over</span>(:<span class="ruby-identifier">partition=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">c3</span>, <span class="ruby-identifier">c4</span>], :<span class="ruby-identifier">order=</span><span class="ruby-operator">&gt;</span>[<span class="ruby-identifier">c5</span>, <span class="ruby-identifier">c6</span>])}&#x000A;<span class="ruby-comment"># SELECT function(c1, c2) OVER (PARTITION BY c3, c4 ORDER BY c5, c6) FROM albums</span></pre>
             
@@ -320,7 +321,7 @@
             
             <p>If the database supports schema qualified functions, <a
             href="../../classes/Sequel.html">Sequel</a> can handle them by calling the
-            function method on a QuailfiedIdentifier:</p>
+            <code>function</code> method on a QuailfiedIdentifier:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema</span>[:<span class="ruby-identifier">function</span>].<span class="ruby-identifier">function</span>}&#x000A;<span class="ruby-comment"># SELECT schema.function() FROM albums</span>&#x000A;&#x000A;<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">select</span>{<span class="ruby-identifier">schema</span>[:<span class="ruby-identifier">function</span>].<span class="ruby-identifier">function</span>(<span class="ruby-identifier">col</span>, <span class="ruby-value">2</span>, <span class="ruby-string">&quot;a&quot;</span>)}&#x000A;<span class="ruby-comment"># SELECT schema.function(col, 2, &#39;a&#39;) FROM albums</span></pre>
             
@@ -356,10 +357,10 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>)   <span class="ruby-comment"># (&quot;column&quot; != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>([[:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>]]) <span class="ruby-comment"># (&quot;column&quot; != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>)        <span class="ruby-comment"># (&quot;column&quot; != 1)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>([[:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>]])      <span class="ruby-comment"># (&quot;column&quot; != 1)</span></pre>
             
-            <p>The difference between the two is that negate only works on hashes and
-            arrays of element arrays, and it negates all entries in the hash or array,
-            while ~ does a general inversion.  This is best shown by an example with
-            multiple entries:</p>
+            <p>The difference between the two is that <code>negate</code> only works on
+            hashes and arrays of element arrays, and it negates all entries in the hash
+            or array, while ~ does a general inversion.  This is best shown by an
+            example with multiple entries:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">negate</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">foo</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)   <span class="ruby-comment"># ((&quot;column&quot; != 1) AND (foo != 2))</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">~</span>(:<span class="ruby-identifier">column</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, :<span class="ruby-identifier">foo</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">2</span>)        <span class="ruby-comment"># ((&quot;column&quot; != 1) OR (foo != 2))</span></pre>
             
@@ -409,7 +410,7 @@
             <h3 id="label-Identity+Operators+-28IS-2C+IS+NOT-29">Identity Operators (IS, IS NOT)<span><a href="#label-Identity+Operators+-28IS-2C+IS+NOT-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>Hashes in <a href="../../classes/Sequel.html">Sequel</a> use IS if the
-            value is true, false, or nil:</p>
+            value is <code>true</code>, <code>false</code>, or <code>nil</code>:</p>
             
             <pre class="ruby">{:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">nil</span>} <span class="ruby-comment"># (&quot;column&quot; IS NULL)</span>&#x000A;{:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">true</span>} <span class="ruby-comment"># (&quot;column&quot; IS TRUE)</span>&#x000A;{:<span class="ruby-identifier">column=</span><span class="ruby-operator">&gt;</span><span class="ruby-keyword">false</span>} <span class="ruby-comment"># (&quot;column&quot; IS FALSE)</span></pre>
             
@@ -464,7 +465,7 @@
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">+</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;column&quot; + 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">-</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>], <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; - 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">*</span>(<span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>], <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;table&quot;.&quot;column&quot; * 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">/</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># &quot;column&quot; / 1</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">**</span>(:<span class="ruby-identifier">column</span>, <span class="ruby-value">1</span>) <span class="ruby-comment"># power(&quot;column&quot;, 1)</span></pre>
             
             <p>Note that since <a href="../../classes/Sequel.html">Sequel</a> implements
-            support for ruby&#39;s coercion protocol, the following also works:</p>
+            support for Ruby&#39;s coercion protocol, the following also works:</p>
             
             <pre class="ruby"><span class="ruby-value">1</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">column</span>]&#x000A;<span class="ruby-value">1</span> <span class="ruby-operator">-</span> <span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">table</span>][:<span class="ruby-identifier">column</span>]</pre>
             
@@ -485,7 +486,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(:<span class="ruby-identifier">func</span>) <span class="ruby-operator">&gt;</span> (<span class="ruby-value">1</span> <span class="ruby-operator">&amp;</span> :<span class="ruby-identifier">column3</span>)</pre>
             
-            <p>You and also use the <code>Sequel.&amp;</code> and <code>Sequel.|</code>
+            <p>You can also use the <code>Sequel.&amp;</code> and <code>Sequel.|</code>
             methods:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-operator">&amp;</span>(:<span class="ruby-identifier">column1</span>, :<span class="ruby-identifier">column2</span>) <span class="ruby-comment"># (&quot;column1&quot; AND &quot;column2&quot;)</span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-operator">|</span>({:<span class="ruby-identifier">column1=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>}, {:<span class="ruby-identifier">column2=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>}) <span class="ruby-comment"># ((&quot;column1&quot; = 1) OR (&quot;column2&quot; = 2))</span></pre>
@@ -563,7 +564,7 @@
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">name</span>].<span class="ruby-identifier">sql_string</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39; - Name&#39;</span> <span class="ruby-comment"># (&quot;name&quot; || &#39; - Name&#39;)</span></pre>
             
             <p>Just like for the bitwise operators, <a
-            href="../../classes/Sequel.html">Sequel</a> allows you do do the cast and
+            href="../../classes/Sequel.html">Sequel</a> allows you to do the cast and
             conversion at the same time via <code>cast_string</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>[:<span class="ruby-identifier">number</span>].<span class="ruby-identifier">cast_string</span> <span class="ruby-operator">+</span> <span class="ruby-string">&#39; - Number&#39;</span> <span class="ruby-comment"># (CAST(number AS varchar(255)) || &#39; - Number&#39;)</span></pre>
@@ -583,7 +584,7 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([<span class="ruby-string">&#39;Name&#39;</span>, :<span class="ruby-identifier">name</span>]) <span class="ruby-comment"># (&#39;Name&#39; || &quot;name&quot;)</span></pre>
             
-            <p>Just like ruby&#39;s <code>String#join</code>, you can provide an argument
+            <p>Just like Ruby&#39;s <code>String#join</code>, you can provide an argument
             for a string used to join each element:</p>
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">join</span>([<span class="ruby-string">&#39;Name&#39;</span>, :<span class="ruby-identifier">name</span>], <span class="ruby-string">&#39; - &#39;</span>) <span class="ruby-comment"># (&#39;Name&#39; || &#39; - &#39; || &quot;name&quot;)</span></pre>
@@ -599,11 +600,12 @@
             
             <pre class="ruby"><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># (&quot;name&quot; LIKE &#39;A%&#39; ESCAPE &#39;\&#39;) </span>&#x000A;<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">ilike</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># (&quot;name&quot; ILIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</span></pre>
             
-            <p>Note the above syntax for ilike, while Sequel&#39;s default, is specific to
-            PostgreSQL.  However, most other adapters override the behavior.  For
-            example, on MySQL, <a href="../../classes/Sequel.html">Sequel</a> uses LIKE
-            BINARY for <code>like</code>, and LIKE for <code>ilike</code>.  If the
-            database supports both case sensitive and case insensitive LIKE, then
+            <p>Note the above syntax for <code>ilike</code>, while Sequel&#39;s default,
+            is specific to PostgreSQL.  However, most other adapters override the
+            behavior.  For example, on MySQL, <a
+            href="../../classes/Sequel.html">Sequel</a> uses LIKE BINARY for
+            <code>like</code>, and LIKE for <code>ilike</code>.  If the database
+            supports both case sensitive and case insensitive LIKE, then
             <code>like</code> will use a case sensitive LIKE, and <code>ilike</code>
             will use a case insensitive LIKE.</p>
             
@@ -612,7 +614,7 @@
             <pre class="ruby"><span class="ruby-operator">~</span><span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(:<span class="ruby-identifier">name</span>, <span class="ruby-string">&#39;A%&#39;</span>) <span class="ruby-comment"># (&quot;name&quot; NOT LIKE &#39;A%&#39; ESCAPE &#39;\&#39;)</span></pre>
             
             <p><a href="../../classes/Sequel.html">Sequel</a> also supports SQL regular
-            expressions on MySQL and PostgreSQL.  You can use these by passing a ruby
+            expressions on MySQL and PostgreSQL.  You can use these by passing a Ruby
             regular expression to <code>like</code> or <code>ilike</code>, or by making
             the regular expression a hash value:</p>
             
@@ -653,7 +655,7 @@
             <p><a href="../../classes/Sequel.html">Sequel</a> allows the easy production
             of SQL CASE statements using the <code>Sequel.case</code> method.  The
             first argument is a hash or array of two element arrays representing the
-            conditions, the second argument is the default value (ELSE).   The keys of
+            conditions, the second argument is the default value (ELSE).  The keys of
             the hash (or first element in each array) is the WHEN condition, and the
             values of the hash (or second element in each array) is the THEN result. 
             Here are some examples:</p>
@@ -693,8 +695,8 @@
             
             <h3 id="label-Creating+Datasets">Creating Datasets<span><a href="#label-Creating+Datasets">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>You generally start by creating a dataset by calling
-            <code>Dataset#[]</code> with a symbol specifying the table name:</p>
+            <p>You generally start creating a dataset by calling <code>Dataset#[]</code>
+            with a symbol specifying the table name:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>] <span class="ruby-comment"># SELECT * FROM albums</span></pre>
             
@@ -702,7 +704,8 @@
             
             <pre class="ruby"><span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>, :<span class="ruby-identifier">artists</span>] <span class="ruby-comment"># SELECT * FROM albums, artists</span></pre>
             
-            <p>If you don&#39;t want to select from any FROM tables, just call dataset:</p>
+            <p>If you don&#39;t want to select from any FROM tables, just call
+            <code>dataset</code>:</p>
             
             <pre class="ruby"><span class="ruby-constant">DB</span>.<span class="ruby-identifier">dataset</span> <span class="ruby-comment"># SELECT *</span></pre>
             
@@ -733,7 +736,7 @@
             <pre class="ruby"><span class="ruby-identifier">ds</span> = <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">albums</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>)&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">all</span> <span class="ruby-comment"># SELECT * FROM albums WHERE (id = 1)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">insert</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>) <span class="ruby-comment"># INSERT INTO albums (name) VALUES (&#39;RF&#39;)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">update</span>(:<span class="ruby-identifier">name=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;RF&#39;</span>) <span class="ruby-comment"># UPDATE albums SET name = &#39;RF&#39; WHERE (id = 1)</span>&#x000A;<span class="ruby-identifier">ds</span>.<span class="ruby-identifier">delete</span> <span class="ruby-comment"># DELETE FROM albums WHERE (id = 1)</span></pre>
             
             <p>Note how <code>update</code> and <code>delete</code> used the
-            <code>where</code> argument, but that <code>insert</code> did not, because
+            <code>where</code> argument, but <code>insert</code> did not, because
             INSERT doesn&#39;t use a WHERE clause.</p>
             
             <h3 id="label-Methods+Used+for+Each+SQL+Clause">Methods Used for Each SQL Clause<span><a href="#label-Methods+Used+for+Each+SQL+Clause">&para;</a> <a href="#top">&uarr;</a></span></h3>

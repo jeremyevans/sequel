@@ -51,6 +51,10 @@
             allocating an arbitrary number of prepared statements.  You have been
             warned.</p>
             
+            <p>Note that in most cases, this plugin will probably make things slower, so
+            you should only use it if you really want to use prepared statements for
+            Dataset#with_pk.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclasses use prepared statements for Dataset#with_pk (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements_with_pk</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class use prepared statements for Dataset#with_pk</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements_with_pk</span></pre>
@@ -88,7 +92,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_with_pk.rb, line 25</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:prepared_statements</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements_with_pk.rb, line 29</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">plugin</span>(<span class="ruby-value">:prepared_statements</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

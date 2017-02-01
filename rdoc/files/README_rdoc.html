@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
+          <span class='datetime'>2017-01-16 09:47:58 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -230,8 +230,8 @@
             
             <pre class="ruby"><span class="ruby-identifier">posts</span>.<span class="ruby-identifier">all</span>&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span></pre>
             
-            <p>The all method returns an array of hashes, where each hash corresponds to a
-            record.</p>
+            <p>The <code>all</code> method returns an array of hashes, where each hash
+            corresponds to a record.</p>
             
             <p>You can also iterate through records one at a time using <code>each</code>:</p>
             
@@ -351,8 +351,8 @@
             Much of Sequel&#39;s DSL uses this style, calling methods on the <a
             href="../classes/Sequel.html">Sequel</a> module that return SQL expression
             objects.  <a href="../classes/Sequel.html">Sequel</a> also ships with a <a
-            href="doc/core_extensions_rdoc.html">core_extensions extension</a>) that
-            integrates Sequel&#39;s DSL better into the ruby language, allowing you to
+            href="doc/core_extensions_rdoc.html">core_extensions extension</a> that
+            integrates Sequel&#39;s DSL better into the Ruby language, allowing you to
             write:</p>
             
             <pre class="ruby">:<span class="ruby-identifier">stamp</span>.<span class="ruby-identifier">desc</span></pre>
@@ -732,9 +732,9 @@
             associations will cause the result set to be a cartesian product, so you
             should be very careful with your filters when using it in that case.</p>
             
-            <p>You can dynamically customize the eagerly loaded dataset by using using a
-            proc.  This proc is passed the dataset used for eager loading, and should
-            return a modified copy of that dataset:</p>
+            <p>You can dynamically customize the eagerly loaded dataset by using a proc. 
+            This proc is passed the dataset used for eager loading, and should return a
+            modified copy of that dataset:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Eagerly load only replies containing &#39;foo&#39;</span>&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">eager</span>(:<span class="ruby-identifier">replies=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">proc</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">ds</span><span class="ruby-operator">|</span> <span class="ruby-identifier">ds</span>.<span class="ruby-identifier">where</span>(<span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">like</span>(<span class="ruby-identifier">text</span>, <span class="ruby-string">&#39;%foo%&#39;</span>))}).<span class="ruby-identifier">all</span></pre>
             
@@ -752,8 +752,8 @@
             
             <h3 id="label-Joining+with+Associations">Joining with Associations<span><a href="#label-Joining+with+Associations">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
-            <p>You can use the association_join method to add a join to the model&#39;s
-            dataset based on the assocation:</p>
+            <p>You can use the <code>association_join</code> method to add a join to the
+            model&#39;s dataset based on the assocation:</p>
             
             <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">association_join</span>(:<span class="ruby-identifier">author</span>)&#x000A;<span class="ruby-comment"># SELECT * FROM posts</span>&#x000A;<span class="ruby-comment"># INNER JOIN authors AS author ON (author.id = posts.author_id)</span></pre>
             

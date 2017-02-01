@@ -58,6 +58,7 @@
               <li><a href="#method-i-disconnect_connection">disconnect_connection</a></li>
               <li><a href="#method-i-execute_dui">execute_dui</a></li>
               <li><a href="#method-i-execute_insert">execute_insert</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#method-i-server_version">server_version</a></li>
             </ol>
           </div>
@@ -271,6 +272,22 @@
                   <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 161</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">c</span><span class="ruby-operator">|</span> <span class="ruby-keyword">return</span> <span class="ruby-identifier">c</span>.<span class="ruby-identifier">insert_id</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 165</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-server_version'>
                 <a name='method-i-server_version'></a>
                 <div class='synopsis'>
@@ -286,7 +303,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-server_version-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 166</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> (<span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">server_version</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:server_version</span>)} <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-server_version-source'><span class="ruby-comment"># File lib/sequel/adapters/mysql.rb, line 172</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">server_version</span>(<span class="ruby-identifier">server</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@server_version</span> <span class="ruby-operator">||=</span> (<span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">server</span>){<span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">server_version</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">conn</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:server_version</span>)} <span class="ruby-operator">||</span> <span class="ruby-keyword">super</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

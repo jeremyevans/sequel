@@ -29,17 +29,66 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-01-12 12:01:03 -0800</span>
+          <span class='datetime'>2017-02-01 08:23:06 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
             
-            <h3 id="label-4.42.1+-282017-01-12-29">4.42.1 (2017-01-12)<span><a href="#label-4.42.1+-282017-01-12-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <h3 id="label-4.43.0+-282017-02-01-29">4.43.0 (2017-02-01)<span><a href="#label-4.43.0+-282017-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>
+            <p>Make jdbc/postgresql adapter work if pg_hstore extension is loaded first
+            (jeremyevans) (#1296)</p>
+            </li><li>
+            <p>Make prepared_statements_associations plugin work correctly on some
+            instance specific associations (jeremyevans)</p>
+            </li><li>
+            <p>Make <a href="doc/prepared_statements_rdoc.html">prepared_statements</a>
+            plugin not use prepared statements in cases where it is probably slower
+            (jeremyevans)</p>
+            </li><li>
+            <p>Optimize Model#refresh similar to Model.with_pk (jeremyevans)</p>
+            </li><li>
+            <p>Make Database#extension not attempt to load the same extension more than
+            once (jeremyevans)</p>
+            </li><li>
+            <p>Implement Database#freeze such that it can be used in production
+            (jeremyevans)</p>
+            </li><li>
+            <p>Freeze enum_labels in the pg_enum extension (jeremyevans)</p>
+            </li><li>
+            <p>Handle Database#type_supported? thread-safely on PostgreSQL (jeremyevans)</p>
+            </li><li>
+            <p>Handle primary_key_sequences thread-safely on Oracle (jeremyevans)</p>
+            </li><li>
+            <p>Handle sharding better when using mysql2 native prepared statements
+            (jeremyevans)</p>
+            </li><li>
+            <p>Use thread-safe incrementor for mock adapter autoid handling (jeremyevans)</p>
+            </li><li>
+            <p>Make Model#freeze not freeze associations hash until after validating the
+            model instance (jeremyevans)</p>
+            </li><li>
+            <p>Make prepared_statements_associations plugin work correctly when model
+            object explicitly specifies server to use when also using sharding plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make prepared_statements_with_pk plugin work correctly when dataset
+            explicitly specifies server to use (jeremyevans)</p>
+            </li><li>
+            <p>Make <a href="doc/prepared_statements_rdoc.html">prepared_statements</a>
+            plugin work correctly when model object explicitly specifies server to use
+            (jeremyevans)</p>
+            </li><li>
             <p>Make dataset_module inherited to subclasses when using the
             single_table_inheritance plugin (jeremyevans) (#1284)</p>
+            </li><li>
+            <p>Support use of SQLite result codes in the jdbc-sqlite adapter, if the jdbc
+            sqlite driver supports them (flash-gordon, jeremyevans) (#1283)</p>
+            </li><li>
+            <p>Make timestamp migrator handle key length limitations when using MySQL with
+            InnoDB engine and utf8mb4 charset default (jeremyevans) (#1282)</p>
             </li></ul>
             
             <h3 id="label-4.42.0+-282017-01-01-29">4.42.0 (2017-01-01)<span><a href="#label-4.42.0+-282017-01-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>

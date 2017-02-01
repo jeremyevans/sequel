@@ -38,8 +38,10 @@
           <div id='description'>
             
             <p>The prepared_statements plugin modifies the model to use prepared
-            statements for instance level deletes and saves, as well as class level
-            lookups by primary key.</p>
+            statements for instance level saves (inserts and updates).  It also will
+            use prepared statements for deletes, refreshes, and class level lookups by
+            primary key, if it thinks that using a prepared statement will be faster in
+            such cases.</p>
             
             <p>Note that this plugin is unsafe in some circumstances, as it can allow up
             to 2^N prepared statements to be created for each type of insert and update
@@ -114,7 +116,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-apply-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements.rb, line 44</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, <span class="ruby-value">:insert=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:insert_select=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:update=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:lookup_sql=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:fixed=</span><span class="ruby-operator">&gt;</span>{})&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-apply-source'><span class="ruby-comment"># File lib/sequel/plugins/prepared_statements.rb, line 33</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">apply</span>(<span class="ruby-identifier">model</span>)&#x000A;  <span class="ruby-identifier">model</span>.<span class="ruby-identifier">instance_variable_set</span>(<span class="ruby-value">:@prepared_statements</span>, <span class="ruby-value">:insert=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:insert_select=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:update=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:lookup_sql=</span><span class="ruby-operator">&gt;</span>{}, <span class="ruby-value">:fixed=</span><span class="ruby-operator">&gt;</span>{})&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -54,6 +54,7 @@
               <li><a href="#method-i-execute">execute</a></li>
               <li><a href="#method-i-execute_dui">execute_dui</a></li>
               <li><a href="#method-i-execute_insert">execute_insert</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -189,6 +190,22 @@
                     [show source]
                   </a>
                   <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">synchronize</span>(<span class="ruby-identifier">opts</span>[<span class="ruby-value">:server</span>]) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">conn</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">_execute</span>(<span class="ruby-identifier">conn</span>, <span class="ruby-value">:insert</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlanywhere.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

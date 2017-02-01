@@ -43,6 +43,10 @@
             use of prepared statements for associations where it will not work,
             assuming you load the plugin before defining the associations.</p>
             
+            <p>Note that in most cases, this plugin will probably make things slower, so
+            you should only use it if you really want to use prepared statements to
+            load associations.</p>
+            
             <p>Usage:</p>
             
             <pre class="ruby"><span class="ruby-comment"># Make all model subclasses more safe when using prepared statements (called before loading subclasses)</span>&#x000A;<span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements_associations</span>&#x000A;&#x000A;<span class="ruby-comment"># Make the Album class more safe when using prepared statements</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">prepared_statements_associations</span></pre>

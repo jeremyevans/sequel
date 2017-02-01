@@ -77,7 +77,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-_fetch-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 319</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_fetch</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_fetch</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:fetch</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 322</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_fetch</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_fetch</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:fetch</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-_fetch-3D'>
@@ -94,7 +94,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-_fetch-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-_fetch-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 324</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_fetch=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_fetch</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:fetch</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-_fetch-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 327</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_fetch=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_fetch</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:fetch</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-autoid'>
@@ -111,7 +111,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-autoid-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 308</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autoid</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_autoid</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:autoid</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 311</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autoid</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_autoid</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:autoid</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-autoid-3D'>
@@ -128,7 +128,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-autoid-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-autoid-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 313</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autoid=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_autoid</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:autoid</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-autoid-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 316</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">autoid=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_autoid</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:autoid</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-columns'>
@@ -147,7 +147,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-columns-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 343</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-columns-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 346</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">columns</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">cs</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">cs</span>.<span class="ruby-identifier">empty?</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-keyword">self</span>.<span class="ruby-identifier">columns</span> = <span class="ruby-identifier">cs</span>&#x000A;    <span class="ruby-keyword">self</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-fetch_rows'>
@@ -163,7 +163,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-fetch_rows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 352</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-fetch_rows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 355</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">fetch_rows</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-numrows'>
@@ -180,7 +180,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-numrows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 330</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">numrows</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_numrows</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:numrows</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 333</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">numrows</span>&#x000A;  <span class="ruby-identifier">cache_get</span>(<span class="ruby-value">:_numrows</span>) <span class="ruby-operator">||</span> <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:numrows</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-numrows-3D'>
@@ -197,7 +197,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-numrows-3D-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-numrows-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 335</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">numrows=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_numrows</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:numrows</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-numrows-3D-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 338</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">numrows=</span>(<span class="ruby-identifier">v</span>)&#x000A;  <span class="ruby-identifier">cache_set</span>(<span class="ruby-value">:_numrows</span>, <span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-ivar">@opts</span>[<span class="ruby-value">:numrows</span>] = <span class="ruby-identifier">v</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-quote_identifiers-3F'>
@@ -213,7 +213,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-quote_identifiers-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-quote_identifiers-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 356</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">quote_identifiers?</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:quote_identifiers</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:quote_identifiers_default</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-quote_identifiers-3F-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 359</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">quote_identifiers?</span>&#x000A;  <span class="ruby-ivar">@opts</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:quote_identifiers</span>, <span class="ruby-identifier">db</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:quote_identifiers_default</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_autoid'>
@@ -230,7 +230,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_autoid-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 361</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_autoid</span>(<span class="ruby-identifier">autoid</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:autoid=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">autoid</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_autoid-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 364</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_autoid</span>(<span class="ruby-identifier">autoid</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:autoid=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">autoid</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_fetch'>
@@ -247,7 +247,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_fetch-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 366</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_fetch</span>(<span class="ruby-identifier">fetch</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">fetch</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_fetch-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 369</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_fetch</span>(<span class="ruby-identifier">fetch</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:fetch=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">fetch</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-with_numrows'>
@@ -264,7 +264,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-with_numrows-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-with_numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 371</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_numrows</span>(<span class="ruby-identifier">numrows</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:numrows=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">numrows</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-with_numrows-source'><span class="ruby-comment"># File lib/sequel/adapters/mock.rb, line 374</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">with_numrows</span>(<span class="ruby-identifier">numrows</span>)&#x000A;  <span class="ruby-identifier">clone</span>(<span class="ruby-value">:numrows=</span><span class="ruby-operator">&gt;</span><span class="ruby-identifier">numrows</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

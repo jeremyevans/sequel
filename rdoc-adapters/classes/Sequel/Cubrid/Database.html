@@ -49,6 +49,7 @@
               <li><a href="#method-i-execute_ddl">execute_ddl</a></li>
               <li><a href="#method-i-execute_dui">execute_dui</a></li>
               <li><a href="#method-i-execute_insert">execute_insert</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#method-i-server_version">server_version</a></li>
             </ol>
           </div>
@@ -169,6 +170,22 @@
                     [show source]
                   </a>
                   <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/cubrid.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">execute</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-value">:type=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">:insert</span>))&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/cubrid.rb, line 91</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">server_version</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-server_version'>

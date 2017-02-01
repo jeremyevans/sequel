@@ -87,10 +87,12 @@
             
             <pre class="ruby"><span class="ruby-constant">Example</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">lock!</span>(<span class="ruby-string">&#39;FOR NO KEY UPDATE&#39;</span>)&#x000A;<span class="ruby-comment">#=&gt; SELECT * FROM examples WHERE id = 1 FOR NO KEY UPDATE LIMIT 1</span></pre>
             </li><li>
-            <p>Sequel::Dataset#skip_locked has been added, which skips locked rows when
-            returning query results. This is useful whenever you are implementing a
-            queue or similar data structure.  Currently, this is supported on
-            PostgreSQL 9.5+, Oracle, and Microsoft SQL Server.</p>
+            <p><a
+            href="../../../classes/Sequel/Dataset.html#method-i-skip_locked">Sequel::Dataset#skip_locked</a>
+            has been added, which skips locked rows when returning query results. This
+            is useful whenever you are implementing a queue or similar data structure. 
+            Currently, this is supported on PostgreSQL 9.5+, Oracle, and Microsoft SQL
+            Server.</p>
             </li><li>
             <p>An sql_comments extension has been added for setting SQL comments on
             queries:</p>

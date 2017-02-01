@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-04-19 12:52:38 -0700</span>
+          <span class='datetime'>2017-01-25 18:19:06 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -177,7 +177,7 @@
             
             <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_helpers</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">validates_presence</span> [:<span class="ruby-identifier">name</span>, :<span class="ruby-identifier">website</span>]&#x000A;    <span class="ruby-identifier">validates_unique</span> :<span class="ruby-identifier">name</span>&#x000A;    <span class="ruby-identifier">validates_format</span> <span class="ruby-regexp">/\Ahttps?:\/\//</span>, :<span class="ruby-identifier">website</span>, :<span class="ruby-identifier">message=</span><span class="ruby-operator">&gt;</span><span class="ruby-string">&#39;is not a valid URL&#39;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
-            <p>Other than <code>validates_unique</code>, which has it&#39;s own API, the
+            <p>Other than <code>validates_unique</code>, which has its own API, the
             methods defined by <code>validation_helpers</code> have one of the
             following two APIs:</p>
             <table class="rdoc-list note-list"><tbody><tr><td class='label'><code>(atts, opts={})</code></td><td>

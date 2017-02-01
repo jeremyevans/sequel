@@ -56,6 +56,7 @@
               <li><a href="#method-i-execute_ddl">execute_ddl</a></li>
               <li><a href="#method-i-execute_dui">execute_dui</a></li>
               <li><a href="#method-i-execute_insert">execute_insert</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#method-i-to_application_timestamp">to_application_timestamp</a></li>
             </ol>
           </div>
@@ -219,6 +220,22 @@
                   <pre id='method-i-execute_insert-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 149</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">execute_insert</span>(<span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>=<span class="ruby-constant">OPTS</span>)&#x000A;  <span class="ruby-identifier">_execute</span>(<span class="ruby-value">:insert</span>, <span class="ruby-identifier">sql</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 153</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@conversion_procs</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-to_application_timestamp'>
                 <a name='method-i-to_application_timestamp'></a>
                 <div class='synopsis'>
@@ -235,7 +252,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_application_timestamp-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_application_timestamp-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 154</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to : #{s.inspect} (#{s.class.inspect})&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_application_timestamp-source'><span class="ruby-comment"># File lib/sequel/adapters/sqlite.rb, line 159</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_application_timestamp</span>(<span class="ruby-identifier">s</span>)&#x000A;  <span class="ruby-keyword">case</span> <span class="ruby-identifier">s</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">String</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Integer</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-constant">Time</span>.<span class="ruby-identifier">at</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">when</span> <span class="ruby-constant">Float</span>&#x000A;    <span class="ruby-keyword">super</span>(<span class="ruby-constant">DateTime</span>.<span class="ruby-identifier">jd</span>(<span class="ruby-identifier">s</span>).<span class="ruby-identifier">to_s</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">raise</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;unhandled type when converting to : #{s.inspect} (#{s.class.inspect})&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
