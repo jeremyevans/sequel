@@ -9,6 +9,9 @@ begin
   raise LoadError unless defined?(PGconn::CONNECTION_OK)
 
   SEQUEL_POSTGRES_USES_PG = true
+  # The minimum version of the sequel_pg accelerator that
+  # is intended to work with this sequel
+  SEQUEL_PG_MINIMUM_VERSION = '1.6.17'
 rescue LoadError => e 
   SEQUEL_POSTGRES_USES_PG = false
   begin
@@ -857,6 +860,11 @@ end
 if SEQUEL_POSTGRES_USES_PG && !ENV['NO_SEQUEL_PG']
   begin
     require 'sequel_pg'
+    if defined?( Gem ) && ( sequel_pg_spec = Gem.loaded_specs['sequel_pg'] )
+      unless sequel_pg_spec.version >= Gem::Version.new( SEQUEL_PG_MINIMUM_VERSION )
+        raise "the installed sequel_pg is too old, please update to at least #{SEQUEL_PG_MINIMUM_VERSION}"
+      end
+    end
   rescue LoadError
     if RUBY_PLATFORM =~ /mingw|mswin/
       begin
