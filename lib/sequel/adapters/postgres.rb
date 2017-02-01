@@ -2,18 +2,20 @@
 
 Sequel.require 'adapters/shared/postgres'
 
+module Sequel
+  module Postgres
+  end
+end
+
 begin 
   require 'pg' 
 
   # Work around postgres-pr 0.7.0+ which ships with a pg.rb file
   raise LoadError unless defined?(PGconn::CONNECTION_OK)
 
-  SEQUEL_POSTGRES_USES_PG = true
-  # The minimum version of the sequel_pg accelerator that
-  # is intended to work with this sequel
-  SEQUEL_PG_MINIMUM_VERSION = '1.6.17'
+  Sequel::Postgres::USES_PG = true
 rescue LoadError => e 
-  SEQUEL_POSTGRES_USES_PG = false
+  Sequel::Postgres::USES_PG = false
   begin
     require 'postgres'
     # Attempt to get uniform behavior for the PGconn object no matter
@@ -142,7 +144,7 @@ module Sequel
       # Hash of prepared statements for this connection.  Keys are
       # string names of the server side prepared statement, and values
       # are SQL strings.
-      attr_reader(:prepared_statements) if SEQUEL_POSTGRES_USES_PG
+      attr_reader(:prepared_statements) if USES_PG
       
       # Raise a Sequel::DatabaseDisconnectError if a one of the disconnect
       # error classes is raised, or a PGError is raised and the connection
@@ -233,7 +235,7 @@ module Sequel
       # are only supported if the pg driver is used.
       def connect(server)
         opts = server_opts(server)
-        if SEQUEL_POSTGRES_USES_PG
+        if USES_PG
           connection_params = {
             :host => opts[:host],
             :port => opts[:port] || 5432,
@@ -315,7 +317,7 @@ module Sequel
         nil
       end
 
-      if SEQUEL_POSTGRES_USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
+      if USES_PG && Object.const_defined?(:PG) && ::PG.const_defined?(:Constants) && ::PG::Constants.const_defined?(:PG_DIAG_SCHEMA_NAME)
         # Return a hash of information about the related PGError (or Sequel::DatabaseError that
         # wraps a PGError), with the following entries:
         #
@@ -345,7 +347,7 @@ module Sequel
         synchronize(opts[:server]){|conn| check_database_errors{_execute(conn, sql, opts, &block)}}
       end
 
-      if SEQUEL_POSTGRES_USES_PG
+      if USES_PG
         # +copy_table+ uses PostgreSQL's +COPY TO STDOUT+ SQL statement to return formatted
         # results directly to the caller.  This method is only supported if pg is the
         # underlying ruby driver.  This method should only be called if you want
@@ -722,7 +724,7 @@ module Sequel
         clone(:where=>Sequel.lit(['CURRENT OF '], Sequel.identifier(cursor_name)))
       end
 
-      if SEQUEL_POSTGRES_USES_PG
+      if USES_PG
         
         PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
         
@@ -857,20 +859,17 @@ module Sequel
   end
 end
 
-if SEQUEL_POSTGRES_USES_PG && !ENV['NO_SEQUEL_PG']
+if Sequel::Postgres::USES_PG && !ENV['NO_SEQUEL_PG']
   begin
     require 'sequel_pg'
-    if defined?( Gem ) && ( sequel_pg_spec = Gem.loaded_specs['sequel_pg'] )
-      unless sequel_pg_spec.version >= Gem::Version.new( SEQUEL_PG_MINIMUM_VERSION )
-        raise "the installed sequel_pg is too old, please update to at least #{SEQUEL_PG_MINIMUM_VERSION}"
-      end
+    if defined?(Gem) &&
+       (sequel_pg_spec = Gem.loaded_specs['sequel_pg'] rescue nil) &&
+       (sequel_pg_spec.version < Gem::Version.new('1.6.17'))
+        raise Sequel::Error, "the installed sequel_pg is too old, please update to at least sequel_pg-1.6.17"
     end
   rescue LoadError
-    if RUBY_PLATFORM =~ /mingw|mswin/
-      begin
-        require "#{RUBY_VERSION[0...3]}/sequel_pg"
-      rescue LoadError
-      end
-    end
   end
 end
+
+# SEQUEL5: Remove
+SEQUEL_POSTGRES_USES_PG = Sequel::Postgres::USES_PG

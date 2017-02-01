@@ -1,5 +1,7 @@
 === master
 
+* Raise error if the postgres adapter attempts to load an incompatible version of sequel_pg (mahlonsmith) (#1298)
+
 * Fix jdbc adapter so basic_type_convertor_map is not shared between instances, work with Database#freeze (jeremyevans)
 
 === 4.43.0 (2017-02-01)
