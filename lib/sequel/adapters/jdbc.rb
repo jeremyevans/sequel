@@ -137,6 +137,10 @@ module Sequel
         BASIC_MAP[types.const_get(type)] = o.method(meth) 
         MAP[types.const_get(type)] = o.method(:"Ruby#{meth}") 
       end
+
+      MAP.freeze
+      BASIC_MAP.freeze
+      INSTANCE.freeze
     end
 
     # JDBC Databases offer a fairly uniform interface that does not change
@@ -672,7 +676,7 @@ module Sequel
       # that runs queries works correctly.  This cannot be overriding in subadapters,
       def setup_type_convertor_map_early
         @type_convertor_map = TypeConvertor::MAP.merge(Java::JavaSQL::Types::TIMESTAMP=>timestamp_convertor)
-        @basic_type_convertor_map = TypeConvertor::BASIC_MAP
+        @basic_type_convertor_map = TypeConvertor::BASIC_MAP.dup
       end
 
       # Yield a new statement object, and ensure that it is closed before returning.
