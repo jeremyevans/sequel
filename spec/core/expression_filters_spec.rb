@@ -1225,6 +1225,11 @@ describe "Sequel.recursive_map" do
     Sequel.recursive_map([nil], proc{|s| s.to_i}).must_equal [nil]
     Sequel.recursive_map([[nil]], proc{|s| s.to_i}).must_equal [[nil]]
   end
+  
+  it "should call callable for falsey value" do 
+    Sequel.recursive_map([false], proc{|s| 'false'}).must_equal ['false']  
+    Sequel.recursive_map([[false]], proc{|s| 'false'}).must_equal [['false']]  
+  end
 end
 
 describe "Sequel.delay" do
