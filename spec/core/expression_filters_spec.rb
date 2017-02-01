@@ -1228,6 +1228,7 @@ describe "Sequel.recursive_map" do
   
   it "should call callable for falsey value" do 
     Sequel.recursive_map([false], proc{|s| 'false'}).must_equal ['false']  
+    Sequel.recursive_map([[false]], proc{|s| 'false'}).must_equal [['false']]  
   end
 end
 
