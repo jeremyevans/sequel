@@ -204,7 +204,7 @@ module Sequel
     array.map do |i|
       if i.is_a?(Array)
         recursive_map(i, converter)
-      elsif i
+      elsif !i.nil?
         converter.call(i)
       end
     end
