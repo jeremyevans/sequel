@@ -1,5 +1,7 @@
 === master
 
+* Correctly handle conversion of false values when typecasting PostgreSQL arrays (mistoo) (#1299)
+
 * Raise error if the postgres adapter attempts to load an incompatible version of sequel_pg (mahlonsmith) (#1298)
 
 * Fix jdbc adapter so basic_type_convertor_map is not shared between instances, work with Database#freeze (jeremyevans)
