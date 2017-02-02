@@ -43,8 +43,8 @@ module Sequel
 
         def disconnect_error?(exception, opts)
           super ||
-            exception.message =~ /\AThe connection does not exist\./ ||
-            exception.message =~ /\ACommunication link failure\./
+            exception.message.start_with?('The connection does not exist.') ||
+            exception.message.start_with?('Communication link failure.')
         end
 
         end
