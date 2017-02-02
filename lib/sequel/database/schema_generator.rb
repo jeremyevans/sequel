@@ -414,6 +414,33 @@ module Sequel
       # CreateTableGenerator#index for available options.
       #
       #   add_index(:artist_id) # CREATE INDEX table_artist_id_index ON table (artist_id)
+      #
+      # Options:
+      #
+      # :name :: Give a specific name for the index. Highly recommended if you plan on
+      #          dropping the index later.
+      # :where :: A filter expression, used to setup a partial index (if supported).
+      # :unique :: Create a unique index.
+      #
+      # PostgreSQL specific options:
+      #
+      # :concurrently :: Create the index concurrently, so it doesn't require an exclusive lock
+      #                  on the table.
+      # :index_type :: The underlying index type to use for a full_text index, gin by default).
+      # :language :: The language to use for a full text index (simple by default).
+      # :opclass :: Set an opclass to use for all columns (per-column opclasses require
+      #             custom SQL).
+      # :type :: Set the index type (e.g. full_text, spatial, hash, gin, gist, btree).
+      #
+      # MySQL specific options:
+      #
+      # :type :: Set the index type, with full_text and spatial indexes handled specially.
+      #
+      # Microsoft SQL Server specific options:
+      #
+      # :include :: Includes additional columns in the index.
+      # :key_index :: Sets the KEY INDEX to the given value.
+      # :type :: clustered uses a clustered index, full_text uses a full text index.
       def add_index(columns, opts = OPTS)
         @operations << {:op => :add_index, :columns => Array(columns)}.merge!(opts)
       end
