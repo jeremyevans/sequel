@@ -791,7 +791,7 @@ module Sequel
     #   # {[1, 3]=>['Jim', 'bo'], [2, 4]=>['Bob', 'be'], ...}
     #
     #   DB[:table].to_hash([:id, :name]) # SELECT * FROM table
-    #   # {[1, 'Jim']=>{:id=>1, :name=>'Jim'}, [2, 'Bob'=>{:id=>2, :name=>'Bob'}, ...}
+    #   # {[1, 'Jim']=>{:id=>1, :name=>'Jim'}, [2, 'Bob']=>{:id=>2, :name=>'Bob'}, ...}
     #
     # Options:
     # :all :: Use all instead of each to retrieve the objects
