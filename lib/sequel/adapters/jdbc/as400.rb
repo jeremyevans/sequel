@@ -42,7 +42,11 @@ module Sequel
         private
 
         def disconnect_error?(exception, opts)
-          super || exception.message =~ /\AThe connection does not exist\./
+          super ||
+            exception.message =~ /\AThe connection does not exist\./ ||
+            exception.message =~ /\ACommunication link failure\./
+        end
+
         end
 
         # Use JDBC connection's setAutoCommit to false to start transactions
