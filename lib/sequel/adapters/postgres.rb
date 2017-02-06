@@ -2,11 +2,6 @@
 
 Sequel.require 'adapters/shared/postgres'
 
-module Sequel
-  module Postgres
-  end
-end
-
 begin 
   require 'pg' 
 
@@ -105,6 +100,13 @@ module Sequel
     PG_TYPES[17] = Class.new do
       def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
     end.new.method(:bytea)
+
+    if Sequel::Postgres::USES_PG
+      # Whether the given sequel_pg version integer is supported.
+      def self.sequel_pg_version_supported?(version)
+        version >= 10617
+      end
+    end
 
     @use_iso_date_format = true
 
