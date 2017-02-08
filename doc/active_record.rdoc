@@ -297,7 +297,7 @@ Sequel doesn't have a <tt>has_many :through</tt> association, instead you can us
 
 Sequel doesn't come with support for polymorphic associations.  Using polymorphic associations is generally bad from a database design perspective, as it violates referential integrity.  If you have an old database and must have polymorphic associations, there is an external +sequel_polymorphic+ plugin that can handle them, just by using the standard association options provided by Sequel.
 
-Sequel doesn't directly support creating a bunch of associated objects and delaying saving them to the database until the main object is saved, like you can with the <tt>association.build</tt> methods in ActiveRecord.  You can use +before_save or +after_save+ hooks, or the +nested_attributes+ or +instance_hooks+ plugins to get similar support.
+Sequel doesn't directly support creating a bunch of associated objects and delaying saving them to the database until the main object is saved, like you can with the <tt>association.build</tt> methods in ActiveRecord.  You can use +before_save+ or +after_save+ hooks, or the +nested_attributes+ or +instance_hooks+ plugins to get similar support.
 
 Sequel supports the same basic association hooks/callbacks as ActiveRecord.  It also supports <tt>:after_load</tt>, which is run after the associated objects are loaded.  For <tt>*_to_one</tt> associations, it supports +before_set+ and +after_set+ hooks, since a setter method is used instead of an add/remove method pair.
 
@@ -316,7 +316,7 @@ Association datasets are just like any other Sequel dataset, in that you can fil
 
   gold_albums = artist.albums_dataset.where{copies_sold > 500000}.order(:name).all  
 
-Sequel caches associated objects similarly to ActiveRecord, and you can skip the cache by passing +true+ to the association method, just like ActiveRecord.
+Sequel caches associated objects similarly to ActiveRecord, and you can skip the cache by passing +:reload=>true+ to the association method.
 
 === Eager Loading
 
