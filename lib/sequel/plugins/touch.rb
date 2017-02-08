@@ -63,6 +63,13 @@ module Sequel
 
         Plugins.inherited_instance_variables(self, :@touched_associations=>:dup, :@touch_column=>nil)
 
+        # Freeze the touched associations when freezing the model class.
+        def freeze
+          @touched_associations.freeze
+
+          super
+        end
+
         # Add additional associations to be touched.  See the :association option
         # of the Sequel::Plugin::Touch.configure method for the format of the associations
         # arguments.

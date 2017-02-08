@@ -27,16 +27,36 @@ module Sequel
     # +columns+ option. This can be a performance gain if it
     # would avoid pointlessly comparing many other columns.
     # Note that this option currently only has an effect if the
-    # dataset # supports RETURNING.
+    # dataset supports RETURNING.
     #
     #   # Only include the artist column in RETURNING
     #   Album.plugin :update_refresh, :columns => :artist
     #
     #   # Only include the artist and title columns in RETURNING
     #   Album.plugin :update_refresh, :columns => [ :artist, :title ]
-    #
     module UpdateRefresh
+      # Set the specific columns to refresh, if the :columns option
+      # is provided.
+      def self.configure(model, opts=OPTS)
+        model.instance_eval do
+          @update_refresh_columns = Array(opts[:columns]) || []
+        end
+      end
+
+      module ClassMethods
+        # The specific columns to refresh when updating, if UPDATE RETURNING is supported.
+        attr_reader :update_refresh_columns
+
+        # Freeze the update refresh columns when freezing the model class.
+        def freeze
+          @update_refresh_columns.freeze
+
+          super
+        end
+      end
+
       module InstanceMethods
+        # If the dataset does not support UPDATE RETURNING, then refresh after an update.
         def after_update
           super
           unless this.supports_returning?(:update)
@@ -46,6 +66,8 @@ module Sequel
 
         private
 
+        # If the dataset supports UPDATE RETURNING, use it to do the refresh in the same
+        # query as the update.
         def _update_without_checking(columns)
           ds = _update_dataset
           if ds.supports_returning?(:update)
@@ -61,17 +83,6 @@ module Sequel
           end
         end
       end
-
-      module ClassMethods
-        attr_reader :update_refresh_columns
-      end
-
-      def self.configure(model, opts=OPTS)
-        model.instance_eval do
-          @update_refresh_columns = Array(opts[:columns]) || []
-        end
-      end
-
     end
   end
 end

@@ -1737,6 +1737,15 @@ module Sequel
           opts.eager_load_results(eo, &block)
         end
 
+        # Freeze association related metadata when freezing model class.
+        def freeze
+          @association_reflections.freeze.each_value(&:freeze)
+          @autoreloading_associations.freeze.each_value(&:freeze)
+          @default_association_options.freeze
+
+          super
+        end
+
         # Shortcut for adding a many_to_many association, see #associate
         def many_to_many(name, opts=OPTS, &block)
           associate(:many_to_many, name, opts, &block)

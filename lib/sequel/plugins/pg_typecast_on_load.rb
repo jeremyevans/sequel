@@ -49,6 +49,13 @@ module Sequel
           super(load_typecast_pg(values))
         end
 
+        # Freeze the typecast on load columns when freezing the model class.
+        def freeze
+          @pg_typecast_on_load_columns.freeze
+
+          super
+        end
+
         # Lookup the conversion proc for the column's oid in the Database
         # object, and use it to convert the value.
         def load_typecast_pg(values)

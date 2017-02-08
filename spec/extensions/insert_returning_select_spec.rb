@@ -63,4 +63,10 @@ describe "Sequel::Plugins::InsertReturningSelect" do
     b.create(:x=>2).must_equal b.load(:id=>1, :x=>2)
     @db.sqls.must_equal ['INSERT INTO albums (x) VALUES (2) RETURNING id, x']
   end
+
+  it "should freeze instance_insert_dataset when freezing model class" do
+    @Album.plugin :insert_returning_select
+    @Album.freeze
+    @Album.instance_insert_dataset.frozen?.must_equal true
+  end
 end

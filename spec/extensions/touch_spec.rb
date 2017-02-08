@@ -208,4 +208,10 @@ describe "Touch plugin" do
     DB.sqls.must_equal ["UPDATE artists SET modified_on = CURRENT_TIMESTAMP WHERE (id = 4)",
       "UPDATE albums SET modified_on = CURRENT_TIMESTAMP WHERE (albums.artist_id = 4)"]
   end
+
+  it "should freeze touched associations when freezing model class" do
+    @Artist.plugin :touch, :associations=>:albums
+    @Artist.freeze
+    @Artist.touched_associations.frozen?.must_equal true
+  end
 end

@@ -694,4 +694,9 @@ describe "NestedAttributes plugin" do
     @Tag.columns :id, :name, :number
     proc{@Album.load(:id=>10, :name=>'Al').set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.must_raise(Sequel::Error)
   end
+
+  it "should freeze nested_attributes_module when freezing model class" do
+    @Artist.freeze
+    @Artist.nested_attributes_module.frozen?.must_equal true
+  end
 end

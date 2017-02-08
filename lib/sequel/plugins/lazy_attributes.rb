@@ -42,6 +42,13 @@ module Sequel
         # be overridden and call super to get the lazy attribute behavior
         attr_accessor :lazy_attributes_module
 
+        # Freeze lazy attributes module when freezing model class.
+        def freeze
+          @lazy_attributes_module.freeze if @lazy_attributes_module
+
+          super
+        end
+
         # Remove the given attributes from the list of columns selected by default.
         # For each attribute given, create an accessor method that allows a lazy
         # lookup of the attribute.  Each attribute should be given as a symbol.

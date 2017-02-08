@@ -19,6 +19,7 @@ describe "ActiveModel plugin" do
     end
     @c = AMLintTest
     @c.plugin :active_model
+    @c.freeze if @freeze_class
     @m = @model = @c.new
     @o = @c.load({})
   end
@@ -26,7 +27,6 @@ describe "ActiveModel plugin" do
     Object.send(:remove_const, :AMLintTest)
     Object.send(:remove_const, :Blog)
   end
-  include ActiveModel::Lint::Tests
 
   it ".to_model should return self, not a proxy object" do
     @m.object_id.must_equal @m.to_model.object_id
@@ -40,6 +40,7 @@ describe "ActiveModel plugin" do
     @o.to_key.must_be_nil
 
     @c.set_primary_key [:id2, :id]
+    @c.freeze
     @o.to_key.must_be_nil
     @o.id = 1
     @o.id2 = 2
@@ -55,6 +56,7 @@ describe "ActiveModel plugin" do
     @o.id = 1
     @o.to_param.must_equal '1'
     @c.set_primary_key [:id2, :id]
+    @c.freeze
     @o.id2 = 2
     @o.to_param.must_equal '2-1'
     @o.meta_def(:to_param_joiner){'|'}
@@ -80,6 +82,18 @@ describe "ActiveModel plugin" do
   it "#to_partial_path should return a path string" do
     @m.to_partial_path.must_equal 'am_lint_tests/am_lint_test'
     Blog::Post.new.to_partial_path.must_equal 'blog/posts/post'
+  end
+
+  describe "with unfrozen model class" do
+    include ActiveModel::Lint::Tests
+  end
+
+  describe "with frozen model class" do
+    before do
+      @freeze_class = true
+    end
+
+    include ActiveModel::Lint::Tests
   end
 end
 end 

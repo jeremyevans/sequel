@@ -152,6 +152,15 @@ module Sequel
         # The default opts to use when serializing model objects to JSON.
         attr_reader :json_serializer_opts
 
+        # Freeze json serializier opts when freezing model class
+        def freeze
+          @json_serializer_opts.freeze.each_value do |v|
+            v.freeze if v.is_a?(Array) || v.is_a?(Hash)
+          end
+
+          super
+        end
+
         # Attempt to parse a single instance from the given JSON string,
         # with options passed to InstanceMethods#from_json_node.
         def from_json(json, opts=OPTS)

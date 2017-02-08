@@ -58,7 +58,10 @@ module Sequel
     module Composition
       # Define the necessary class instance variables.
       def self.apply(model)
-        model.instance_eval{@compositions = {}}
+        model.instance_eval do
+          @compositions = {}
+          include(@composition_module ||= Module.new)
+        end
       end
 
       module ClassMethods
@@ -130,7 +133,6 @@ module Sequel
         
         # Define getter and setter methods for the composition object.
         def define_composition_accessor(name, opts=OPTS)
-          include(@composition_module ||= Module.new) unless composition_module
           composer = opts[:composer]
           composition_module.class_eval do
             define_method(name) do 
@@ -147,6 +149,14 @@ module Sequel
               compositions[name] = v
             end
           end
+        end
+
+        # Freeze composition information when freezing model class.
+        def freeze
+          compositions.freeze.each_value(&:freeze)
+          composition_module.freeze
+
+          super
         end
       end
 

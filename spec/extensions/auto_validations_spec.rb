@@ -189,4 +189,12 @@ describe "Sequel::Plugins::AutoValidations" do
     @m.valid?.must_equal false
     @m.errors.must_equal([:name, :num]=>["u_message"])
   end
+
+  it "should not allow modifying auto validation information for frozen model classes" do
+    @c.freeze
+    @c.auto_validate_not_null_columns.frozen?.must_equal true
+    @c.auto_validate_explicit_not_null_columns.frozen?.must_equal true
+    @c.auto_validate_max_length_columns.frozen?.must_equal true
+    @c.auto_validate_unique_columns.frozen?.must_equal true
+  end
 end

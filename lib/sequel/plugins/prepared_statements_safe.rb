@@ -38,6 +38,13 @@ module Sequel
         Plugins.inherited_instance_variables(self, :@prepared_statements_column_defaults=>:dup)
         Plugins.after_set_dataset(self, :set_prepared_statements_column_defaults)
 
+        # Freeze the prepared statements column defaults when freezing the model class.
+        def freeze
+          @prepared_statements_column_defaults.freeze if @prepared_statements_column_defaults
+
+          super
+        end
+
         private
 
         # Set the column defaults based on the database schema.  All columns

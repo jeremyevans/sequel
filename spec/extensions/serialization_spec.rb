@@ -361,4 +361,11 @@ describe "Serialization plugin" do
     o.column_changes.must_equal(:abc=>[1, 2], :def=>["hello", "hello2"])
   end
 
+  it "should freeze serialization metadata when freezing model class" do
+    @c.plugin :serialization, :yaml, :abc, :def
+    @c.freeze
+    @c.serialization_map.frozen?.must_equal true
+    @c.deserialization_map.frozen?.must_equal true
+    @c.serialization_module.frozen?.must_equal true
+  end
 end

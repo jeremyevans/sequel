@@ -90,6 +90,18 @@ module Sequel
         Plugins.inherited_instance_variables(self, :@constraint_validations_table=>nil, :@constraint_validation_options=>:hash_dup)
         Plugins.after_set_dataset(self, :parse_constraint_validations)
 
+        # Freeze constraint validations data when freezing model class.
+        def freeze
+          @constraint_validations.freeze.each(&:freeze)
+          @constraint_validation_reflections.freeze.each_value do |v|
+            v.freeze
+            v.each(&:freeze)
+          end
+          @constraint_validation_options.freeze.each_value(&:freeze)
+
+          super
+        end
+
         private
 
         # If the database has not already parsed constraint validation

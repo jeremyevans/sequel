@@ -32,11 +32,11 @@ module Sequel
 
       # Setup the datastructure used to hold the prepared statements in the model.
       def self.apply(model)
-        model.instance_variable_set(:@prepared_statements, :insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}, :fixed=>{})
+        model.instance_variable_set(:@prepared_statements, {:insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}, :fixed=>{}}.freeze)
       end
 
       module ClassMethods
-        Plugins.inherited_instance_variables(self, :@prepared_statements=>lambda{|v| {:insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}, :fixed=>{}}})
+        Plugins.inherited_instance_variables(self, :@prepared_statements=>lambda{|v| {:insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}, :fixed=>{}}.freeze})
 
         private
 

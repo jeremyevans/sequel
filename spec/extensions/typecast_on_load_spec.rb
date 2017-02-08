@@ -77,4 +77,10 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
     @c.plugin :typecast_on_load, :b
     @c.load(:id=>1, :b=>"1", :y=>"0").modified?.must_equal false
   end
+
+  it "should freeze typecast_on_load columns when freezing model class" do
+    @c.plugin :typecast_on_load, :b
+    @c.freeze
+    @c.typecast_on_load_columns.frozen?.must_equal true
+  end
 end

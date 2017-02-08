@@ -28,6 +28,14 @@ module Sequel
 
       module ClassMethods
         include ::ActiveModel::Naming
+
+        # Cache model_name and to_partial path value before freezing.
+        def freeze
+          model_name
+          _to_partial_path
+
+          super
+        end
         
         # Class level cache for to_partial_path.
         def _to_partial_path

@@ -152,6 +152,18 @@ module Sequel
 
         Plugins.inherited_instance_variables(self, :@sti_dataset=>nil, :@sti_key=>nil, :@sti_key_map=>nil, :@sti_model_map=>nil, :@sti_key_chooser=>nil)
 
+        # Freeze STI information when freezing model class.  Note that
+        # because of how STI works, you should not freeze an STI subclass
+        # until after all subclasses of it have been created.
+        def freeze
+          @sti_dataset.freeze
+          @sti_key_array.freeze if @sti_key_array
+          @sti_key_map.freeze if @sti_key_map.is_a?(Hash)
+          @sti_model_map.freeze if @sti_model_map.is_a?(Hash)
+
+          super
+        end
+
         # Copy the necessary attributes to the subclasses, and filter the
         # subclass's dataset based on the sti_kep_map entry for the class.
         def inherited(subclass)
@@ -159,7 +171,7 @@ module Sequel
           key = Array(sti_key_map[subclass]).dup
           sti_subclass_added(key)
           rp = dataset.row_proc
-          subclass.set_dataset(sti_dataset.where(SQL::QualifiedIdentifier.new(sti_dataset.first_source_alias, sti_key)=>Sequel.delay{key}), :inherited=>true)
+          subclass.set_dataset(sti_dataset.where(SQL::QualifiedIdentifier.new(sti_dataset.first_source_alias, sti_key)=>Sequel.delay{Sequel.synchronize{key}}), :inherited=>true)
           subclass.instance_eval do
             @dataset = @dataset.with_row_proc(rp)
             @sti_key_array = key

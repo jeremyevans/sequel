@@ -58,4 +58,9 @@ describe "prepared_statements_safe plugin" do
     c1.prepared_statements_column_defaults.must_equal(:name=>'foo')
     Class.new(c1).prepared_statements_column_defaults.must_equal(:name=>'foo')
   end
+
+  it "should freeze prepared statement column defaults when freezing model class" do
+    @c.freeze
+    @c.prepared_statements_column_defaults.frozen?.must_equal true
+  end
 end

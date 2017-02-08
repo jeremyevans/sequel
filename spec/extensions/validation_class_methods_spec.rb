@@ -16,6 +16,19 @@ describe Sequel::Model do
     end
   end
   
+  it "should freeze validation metadata when freezing model class" do
+    @c.validates_acceptance_of(:a)
+    @c.freeze
+    @c.validations.frozen?.must_equal true
+    @c.validations.values.all?(&:frozen?).must_equal true
+    @c.validation_reflections.frozen?.must_equal true
+    @c.validation_reflections.values.all? do |vs|
+      vs.frozen? && vs.all? do |v|
+        v.frozen? && v.last.frozen?
+      end
+    end.must_equal true
+  end
+
   it "should respond to validations, has_validations?, and validation_reflections" do
     @c.must_respond_to(:validations)
     @c.must_respond_to(:has_validations?)

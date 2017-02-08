@@ -63,6 +63,13 @@ module Sequel
 
         Plugins.inherited_instance_variables(self, :@parent_column=>nil, :@tree_order=>nil)
 
+        # Should freeze tree order if it is an array when freezing the model class.
+        def freeze
+          @tree_order.freeze if @tree_order.is_a?(Array)
+        
+          super
+        end
+
         # Returns list of all root nodes (those with no parent nodes).
         #
         #   TreeClass.roots # => [root1, root2]

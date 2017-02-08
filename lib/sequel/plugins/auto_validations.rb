@@ -127,6 +127,16 @@ module Sequel
           @auto_validate_types
         end
 
+        # Freeze auto_validation settings when freezing model class.
+        def freeze
+          @auto_validate_not_null_columns.freeze
+          @auto_validate_explicit_not_null_columns.freeze
+          @auto_validate_max_length_columns.freeze
+          @auto_validate_unique_columns.freeze
+
+          super
+        end
+
         # Skip automatic validations for the given validation type (:not_null, :types, :unique).
         # If :all is given as the type, skip all auto validations.
         def skip_auto_validations(type)

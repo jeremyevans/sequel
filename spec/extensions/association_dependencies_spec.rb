@@ -72,6 +72,14 @@ describe "AssociationDependencies plugin" do
     DB.sqls.must_equal ['DELETE FROM aoa WHERE (l = 2)', 'DELETE FROM artists WHERE id = 2']
   end
 
+  it "should not allow modifications if class is frozen" do
+    @Artist.add_association_dependencies :other_artists=>:nullify
+    @Artist.freeze
+    proc{@Artist.add_association_dependencies :albums=>:nullify}.must_raise RuntimeError, TypeError
+    @Artist.association_dependencies.frozen?.must_equal true
+    @Artist.association_dependencies[:before_nullify].frozen?.must_equal true
+  end
+
   it "should raise an error if attempting to nullify a many_to_one association" do
     proc{@Album.add_association_dependencies :artist=>:nullify}.must_raise(Sequel::Error)
   end

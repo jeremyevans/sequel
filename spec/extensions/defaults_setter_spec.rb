@@ -99,4 +99,11 @@ describe "Sequel::Plugins::DefaultsSetter" do
     c.plugin :defaults_setter
     c.default_values.must_equal(:a=>2)
   end
+
+  it "should freeze default values when freezing model class" do
+    c = Class.new(Sequel::Model(@db[:bar]))
+    c.plugin :defaults_setter
+    c.freeze
+    c.default_values.frozen?.must_equal true
+  end
 end

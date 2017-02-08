@@ -167,4 +167,10 @@ describe "Sequel::Plugins::LazyAttributes" do
     m.name.must_equal 3
     @db.sqls.must_equal ["SELECT la.id FROM la LIMIT 1", "SELECT la.name FROM la WHERE (id = 1) LIMIT 1"]
   end
+
+  it "should freeze lazy_attributes_module when freezing model class" do
+    @c.plugin :lazy_attributes, :blah
+    @c.freeze
+    @c.lazy_attributes_module.frozen?.must_equal true
+  end
 end

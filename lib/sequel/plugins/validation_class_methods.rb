@@ -39,6 +39,19 @@ module Sequel
         # options.
         attr_reader :validation_reflections
 
+        # Freeze validation metadata when freezing model class.
+        def freeze
+          @validations.freeze.each_value(&:freeze)
+          @validation_reflections.freeze.each_value do |vs|
+            vs.freeze.each do |v|
+              v.freeze
+              v.last.freeze
+            end
+          end
+
+          super
+        end
+
         # The Generator class is used to generate validation definitions using 
         # the validates {} idiom.
         class Generator

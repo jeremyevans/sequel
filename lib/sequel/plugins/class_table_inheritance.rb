@@ -245,6 +245,17 @@ module Sequel
         # Alias to sti_model_map, for backwards compatibility.
         def cti_model_map; sti_model_map; end
 
+        # Freeze CTI information when freezing model class.
+        def freeze
+          @cti_models.freeze
+          @cti_tables.freeze
+          @cti_instance_dataset.freeze
+          @cti_table_columns.freeze
+          @cti_table_map.freeze
+
+          super
+        end
+
         Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil)
 
         def inherited(subclass)

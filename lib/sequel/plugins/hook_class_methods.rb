@@ -82,6 +82,12 @@ module Sequel
             class_eval("def #{hook}; model.hook_blocks(:#{hook}){|b| return false if instance_eval(&b) == false}; end", __FILE__, __LINE__)
           end
         end
+
+        # Freeze hooks when freezing model class.
+        def freeze
+          @hooks.freeze.each_value(&:freeze)
+          super
+        end
     
         # Returns true if there are any hook blocks for the given hook.
         def has_hooks?(hook)

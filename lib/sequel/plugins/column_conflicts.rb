@@ -60,6 +60,14 @@ module Sequel
           columns.find_all{|c| mod.method_defined?("#{c}=")}.each{|c| set_column_conflict!(c)}
         end
 
+        # Freeze column conflict information when freezing model class.
+        def freeze
+          @get_column_conflicts.freeze
+          @set_column_conflicts.freeze
+
+          super
+        end
+
         # Set the given column as one with a getter method conflict.
         def get_column_conflict!(column)
           @get_column_conflicts[column.to_sym] = @get_column_conflicts[column.to_s] = column.to_sym

@@ -303,4 +303,11 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should raise an error if using an unsupported :associations option" do
     proc{Artist.from_json(@artist.to_json, :associations=>'')}.must_raise(Sequel::Error)
   end
+
+  it "should freeze json serializier opts when model class is frozen" do
+    Album.json_serializer_opts[:only] = [:id]
+    Album.freeze
+    Album.json_serializer_opts.frozen?.must_equal true
+    Album.json_serializer_opts[:only].frozen?.must_equal true
+  end
 end

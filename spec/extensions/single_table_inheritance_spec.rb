@@ -19,6 +19,16 @@ describe Sequel::Model, "single table inheritance plugin" do
     Object.send(:remove_const, :StiTest)
   end
 
+  it "should freeze sti metadata when freezing model class" do
+    StiTest.freeze
+    StiTest.sti_dataset.frozen?.must_equal true
+
+    StiTestSub1.freeze
+    StiTestSub1.sti_key_array.frozen?.must_equal true
+
+    proc{class ::StiTestSub1Sub1 < StiTestSub1; end}.must_raise RuntimeError, TypeError
+  end
+
   it "should have simple_table = nil" do
     StiTest.simple_table.must_equal "sti_tests"
     StiTestSub1.simple_table.must_be_nil
@@ -180,8 +190,15 @@ describe Sequel::Model, "single table inheritance plugin" do
     end
     after do
       Object.send(:remove_const, :StiTest2)
-      Object.send(:remove_const, :StiTest3)
-      Object.send(:remove_const, :StiTest4)
+      Object.send(:remove_const, :StiTest3) if defined?(StiTest3)
+      Object.send(:remove_const, :StiTest4) if defined?(StiTest4)
+    end
+
+    it "should freeze sti key and model map if given as hashes when freezing model class" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>StiTest2, 1=>:StiTest3, 2=>'StiTest4'}, :key_map=>{StiTest2=>4, 'StiTest3'=>5, 'StiTest4'=>6}
+      StiTest2.freeze
+      StiTest2.sti_key_map.frozen?.must_equal true
+      StiTest2.sti_model_map.frozen?.must_equal true
     end
 
     it "should have working row_proc if using set_dataset in subclass to remove columns" do

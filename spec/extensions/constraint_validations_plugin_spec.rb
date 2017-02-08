@@ -285,4 +285,16 @@ describe "Sequel::Plugins::ConstraintValidations" do
     c.constraint_validations.must_equal [[:validates_presence, :name]]
     c.constraint_validation_reflections.must_equal(:name=>[[:presence, {}]])
   end
+
+  it "should freeze constraint validations data when freezing model class" do
+    @c = model_class
+    @c.freeze
+    @c.constraint_validations.frozen?.must_equal true
+    @c.constraint_validations.all?(&:frozen?).must_equal true
+    @c.constraint_validation_reflections.frozen?.must_equal true
+    @c.constraint_validation_reflections.values.all?(&:frozen?).must_equal true
+    @c.constraint_validation_reflections.values.all?{|r| r.all?(&:frozen?)}.must_equal true
+    @c.instance_variable_get(:@constraint_validation_options).frozen?.must_equal true
+    @c.instance_variable_get(:@constraint_validation_options).values.all?(&:frozen?).must_equal true
+  end
 end

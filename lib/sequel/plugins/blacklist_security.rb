@@ -23,6 +23,13 @@ module Sequel
   
         Plugins.inherited_instance_variables(self, :@restricted_columns=>:dup)
 
+        # Freeze restricted columns when freezing model class.
+        def freeze
+          @restricted_columns.freeze
+
+          super
+        end
+
         # Set the columns to restrict when using mass assignment (e.g. +set+).  Using this means that
         # attempts to call setter methods for the columns listed here will cause an
         # exception or be silently skipped (based on the +strict_param_setting+ setting).

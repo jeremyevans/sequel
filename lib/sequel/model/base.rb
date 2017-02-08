@@ -238,7 +238,7 @@ module Sequel
       
       # Clear the setter_methods cache
       def clear_setter_methods_cache
-        @setter_methods = nil
+        @setter_methods = nil unless frozen?
       end
   
       # Returns the columns in the result set in their original order.
@@ -249,7 +249,9 @@ module Sequel
       #   Artist.columns
       #   # => [:id, :name]
       def columns
-        @columns || set_columns(dataset.naked.columns)
+        return @columns if @columns
+        return nil if frozen?
+        set_columns(dataset.naked.columns)
       end
     
       # Creates instance using new with the given values and block, and saves it.
@@ -388,7 +390,9 @@ module Sequel
       #   # {:id=>{:type=>:integer, :primary_key=>true, ...},
       #   #  :name=>{:type=>:string, :primary_key=>false, ...}} 
       def db_schema
-        @db_schema ||= get_db_schema
+        return @db_schema if @db_schema
+        return nil if frozen?
+        @db_schema = get_db_schema
       end
   
       # Create a column alias, where the column methods have one name, but the underlying storage uses a
@@ -603,6 +607,31 @@ module Sequel
       # optimized handling of the single argument case.
       def first!(*args, &block)
         first(*args, &block) || raise(Sequel::NoMatchingRow.new(dataset))
+      end
+
+      # Freeze a model class, disallowing any further changes to it.
+      def freeze
+        dataset_module.freeze
+        overridable_methods_module.freeze
+
+        if @dataset
+          @dataset.freeze
+          @instance_dataset.freeze
+          db_schema.freeze.each_value(&:freeze)
+          columns.freeze
+          setter_methods.freeze
+        else
+          @setter_methods = [].freeze
+        end
+
+        @dataset_method_modules.freeze
+        @default_set_fields_options.freeze
+        @finders.freeze
+        @finder_loaders.freeze
+        @plugins.freeze
+        @allowed_columns.freeze if @allowed_columns
+
+        super
       end
 
       # Clear the setter_methods cache when a module is included, as it
@@ -856,14 +885,16 @@ module Sequel
           end
         end
         self.simple_pk = if key && !key.is_a?(Array)
-          (@dataset || db).literal(key)
+          (@dataset || db).literal(key).freeze
         end
         @primary_key = key
       end
   
       # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
       def setter_methods
-        @setter_methods ||= get_setter_methods
+        return @setter_methods if @setter_methods
+        raise if frozen?
+        @setter_methods = get_setter_methods
       end
 
       # Sets up a dataset method that returns a filtered dataset.
@@ -951,11 +982,11 @@ module Sequel
       def convert_input_dataset(ds)
         case ds
         when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, LiteralString
-          self.simple_table = db.literal(ds)
+          self.simple_table = db.literal(ds).freeze
           ds = db.from(ds)
         when Dataset
           self.simple_table = if ds.send(:simple_select_all?)
-            ds.literal(ds.first_source_table)
+            ds.literal(ds.first_source_table).freeze
           end
           @db = ds.db
         else

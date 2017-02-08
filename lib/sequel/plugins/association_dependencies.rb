@@ -73,6 +73,13 @@ module Sequel
           end
         end
 
+        # Freeze association dependencies when freezing model class.
+        def freeze
+          @association_dependencies.freeze.each_value(&:freeze)
+
+          super
+        end
+
         Plugins.inherited_instance_variables(self, :@association_dependencies=>:hash_dup)
       end
 

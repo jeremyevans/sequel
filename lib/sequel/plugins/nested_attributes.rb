@@ -85,6 +85,13 @@ module Sequel
         # call be overridden and call super to get the default behavior
         attr_accessor :nested_attributes_module
         
+        # Freeze nested_attributes_module when freezing model class.
+        def freeze
+          @nested_attributes_module.freeze if @nested_attributes_module
+
+          super
+        end
+
         # Allow nested attributes to be set for the given associations.  Options:
         # :destroy :: Allow destruction of nested records.
         # :fields :: If provided, should be an Array or proc. If it is an array,

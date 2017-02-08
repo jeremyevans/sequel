@@ -55,6 +55,15 @@ module Sequel
           @skip_input_transformer_columns[transformer_name] = []
         end
 
+        # Freeze input transformers when freezing model class
+        def freeze
+          @input_transformers.freeze
+          @input_transformer_order.freeze
+          @skip_input_transformer_columns.freeze.each_value(&:freeze)
+
+          super
+        end
+
         # Set columns that the transformer should skip.
         def skip_input_transformer(transformer_name, *columns)
           @skip_input_transformer_columns[transformer_name].concat(columns).uniq!

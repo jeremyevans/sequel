@@ -36,6 +36,12 @@ module Sequel
         
         Plugins.after_set_dataset(self, :set_default_values)
 
+        # Freeze default values when freezing model class
+        def freeze
+          @default_values.freeze
+          super
+        end
+
         private
 
         # Parse the cached database schema for this model and set the default values appropriately.

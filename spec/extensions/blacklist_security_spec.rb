@@ -85,4 +85,10 @@ describe Sequel::Model, ".restricted_columns " do
     i.values.must_equal(:y => 7)
     DB.sqls.must_equal ["INSERT INTO blahblah (y) VALUES (7)", "SELECT * FROM blahblah WHERE id = 10"]
   end
+
+  it "should freeze restricted_columns when freezing class" do
+    @c.set_restricted_columns :z
+    @c.freeze
+    @c.restricted_columns.frozen?.must_equal true
+  end
 end

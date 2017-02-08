@@ -30,6 +30,14 @@ module Sequel
         # The dataset to use to insert new rows.  For internal use only.
         attr_reader :instance_insert_dataset
 
+        # Freeze instance insert dataset when freezing model class.
+        def freeze
+          super
+
+          @instance_insert_dataset.freeze if @instance_insert_dataset
+          self
+        end
+
         private
 
         # When reseting the instance dataset, also reset the instance_insert_dataset.

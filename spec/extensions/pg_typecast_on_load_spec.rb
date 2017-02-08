@@ -60,4 +60,9 @@ describe Sequel::Model, "PgTypecastOnLoad plugin" do
   it "should not mark the object as modified" do
     @c.first.modified?.must_equal false
   end
+
+  it "should freeze pg_typecast_on_load_columns" do
+    @c.freeze
+    @c.pg_typecast_on_load_columns.frozen?.must_equal true
+  end
 end

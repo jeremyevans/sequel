@@ -177,5 +177,12 @@ describe "Sequel::Plugins::CsvSerializer" do
     @album.to_csv(:only=>:name).must_equal "RF\n"
     @album.to_csv(:except=>[:id, :artist_id]).must_equal "RF\n"
   end
+
+  it "should freeze csv serializier opts when model class is frozen" do
+    @Album.csv_serializer_opts[:only] = [:id]
+    @Album.freeze
+    @Album.csv_serializer_opts.frozen?.must_equal true
+    @Album.csv_serializer_opts[:only].frozen?.must_equal true
+  end
 end
 end

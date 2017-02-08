@@ -95,6 +95,15 @@ module Sequel
           end
         end
 
+        # Freeze csv serializier opts when freezing model class
+        def freeze
+          @csv_serializer_opts.freeze.each_value do |v|
+            v.freeze if v.is_a?(Array) || v.is_a?(Hash)
+          end
+
+          super
+        end
+
         # Attempt to parse a single instance from the given CSV string
         def from_csv(csv, opts = {})
           new.from_csv(csv, opts)

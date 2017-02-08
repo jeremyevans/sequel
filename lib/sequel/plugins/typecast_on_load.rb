@@ -44,6 +44,13 @@ module Sequel
           super.load_typecast
         end
 
+        # Freeze typecast on load columns when freezing model class.
+        def freeze
+          @typecast_on_load_columns.freeze
+
+          super
+        end
+
         Plugins.inherited_instance_variables(self, :@typecast_on_load_columns=>:dup)
       end
 

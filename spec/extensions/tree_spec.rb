@@ -274,5 +274,11 @@ describe Sequel::Model, "tree plugin with composite keys" do
       @c.dataset = @c.dataset.with_fetch(:id=>1, :id2=>6, :parent_id=>nil, :parent_id2=>2, :name=>'r')
       @c.root.update(:name => 'fdsa') 
     end
+
+    it "freezes tree_order if it is an array" do
+      @c.tree_order = [:id]
+      @c.freeze
+      @c.tree_order.frozen?.must_equal true
+    end
   end
 end

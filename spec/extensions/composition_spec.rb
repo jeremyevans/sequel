@@ -241,4 +241,12 @@ describe "Composition plugin" do
     sql.must_include("month = 2")
     sql.must_include("day = 3")
   end
+
+  it "should freeze composition metadata when freezing model class" do
+    @c.composition :date, :mapping=>[:year, :month, :day]
+    @c.freeze
+    @c.compositions.frozen?.must_equal true
+    @c.compositions[:date].frozen?.must_equal true
+    @c.composition_module.frozen?.must_equal true
+  end
 end

@@ -12,6 +12,16 @@ describe Sequel::Model, "hook_class_methods plugin" do
     DB.reset
   end
   
+  it "should freeze hooks when freezing model class" do
+    c = model_class.call Sequel::Model do
+      before_save{adds << 'hi'}
+    end
+    c.freeze
+    hooks = c.instance_variable_get(:@hooks)
+    hooks.frozen?.must_equal true
+    hooks.values.all?(&:frozen?).must_equal true
+  end
+
   it "should be definable using a block" do
     adds = []
     c = model_class.call Sequel::Model do

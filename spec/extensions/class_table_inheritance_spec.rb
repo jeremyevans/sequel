@@ -51,6 +51,15 @@ describe "class_table_inheritance plugin" do
     Object.send(:remove_const, :Employee)
   end
 
+  it "should freeze CTI information when freezing model class" do
+    Employee.freeze
+    Employee.cti_models.frozen?.must_equal true
+    Employee.cti_tables.frozen?.must_equal true
+    Employee.cti_instance_dataset.frozen?.must_equal true
+    Employee.cti_table_columns.frozen?.must_equal true
+    Employee.cti_table_map.frozen?.must_equal true
+  end
+
   it "should not attempt to use prepared statements" do
     Manager.plugin :prepared_statements
     Manager[1]

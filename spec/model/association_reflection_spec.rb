@@ -563,3 +563,41 @@ describe Sequel::Model::Associations::AssociationReflection, "with default assoc
     r[:bar].must_equal 2
   end
 end
+
+describe "Sequel::Model.freeze" do
+  it "should freeze the model class and not allow any changes to associations" do
+    model = Class.new(Sequel::Model(:items))
+    model.many_to_one :foo, :class=>model, :key=>:id
+    model.default_association_options = {:read_only=>true}
+    model.freeze
+
+    model.association_reflections.frozen?.must_equal true
+    model.association_reflection(:foo).frozen?.must_equal true
+    model.autoreloading_associations.frozen?.must_equal true
+    model.autoreloading_associations[:id].frozen?.must_equal true
+    model.default_association_options.frozen?.must_equal true
+  end
+
+  it "should allow subclasses of frozen model classes to modify associations" do
+    model = Class.new(Sequel::Model(:items))
+    model.many_to_one :foo, :class=>model, :key=>:id
+    model.freeze
+    model = Class.new(model)
+    model.dataset = :items2
+
+    model.association_reflection(:foo).frozen?.must_equal true
+    model.autoreloading_associations.frozen?.must_equal false
+    model.autoreloading_associations[:id].frozen?.must_equal false
+
+    model.many_to_one :bar, :class=>model, :key=>:id
+    model.many_to_one :foo, :class=>model, :key=>:id
+    model.association_reflections.frozen?.must_equal false
+    model.association_reflection(:foo).frozen?.must_equal false
+    model.association_reflection(:bar).frozen?.must_equal false
+
+    model.default_association_options.frozen?.wont_equal true
+    model.default_association_options = {:read_only=>true}
+    model.default_association_options.frozen?.wont_equal true
+  end
+end
+

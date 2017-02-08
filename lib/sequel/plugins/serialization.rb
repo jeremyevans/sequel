@@ -125,6 +125,15 @@ module Sequel
         attr_accessor :serialization_module
 
         Plugins.inherited_instance_variables(self, :@deserialization_map=>:dup, :@serialization_map=>:dup)
+
+        # Freeze serialization metadata when freezing model class.
+        def freeze
+          @deserialization_map.freeze
+          @serialization_map.freeze
+          @serialization_module.freeze if @serialization_module
+
+          super
+        end
         
         # Create instance level reader that deserializes column values on request,
         # and instance level writer that stores new deserialized values.

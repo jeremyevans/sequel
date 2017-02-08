@@ -180,6 +180,63 @@ describe "Sequel::Model()" do
   end
 end
 
+describe "Sequel::Model.freeze" do
+  it "should freeze the model class and not allow any changes" do
+    model = Class.new(Sequel::Model(:items))
+    model.set_allowed_columns [:id]
+    model.freeze
+
+    model.frozen?.must_equal true
+    model.dataset.frozen?.must_equal true
+    model.db_schema.frozen?.must_equal true
+    model.db_schema[:id].frozen?.must_equal true
+    model.columns.frozen?.must_equal true
+    model.setter_methods.frozen?.must_equal true
+    model.send(:overridable_methods_module).frozen?.must_equal true
+    model.default_set_fields_options.frozen?.must_equal true
+
+    proc{model.dataset_module{}}.must_raise RuntimeError, TypeError
+    proc{model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}}.must_raise RuntimeError, TypeError
+  end
+
+  it "should freeze a model class without a dataset without breaking" do
+    model = Class.new(Sequel::Model)
+    model.freeze
+    model.frozen?.must_equal true
+    proc{model.dataset}.must_raise Sequel::Error
+    model.db_schema.must_be_nil
+    model.columns.must_be_nil
+    model.setter_methods.must_equal []
+    model.send(:overridable_methods_module).frozen?.must_equal true
+    model.default_set_fields_options.frozen?.must_equal true
+
+    proc{model.dataset_module{}}.must_raise RuntimeError, TypeError
+    proc{model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}}.must_raise RuntimeError, TypeError
+  end
+
+  it "should allow subclasses of frozen model classes to work correctly" do
+    model = Class.new(Sequel::Model(:items))
+    model.freeze
+    model = Class.new(model)
+    model.dataset = :items2
+
+    model.dataset_module{}
+    model.plugin Module.new
+    model.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
+    model.first_by_name('a').values.must_equal(:id=>1, :x=>1)
+    model.dataset.frozen?.must_equal false
+
+    model.frozen?.must_equal false
+    model.dataset.frozen?.must_equal false
+    model.db_schema.frozen?.must_equal false
+    model.db_schema[:id].frozen?.must_equal false
+    model.setter_methods.frozen?.must_equal false
+    model.dataset_module{}.frozen?.must_equal false
+    model.send(:overridable_methods_module).frozen?.must_equal false
+    model.default_set_fields_options.frozen?.must_equal false
+  end
+end
+
 describe Sequel::Model do
   it "should have class method aliased as model" do
     Sequel::Model.instance_methods.collect{|x| x.to_s}.must_include("model")

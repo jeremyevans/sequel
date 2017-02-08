@@ -55,4 +55,10 @@ describe "column_conflicts plugin" do
     o.get_column_value(:object_id).must_equal 3
     o.object_id.wont_equal 3
   end
+
+  it "should freeze column conflict information when freezing model class" do
+    @c.freeze
+    @c.get_column_conflicts.frozen?.must_equal true
+    @c.set_column_conflicts.frozen?.must_equal true
+  end
 end
