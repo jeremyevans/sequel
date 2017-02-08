@@ -21,6 +21,8 @@ module Sequel
         # this setting, such as the primary key column and columns in Model::RESTRICTED_SETTER_METHODS.
         attr_reader :restricted_columns
   
+        Plugins.inherited_instance_variables(self, :@restricted_columns=>:dup)
+
         # Set the columns to restrict when using mass assignment (e.g. +set+).  Using this means that
         # attempts to call setter methods for the columns listed here will cause an
         # exception or be silently skipped (based on the +strict_param_setting+ setting).
