@@ -18,7 +18,6 @@ matrix:
   allow_failures:
     - rvm: jruby-head
     - rvm: ruby-head
-    - rvm: jruby-9.1.7.0
     - rvm: jruby-18mode
     - rvm: jruby-19mode
 script: bundle exec rake spec_travis
