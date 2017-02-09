@@ -50,6 +50,19 @@ describe Sequel::Model, "Subclasses plugin" do
     sssc1.descendents.must_equal []
   end
 
+  it "#freeze_descendents should finalize the associations for all descendents" do
+    sc1 = Class.new(@c)
+    sc1.set_dataset :bars
+    sc1.set_primary_key :foo
+    sc2 = Class.new(@c)
+    sc2.set_dataset :bazs
+    sc2.many_to_one :bar, :class=>sc1
+    @c.freeze_descendents
+    sc1.frozen?.must_equal true
+    sc2.frozen?.must_equal true
+    sc2.association_reflection(:bar)[:primary_key].must_equal :foo
+  end
+
   it "plugin block should be called with each subclass created" do
     c = Class.new(Sequel::Model)
     a = []

@@ -1,5 +1,7 @@
 === master
 
+* Add Model.freeze_descendents to subclasses plugin, for easier finalizing associations/freezing of descendent classes (jeremyevans)
+
 * Add Model.finalize_associations method for finalizing associations, speeding up some association reflections methods almost 10x (jeremyevans)
 
 * Implement Model.freeze such that it can be used in production (jeremyevans)
