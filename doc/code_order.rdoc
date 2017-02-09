@@ -83,6 +83,21 @@ unless the model classes are very simple.  Example:
 
   Dir['./models/*.rb'].each{|f| require f}
 
+== Finalize Associations and Freeze Model Classes and Database
+
+After all the models have been setup, you can finalize the associations.
+This can speed up association reflection methods by doing a lookup in
+advance to find the associated class, and cache related association
+information in the association itself.
+
+Additionally, in production and testing, you should freeze the
+model classes and Database instance, so that you can detect
+unsafe runtime modification of the configuration:
+
+  model_classes.each(&:finalize_associations)
+  model_classes.each(&:freeze)
+  DB.freeze
+
 == Disconnect If Using Forking Webserver with Code Preloading
 
 If you are using a forking webserver such as unicorn or passenger, with

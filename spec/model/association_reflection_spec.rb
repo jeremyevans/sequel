@@ -601,3 +601,118 @@ describe "Sequel::Model.freeze" do
   end
 end
 
+describe "Sequel::Model.finalize_associations" do
+  before do
+    class ::MtmItem < Sequel::Model
+      set_primary_key :mtm_id
+      many_to_many :items
+      many_to_one :item
+    end
+    class ::OtoItem < Sequel::Model
+      set_primary_key :oto_id
+    end
+    class ::Item < Sequel::Model
+      many_to_one :item
+      one_to_many :items, :limit=>10
+      one_to_one :mtm_item
+      many_to_many :mtm_items
+      one_through_one :oto_item
+    end
+    [MtmItem, OtoItem, Item].each(&:finalize_associations)
+  end
+  after do
+    Object.send(:remove_const, :Item)
+    Object.send(:remove_const, :MtmItem)
+    Object.send(:remove_const, :OtoItem)
+  end
+
+  it "should finalize many_to_one associations" do
+    r = Item.association_reflection(:item)
+    r[:class].must_equal Item
+    r[:_dataset].sql.must_equal "SELECT * FROM items LIMIT 1"
+    r[:associated_eager_dataset].sql.must_equal "SELECT * FROM items"
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT items.id FROM items WHERE (items.id IS NOT NULL)"
+    r[:placeholder_loader].wont_be_nil
+    r[:predicate_key].must_equal Sequel.qualify(:items, :id)
+    r[:primary_key].must_equal :id
+    r[:primary_keys].must_equal [:id]
+    r[:primary_key_method].must_equal :id
+    r[:primary_key_methods].must_equal [:id]
+    r[:qualified_primary_key].must_equal Sequel.qualify(:items, :id)
+    r.fetch(:reciprocal_type).must_equal :one_to_many
+    r.fetch(:reciprocal).must_equal :items
+  end
+
+  it "should finalize one_to_many associations" do
+    r = Item.association_reflection(:items)
+    r[:class].must_equal Item
+    r[:_dataset].sql.must_equal "SELECT * FROM items LIMIT 10"
+    r[:associated_eager_dataset].sql.must_equal "SELECT * FROM items"
+    r[:_eager_limit_strategy].must_equal :union
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT items.item_id FROM items WHERE ((items.item_id IS NOT NULL) AND (items.id IN (SELECT t1.id FROM items AS t1 WHERE (t1.item_id = items.item_id) LIMIT 10)))"
+    r[:placeholder_loader].wont_be_nil
+    r[:predicate_key].must_equal Sequel.qualify(:items, :item_id)
+    r[:predicate_keys].must_equal [Sequel.qualify(:items, :item_id)]
+    r[:qualified_primary_key].must_equal Sequel.qualify(:items, :id)
+    r.fetch(:reciprocal).must_equal :item
+  end
+
+  it "should finalize one_to_one associations" do
+    r = Item.association_reflection(:mtm_item)
+    r[:class].must_equal MtmItem
+    r[:_dataset].sql.must_equal "SELECT * FROM mtm_items LIMIT 1"
+    r[:associated_eager_dataset].sql.must_equal "SELECT * FROM mtm_items"
+    r[:_eager_limit_strategy].must_be_nil
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT mtm_items.item_id FROM mtm_items WHERE (mtm_items.item_id IS NOT NULL)"
+    r[:placeholder_loader].wont_be_nil
+    r[:predicate_key].must_equal Sequel.qualify(:mtm_items, :item_id)
+    r[:predicate_keys].must_equal [Sequel.qualify(:mtm_items, :item_id)]
+    r[:qualified_primary_key].must_equal Sequel.qualify(:items, :id)
+    r.fetch(:reciprocal).must_equal :item
+  end
+
+  it "should finalize many_to_many associations" do
+    r = Item.association_reflection(:mtm_items)
+    r[:class].must_equal MtmItem
+    r[:_dataset].sql.must_equal "SELECT mtm_items.* FROM mtm_items INNER JOIN items_mtm_items ON (items_mtm_items.mtm_item_id = mtm_items.mtm_id)"
+    r[:associated_eager_dataset].sql.must_equal "SELECT mtm_items.* FROM mtm_items INNER JOIN items_mtm_items ON (items_mtm_items.mtm_item_id = mtm_items.mtm_id)"
+    r[:_eager_limit_strategy].must_be_nil
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT items_mtm_items.item_id FROM mtm_items INNER JOIN items_mtm_items ON (items_mtm_items.mtm_item_id = mtm_items.mtm_id) WHERE (items_mtm_items.item_id IS NOT NULL)"
+    r[:placeholder_loader].wont_be_nil
+    r[:predicate_key].must_equal Sequel.qualify(:items_mtm_items, :item_id)
+    r[:predicate_keys].must_equal [Sequel.qualify(:items_mtm_items, :item_id)]
+    r.fetch(:reciprocal).must_equal :items
+    r[:associated_key_array].must_equal [Sequel.qualify(:items_mtm_items, :item_id).as(:x_foreign_key_x)]
+    r[:qualified_right_key].must_equal Sequel.qualify(:items_mtm_items, :mtm_item_id)
+    r[:join_table_source].must_equal :items_mtm_items
+    r[:join_table_alias].must_equal :items_mtm_items
+    r[:qualified_right_primary_key].must_equal Sequel.qualify(:mtm_items, :mtm_id)
+    r[:right_primary_key].must_equal :mtm_id
+    r[:right_primary_keys].must_equal [:mtm_id]
+    r[:right_primary_key_method].must_equal :mtm_id
+    r[:right_primary_key_methods].must_equal [:mtm_id]
+    r[:select].must_equal Sequel::SQL::ColumnAll.new(:mtm_items)
+  end
+
+  it "should finalize one_through_one associations" do
+    r = Item.association_reflection(:oto_item)
+    r[:class].must_equal OtoItem
+    r[:_dataset].sql.must_equal "SELECT oto_items.* FROM oto_items INNER JOIN items_oto_items ON (items_oto_items.oto_item_id = oto_items.oto_id) LIMIT 1"
+    r[:associated_eager_dataset].sql.must_equal "SELECT oto_items.* FROM oto_items INNER JOIN items_oto_items ON (items_oto_items.oto_item_id = oto_items.oto_id)"
+    r[:_eager_limit_strategy].must_be_nil
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT items_oto_items.item_id FROM oto_items INNER JOIN items_oto_items ON (items_oto_items.oto_item_id = oto_items.oto_id) WHERE (items_oto_items.item_id IS NOT NULL)"
+    r[:placeholder_loader].wont_be_nil
+    r[:predicate_key].must_equal Sequel.qualify(:items_oto_items, :item_id)
+    r[:predicate_keys].must_equal [Sequel.qualify(:items_oto_items, :item_id)]
+    r[:associated_key_array].must_equal [Sequel.qualify(:items_oto_items, :item_id).as(:x_foreign_key_x)]
+    r[:qualified_right_key].must_equal Sequel.qualify(:items_oto_items, :oto_item_id)
+    r[:join_table_source].must_equal :items_oto_items
+    r[:join_table_alias].must_equal :items_oto_items
+    r[:qualified_right_primary_key].must_equal Sequel.qualify(:oto_items, :oto_id)
+    r[:right_primary_key].must_equal :oto_id
+    r[:right_primary_keys].must_equal [:oto_id]
+    r[:right_primary_key_method].must_equal :oto_id
+    r[:right_primary_key_methods].must_equal [:oto_id]
+    r[:select].must_equal Sequel::SQL::ColumnAll.new(:oto_items)
+  end
+end

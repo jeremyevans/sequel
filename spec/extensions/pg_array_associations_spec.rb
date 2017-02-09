@@ -735,3 +735,49 @@ describe Sequel::Model, "pg_array_associations" do
     t.artists.must_equal [a]
   end
 end
+
+describe "Sequel::Model.finalize_associations" do
+  before do
+    class ::Foo < Sequel::Model
+      plugin :pg_array_associations
+      many_to_pg_array :items
+    end
+    class ::Item < Sequel::Model
+      plugin :pg_array_associations
+      pg_array_to_many :foos
+    end
+    [Foo, Item].each(&:finalize_associations)
+  end
+  after do
+    Object.send(:remove_const, :Item)
+    Object.send(:remove_const, :Foo)
+  end
+
+  it "should finalize pg_array_to_many associations" do
+    r = Item.association_reflection(:foos)
+    r[:class].must_equal Foo
+    r[:_dataset].sql.must_equal "SELECT * FROM foos"
+    r[:associated_eager_dataset].sql.must_equal "SELECT * FROM foos"
+    r.fetch(:_eager_limit_strategy).must_be_nil
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT array_agg(foos.id) FROM foos WHERE (foos.id IS NOT NULL)"
+    r[:predicate_key].must_equal Sequel.qualify(:foos, :id)
+    r[:predicate_keys].must_equal [Sequel.qualify(:foos, :id)]
+    r[:reciprocal].must_equal :items
+    r[:array_type].must_equal :integer
+    r[:primary_key].must_equal :id
+    r[:primary_key_method].must_equal :id
+  end
+
+  it "should finalize many_to_pg_array associations" do
+    r = Foo.association_reflection(:items)
+    r[:class].must_equal Item
+    r[:_dataset].sql.must_equal "SELECT * FROM items"
+    r[:associated_eager_dataset].sql.must_equal  "SELECT * FROM items"
+    r.fetch(:_eager_limit_strategy).must_be_nil
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT unnest(items.foo_ids) FROM items WHERE (items.foo_ids IS NOT NULL)"
+    r[:predicate_key].must_equal Sequel.qualify(:items, :foo_ids)
+    r[:predicate_keys].must_equal [Sequel.qualify(:items, :foo_ids)]
+    r[:reciprocal].must_equal :foos
+    r[:array_type].must_equal :integer
+  end
+end

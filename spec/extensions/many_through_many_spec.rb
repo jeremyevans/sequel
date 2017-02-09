@@ -2115,3 +2115,47 @@ describe "one_through_many eager loading methods" do
     @c1.order(:artists__blah2, :artists__blah3).eager_graph(:tag).sql.must_equal 'SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tag.blah__id, tag.blah__id DESC, blah.id DESC, blah.id, tag.album_id, tag.album_id DESC, 1, RANDOM(), b.a'
   end
 end
+
+describe "Sequel::Model.finalize_associations" do
+  before do
+    class ::Item < Sequel::Model
+      plugin :many_through_many
+      many_through_many :items, [[:foos, :item1_id, :foo1_id], [:bars, :foo2_id, :item2_id]]
+      one_through_many :item, [[:foos, :item1_id, :foo1_id], [:bars, :foo2_id, :item2_id]]
+      finalize_associations
+    end
+  end
+  after do
+    Object.send(:remove_const, :Item)
+  end
+
+  it "should finalize one_through_many associations" do
+    r = Item.association_reflection(:item)
+    r[:class].must_equal Item
+    r[:_dataset].sql.must_equal "SELECT items.* FROM items INNER JOIN bars ON (bars.item2_id = items.id) INNER JOIN foos ON (foos.foo1_id = bars.foo2_id) LIMIT 1"
+    r[:associated_eager_dataset].sql.must_equal "SELECT items.* FROM items INNER JOIN bars ON (bars.item2_id = items.id) INNER JOIN foos ON (foos.foo1_id = bars.foo2_id)"
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT foos.item1_id FROM items INNER JOIN bars ON (bars.item2_id = items.id) INNER JOIN foos ON (foos.foo1_id = bars.foo2_id) WHERE (foos.item1_id IS NOT NULL)"
+    r[:placeholder_loader].wont_be_nil
+    r[:predicate_key].must_equal Sequel.qualify(:foos, :item1_id)
+    r[:associated_key_table].must_equal :foos
+    r[:edges].must_equal [{:table=>:foos, :left=>:id, :right=>:item1_id, :conditions=>[], :join_type=>:left_outer, :block=>nil}, {:table=>:bars, :left=>:foo1_id, :right=>:foo2_id, :conditions=>[], :join_type=>:left_outer, :block=>nil}]
+    r[:final_edge].must_equal(:table=>:items, :left=>:item2_id, :right=>:id, :conditions=>nil, :join_type=>nil, :block=>nil)
+    r[:final_reverse_edge].must_equal(:table=>:foos, :left=>:foo1_id, :right=>:foo2_id, :alias=>:foos)
+    r[:reverse_edges].must_equal [{:table=>:bars, :left=>:item2_id, :right=>:id, :alias=>:bars}]
+  end
+
+  it "should finalize many_through_many associations" do
+    r = Item.association_reflection(:items)
+    r[:class].must_equal Item
+    r[:_dataset].sql.must_equal "SELECT items.* FROM items INNER JOIN bars ON (bars.item2_id = items.id) INNER JOIN foos ON (foos.foo1_id = bars.foo2_id)"
+    r[:associated_eager_dataset].sql.must_equal "SELECT items.* FROM items INNER JOIN bars ON (bars.item2_id = items.id) INNER JOIN foos ON (foos.foo1_id = bars.foo2_id)"
+    r[:filter_by_associations_conditions_dataset].sql.must_equal "SELECT foos.item1_id FROM items INNER JOIN bars ON (bars.item2_id = items.id) INNER JOIN foos ON (foos.foo1_id = bars.foo2_id) WHERE (foos.item1_id IS NOT NULL)"
+    r[:placeholder_loader].wont_be_nil
+    r[:predicate_key].must_equal Sequel.qualify(:foos, :item1_id)
+    r[:associated_key_table].must_equal :foos
+    r[:edges].must_equal [{:table=>:foos, :left=>:id, :right=>:item1_id, :conditions=>[], :join_type=>:left_outer, :block=>nil}, {:table=>:bars, :left=>:foo1_id, :right=>:foo2_id, :conditions=>[], :join_type=>:left_outer, :block=>nil}]
+    r[:final_edge].must_equal(:table=>:items, :left=>:item2_id, :right=>:id, :conditions=>nil, :join_type=>nil, :block=>nil)
+    r[:final_reverse_edge].must_equal(:table=>:foos, :left=>:foo1_id, :right=>:foo2_id, :alias=>:foos)
+    r[:reverse_edges].must_equal [{:table=>:bars, :left=>:item2_id, :right=>:id, :alias=>:bars}]
+  end
+end

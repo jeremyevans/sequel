@@ -102,6 +102,17 @@ module Sequel
           END
         end
 
+        FINALIZE_SETTINGS = superclass::FINALIZE_SETTINGS.merge(
+          :associated_key_table=>:associated_key_table,
+          :edges=>:edges,
+          :final_edge=>:final_edge,
+          :final_reverse_edge=>:final_reverse_edge,
+          :reverse_edges=>:reverse_edges
+        ).freeze
+        def finalize_settings
+          FINALIZE_SETTINGS
+        end
+
         # The alias for the first join table.
         def join_table_alias
           final_reverse_edge[:alias]

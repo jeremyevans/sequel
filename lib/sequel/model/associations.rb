@@ -7,7 +7,7 @@ module Sequel
     module Associations
       # Map of association type symbols to association reflection classes.
       ASSOCIATION_TYPES = {}
-    
+
       # Set an empty association reflection hash in the model
       def self.apply(model)
         model.instance_eval do
@@ -23,7 +23,7 @@ module Sequel
       # be instantiated by the user.
       class AssociationReflection < Hash
         include Sequel::Inflections
-    
+
         # Name symbol for the _add internal association method
         def _add_method
           :"_add_#{singularize(self[:name])}"
@@ -339,6 +339,38 @@ module Sequel
           {filter_by_associations_conditions_key=>ds}
         end
 
+        # Finalize the association by first attempting to populate the thread-safe cache,
+        # and then transfering the thread-safe cache value to the association itself,
+        # so that a mutex is not needed to get the value.
+        def finalize
+          return unless cache = self[:cache]
+
+          finalize_settings.each do |meth, key|
+            next if has_key?(key)
+
+            send(meth)
+            self[key] = cache.delete(key) if cache.has_key?(key)
+          end
+
+          nil
+        end
+
+        # Map of methods to cache keys used for finalizing associations.
+        FINALIZE_SETTINGS = {
+          :associated_class=>:class,
+          :associated_dataset=>:_dataset,
+          :associated_eager_dataset=>:associated_eager_dataset,
+          :eager_limit_strategy=>:_eager_limit_strategy,
+          :filter_by_associations_conditions_dataset=>:filter_by_associations_conditions_dataset,
+          :placeholder_loader=>:placeholder_loader,
+          :predicate_key=>:predicate_key,
+          :predicate_keys=>:predicate_keys,
+          :reciprocal=>:reciprocal,
+        }.freeze
+        def finalize_settings
+          FINALIZE_SETTINGS
+        end
+    
         # Whether to handle silent modification failure when adding/removing
         # associated records, false by default.
         def handle_silent_modification_failure?
@@ -782,6 +814,18 @@ module Sequel
           nil
         end
 
+        FINALIZE_SETTINGS = superclass::FINALIZE_SETTINGS.merge(
+          :primary_key=>:primary_key,
+          :primary_keys=>:primary_keys,
+          :primary_key_method=>:primary_key_method,
+          :primary_key_methods=>:primary_key_methods,
+          :qualified_primary_key=>:qualified_primary_key,
+          :reciprocal_type=>:reciprocal_type
+        ).freeze
+        def finalize_settings
+          FINALIZE_SETTINGS
+        end
+
         # The expression to use on the left hand side of the IN lookup when eager loading
         def predicate_key
           cached_fetch(:predicate_key){qualified_primary_key}
@@ -924,6 +968,13 @@ module Sequel
         # current table's primary key.
         def default_key
           :"#{underscore(demodulize(self[:model].name))}_id"
+        end
+
+        FINALIZE_SETTINGS = superclass::FINALIZE_SETTINGS.merge(
+          :qualified_primary_key=>:qualified_primary_key
+        ).freeze
+        def finalize_settings
+          FINALIZE_SETTINGS
         end
 
         # Handle silent failure of add/remove methods if raise_on_save_failure is false.
@@ -1196,6 +1247,22 @@ module Sequel
           :"#{singularize(self[:name])}_id"
         end
       
+        FINALIZE_SETTINGS = superclass::FINALIZE_SETTINGS.merge(
+          :associated_key_array=>:associated_key_array,
+          :qualified_right_key=>:qualified_right_key,
+          :join_table_source=>:join_table_source,
+          :join_table_alias=>:join_table_alias,
+          :qualified_right_primary_key=>:qualified_right_primary_key,
+          :right_primary_key=>:right_primary_key,
+          :right_primary_keys=>:right_primary_keys,
+          :right_primary_key_method=>:right_primary_key_method,
+          :right_primary_key_methods=>:right_primary_key_methods,
+          :select=>:select
+        ).freeze
+        def finalize_settings
+          FINALIZE_SETTINGS
+        end
+
         # The hash key to use for the eager loading predicate (left side of IN (1, 2, 3)).
         # The left key qualified by the join table.
         def predicate_key
@@ -1744,6 +1811,14 @@ module Sequel
           @default_association_options.freeze
 
           super
+        end
+
+        # Finalize all associations such that values that are looked up
+        # dynamically in associated classes are set statically.
+        # As this modifies the associations, it must be done before
+        # calling freeze.
+        def finalize_associations
+          @association_reflections.each_value(&:finalize)
         end
 
         # Shortcut for adding a many_to_many association, see #associate

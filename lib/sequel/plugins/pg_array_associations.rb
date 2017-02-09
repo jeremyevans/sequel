@@ -122,6 +122,13 @@ module Sequel
           nil
         end
 
+        FINALIZE_SETTINGS = superclass::FINALIZE_SETTINGS.merge(
+          :array_type=>:array_type
+        ).freeze
+        def finalize_settings
+          FINALIZE_SETTINGS
+        end
+
         # Handle silent failure of add/remove methods if raise_on_save_failure is false.
         def handle_silent_modification_failure?
           self[:raise_on_save_failure] == false
@@ -227,6 +234,15 @@ module Sequel
         # Don't use a filter by associations limit strategy
         def filter_by_associations_limit_strategy
           nil
+        end
+
+        FINALIZE_SETTINGS = superclass::FINALIZE_SETTINGS.merge(
+          :array_type=>:array_type,
+          :primary_key=>:primary_key,
+          :primary_key_method=>:primary_key_method
+        ).freeze
+        def finalize_settings
+          FINALIZE_SETTINGS
         end
 
         # Handle silent failure of add/remove methods if raise_on_save_failure is false
