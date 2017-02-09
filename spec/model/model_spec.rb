@@ -184,7 +184,9 @@ describe "Sequel::Model.freeze" do
   it "should freeze the model class and not allow any changes" do
     model = Class.new(Sequel::Model(:items))
     model.set_allowed_columns [:id]
+    model.finder(:name=>:f_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
     model.freeze
+    model.f_by_name(1)
 
     model.frozen?.must_equal true
     model.dataset.frozen?.must_equal true

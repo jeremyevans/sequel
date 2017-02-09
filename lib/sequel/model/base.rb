@@ -583,7 +583,7 @@ module Sequel
           end
         end
 
-        Sequel.synchronize{@finder_loaders[meth_name] = loader_proc}
+        @finder_loaders[meth_name] = loader_proc
         mod = opts[:mod] || (class << self; self; end)
         if prepare
           def_prepare_method(mod, meth_name)
@@ -614,12 +614,15 @@ module Sequel
         dataset_module.freeze
         overridable_methods_module.freeze
 
+        @finder_loaders.freeze
+
         if @dataset
           @dataset.freeze
           @instance_dataset.freeze
           db_schema.freeze.each_value(&:freeze)
           columns.freeze
           setter_methods.freeze
+          @finder_loaders.each_key{|k| finder_for(k)}
         else
           @setter_methods = [].freeze
         end
@@ -627,7 +630,6 @@ module Sequel
         @dataset_method_modules.freeze
         @default_set_fields_options.freeze
         @finders.freeze
-        @finder_loaders.freeze
         @plugins.freeze
         @allowed_columns.freeze if @allowed_columns
 
@@ -1059,7 +1061,7 @@ module Sequel
       # for the method, load the finder and set correctly in the finders hash, then
       # return the finder.
       def finder_for(meth)
-        unless finder = Sequel.synchronize{@finders[meth]}
+        unless finder = (frozen? ? @finders[meth] : Sequel.synchronize{@finders[meth]})
           finder_loader = @finder_loaders.fetch(meth)
           finder = finder_loader.call(self)
           Sequel.synchronize{@finders[meth] = finder}
@@ -1250,7 +1252,7 @@ module Sequel
       # Reset the instance dataset to a modified copy of the current dataset,
       # should be used whenever the model's dataset is modified.
       def reset_instance_dataset
-        @finders.clear if @finders
+        Sequel.synchronize{@finders.clear if @finders}
         @instance_dataset = @dataset.limit(1).naked if @dataset
       end
   
