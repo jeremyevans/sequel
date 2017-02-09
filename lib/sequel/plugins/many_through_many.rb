@@ -81,7 +81,7 @@ module Sequel
     module ManyThroughMany
       # The AssociationReflection subclass for many_through_many associations.
       class ManyThroughManyAssociationReflection < Sequel::Model::Associations::ManyToManyAssociationReflection
-        Sequel::Model::Associations::ASSOCIATION_TYPES[:many_through_many] = self
+        Sequel.synchronize{Sequel::Model::Associations::ASSOCIATION_TYPES[:many_through_many] = self}
 
         # many_through_many and one_through_many associations can be clones
         def cloneable?(ref)
@@ -192,7 +192,7 @@ module Sequel
       end
 
       class OneThroughManyAssociationReflection < ManyThroughManyAssociationReflection
-        Sequel::Model::Associations::ASSOCIATION_TYPES[:one_through_many] = self
+        Sequel.synchronize{Sequel::Model::Associations::ASSOCIATION_TYPES[:one_through_many] = self}
         include Sequel::Model::Associations::SingularAssociationReflection
       end
 

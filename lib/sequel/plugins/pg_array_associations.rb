@@ -75,7 +75,7 @@ module Sequel
     module PgArrayAssociations
       # The AssociationReflection subclass for many_to_pg_array associations.
       class ManyToPgArrayAssociationReflection < Sequel::Model::Associations::AssociationReflection
-        Sequel::Model::Associations::ASSOCIATION_TYPES[:many_to_pg_array] = self
+        Sequel.synchronize{Sequel::Model::Associations::ASSOCIATION_TYPES[:many_to_pg_array] = self}
 
         def array_type
           cached_fetch(:array_type) do
@@ -184,7 +184,7 @@ module Sequel
 
       # The AssociationReflection subclass for pg_array_to_many associations.
       class PgArrayToManyAssociationReflection < Sequel::Model::Associations::AssociationReflection
-        Sequel::Model::Associations::ASSOCIATION_TYPES[:pg_array_to_many] = self
+        Sequel.synchronize{Sequel::Model::Associations::ASSOCIATION_TYPES[:pg_array_to_many] = self}
 
         def array_type
           cached_fetch(:array_type) do

@@ -1735,7 +1735,7 @@ module Sequel
         #                              Defaults to :right_primary_key option.
         # :uniq :: Adds a after_load callback that makes the array of objects unique.
         def associate(type, name, opts = OPTS, &block)
-          raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
+          raise(Error, 'invalid association type') unless assoc_class = Sequel.synchronize{ASSOCIATION_TYPES[type]}
           raise(Error, 'Model.associate name argument must be a symbol') unless name.is_a?(Symbol)
 
           # dup early so we don't modify opts
