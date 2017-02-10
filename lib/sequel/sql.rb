@@ -2009,6 +2009,11 @@ module Sequel
     include SQL::InequalityMethods
     include SQL::AliasMethods
     include SQL::CastMethods
+
+    # Show that the current string is a literal string in addition to the output.
+    def inspect
+      "#<#{self.class} #{super}>"
+    end
       
     # Return self if no args are given, otherwise return a SQL::PlaceholderLiteralString
     # with the current string and the given args.

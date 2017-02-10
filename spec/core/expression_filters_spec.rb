@@ -248,6 +248,10 @@ describe "Blockless Ruby Filters" do
     @d.l(~((((Sequel.lit('x') - :y)/(Sequel.expr(:x) + :y))*:z) <= 100)).must_equal '((((x - y) / (x + y)) * z) > 100)'
   end
 
+  it "should have LiteralString#inspect show it is a literal string" do
+    Sequel.lit('x').inspect.must_equal "#<Sequel::LiteralString \"x\">"
+  end
+
   it "should support hashes by ANDing the conditions" do
     @d.l(:x => 100, :y => 'a')[1...-1].split(' AND ').sort.must_equal ['(x = 100)', '(y = \'a\')']
     @d.l(:x => true, :y => false)[1...-1].split(' AND ').sort.must_equal ['(x IS TRUE)', '(y IS FALSE)']

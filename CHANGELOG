@@ -1,5 +1,7 @@
 === master
 
+* Make LiteralString#inspect show that it is a literal string (jeremyevans)
+
 * Make Model::Associations::AssociationReflection#inspect show reflection class and guess at association definition line (jeremyevans)
 
 * Make SQLTime#inspect show it is an SQLTime instance, and only the time component (jeremyevans)
