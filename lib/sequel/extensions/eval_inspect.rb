@@ -26,8 +26,10 @@ module Sequel
     # for eval.
     def eval_inspect(obj)
       case obj
-      when Sequel::SQL::Blob, Sequel::LiteralString, Sequel::SQL::ValueList
-        "#{obj.class}.new(#{obj.inspect})"
+      when Sequel::SQL::Blob, Sequel::LiteralString, BigDecimal
+        "#{obj.class}.new(#{obj.to_s.inspect})"
+      when Sequel::SQL::ValueList
+        "#{obj.class}.new(#{obj.to_a.inspect})"
       when Array
         "[#{obj.map{|o| eval_inspect(o)}.join(', ')}]"
       when Hash
@@ -50,8 +52,6 @@ module Sequel
       when Date
         # Ignore offset and date of calendar reform
         "Date.new(#{obj.year}, #{obj.month}, #{obj.day})"
-      when BigDecimal
-        "BigDecimal.new(#{obj.to_s.inspect})"
       else
         obj.inspect
       end
