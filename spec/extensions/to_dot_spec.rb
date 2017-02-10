@@ -80,7 +80,7 @@ END
   end
 
   it "should handle LiteralStrings" do
-    dot(@ds.filter('a')).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"\\\"(a)\\\".lit\"];"]
+    dot(@ds.filter('a')).must_equal ["1 -> 2 [label=\"where\"];", "2 [label=\"Sequel.lit(\\\"(a)\\\")\"];"]
   end
 
   it "should handle true, false, nil" do
