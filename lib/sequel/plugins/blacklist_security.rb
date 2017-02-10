@@ -15,6 +15,10 @@ module Sequel
     #   # Make the Album class support the blacklist security features.
     #   Album.plugin :blacklist_security
     module BlacklistSecurity
+      # Special array subclass used for marking methods to be removed.
+      class ExceptionList < Array
+      end
+
       module ClassMethods
         # Which columns are specifically restricted in a call to set/update/new/etc.
         # (default: not set).  Some columns are restricted regardless of
@@ -62,10 +66,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # Special array subclass used for marking methods to be removed.
-        class ExceptionList < Array
-        end
-
         # Set all values using the entries in the hash, except for the keys
         # given in except.  You should probably use +set_fields+ or +set_only+
         # instead of this method, as blacklist approaches to security are a bad idea.

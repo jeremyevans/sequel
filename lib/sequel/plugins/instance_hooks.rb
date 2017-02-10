@@ -29,10 +29,11 @@ module Sequel
     #   # Add the instance hook methods just to Album instances
     #   Album.plugin :instance_hooks
     module InstanceHooks
+      BEFORE_HOOKS = Sequel::Model::BEFORE_HOOKS
+      AFTER_HOOKS = Sequel::Model::AFTER_HOOKS
+      HOOKS = BEFORE_HOOKS + AFTER_HOOKS
+
       module InstanceMethods 
-        BEFORE_HOOKS = Sequel::Model::BEFORE_HOOKS
-        AFTER_HOOKS = Sequel::Model::AFTER_HOOKS
-        HOOKS = BEFORE_HOOKS + AFTER_HOOKS
         HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
           def #{h}_hook(&block)
             raise Sequel::Error, "can't add hooks to frozen object" if frozen?

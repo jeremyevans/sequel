@@ -1,5 +1,7 @@
 === master
 
+* Make plugins not modify the constant namespace for the model class that uses them (jeremyevans)
+
 * Do not modify encoding of SQL::Blob instances in force_encoding plugin (jeremyevans)
 
 * Add Model.freeze_descendents to subclasses plugin, for easier finalizing associations/freezing of descendent classes (jeremyevans)

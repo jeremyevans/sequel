@@ -18,6 +18,9 @@ module Sequel
     #   # Make the Album class active_model compliant
     #   Album.plugin :active_model
     module ActiveModel
+      # The default string to join composite primary keys with in to_param.
+      DEFAULT_TO_PARAM_JOINER = '-'.freeze
+      
       # ActiveModel compliant error class
       class Errors < Sequel::Model::Errors
         # Add autovivification so that #[] always returns an array.
@@ -44,9 +47,6 @@ module Sequel
       end
 
       module InstanceMethods
-        # The default string to join composite primary keys with in to_param.
-        DEFAULT_TO_PARAM_JOINER = '-'.freeze
-      
         # Record that an object was destroyed, for later use by
         # destroyed?
         def after_destroy

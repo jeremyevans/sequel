@@ -52,6 +52,9 @@ module Sequel
     #   DB[:company].insert(:name=>'MS', :address=>
     #     Address.load(:street=>'123 Foo St', :city=>'Bar Town', :zip=>'12345'))
     module PgRow
+      ROW = 'ROW'.freeze
+      CAST = '::'.freeze
+
       # When loading the extension, make sure the database has the pg_row extension
       # loaded, load the custom database extensions, and automatically register the
       # row type if the model has a dataset.
@@ -70,9 +73,6 @@ module Sequel
       end
 
       module InstanceMethods
-        ROW = 'ROW'.freeze
-        CAST = '::'.freeze
-
         # Literalize the model instance and append it to the sql.
         def sql_literal_append(ds, sql)
           sql << ROW
