@@ -24,6 +24,20 @@ describe "force_encoding plugin" do
     o.x.encoding.must_equal @e1
   end
   
+  it "should not force encoding of blobs to given encoding on load" do
+    s = Sequel.blob('blah'.dup.force_encoding('BINARY'))
+    o = @c.load(:id=>1, :x=>s)
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal Encoding.find('BINARY')
+  end
+  
+  it "should not force encoding of blobs to given encoding when setting column values" do
+    s = Sequel.blob('blah'.dup.force_encoding('BINARY'))
+    o = @c.new(:x=>s)
+    o.x.must_equal 'blah'
+    o.x.encoding.must_equal Encoding.find('BINARY')
+  end
+  
   it "should work correctly when given a frozen string" do
     s = 'blah'.dup
     s.force_encoding('US-ASCII')

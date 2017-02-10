@@ -58,15 +58,16 @@ module Sequel
         
         # Force the encoding for all string values in the given row hash.
         def force_hash_encoding(row)
-          fe = model.forced_encoding
-          row.values.each{|v| v.force_encoding(fe) if v.is_a?(String)} if fe
+          if fe = model.forced_encoding
+            row.each_value{|v| v.force_encoding(fe) if v.is_a?(String) && !v.is_a?(Sequel::SQL::Blob)}
+          end
           row
         end
         
         # Force the encoding of all returned strings to the model's forced_encoding.
         def typecast_value(column, value)
           s = super
-          if s.is_a?(String) && (fe = model.forced_encoding)
+          if s.is_a?(String) && !s.is_a?(Sequel::SQL::Blob) && (fe = model.forced_encoding)
             s = s.dup if s.frozen?
             s.force_encoding(fe)
           end
