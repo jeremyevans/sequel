@@ -274,6 +274,10 @@ describe "Blockless Ruby Filters" do
     @d.l([:x, :y]=>Sequel.value_list([[1,2], [3,4]])).must_equal '(((x = 1) AND (y = 2)) OR ((x = 3) AND (y = 4)))'
     @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).must_equal '(((x = 1) AND (y = 2) AND (z = 5)) OR ((x = 3) AND (y = 4) AND (z = 6)))'
   end
+
+  it "should have SQL::ValueList#inspect show it is a value list" do
+    Sequel.value_list([[1,2], [3,4]]).inspect.must_equal "#<Sequel::SQL::ValueList [[1, 2], [3, 4]]>"
+  end
   
   it "should support StringExpression#+ for concatenation of SQL strings" do
     @d.lit(Sequel.expr(:x).sql_string + :y).must_equal '(x || y)'

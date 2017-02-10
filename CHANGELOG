@@ -1,5 +1,7 @@
 === master
 
+* Make SQL::ValueList#inspect show that it is a value list (jeremyevans)
+
 * Make LiteralString#inspect show that it is a literal string (jeremyevans)
 
 * Make Model::Associations::AssociationReflection#inspect show reflection class and guess at association definition line (jeremyevans)

@@ -1820,6 +1820,10 @@ module Sequel
     # ruby array of two element arrays as an SQL value list instead of an ordered
     # hash-like conditions specifier.
     class ValueList < ::Array
+      # Show that this is a value list and not just an array
+      def inspect
+        "#<#{self.class} #{super}>"
+      end
     end
 
     # The purpose of the +VirtualRow+ class is to allow the easy creation of SQL identifiers and functions
