@@ -966,9 +966,13 @@ describe "Sequel core extension replacements" do
     o = Sequel.blob(('a'..'z').to_a.join)
     o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"abcdefghij\" end=\"qrstuvwxyz\">"
     o = Sequel.blob(255.chr)
-    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=1 content=\"\\xFF\">"
+    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=1 content=\"#{RUBY_VERSION >= '1.9' ? "\\xFF" : "\\377"}\">"
     o = Sequel.blob((230..255).map(&:chr).join)
-    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"\\xE6\\xE7\\xE8\\xE9\\xEA\\xEB\\xEC\\xED\\xEE\\xEF\" end=\"\\xF6\\xF7\\xF8\\xF9\\xFA\\xFB\\xFC\\xFD\\xFE\\xFF\">"
+    if RUBY_VERSION >= '1.9'
+      o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"\\xE6\\xE7\\xE8\\xE9\\xEA\\xEB\\xEC\\xED\\xEE\\xEF\" end=\"\\xF6\\xF7\\xF8\\xF9\\xFA\\xFB\\xFC\\xFD\\xFE\\xFF\">"
+    else
+      o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"\\346\\347\\350\\351\\352\\353\\354\\355\\356\\357\" end=\"\\366\\367\\370\\371\\372\\373\\374\\375\\376\\377\">"
+    end
   end
 
   it "Sequel.deep_qualify should do a deep qualification into nested structors" do

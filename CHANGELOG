@@ -1,5 +1,7 @@
 === master
 
+* Add implicit_subquery extension, for implicitly using a subquery for datasets using raw SQL when calling dataset methods that modify SQL (jeremyevans)
+
 * Make Dataset#from_self keep the columns from the current dataset if present (jeremyevans)
 
 * Add implicit_subquery extension, implicitly using subqueries for dataset methods if the current dataset uses raw SQL (jeremyevans)
