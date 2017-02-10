@@ -387,6 +387,18 @@ module Sequel
           end
         end
 
+        # Show which type of reflection this is, and a guess at what line was used to create the
+        # association.
+        def inspect
+          o = self[:orig_opts].dup
+          o.delete(:class)
+          o.delete(:class_name)
+          o.delete(:block) unless o[:block]
+          o[:class] = self[:orig_class] if self[:orig_class]
+
+          "#<#{self.class} #{self[:model]}.#{self[:type]} #{self[:name].inspect}#{", #{o.inspect[1...-1]}" unless o.empty?}>"
+        end
+
         # The limit and offset for this association (returned as a two element array).
         def limit_and_offset
           if (v = self[:limit]).is_a?(Array)
@@ -1783,6 +1795,7 @@ module Sequel
           def_association_instance_methods(opts)
       
           orig_opts.delete(:clone)
+          opts[:orig_class] = orig_opts[:class] || orig_opts[:class_name]
           orig_opts.merge!(:class_name=>opts[:class_name], :class=>opts[:class], :block=>opts[:block])
           opts[:orig_opts] = orig_opts
           # don't add to association_reflections until we are sure there are no errors

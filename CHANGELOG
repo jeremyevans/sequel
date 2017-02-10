@@ -1,5 +1,7 @@
 === master
 
+* Make Model::Associations::AssociationReflection#inspect show reflection class and guess at association definition line (jeremyevans)
+
 * Make SQLTime#inspect show it is an SQLTime instance, and only the time component (jeremyevans)
 
 * Make SQL::Blob#inspect show that it is a blob, the number of bytes, and some or all of the content (jeremyevans)

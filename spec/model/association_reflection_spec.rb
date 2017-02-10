@@ -15,6 +15,19 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     @c.association_reflection(:c).associated_class.must_equal ParParent
   end
 
+  it "should have inspect include association class and representation of association definition " do
+    ParParent.many_to_one :c
+    ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c>"
+    ParParent.many_to_one :c, :class=>ParParent
+    ParParent.association_reflection(:c).inspect.must_equal "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :class=>ParParent>"
+    ParParent.many_to_one :c, :class=>ParParent, :key=>:c_id
+    ["#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :key=>:c_id, :class=>ParParent>",
+     "#<Sequel::Model::Associations::ManyToOneAssociationReflection ParParent.many_to_one :c, :class=>ParParent, :key=>:c_id>"].must_include ParParent.association_reflection(:c).inspect
+
+    @c.one_to_many :foos do |ds| ds end
+    @c.association_reflection(:foos).inspect.must_equal "#<Sequel::Model::Associations::OneToManyAssociationReflection #{@c.to_s}.one_to_many :foos, :block=>#{@c.association_reflection(:foos)[:block].inspect}>"
+  end
+
   it "should figure out the class if the :class value is not present" do
     @c.many_to_one :c, :class=>'ParParent'
     @c.association_reflection(:c).keys.wont_include(:class)
