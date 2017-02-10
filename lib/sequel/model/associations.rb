@@ -56,7 +56,13 @@ module Sequel
       
         # The class associated to the current model class via this association
         def associated_class
-          cached_fetch(:class){constantize(self[:class_name])}
+          cached_fetch(:class) do
+            begin
+              constantize(self[:class_name])
+            rescue NameError => e
+              raise NameError, "#{e.message} (this happened when attempting to find the associated class for #{inspect})", e.backtrace
+            end
+          end
         end
 
         # The dataset associated via this association, with the non-instance specific

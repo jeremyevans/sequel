@@ -43,6 +43,17 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
     ParParent.many_to_one :par_parent, :class=>'ParParent', :class_namespace=>'ParParent'
     ParParent.association_reflection(:par_parent).associated_class.must_equal ParParent::ParParent
   end
+
+  it "should include association inspect output if an exception would be raised" do
+    r = @c.many_to_one(:c)
+
+    begin
+      r.associated_class
+    rescue NameError => e
+    end
+
+    e.message.must_include r.inspect
+  end
 end
 
 describe Sequel::Model::Associations::AssociationReflection, "#primary_key" do
