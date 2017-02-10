@@ -1,5 +1,7 @@
 === master
 
+* Make SQLTime#inspect show it is an SQLTime instance, and only the time component (jeremyevans)
+
 * Make SQL::Blob#inspect show that it is a blob, the number of bytes, and some or all of the content (jeremyevans)
 
 * Make plugins not modify the constant namespace for the model class that uses them (jeremyevans)

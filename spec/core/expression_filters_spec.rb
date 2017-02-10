@@ -1149,6 +1149,11 @@ describe "Sequel::SQLTime" do
     Sequel::SQLTime.create(1, 2, 3).strftime('%Y-%m-%d').must_equal Date.new(2000).strftime('%Y-%m-%d')
   end
 
+  it "#inspect should show class and time by default" do
+    Sequel::SQLTime.create(1, 2, 3).inspect.must_equal "#<Sequel::SQLTime 01:02:03>"
+    Sequel::SQLTime.create(13, 24, 35).inspect.must_equal "#<Sequel::SQLTime 13:24:35>"
+  end
+
   it "#to_s should include hour, minute, and second by default" do
     Sequel::SQLTime.create(1, 2, 3).to_s.must_equal "01:02:03"
     Sequel::SQLTime.create(1, 2, 3, 500000).to_s.must_equal "01:02:03"

@@ -62,6 +62,11 @@ module Sequel
       end
     end
 
+    # Show that this is an SQLTime, and the time represented
+    def inspect
+     "#<#{self.class} #{to_s}>"
+    end
+
     # Return a string in HH:MM:SS format representing the time.
     def to_s(*args)
       if args.empty?
