@@ -1,5 +1,7 @@
 === master
 
+* Make SQL::Blob#inspect show that it is a blob, the number of bytes, and some or all of the content (jeremyevans)
+
 * Make plugins not modify the constant namespace for the model class that uses them (jeremyevans)
 
 * Do not modify encoding of SQL::Blob instances in force_encoding plugin (jeremyevans)

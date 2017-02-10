@@ -1054,6 +1054,20 @@ module Sequel
       def lit(*args)
         args.empty? ? LiteralString.new(self) : SQL::PlaceholderLiteralString.new(self, args)
       end
+
+      # Return a string showing that this is a blob, the size, and the some or all of the content,
+      # depending on the size.
+      def inspect
+        size = length
+
+        content = if size > 20
+          "start=#{self[0...10].to_s.inspect} end=#{self[-10..-1].to_s.inspect}"
+        else
+          "content=#{super}"
+        end
+
+        "#<#{self.class}:0x#{"%x" % object_id} bytes=#{size} #{content}>"
+      end
       
       # Returns +self+, since it is already a blob.
       def to_sequel_blob

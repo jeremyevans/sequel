@@ -952,6 +952,17 @@ describe "Sequel core extension replacements" do
     Sequel.blob(o).must_be_same_as(o)
   end
 
+  it "Sequel.blob#inspect output should indicate it is a blob and the size" do
+    o = Sequel.blob('a')
+    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=1 content=\"a\">"
+    o = Sequel.blob(('a'..'z').to_a.join)
+    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"abcdefghij\" end=\"qrstuvwxyz\">"
+    o = Sequel.blob(255.chr)
+    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=1 content=\"\\xFF\">"
+    o = Sequel.blob((230..255).map(&:chr).join)
+    o.inspect.must_equal "#<Sequel::SQL::Blob:0x#{'%x' % o.object_id} bytes=26 start=\"\\xE6\\xE7\\xE8\\xE9\\xEA\\xEB\\xEC\\xED\\xEE\\xEF\" end=\"\\xF6\\xF7\\xF8\\xF9\\xFA\\xFB\\xFC\\xFD\\xFE\\xFF\">"
+  end
+
   it "Sequel.deep_qualify should do a deep qualification into nested structors" do
     l(Sequel.deep_qualify(:t, Sequel.+(:c, 1)), "(t.c + 1)")
   end
