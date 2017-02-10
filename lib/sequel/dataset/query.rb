@@ -281,7 +281,11 @@ module Sequel
       fs = {}
       non_sql = non_sql_options
       @opts.keys.each{|k| fs[k] = nil unless non_sql.include?(k)}
-      clone(fs).from(opts[:alias] ? as(opts[:alias], opts[:column_aliases]) : self)
+      c = clone(fs).from(opts[:alias] ? as(opts[:alias], opts[:column_aliases]) : self)
+      if cols = _columns
+        c.send(:columns=, cols)
+      end
+      c
     end
 
     # Match any of the columns to any of the patterns. The terms can be

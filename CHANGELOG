@@ -1,5 +1,9 @@
 === master
 
+* Make Dataset#from_self keep the columns from the current dataset if present (jeremyevans)
+
+* Add implicit_subquery extension, implicitly using subqueries for dataset methods if the current dataset uses raw SQL (jeremyevans)
+
 * Make SQL::ValueList#inspect show that it is a value list (jeremyevans)
 
 * Make LiteralString#inspect show that it is a literal string (jeremyevans)

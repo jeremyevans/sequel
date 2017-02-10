@@ -2057,6 +2057,11 @@ describe "Dataset#from_self" do
     @ds.from_self.sql.must_equal 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS t1'
   end
   
+  it "should keep any existing columns" do
+    @ds.columns(:id, :a)
+    @ds.from_self.columns.must_equal [:id, :a]
+  end
+  
   it "should modify only the new dataset" do
     @ds.from_self.select(:bogus).sql.must_equal 'SELECT bogus FROM (SELECT name FROM test LIMIT 1) AS t1'
   end
