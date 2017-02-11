@@ -39,7 +39,7 @@ module Sequel
       end
 
       meths = (<<-METHS).split.map(&:to_sym)
-        distinct grep group group_and_count group_append 
+        distinct eager grep group group_and_count group_append 
         limit offset order order_append order_prepend 
         select select_all select_append select_group server
       METHS
