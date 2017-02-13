@@ -1,5 +1,7 @@
 === master
 
+* Add where_all, where_each, where_single_value model dataset methods, optimized for frozen datasets (jeremyevans)
+
 * Add eager method to dataset_module (jeremyevans)
 
 * Add implicit_subquery extension, for implicitly using a subquery for datasets using raw SQL when calling dataset methods that modify SQL (jeremyevans)

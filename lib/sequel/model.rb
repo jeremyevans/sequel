@@ -37,8 +37,8 @@ module Sequel
     ANONYMOUS_MODEL_CLASSES_MUTEX = @Model_mutex = Mutex.new
 
     # Class methods added to model that call the method of the same name on the dataset
-    DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
-      [:each_server]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
+    DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) -
+      [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
     
     # Boolean settings that can be modified at the global, class, or instance level.
     BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \

@@ -147,3 +147,62 @@ describe Sequel::Model::DatasetMethods  do
     proc{@c.paged_each{|r| }}.must_raise(Sequel::Error)
   end
 end 
+
+describe Sequel::Model::DatasetMethods, "#where_all"  do
+  before do
+    @c = Class.new(Sequel::Model(DB[:items].freeze))
+    DB.reset
+  end
+
+  it "should filter dataset with condition, and return related rows" do
+    5.times do
+      @c.where_all(:id=>1).must_equal [@c.load(:id=>1, :x=>1)]
+      @c.db.sqls.must_equal ['SELECT * FROM items WHERE (id = 1)']
+    end
+  end
+
+  it "should yield each row to the given block" do
+    5.times do
+      a = []
+      @c.where_all(:id=>1){|r| a << r}.must_equal [@c.load(:id=>1, :x=>1)]
+      a.must_equal [@c.load(:id=>1, :x=>1)]
+      @c.db.sqls.must_equal ['SELECT * FROM items WHERE (id = 1)']
+    end
+  end
+end
+
+describe Sequel::Model::DatasetMethods, "#where_each"  do
+  before do
+    @c = Class.new(Sequel::Model(DB[:items].freeze))
+    DB.reset
+  end
+
+  it "should yield each row to the given block" do
+    5.times do
+      a = []
+      @c.where_each(:id=>1){|r| a << r}
+      a.must_equal [@c.load(:id=>1, :x=>1)]
+      @c.db.sqls.must_equal ['SELECT * FROM items WHERE (id = 1)']
+    end
+  end
+end
+
+describe Sequel::Model::DatasetMethods, "#where_single_value"  do
+  before do
+    @c = Class.new(Sequel::Model(DB[:items].freeze))
+    @c.class_eval do
+      dataset_module do
+        select :only_id, :id
+      end
+    end
+    DB.reset
+  end
+
+  it "should return single value" do
+    5.times do
+      a = []
+      @c.only_id.where_single_value(:id=>1).must_equal 1
+      @c.db.sqls.must_equal ['SELECT id FROM items WHERE (id = 1) LIMIT 1']
+    end
+  end
+end
