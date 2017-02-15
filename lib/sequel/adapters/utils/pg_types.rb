@@ -39,6 +39,7 @@ module Sequel
         end
         ::Sequel::SQL::Blob.new(str)
       end
+      def citext(s) s.to_s end
     end.new
 
     # Type OIDs for string types used by PostgreSQL.  These types don't
@@ -63,6 +64,7 @@ module Sequel
       [1083, 1266] => ::Sequel.method(:string_to_time),
       [1082] => ::Sequel.method(:string_to_date),
       [1184, 1114] => ::Sequel.method(:database_to_application_timestamp),
+      [89657] => tt.method(:citext),
     }.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}
     end
