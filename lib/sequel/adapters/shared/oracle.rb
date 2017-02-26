@@ -621,6 +621,12 @@ module Sequel
       def supports_quoted_function_names?
         true
       end
+
+      # Return the primary key to use for RETURNING in an INSERT statement.
+      def insert_pk
+        pk = db.primary_key(opts[:from].first)
+        pk ? Sequel::SQL::Identifier.new(pk) : NULL
+      end
     end
   end
 end

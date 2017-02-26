@@ -2,6 +2,15 @@ SEQUEL_ADAPTER_TEST = :oracle
 
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
+def DB.sqls
+  (@sqls ||= [])
+end
+logger = Object.new
+def logger.method_missing(m, msg)
+  DB.sqls << msg
+end
+DB.loggers << logger
+
 describe "An Oracle database" do
   before(:all) do
     DB.create_table!(:items) do
@@ -12,7 +21,7 @@ describe "An Oracle database" do
     end
 
     DB.create_table!(:books) do
-      Integer :id
+      primary_key :id
       String :title, :size => 50
       Integer :category_id
     end
@@ -28,6 +37,10 @@ describe "An Oracle database" do
       String :content, :text => true
     end
     @d = DB[:items]
+  end
+  before do
+    @db = DB
+    DB.sqls.clear
   end
   after do
     @d.delete
@@ -86,7 +99,7 @@ describe "An Oracle database" do
   end
   
   it "should provide schema information" do
-    books_schema = [[:id, [:integer, false, true, nil]],
+    books_schema = [[:id, [:integer, true, false, nil]],
       [:title, [:string, false, true, nil]],
       [:category_id, [:integer, false, true, nil]]]
     categories_schema = [[:id, [:integer, false, true, nil]],
@@ -278,14 +291,14 @@ describe "An Oracle database" do
       {:id => 1, :title => 'aaa', :cat_name => 'ruby'},
       {:id => 2, :title => 'bbb', :cat_name => 'ruby'},
       {:id => 3, :title => 'ccc', :cat_name => 'rails'},
-      {:id => 4, :title => 'ddd', :cat_name => nil} 
+      {:id => 4, :title => 'ddd', :cat_name => nil}
     ]
-    
-    @d1.left_outer_join(:categories, :id => :category_id).select(Sequel[:books][:id], :title, :cat_name).reverse_order(Sequel[:books][:id]).limit(2, 0).to_a.must_equal [      
-      {:id => 4, :title => 'ddd', :cat_name => nil}, 
+
+    @d1.left_outer_join(:categories, :id => :category_id).select(Sequel[:books][:id], :title, :cat_name).reverse_order(Sequel[:books][:id]).limit(2, 0).to_a.must_equal [
+      {:id => 4, :title => 'ddd', :cat_name => nil},
       {:id => 3, :title => 'ccc', :cat_name => 'rails'}
-    ]      
-  end  
+    ]
+  end
 
   it "should allow columns to be renamed" do
     @d1 = DB[:books]
@@ -309,5 +322,19 @@ describe "An Oracle database" do
 
   it "#lock_style should accept symbols" do
     DB[:books].lock_style(:update).sql.must_equal 'SELECT * FROM "BOOKS" FOR UPDATE'
+  end
+
+  unless defined? JRUBY_VERSION
+    it "should use INSERT RETURNING statement by default" do
+      @db[:books].delete
+
+      log do
+        @db[:books].insert(:title => 'aaa').must_equal 1
+      end
+
+      check_sqls do
+        @db.sqls.last.must_equal "INSERT INTO \"BOOKS\" (\"TITLE\") VALUES ('aaa') RETURNING \"ID\" INTO :id; [nil]"
+      end
+    end
   end
 end
