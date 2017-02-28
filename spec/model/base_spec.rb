@@ -394,16 +394,6 @@ describe Sequel::Model, ".dataset_module" do
     @c.where(:bar).foo.opts[:server].must_equal :baz
   end
 
-  it "should have dataset_module support an eager method" do
-    @c.many_to_one :foo, :class=>@c
-    @c.many_to_one :bar, :class=>@c
-    @c.many_to_one :baz, :class=>@c
-    @c.many_to_one :quux, :class=>@c
-    @c.dataset_module{eager(:foo, {:foo=>{:bar=>:baz}}, :quux)}
-    @c.foo.opts[:eager].must_equal(:foo=>{:bar=>:baz}, :quux=>nil)
-    @c.where(:bar).foo.opts[:eager].must_equal(:foo=>{:bar=>:baz}, :quux=>nil)
-  end
-
   it "should raise error if called with both an argument and a block" do
     proc{@c.dataset_module(Module.new{def return_3() 3 end}){}}.must_raise(Sequel::Error)
   end

@@ -4624,3 +4624,19 @@ describe "association autoreloading" do
     DB.sqls.must_equal ['SELECT * FROM artists WHERE id = 1']
   end
 end
+
+describe Sequel::Model, ".dataset_module" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+  end
+  
+  it "should have dataset_module support an eager method" do
+    @c.many_to_one :foo, :class=>@c
+    @c.many_to_one :bar, :class=>@c
+    @c.many_to_one :baz, :class=>@c
+    @c.many_to_one :quux, :class=>@c
+    @c.dataset_module{eager(:foo, {:foo=>{:bar=>:baz}}, :quux)}
+    @c.foo.opts[:eager].must_equal(:foo=>{:bar=>:baz}, :quux=>nil)
+    @c.where(:bar).foo.opts[:eager].must_equal(:foo=>{:bar=>:baz}, :quux=>nil)
+  end
+end
