@@ -2075,7 +2075,7 @@ module Sequel
 
       # Get the row of column data from the database.
       def _refresh_get(dataset)
-        if (sql = (m = model).fast_pk_lookup_sql) && !dataset.opts[:lock]
+        if (sql = model.fast_pk_lookup_sql) && !dataset.opts[:lock]
           sql = sql.dup
           ds = use_server(dataset)
           ds.literal_append(sql, pk)
