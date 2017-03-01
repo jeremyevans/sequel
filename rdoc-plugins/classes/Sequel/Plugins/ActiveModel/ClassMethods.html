@@ -41,6 +41,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-_to_partial_path">_to_partial_path</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -68,7 +69,24 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-_to_partial_path-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-_to_partial_path-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 32</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_to_partial_path</span>&#x000A;  <span class="ruby-ivar">@_to_partial_path</span> <span class="ruby-operator">||=</span> <span class="ruby-node">&quot;#{underscore(pluralize(to_s))}/#{underscore(demodulize(to_s))}&quot;</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-_to_partial_path-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 43</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">_to_partial_path</span>&#x000A;  <span class="ruby-ivar">@_to_partial_path</span> <span class="ruby-operator">||=</span> <span class="ruby-node">&quot;#{underscore(pluralize(to_s))}/#{underscore(demodulize(to_s))}&quot;</span>.<span class="ruby-identifier">freeze</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Cache model_name and to_partial path value before freezing.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/active_model.rb, line 35</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-identifier">model_name</span>&#x000A;  <span class="ruby-identifier">_to_partial_path</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

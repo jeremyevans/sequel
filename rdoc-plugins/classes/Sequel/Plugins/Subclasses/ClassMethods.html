@@ -41,6 +41,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-descendents">descendents</a></li>
+              <li><a href="#method-i-freeze_descendents">freeze_descendents</a></li>
               <li><a href="#method-i-inherited">inherited</a></li>
               <li><a href="#attribute-i-on_subclass">on_subclass</a></li>
               <li><a href="#attribute-i-subclasses">subclasses</a></li>
@@ -92,7 +93,25 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-descendents-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 45</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">descendents</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 53</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">descendents</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span>.<span class="ruby-identifier">dup</span>}.<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">x</span>] <span class="ruby-operator">+</span> <span class="ruby-identifier">x</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:descendents</span>)}.<span class="ruby-identifier">flatten</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-freeze_descendents'>
+                <a name='method-i-freeze_descendents'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze_descendents</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze all descendent classes.  This also finalizes the associations for
+                  those classes before freezing.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze_descendents-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze_descendents-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze_descendents</span>&#x000A;  <span class="ruby-identifier">descendents</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:finalize_associations</span>).<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-inherited'>
@@ -110,7 +129,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-inherited-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">subclass</span>}&#x000A;  <span class="ruby-identifier">on_subclass</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">subclass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">on_subclass</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-inherited-source'><span class="ruby-comment"># File lib/sequel/plugins/subclasses.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inherited</span>(<span class="ruby-identifier">subclass</span>)&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">synchronize</span>{<span class="ruby-identifier">subclasses</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">subclass</span>}&#x000A;  <span class="ruby-identifier">on_subclass</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">subclass</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">on_subclass</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

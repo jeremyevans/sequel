@@ -500,7 +500,7 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>MINOR</td>
                     <td>=</td>
-                    <td class='context-item-value'>43</td>
+                    <td class='context-item-value'>44</td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
                       
@@ -1079,7 +1079,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-recursive_map-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-recursive_map-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 202</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">recursive_map</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">converter</span>)&#x000A;  <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;      <span class="ruby-identifier">recursive_map</span>(<span class="ruby-identifier">i</span>, <span class="ruby-identifier">converter</span>)&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-identifier">i</span>&#x000A;      <span class="ruby-identifier">converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-recursive_map-source'><span class="ruby-comment"># File lib/sequel/core.rb, line 202</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">recursive_map</span>(<span class="ruby-identifier">array</span>, <span class="ruby-identifier">converter</span>)&#x000A;  <span class="ruby-identifier">array</span>.<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">i</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>)&#x000A;      <span class="ruby-identifier">recursive_map</span>(<span class="ruby-identifier">i</span>, <span class="ruby-identifier">converter</span>)&#x000A;    <span class="ruby-keyword">elsif</span> <span class="ruby-operator">!</span><span class="ruby-identifier">i</span>.<span class="ruby-identifier">nil?</span>&#x000A;      <span class="ruby-identifier">converter</span>.<span class="ruby-identifier">call</span>(<span class="ruby-identifier">i</span>)&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-class' id='method-method-c-require'>

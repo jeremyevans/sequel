@@ -41,6 +41,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#attribute-i-default_values">default_values</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
             </ol>
           </div>
           <div id='context'>
@@ -65,6 +66,26 @@
                     </td>
                   </tr>
                 </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze default values when freezing model class</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/defaults_setter.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@default_values</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

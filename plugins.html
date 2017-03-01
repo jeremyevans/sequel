@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.43.0</h2>
+    <h2>Sequel::Model Plugins for v4.44.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -153,10 +153,12 @@
 
 <ul>
 <li><a href='http://github.com/jeremyevans/forme'>forme</a>: HTML forms library for ruby that integrates with Sequel::Model for easy form creation.</li>
+<li><a href='https://github.com/kenaniah/sequel-active_record'>sequel-active_record</a>: Provides ActiveRecord compatibility to ease transitions to Sequel.</li>
 <li><a href='http://github.com/gucki/sequel_bulk_attributes'>sequel_bulk_attributes</a>: Provides bulk assignment functionality for one_to_many associations.</li>
 <li><a href='http://github.com/sdepold/sequel-bit_fields'>sequel-bit_fields</a>: Allows treating an integer column as a bitfield of many boolean settings.</li>
 <li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
 <li><a href='http://github.com/mig-hub/sequel-crushyform'>sequel_crushyform</a>: Builds forms for you</li>
+<li><a href='https://github.com/adam12/sequel-hash_id'>sequel-hash_id</a>: Obscure your primary keys with a hashid.</li>
 <li><a href='http://github.com/gucki/sequel_mappable'>sequel_mappable</a>: Provides geocoding functionality to model and dataset.</li>
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
@@ -220,6 +222,7 @@
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/filter_having_rb.html">filter_having</a>: Makes Dataset#filter, #and, #or, and #having operate on HAVING clause if HAVING clause is already present.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/graph_each_rb.html">graph_each</a>: Makes Dataset#each split returned results by table when using Dataset#graph.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/hash_aliases_rb.html">hash_aliases</a>: Makes Dataset#select and #from treat hashes and alias specifications.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/implicit_subquery_rb.html">implicit_subquery</a>: Makes dataset methods that return datasets with modified SQL use a subquery implicitly if the current dataset uses raw SQL.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/null_dataset_rb.html">null_dataset</a>: Adds Dataset#nullify to get a dataset that will never issue a query.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/no_auto_literal_strings_rb.html">no_auto_literal_strings</a>: Removes the default support for plain strings as literal strings in dataset filter and update methods.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/mssql_emulate_lateral_with_apply_rb.html">mssql_emulate_lateral_with_apply</a>: Emulates LATERAL queries using CROSS/OUTER APPLY on Microsoft SQL Server.</li>

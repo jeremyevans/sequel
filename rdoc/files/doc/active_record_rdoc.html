@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2016-12-19 14:54:41 -0800</span>
+          <span class='datetime'>2017-02-08 14:57:24 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -359,7 +359,7 @@
             creating a bunch of associated objects and delaying saving them to the
             database until the main object is saved, like you can with the
             <code>association.build</code> methods in ActiveRecord.  You can use
-            +before_save or <code>after_save</code> hooks, or the
+            <code>before_save</code> or <code>after_save</code> hooks, or the
             <code>nested_attributes</code> or <code>instance_hooks</code> plugins to
             get similar support.</p>
             
@@ -393,7 +393,7 @@
             
             <p><a href="../../classes/Sequel.html">Sequel</a> caches associated objects
             similarly to ActiveRecord, and you can skip the cache by passing
-            <code>true</code> to the association method, just like ActiveRecord.</p>
+            +:reload=&gt;true+ to the association method.</p>
             
             <h3 id="label-Eager+Loading">Eager Loading<span><a href="#label-Eager+Loading">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

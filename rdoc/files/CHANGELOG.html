@@ -29,12 +29,69 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-02-01 08:23:06 -0800</span>
+          <span class='datetime'>2017-03-01 10:48:38 -0800</span>
         </div>
       </div>
       <div id='content'>
         <div id='text'>
           <div id='description'>
+            
+            <h3 id="label-4.44.0+-282017-03-01-29">4.44.0 (2017-03-01)<span><a href="#label-4.44.0+-282017-03-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
+            <ul><li>
+            <p>Add where_all, where_each, where_single_value model dataset methods,
+            optimized for frozen datasets (jeremyevans)</p>
+            </li><li>
+            <p>Add eager method to dataset_module (jeremyevans)</p>
+            </li><li>
+            <p>Add implicit_subquery extension, for implicitly using a subquery for
+            datasets using raw SQL when calling dataset methods that modify SQL
+            (jeremyevans)</p>
+            </li><li>
+            <p>Make Dataset#from_self keep the columns from the current dataset if present
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add implicit_subquery extension, implicitly using subqueries for dataset
+            methods if the current dataset uses raw SQL (jeremyevans)</p>
+            </li><li>
+            <p>Make SQL::ValueList#inspect show that it is a value list (jeremyevans)</p>
+            </li><li>
+            <p>Make LiteralString#inspect show that it is a literal string (jeremyevans)</p>
+            </li><li>
+            <p>Make Model::Associations::AssociationReflection#inspect show reflection
+            class and guess at association definition line (jeremyevans)</p>
+            </li><li>
+            <p>Make SQLTime#inspect show it is an SQLTime instance, and only the time
+            component (jeremyevans)</p>
+            </li><li>
+            <p>Make SQL::Blob#inspect show that it is a blob, the number of bytes, and
+            some or all of the content (jeremyevans)</p>
+            </li><li>
+            <p>Make plugins not modify the constant namespace for the model class that
+            uses them (jeremyevans)</p>
+            </li><li>
+            <p>Do not modify encoding of SQL::Blob instances in force_encoding plugin
+            (jeremyevans)</p>
+            </li><li>
+            <p>Add Model.freeze_descendents to subclasses plugin, for easier finalizing
+            associations/freezing of descendent classes (jeremyevans)</p>
+            </li><li>
+            <p>Add Model.finalize_associations method for finalizing associations,
+            speeding up some association reflections methods almost 10x (jeremyevans)</p>
+            </li><li>
+            <p>Implement Model.freeze such that it can be used in production (jeremyevans)</p>
+            </li><li>
+            <p>Recognize another disconnect error in the jdbc/as400 adapter (perlun)
+            (#1300)</p>
+            </li><li>
+            <p>Correctly handle conversion of false values when typecasting PostgreSQL
+            arrays (mistoo) (#1299)</p>
+            </li><li>
+            <p>Raise error if the postgres adapter attempts to load an incompatible
+            version of sequel_pg (mahlonsmith) (#1298)</p>
+            </li><li>
+            <p>Fix jdbc adapter so basic_type_convertor_map is not shared between
+            instances, work with Database#freeze (jeremyevans)</p>
+            </li></ul>
             
             <h3 id="label-4.43.0+-282017-02-01-29">4.43.0 (2017-02-01)<span><a href="#label-4.43.0+-282017-02-01-29">&para;</a> <a href="#top">&uarr;</a></span></h3>
             <ul><li>

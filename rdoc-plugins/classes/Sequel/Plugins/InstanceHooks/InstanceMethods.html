@@ -47,34 +47,6 @@
           <div id='context'>
           </div>
           <div id='section'>
-            <div id='constants-list'>
-              <h2>Constants</h2>
-              <div class='name-list'>
-                <table summary='Constants'>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>AFTER_HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel::Model::AFTER_HOOKS</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>BEFORE_HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>Sequel::Model::BEFORE_HOOKS</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                  <tr class='top-aligned-row context-row'>
-                    <td class='context-item-name'>HOOKS</td>
-                    <td>=</td>
-                    <td class='context-item-value'>BEFORE_HOOKS + AFTER_HOOKS</td>
-                    <td>&nbsp;</td>
-                    <td class='context-item-desc'></td>
-                  </tr>
-                </table>
-              </div>
-            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-after_save'>
@@ -91,7 +63,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_save-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 60</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_validation</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_validation</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_save-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 61</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_save</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_save</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:after_validation</span>)&#x000A;  <span class="ruby-ivar">@instance_hooks</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:before_validation</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-after_validation'>
@@ -108,7 +80,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_validation-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 54</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_validation</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_validation</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_validation-source'><span class="ruby-comment"># File lib/sequel/plugins/instance_hooks.rb, line 55</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_validation</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">run_after_instance_hooks</span>(<span class="ruby-value">:after_validation</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

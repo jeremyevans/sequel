@@ -41,6 +41,7 @@
             <h3>Public Instance</h3>
             <ol>
               <li><a href="#method-i-add_input_transformer">add_input_transformer</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#attribute-i-input_transformer_order">input_transformer_order</a></li>
               <li><a href="#attribute-i-input_transformers">input_transformers</a></li>
               <li><a href="#method-i-skip_input_transformer">skip_input_transformer</a></li>
@@ -97,6 +98,23 @@
                   <pre id='method-i-add_input_transformer-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">add_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)&#x000A;  <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-string">&#39;must provide both transformer name and block when adding input transformer&#39;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">transformer_name</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-ivar">@input_transformers</span>[<span class="ruby-identifier">transformer_name</span>] = <span class="ruby-identifier">block</span>&#x000A;  <span class="ruby-ivar">@input_transformer_order</span>.<span class="ruby-identifier">unshift</span>(<span class="ruby-identifier">transformer_name</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>] = []&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze input transformers when freezing model class</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@input_transformers</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@input_transformer_order</span>.<span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span>(<span class="ruby-operator">&amp;</span><span class="ruby-value">:freeze</span>)&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-skip_input_transformer'>
                 <a name='method-i-skip_input_transformer'></a>
                 <div class='synopsis'>
@@ -111,7 +129,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-skip_input_transformer-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-skip_input_transformer-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 58</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skip_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>].<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">columns</span>).<span class="ruby-identifier">uniq!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-skip_input_transformer-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 67</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skip_input_transformer</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">columns</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>].<span class="ruby-identifier">concat</span>(<span class="ruby-identifier">columns</span>).<span class="ruby-identifier">uniq!</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-skip_input_transformer-3F'>
@@ -128,7 +146,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-skip_input_transformer-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-skip_input_transformer-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 63</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skip_input_transformer?</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-skip_input_transformer-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/input_transformer.rb, line 72</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">skip_input_transformer?</span>(<span class="ruby-identifier">transformer_name</span>, <span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-ivar">@skip_input_transformer_columns</span>[<span class="ruby-identifier">transformer_name</span>].<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

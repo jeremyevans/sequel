@@ -49,6 +49,7 @@
             <ol>
               <li><a href="#method-i-cloneable-3F">cloneable?</a></li>
               <li><a href="#method-i-default_associated_key_alias">default_associated_key_alias</a></li>
+              <li><a href="#method-i-finalize_settings">finalize_settings</a></li>
               <li><a href="#method-i-join_table_alias">join_table_alias</a></li>
               <li><a href="#method-i-reciprocal">reciprocal</a></li>
             </ol>
@@ -56,6 +57,28 @@
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FINALIZE_SETTINGS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      superclass::FINALIZE_SETTINGS.merge(
+                      :associated_key_table=>:associated_key_table,
+                      :edges=>:edges,
+                      :final_edge=>:final_edge,
+                      :final_reverse_edge=>:final_reverse_edge,
+                      :reverse_edges=>:reverse_edges
+                      ).freeze
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-cloneable-3F'>
@@ -93,6 +116,22 @@
                   <pre id='method-i-default_associated_key_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_associated_key_alias</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:uses_left_composite_keys</span>] <span class="ruby-operator">?</span> (<span class="ruby-value">0</span><span class="ruby-operator">...</span><span class="ruby-keyword">self</span>[<span class="ruby-value">:through</span>].<span class="ruby-identifier">first</span>[<span class="ruby-value">:left</span>].<span class="ruby-identifier">length</span>).<span class="ruby-identifier">map</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">i</span><span class="ruby-operator">|</span> <span class="ruby-value">:&quot;x_foreign_key_#{i}_x&quot;</span>} <span class="ruby-operator">:</span> <span class="ruby-value">:x_foreign_key_x</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-finalize_settings'>
+                <a name='method-i-finalize_settings'></a>
+                <div class='synopsis'>
+                  <span class='name'>finalize_settings</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-finalize_settings-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-finalize_settings-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 111</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">finalize_settings</span>&#x000A;  <span class="ruby-constant">FINALIZE_SETTINGS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-join_table_alias'>
                 <a name='method-i-join_table_alias'></a>
                 <div class='synopsis'>
@@ -107,7 +146,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-join_table_alias-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-join_table_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 105</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">join_table_alias</span>&#x000A;  <span class="ruby-identifier">final_reverse_edge</span>[<span class="ruby-value">:alias</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-join_table_alias-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 116</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">join_table_alias</span>&#x000A;  <span class="ruby-identifier">final_reverse_edge</span>[<span class="ruby-value">:alias</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-reciprocal'>
@@ -124,7 +163,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-reciprocal-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-reciprocal-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 110</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-reciprocal-source'><span class="ruby-comment"># File lib/sequel/plugins/many_through_many.rb, line 121</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">reciprocal</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

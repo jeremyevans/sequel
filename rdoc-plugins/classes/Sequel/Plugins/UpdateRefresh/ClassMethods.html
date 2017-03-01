@@ -40,6 +40,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#attribute-i-update_refresh_columns">update_refresh_columns</a></li>
             </ol>
           </div>
@@ -55,9 +56,33 @@
                       <a name='attribute-i-update_refresh_columns'>update_refresh_columns</a>
                     </td>
                     <td class='context-item-value'>[R]</td>
-                    <td class='context-item-desc'></td>
+                    <td class='context-item-desc'>
+                      
+                      <p>The specific columns to refresh when updating, if UPDATE RETURNING is
+                      supported.</p>
+                    </td>
                   </tr>
                 </table>
+              </div>
+            </div>
+            <div id='methods'>
+              <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze the update refresh columns when freezing the model class.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 50</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@update_refresh_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
               </div>
             </div>
           </div>

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-06-06 17:24:35 -0700</span>
+          <span class='datetime'>2017-02-09 12:56:18 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -125,6 +125,19 @@
             class, unless the model classes are very simple.  Example:</p>
             
             <pre class="ruby"><span class="ruby-constant">Dir</span>[<span class="ruby-string">&#39;./models/*.rb&#39;</span>].<span class="ruby-identifier">each</span>{<span class="ruby-operator">|</span><span class="ruby-identifier">f</span><span class="ruby-operator">|</span> <span class="ruby-identifier">require</span> <span class="ruby-identifier">f</span>}</pre>
+            
+            <h2 id="label-Finalize+Associations+and+Freeze+Model+Classes+and+Database">Finalize Associations and Freeze Model Classes and Database<span><a href="#label-Finalize+Associations+and+Freeze+Model+Classes+and+Database">&para;</a> <a href="#top">&uarr;</a></span></h2>
+            
+            <p>After all the models have been setup, you can finalize the associations.
+            This can speed up association reflection methods by doing a lookup in
+            advance to find the associated class, and cache related association
+            information in the association itself.</p>
+            
+            <p>Additionally, in production and testing, you should freeze the model
+            classes and Database instance, so that you can detect unsafe runtime
+            modification of the configuration:</p>
+            
+            <pre class="ruby"><span class="ruby-identifier">model_classes</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span>:<span class="ruby-identifier">finalize_associations</span>)&#x000A;<span class="ruby-identifier">model_classes</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span>:<span class="ruby-identifier">freeze</span>)&#x000A;<span class="ruby-constant">DB</span>.<span class="ruby-identifier">freeze</span></pre>
             
             <h2 id="label-Disconnect+If+Using+Forking+Webserver+with+Code+Preloading">Disconnect If Using Forking Webserver with Code Preloading<span><a href="#label-Disconnect+If+Using+Forking+Webserver+with+Code+Preloading">&para;</a> <a href="#top">&uarr;</a></span></h2>
             

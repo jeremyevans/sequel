@@ -40,6 +40,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#method-i-touch_associations">touch_associations</a></li>
               <li><a href="#attribute-i-touch_column">touch_column</a></li>
               <li><a href="#attribute-i-touched_associations">touched_associations</a></li>
@@ -81,6 +82,23 @@
             </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze the touched associations when freezing the model class.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 66</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@touched_associations</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-touch_associations'>
                 <a name='method-i-touch_associations'></a>
                 <div class='synopsis'>
@@ -97,7 +115,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-touch_associations-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-touch_associations-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 68</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">touch_associations</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>)&#x000A;  <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">a</span> = {<span class="ruby-identifier">a</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_column</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    <span class="ruby-identifier">a</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid association: #{k}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">k</span>)&#x000A;      <span class="ruby-identifier">touched_associations</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-touch_associations-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 75</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">touch_associations</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">associations</span>)&#x000A;  <span class="ruby-identifier">associations</span>.<span class="ruby-identifier">flatten</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">a</span> = {<span class="ruby-identifier">a</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_column</span>} <span class="ruby-keyword">if</span> <span class="ruby-identifier">a</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Symbol</span>)&#x000A;    <span class="ruby-identifier">a</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;      <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;invalid association: #{k}&quot;</span>) <span class="ruby-keyword">unless</span> <span class="ruby-identifier">association_reflection</span>(<span class="ruby-identifier">k</span>)&#x000A;      <span class="ruby-identifier">touched_associations</span>[<span class="ruby-identifier">k</span>] = <span class="ruby-identifier">v</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

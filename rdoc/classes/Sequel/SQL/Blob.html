@@ -51,6 +51,7 @@
             <h2>Methods</h2>
             <h3>Public Instance</h3>
             <ol>
+              <li><a href="#method-i-inspect">inspect</a></li>
               <li><a href="#method-i-lit">lit</a></li>
               <li><a href="#method-i-to_sequel_blob">to_sequel_blob</a></li>
             </ol>
@@ -67,6 +68,24 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Instance methods</h2>
+              <div class='method public-instance' id='method-method-i-inspect'>
+                <a name='method-i-inspect'></a>
+                <div class='synopsis'>
+                  <span class='name'>inspect</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Return a string showing that this is a blob, the size, and the some or all
+                  of the content, depending on the size.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-inspect-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-inspect-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1064</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">inspect</span>&#x000A;  <span class="ruby-identifier">size</span> = <span class="ruby-identifier">length</span>&#x000A;&#x000A;  <span class="ruby-identifier">content</span> = <span class="ruby-keyword">if</span> <span class="ruby-identifier">size</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">20</span>&#x000A;    <span class="ruby-node">&quot;start=#{self[0...10].to_s.inspect} end=#{self[-10..-1].to_s.inspect}&quot;</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-node">&quot;content=#{super}&quot;</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-node">&quot;#&lt;#{self.class}:0x#{&quot;%x&quot; % object_id} bytes=#{size} #{content}&gt;&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-lit'>
                 <a name='method-i-lit'></a>
                 <div class='synopsis'>
@@ -84,7 +103,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-lit-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1053</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-lit-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1058</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">lit</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)&#x000A;  <span class="ruby-identifier">args</span>.<span class="ruby-identifier">empty?</span> <span class="ruby-operator">?</span> <span class="ruby-constant">LiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>) <span class="ruby-operator">:</span> <span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">PlaceholderLiteralString</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>, <span class="ruby-identifier">args</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-to_sequel_blob'>
@@ -101,7 +120,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-to_sequel_blob-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-to_sequel_blob-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1058</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_sequel_blob</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-to_sequel_blob-source'><span class="ruby-comment"># File lib/sequel/sql.rb, line 1077</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">to_sequel_blob</span>&#x000A;  <span class="ruby-keyword">self</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

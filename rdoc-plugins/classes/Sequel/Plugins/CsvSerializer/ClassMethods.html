@@ -42,6 +42,7 @@
             <ol>
               <li><a href="#method-i-array_from_csv">array_from_csv</a></li>
               <li><a href="#attribute-i-csv_serializer_opts">csv_serializer_opts</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#method-i-from_csv">from_csv</a></li>
               <li><a href="#method-i-process_csv_serializer_opts">process_csv_serializer_opts</a></li>
             </ol>
@@ -85,6 +86,23 @@
                   <pre id='method-i-array_from_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 89</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">array_from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-constant">CSV</span>.<span class="ruby-identifier">parse</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)).<span class="ruby-identifier">map</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">row</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">row</span> = <span class="ruby-identifier">row</span>.<span class="ruby-identifier">to_hash</span>&#x000A;    <span class="ruby-identifier">row</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-keyword">nil</span>)&#x000A;    <span class="ruby-identifier">new</span>(<span class="ruby-identifier">row</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze csv serializier opts when freezing model class</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@csv_serializer_opts</span>.<span class="ruby-identifier">freeze</span>.<span class="ruby-identifier">each_value</span> <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">v</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-identifier">v</span>.<span class="ruby-identifier">freeze</span> <span class="ruby-keyword">if</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Array</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">is_a?</span>(<span class="ruby-constant">Hash</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-from_csv'>
                 <a name='method-i-from_csv'></a>
                 <div class='synopsis'>
@@ -99,7 +117,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-from_csv-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-from_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 98</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-identifier">new</span>.<span class="ruby-identifier">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-from_csv-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 107</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span> = {})&#x000A;  <span class="ruby-identifier">new</span>.<span class="ruby-identifier">from_csv</span>(<span class="ruby-identifier">csv</span>, <span class="ruby-identifier">opts</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-process_csv_serializer_opts'>
@@ -116,7 +134,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-process_csv_serializer_opts-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-process_csv_serializer_opts-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 103</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">opts</span> = (<span class="ruby-identifier">csv_serializer_opts</span> <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">opts_cols</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)&#x000A;  <span class="ruby-identifier">opts_include</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:include</span>)&#x000A;  <span class="ruby-identifier">opts_except</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:except</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:only</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">opts_cols</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">columns</span>) <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts_include</span>) <span class="ruby-operator">-</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts_except</span>)&#x000A;  <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-process_csv_serializer_opts-source'><span class="ruby-comment"># File lib/sequel/plugins/csv_serializer.rb, line 112</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">process_csv_serializer_opts</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">opts</span> = (<span class="ruby-identifier">csv_serializer_opts</span> <span class="ruby-operator">||</span> {}).<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)&#x000A;  <span class="ruby-identifier">opts_cols</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:columns</span>)&#x000A;  <span class="ruby-identifier">opts_include</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:include</span>)&#x000A;  <span class="ruby-identifier">opts_except</span> = <span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:except</span>)&#x000A;  <span class="ruby-identifier">opts</span>[<span class="ruby-value">:headers</span>] <span class="ruby-operator">||=</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-value">:only</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">opts_cols</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">columns</span>) <span class="ruby-operator">+</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts_include</span>) <span class="ruby-operator">-</span> <span class="ruby-constant">Array</span>(<span class="ruby-identifier">opts_except</span>)&#x000A;  <span class="ruby-identifier">opts</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

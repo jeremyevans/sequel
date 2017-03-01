@@ -66,7 +66,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_create-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_create-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 81</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_create-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 88</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_create</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-after_destroy'>
@@ -84,7 +84,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_destroy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 87</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_destroy-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 94</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_destroy</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-after_update'>
@@ -102,7 +102,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_update-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 100</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-identifier">touch_associations</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-touch'>
@@ -122,7 +122,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-touch-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-touch-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 102</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">touch</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_instance_value</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">column</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_instance_value</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-touch-source'><span class="ruby-comment"># File lib/sequel/plugins/touch.rb, line 109</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">touch</span>(<span class="ruby-identifier">column</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_instance_value</span>)&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-identifier">column</span> = <span class="ruby-identifier">model</span>.<span class="ruby-identifier">touch_column</span>&#x000A;    <span class="ruby-identifier">set</span>(<span class="ruby-identifier">column</span>=<span class="ruby-operator">&gt;</span><span class="ruby-identifier">touch_instance_value</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">columns</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">column</span>)&#x000A;  <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-identifier">save_changes</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

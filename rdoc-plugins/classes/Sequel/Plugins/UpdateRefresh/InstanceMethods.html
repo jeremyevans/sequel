@@ -56,12 +56,14 @@
                 </div>
                 <div class='description'>
                   
+                  <p>If the dataset does not support UPDATE RETURNING, then refresh after an
+                  update.</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-after_update-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 39</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">this</span>.<span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:update</span>)&#x000A;    <span class="ruby-identifier">refresh</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-after_update-source'><span class="ruby-comment"># File lib/sequel/plugins/update_refresh.rb, line 59</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">after_update</span>&#x000A;  <span class="ruby-keyword">super</span>&#x000A;  <span class="ruby-keyword">unless</span> <span class="ruby-identifier">this</span>.<span class="ruby-identifier">supports_returning?</span>(<span class="ruby-value">:update</span>)&#x000A;    <span class="ruby-identifier">refresh</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

@@ -56,6 +56,7 @@
               <li><a href="#method-i-eager_limit_strategy">eager_limit_strategy</a></li>
               <li><a href="#method-i-filter_by_associations_conditions_expression">filter_by_associations_conditions_expression</a></li>
               <li><a href="#method-i-filter_by_associations_limit_strategy">filter_by_associations_limit_strategy</a></li>
+              <li><a href="#method-i-finalize_settings">finalize_settings</a></li>
               <li><a href="#method-i-handle_silent_modification_failure-3F">handle_silent_modification_failure?</a></li>
               <li><a href="#method-i-predicate_key">predicate_key</a></li>
               <li><a href="#method-i-primary_key">primary_key</a></li>
@@ -65,6 +66,26 @@
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FINALIZE_SETTINGS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      superclass::FINALIZE_SETTINGS.merge(
+                      :array_type=>:array_type,
+                      :primary_key=>:primary_key,
+                      :primary_key_method=>:primary_key_method
+                      ).freeze
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-array_type'>
@@ -80,7 +101,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-array_type-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-array_type-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 181</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">array_type</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:array_type</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sch</span> = <span class="ruby-keyword">self</span>[<span class="ruby-value">:model</span>].<span class="ruby-identifier">db_schema</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">s</span> = <span class="ruby-identifier">sch</span>[<span class="ruby-keyword">self</span>[<span class="ruby-value">:key</span>]]) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">t</span> = <span class="ruby-identifier">s</span>[<span class="ruby-value">:db_type</span>])&#x000A;      <span class="ruby-identifier">t</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-value">:integer</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-array_type-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 188</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">array_type</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:array_type</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-keyword">if</span> (<span class="ruby-identifier">sch</span> = <span class="ruby-keyword">self</span>[<span class="ruby-value">:model</span>].<span class="ruby-identifier">db_schema</span>) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">s</span> = <span class="ruby-identifier">sch</span>[<span class="ruby-keyword">self</span>[<span class="ruby-value">:key</span>]]) <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">t</span> = <span class="ruby-identifier">s</span>[<span class="ruby-value">:db_type</span>])&#x000A;      <span class="ruby-identifier">t</span>&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-value">:integer</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-associated_object_keys'>
@@ -97,7 +118,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-associated_object_keys-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-associated_object_keys-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 192</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associated_object_keys</span>&#x000A;  <span class="ruby-constant">Array</span>(<span class="ruby-identifier">primary_key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-associated_object_keys-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 199</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">associated_object_keys</span>&#x000A;  <span class="ruby-constant">Array</span>(<span class="ruby-identifier">primary_key</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-can_have_associated_objects-3F'>
@@ -115,7 +136,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-can_have_associated_objects-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-can_have_associated_objects-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 198</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_have_associated_objects?</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:key</span>])&#x000A;  <span class="ruby-identifier">v</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-can_have_associated_objects-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 205</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">can_have_associated_objects?</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">v</span> = <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">get_column_value</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:key</span>])&#x000A;  <span class="ruby-identifier">v</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">v</span>.<span class="ruby-identifier">empty?</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-dataset_need_primary_key-3F'>
@@ -132,7 +153,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-dataset_need_primary_key-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-dataset_need_primary_key-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 204</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dataset_need_primary_key?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-dataset_need_primary_key-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 211</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">dataset_need_primary_key?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-default_key'>
@@ -150,7 +171,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-default_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-default_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 210</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_key</span>&#x000A;  <span class="ruby-value">:&quot;#{singularize(self[:name])}_ids&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-default_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 217</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">default_key</span>&#x000A;  <span class="ruby-value">:&quot;#{singularize(self[:name])}_ids&quot;</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-eager_graph_limit_strategy'>
@@ -167,7 +188,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eager_graph_limit_strategy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-eager_graph_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 215</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_graph_limit_strategy</span>(<span class="ruby-identifier">_</span>)&#x000A;  <span class="ruby-value">:ruby</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:limit</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-eager_graph_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 222</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_graph_limit_strategy</span>(<span class="ruby-identifier">_</span>)&#x000A;  <span class="ruby-value">:ruby</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:limit</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-eager_limit_strategy'>
@@ -184,7 +205,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-eager_limit_strategy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-eager_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 220</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_limit_strategy</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:_eager_limit_strategy</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-value">:ruby</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:limit</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-eager_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">eager_limit_strategy</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:_eager_limit_strategy</span>) <span class="ruby-keyword">do</span>&#x000A;    <span class="ruby-value">:ruby</span> <span class="ruby-keyword">if</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:limit</span>]&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-filter_by_associations_conditions_expression'>
@@ -200,7 +221,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-filter_by_associations_conditions_expression-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-filter_by_associations_conditions_expression-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 252</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_associations_conditions_expression</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">filter_by_associations_conditions_dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">filter_by_associations_conditions_subquery_conditions</span>(<span class="ruby-identifier">obj</span>))&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:coalesce</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">filter_by_associations_conditions_key</span>).<span class="ruby-identifier">overlaps</span>(<span class="ruby-identifier">ds</span>), <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Constants</span><span class="ruby-operator">::</span><span class="ruby-constant">FALSE</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-filter_by_associations_conditions_expression-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 268</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_associations_conditions_expression</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-identifier">ds</span> = <span class="ruby-identifier">filter_by_associations_conditions_dataset</span>.<span class="ruby-identifier">where</span>(<span class="ruby-identifier">filter_by_associations_conditions_subquery_conditions</span>(<span class="ruby-identifier">obj</span>))&#x000A;  <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">function</span>(<span class="ruby-value">:coalesce</span>, <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">pg_array</span>(<span class="ruby-identifier">filter_by_associations_conditions_key</span>).<span class="ruby-identifier">overlaps</span>(<span class="ruby-identifier">ds</span>), <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">SQL</span><span class="ruby-operator">::</span><span class="ruby-constant">Constants</span><span class="ruby-operator">::</span><span class="ruby-constant">FALSE</span>)&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-filter_by_associations_limit_strategy'>
@@ -217,7 +238,23 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-filter_by_associations_limit_strategy-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-filter_by_associations_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 227</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_associations_limit_strategy</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-filter_by_associations_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 234</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_associations_limit_strategy</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-finalize_settings'>
+                <a name='method-i-finalize_settings'></a>
+                <div class='synopsis'>
+                  <span class='name'>finalize_settings</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-finalize_settings-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-finalize_settings-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 243</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">finalize_settings</span>&#x000A;  <span class="ruby-constant">FINALIZE_SETTINGS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-handle_silent_modification_failure-3F'>
@@ -235,7 +272,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-handle_silent_modification_failure-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-handle_silent_modification_failure-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 233</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">handle_silent_modification_failure?</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:raise_on_save_failure</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:save_after_modify</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-handle_silent_modification_failure-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 249</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">handle_silent_modification_failure?</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:raise_on_save_failure</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-keyword">self</span>[<span class="ruby-value">:save_after_modify</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-predicate_key'>
@@ -252,7 +289,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-predicate_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-predicate_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 238</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:predicate_key</span>){<span class="ruby-identifier">qualify_assoc</span>(<span class="ruby-identifier">primary_key</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-predicate_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 254</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:predicate_key</span>){<span class="ruby-identifier">qualify_assoc</span>(<span class="ruby-identifier">primary_key</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-primary_key'>
@@ -269,7 +306,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-primary_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 243</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:primary_key</span>){<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">primary_key</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no primary key specified for #{associated_class.inspect}&quot;</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 259</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:primary_key</span>){<span class="ruby-identifier">associated_class</span>.<span class="ruby-identifier">primary_key</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">raise</span>(<span class="ruby-constant">Error</span>, <span class="ruby-node">&quot;no primary key specified for #{associated_class.inspect}&quot;</span>)}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-primary_key_method'>
@@ -286,7 +323,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-primary_key_method-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-primary_key_method-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 248</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key_method</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:primary_key_method</span>){<span class="ruby-identifier">primary_key</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-primary_key_method-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 264</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key_method</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:primary_key_method</span>){<span class="ruby-identifier">primary_key</span>}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

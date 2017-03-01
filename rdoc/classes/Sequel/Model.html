@@ -173,8 +173,8 @@
                     <td class='context-item-name'>DATASET_METHODS</td>
                     <td>=</td>
                     <td class='context-item-value'>
-                      (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
-                      [:each_server]) - [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
+                      (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) -
+                      [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
@@ -205,8 +205,7 @@
                     <td class='context-item-value'>
                       {:@allowed_columns=>:dup,
                       :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
-                      :@raise_on_save_failure=>nil, :@require_modification=>nil, 
-                      :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
+                      :@raise_on_save_failure=>nil, :@require_modification=>nil, :@restrict_primary_key=>nil,
                       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
                       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
                       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,

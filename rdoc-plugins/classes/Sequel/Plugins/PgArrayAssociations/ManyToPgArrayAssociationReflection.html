@@ -54,6 +54,7 @@
               <li><a href="#method-i-eager_graph_limit_strategy">eager_graph_limit_strategy</a></li>
               <li><a href="#method-i-eager_limit_strategy">eager_limit_strategy</a></li>
               <li><a href="#method-i-filter_by_associations_limit_strategy">filter_by_associations_limit_strategy</a></li>
+              <li><a href="#method-i-finalize_settings">finalize_settings</a></li>
               <li><a href="#method-i-handle_silent_modification_failure-3F">handle_silent_modification_failure?</a></li>
               <li><a href="#method-i-predicate_key">predicate_key</a></li>
               <li><a href="#method-i-primary_key">primary_key</a></li>
@@ -63,6 +64,24 @@
           <div id='context'>
           </div>
           <div id='section'>
+            <div id='constants-list'>
+              <h2>Constants</h2>
+              <div class='name-list'>
+                <table summary='Constants'>
+                  <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>FINALIZE_SETTINGS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      superclass::FINALIZE_SETTINGS.merge(
+                      :array_type=>:array_type
+                      ).freeze
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             <div id='methods'>
               <h2>Public Instance methods</h2>
               <div class='method public-instance' id='method-method-i-array_type'>
@@ -186,6 +205,22 @@
                   <pre id='method-i-filter_by_associations_limit_strategy-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 120</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">filter_by_associations_limit_strategy</span>&#x000A;  <span class="ruby-keyword">nil</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
+              <div class='method public-instance' id='method-method-i-finalize_settings'>
+                <a name='method-i-finalize_settings'></a>
+                <div class='synopsis'>
+                  <span class='name'>finalize_settings</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-finalize_settings-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-finalize_settings-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 127</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">finalize_settings</span>&#x000A;  <span class="ruby-constant">FINALIZE_SETTINGS</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-instance' id='method-method-i-handle_silent_modification_failure-3F'>
                 <a name='method-i-handle_silent_modification_failure-3F'></a>
                 <div class='synopsis'>
@@ -201,7 +236,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-handle_silent_modification_failure-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-handle_silent_modification_failure-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 125</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">handle_silent_modification_failure?</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:raise_on_save_failure</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-handle_silent_modification_failure-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 132</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">handle_silent_modification_failure?</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:raise_on_save_failure</span>] <span class="ruby-operator">==</span> <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-predicate_key'>
@@ -219,7 +254,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-predicate_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-predicate_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 130</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:predicate_key</span>){<span class="ruby-identifier">qualify_assoc</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:key_column</span>])}&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-predicate_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 137</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">predicate_key</span>&#x000A;  <span class="ruby-identifier">cached_fetch</span>(<span class="ruby-value">:predicate_key</span>){<span class="ruby-identifier">qualify_assoc</span>(<span class="ruby-keyword">self</span>[<span class="ruby-value">:key_column</span>])}&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-primary_key'>
@@ -237,7 +272,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-primary_key-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 136</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_key</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-primary_key-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 143</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">primary_key</span>&#x000A;  <span class="ruby-keyword">self</span>[<span class="ruby-value">:primary_key</span>]&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
               <div class='method public-instance' id='method-method-i-remove_before_destroy-3F'>
@@ -255,7 +290,7 @@
                   <a class='source-toggle' href='#' onclick="toggleCode('method-i-remove_before_destroy-3F-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-remove_before_destroy-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 142</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_before_destroy?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-i-remove_before_destroy-3F-source'><span class="ruby-comment"># File lib/sequel/plugins/pg_array_associations.rb, line 149</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">remove_before_destroy?</span>&#x000A;  <span class="ruby-keyword">false</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

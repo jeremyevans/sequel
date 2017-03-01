@@ -42,6 +42,7 @@
             <ol>
               <li><a href="#method-i-add_typecast_on_load_columns">add_typecast_on_load_columns</a></li>
               <li><a href="#method-i-call">call</a></li>
+              <li><a href="#method-i-freeze">freeze</a></li>
               <li><a href="#attribute-i-typecast_on_load_columns">typecast_on_load_columns</a></li>
             </ol>
           </div>
@@ -100,6 +101,23 @@
                     [show source]
                   </a>
                   <pre id='method-i-call-source'><span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb, line 42</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-identifier">values</span>)&#x000A;  <span class="ruby-keyword">super</span>.<span class="ruby-identifier">load_typecast</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
+              <div class='method public-instance' id='method-method-i-freeze'>
+                <a name='method-i-freeze'></a>
+                <div class='synopsis'>
+                  <span class='name'>freeze</span>
+                  <span class='arguments'>()</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Freeze typecast on load columns when freezing model class.</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-freeze-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-i-freeze-source'><span class="ruby-comment"># File lib/sequel/plugins/typecast_on_load.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">freeze</span>&#x000A;  <span class="ruby-ivar">@typecast_on_load_columns</span>.<span class="ruby-identifier">freeze</span>&#x000A;&#x000A;  <span class="ruby-keyword">super</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>
