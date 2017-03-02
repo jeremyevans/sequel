@@ -174,6 +174,8 @@ describe "Sequel::Plugins::Dirty" do
     include dirty_plugin_specs
 
     it "previous_changes should be the previous changes after saving" do
+      @o.previous_changes.should == {}
+      @o.previous_changes[:initial_changes].first.should be_nil
       @o.save
       @o.previous_changes.must_equal(:initial_changed=>['ic', 'ic2'], :missing_changed=>[nil, 'mc2'])
     end
