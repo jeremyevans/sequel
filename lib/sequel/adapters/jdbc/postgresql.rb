@@ -195,6 +195,11 @@ module Sequel
           sql << APOS << db.synchronize(@opts[:server]){|c| c.escape_string(v)} << APOS
         end
 
+        # SQL fragment for Sequel::SQLTime, containing just the time part
+        def literal_sqltime(v)
+          v.strftime("'%H:%M:%S#{sprintf(".%03d", (v.usec/1000.0).round)}'")
+        end
+
         STRING_TYPE = Java::JavaSQL::Types::VARCHAR
         ARRAY_TYPE = Java::JavaSQL::Types::ARRAY
         PG_SPECIFIC_TYPES = [ARRAY_TYPE, Java::JavaSQL::Types::OTHER, Java::JavaSQL::Types::STRUCT]
