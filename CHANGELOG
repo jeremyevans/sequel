@@ -1,3 +1,7 @@
+=== master
+
+* Add oracle support to the odbc adapter (samuel02) (#1315)
+
 === 4.44.0 (2017-03-01)
 
 * Add where_all, where_each, where_single_value model dataset methods, optimized for frozen datasets (jeremyevans)
