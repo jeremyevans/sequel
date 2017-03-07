@@ -1,5 +1,7 @@
 === master
 
+* Make Database#indexes on MySQL handle qualified identifiers (jeremyevans) (#1316)
+
 * Add oracle support to the odbc adapter (samuel02) (#1315)
 
 === 4.44.0 (2017-03-01)

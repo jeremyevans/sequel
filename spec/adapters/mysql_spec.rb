@@ -338,6 +338,11 @@ describe "A MySQL database" do
   it "should handle the creation and dropping of an InnoDB table with foreign keys" do
     DB.create_table!(:test_innodb, :engine=>:InnoDB){primary_key :id; foreign_key :fk, :test_innodb, :key=>:id}
   end
+
+  it "should handle qualified tables in #indexes" do
+    DB.create_table!(:test_innodb){primary_key :id; String :name; index :name, :unique=>true, :name=>:test_innodb_name_idx}
+    DB.indexes(Sequel.qualify(DB.get{database{}}, :test_innodb)).must_equal(:test_innodb_name_idx=>{:unique=>true, :columns=>[:name]})
+  end
 end
 
 describe "A MySQL database" do

@@ -110,7 +110,16 @@ module Sequel
         remove_indexes = []
         m = output_identifier_meth
         im = input_identifier_meth
-        metadata_dataset.with_sql("SHOW INDEX FROM ?", SQL::Identifier.new(im.call(table))).each do |r|
+        schema, table = schema_and_table(table)
+
+        table = Sequel::SQL::Identifier.new(table)
+        sql = "SHOW INDEX FROM #{literal(table)}"
+        if schema
+          schema = Sequel::SQL::Identifier.new(schema)
+          sql += " FROM #{literal(schema)}"
+        end
+
+        metadata_dataset.with_sql(sql).each do |r|
           name = r[:Key_name]
           next if name == PRIMARY
           name = m.call(name)
