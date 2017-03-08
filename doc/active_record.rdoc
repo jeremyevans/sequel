@@ -535,10 +535,9 @@ If you want to use a specific <tt>Sequel::Database</tt> object, you can use <tt>
   BACKUP_DB = Sequel.connect('postgres://...')
   Album.db = BACKUP_DB
 
-If you want a specific dataset in that database, you can use +set_dataset+ or <tt>dataset=</tt>:
+If you want a specific dataset in that database for a model, setup the model with a specific dataset:
 
-  Album.set_dataset BACKUP_DB[:albums]
-  Album.dataset = BACKUP_DB[:albums]
+  class Album < Sequel::Model(BACKUP_DB[:albums]); end
 
 ==== <tt>exists?</tt>
 

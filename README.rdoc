@@ -512,15 +512,14 @@ Sequel model classes assume that the table name is an underscored plural of the 
 
 You can explicitly set the table name or even the dataset used:
 
-  class Post < Sequel::Model(:my_posts)
-  end
+  class Post < Sequel::Model(:my_posts); end
   # or:
-  Post.set_dataset :my_posts
+  class Post < Sequel::Model(DB[:my_posts]); end
 
-If you call +set_dataset+ with a symbol, it assumes you are referring to the table with the same name.  You can also call it with a dataset, which will set the defaults for all retrievals for that model:
+If you pass a symbol to the <tt>Sequel::Model</tt> method, it assumes you are referring to the table with the same name.  You can also call it with a dataset, which will set the defaults for all retrievals for that model:
 
-  Post.set_dataset DB[:my_posts].where(:category => 'ruby')
-  Post.set_dataset DB[:my_posts].select(:id, :name).order(:date)
+  class Post < Sequel::Model(DB[:my_posts].where(:category => 'ruby')); end
+  class Post < Sequel::Model(DB[:my_posts].select(:id, :name).order(:date)); end
 
 === Model instances
 

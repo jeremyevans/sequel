@@ -82,7 +82,7 @@ module Sequel
       #
       # or:
       #
-      #   Foo = Sequel::Model()
+      #   Foo = Class.new(Sequel::Model)
       #   Foo.set_dataset :my_foo
       attr_accessor :require_valid_table
 
@@ -167,7 +167,9 @@ module Sequel
       # The purpose of this method is to set the dataset/database automatically
       # for a model class, if the table name doesn't match the implicit
       # name.  This is neater than using set_dataset inside the class,
-      # doesn't require a bogus query for the schema.
+      # doesn't require a bogus query for the schema, and works when using
+      # +require_valid_table+, or with plugins that assume a model's dataset
+      # is valid.
       #
       # When creating subclasses of Sequel::Model itself, this method is usually
       # called on Sequel itself, using <tt>Sequel::Model(:something)</tt>.
@@ -835,17 +837,27 @@ module Sequel
       # database with the table name given. Other arguments raise an +Error+.
       # Returns self.
       #
-      # This changes the row_proc of the dataset to return
-      # model objects and extends the dataset with the dataset_method_modules.
       # It also attempts to determine the database schema for the model,
       # based on the given dataset.
-      #
-      #   Artist.set_dataset(:tbl_artists)
-      #   Artist.set_dataset(DB[:artists])
       #
       # Note that you should not use this to change the model's dataset
       # at runtime.  If you have that need, you should look into Sequel's
       # sharding support.
+      #
+      # You should avoid calling this method directly.  Instead of doing:
+      #
+      #   class Artist < Sequel::Model
+      #     set_dataset :tbl_artists
+      #   end
+      #
+      # You should use:
+      #
+      #   class Artist < Sequel::Model(:tbl_artists)
+      #   end
+      #
+      # This ensures the class never uses an invalid dataset.  Calling +set_dataset+
+      # after creating a class can create a class with initial invalid dataset, which
+      # will break when +require_valid_table+ or certain plugins are used.
       def set_dataset(ds, opts=OPTS)
         inherited = opts[:inherited]
         @dataset = convert_input_dataset(ds)
@@ -2433,8 +2445,7 @@ module Sequel
       end
     end
 
-    # Dataset methods are methods that the model class extends its dataset with in
-    # the call to set_dataset.
+    # DatasetMethods contains methods that all model datasets have.
     module DatasetMethods
       Dataset.def_deprecated_opts_setter(self, :model)
 

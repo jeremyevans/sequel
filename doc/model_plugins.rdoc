@@ -243,7 +243,7 @@ In many plugins, if the model class changes the dataset, you need to change the 
     end
   end
 
-With this code, any time the model's dataset changes, the state of the plugin will be updated to set the correct table name.
+With this code, any time the model's dataset changes, the state of the plugin will be updated to set the correct table name.  This is also called when creating a new model class with a dataset.
 
 == Making Dataset Methods Callable as Class Methods
 
