@@ -289,7 +289,7 @@ module Sequel
       ONLY_OFFSET = " TOP 2147483647".freeze
 
       Dataset.def_sql_method(self, :insert, %w'with insert into columns values')
-      Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having order compounds lock')
+      Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from join where group having compounds order lock')
 
       # Whether to convert smallint to boolean arguments for this dataset.
       # Defaults to the SqlAnywhere module setting.

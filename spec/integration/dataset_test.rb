@@ -616,6 +616,10 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     DB.drop_table?(:i1, :i2, :i3)
   end
   
+  it "should give the correct results for UNION with an existing order" do
+    @ds1.order(:number).union(@ds2).order(:number).map{|x| x[:number].to_s}.must_equal %w'10 20 30'
+  end
+
   it "should give the correct results for simple UNION, EXCEPT, and INTERSECT" do
     @ds1.union(@ds2).order(:number).map{|x| x[:number].to_s}.must_equal %w'10 20 30'
     if @ds1.supports_intersect_except?

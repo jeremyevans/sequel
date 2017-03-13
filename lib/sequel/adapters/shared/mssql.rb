@@ -525,7 +525,7 @@ module Sequel
   
     module DatasetMethods
       include(Module.new do
-        Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from lock join where group having order compounds')
+        Dataset.def_sql_method(self, :select, %w'with select distinct limit columns into from lock join where group having compounds order')
       end)
       include EmulateOffsetWithRowNumber
 
