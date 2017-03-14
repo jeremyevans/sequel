@@ -39,13 +39,14 @@ module Sequel
       end
 
       meths = (<<-METHS).split.map(&:to_sym)
-        distinct eager grep group group_and_count group_append 
+        distinct grep group group_and_count group_append 
         limit offset order order_append order_prepend 
         select select_all select_append select_group server
       METHS
 
-      meths.each do |meth|
-        define_method(meth) do |name, *args, &block|
+      # Define a method in the module
+      def self.def_dataset_caching_method(mod, meth)
+        mod.send(:define_method, meth) do |name, *args, &block|
           if block
             @model.def_dataset_method(name){send(meth, *args, &block)}
           else
@@ -57,6 +58,10 @@ module Sequel
         end
       end
 
+      meths.each do |meth|
+        def_dataset_caching_method(self, meth)
+      end
+
       private
 
       # Add a class method to the related model that
@@ -65,5 +70,7 @@ module Sequel
         @model.send(:def_model_dataset_method, meth)
       end
     end
+
+    @dataset_module_class = DatasetModule
   end
 end

@@ -78,7 +78,7 @@ module Sequel
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
       :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
       :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
-      :@cache_anonymous_models=>nil, :@Model_mutex=>nil}
+      :@cache_anonymous_models=>nil, :@Model_mutex=>nil, :@dataset_module_class=>nil}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to

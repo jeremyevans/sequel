@@ -24,6 +24,9 @@ module Sequel
       # with all of these modules.
       attr_reader :dataset_method_modules
 
+      # The Module subclass to use for dataset_module blocks.
+      attr_reader :dataset_module_class
+
       # The default options to use for Model#set_fields.  These are merged with
       # the options given to set_fields.
       attr_accessor :default_set_fields_options
@@ -340,13 +343,13 @@ module Sequel
           dataset_extend(mod)
           mod
         else
-          @dataset_module ||= DatasetModule.new(self)
+          @dataset_module ||= dataset_module_class.new(self)
           @dataset_module.module_eval(&Proc.new) if block_given?
           dataset_extend(@dataset_module)
           @dataset_module
         end
       end
-    
+
       # Returns the database associated with the Model class.
       # If this model doesn't have a database associated with it,
       # assumes the superclass's database, or the first object in

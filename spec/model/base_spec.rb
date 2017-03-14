@@ -285,6 +285,12 @@ describe Sequel::Model, ".dataset_module" do
     @c.where(:foo).released.sql.must_equal 'SELECT * FROM items WHERE (foo AND released)'
   end
 
+  if Sequel::Model.dataset_module_class == Sequel::Model::DatasetModule
+    it "should have dataset_module not support an eager method" do
+      proc{@c.dataset_module{eager :foo}}.must_raise NoMethodError
+    end
+  end
+
   it "should have dataset_module support a having method" do
     @c.dataset_module{having(:released){released}}
     @c.released.sql.must_equal 'SELECT * FROM items HAVING released'

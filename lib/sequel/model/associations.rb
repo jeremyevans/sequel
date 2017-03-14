@@ -15,7 +15,13 @@ module Sequel
           @autoreloading_associations = {}
           @cache_associations = true
           @default_association_options = {}
+          @dataset_module_class = DatasetModule
         end
+      end
+
+      # The dataset module to use for classes using the associations plugin.
+      class DatasetModule < Model::DatasetModule
+        def_dataset_caching_method(self, :eager)
       end
 
       # AssociationReflection is a Hash subclass that keeps information on Sequel::Model associations. It
