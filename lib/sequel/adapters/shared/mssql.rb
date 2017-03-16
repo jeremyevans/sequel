@@ -847,6 +847,21 @@ module Sequel
         (options_overlap(Sequel::Dataset::COUNT_FROM_SELF_OPTS) && !options_overlap([:limit])) ? unordered.from_self : super
       end
 
+      # If the dataset using a order without a limit or offset or custom SQL, 
+      # remove the order.  Compounds on Microsoft SQL Server have undefined
+      # order unless the result is specifically ordered.  Applying the current
+      # order before the compound doesn't work in all cases, such as when
+      # qualified identifiers are used.  If you want to ensure a order
+      # for a compound dataset, apply the order after all compounds have been
+      # added.
+      def compound_from_self
+        if @opts[:order]  && !(@opts[:sql] || @opts[:limit] || @opts[:offset])
+          unordered
+        else
+          super
+        end
+      end
+
       private
 
       # Whether we are using SQL Server 2005 or later.
