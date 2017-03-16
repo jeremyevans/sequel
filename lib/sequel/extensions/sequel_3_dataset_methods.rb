@@ -29,14 +29,14 @@ module Sequel
     COMMA = Dataset::COMMA
     # Change the database for this dataset.
     def db=(v)
-      raise_if_frozen!
+      raise_if_frozen!("db=")
       @db = v
       @cache = {}
     end
 
     # Change the options for this dataset.
     def opts=(v)
-      raise_if_frozen!
+      raise_if_frozen!("opts=")
       @opts = v
       @cache = {}
     end

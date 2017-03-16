@@ -1186,6 +1186,19 @@ module Sequel
 
     private
 
+    # Load the extensions into the receiver, without checking if the receiver is frozen.
+    def _extension!(exts)
+      Sequel.extension(*exts)
+      exts.each do |ext|
+        if pr = Sequel.synchronize{EXTENSIONS[ext]}
+          pr.call(self)
+        else
+          raise(Error, "Extension #{ext} does not have specific support handling individual datasets (try: Sequel.extension #{ext.inspect})")
+        end
+      end
+      self
+    end
+
     # Internal filtering method so it works on either the WHERE or HAVING clauses, with or
     # without inversion.
     def _filter_or_exclude(invert, clause, *cond, &block)

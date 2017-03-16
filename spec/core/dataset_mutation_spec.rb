@@ -8,42 +8,42 @@ describe "Dataset" do
     @d = Sequel.mock.dataset.from(:x)
   end
 
-  it "should support self-changing select!" do
+  deprecated "should support self-changing select!" do
     @d.select!(:y)
     @d.sql.must_equal "SELECT y FROM x"
   end
   
-  it "should support self-changing from!" do
+  deprecated "should support self-changing from!" do
     @d.from!(:y)
     @d.sql.must_equal "SELECT * FROM y"
   end
 
-  it "should support self-changing order!" do
+  deprecated "should support self-changing order!" do
     @d.order!(:y)
     @d.sql.must_equal "SELECT * FROM x ORDER BY y"
   end
   
-  it "should support self-changing filter!" do
+  deprecated "should support self-changing filter!" do
     @d.filter!(:y => 1)
     @d.sql.must_equal "SELECT * FROM x WHERE (y = 1)"
   end
 
-  it "should support self-changing filter! with block" do
+  deprecated "should support self-changing filter! with block" do
     @d.filter!{y < 2}
     @d.sql.must_equal "SELECT * FROM x WHERE (y < 2)"
   end
   
-  it "should raise for ! methods that don't return a dataset" do
+  deprecated "should raise for ! methods that don't return a dataset" do
     proc {@d.opts!}.must_raise(NoMethodError)
   end
   
-  it "should raise for missing methods" do
+  deprecated "should raise for missing methods" do
     proc {@d.xuyz}.must_raise(NoMethodError)
     proc {@d.xyz!}.must_raise(NoMethodError)
     proc {@d.xyz?}.must_raise(NoMethodError)
   end
   
-  it "should support chaining of bang methods" do
+  deprecated "should support chaining of bang methods" do
       @d.order!(:y).filter!(:y => 1).sql.must_equal "SELECT * FROM x WHERE (y = 1) ORDER BY y"
   end
 end
@@ -53,11 +53,11 @@ describe "Frozen Datasets" do
     @ds = Sequel.mock[:test].freeze
   end
 
-  it "should have dups not be frozen" do
+  deprecated "should have dups not be frozen" do
     @ds.dup.wont_be :frozen?
   end
 
-  it "should raise an error when calling mutation methods" do
+  deprecated "should raise an error when calling mutation methods" do
     proc{@ds.select!(:a)}.must_raise RuntimeError
     proc{@ds.row_proc = proc{}}.must_raise RuntimeError
     proc{@ds.extension! :query}.must_raise RuntimeError
@@ -74,7 +74,7 @@ describe "Dataset mutation methods" do
     ds.sql
   end
 
-  it "should modify the dataset in place" do
+  deprecated "should modify the dataset in place" do
     dsc = Sequel.mock[:u]
     dsc.send(:columns=, [:v])
 
@@ -132,7 +132,7 @@ describe "Dataset mutation methods" do
     dsc.graph!(dsc, {:b=>:c}, :table_alias=>:foo).ungraphed!.opts[:graph].must_be_nil
   end
 
-  it "should clear the cache" do
+  deprecated "should clear the cache" do
     ds = Sequel.mock[:a]
     ds.columns
     ds.send(:cache_set, :columns, [:a])
@@ -145,7 +145,7 @@ describe "Dataset#clone" do
     @dataset = Sequel.mock.dataset.from(:items)
   end
 
-  it "should copy the dataset opts" do
+  deprecated "should copy the dataset opts" do
     clone = @dataset.clone
     clone.opts.must_equal @dataset.opts
     @dataset.filter!(:a => 'b')
@@ -173,20 +173,20 @@ describe "Dataset extensions" do
     @ds = Sequel.mock.dataset
   end
 
-  it "should have #extension! modify the receiver" do
+  deprecated "should have #extension! modify the receiver" do
     Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
     @ds.extension!(:foo)
     @ds.a.must_equal 1
   end
 
-  it "should have #extension! return the receiver" do
+  deprecated "should have #extension! return the receiver" do
     Sequel::Dataset.register_extension(:foo, Module.new{def a; 1; end})
     @ds.extension!(:foo).must_be_same_as(@ds)
   end
 end
 
 describe "Dataset#naked!" do
-  it "should remove any existing row_proc" do
+  deprecated "should remove any existing row_proc" do
     d = Sequel.mock.dataset.with_row_proc(Proc.new{|r| r})
     d.naked!.row_proc.must_be_nil
     d.row_proc.must_be_nil
@@ -194,7 +194,7 @@ describe "Dataset#naked!" do
 end
 
 describe "Dataset#row_proc=" do
-  it "should set the row_proc" do
+  deprecated "should set the row_proc" do
     d = Sequel.mock.dataset.with_row_proc(Proc.new{|r| r})
     d.row_proc.wont_be_nil
     d.row_proc = nil
@@ -203,7 +203,7 @@ describe "Dataset#row_proc=" do
 end
 
 describe "Dataset#quote_identifiers=" do
-  it "should change quote identifiers setting" do
+  deprecated "should change quote identifiers setting" do
     d = Sequel.mock.dataset.with_quote_identifiers(true)
     d.literal(:a).must_equal '"a"'
     d.quote_identifiers = false
@@ -212,13 +212,13 @@ describe "Dataset#quote_identifiers=" do
 end
 
 describe "Dataset#from_self!" do
-  it "should work" do
+  deprecated "should work" do
     Sequel.mock.dataset.from(:test).select(:name).limit(1).from_self!.sql.must_equal 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS t1'
   end
 end
 
 describe "Sequel Mock Adapter" do
-  it "should be able to set the rows returned by each on a per dataset basis using _fetch" do
+  deprecated "should be able to set the rows returned by each on a per dataset basis using _fetch" do
     rs = []
     db = Sequel.mock(:fetch=>{:a=>1})
     ds = db[:t]
@@ -229,7 +229,7 @@ describe "Sequel Mock Adapter" do
     rs.must_equal [{:a=>1}, {:b=>2}]
   end
 
-  it "should be able to set the number of rows modified by update and delete on a per dataset basis" do
+  deprecated "should be able to set the number of rows modified by update and delete on a per dataset basis" do
     db = Sequel.mock(:numrows=>2)
     ds = db[:t]
     ds.update(:a=>1).must_equal 2
@@ -239,7 +239,7 @@ describe "Sequel Mock Adapter" do
     ds.delete.must_equal 3
   end
 
-  it "should be able to set the autogenerated primary key returned by insert on a per dataset basis" do
+  deprecated "should be able to set the autogenerated primary key returned by insert on a per dataset basis" do
     db = Sequel.mock(:autoid=>1)
     ds = db[:t]
     ds.insert(:a=>1).must_equal 1

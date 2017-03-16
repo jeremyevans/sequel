@@ -143,7 +143,7 @@ module Sequel
       
       # Set the method to call on identifiers going into the database for this dataset
       def identifier_input_method=(v)
-        raise_if_frozen!
+        raise_if_frozen!("identifier_input_method=")
         skip_symbol_cache!
         @opts[:identifier_input_method] = v
       end
@@ -156,7 +156,7 @@ module Sequel
     
       # Set the method to call on identifiers coming the database for this dataset
       def identifier_output_method=(v)
-        raise_if_frozen!
+        raise_if_frozen!("identifier_output_method=")
         @opts[:identifier_output_method] = v
       end
 

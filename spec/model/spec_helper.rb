@@ -11,6 +11,8 @@ gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 
+require "#{File.dirname(File.dirname(__FILE__))}/deprecation_helper.rb"
+
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil
 Sequel.identifier_output_method = nil

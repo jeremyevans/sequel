@@ -3,6 +3,8 @@ require 'minitest/autorun'
 require 'minitest/hooks/default'
 require 'minitest/shared_description'
 
+require "#{File.dirname(__FILE__)}/deprecation_helper.rb"
+
 def Sequel.guarded?(*checked)
   unless ENV['SEQUEL_NO_PENDING']
     checked.each do |c|

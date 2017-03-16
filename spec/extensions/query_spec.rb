@@ -89,7 +89,7 @@ describe "Dataset#query" do
   
   # SEQUEL5: Remove
   unless Sequel.mock.dataset.frozen?
-    it "should have an appropriate mutation method" do
+    deprecated "should have an appropriate mutation method" do
       @d.query! do
         select :a, :b___mongo
         from :yyy

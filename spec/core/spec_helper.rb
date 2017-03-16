@@ -10,12 +10,13 @@ unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(File.expand_path(__FILE__)), "../../lib/"))
   require 'sequel/core'
 end
-Sequel::Deprecation.backtrace_filter = lambda{|line, lineno| lineno < 4 || line =~ /_spec\.rb/}
 
 gem 'minitest'
 require 'minitest/autorun'
 require 'minitest/hooks/default'
 require 'minitest/shared_description'
+
+require "#{File.dirname(File.dirname(__FILE__))}/deprecation_helper.rb"
 
 class Minitest::HooksSpec
   def meta_def(obj, name, &block)

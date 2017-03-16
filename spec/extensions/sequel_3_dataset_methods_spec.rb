@@ -59,7 +59,7 @@ end
 # SEQUEL5: Remove
 unless Sequel.mock.dataset.frozen?
   describe "Dataset#db=" do
-    it "should change the dataset's database" do
+    deprecated "should change the dataset's database" do
       db = Sequel.mock
       ds = db[:items].extension(:sequel_3_dataset_methods)
       db2 = Sequel.mock
@@ -68,14 +68,14 @@ unless Sequel.mock.dataset.frozen?
       ds.db.wont_equal db
     end
 
-    it "should raise error for frozen datasets" do
+    deprecated "should raise error for frozen datasets" do
       ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
       proc{ds.db = ds.db}.must_raise RuntimeError
     end
   end
 
   describe "Dataset#opts=" do
-    it "should change the dataset's opts" do
+    deprecated "should change the dataset's opts" do
       db = Sequel.mock
       ds = db[:items].extension(:sequel_3_dataset_methods)
       ds.sql.must_equal 'SELECT * FROM items'
@@ -84,7 +84,7 @@ unless Sequel.mock.dataset.frozen?
       ds.opts.must_equal({})
     end
 
-    it "should raise error for frozen datasets" do
+    deprecated "should raise error for frozen datasets" do
       ds = Sequel.mock.dataset.extension(:sequel_3_dataset_methods).freeze
       proc{ds.opts = {}}.must_raise RuntimeError
     end

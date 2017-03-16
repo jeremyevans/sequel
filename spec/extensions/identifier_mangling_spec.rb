@@ -190,14 +190,14 @@ describe "Dataset" do
   
   # SEQUEL5: Remove
   unless Sequel.mock(:identifier_mangling=>true).dataset.frozen?
-    it "should have quote_identifiers= method which changes literalization of identifiers" do
+    deprecated "should have quote_identifiers= method which changes literalization of identifiers" do
       @dataset.quote_identifiers = true
       @dataset.literal(:a).must_equal '"a"'
       @dataset.quote_identifiers = false
       @dataset.literal(:a).must_equal 'a'
     end
     
-    it "should have identifier_input_method= method which changes literalization of identifiers" do
+    deprecated "should have identifier_input_method= method which changes literalization of identifiers" do
       @dataset.identifier_input_method = :upcase
       @dataset.literal(:a).must_equal 'A'
       @dataset.identifier_input_method = :downcase
@@ -206,7 +206,7 @@ describe "Dataset" do
       @dataset.literal(:at_b).must_equal 'b_ta'
     end
     
-    it "should have identifier_output_method= method which changes identifiers returned from the database" do
+    deprecated "should have identifier_output_method= method which changes identifiers returned from the database" do
       @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
       @dataset.identifier_output_method = :upcase
       @dataset.send(:output_identifier, "at_b_C").must_equal :AT_B_C

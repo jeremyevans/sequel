@@ -1,5 +1,7 @@
 === master
 
+* Deprecate dataset mutation (jeremyevans)
+
 * Handle dumping of autoincrementing 64-bit integer primary key columns correctly when using :same_db option in the schema dumper (jeremyevans) (#1324)
 
 * Add Model.dataset_module_class accessor, allowing plugins to support custom behavior in dataset_module blocks (jeremyevans)
