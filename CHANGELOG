@@ -1,5 +1,7 @@
 === master
 
+* Automatically use from_self when using a dataset as part of a compound if it has an offset but no limit (jeremyevans)
+
 * Drop order on existing datasets when using Dataset#union/intersect/except on Microsoft SQL Server unless a limit or offset is used (jeremyevans)
 
 * Deprecate dataset mutation (jeremyevans)
