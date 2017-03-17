@@ -135,10 +135,17 @@ describe "Sequel::Plugins::PreparedStatementsAssociations" do
     @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
   end
 
-  it "should run a regular query if there is a callback" do
+  deprecated "should run a regular query if there is a callback" do
     @Artist.load(:id=>1).albums(proc{|ds| ds})
     @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
     @Artist.load(:id=>1).album(proc{|ds| ds})
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
+  end
+
+  it "should run a regular query if there is a block" do
+    @Artist.load(:id=>1).albums{|ds| ds}
+    @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1)"]
+    @Artist.load(:id=>1).album{|ds| ds}
     @db.sqls.must_equal ["SELECT * FROM albums WHERE (albums.artist_id = 1) LIMIT 1"]
   end
 

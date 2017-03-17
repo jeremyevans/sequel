@@ -1,5 +1,11 @@
 === master
 
+* The :proxy_argument option passed to association_proxies plugin block is now an empty hash if no arguments are passed to the association method (jeremyevans)
+
+* Deprecate passing non-hash arguments to association methods (jeremyevans)
+
+* Deprecate passing multiple arguments to association methods (jeremyevans)
+
 * Deprecate model transaction hook methods (jeremyevans)
 
 * Drop support for pg <0.8.0 in the postgres adapter (jeremyevans)

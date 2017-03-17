@@ -2037,12 +2037,12 @@ describe "Sequel::Model Simple Associations" do
     @artist.add_album(@album)
 
     @artist.albums.must_equal [@album]
-    @artist.albums(proc{|ds| ds.exclude(:id=>@album.id)}).must_equal []
-    @artist.albums(proc{|ds| ds.filter(:id=>@album.id)}).must_equal [@album]
+    @artist.albums{|ds| ds.exclude(:id=>@album.id)}.must_equal []
+    @artist.albums{|ds| ds.filter(:id=>@album.id)}.must_equal [@album]
 
     @album.artist.must_equal @artist
-    @album.artist(proc{|ds| ds.exclude(:id=>@artist.id)}).must_be_nil
-    @album.artist(proc{|ds| ds.filter(:id=>@artist.id)}).must_equal @artist
+    @album.artist{|ds| ds.exclude(:id=>@artist.id)}.must_be_nil
+    @album.artist{|ds| ds.filter(:id=>@artist.id)}.must_equal @artist
 
     @artist.albums{|ds| ds.exclude(:id=>@album.id)}.must_equal []
     @artist.albums{|ds| ds.filter(:id=>@album.id)}.must_equal [@album]

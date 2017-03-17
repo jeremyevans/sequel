@@ -91,7 +91,7 @@ module Sequel
         # If there the association is not in the associations cache and the object
         # was reteived via Dataset#all, eagerly load the association for all model
         # objects retrieved with the current object.
-        def load_associated_objects(opts, dynamic_opts=nil, &block)
+        def load_associated_objects(opts, dynamic_opts=OPTS, &block)
           dynamic_opts = load_association_objects_options(dynamic_opts, &block)
           name = opts[:name]
           if (!associations.include?(name) || dynamic_opts[:eager_reload]) && retrieved_by && !frozen? && !dynamic_opts[:callback] && !dynamic_opts[:reload]

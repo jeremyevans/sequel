@@ -440,7 +440,7 @@ describe Sequel::Model, "many_through_many" do
     n = @c1.load(:id => 1234)
     n.associations[:tags] = []
     DB.sqls.must_equal []
-    n.tags(true).must_equal [@c2.load(:id=>1)]
+    n.tags(:reload=>true).must_equal [@c2.load(:id=>1)]
     DB.sqls.must_equal ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id = 1234)']
     n.associations[:tags].must_equal n.tags
     DB.sqls.length.must_equal 0
@@ -1558,7 +1558,7 @@ describe Sequel::Model, "one_through_many" do
     n = @c1.load(:id => 1234)
     n.associations[:tag] = nil
     DB.sqls.must_equal []
-    n.tag(true).must_equal @c2.load(:id=>1)
+    n.tag(:reload=>true).must_equal @c2.load(:id=>1)
     DB.sqls.must_equal ['SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id = 1234) LIMIT 1']
     n.associations[:tag].must_equal n.tag
     DB.sqls.length.must_equal 0

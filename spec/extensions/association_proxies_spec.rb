@@ -44,13 +44,13 @@ describe "Sequel::Plugins::AssociationProxies" do
       proxy_block = opts[:proxy_block]
       cached = opts[:instance].associations[opts[:reflection][:name]]
       is_size = opts[:method] == :size
-      is_size && !cached && !proxy_arg && !proxy_block
+      is_size && !cached && !proxy_arg[:reload] && !proxy_block
     end
     @t.size.must_equal 1
     Item.db.sqls.must_equal ["SELECT count(*) AS count FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE (items_tags.item_id = 1) LIMIT 1"]
     @i.tags{|ds| ds}.size.must_equal 1
     Item.db.sqls.must_equal ["SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE (items_tags.item_id = 1)"]
-    @i.tags(true).size.must_equal 1
+    @i.tags(:reload=>true).size.must_equal 1
     Item.db.sqls.must_equal ["SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE (items_tags.item_id = 1)"]
     @t.size.must_equal 1
     Item.db.sqls.must_equal []
@@ -61,7 +61,7 @@ describe "Sequel::Plugins::AssociationProxies" do
     Item.db.sqls.length.must_equal 1
     @t.select{|x| false}.must_equal []
     Item.db.sqls.length.must_equal 0
-    @i.tags(true).select{|x| false}.must_equal []
+    @i.tags(:reload=>true).select{|x| false}.must_equal []
     Item.db.sqls.length.must_equal 1
     @t.filter(:a=>1).sql.must_equal "SELECT tags.* FROM tags INNER JOIN items_tags ON (items_tags.tag_id = tags.id) WHERE ((items_tags.item_id = 1) AND (a = 1))"
     Item.db.sqls.length.must_equal 0

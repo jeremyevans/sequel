@@ -447,12 +447,14 @@ describe Sequel::Model, "many_to_one" do
     DB.reset
     d.parent_id = 234
     d.associations[:parent] = 42
-    d.parent(true).wont_equal 42 
-    DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
     d.parent(:reload=>true).wont_equal 42 
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
-    d.parent(Object.new).wont_equal 42 
-    DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
+    deprecated do
+      d.parent(true).wont_equal 42 
+      DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
+      d.parent(Object.new).wont_equal 42 
+      DB.sqls.must_equal ["SELECT * FROM nodes WHERE id = 234"]
+    end
   end
   
   it "should use a callback if given one as the argument" do
@@ -462,7 +464,7 @@ describe Sequel::Model, "many_to_one" do
     DB.reset
     d.parent_id = 234
     d.associations[:parent] = 42
-    d.parent(proc{|ds| ds.filter{name > 'M'}}).wont_equal 42 
+    d.parent{|ds| ds.where{name > 'M'}}.wont_equal 42 
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE ((nodes.id = 234) AND (name > 'M')) LIMIT 1"]
   end
   
@@ -995,8 +997,12 @@ describe Sequel::Model, "one_to_one" do
     @c2.one_to_one :parent, :class => @c2
     d = @c2.load(:id => 1)
     d.associations[:parent] = [42]
-    d.parent(true).wont_equal 42 
+    d.parent(:reload=>true).wont_equal 42 
     DB.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
+    deprecated do
+      d.parent(true).wont_equal 42 
+      DB.sqls.must_equal ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
+    end
   end
   
   it "should have the setter set the reciprocal many_to_one cached association" do
@@ -1223,7 +1229,16 @@ describe Sequel::Model, "one_to_many" do
     end
   end
 
-  it "should use a callback if given one as the argument" do
+  it "should use a callback if given one as a block" do
+    @c2.one_to_many :attributes, :class => @c1, :key => :nodeid
+    
+    d = @c2.load(:id => 1234)
+    d.associations[:attributes] = []
+    d.attributes{|ds| ds.where{name > 'M'}}.wont_equal []
+    DB.sqls.must_equal ["SELECT * FROM attributes WHERE ((attributes.nodeid = 1234) AND (name > 'M'))"]
+  end
+  
+  deprecated "should use a callback if given one as the argument" do
     @c2.one_to_many :attributes, :class => @c1, :key => :nodeid
     
     d = @c2.load(:id => 1234)
@@ -1552,8 +1567,12 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
     n.associations[:attributes] = 42
-    n.attributes(true).wont_equal 42
+    n.attributes(:reload=>true).wont_equal 42
     DB.sqls.must_equal ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
+    deprecated do
+      n.attributes(true).wont_equal 42
+      DB.sqls.must_equal ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
+    end
   end
 
   it "should add item to cache if it exists when calling add_" do
@@ -2416,8 +2435,12 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     n.associations[:attributes] = 42
-    n.attributes(true).wont_equal 42
+    n.attributes(:reload=>true).wont_equal 42
     DB.sqls.must_equal ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)"]
+    deprecated do
+      n.attributes(true).wont_equal 42
+      DB.sqls.must_equal ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234)"]
+    end
   end
 
   it "should add item to cache if it exists when calling add_" do
@@ -3004,8 +3027,12 @@ describe Sequel::Model, "one_through_one" do
 
     n = @c2.new(:id => 1234)
     n.associations[:attribute] = 42
-    n.attribute(true).wont_equal 42
+    n.attribute(:reload=>true).wont_equal 42
     DB.sqls.must_equal ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1"]
+    deprecated do
+      n.attribute(true).wont_equal 42
+      DB.sqls.must_equal ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) WHERE (attributes_nodes.node_id = 1234) LIMIT 1"]
+    end
   end
 
   it "should not add associations methods directly to class" do

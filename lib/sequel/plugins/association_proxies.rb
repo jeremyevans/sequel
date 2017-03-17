@@ -99,7 +99,14 @@ module Sequel
         # Changes the association method to return a proxy instead of the associated objects
         # directly.
         def def_association_method(opts)
-          opts.returns_array? ? association_module_def(opts.association_method, opts){|*r, &block| AssociationProxy.new(self, opts, r[0], &block)} : super
+          if opts.returns_array?
+            association_module_def(opts.association_method, opts) do |*dynamic_opts, &block|
+              Sequel::Deprecation.deprecate("Passing multiple arguments to ##{opts.association_method}", "Additional arguments are currently ignored.") if dynamic_opts.length > 1
+              AssociationProxy.new(self, opts, dynamic_opts.length == 0 ? OPTS : dynamic_opts[0], &block)
+            end
+          else
+            super
+          end
         end
       end
     end

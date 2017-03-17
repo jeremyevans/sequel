@@ -1897,7 +1897,10 @@ module Sequel
 
         # Adds the association method to the association methods module.
         def def_association_method(opts)
-          association_module_def(opts.association_method, opts){|*dynamic_opts, &block| load_associated_objects(opts, dynamic_opts[0], &block)}
+          association_module_def(opts.association_method, opts) do |*dynamic_opts, &block|
+            Sequel::Deprecation.deprecate("Passing multiple arguments to ##{opts.association_method}", "Additional arguments are currently ignored.") if dynamic_opts.length > 1
+            load_associated_objects(opts, dynamic_opts.length == 0 ? OPTS : dynamic_opts[0], &block)
+          end
         end
       
         # Define all of the association instance methods for this association.
@@ -2390,13 +2393,16 @@ module Sequel
         def load_association_objects_options(dynamic_opts, &block)
           dynamic_opts = case dynamic_opts
           when true, false, nil
+            Sequel::Deprecation.deprecate("Passing #{dynamic_opts.inspect} an argument to an association loading method", "Pass {:reload=>#{dynamic_opts.inspect}} instead")
             {:reload=>dynamic_opts}
           when Hash
             Hash[dynamic_opts]
           else
             if dynamic_opts.respond_to?(:call)
+              Sequel::Deprecation.deprecate("Passing callbable argument #{dynamic_opts.inspect} to an association loading method", "Pass a block to the method to use a callback")
               {:callback=>dynamic_opts}
             else
+              Sequel::Deprecation.deprecate("Passing #{dynamic_opts.inspect} an argument to an association loading method", "Pass {:reload=>true} if you would like to reload the association")
               {:reload=>true}
             end
           end
