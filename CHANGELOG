@@ -1,5 +1,7 @@
 === master
 
+* Deprecate passing a block to Database#from (jeremyevans)
+
 * Deprecate Sequel::Model::ANONYMOUS_MODEL_CLASSES{,_MUTEX} (jeremyevans)
 
 * Deprecate Sequel.cache_anonymous_models and Sequel.cache_anonymous_models= (jeremyevans)

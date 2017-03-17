@@ -59,7 +59,12 @@ module Sequel
     #   DB.from(:items){id > 2} # SELECT * FROM items WHERE (id > 2)
     def from(*args, &block)
       ds = @default_dataset.from(*args)
-      block ? ds.where(&block) : ds
+      if block
+        Sequel::Deprecation.deprecate("Sequel::Database#from with a block", "Use .from(*args).where(&block) instead")
+        ds.where(&block)
+      else
+        ds
+      end
     end
     
     # Returns a new dataset with the select method invoked.

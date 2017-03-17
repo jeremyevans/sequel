@@ -328,7 +328,7 @@ describe "Database#dataset" do
     e.sql.must_equal 'SELECT * FROM miu'
   end
   
-  it "should provide a filtered #from dataset if a block is given" do
+  deprecated "should provide a filtered #from dataset if a block is given" do
     d = @db.from(:mau){x.sql_number > 100}
     d.must_be_kind_of(Sequel::Dataset)
     d.sql.must_equal 'SELECT * FROM mau WHERE (x > 100)'
