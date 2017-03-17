@@ -141,8 +141,6 @@ module Sequel
       # errors.
       DISCONNECT_ERROR_RE = /\A#{Regexp.union(disconnect_errors)}/
       
-      self.translate_results = false if respond_to?(:translate_results=)
-      
       # Hash of prepared statements for this connection.  Keys are
       # string names of the server side prepared statement, and values
       # are SQL strings.

@@ -1,5 +1,7 @@
 === master
 
+* Drop support for pg <0.8.0 in the postgres adapter (jeremyevans)
+
 * Deprecate passing a block to Database#from (jeremyevans)
 
 * Deprecate Sequel::Model::ANONYMOUS_MODEL_CLASSES{,_MUTEX} (jeremyevans)
