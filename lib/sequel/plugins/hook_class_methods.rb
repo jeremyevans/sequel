@@ -34,6 +34,14 @@ module Sequel
     #   # Allow the use of hook class methods in the Album class
     #   Album.plugin :hook_class_methods
     module HookClassMethods
+      # SEQUEL5: Remove
+      DEPRECATION_REPLACEMENTS = {
+        :after_commit=>"Use after_save{db.after_commit{}} instead",
+        :after_destroy_commit=>"Use after_destroy{db.after_commit{}} instead",
+        :after_destroy_rollback=>"Use before_destroy{db.after_rollback{}} instead",
+        :after_rollback=>"Use before_save{db.after_rollback{}} instead"
+      }.freeze
+
       # Set up the hooks instance variable in the model.
       def self.apply(model)
         hooks = model.instance_variable_set(:@hooks, {})
@@ -41,7 +49,14 @@ module Sequel
       end
 
       module ClassMethods
-        Model::HOOKS.each{|h| class_eval("def #{h}(method = nil, &block); add_hook(:#{h}, method, &block) end", __FILE__, __LINE__)}
+        Model::HOOKS.each do |h|
+          class_eval(<<-END, __FILE__, __LINE__ + 1)
+            def #{h}(method = nil, &block)
+              #{"Sequel::Deprecation.deprecate('Sequel::Model.#{h} in the hook_class_methods plugin', #{DEPRECATION_REPLACEMENTS[h].inspect})" if DEPRECATION_REPLACEMENTS[h]}
+              add_hook(:#{h}, method, &block)
+            end
+          END
+        end
 
         # This adds a new hook type. It will define both a class
         # method that you can use to add hooks, as well as an instance method

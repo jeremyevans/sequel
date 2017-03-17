@@ -86,7 +86,7 @@ describe "Sequel::Model basic support" do
     i.save.must_be_nil
   end
 
-  it "#should respect after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks" do
+  deprecated "#should respect after_commit, after_rollback, after_destroy_commit, and after_destroy_rollback hooks" do
     i = Item.create(:name=>'J')
     i.use_transactions = true
     def i.hooks

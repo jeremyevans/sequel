@@ -1,5 +1,7 @@
 === master
 
+* Deprecate model transaction hook methods (jeremyevans)
+
 * Drop support for pg <0.8.0 in the postgres adapter (jeremyevans)
 
 * Deprecate passing a block to Database#from (jeremyevans)

@@ -119,7 +119,7 @@ module Sequel
       # Whether to enable the after_commit and after_rollback hooks when saving/destroying
       # instances.  On by default, can be turned off for performance reasons or when using
       # prepared transactions (which aren't compatible with after commit/rollback).
-      attr_accessor :use_after_commit_rollback
+      attr_accessor :use_after_commit_rollback # SEQUEL5: Deprecate after release
   
       # Whether to use a transaction by default when saving/deleting records (default: true).
       # If you are sending database queries in before_* or after_* hooks, you shouldn't change
@@ -2021,7 +2021,10 @@ module Sequel
       def _destroy(opts)
         sh = {:server=>this_server}
         uacr = use_after_commit_rollback
-        db.after_rollback(sh){after_destroy_rollback} if uacr.nil? ? (method(:after_destroy_rollback).owner != InstanceMethods) : uacr
+        if uacr.nil? ? (method(:after_destroy_rollback).owner != InstanceMethods) : uacr
+          Sequel::Deprecation.deprecate("Model#after_destroy_rollback", "Instead, call db.after_rollback in Model#before_destroy.")
+          db.after_rollback(sh){after_destroy_rollback}
+        end
         called = false
         around_destroy do
           called = true
@@ -2031,7 +2034,10 @@ module Sequel
           true
         end
         raise_hook_failure(:around_destroy) unless called
-        db.after_commit(sh){after_destroy_commit} if uacr.nil? ? (method(:after_destroy_commit).owner != InstanceMethods) : uacr
+        if uacr.nil? ? (method(:after_destroy_commit).owner != InstanceMethods) : uacr
+          Sequel::Deprecation.deprecate("Model#after_destroy_commit", "Instead, call db.after_commit in Model#after_destroy.")
+          db.after_commit(sh){after_destroy_commit}
+        end
         self
       end
       
@@ -2108,7 +2114,10 @@ module Sequel
       def _save(opts)
         sh = {:server=>this_server}
         uacr = use_after_commit_rollback
-        db.after_rollback(sh){after_rollback} if uacr.nil? ? (method(:after_rollback).owner != InstanceMethods) : uacr
+        if uacr.nil? ? (method(:after_rollback).owner != InstanceMethods) : uacr
+          Sequel::Deprecation.deprecate("Model#after_rollback", "Instead, call db.after_rollback in Model#before_save.")
+          db.after_rollback(sh){after_rollback}
+        end
         pk = nil
         called_save = false
         called_cu = false
@@ -2154,7 +2163,10 @@ module Sequel
         end
         raise_hook_failure(:around_save) unless called_save
         _after_save(pk)
-        db.after_commit(sh){after_commit} if uacr.nil? ? (method(:after_commit).owner != InstanceMethods) : uacr
+        if uacr.nil? ? (method(:after_commit).owner != InstanceMethods) : uacr
+          Sequel::Deprecation.deprecate("Model#after_commit", "Instead, call db.after_commit in Model#after_save.")
+          db.after_commit(sh){after_commit}
+        end
         self
       end
       

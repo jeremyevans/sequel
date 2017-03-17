@@ -32,40 +32,88 @@ module Sequel
       BEFORE_HOOKS = Sequel::Model::BEFORE_HOOKS
       AFTER_HOOKS = Sequel::Model::AFTER_HOOKS
       HOOKS = BEFORE_HOOKS + AFTER_HOOKS
+      # SEQUEL5: Remove
+      DEPRECATION_REPLACEMENTS = {
+        :after_commit=>"Use obj.after_save_hook{obj.db.after_commit{}} instead",
+        :after_destroy_commit=>"Use obj.after_destroy_hook{obj.db.after_commit{}} instead",
+        :after_destroy_rollback=>"Use obj.before_destroy_hook{obj.db.after_rollback{}} instead",
+        :after_rollback=>"Use obj.before_save_hook{obj.db.after_rollback{}} instead"
+      }.freeze
 
       module InstanceMethods 
         HOOKS.each{|h| class_eval(<<-END , __FILE__, __LINE__+1)}
           def #{h}_hook(&block)
+            #{"Sequel::Deprecation.deprecate('Sequel::Model##{h}_hook in the instance_hooks plugin', #{DEPRECATION_REPLACEMENTS[h].inspect})" if DEPRECATION_REPLACEMENTS[h]}
             raise Sequel::Error, "can't add hooks to frozen object" if frozen?
             add_instance_hook(:#{h}, &block)
             self
           end
         END
         
-        BEFORE_HOOKS.each{|h| class_eval("def #{h}; run_before_instance_hooks(:#{h}) == false ? false : super end", __FILE__, __LINE__)}
-        (AFTER_HOOKS - [:after_validation, :after_save]).each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}
+        (BEFORE_HOOKS - [:before_destroy, :before_save]).each{|h| class_eval("def #{h}; (@instance_hooks && run_before_instance_hooks(:#{h}) == false) ? false : super end", __FILE__, __LINE__)}
+        (AFTER_HOOKS - [:after_validation, :after_save, :after_destroy, :after_commit, :after_destroy_commit, :after_destroy_rollback, :after_rollback]).each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}
           def #{h}
             super
+            return unless @instance_hooks
             run_after_instance_hooks(:#{h})
             @instance_hooks.delete(:#{h})
             @instance_hooks.delete(:#{h.to_s.sub('after', 'before')})
           end
         END
 
-        # Run after validation hooks, without clearing the validation hooks.
+        # Run after destroy instance hooks.
+        def after_destroy
+          super
+          return unless @instance_hooks
+          if ad = @instance_hooks[:after_destroy_commit]
+            db.after_commit{ad.each(&:call)}
+          end
+          run_after_instance_hooks(:after_destroy)
+          @instance_hooks.delete(:after_destroy)
+          @instance_hooks.delete(:before_destroy)
+          @instance_hooks.delete(:after_destroy_commit)
+          @instance_hooks.delete(:after_destroy_rollback)
+        end
+
+        # Run after validation instance hooks.
         def after_validation
           super
+          return unless @instance_hooks
           run_after_instance_hooks(:after_validation)
         end
         
-        # Run after save hooks, clearing both the save and validation hooks.
+        # Run after save instance hooks.
         def after_save
           super
+          return unless @instance_hooks
+          if (ac = @instance_hooks[:after_commit])
+            db.after_commit{ac.each(&:call)}
+          end
           run_after_instance_hooks(:after_save)
           @instance_hooks.delete(:after_save)
           @instance_hooks.delete(:before_save)
           @instance_hooks.delete(:after_validation)
           @instance_hooks.delete(:before_validation)
+          @instance_hooks.delete(:after_commit)
+          @instance_hooks.delete(:after_rollback)
+        end
+
+        # Run before_destroy instance hooks.
+        def before_destroy
+          return super unless @instance_hooks
+          if adr = @instance_hooks[:after_destroy_rollback]
+            db.after_rollback{adr.each(&:call)}
+          end
+          run_before_instance_hooks(:before_destroy) == false ? false : super
+        end
+
+        # Run before_save instance hooks.
+        def before_save
+          return super unless @instance_hooks
+          if ar = @instance_hooks[:after_rollback]
+            db.after_rollback{ar.each(&:call)}
+          end
+          run_before_instance_hooks(:before_save) == false ? false : super
         end
         
         private

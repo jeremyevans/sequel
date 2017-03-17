@@ -210,10 +210,12 @@ describe "InstanceHooks plugin with transactions" do
     @c = Class.new(Sequel::Model(@db[:items])) do
       attr_accessor :rb
       def after_save
+        super
         db.execute('as')
         raise Sequel::Rollback if rb
       end
       def after_destroy
+        super
         db.execute('ad')
         raise Sequel::Rollback if rb
       end
@@ -227,28 +229,28 @@ describe "InstanceHooks plugin with transactions" do
     @db.sqls
   end
   
-  it "should support after_commit_hook" do
+  deprecated "should support after_commit_hook" do
     @o.after_commit_hook{@db.execute('ac1')}
     @o.after_commit_hook{@db.execute('ac2')}
     @o.save.wont_equal nil
     @db.sqls.must_equal ['BEGIN', 'as', 'COMMIT', 'ac1', 'ac2']
   end
   
-  it "should support after_rollback_hook" do
+  deprecated "should support after_rollback_hook" do
     @or.after_rollback_hook{@db.execute('ar1')}
     @or.after_rollback_hook{@db.execute('ar2')}
     @or.save.must_be_nil
     @db.sqls.must_equal ['BEGIN', 'as', 'ROLLBACK', 'ar1', 'ar2']
   end
   
-  it "should support after_commit_hook" do
+  deprecated "should support after_destroy_commit_hook" do
     @o.after_destroy_commit_hook{@db.execute('adc1')}
     @o.after_destroy_commit_hook{@db.execute('adc2')}
     @o.destroy.wont_equal nil
     @db.sqls.must_equal ['BEGIN', "DELETE FROM items WHERE (id = 1)", 'ad', 'COMMIT', 'adc1', 'adc2']
   end
   
-  it "should support after_rollback_hook" do
+  deprecated "should support after_destroy_rollback_hook" do
     @or.after_destroy_rollback_hook{@db.execute('adr1')}
     @or.after_destroy_rollback_hook{@db.execute('adr2')}
     @or.destroy.must_be_nil
@@ -267,10 +269,12 @@ describe "InstanceHooks plugin with transactions" do
     @o.after_save_hook{r 1}.must_be_same_as(@o)
     @o.after_update_hook{r 1}.must_be_same_as(@o)
     @o.after_create_hook{r 1}.must_be_same_as(@o)
-    @o.after_commit_hook{r 1}.must_be_same_as(@o)
-    @o.after_rollback_hook{r 1}.must_be_same_as(@o)
-    @o.after_destroy_commit_hook{r 1}.must_be_same_as(@o)
-    @o.after_destroy_rollback_hook{r 1}.must_be_same_as(@o)
+    deprecated do
+      @o.after_commit_hook{r 1}.must_be_same_as(@o)
+      @o.after_rollback_hook{r 1}.must_be_same_as(@o)
+      @o.after_destroy_commit_hook{r 1}.must_be_same_as(@o)
+      @o.after_destroy_rollback_hook{r 1}.must_be_same_as(@o)
+    end
   end
 
 end

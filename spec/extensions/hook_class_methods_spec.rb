@@ -383,7 +383,7 @@ describe "Model transaction hooks" do
     end
   end
   
-  it "should call after_commit or after_rollback depending on whether the transaction commits or rolls back" do
+  deprecated "should call after_commit or after_rollback depending on whether the transaction commits or rolls back" do
     @c.after_commit{DB << 'AC'}
     @c.after_rollback{DB << 'AR'}
     m = @c.load(:id => 2233, :x=>123)
@@ -400,7 +400,7 @@ describe "Model transaction hooks" do
     end
   end
   
-  it "should call after_destroy_commit or after_destroy_rollback depending on whether the transaction commits or rolls back" do
+  deprecated "should call after_destroy_commit or after_destroy_rollback depending on whether the transaction commits or rolls back" do
     @c.after_destroy_commit {DB << 'ADC'}
     @c.after_destroy_rollback{DB << 'ADR'}
 
