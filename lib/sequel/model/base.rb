@@ -193,10 +193,8 @@ module Sequel
       #   end
       def Model(source)
         if cache_anonymous_models
-          mutex = @Model_mutex
-          cache = mutex.synchronize{@Model_cache ||= {}}
-
-          if klass = mutex.synchronize{cache[source]}
+          cache = Sequel.synchronize{@Model_cache ||= {}}
+          if klass = Sequel.synchronize{cache[source]}
             return klass
           end
         end
@@ -210,7 +208,7 @@ module Sequel
         end
 
         if cache_anonymous_models
-          mutex.synchronize{cache[source] = klass}
+          Sequel.synchronize{cache[source] = klass}
         end
 
         klass

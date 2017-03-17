@@ -163,7 +163,7 @@ describe "Sequel::Model()" do
       end.must_raise TypeError
     end
 
-    it "should use separate cache and cache settings for subclasses" do
+    it "should use separate anonymous cache for subclasses" do
       c = Class.new(Sequel::Model)
       c.cache_anonymous_models.must_equal true
       class ::Album < c::Model(:table); end

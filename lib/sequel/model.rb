@@ -31,13 +31,6 @@ module Sequel
   class Model
     OPTS = Sequel::OPTS
 
-    # Map that stores model classes created with <tt>Sequel::Model()</tt>, to allow the reopening
-    # of classes when dealing with code reloading.
-    ANONYMOUS_MODEL_CLASSES = @Model_cache = {}
-
-    # Mutex protecting access to ANONYMOUS_MODEL_CLASSES
-    ANONYMOUS_MODEL_CLASSES_MUTEX = @Model_mutex = Mutex.new
-
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) -
       [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
@@ -80,7 +73,7 @@ module Sequel
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
       :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
       :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
-      :@cache_anonymous_models=>nil, :@Model_mutex=>nil, :@dataset_module_class=>nil}
+      :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to
@@ -131,5 +124,9 @@ module Sequel
     RESTRICTED_SETTER_METHODS = instance_methods.map(&:to_s).grep(SETTER_METHOD_REGEXP)
 
     def_Model(::Sequel)
+
+    ANONYMOUS_MODEL_CLASSES = @Model_cache # :nodoc:
+
+    ANONYMOUS_MODEL_CLASSES_MUTEX = Mutex.new # :nodoc:
   end
 end
