@@ -56,5 +56,13 @@ module Sequel
       end
       nil
     end
+
+    # If using ruby 2.3+, use Module#deprecate_constant to deprecate the constant,
+    # otherwise do nothing as the ruby implementation does not support constant deprecation.
+    def self.deprecate_constant(mod, constant)
+      if RUBY_VERSION > '2.3'
+        mod.deprecate_constant(constant)
+      end
+    end
   end
 end
