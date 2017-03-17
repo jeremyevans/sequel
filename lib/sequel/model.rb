@@ -126,7 +126,9 @@ module Sequel
     def_Model(::Sequel)
 
     ANONYMOUS_MODEL_CLASSES = @Model_cache # :nodoc:
+    Sequel::Deprecation.deprecate_constant(self, :ANONYMOUS_MODEL_CLASSES)
 
     ANONYMOUS_MODEL_CLASSES_MUTEX = Mutex.new # :nodoc:
+    Sequel::Deprecation.deprecate_constant(self, :ANONYMOUS_MODEL_CLASSES_MUTEX)
   end
 end

@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel::Model::ANONYMOUS_MODEL_CLASSES{,_MUTEX} (jeremyevans)
+
 * Deprecate Sequel.cache_anonymous_models and Sequel.cache_anonymous_models= (jeremyevans)
 
 * Automatically use from_self when using a dataset as part of a compound if it has an offset but no limit (jeremyevans)
