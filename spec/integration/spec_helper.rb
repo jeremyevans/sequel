@@ -25,7 +25,7 @@ if ENV['SEQUEL_MODEL_PREPARED_STATEMENTS']
   Sequel::Model.plugin :prepared_statements_associations
 end
 Sequel::Model.use_transactions = false
-Sequel.cache_anonymous_models = false
+Sequel::Model.cache_anonymous_models = false
 
 require './spec/guards_helper'
 

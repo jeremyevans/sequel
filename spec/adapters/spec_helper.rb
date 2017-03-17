@@ -24,7 +24,7 @@ if ENV['SEQUEL_MODEL_PREPARED_STATEMENTS']
   Sequel::Model.plugin :prepared_statements
   Sequel::Model.plugin :prepared_statements_associations
 end
-Sequel.cache_anonymous_models = false
+Sequel::Model.cache_anonymous_models = false
 
 class Sequel::Database
   def log_duration(duration, message)

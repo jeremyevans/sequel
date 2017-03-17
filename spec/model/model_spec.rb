@@ -102,14 +102,14 @@ describe "Sequel::Model()" do
 
   describe "reloading" do
     before do
-      Sequel.cache_anonymous_models = true
+      Sequel::Model.cache_anonymous_models = true
     end
     after do
-      Sequel.cache_anonymous_models = false
+      Sequel::Model.cache_anonymous_models = false
       Object.send(:remove_const, :Album) if defined?(::Album)
     end
 
-    it "Sequel.cache_anonymous_models should return value for Sequel::Model" do
+    deprecated "Sequel.cache_anonymous_models should return value for Sequel::Model" do
       Sequel.cache_anonymous_models.must_equal true
       Sequel::Model.cache_anonymous_models = false
       Sequel.cache_anonymous_models.must_equal false
@@ -156,7 +156,7 @@ describe "Sequel::Model()" do
     end
 
     it "should raise an exception if anonymous model caching is disabled" do
-      Sequel.cache_anonymous_models = false
+      Sequel::Model.cache_anonymous_models = false
       proc do
         class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end
         class ::Album < Sequel::Model(@db[Sequel.identifier(:table)]); end

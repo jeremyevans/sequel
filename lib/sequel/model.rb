@@ -5,11 +5,13 @@ require 'sequel/core'
 module Sequel
   # Delegate to Sequel::Model, only for backwards compatibility.
   def self.cache_anonymous_models
+    Sequel::Deprecation.deprecate("Sequel.cache_anonymous_models", "Use Sequel::Model.cache_anonymous_models")
     Model.cache_anonymous_models
   end
 
   # Delegate to Sequel::Model, only for backwards compatibility.
   def self.cache_anonymous_models=(v)
+    Sequel::Deprecation.deprecate("Sequel.cache_anonymous_models=", "Use Sequel::Model.cache_anonymous_models=")
     Model.cache_anonymous_models = v
   end
 
