@@ -94,7 +94,7 @@ module Sequel
     #
     #   a = Executive.first
     #   a.values # {:id=>1, name=>'S', :kind=>'Executive', :num_staff=>4, :num_managers=>2}
-    #   
+    #
     # Note that when loading from a subclass, because the subclass dataset uses a JOIN,
     # if you are referencing the primary key column, you need to disambiguate the reference
     # by explicitly qualifying it:
@@ -287,12 +287,12 @@ module Sequel
             if cti_tables.length == 1
               ds = ds.select(*self.columns.map{|cc| Sequel.qualify(table_name, Sequel.identifier(cc))})
             end
-            sel_app = (columns - [pk]).map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
+            sel_app = (columns - ds.columns).map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
             @sti_dataset = ds.join(table, pk=>pk).select_append(*sel_app)
             set_dataset(@sti_dataset)
             set_columns(self.columns)
             @dataset = @dataset.with_row_proc(lambda{|r| subclass.sti_load(r)})
-            (columns - [pk]).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
+            (columns - ds.columns).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
 
             @cti_models += [self]
             @cti_tables += [table]
