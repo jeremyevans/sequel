@@ -100,7 +100,7 @@ module Sequel
     # by explicitly qualifying it:
     #
     #   a = Executive.where(:id=>1).first # database error
-    #   a = Executive.where(:executives__id=>1).first # no error
+    #   a = Executive.where{{executives[:id]=>1}}.first # no error
     #
     # = Usage
     #
