@@ -11,9 +11,9 @@ toolkit for Ruby.
   statements, bound variables, stored procedures, savepoints,
   two-phase commit, transaction isolation, master/slave
   configurations, and database sharding.
-* Sequel currently has adapters for ADO, Amalgalite, CUBRID,
-  DataObjects, IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle,
-  PostgreSQL, SQLAnywhere, SQLite3, Swift, and TinyTDS.
+* Sequel currently has adapters for ADO, Amalgalite, 
+  IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle,
+  PostgreSQL, SQLAnywhere, SQLite3, and TinyTDS.
 
 == Resources
 

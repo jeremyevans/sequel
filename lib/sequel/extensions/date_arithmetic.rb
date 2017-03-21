@@ -92,6 +92,7 @@ module Sequel
               args << "#{value} #{sql_unit}"
             end
             return function_sql_append(sql, Sequel.function(:datetime, *args))
+          # SEQUEL5: Remove cubrid
           when :mysql, :hsqldb, :cubrid
             if db_type == :hsqldb
               # HSQLDB requires 2.2.9+ for the DATE_ADD function

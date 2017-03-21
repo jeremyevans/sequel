@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+#SEQUEL5: Remove
+
 Sequel::JDBC.load_driver('com.informix.jdbc.IfxDriver')
 Sequel.require 'adapters/shared/informix'
 

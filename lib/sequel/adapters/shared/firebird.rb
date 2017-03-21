@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("Sequel support for Firebird", "Please consider maintaining it yourself as an external sequel adapter if you want to continue using it")
+
 module Sequel
   module Firebird
     Sequel::Database.set_shared_adapter_scheme(:firebird, self)

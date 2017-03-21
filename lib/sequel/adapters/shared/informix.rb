@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("Sequel support for Informix", "Please consider maintaining it yourself as an external sequel adapter if you want to continue using it")
+
 module Sequel
   module Informix
     Sequel::Database.set_shared_adapter_scheme(:informix, self)

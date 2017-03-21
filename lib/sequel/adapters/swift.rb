@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The swift adapter", "Please consider maintaining it yourself as an external gem if you want to continue using it")
+
 module Sequel
   # Module holding the Swift DB support for Sequel.  Swift DB is a
   # collection of drivers used in Swift ORM.

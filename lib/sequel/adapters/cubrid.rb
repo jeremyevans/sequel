@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+#SEQUEL5: Remove
+
 require 'cubrid'
 Sequel.require 'adapters/shared/cubrid'
 

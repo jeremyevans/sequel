@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+#SEQUEL5: Remove
+
 Sequel.require 'adapters/shared/progress'
 
 Sequel.synchronize do

@@ -45,8 +45,8 @@ describe "string_agg extension" do
     ds.literal(@sa4).must_equal "list(DISTINCT c, ',' ORDER BY o)"
   end
 
-  it "should correctly literalize on MySQL, H2, HSQLDB, CUBRID" do
-    [:mysql, :h2, :hsqldb, :cubrid].each do |type|
+  it "should correctly literalize on MySQL, H2, HSQLDB" do
+    [:mysql, :h2, :hsqldb].each do |type|
       db = dbf.call(type)
       db.meta_def(:database_type){type}
       ds = db.dataset.with_quote_identifiers(false).with_extend{def input_identifier(v) v.to_s end}

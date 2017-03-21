@@ -9,6 +9,7 @@ module Sequel
 
     # Array of supported database adapters
     ADAPTERS = %w'ado amalgalite cubrid do ibmdb jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite swift tinytds'.collect(&:to_sym)
+    # SEQUEL5: Remove cubrid do swift
 
     @single_threaded = false
 
@@ -37,6 +38,7 @@ module Sequel
     def self.connect(conn_string, opts = OPTS)
       case conn_string
       when String
+        # SEQUEL5: Remove do
         if match = /\A(jdbc|do):/o.match(conn_string)
           c = adapter_class(match[1].to_sym)
           opts = opts.merge(:orig_opts=>opts.dup)

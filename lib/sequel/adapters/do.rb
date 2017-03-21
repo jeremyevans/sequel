@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The do (DataObjects) adapter", "Please consider maintaining it yourself as an external gem if you want to continue using it")
+
 require 'data_objects'
 
 module Sequel

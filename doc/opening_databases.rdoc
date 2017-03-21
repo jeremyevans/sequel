@@ -155,31 +155,6 @@ Without a database argument, assumes a memory database, so you can do:
 Handles paths in the connection string similar to the SQLite adapter, so see
 the sqlite section below for details.
 
-=== cubrid
-
-cubrid is a ruby extension for accessing a CUBRID database.  Currently,
-the ruby cubrid gem is in fairly rough state, with broken transaction
-support and some other issues, but most things work.
-
-=== do 
-
-Requires: data_objects
-
-The DataObjects adapter supports PostgreSQL, MySQL, and SQLite.  One possible
-advantage of using DataObjects is that it does the typecasting in C, which may
-be faster than the other adapters.
-
-Similar to the JDBC adapter, the DO adapter only cares about connection strings,
-which can either be the String argument given to Sequel.connect directly or contained
-in a :uri or :url option.  The DO adapter passes through the connection string
-directly to DataObjects, it does no processing of it (other than removing the do: prefix).
-
-Connection string examples:
-
-  do:sqlite3::memory:
-  do:postgres://user:password@host/database
-  do:mysql://user:password@host/database
-
 === ibmdb
 
 requires 'ibm_db'
@@ -226,9 +201,6 @@ Example connection strings:
   jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test
   jdbc:oracle:thin:user/password@localhost:1521:database
   jdbc:db2://localhost:3700/database:user=user;password=password;
-  jdbc:firebirdsql:localhost/3050:/path/to/database.fdb
-  jdbc:jdbcprogress:T:hostname:port:database
-  jdbc:cubrid:hostname:port:database:::
   jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password
 
 You can also use JNDI connection strings:
@@ -391,24 +363,6 @@ of connections in the connection pool to 1 by default when an SQLite memory
 database is used.  Attempts to force the use of more than 1 connection
 can result in weird behavior, since the connections will be to separate
 memory databases.
-
-=== swift
-
-swift is a ruby 1.9+ library, so you'll need to be running ruby 1.9+.  It
-can connect to SQLite, MySQL, and PostgreSQL, and you must specify which
-database using the db_type option.
-
-You need to install one of the swift db adapters
-
-* swift-db-sqlite3
-* swift-db-mysql
-* swift-db-postgres
-
-Examples:
-
-  swift:///?database=:memory:&db_type=sqlite
-  swift://root:root@localhost/test?db_type=mysql
-  swift://root:root@localhost/test?db_type=postgres
 
 === tinytds
 

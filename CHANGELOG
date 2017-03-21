@@ -1,5 +1,9 @@
 === master
 
+* Deprecate do (DataObjects), swift, and jdbc/as400 adapters (jeremyevans)
+
+* Deprecate support for Cubrid, Firebird, Informix, and Progress databases (jeremyevans)
+
 * The :proxy_argument option passed to association_proxies plugin block is now an empty hash if no arguments are passed to the association method (jeremyevans)
 
 * Deprecate passing non-hash arguments to association methods (jeremyevans)

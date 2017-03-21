@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("Sequel support for Cubrid", "Please consider maintaining it yourself as an external sequel adapter if you want to continue using it")
+
 Sequel.require %w'split_alter_table unmodified_identifiers', 'adapters/utils'
 
 module Sequel

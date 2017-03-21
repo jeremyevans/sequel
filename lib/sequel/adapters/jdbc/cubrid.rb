@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+#SEQUEL5: Remove
+
 Sequel::JDBC.load_driver('Java::cubrid.jdbc.driver.CUBRIDDriver')
 Sequel.require 'adapters/shared/cubrid'
 Sequel.require 'adapters/jdbc/transactions'
