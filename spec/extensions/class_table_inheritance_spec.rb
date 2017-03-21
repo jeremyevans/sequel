@@ -457,3 +457,42 @@ describe "class_table_inheritance plugin without sti_key" do
     @db.sqls.must_equal ['SELECT employees.id, employees.name, staff.manager_id FROM employees INNER JOIN staff ON (staff.id = employees.id) WHERE (staff.manager_id = 3)']
   end
 end
+
+describe "class_table_inheritance plugin with duplicate columns" do
+  before do
+    @db = Sequel.mock(:autoid=>proc{|sql| 1})
+    def @db.supports_schema_parsing?() true end
+    def @db.schema(table, opts={})
+      {:employees=>[[:id, {:primary_key=>true, :type=>:integer}], [:name, {:type=>:string}], [:kind, {:type=>:string}]],
+       :managers=>[[:id, {:type=>:integer}], [:name, {:type=>:string}]],
+       }[table.is_a?(Sequel::Dataset) ? table.first_source_table : table]
+    end
+    @db.extend_datasets do
+      def columns
+        {[:employees]=>[:id, :name, :kind],
+         [:managers]=>[:id, :name],
+        }[opts[:from] + (opts[:join] || []).map{|x| x.table}]
+      end
+    end
+    class ::Employee < Sequel::Model(@db)
+      def _save_refresh; @values[:id] = 1 end
+      def self.columns
+        dataset.columns
+      end
+      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
+    end 
+    deprecated do
+    class ::Manager < Employee; end
+    end
+    @ds = Employee.dataset
+    @db.sqls
+  end
+  after do
+    Object.send(:remove_const, :Manager)
+    Object.send(:remove_const, :Employee)
+  end
+
+  it "should select names from both tables" do
+    Manager.dataset.sql.must_equal 'SELECT employees.id, employees.name, employees.kind, managers.name FROM employees INNER JOIN managers ON (managers.id = employees.id)'
+  end
+end

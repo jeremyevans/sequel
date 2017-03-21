@@ -287,12 +287,16 @@ module Sequel
             if cti_tables.length == 1
               ds = ds.select(*self.columns.map{|cc| Sequel.qualify(table_name, Sequel.identifier(cc))})
             end
-            sel_app = (columns - [pk]).map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
+            cols = columns - [pk]
+            unless (cols & ds.columns).empty?
+              Sequel::Deprecation.deprecate('Using class_table_inheritance with duplicate column names in subclass tables (other than the primary key column)', 'Make sure all tables used have unique column names, or implement support for handling duplicate column names in the class_table_inheritance plugin')
+            end
+            sel_app = cols.map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
             @sti_dataset = ds.join(table, pk=>pk).select_append(*sel_app)
             set_dataset(@sti_dataset)
             set_columns(self.columns)
             @dataset = @dataset.with_row_proc(lambda{|r| subclass.sti_load(r)})
-            (columns - [pk]).each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
+            cols.each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
 
             @cti_models += [self]
             @cti_tables += [table]

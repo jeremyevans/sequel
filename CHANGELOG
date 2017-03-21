@@ -1,5 +1,7 @@
 === master
 
+* Deprecate having duplicate column names in subclass tables when using the class_table_inheritance plugin (jeremyevans)
+
 * Deprecate do (DataObjects), swift, and jdbc/as400 adapters (jeremyevans)
 
 * Deprecate support for Cubrid, Firebird, Informix, and Progress databases (jeremyevans)
