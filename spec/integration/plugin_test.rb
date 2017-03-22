@@ -294,7 +294,7 @@ describe "Many Through Many Plugin" do
   end
 
   it "should handle typical case with 3 join tables" do
-    Artist.many_through_many :related_artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]], :class=>Artist, :distinct=>true
+    Artist.many_through_many :related_artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]], :class=>Artist, :distinct=>true, :delay_pks=>false
     Artist[@artist1.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 4'
     Artist[@artist2.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 3'
     Artist[@artist3.id].related_artists.map{|x| x.name}.sort.must_equal %w'2 3 4'
@@ -1193,11 +1193,11 @@ describe "AssociationPks plugin" do
     end
     class ::Artist < Sequel::Model
       plugin :association_pks
-      one_to_many :albums, :order=>:id
+      one_to_many :albums, :order=>:id, :delay_pks=>false
     end 
     class ::Album < Sequel::Model
       plugin :association_pks
-      many_to_many :tags, :order=>:id
+      many_to_many :tags, :order=>:id, :delay_pks=>false
     end 
     class ::Tag < Sequel::Model
     end 
@@ -1293,7 +1293,7 @@ describe "AssociationPks plugin" do
     Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [@h2], []]
   end
 
-  it "should handle :delay association option for new instances" do
+  deprecated "should handle :delay_pks=>true association option for new instances" do
     album_class = Class.new(Album)
     album_class.many_to_many :tags, :clone=>:tags, :delay_pks=>true, :join_table=>:albums_tags, :left_key=>:album_id
     album = album_class.new(:name=>'test album')
@@ -1309,7 +1309,7 @@ describe "AssociationPks plugin" do
     album_class.with_pk!(album.pk).tag_pks.sort.must_equal []
   end
 
-  it "should handle :delay=>:all association option for existing instances" do
+  it "should handle :delay_pks=>:always association option for existing instances" do
     album_class = Class.new(Album)
     album_class.many_to_many :tags, :clone=>:tags, :delay_pks=>:always, :join_table=>:albums_tags, :left_key=>:album_id
     album = album_class.with_pk!(@al1)
@@ -1368,7 +1368,7 @@ describe "AssociationPks plugin" do
 
   it "should set associated right-side cpks correctly for a one_to_many association" do
     Album.use_transactions = true
-    Album.one_to_many :vocalists, :order=>:first
+    Album.one_to_many :vocalists, :order=>:first, :delay_pks=>false
     Album.order(:id).all.map{|a| a.vocalist_pks.sort}.must_equal [[@v1, @v2, @v3], [], []]
 
     Album[@al2].vocalist_pks = [@v1, @v3]
@@ -1389,7 +1389,7 @@ describe "AssociationPks plugin" do
 
   it "should set associated right-side cpks correctly for a many_to_many association" do
     Album.use_transactions = true
-    Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>:first
+    Album.many_to_many :vocalists, :join_table=>:albums_vocalists, :right_key=>[:first, :last], :order=>:first, :delay_pks=>false
 
     @db[:albums_vocalists].filter(:album_id=>@al1).select_order_map([:first, :last]).must_equal [@v1, @v2, @v3]
     Album[@al1].vocalist_pks = [@v1, @v3]
@@ -1412,7 +1412,7 @@ describe "AssociationPks plugin" do
 
   it "should set associated pks correctly with left-side cpks for a one_to_many association" do
     Vocalist.use_transactions = true
-    Vocalist.one_to_many :instruments, :key=>[:first, :last], :order=>:id
+    Vocalist.one_to_many :instruments, :key=>[:first, :last], :order=>:id, :delay_pks=>false
     Vocalist.order(:first, :last).all.map{|a| a.instrument_pks.sort}.must_equal [[@i1, @i2, @i3], [], []]
 
     Vocalist[@v2].instrument_pks = [@i1, @i3]
@@ -1433,7 +1433,7 @@ describe "AssociationPks plugin" do
 
   it "should set associated pks correctly with left-side cpks for a many_to_many association" do
     Vocalist.use_transactions = true
-    Vocalist.many_to_many :instruments, :join_table=>:vocalists_instruments, :left_key=>[:first, :last], :order=>:id
+    Vocalist.many_to_many :instruments, :join_table=>:vocalists_instruments, :left_key=>[:first, :last], :order=>:id, :delay_pks=>false
 
     @db[:vocalists_instruments].filter([:first, :last]=>[@v1]).select_order_map(:instrument_id).must_equal [@i1, @i2, @i3]
     Vocalist[@v1].instrument_pks = [@i1, @i3]
@@ -1456,7 +1456,7 @@ describe "AssociationPks plugin" do
 
   it "should set associated right-side cpks correctly with left-side cpks for a one_to_many association" do
     Vocalist.use_transactions = true
-    Vocalist.one_to_many :hits, :key=>[:first, :last], :order=>:week
+    Vocalist.one_to_many :hits, :key=>[:first, :last], :order=>:week, :delay_pks=>false
     Vocalist.order(:first, :last).all.map{|a| a.hit_pks.sort}.must_equal [[@h1, @h2, @h3], [], []]
 
     Vocalist[@v2].hit_pks = [@h1, @h3]
@@ -1477,7 +1477,7 @@ describe "AssociationPks plugin" do
 
   it "should set associated right-side cpks correctly with left-side cpks for a many_to_many association" do
     Vocalist.use_transactions = true
-    Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>:week
+    Vocalist.many_to_many :hits, :join_table=>:vocalists_hits, :left_key=>[:first, :last], :right_key=>[:year, :week], :order=>:week, :delay_pks=>false
 
     @db[:vocalists_hits].filter([:first, :last]=>[@v1]).select_order_map([:year, :week]).must_equal [@h1, @h2, @h3]
     Vocalist[@v1].hit_pks = [@h1, @h3]

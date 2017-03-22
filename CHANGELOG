@@ -1,5 +1,9 @@
 === master
 
+* Add deprecation message for using association_pks setter method with :delay_pks=>true association option (jeremyevans)
+
+* Add deprecation message for using association_pks setter method without :delay_pks association option (jeremyevans)
+
 * Deprecate having duplicate column names in subclass tables when using the class_table_inheritance plugin (jeremyevans)
 
 * Deprecate do (DataObjects), swift, and jdbc/as400 adapters (jeremyevans)

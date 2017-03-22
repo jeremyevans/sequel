@@ -29,6 +29,12 @@ module Sequel
     # objects, and the setting will not be persisted until after the object has
     # been saved.
     #
+    # SEQUEL5: Starting in Sequel 5, the :delay_pks association option will default
+    # to :delay_pks=>:always.  If you would like to use the Sequel 4 behavior of
+    # having the setter make modifications immediately, explicitly use the
+    # :delay_pks=>false option.  Additionally, Sequel 5 will not support the current
+    # :delay_pks=>true behavior, treating it as :delay_pks=>:always.
+    #
     # By default, if you pass a nil value to the setter, an exception will be raised.
     # You can change this behavior by using the :association_pks_nil association option.
     # If set to :ignore, the setter will take no action if nil is given.
@@ -201,11 +207,17 @@ module Sequel
 
           pks = convert_pk_array(opts, pks)
 
-          delay = opts[:delay_pks]
+          delay = opts.fetch(:delay_pks) do
+            Sequel::Deprecation.deprecate("association_pks will default to assuming the :delay_pks=>:always association option starting in Sequel 5.  Explicitly set :delay_pks=>false option for the association if you want changes to take effect immediately instead of being delayed until the object is saved (association: #{opts.inspect}).")
+            false
+          end
           if (new? && delay) || (delay == :always)
             modified!
             (@_association_pks ||= {})[opts[:name]] = pks
           else
+            if !new? && delay && delay != :always
+              Sequel::Deprecation.deprecate("association_pks with the :delay_pks=>true association option will also delay setting of associated values for existing objects in Sequel 5 (currently it just delays setting of associated values for new objects).  Please change to using :delay_pks=>:always to avoid this message.  Sequel 5 will not support the existing :delay_pks=>true behavior for only delaying for new objects and not for existing objects.")
+            end
             instance_exec(pks, &opts[:pks_setter])
           end
         end
