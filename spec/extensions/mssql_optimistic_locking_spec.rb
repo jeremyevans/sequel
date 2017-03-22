@@ -35,7 +35,7 @@ describe "MSSSQL optimistic locking plugin" do
     @db.numrows = 0
     @o.timestamp = '2345'
     proc{@o.destroy}.must_raise(Sequel::NoExistingObject)
-    @db.sqls.must_equal ["DELETE FROM items WHERE ((id = 1) AND (timestamp = 0x32333435))"]
+    @db.sqls.must_equal ["DELETE TOP (1) FROM items WHERE ((id = 1) AND (timestamp = 0x32333435))"]
   end
 
   it "should allow refresh after failed save" do

@@ -202,9 +202,22 @@ describe "A MySQL dataset" do
     @d.order(:name).update_sql(:value => 1).must_equal 'UPDATE `items` SET `value` = 1 ORDER BY `name`'
   end
 
-  it "should support LIMIT clause in UPDATE statements" do
-    @d.limit(10).update_sql(:value => 1).must_equal 'UPDATE `items` SET `value` = 1 LIMIT 10'
+  it "should support updating a limited dataset" do
+    @d.import [:value], [[2], [3]]
+    @d.limit(1).update(:value => 4).must_equal 1
+    [[2,4], [3,4]].must_include @d.select_order_map(:value)
   end
+
+  it "should support updating a ordered, limited dataset" do
+    @d.import [:value], [[2], [3]]
+    @d.order(:value).limit(1).update(:value => 4).must_equal 1
+    @d.select_order_map(:value).must_equal [3,4]
+  end
+
+  it "should raise error for updating a dataset with an offset" do
+    proc{@d.offset(1).update(:value => 4)}.must_raise Sequel::InvalidOperation
+    proc{@d.order(:value).offset(1).update(:value => 4)}.must_raise Sequel::InvalidOperation
+  end if false # SEQUEL5
 
   it "should support regexps" do
     @d << {:name => 'abc', :value => 1}

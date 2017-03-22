@@ -89,7 +89,7 @@ module Sequel
           end
           ds = ds.order(*self[:order]) if self[:order]
           ds = ds.limit(*self[:limit]) if self[:limit]
-          ds = ds.limit(1) if limit_to_single_row?
+          ds = ds.limit(1).skip_limit_check if limit_to_single_row?
           ds = ds.eager(self[:eager]) if self[:eager]
           ds = ds.distinct if self[:distinct]
           ds
@@ -2168,7 +2168,7 @@ module Sequel
                 cks.zip(cpks).each{|k, pk| o.set_column_value(:"#{k}=", get_column_value(pk))}
               end
               checked_transaction do
-                up_ds.update(ck_nil_hash)
+                up_ds.skip_limit_check.update(ck_nil_hash)
                 o.save(save_opts) || raise(Sequel::Error, "invalid associated object, cannot save") if o
               end
             end

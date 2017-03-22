@@ -897,6 +897,13 @@ module Sequel
       end
     end
 
+    # Specify that the check for limits/offsets when updating/deleting be skipped for the dataset.
+    def skip_limit_check
+      cached_dataset(:_skip_limit_check_ds) do
+        clone(:skip_limit_check=>true)
+      end
+    end
+
     # Skip locked rows when returning results from this dataset.
     def skip_locked
       cached_dataset(:_skip_locked_ds) do

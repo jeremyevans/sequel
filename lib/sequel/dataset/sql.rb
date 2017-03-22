@@ -155,6 +155,7 @@ module Sequel
         static_sql(opts[:sql])
       else
         check_truncation_allowed!
+        check_not_limited!(:truncate)
         raise(InvalidOperation, "Can't truncate filtered datasets") if opts[:where] || opts[:having]
         t = String.new
         source_list_append(t, opts[:from])
@@ -172,6 +173,7 @@ module Sequel
     def update_sql(values = OPTS)
       return static_sql(opts[:sql]) if opts[:sql]
       check_modification_allowed!
+      check_not_limited!(:update)
       clone(:values=>values).send(:_update_sql)
     end
     
@@ -205,7 +207,7 @@ module Sequel
       lines << "def #{'_' if priv}#{type}_sql"
       lines << 'if sql = opts[:sql]; return static_sql(sql) end' unless priv
       lines << "if sql = cache_get(:_#{type}_sql); return sql end" if cacheable
-      lines << 'check_modification_allowed!' if type == :delete
+      lines << 'check_modification_allowed!' << 'check_not_limited!(:delete)' if type == :delete
       lines << 'sql = @opts[:append_sql] || sql_string_origin'
 
       if clauses.all?{|c| c.is_a?(Array)}
@@ -920,6 +922,14 @@ module Sequel
     def check_modification_allowed!
       raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
       raise(InvalidOperation, "Joined datasets cannot be modified") if !supports_modifying_joins? && joined_dataset?
+    end
+
+    # Emit deprecation warning if the dataset uses limits or offsets.
+    def check_not_limited!(type)
+      return if @opts[:skip_limit_check] && type != :truncate
+      # SEQUEL5
+      #raise InvalidOperation, "Dataset##{type} not supported on datasets with limits or offsets" if opts[:limit] || opts[:offset]
+      Sequel::Deprecation.deprecate("Dataset##{type} on datasets with limits or offsets", "Call unlimited to remove the limit #{'or skip_limit_check to ignore the limit ' unless type == :truncate}before calling #{type}") if @opts[:limit] || @opts[:offset]
     end
 
     # Alias of check_modification_allowed!

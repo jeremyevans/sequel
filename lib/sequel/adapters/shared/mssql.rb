@@ -578,7 +578,7 @@ module Sequel
       NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output, :mssql_unicode_strings]).freeze
 
       Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
-      Dataset.def_sql_method(self, :delete, %w'with delete from output from2 where')
+      Dataset.def_sql_method(self, :delete, %w'with delete limit from output from2 where')
       Dataset.def_sql_method(self, :insert, %w'with insert into columns output values')
       Dataset.def_sql_method(self, :update, [['if is_2005_or_later?', %w'with update limit table set output from where'], ['else', %w'update table set output from where']])
 
@@ -864,6 +864,15 @@ module Sequel
 
       private
 
+      # Allow update and delete for unordered, limited datasets only.
+      def check_not_limited!(type)
+        return if @opts[:skip_limit_check] && type != :truncate
+        #SEQUEL5
+        #raise Sequel::InvalidOperation, "Dataset##{type} not suppored on ordered, limited datasets" if opts[:order] && opts[:limit]
+        Sequel::Deprecation.deprecate("Dataset##{type} on ordered, limited datasets", "Call unlimited to not use a limit, or unordered to not use an order, or skip_limit_check to ignore the limit") if @opts[:order] && @opts[:limit]
+        super if type == :truncate || @opts[:offset]
+      end
+
       # Whether we are using SQL Server 2005 or later.
       def is_2005_or_later?
         server_version >= 9000000
@@ -1001,18 +1010,27 @@ module Sequel
       def select_limit_sql(sql)
         if l = @opts[:limit]
           return if is_2012_or_later? && @opts[:order] && @opts[:offset]
-
-          if is_2005_or_later?
-            sql << TOP_PAREN
-            literal_append(sql, l)
-            sql << PAREN_CLOSE
-          else
-            sql << TOP
-            literal_append(sql, l)
-          end
+          shared_limit_sql(sql, l)
         end
       end
-      alias update_limit_sql select_limit_sql
+
+      def shared_limit_sql(sql, l)
+        if is_2005_or_later?
+          sql << TOP_PAREN
+          literal_append(sql, l)
+          sql << PAREN_CLOSE
+        else
+          sql << TOP
+          literal_append(sql, l)
+        end
+      end
+
+      def update_limit_sql(sql)
+        if l = @opts[:limit]
+          shared_limit_sql(sql, l)
+        end
+      end
+      alias delete_limit_sql update_limit_sql
 
       # Support different types of locking styles
       def select_lock_sql(sql)

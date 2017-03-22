@@ -264,6 +264,37 @@ describe "Offset support" do
   end
 end
 
+describe "Update/Delete on limited datasets" do
+  before do
+    @db = DB
+    @db.create_table!(:i){Integer :id}
+    @ds = @db[:i]
+    @ds.import [:id], [[1], [2]]
+  end
+  after do
+    @db.drop_table?(:i)
+  end
+  
+  it "should handle deletes and updates on limited datasets" do
+    @ds.limit(1).update(:id=>Sequel[:id]+10)
+    [[2, 11], [1, 12]].must_include @ds.select_order_map(:id)
+    @ds.limit(1).delete
+    [[1], [2]].must_include @ds.select_order_map(:id)
+  end
+  
+  it "should raise error for updates on ordered, limited datasets" do
+  end
+
+  it "should raise error for updates and deletes on datasets with offsets or limits with orders" do
+    proc{@ds.offset(1).delete}.must_raise Sequel::InvalidOperation
+    proc{@ds.offset(1).update(:id=>Sequel[:id]+10)}.must_raise Sequel::InvalidOperation
+    proc{@ds.limit(1, 1).delete}.must_raise Sequel::InvalidOperation
+    proc{@ds.limit(1, 1).update(:id=>Sequel[:id]+10)}.must_raise Sequel::InvalidOperation
+    proc{@ds.order(:id).limit(1).update(:id=>Sequel[:id]+10)}.must_raise Sequel::InvalidOperation
+    proc{@ds.order(:id).limit(1).delete}.must_raise Sequel::InvalidOperation
+  end if false # SEQUEL5 
+end if DB.dataset.send(:is_2012_or_later?)
+
 describe "Common Table Expressions" do
   before do
     @db = DB

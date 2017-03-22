@@ -1,5 +1,11 @@
 === master
 
+* Make Dataset#delete respect an existing limit on Microsoft SQL Server (jeremyevans)
+
+* Add Dataset#skip_limit_check to mark a dataset as skipping the limit/offset check for updates and deletes (jeremyevans)
+
+* Deprecate calling Dataset#{update/delete/truncate} on datasets with limits or offsets unless the database supports it (jeremyevans)
+
 * Add deprecation message for using association_pks setter method with :delay_pks=>true association option (jeremyevans)
 
 * Add deprecation message for using association_pks setter method without :delay_pks association option (jeremyevans)

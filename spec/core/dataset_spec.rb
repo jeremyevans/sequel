@@ -233,6 +233,68 @@ describe "A dataset with multiple tables in its FROM clause" do
   end
 end
 
+describe "A dataset with a limit" do
+  before do
+    @dataset = Sequel.mock[:a].limit(1)
+  end
+
+  it "should ignore limit if skip_limit_check is used before #update" do
+    @dataset.skip_limit_check.update(:a=>1)
+    @dataset.db.sqls.must_equal ['UPDATE a SET a = 1']
+  end
+
+  it "should ignore limit if skip_limit_check is used before #delete" do
+    @dataset.skip_limit_check.delete
+    @dataset.db.sqls.must_equal ['DELETE FROM a']
+  end
+  
+  if false #SEQUEL5
+    it "should raise on #update" do
+      proc{@dataset.update(:a=>1)}.must_raise(Sequel::InvalidOperation)
+    end
+
+    it "should raise on #delete" do
+      proc{@dataset.delete}.must_raise(Sequel::InvalidOperation)
+    end
+    
+    it "should raise on #truncate" do
+      proc{@dataset.truncate}.must_raise(Sequel::InvalidOperation)
+      proc{@dataset.skip_limit_check.truncate}.must_raise(Sequel::InvalidOperation)
+    end
+  end
+end
+
+describe "A dataset with an offset" do
+  before do
+    @dataset = Sequel.mock[:a].offset(1)
+  end
+
+  it "should ignore offset if skip_limit_check is used before #update" do
+    @dataset.skip_limit_check.update(:a=>1)
+    @dataset.db.sqls.must_equal ['UPDATE a SET a = 1']
+  end
+
+  it "should ignore offset if skip_limit_check is used before #delete" do
+    @dataset.skip_limit_check.delete
+    @dataset.db.sqls.must_equal ['DELETE FROM a']
+  end
+  
+  if false #SEQUEL5
+    it "should raise on #update" do
+      proc{@dataset.update(:a=>1)}.must_raise(Sequel::InvalidOperation)
+    end
+
+    it "should raise on #delete" do
+      proc{@dataset.delete}.must_raise(Sequel::InvalidOperation)
+    end
+    
+    it "should raise on #truncate" do
+      proc{@dataset.truncate}.must_raise(Sequel::InvalidOperation)
+      proc{@dataset.skip_limit_check.truncate}.must_raise(Sequel::InvalidOperation)
+    end
+  end
+end
+
 describe "Dataset#unused_table_alias" do
   before do
     @ds = Sequel.mock.dataset.from(:test)

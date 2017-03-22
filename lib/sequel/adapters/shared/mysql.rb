@@ -871,6 +871,11 @@ module Sequel
       
       private
 
+      # Allow update and delete for limited datasets, unless there is an offset.
+      def check_not_limited!(type)
+        super if type == :truncate || @opts[:offset]
+      end
+
       # Consider the first table in the joined dataset is the table to delete
       # from, but include the others for the purposes of selecting rows.
       def delete_from_sql(sql)
