@@ -574,7 +574,8 @@ module Sequel
 
       def database_exception_sqlstate(exception, opts)
         if exception.respond_to?(:result) && (result = exception.result)
-          result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+          sqlstate = result.error_field(::PGresult::PG_DIAG_SQLSTATE)
+          sqlstate == '40P01' ? '40001' : sqlstate
         end
       end
 
