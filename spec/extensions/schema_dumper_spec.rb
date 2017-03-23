@@ -254,7 +254,7 @@ END_MIG
 
   it "should sort table names topologically when dumping a migration with foreign keys" do
     @d.meta_def(:tables){|o| [:t1, :t2]}
-    @d.meta_def(:schema) do |t|
+    @d.meta_def(:schema) do |t, *o|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true}]]
     end
     @d.meta_def(:supports_foreign_key_parsing?){true}
@@ -278,7 +278,7 @@ END_MIG
 
   it "should handle circular dependencies when dumping a migration with foreign keys" do
     @d.meta_def(:tables){|o| [:t1, :t2]}
-    @d.meta_def(:schema) do |t|
+    @d.meta_def(:schema) do |t, *o|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer'}]]
     end
     @d.meta_def(:supports_foreign_key_parsing?){true}
@@ -306,7 +306,7 @@ END_MIG
 
   it "should sort topologically even if the database raises an error when trying to parse foreign keys for a non-existent table" do
     @d.meta_def(:tables){|o| [:t1, :t2]}
-    @d.meta_def(:schema) do |t|
+    @d.meta_def(:schema) do |t, *o|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true}]]
     end
     @d.meta_def(:supports_foreign_key_parsing?){true}
@@ -587,7 +587,7 @@ END_MIG
 
   it "should support dumping just foreign_keys as a migration" do
     @d.meta_def(:tables){|o| [:t1, :t2, :t3]}
-    @d.meta_def(:schema) do |t|
+    @d.meta_def(:schema) do |t, *o|
       t == :t1 ? [[:c2, {:db_type=>'integer'}]] : [[:c1, {:db_type=>'integer'}]]
     end
     @d.meta_def(:supports_foreign_key_parsing?){true}
