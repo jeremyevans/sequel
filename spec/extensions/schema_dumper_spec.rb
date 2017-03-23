@@ -75,9 +75,9 @@ end
 describe "Sequel::Database dump methods" do
   before do
     @d = Sequel::Database.new.extension(:schema_dumper)
-    @d.meta_def(:tables){|o| [:t1, :t2]}
+    @d.meta_def(:tables){|o| o[:schema] ? [o[:schema]] : [:t1, :t2]}
     @d.meta_def(:schema) do |t, *o|
-      case t
+      v = case t
       when :t1, 't__t1', Sequel.identifier(:t__t1)
         [[:c1, {:db_type=>'integer', :primary_key=>true, :auto_increment=>true, :allow_null=>false}],
          [:c2, {:db_type=>'varchar(20)', :allow_null=>true}]]
@@ -90,7 +90,17 @@ describe "Sequel::Database dump methods" do
       when :t5
         [[:c1, {:db_type=>'blahblah', :allow_null=>true}]]
       end
+
+      if o.first.is_a?(Hash) && o.first[:schema]
+        v.last.last[:db_type] = o.first[:schema]
+      end
+
+      v
     end
+  end
+
+  it "should support dumping table with :schema option" do
+    @d.dump_table_schema(:t1, :schema=>'varchar(15)').must_equal "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>15\nend"
   end
 
   it "should support dumping table schemas as create_table method calls" do
@@ -209,6 +219,19 @@ describe "Sequel::Database dump methods" do
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
     end
     @d.dump_table_schema(:t1).must_equal "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1], :unique=>true\nend"
+  end
+
+  it "should support dumping the whole database as a migration with a :schema option" do
+    @d.dump_schema_migration(:schema=>'t__t1').must_equal <<-END_MIG
+Sequel.migration do
+  change do
+    create_table("t__t1") do
+      primary_key :c1
+      String :c2
+    end
+  end
+end
+END_MIG
   end
 
   it "should support dumping the whole database as a migration" do

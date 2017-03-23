@@ -1,5 +1,7 @@
 === master
 
+* Make Database#dump_{table_schema,schema_migration} in schema_dumper extension support :schema option (dadario) (#1328)
+
 * Make Dataset#delete respect an existing limit on Microsoft SQL Server (jeremyevans)
 
 * Add Dataset#skip_limit_check to mark a dataset as skipping the limit/offset check for updates and deletes (jeremyevans)
