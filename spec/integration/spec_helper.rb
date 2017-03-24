@@ -32,10 +32,10 @@ require './spec/guards_helper'
 IDENTIFIER_MANGLING = !ENV['SEQUEL_NO_MANGLE'] unless defined?(IDENTIFIER_MANGLING)
 
 unless defined?(DB)
-  opts = {}
-  opts[:identifier_mangling] = false unless IDENTIFIER_MANGLING
-  DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'], opts)
+  # SEQUEL5: Remove :identifier_mangling=>false
+  DB = Sequel.connect(ENV['SEQUEL_INTEGRATION_URL'], :identifier_mangling=>false)
   DB.extension(:freeze_datasets) if ENV['SEQUEL_FREEZE_DATASETS']
+  DB.extension(:identifier_mangling) if IDENTIFIER_MANGLING
 end
 
 if DB.adapter_scheme == :ibmdb || (DB.adapter_scheme == :ado && DB.database_type == :access)

@@ -13,9 +13,13 @@ require 'minitest/hooks/default'
 
 require "#{File.dirname(File.dirname(__FILE__))}/deprecation_helper.rb"
 
+# SEQUEL5: Remove
+output = Sequel::Deprecation.output
+Sequel::Deprecation.output = nil
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil
 Sequel.identifier_output_method = nil
+Sequel::Deprecation.output = output
 
 class << Sequel::Model
   attr_writer :db_schema

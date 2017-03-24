@@ -31,6 +31,10 @@ if ENV['SEQUEL_COLUMNS_INTROSPECTION']
   Sequel::Mock::Dataset.send(:include, Sequel::ColumnsIntrospection)
 end
 
+# SEQUEL5: Remove
+output = Sequel::Deprecation.output
+Sequel::Deprecation.output = nil
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil
 Sequel.identifier_output_method = nil
+Sequel::Deprecation.output = output

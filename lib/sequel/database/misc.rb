@@ -150,7 +150,7 @@ module Sequel
       reset_default_dataset
       adapter_initialize
       if typecast_value_boolean(@opts.fetch(:identifier_mangling, true))
-        extension(:identifier_mangling)
+        extension(:_deprecated_identifier_mangling)
       end
 
       unless typecast_value_boolean(@opts[:keep_reference]) == false

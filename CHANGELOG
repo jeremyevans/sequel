@@ -1,5 +1,11 @@
 === master
 
+* Deprecate Sequel.identifier_{in,out}put_method= and .quote_identifiers= singleton setters (jeremyevans)
+
+* Deprecate Sequel::Database.identifier_{in,out}put_method and .quote_identifiers singleton accessors (jeremyevans)
+
+* Deprecate loading the identifier_mangling by default, require it be loaded explicitly if needed (jeremyevans)
+
 * Make Database#dump_{table_schema,schema_migration} in schema_dumper extension support :schema option (dadario) (#1328)
 
 * Make Dataset#delete respect an existing limit on Microsoft SQL Server (jeremyevans)

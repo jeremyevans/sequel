@@ -9,168 +9,138 @@ describe "identifier_mangling extension" do
     end
   end
   
-  it "should respect the :quote_identifiers option" do
-    db = Sequel::Database.new(:quote_identifiers=>false).extension(:identifier_mangling)
+  deprecated "should respect the :quote_identifiers option" do
+    db = Sequel::Database.new(:quote_identifiers=>false, :identifier_mangling=>true)
     db.quote_identifiers?.must_equal false
-    db = Sequel::Database.new(:quote_identifiers=>true).extension(:identifier_mangling)
+    db = Sequel::Database.new(:quote_identifiers=>true, :identifier_mangling=>true)
     db.quote_identifiers?.must_equal true
   end
 
-  it "should respect the :quote_identifiers setting" do
-    db = Sequel::Database.new.extension(:identifier_mangling)
+  deprecated "should respect the :quote_identifiers setting" do
+    db = Sequel::Database.new(:identifier_mangling=>true)
     db.quote_identifiers?.must_equal false
     db.quote_identifiers = true
     db.quote_identifiers?.must_equal true
   end
 
-  it "should upcase on input and downcase on output by default" do
-    db = Sequel::Database.new.extension(:identifier_mangling)
+  deprecated "should upcase on input and downcase on output by default" do
+    db = Sequel::Database.new(:identifier_mangling=>true)
     db.send(:identifier_input_method_default).must_equal :upcase
     db.send(:identifier_output_method_default).must_equal :downcase
   end
 
-  it "should respect the :identifier_input_method option" do
-    db = Sequel::Database.new.extension(:identifier_mangling)
-    db.identifier_input_method.must_be_nil
-    db.identifier_input_method = :downcase
-    db.identifier_input_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_input_method=>nil).extension(:identifier_mangling)
-    db.identifier_input_method.must_be_nil
-    db.identifier_input_method = :downcase
-    db.identifier_input_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_input_method=>:upcase).extension(:identifier_mangling)
-    db.identifier_input_method.must_equal :upcase
-    db.identifier_input_method = nil
-    db.identifier_input_method.must_be_nil
-  end
-  
-  deprecated "should default to Sequel.identifier_input_method" do
-    Sequel.identifier_input_method = :downcase
-    Sequel::Database.identifier_input_method.must_equal :downcase
-    db = Sequel::Database.new.extension(:identifier_mangling)
-    db.identifier_input_method.must_equal :downcase
-    db.identifier_input_method = :upcase
-    db.identifier_input_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_input_method=>nil).extension(:identifier_mangling)
-    db.identifier_input_method.must_be_nil
-    db.identifier_input_method = :upcase
-    db.identifier_input_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_input_method=>:upcase).extension(:identifier_mangling)
-    db.identifier_input_method.must_equal :upcase
-    db.identifier_input_method = nil
-    db.identifier_input_method.must_be_nil
+  deprecated "should respect the :identifier_input_method option" do
     Sequel.identifier_input_method = nil
     Sequel::Database.identifier_input_method.must_equal false
-    db = Sequel::Database.new.extension(:identifier_mangling)
+    db = Sequel::Database.new(:identifier_input_method=>nil, :identifier_mangling=>true)
+    db.identifier_input_method.must_be_nil
+    db.identifier_input_method = :downcase
+    db.identifier_input_method.must_equal :downcase
+    db = Sequel::Database.new(:identifier_input_method=>:upcase, :identifier_mangling=>true)
+    db.identifier_input_method.must_equal :upcase
+    db.identifier_input_method = nil
+    db.identifier_input_method.must_be_nil
+    Sequel.identifier_input_method = :downcase
+    Sequel::Database.identifier_input_method.must_equal :downcase
+    db = Sequel::Database.new(:identifier_input_method=>nil, :identifier_mangling=>true)
     db.identifier_input_method.must_be_nil
     db.identifier_input_method = :upcase
     db.identifier_input_method.must_equal :upcase
+    db = Sequel::Database.new(:identifier_input_method=>:upcase, :identifier_mangling=>true)
+    db.identifier_input_method.must_equal :upcase
+    db.identifier_input_method = nil
+    db.identifier_input_method.must_be_nil
   end
   
-  it "should respect the :identifier_output_method option" do
-    db = Sequel::Database.new.extension(:identifier_mangling)
+  deprecated "should respect the :identifier_output_method option" do
+    Sequel.identifier_output_method = nil
+    Sequel::Database.identifier_output_method.must_equal false
+    db = Sequel::Database.new(:identifier_output_method=>nil, :identifier_mangling=>true)
+    db.identifier_output_method.must_be_nil
+    db.identifier_output_method = :downcase
+    db.identifier_output_method.must_equal :downcase
+    db = Sequel::Database.new(:identifier_output_method=>:upcase, :identifier_mangling=>true)
+    db.identifier_output_method.must_equal :upcase
+    db.identifier_output_method = nil
+    db.identifier_output_method.must_be_nil
+    Sequel.identifier_output_method = :downcase
+    Sequel::Database.identifier_output_method.must_equal :downcase
+    db = Sequel::Database.new(:identifier_output_method=>nil, :identifier_mangling=>true)
     db.identifier_output_method.must_be_nil
     db.identifier_output_method = :upcase
     db.identifier_output_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_output_method=>nil).extension(:identifier_mangling)
-    db.identifier_output_method.must_be_nil
-    db.identifier_output_method = :downcase
-    db.identifier_output_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_output_method=>:upcase).extension(:identifier_mangling)
+    db = Sequel::Database.new(:identifier_output_method=>:upcase, :identifier_mangling=>true)
     db.identifier_output_method.must_equal :upcase
     db.identifier_output_method = nil
     db.identifier_output_method.must_be_nil
-  end
-
-  deprecated "should default to Sequel.identifier_output_method" do
-    Sequel.identifier_output_method = :upcase
-    Sequel::Database.identifier_output_method.must_equal :upcase
-    db = Sequel::Database.new.extension(:identifier_mangling)
-    db.identifier_output_method.must_equal :upcase
-    db.identifier_output_method = :downcase
-    db.identifier_output_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_output_method=>nil).extension(:identifier_mangling)
-    db.identifier_output_method.must_be_nil
-    db.identifier_output_method = :downcase
-    db.identifier_output_method.must_equal :downcase
-    db = Sequel::Database.new(:identifier_output_method=>:upcase).extension(:identifier_mangling)
-    db.identifier_output_method.must_equal :upcase
-    db.identifier_output_method = nil
-    db.identifier_output_method.must_be_nil
-    Sequel.identifier_output_method = nil
-    Sequel::Database.identifier_output_method.must_equal false
-    db = Sequel::Database.new.extension(:identifier_mangling)
-    db.identifier_output_method.must_be_nil
-    db.identifier_output_method = :downcase
-    db.identifier_output_method.must_equal :downcase
   end
 
   deprecated "should use the default Sequel.quote_identifiers value" do
     Sequel.quote_identifiers = true
-    Sequel::Database.new.extension(:identifier_mangling).quote_identifiers?.must_equal true
+    Sequel::Database.new(:identifier_mangling=>true).quote_identifiers?.must_equal true
     Sequel.quote_identifiers = false
-    Sequel::Database.new.extension(:identifier_mangling).quote_identifiers?.must_equal false
+    Sequel::Database.new(:identifier_mangling=>true).quote_identifiers?.must_equal false
     Sequel::Database.quote_identifiers = true
-    Sequel::Database.new.extension(:identifier_mangling).quote_identifiers?.must_equal true
+    Sequel::Database.new(:identifier_mangling=>true).quote_identifiers?.must_equal true
     Sequel::Database.quote_identifiers = false
-    Sequel::Database.new.extension(:identifier_mangling).quote_identifiers?.must_equal false
+    Sequel::Database.new(:identifier_mangling=>true).quote_identifiers?.must_equal false
   end
 
   deprecated "should use the default Sequel.identifier_input_method value" do
     Sequel.identifier_input_method = :downcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_input_method.must_equal :downcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_input_method.must_equal :downcase
     Sequel.identifier_input_method = :upcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_input_method.must_equal :upcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_input_method.must_equal :upcase
     Sequel::Database.identifier_input_method = :downcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_input_method.must_equal :downcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_input_method.must_equal :downcase
     Sequel::Database.identifier_input_method = :upcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_input_method.must_equal :upcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_input_method.must_equal :upcase
   end
   
   deprecated "should use the default Sequel.identifier_output_method value" do
     Sequel.identifier_output_method = :downcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_output_method.must_equal :downcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_output_method.must_equal :downcase
     Sequel.identifier_output_method = :upcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_output_method.must_equal :upcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_output_method.must_equal :upcase
     Sequel::Database.identifier_output_method = :downcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_output_method.must_equal :downcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_output_method.must_equal :downcase
     Sequel::Database.identifier_output_method = :upcase
-    Sequel::Database.new.extension(:identifier_mangling).identifier_output_method.must_equal :upcase
+    Sequel::Database.new(:identifier_mangling=>true).identifier_output_method.must_equal :upcase
   end
 
   deprecated "should respect the quote_indentifiers_default method if Sequel.quote_identifiers = nil" do
     Sequel.quote_identifiers = nil
-    Sequel::Database.new.extension(:identifier_mangling).quote_identifiers?.must_equal true
+    Sequel::Database.new(:identifier_mangling=>true).quote_identifiers?.must_equal true
     x = Class.new(Sequel::Database){def quote_identifiers_default; false end}
-    x.new.extension(:identifier_mangling).quote_identifiers?.must_equal false
+    x.new(:identifier_mangling=>true).quote_identifiers?.must_equal false
     y = Class.new(Sequel::Database){def quote_identifiers_default; true end}
-    y.new.extension(:identifier_mangling).quote_identifiers?.must_equal true
+    y.new(:identifier_mangling=>true).quote_identifiers?.must_equal true
   end
   
-  it "should respect the identifier_input_method_default method if Sequel.identifier_input_method is not called" do
+  deprecated "should respect the identifier_input_method_default method if Sequel.identifier_input_method is not called" do
     class Sequel::Database
       @identifier_input_method = nil
     end
     x = Class.new(Sequel::Database){def identifier_input_method_default; :downcase end}
-    x.new.extension(:identifier_mangling).identifier_input_method.must_equal :downcase
+    x.new(:identifier_mangling=>true).identifier_input_method.must_equal :downcase
     y = Class.new(Sequel::Database){def identifier_input_method_default; :camelize end}
-    y.new.extension(:identifier_mangling).identifier_input_method.must_equal :camelize
+    y.new(:identifier_mangling=>true).identifier_input_method.must_equal :camelize
   end
   
-  it "should respect the identifier_output_method_default method if Sequel.identifier_output_method is not called" do
+  deprecated "should respect the identifier_output_method_default method if Sequel.identifier_output_method is not called" do
     class Sequel::Database
       @identifier_output_method = nil
     end
     x = Class.new(Sequel::Database){def identifier_output_method_default; :upcase end}
-    x.new.extension(:identifier_mangling).identifier_output_method.must_equal :upcase
+    x.new(:identifier_mangling=>true).identifier_output_method.must_equal :upcase
     y = Class.new(Sequel::Database){def identifier_output_method_default; :underscore end}
-    y.new.extension(:identifier_mangling).identifier_output_method.must_equal :underscore
+    y.new(:identifier_mangling=>true).identifier_output_method.must_equal :underscore
   end
 end
 
 describe "Database#input_identifier_meth" do
-  it "should be the input_identifer method of a default dataset for this database" do
-    db = Sequel::Database.new.extension(:identifier_mangling)
+  deprecated "should be the input_identifer method of a default dataset for this database" do
+    db = Sequel::Database.new(:identifier_mangling=>true)
     db.send(:input_identifier_meth).call(:a).must_equal 'a'
     db.identifier_input_method = :upcase
     db.send(:input_identifier_meth).call(:a).must_equal 'A'
@@ -178,8 +148,8 @@ describe "Database#input_identifier_meth" do
 end
 
 describe "Database#output_identifier_meth" do
-  it "should be the output_identifer method of a default dataset for this database" do
-    db = Sequel::Database.new.extension(:identifier_mangling)
+  deprecated "should be the output_identifer method of a default dataset for this database" do
+    db = Sequel::Database.new(:identifier_mangling=>true)
     db.send(:output_identifier_meth).call('A').must_equal :A
     db.identifier_output_method = :downcase
     db.send(:output_identifier_meth).call('A').must_equal :a
@@ -187,8 +157,8 @@ describe "Database#output_identifier_meth" do
 end
 
 describe "Database#metadata_dataset" do
-  it "should be a dataset with the default settings for identifier_mangling" do
-    ds = Sequel::Database.new.extension(:identifier_mangling).send(:metadata_dataset)
+  deprecated "should be a dataset with the default settings for identifier_mangling" do
+    ds = Sequel::Database.new(:identifier_mangling=>true).send(:metadata_dataset)
     ds.literal(:a).must_equal 'A'
     ds.send(:output_identifier, 'A').must_equal :a
   end
@@ -196,27 +166,27 @@ end
 
 describe "Dataset" do
   before do
-    @dataset = Sequel.mock.extension(:identifier_mangling).dataset
+    @dataset = Sequel.mock(:identifier_mangling=>true).dataset
   end
   
-  it "should get quote_identifiers default from database" do
-    db = Sequel::Database.new(:quote_identifiers=>true).extension(:identifier_mangling)
+  deprecated "should get quote_identifiers default from database" do
+    db = Sequel::Database.new(:quote_identifiers=>true, :identifier_mangling=>true)
     db[:a].quote_identifiers?.must_equal true
-    db = Sequel::Database.new(:quote_identifiers=>false).extension(:identifier_mangling)
+    db = Sequel::Database.new(:quote_identifiers=>false, :identifier_mangling=>true)
     db[:a].quote_identifiers?.must_equal false
   end
 
-  it "should get identifier_input_method default from database" do
-    db = Sequel::Database.new(:identifier_input_method=>:upcase).extension(:identifier_mangling)
+  deprecated "should get identifier_input_method default from database" do
+    db = Sequel::Database.new(:identifier_input_method=>:upcase, :identifier_mangling=>true)
     db[:a].identifier_input_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_input_method=>:downcase).extension(:identifier_mangling)
+    db = Sequel::Database.new(:identifier_input_method=>:downcase, :identifier_mangling=>true)
     db[:a].identifier_input_method.must_equal :downcase
   end
 
-  it "should get identifier_output_method default from database" do
-    db = Sequel::Database.new(:identifier_output_method=>:upcase).extension(:identifier_mangling)
+  deprecated "should get identifier_output_method default from database" do
+    db = Sequel::Database.new(:identifier_output_method=>:upcase, :identifier_mangling=>true)
     db[:a].identifier_output_method.must_equal :upcase
-    db = Sequel::Database.new(:identifier_output_method=>:downcase).extension(:identifier_mangling)
+    db = Sequel::Database.new(:identifier_output_method=>:downcase, :identifier_mangling=>true)
     db[:a].identifier_output_method.must_equal :downcase
   end
   
@@ -249,7 +219,7 @@ describe "Dataset" do
     end
   end
   
-  it "should have with_quote_identifiers method which returns cloned dataset with changed literalization of identifiers" do
+  deprecated "should have with_quote_identifiers method which returns cloned dataset with changed literalization of identifiers" do
     @dataset.with_quote_identifiers(true).literal(:a).must_equal '"a"'
     @dataset.with_quote_identifiers(false).literal(:a).must_equal 'a'
     ds = @dataset.freeze.with_quote_identifiers(false)
@@ -257,7 +227,7 @@ describe "Dataset" do
     ds.frozen?.must_equal true
   end
   
-  it "should have with_identifier_input_method method which returns cloned dataset with changed literalization of identifiers" do
+  deprecated "should have with_identifier_input_method method which returns cloned dataset with changed literalization of identifiers" do
     @dataset.with_identifier_input_method(:upcase).literal(:a).must_equal 'A'
     @dataset.with_identifier_input_method(:downcase).literal(:A).must_equal 'a'
     @dataset.with_identifier_input_method(:reverse).literal(:at_b).must_equal 'b_ta'
@@ -266,7 +236,7 @@ describe "Dataset" do
     ds.literal(:at_b).must_equal 'b_ta'
   end
   
-  it "should have with_identifier_output_method method which returns cloned dataset with changed identifiers returned from the database" do
+  deprecated "should have with_identifier_output_method method which returns cloned dataset with changed identifiers returned from the database" do
     @dataset.send(:output_identifier, "at_b_C").must_equal :at_b_C
     @dataset.with_identifier_output_method(:upcase).send(:output_identifier, "at_b_C").must_equal :AT_B_C
     @dataset.with_identifier_output_method(:downcase).send(:output_identifier, "at_b_C").must_equal :at_b_c
@@ -276,7 +246,7 @@ describe "Dataset" do
     ds.frozen?.must_equal true
   end
   
-  it "should have output_identifier handle empty identifiers" do
+  deprecated "should have output_identifier handle empty identifiers" do
     @dataset.send(:output_identifier, "").must_equal :untitled
     @dataset.with_identifier_output_method(:upcase).send(:output_identifier, "").must_equal :UNTITLED
     @dataset.with_identifier_output_method(:downcase).send(:output_identifier, "").must_equal :untitled
@@ -297,17 +267,14 @@ describe "Frozen Datasets" do
 end
 
 describe "identifier_mangling extension" do
-  it "should be able to load dialects based on the database name" do
+  deprecated "should be able to load dialects based on the database name" do
     begin
-      qi, ii, io = nil
-      deprecated do
-        qi = class Sequel::Database; @quote_identifiers; end
-        ii = class Sequel::Database; @identifier_input_method; end
-        io = class Sequel::Database; @identifier_output_method; end
-        Sequel.quote_identifiers = nil
-        class Sequel::Database; @identifier_input_method=nil; end
-        class Sequel::Database; @identifier_output_method=nil; end
-      end
+      qi = class Sequel::Database; @quote_identifiers; end
+      ii = class Sequel::Database; @identifier_input_method; end
+      io = class Sequel::Database; @identifier_output_method; end
+      Sequel.quote_identifiers = nil
+      class Sequel::Database; @identifier_input_method=nil; end
+      class Sequel::Database; @identifier_output_method=nil; end
       Sequel.mock(:host=>'access').select(Date.new(2011, 12, 13)).sql.must_equal 'SELECT #2011-12-13#'
       Sequel.mock(:host=>'db2').select(1).sql.must_equal 'SELECT 1 FROM "SYSIBM"."SYSDUMMY1"'
       Sequel.mock(:host=>'mssql')[:a].full_text_search(:b, 'c').sql.must_equal "SELECT * FROM [A] WHERE (CONTAINS ([B], 'c'))"
@@ -317,25 +284,23 @@ describe "identifier_mangling extension" do
       Sequel.mock(:host=>'sqlanywhere').from(:a).offset(1).sql.must_equal 'SELECT TOP 2147483647 START AT (1 + 1) * FROM "A"'
       Sequel.mock(:host=>'sqlite')[:a___b].sql.must_equal "SELECT * FROM `a` AS 'b'"
     ensure
-      deprecated do
-        Sequel.quote_identifiers = qi
-        Sequel::Database.send(:instance_variable_set, :@identifier_input_method, ii)
-        Sequel::Database.send(:instance_variable_set, :@identifier_output_method, io)
-      end
+      Sequel.quote_identifiers = qi
+      Sequel::Database.send(:instance_variable_set, :@identifier_input_method, ii)
+      Sequel::Database.send(:instance_variable_set, :@identifier_output_method, io)
     end
   end
 end
 
 describe Sequel::Model, ".[] optimization" do
   before do
-    @db = Sequel.mock(:quote_identifiers=>true).extension(:identifier_mangling)
+    @db = Sequel.mock(:identifier_mangling=>true, :quote_identifiers=>true)
     def @db.schema(*) [[:id, {:primary_key=>true}]] end
     def @db.supports_schema_parsing?() true end
     @c = Class.new(Sequel::Model(@db))
     @ds = @db.dataset.with_quote_identifiers(true)
   end
 
-  it "should have simple_pk and simple_table respect dataset's identifier input methods" do
+  deprecated "should have simple_pk and simple_table respect dataset's identifier input methods" do
     ds = @db.from(:ab).with_identifier_input_method(:reverse)
     @c.set_dataset ds
     @c.simple_table.must_equal '"ba"'
@@ -346,3 +311,4 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_table.must_equal '"fe"."hg"'
   end
 end
+

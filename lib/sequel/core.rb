@@ -152,6 +152,7 @@ module Sequel
   #
   # Other String instance methods work as well.
   def self.identifier_input_method=(value)
+    # SEQUEL5: Remove
     Database.identifier_input_method = value
   end
 
@@ -168,6 +169,7 @@ module Sequel
   #
   # Other String instance methods work as well.
   def self.identifier_output_method=(value)
+    # SEQUEL5: Remove
     Database.identifier_output_method = value
   end
 
@@ -194,6 +196,7 @@ module Sequel
   #
   #   Sequel.quote_identifiers = false
   def self.quote_identifiers=(value)
+    # SEQUEL5: Remove
     Database.quote_identifiers = value
   end
 

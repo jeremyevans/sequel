@@ -5,9 +5,11 @@ describe "A new Database" do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
   after do
-    Sequel.quote_identifiers = false
-    Sequel.identifier_input_method = nil
-    Sequel.identifier_output_method = nil
+    deprecated do
+      Sequel.quote_identifiers = false
+      Sequel.identifier_input_method = nil
+      Sequel.identifier_output_method = nil
+    end
   end
   
   it "should receive options" do
