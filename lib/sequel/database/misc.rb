@@ -125,7 +125,7 @@ module Sequel
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
       @sharded = !!@opts[:servers]
       @opts[:adapter_class] = self.class
-      @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, Database.single_threaded))
+      @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, Sequel.single_threaded))
       @default_string_column_size = @opts[:default_string_column_size] || DEFAULT_STRING_COLUMN_SIZE
 
       @schemas = {}

@@ -25,8 +25,6 @@ module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
   @split_symbols = true
-
-  # Whether Sequel is being run in single threaded mode
   @single_threaded = false
 
   class << self
@@ -51,6 +49,15 @@ module Sequel
     # they often implement them differently (e.g. + using seconds on +Time+ and
     # days on +DateTime+).
     attr_accessor :datetime_class
+
+    # Set whether sequel is being used in single threaded mode. by default,
+    # Sequel uses a thread-safe connection pool, which isn't as fast as the
+    # single threaded connection pool, and also has some additional thread
+    # safety checks.  If your program will only have one thread,
+    # and speed is a priority, you should set this to true:
+    #
+    #   Sequel.single_threaded = true
+    attr_accessor :single_threaded
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.
@@ -219,18 +226,6 @@ module Sequel
   # Sequel as this file.
   def self.require(files, subdir=nil)
     Array(files).each{|f| super("#{File.dirname(__FILE__).untaint}/#{"#{subdir}/" if subdir}#{f}")}
-  end
-
-  # Set whether Sequel is being used in single threaded mode. By default,
-  # Sequel uses a thread-safe connection pool, which isn't as fast as the
-  # single threaded connection pool, and also has some additional thread
-  # safety checks.  If your program will only have one thread,
-  # and speed is a priority, you should set this to true:
-  #
-  #   Sequel.single_threaded = true
-  def self.single_threaded=(value)
-    @single_threaded = value
-    Database.single_threaded = value
   end
 
   COLUMN_REF_RE1 = /\A((?:(?!__).)+)__((?:(?!___).)+)___(.+)\z/.freeze

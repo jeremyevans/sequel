@@ -1377,7 +1377,7 @@ end
 
 describe "A single threaded database" do
   after do
-    Sequel::Database.single_threaded = false
+    Sequel.single_threaded = false
   end
   
   it "should use a SingleConnectionPool instead of a ConnectionPool" do
@@ -1390,14 +1390,17 @@ describe "A single threaded database" do
     db.pool.must_be_kind_of(Sequel::SingleConnectionPool)
   end
   
-  it "should be constructable using Database.single_threaded = true" do
+  deprecated "should be constructable using Database.single_threaded = true" do
     Sequel::Database.single_threaded = true
+    Sequel.single_threaded.must_equal true
+    Sequel::Database.single_threaded.must_equal true
     db = Sequel::Database.new{123}
     db.pool.must_be_kind_of(Sequel::SingleConnectionPool)
   end
 
   it "should be constructable using Sequel.single_threaded = true" do
     Sequel.single_threaded = true
+    Sequel.single_threaded.must_equal true
     db = Sequel::Database.new{123}
     db.pool.must_be_kind_of(Sequel::SingleConnectionPool)
   end
@@ -1442,7 +1445,7 @@ end
 
 describe "A database" do
   after do
-    Sequel::Database.single_threaded = false
+    Sequel.single_threaded = false
   end
   
   it "should have single_threaded? respond to true if in single threaded mode" do
@@ -1455,7 +1458,7 @@ describe "A database" do
     db = Sequel::Database.new
     db.wont_be :single_threaded?
     
-    Sequel::Database.single_threaded = true
+    Sequel.single_threaded = true
     
     db = Sequel::Database.new{123}
     db.must_be :single_threaded?

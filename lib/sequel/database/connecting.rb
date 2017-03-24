@@ -11,11 +11,14 @@ module Sequel
     ADAPTERS = %w'ado amalgalite cubrid do ibmdb jdbc mock mysql mysql2 odbc oracle postgres sqlanywhere sqlite swift tinytds'.collect(&:to_sym)
     # SEQUEL5: Remove cubrid do swift
 
-    @single_threaded = false
+    def self.single_threaded
+      Sequel::Deprecation.deprecate("Sequel::Database.single_threaded", "Use Sequel.single_threaded instead")
+      Sequel.single_threaded
+    end
 
-    class << self
-      # Whether to use the single threaded connection pool by default
-      attr_accessor :single_threaded
+    def self.single_threaded=(v)
+      Sequel::Deprecation.deprecate("Sequel::Database.single_threaded=", "Use Sequel.single_threaded= instead")
+      Sequel.single_threaded = v
     end
 
     # The Database subclass for the given adapter scheme.
