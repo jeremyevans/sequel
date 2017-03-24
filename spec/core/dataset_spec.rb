@@ -3710,7 +3710,7 @@ describe "Dataset prepared statements and bound variables " do
     @db.sqls.must_equal ["SELECT * FROM items"]
   end
 
-  it "#call should default to using :all if an invalid type is given" do
+  deprecated "#call should default to using :all if an invalid type is given" do
     @ds.filter(:num=>:$n).call(:select_all, :n=>1)
     @db.sqls.must_equal ['SELECT * FROM items WHERE (num = 1)']
   end
@@ -3760,7 +3760,7 @@ describe "Dataset prepared statements and bound variables " do
   it "should handle usage with Dataset.prepared_statements_module" do
     @ds = @ds.with_extend(Sequel::Dataset.send(:prepared_statements_module, :prepare_bind, [Sequel::Dataset::ArgumentMapper, Sequel::Dataset::PreparedStatementMethods]){def foo; :bar; end})
     @ds.foo.must_equal :bar
-    @ds = @ds.clone(:prepared_statement_name => 'foo')
+    @ds = @ds.clone(:prepared_statement_name => 'foo', :prepared_type=>:select)
     @ds.call(:a=>1)
     @db.sqls.must_equal ["foo"]
   end
@@ -3811,7 +3811,7 @@ describe Sequel::Dataset::UnnumberedArgumentMapper do
       "UPDATE items SET num = ? WHERE (num = ?) -- args: [1, 1]"]
   end
 
-  it "should handle unrecognized statement types as :all" do
+  deprecated "should handle unrecognized statement types as :all" do
     ps = @ds.prepare(:select_all, :s)
     ps = ps.with_extend(Sequel::Dataset::UnnumberedArgumentMapper)
     sql = ps.prepared_sql

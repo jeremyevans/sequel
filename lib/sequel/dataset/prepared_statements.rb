@@ -217,6 +217,7 @@ module Sequel
             send(*prepared_type, &block) 
           end
         else
+          Sequel::Deprecation.deprecate("Using an unsupported prepared statement type (#{prepared_type.inspect})", 'Switch to using :select as the prepared statement type')
           all(&block)
         end
       end
@@ -338,6 +339,7 @@ module Sequel
         db.set_prepared_statement(name, ps)
       else
         # :nocov:
+        # SEQUEL5: Add coverage
         Sequel::Deprecation.deprecate("Dataset#prepare will change to requiring a name argument in Sequel 5, please update your code.") unless name
         # :nocov:
       end

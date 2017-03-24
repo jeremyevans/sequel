@@ -1,5 +1,7 @@
 === master
 
+* Deprecate treating unrecognized prepared statement type as :select (jeremyevans)
+
 * Deprecate Sequel.identifier_{in,out}put_method= and .quote_identifiers= singleton setters (jeremyevans)
 
 * Deprecate Sequel::Database.identifier_{in,out}put_method and .quote_identifiers singleton accessors (jeremyevans)
