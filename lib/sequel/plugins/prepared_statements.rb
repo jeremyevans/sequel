@@ -32,6 +32,7 @@ module Sequel
 
       # Setup the datastructure used to hold the prepared statements in the model.
       def self.apply(model)
+        # SEQUEL5: Drop Support for :fixed/:lookup_sql SQL
         model.instance_variable_set(:@prepared_statements, {:insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}, :fixed=>{}}.freeze)
       end
 
@@ -66,6 +67,7 @@ module Sequel
 
         # Return a prepared statement that can be used to delete a row from this model's dataset.
         def prepared_delete
+          # SEQUEL5: Remove
           cached_prepared_statement(:fixed, :delete){prepare_statement(filter(prepared_statement_key_array(primary_key)), :delete)}
         end
 
@@ -84,11 +86,13 @@ module Sequel
 
         # Return a prepared statement that can be used to lookup a row solely based on the primary key.
         def prepared_lookup
+          # SEQUEL5: Remove
           cached_prepared_statement(:fixed, :lookup){prepare_explicit_statement(filter(prepared_statement_key_array(primary_key)), :first)}
         end
 
         # Return a prepared statement that can be used to refresh a row to get new column values after insertion.
         def prepared_refresh
+          # SEQUEL5: Remove
           cached_prepared_statement(:fixed, :refresh){prepare_explicit_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)).where(prepared_statement_key_array(primary_key)), :first)}
         end
 
@@ -122,6 +126,7 @@ module Sequel
         # Use a prepared statement to query the database for the row matching the given primary key.
         def primary_key_lookup(pk)
           return super unless use_prepared_statements_for_pk_lookup?
+          # SEQUEL5: Remove
           prepared_lookup.call(primary_key_hash(pk))
         end
 
@@ -150,6 +155,7 @@ module Sequel
 
         # Use a prepared statement to delete the row.
         def _delete_without_checking
+          # SEQUEL5: Remove
           if use_prepared_statements_for?(:delete)
             _set_prepared_statement_server(model.send(:prepared_delete)).call(pk_hash)
           else
@@ -180,6 +186,7 @@ module Sequel
 
         # Use a prepared statement to refresh this model's column values.
         def _refresh_get(ds)
+          # SEQUEL5: Remove
           if use_prepared_statements_for?(:refresh)
             _set_prepared_statement_server(model.send(:prepared_refresh)).call(pk_hash)
           else
