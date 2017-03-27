@@ -1,5 +1,7 @@
 === master
 
+* Deprecating calling Sequel::Qualifier with two arguments (jeremyevans)
+
 * Add validation_contexts plugin for supporting custom contexts when validating (jeremyevans)
 
 * Deprecate Sequel::Database.single_threaded singleton accessor (jeremyevans)

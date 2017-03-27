@@ -428,7 +428,7 @@ module Sequel
       #   Sequel.deep_qualify(:table, Sequel.+(:column, 1)) # "table"."column" + 1
       #   Sequel.deep_qualify(:table, Sequel.like(:a, 'b')) # "table"."a" LIKE 'b' ESCAPE '\'
       def deep_qualify(qualifier, expr)
-        Sequel::Qualifier.new(Sequel, qualifier).transform(expr)
+        Sequel::Qualifier.new(qualifier).transform(expr)
       end
 
       # Return a delayed evaluation that uses the passed block. This is used

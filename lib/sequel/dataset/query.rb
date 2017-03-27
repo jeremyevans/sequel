@@ -581,8 +581,8 @@ module Sequel
             when false
               nil # Do no qualification
             when :deep
-              k = Sequel::Qualifier.new(self, table_name).transform(k)
-              v = Sequel::Qualifier.new(self, last_alias).transform(v)
+              k = Sequel::Qualifier.new(table_name).transform(k)
+              v = Sequel::Qualifier.new(last_alias).transform(v)
             else
               k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
               v = qualified_column_name(v, last_alias) if v.is_a?(Symbol)

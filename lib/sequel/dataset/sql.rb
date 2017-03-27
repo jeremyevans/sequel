@@ -1368,7 +1368,7 @@ module Sequel
     
     # Qualify the given expression e to the given table.
     def qualified_expression(e, table)
-      Qualifier.new(self, table).transform(e)
+      Qualifier.new(table).transform(e)
     end
 
     def select_columns_sql(sql)

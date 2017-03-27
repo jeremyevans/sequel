@@ -89,11 +89,16 @@ module Sequel
   # Handles qualifying existing datasets, so that unqualified columns
   # in the dataset are qualified with a given table name.
   class Qualifier < ASTTransformer
-    # Store the dataset to use as the basis for qualification, 
-    # and the table used to qualify unqualified columns. 
-    def initialize(ds, table)
-      @ds = ds
-      @table = table
+    # Set the table used to qualify unqualified columns
+    def initialize(table, unused=nil)
+      if unused
+        # :nocov:
+        Sequel::Deprecation.deprecate("Passing two arguments to Sequel::Qualifier.new", 'Pass only the second arguument specifying the table used for qualification')
+        @table = unused
+        # :nocov:
+      else
+        @table = table
+      end
     end
 
     private
@@ -105,7 +110,7 @@ module Sequel
     def v(o)
       case o
       when Symbol
-        t, column, aliaz = @ds.send(:split_symbol, o)
+        t, column, aliaz = Sequel.split_symbol(o)
         if t
           o
         elsif aliaz
