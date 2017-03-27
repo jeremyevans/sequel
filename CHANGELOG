@@ -1,5 +1,7 @@
 === master
 
+* Add validation_contexts plugin for supporting custom contexts when validating (jeremyevans)
+
 * Deprecate Sequel::Database.single_threaded singleton accessor (jeremyevans)
 
 * Deprecate treating unrecognized prepared statement type as :select (jeremyevans)
