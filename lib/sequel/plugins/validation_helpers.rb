@@ -244,6 +244,7 @@ module Sequel
           atts.each do |a|
             arr = Array(a)
             next if arr.any?{|x| errors.on(x)}
+            # SEQUEL5: Default only_if_modified to true
             next if opts[:only_if_modified] && !new? && !arr.any?{|x| changed_columns.include?(x)}
             ds = opts[:dataset] || model.dataset
             ds = if where

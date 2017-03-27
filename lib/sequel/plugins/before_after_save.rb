@@ -21,6 +21,7 @@ module Sequel
     #   Album.plugin :before_after_save
     module BeforeAfterSave
       module InstanceMethods
+        # SEQUEL5: Make module empty as it will be the default behavior
         private
 
         # Refresh and reset modified flag right after INSERT query.

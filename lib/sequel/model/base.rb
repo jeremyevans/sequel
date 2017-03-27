@@ -1749,7 +1749,7 @@ module Sequel
         raise Sequel::Error, "can't save frozen object" if frozen?
         set_server(opts[:server]) if opts[:server] 
         _before_validation
-        if opts[:validate] != false
+        if opts[:validate] != false # SEQUEL5: Remove if
           unless checked_save_failure(opts){_valid?(true, opts)}
             raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
             return
@@ -1957,6 +1957,7 @@ module Sequel
       # Run code directly after the INSERT query, before after_create.
       # This is only a temporary API, it should not be overridden by external code.
       def _after_create(pk)
+        # SEQUEL5: Remove
         @this = nil
         @new = false
         @was_new = true
@@ -1965,6 +1966,7 @@ module Sequel
       # Run code after around_save returns, before calling after_commit.
       # This is only a temporary API, it should not be overridden by external code.
       def _after_save(pk)
+        # SEQUEL5: Remove
         if @was_new
           @was_new = nil
           pk ? _save_refresh : changed_columns.clear
@@ -1977,6 +1979,7 @@ module Sequel
       # Run code directly after the UPDATE query, before after_update.
       # This is only a temporary API, it should not be overridden by external code.
       def _after_update
+        # SEQUEL5: Remove
         @this = nil
       end
 
@@ -2129,7 +2132,12 @@ module Sequel
               called_cu = true
               raise_hook_failure(:before_create) if before_create == false
               pk = _insert
-              _after_create(pk)
+              _after_create(pk) # SEQUEL5: Remove
+              # SEQUEL5
+              # @this = nil
+              # @new = false
+              # @modified = false
+              # pk ? _save_refresh : changed_columns.clear
               after_create
               true
             end
@@ -2140,7 +2148,7 @@ module Sequel
               raise_hook_failure(:before_update) if before_update == false
               columns = opts[:columns]
               if columns.nil?
-                @columns_updated = if opts[:changed]
+                @columns_updated = if opts[:changed] # SEQUEL5: Use local variable instead of instance variable
                   @values.reject{|k,v| !changed_columns.include?(k)}
                 else
                   _save_update_all_columns_hash
@@ -2152,7 +2160,10 @@ module Sequel
                 changed_columns.reject!{|c| columns.include?(c)}
               end
               _update_columns(@columns_updated)
-              _after_update
+              _after_update # SEQUEL5: Remove
+              # SEQUEL5
+              # @this = nil
+              # @modified = false
               after_update
               true
             end
@@ -2162,7 +2173,7 @@ module Sequel
           true
         end
         raise_hook_failure(:around_save) unless called_save
-        _after_save(pk)
+        _after_save(pk) # SEQUEL5: Remove
         if uacr.nil? ? (method(:after_commit).owner != InstanceMethods) : uacr
           Sequel::Deprecation.deprecate("Model#after_commit", "Instead, call db.after_commit in Model#after_save.")
           db.after_commit(sh){after_commit}
@@ -2235,6 +2246,7 @@ module Sequel
         errors.clear
         called = false
         error = false
+        # skip_validate = opts[:validate] == false # SEQUEL5
         around_validation do
           called = true
           if before_validation == false
@@ -2245,11 +2257,12 @@ module Sequel
             end
             false
           else
-            validate
+            validate # unless skip_validate # SEQUEL5
             after_validation
             errors.empty?
           end
         end
+        # return true if skip_validate # SEQUEL5
         error = true unless called
         if error
           if raise_errors

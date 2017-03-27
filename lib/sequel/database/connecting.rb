@@ -70,6 +70,7 @@ module Sequel
       end
       begin
         db = c.new(opts)
+        # SEQUEL5: Default opts[:test] to true
         db.test_connection if opts[:test] && db.send(:typecast_value_boolean, opts[:test])
         if block_given?
           return yield(db)
