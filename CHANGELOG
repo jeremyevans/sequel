@@ -1,5 +1,7 @@
 === master
 
+* Deprecate passing Procs as filter arguments, require they be passed as blocks (jeremyevans)
+
 * Deprecate Sequel::Error::* exception class aliases (jeremyevans)
 
 * Deprecate prepared_statements_associations and prepared_statements_with_pk plugins (jeremyevans)

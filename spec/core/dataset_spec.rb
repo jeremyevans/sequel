@@ -570,6 +570,10 @@ describe "Dataset#where" do
     @dataset.filter(Sequel.expr(:zz) < 3){yy > 3}.sql.must_equal 'SELECT * FROM test WHERE ((zz < 3) AND (yy > 3))'
   end
 
+  deprecated "should allow the use of procs" do
+    @dataset.filter(proc{yy > 3}).sql.must_equal 'SELECT * FROM test WHERE (yy > 3)'
+  end
+
   it "should yield a VirtualRow to the block" do
     x = nil
     @dataset.filter{|r| x = r; false}

@@ -1235,10 +1235,12 @@ module Sequel
     def filter_expr(expr = nil, &block)
       expr = nil if expr == []
 
-      if expr && block
-        return SQL::BooleanExpression.new(:AND, filter_expr(expr), filter_expr(block))
-      elsif block
-        expr = block
+      if block
+        if expr
+          return SQL::BooleanExpression.new(:AND, filter_expr(expr), filter_expr(Sequel.virtual_row(&block)))
+        else
+          return filter_expr(Sequel.virtual_row(&block))
+        end
       end
 
       case expr
@@ -1253,8 +1255,9 @@ module Sequel
           SQL::BooleanExpression.new(:AND, *expr.map{|x| filter_expr(x)})
         end
       when Proc
+        Sequel::Deprecation.deprecate("Passing Proc objects as filter arguments", "Pass them as blocks to the filtering methods or to Sequel.expr")
         filter_expr(Sequel.virtual_row(&expr))
-      when Numeric, SQL::NumericExpression, SQL::StringExpression
+      when Numeric, SQL::NumericExpression, SQL::StringExpression #, Proc # SEQUEL5
         raise(Error, "Invalid filter expression: #{expr.inspect}") 
       when TrueClass, FalseClass
         if supports_where_true?

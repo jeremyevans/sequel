@@ -52,7 +52,7 @@ describe "Dataset::PlaceholderLiteralizer" do
   it "should handle calls with a placeholders used as filter arguments" do
     loader = @c.loader(@ds){|pl, ds| ds.where(pl.arg)}
     loader.first(:id=>1).must_equal @h
-    loader.first(proc{a(b)}).must_equal @h
+    loader.first(Sequel.expr{a(b)}).must_equal @h
     loader.first("a = 1").must_equal @h
     @db.sqls.must_equal ["SELECT * FROM items WHERE (id = 1)", "SELECT * FROM items WHERE a(b)", "SELECT * FROM items WHERE (a = 1)"]
   end

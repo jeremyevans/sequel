@@ -25,8 +25,8 @@ describe "subset_conditions plugin" do
     @c.subset(:published, &p1)
     @c.where(@c.published_conditions).sql.must_equal @c.published.sql
 
-    p2 = proc{:active}
-    @c.subset(:active, &p2)
+    p2 = :active
+    @c.subset(:active, p2)
     @c.where(@c.active_conditions).sql.must_equal @c.active.sql
 
     @c.subset(:active_published, p2, &p1)
