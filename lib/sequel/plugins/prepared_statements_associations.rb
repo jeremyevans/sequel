@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The prepared_statements_associations plugin", "Stop using the plugin, it is probably unneeded and making the application slower")
+
 module Sequel
   module Plugins
     # The prepared_statements_associations plugin modifies the regular association

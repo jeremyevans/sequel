@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The prepared_statements_with_pk plugin", "Stop using the plugin, it is probably unneeded and making the application slower")
+
 module Sequel
   module Plugins
     # The prepared_statements_with_pk plugin allows Dataset#with_pk for model datasets

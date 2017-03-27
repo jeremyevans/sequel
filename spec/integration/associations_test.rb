@@ -1588,22 +1588,24 @@ BasicRegularAndCompositeKeyAssociations = shared_description do
   end
   
   it "should work correctly with prepared_statements_association plugin" do
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    
-    @album.reload
-    @artist.reload
-    @tag.reload
-    
-    [Tag, Album, Artist].each{|x| x.plugin :prepared_statements_associations}
-    @album.artist.must_equal @artist
-    @artist.first_album.must_equal @album
-    @artist.albums.must_equal [@album]
-    @album.tags.must_equal [@tag]
-    @album.alias_tags.must_equal [@tag]
-    @tag.albums.must_equal [@album]
-    unless @no_many_through_many
-      @album.first_tag.must_equal @tag
+    deprecated do
+      @album.update(:artist => @artist)
+      @album.add_tag(@tag)
+      
+      @album.reload
+      @artist.reload
+      @tag.reload
+      
+      [Tag, Album, Artist].each{|x| x.plugin :prepared_statements_associations}
+      @album.artist.must_equal @artist
+      @artist.first_album.must_equal @album
+      @artist.albums.must_equal [@album]
+      @album.tags.must_equal [@tag]
+      @album.alias_tags.must_equal [@tag]
+      @tag.albums.must_equal [@album]
+      unless @no_many_through_many
+        @album.first_tag.must_equal @tag
+      end
     end
   end
 

@@ -396,20 +396,22 @@ end
 
 describe "Dataset#unbind" do
   before do
-    @ds = ds = DB[:items]
-    @ct = proc do |t, v|
-      DB.create_table!(:items) do
-        column :c, t
+    deprecated do
+      @ds = ds = DB[:items]
+      @ct = proc do |t, v|
+        DB.create_table!(:items) do
+          column :c, t
+        end
+        ds.insert(:c=>v)
       end
-      ds.insert(:c=>v)
+      @u = proc{|ds1| ds2, bv = ds1.unbind; ds2.call(:first, bv)}
     end
-    @u = proc{|ds1| ds2, bv = ds1.unbind; ds2.call(:first, bv)}
   end
   after do
     DB.drop_table?(:items)
   end
   
-  it "should unbind values assigned to equality and inequality statements" do
+  deprecated "should unbind values assigned to equality and inequality statements" do
     @ct[Integer, 10]
     @u[@ds.filter(:c=>10)].must_equal(:c=>10)
     @u[@ds.exclude(:c=>10)].must_be_nil
@@ -420,46 +422,52 @@ describe "Dataset#unbind" do
   end
 
   cspecify "should handle numerics and strings", [:odbc], [:swift, :sqlite] do
-    @ct[Integer, 10]
-    @u[@ds.filter(:c=>10)].must_equal(:c=>10)
-    @ct[Float, 0.0]
-    @u[@ds.filter{c < 1}].must_equal(:c=>0.0)
-    @ct[String, 'foo']
-    @u[@ds.filter(:c=>'foo')].must_equal(:c=>'foo')
+    deprecated do
+      @ct[Integer, 10]
+      @u[@ds.filter(:c=>10)].must_equal(:c=>10)
+      @ct[Float, 0.0]
+      @u[@ds.filter{c < 1}].must_equal(:c=>0.0)
+      @ct[String, 'foo']
+      @u[@ds.filter(:c=>'foo')].must_equal(:c=>'foo')
 
-    DB.create_table!(:items) do
-      BigDecimal :c, :size=>[15,2]
+      DB.create_table!(:items) do
+        BigDecimal :c, :size=>[15,2]
+      end
+      @ds.insert(:c=>BigDecimal.new('1.1'))
+      @u[@ds.filter{c > 0}].must_equal(:c=>BigDecimal.new('1.1'))
     end
-    @ds.insert(:c=>BigDecimal.new('1.1'))
-    @u[@ds.filter{c > 0}].must_equal(:c=>BigDecimal.new('1.1'))
   end
 
   cspecify "should handle dates and times", [:do], [:jdbc, :mssql], [:jdbc, :sqlite], [:swift], [:tinytds], :oracle do
-    @ct[Date, Date.today]
-    @u[@ds.filter(:c=>Date.today)].must_equal(:c=>Date.today)
-    t = Time.now
-    @ct[Time, t]
-    @u[@ds.filter{c < t + 1}][:c].to_i.must_equal t.to_i
+    deprecated do
+      @ct[Date, Date.today]
+      @u[@ds.filter(:c=>Date.today)].must_equal(:c=>Date.today)
+      t = Time.now
+      @ct[Time, t]
+      @u[@ds.filter{c < t + 1}][:c].to_i.must_equal t.to_i
+    end
   end
 
-  it "should handle QualifiedIdentifiers" do
+  deprecated "should handle QualifiedIdentifiers" do
     @ct[Integer, 10]
     @u[@ds.filter{items[:c] > 1}].must_equal(:c=>10)
   end
 
   cspecify "should handle deep nesting", :h2 do
-    DB.create_table!(:items) do
-      Integer :a
-      Integer :b
-      Integer :c
-      Integer :d
+    deprecated do
+      DB.create_table!(:items) do
+        Integer :a
+        Integer :b
+        Integer :c
+        Integer :d
+      end
+      @ds.insert(:a=>2, :b=>0, :c=>3, :d=>5)
+      @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>4)=>1}, 0) => 1)].must_equal(:a=>2, :b=>0, :c=>3, :d=>5)
+      @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>5)=>1}, 0) => 1)].must_be_nil
     end
-    @ds.insert(:a=>2, :b=>0, :c=>3, :d=>5)
-    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>4)=>1}, 0) => 1)].must_equal(:a=>2, :b=>0, :c=>3, :d=>5)
-    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and(Sequel.case({~Sequel.expr(:d=>5)=>1}, 0) => 1)].must_be_nil
   end
 
-  it "should handle case where the same variable has the same value in multiple places " do
+  deprecated "should handle case where the same variable has the same value in multiple places " do
     @ct[Integer, 1]
     @u[@ds.filter{c > 1}.or{c < 1}.invert].must_equal(:c=>1)
     @u[@ds.filter{c > 1}.or{c < 1}].must_be_nil

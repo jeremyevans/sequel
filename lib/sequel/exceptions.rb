@@ -78,8 +78,7 @@ module Sequel
   # and won't reraise it (unless a reraise is requested).
   Rollback = Class.new(Error)
 
-  # Error raised when unbinding a dataset that has multiple different values
-  # for a given variable.
+  # SEQUEL5: Remove
   UnbindDuplicate = Class.new(Error)
 
   # Call name on each class to set the name for the class, so it gets cached.
@@ -92,4 +91,6 @@ module Sequel
   Error::InvalidValue = InvalidValue
   Error::PoolTimeoutError = PoolTimeout
   Error::Rollback = Rollback
+
+  Sequel::Deprecation.deprecate_constant(self, :UnbindDuplicate)
 end

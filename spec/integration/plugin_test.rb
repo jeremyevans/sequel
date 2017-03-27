@@ -237,7 +237,6 @@ describe "Many Through Many Plugin" do
     Artist[@artist3.id].albums.map{|x| x.name}.sort.must_equal %w'B C'
     Artist[@artist4.id].albums.map{|x| x.name}.sort.must_equal %w'B D'
     
-    Artist.plugin :prepared_statements_associations
     Artist[@artist1.id].albums.map{|x| x.name}.sort.must_equal %w'A D'
     Artist[@artist2.id].albums.map{|x| x.name}.sort.must_equal %w'A C'
     Artist[@artist3.id].albums.map{|x| x.name}.sort.must_equal %w'B C'
@@ -300,7 +299,6 @@ describe "Many Through Many Plugin" do
     Artist[@artist3.id].related_artists.map{|x| x.name}.sort.must_equal %w'2 3 4'
     Artist[@artist4.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 3 4'
     
-    Artist.plugin :prepared_statements_associations
     Artist[@artist1.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 4'
     Artist[@artist2.id].related_artists.map{|x| x.name}.sort.must_equal %w'1 2 3'
     Artist[@artist3.id].related_artists.map{|x| x.name}.sort.must_equal %w'2 3 4'
@@ -366,7 +364,6 @@ describe "Many Through Many Plugin" do
     Artist[@artist3.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B D'
     Artist[@artist4.id].related_albums.map{|x| x.name}.sort.must_equal %w'B D'
     
-    Artist.plugin :prepared_statements_associations
     Artist[@artist1.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B C'
     Artist[@artist2.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B C D'
     Artist[@artist3.id].related_albums.map{|x| x.name}.sort.must_equal %w'A B D'
@@ -1819,7 +1816,6 @@ describe "Sequel::Plugins::PreparedStatements" do
       Integer :i
     end
     @c = Class.new(Sequel::Model(@db[:ps_test]))
-    @c.plugin :prepared_statements_with_pk
   end
   before do
     @c.dataset.delete
@@ -1895,7 +1891,6 @@ describe "Sequel::Plugins::PreparedStatements with schema changes" do
     @c.one_to_many :ps_tests, :key=>:id, :class=>@c
     @c.many_to_many :mps_tests, :left_key=>:id, :right_key=>:id, :class=>@c, :join_table=>Sequel[:ps_test].as(:x)
     @c.plugin :prepared_statements
-    @c.plugin :prepared_statements_associations
   end
   after do
     @db.drop_table?(:ps_test)

@@ -165,6 +165,7 @@ module Sequel
 
     # Intialize an empty +binds+ hash.
     def initialize
+      Sequel::Deprecation.deprecate("Sequel::Unbinder", 'There is no replacement')
       @binds = {}
     end
 
@@ -210,4 +211,5 @@ module Sequel
       end
     end
   end
+  Sequel::Deprecation.deprecate_constant(self, :Unbinder)
 end

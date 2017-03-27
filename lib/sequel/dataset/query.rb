@@ -923,6 +923,7 @@ module Sequel
     #   bv #  {:a => 1}
     #   ds.call(:select, bv)
     def unbind
+      Sequel::Deprecation.deprecate("Dataset#unbind", "Switch to using placeholders manually instead of unbinding them")
       u = Unbinder.new
       ds = clone(:where=>u.transform(opts[:where]), :join=>u.transform(opts[:join]))
       [ds, u.binds]
