@@ -2642,7 +2642,7 @@ module Sequel
       #   Artist.dataset.with_pk([1, 2])
       #   # SELECT * FROM artists WHERE ((artists.id1 = 1) AND (artists.id2 = 2)) LIMIT 1
       def with_pk(pk)
-        if loader = _with_pk_loader
+        if pk && (loader = _with_pk_loader)
           loader.first(*pk)
         else
           first(model.qualified_primary_key_hash(pk))
