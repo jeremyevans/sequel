@@ -653,7 +653,7 @@ describe Sequel::SQL::VirtualRow do
   end
 
   it "should handle filtered aggregate function calls" do
-    @d.l{count{}.*.filter(:a, :b)}.must_equal 'count(*) FILTER (WHERE ("a" AND "b"))' 
+    @d.l{count{}.*.filter(Sequel.&(:a, :b))}.must_equal 'count(*) FILTER (WHERE ("a" AND "b"))' 
     @d.l{count{}.*.filter(:a=>1)}.must_equal 'count(*) FILTER (WHERE ("a" = 1))'
     @d.l{count{}.*.filter{b > 1}}.must_equal 'count(*) FILTER (WHERE ("b" > 1))'
     @d.l{count{}.*.filter(:a=>1){b > 1}}.must_equal 'count(*) FILTER (WHERE (("a" = 1) AND ("b" > 1)))'

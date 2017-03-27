@@ -13,7 +13,7 @@ describe "subset_conditions plugin" do
     @c.subset(:active, :active)
     @c.where(@c.active_conditions).sql.must_equal @c.active.sql
 
-    @c.subset(:active_published, :active, :published => true)
+    @c.subset(:active_published, Sequel.&(:active, :published => true))
     @c.where(@c.active_published_conditions).sql.must_equal @c.active_published.sql
     @c.where(Sequel.&(@c.active_conditions, @c.published_conditions)).sql.must_equal @c.active_published.sql
     @c.where(Sequel.|(@c.active_conditions, @c.published_conditions)).sql.must_equal "SELECT * FROM a WHERE (active OR (published IS TRUE))"

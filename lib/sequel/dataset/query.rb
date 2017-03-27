@@ -1252,6 +1252,7 @@ module Sequel
         elsif Sequel.condition_specifier?(expr)
           SQL::BooleanExpression.from_value_pairs(expr)
         else
+          Sequel::Deprecation.deprecate("Passing multiple arguments as filter arguments when not using a conditions specifier (#{expr.inspect})", "Pass the arguments to separate filter methods or use Sequel.& to combine them")
           SQL::BooleanExpression.new(:AND, *expr.map{|x| filter_expr(x)})
         end
       when Proc

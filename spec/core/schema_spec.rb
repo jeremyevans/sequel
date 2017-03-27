@@ -598,9 +598,16 @@ describe "DB#create_table" do
     @db.sqls.must_equal ["CREATE TABLE cats (CHECK (price = 100))"]
   end
 
-  it "should accept array constraints" do
+  deprecated "should accept array constraints" do
     @db.create_table(:cats) do
       check [Sequel.expr(:x) > 0, Sequel.expr(:y) < 1]
+    end
+    @db.sqls.must_equal ["CREATE TABLE cats (CHECK ((x > 0) AND (y < 1)))"]
+  end
+
+  it "should accept expression constraints" do
+    @db.create_table(:cats) do
+      check Sequel.&(Sequel.expr(:x) > 0, Sequel.expr(:y) < 1)
     end
     @db.sqls.must_equal ["CREATE TABLE cats (CHECK ((x > 0) AND (y < 1)))"]
   end

@@ -560,7 +560,7 @@ describe "Dataset#where" do
     @dataset.filter(Sequel::SQLFALSE).sql.must_equal "SELECT * FROM test WHERE (1 = 0)"
   end
 
-  it "should allow the use of multiple arguments" do
+  deprecated "should allow the use of multiple arguments" do
     @dataset.filter(:a, :b).sql.must_equal 'SELECT * FROM test WHERE (a AND b)'
     @dataset.filter(:a, :b=>1).sql.must_equal 'SELECT * FROM test WHERE (a AND (b = 1))'
     @dataset.filter(:a, Sequel.expr(:c) > 3, :b=>1).sql.must_equal 'SELECT * FROM test WHERE (a AND (c > 3) AND (b = 1))'
