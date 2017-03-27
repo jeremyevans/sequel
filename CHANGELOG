@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel::Error::* exception class aliases (jeremyevans)
+
 * Deprecate prepared_statements_associations and prepared_statements_with_pk plugins (jeremyevans)
 
 * Deprecate Sequel::Unbinder, Sequel::UnbindDuplicate, and Dataset#unbind (jeremyevans)

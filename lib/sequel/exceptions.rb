@@ -93,4 +93,9 @@ module Sequel
   Error::Rollback = Rollback
 
   Sequel::Deprecation.deprecate_constant(self, :UnbindDuplicate)
+  Sequel::Deprecation.deprecate_constant(Error, :AdapterNotFound)
+  Sequel::Deprecation.deprecate_constant(Error, :InvalidOperation)
+  Sequel::Deprecation.deprecate_constant(Error, :InvalidValue)
+  Sequel::Deprecation.deprecate_constant(Error, :PoolTimeoutError)
+  Sequel::Deprecation.deprecate_constant(Error, :Rollback)
 end
