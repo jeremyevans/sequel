@@ -1944,8 +1944,8 @@ module Sequel
 
       # Validates the object and returns true if no errors are reported.
       #
-      #   artist(:name=>'Valid').valid? # => true
-      #   artist(:name=>'Invalid').valid? # => false
+      #   artist.set(:name=>'Valid').valid? # => true
+      #   artist.set(:name=>'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = OPTS)
         _before_validation
