@@ -949,7 +949,7 @@ module Sequel
       #
       #   Artist.table_name # => :artists
       #   Sequel::Model(:foo).table_name # => :foo
-      #   Sequel::Model(:foo___bar).table_name # => :bar
+      #   Sequel::Model(Sequel[:foo].as(:bar)).table_name # => :bar
       def table_name
         dataset.first_source_alias
       end
@@ -2164,7 +2164,7 @@ module Sequel
               end
               columns = opts[:columns]
               if columns.nil?
-                @columns_updated = if opts[:changed] # SEQUEL5: Use local variable instead of instance variable
+                columns_updated = if opts[:changed] # SEQUEL5: Use local variable instead of instance variable
                   @values.reject{|k,v| !changed_columns.include?(k)}
                 else
                   _save_update_all_columns_hash
@@ -2172,10 +2172,10 @@ module Sequel
                 changed_columns.clear
               else # update only the specified columns
                 columns = Array(columns)
-                @columns_updated = @values.reject{|k, v| !columns.include?(k)}
+                columns_updated = @values.reject{|k, v| !columns.include?(k)}
                 changed_columns.reject!{|c| columns.include?(c)}
               end
-              _update_columns(@columns_updated)
+              _update_columns(columns_updated)
               _after_update # SEQUEL5: Remove
               # SEQUEL5
               # @this = nil
@@ -2196,7 +2196,7 @@ module Sequel
         end
         self
       end
-      
+
       # Refresh the object after saving it, used to get
       # default values of all columns.  Separated from _save so it
       # can be overridden to avoid the refresh.
@@ -2227,6 +2227,7 @@ module Sequel
       # Plugins can override this method in order to update with
       # additional columns, even when the column hash is initially empty.
       def _update_columns(columns)
+        @columns_updated ||= DeprecatedColumnsUpdated.new(columns) # SEQUEL5: Remove
         _update(columns) unless columns.empty?
       end
 

@@ -195,7 +195,7 @@ describe "Model#save" do
     o.changed_columns.must_equal []
   end
 
-  it "should store previous value of @new in @was_new and as well as the hash used for updating in @columns_updated until after hooks finish running" do
+  deprecated "should store previous value of @new in @was_new and as well as the hash used for updating in @columns_updated until after hooks finish running" do
     res = nil
     @c.send(:define_method, :after_save){ res = [@columns_updated, @was_new]}
     o = @c.new(:x => 1, :y => nil)
@@ -209,7 +209,9 @@ describe "Model#save" do
     o = @c.load(:id => 23,:x => 1, :y => nil)
     o[:x] = 2
     o.save
-    res.must_equal [{:x => 2, :y => nil}, nil]
+    res[0].fetch(:x).must_equal 2
+    res[0].fetch(:y).must_be_nil
+    res.fetch(1).must_be_nil
     o.after_save
     res.must_equal [nil, nil]
 
@@ -218,7 +220,8 @@ describe "Model#save" do
     o[:x] = 2
     o[:y] = 22
     o.save(:columns=>:x)
-    res.must_equal [{:x=>2},nil]
+    res[0].fetch(:x).must_equal 2
+    res.fetch(1).must_be_nil
     o.after_save
     res.must_equal [nil, nil]
   end

@@ -125,6 +125,18 @@ module Sequel
 
     def_Model(::Sequel)
 
+    # SEQUEL5: Remove
+    class DeprecatedColumnsUpdated # :nodoc:
+      def initialize(columns_updated)
+        @columns_updated = columns_updated
+      end
+
+      def method_missing(*args, &block)
+        Sequel::Deprecation.deprecate("Accessing @columns_updated directly", "Use the columns_updated plugin and switch to the columns_updated method")
+        @columns_updated.send(*args, &block)
+      end
+    end
+      
     ANONYMOUS_MODEL_CLASSES = @Model_cache # :nodoc:
     Sequel::Deprecation.deprecate_constant(self, :ANONYMOUS_MODEL_CLASSES)
 

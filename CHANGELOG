@@ -1,5 +1,9 @@
 === master
 
+* Add columns_updated plugin for making updated columns hash available in after_update and after_save hooks (jeremyevans)
+
+* Deprecate accessing @columns_updated directly in model after_update and after_save hooks (jeremyevans)
+
 * Deprecate Database#{add,remove}_servers when not using a sharded connection pool (jeremyevans)
 
 * Deprecate Database#each_server (jeremyevans)
