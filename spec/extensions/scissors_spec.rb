@@ -4,7 +4,9 @@ describe "scissors plugin" do
   before do
     @m = Class.new(Sequel::Model(:items))
     @m.use_transactions = true
-    @m.plugin :scissors
+    deprecated do
+      @m.plugin :scissors
+    end
     @m.db.sqls
   end
 

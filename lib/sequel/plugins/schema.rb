@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The schema plugin", "Switch to defining your schema using Database schema methods before creating your model classes")
+
 module Sequel
   module Plugins
     # Sequel's built in schema plugin allows you to define your schema

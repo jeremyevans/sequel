@@ -1,5 +1,7 @@
 # frozen-string-literal: true
 
+Sequel::Deprecation.deprecate("The scissors plugin", "Running with scissors is dangerous")
+
 module Sequel
   module Plugins
     # The scissors plugin adds class methods for update, delete, and destroy.

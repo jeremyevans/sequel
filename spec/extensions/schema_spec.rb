@@ -3,7 +3,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model, "set_schema" do
   before do
     @model = Class.new(Sequel::Model(:items))
-    @model.plugin :schema
+    deprecated do
+      @model.plugin :schema
+    end
   end 
 
   it "sets schema with implicit table name" do
@@ -26,11 +28,13 @@ end
 describe Sequel::Model, "create_table and schema" do
   before do
     @model = Class.new(Sequel::Model)
-    @model.class_eval do
-      plugin :schema
-      set_schema(:items) do
-        text :name
-        float :price, :null => false
+    deprecated do
+      @model.class_eval do
+        plugin :schema
+        set_schema(:items) do
+          text :name
+          float :price, :null => false
+        end
       end
     end
     DB.reset
@@ -76,7 +80,9 @@ end
 describe Sequel::Model, "schema methods" do
   before do
     @model = Class.new(Sequel::Model(:items))
-    @model.plugin :schema
+    deprecated do
+      @model.plugin :schema
+    end
     DB.reset
   end
 
