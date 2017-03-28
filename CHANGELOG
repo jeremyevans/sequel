@@ -1,5 +1,9 @@
 === master
 
+* Deprecate returning false from model before hooks to cancel the action, use Model#cancel_action (jeremyevans)
+
+* Handle Model#cancel_action correctly in before hooks when Model#valid? is called (jeremyevans)
+
 * Deprecate Sequel::BeforeHookFailed (jeremyevans)
 
 * Deprecate passing multiple arguments as filter arguments when not using a conditions specifier (jeremyevans)

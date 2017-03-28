@@ -90,11 +90,12 @@ module Sequel
         # Do not call this method with untrusted input, as that can result in
         # arbitrary code execution.
         def add_hook_type(*hooks)
+          Sequel::Deprecation.deprecate("Sequel::Model.add_hook_type", "You should add your own hook types manually")
           Model::HOOKS.concat(hooks)
           hooks.each do |hook|
             @hooks[hook] = []
             instance_eval("def #{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end", __FILE__, __LINE__)
-            class_eval("def #{hook}; model.hook_blocks(:#{hook}){|b| return false if instance_eval(&b) == false}; end", __FILE__, __LINE__)
+            class_eval("def #{hook}; model.hook_blocks(:#{hook}){|b| return false if instance_eval(&b) == false} end", __FILE__, __LINE__)
           end
         end
 
@@ -140,7 +141,19 @@ module Sequel
       end
 
       module InstanceMethods
-        (Model::BEFORE_HOOKS - [:before_save, :before_destroy]).each{|h| class_eval("def #{h}; model.hook_blocks(:#{h}){|b| return false if instance_eval(&b) == false}; super; end", __FILE__, __LINE__)}
+        (Model::BEFORE_HOOKS - [:before_save, :before_destroy]).each do |h|
+          class_eval(<<-END, __FILE__, __LINE__+1)
+            def #{h}
+              model.hook_blocks(:#{h}) do |b|
+                if instance_eval(&b) == false
+                  Sequel::Deprecation.deprecate("Having #{h} hook block return false to stop evaluation of further #{h} hook blocks", "Instead, call cancel_action inside #{h} hook block")
+                  return false
+                end
+              end
+              super
+            end
+          END
+        end
         (Model::AFTER_HOOKS - [:after_save, :after_destroy, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]).each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; end", __FILE__, __LINE__)}
 
         def after_destroy
@@ -161,7 +174,10 @@ module Sequel
 
         def before_destroy
           model.hook_blocks(:before_destroy) do |b|
-            return false if instance_eval(&b) == false
+            if instance_eval(&b) == false
+              Sequel::Deprecation.deprecate("Having before_destory hook block return false to stop evaluation of further before_destroy hook blocks", "Instead, call cancel_action inside before_destroy hook block")
+              return false
+            end
           end
           super
           if model.has_hooks?(:after_destroy_rollback)
@@ -171,7 +187,10 @@ module Sequel
 
         def before_save
           model.hook_blocks(:before_save) do |b|
-            return false if instance_eval(&b) == false
+            if instance_eval(&b) == false
+              Sequel::Deprecation.deprecate("Having before_save hook block return false to stop evaluation of further before_save hook blocks", "Instead, call cancel_action inside before_save hook block")
+              return false
+            end
           end
           super
           if model.has_hooks?(:after_rollback)

@@ -1,8 +1,9 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "InstanceHooks plugin" do
-  def r(x)
+  def r(x=nil)
     @r << x
+    yield if block_given?
     x
   end
   
@@ -24,7 +25,7 @@ describe "InstanceHooks plugin" do
     @r.must_equal [4, 2, 1, 3]
   end
 
-  it "should cancel the save if before_create_hook block returns false" do
+  deprecated "should cancel the save if before_create_hook block returns false" do
     @o.after_create_hook{r 1}
     @o.before_create_hook{r false}
     @o.before_create_hook{r 4}
@@ -33,6 +34,17 @@ describe "InstanceHooks plugin" do
     @r.clear
     @o.save.must_be_nil
     @r.must_equal [4, false]
+  end
+
+  it "should cancel the save if before_create_hook block calls cancel_action" do
+    @o.after_create_hook{r 1}
+    @o.before_create_hook{r{@o.cancel_action}}
+    @o.before_create_hook{r 4}
+    @o.save.must_be_nil
+    @r.must_equal [4, nil]
+    @r.clear
+    @o.save.must_be_nil
+    @r.must_equal [4, nil]
   end
 
   it "should support before_update_hook and after_update_hook" do
@@ -46,7 +58,7 @@ describe "InstanceHooks plugin" do
     @r.must_equal [4, 2, 1, 3]
   end
 
-  it "should cancel the save if before_update_hook block returns false" do
+  deprecated "should cancel the save if before_update_hook block returns false" do
     @x.after_update_hook{r 1}
     @x.before_update_hook{r false}
     @x.before_update_hook{r 4}
@@ -55,6 +67,17 @@ describe "InstanceHooks plugin" do
     @r.clear
     @x.save.must_be_nil
     @r.must_equal [4, false]
+  end
+
+  it "should cancel the save if before_update_hook block calls cancel_action" do
+    @x.after_update_hook{r 1}
+    @x.before_update_hook{r{@x.cancel_action}}
+    @x.before_update_hook{r 4}
+    @x.save.must_be_nil
+    @r.must_equal [4, nil]
+    @r.clear
+    @x.save.must_be_nil
+    @r.must_equal [4, nil]
   end
 
   it "should support before_save_hook and after_save_hook" do
@@ -76,7 +99,7 @@ describe "InstanceHooks plugin" do
     @r.must_equal [4, 2, 1, 3]
   end
 
-  it "should cancel the save if before_save_hook block returns false" do
+  deprecated "should cancel the save if before_save_hook block returns false" do
     @x.after_save_hook{r 1}
     @x.before_save_hook{r false}
     @x.before_save_hook{r 4}
@@ -94,6 +117,24 @@ describe "InstanceHooks plugin" do
     @r.must_equal [4, false]
   end
 
+  it "should cancel the save if before_save_hook block calls cancel_action" do
+    @x.after_save_hook{r 1}
+    @x.before_save_hook{r{@x.cancel_action}}
+    @x.before_save_hook{r 4}
+    @x.save.must_be_nil
+    @r.must_equal [4, nil]
+    @r.clear
+    
+    @x.after_save_hook{r 1}
+    @x.before_save_hook{r{@x.cancel_action}}
+    @x.before_save_hook{r 4}
+    @x.save.must_be_nil
+    @r.must_equal [4, nil]
+    @r.clear
+    @x.save.must_be_nil
+    @r.must_equal [4, nil]
+  end
+
   it "should support before_destroy_hook and after_destroy_hook" do
     @x.after_destroy_hook{r 1}
     @x.before_destroy_hook{r 2}
@@ -103,12 +144,20 @@ describe "InstanceHooks plugin" do
     @r.must_equal [4, 2, 1, 3]
   end
 
-  it "should cancel the destroy if before_destroy_hook block returns false" do
+  deprecated "should cancel the destroy if before_destroy_hook block returns false" do
     @x.after_destroy_hook{r 1}
     @x.before_destroy_hook{r false}
     @x.before_destroy_hook{r 4}
     @x.destroy.must_be_nil
     @r.must_equal [4, false]
+  end
+
+  it "should cancel the destroy if before_destroy_hook block calls cancel_action" do
+    @x.after_destroy_hook{r 1}
+    @x.before_destroy_hook{r{@x.cancel_action}}
+    @x.before_destroy_hook{r 4}
+    @x.destroy.must_be_nil
+    @r.must_equal [4, nil]
   end
 
   it "should support before_validation_hook and after_validation_hook" do
@@ -120,7 +169,7 @@ describe "InstanceHooks plugin" do
     @r.must_equal [4, 2, 1, 3]
   end
 
-  it "should cancel the save if before_validation_hook block returns false" do
+  deprecated "should cancel the save if before_validation_hook block returns false" do
     @o.after_validation_hook{r 1}
     @o.before_validation_hook{r false}
     @o.before_validation_hook{r 4}
@@ -129,6 +178,17 @@ describe "InstanceHooks plugin" do
     @r.clear
     @o.valid?.must_equal false
     @r.must_equal [4, false]
+  end
+
+  it "should cancel the save if before_validation_hook block calls cancel_action" do
+    @o.after_validation_hook{r 1}
+    @o.before_validation_hook{r{@o.cancel_action}}
+    @o.before_validation_hook{r 4}
+    @o.valid?.must_equal false
+    @r.must_equal [4, nil]
+    @r.clear
+    @o.valid?.must_equal false
+    @r.must_equal [4, nil]
   end
 
   it "should clear only related hooks on successful create" do

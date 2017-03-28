@@ -1948,7 +1948,11 @@ module Sequel
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = OPTS)
         _before_validation
-        _valid?(false, opts)
+        begin
+          _valid?(false, opts)
+        rescue HookFailed
+          false
+        end
       end
 
       private
@@ -2024,20 +2028,23 @@ module Sequel
         sh = {:server=>this_server}
         uacr = use_after_commit_rollback
         if uacr.nil? ? (method(:after_destroy_rollback).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_destroy_rollback", "Instead, call db.after_rollback in Model#before_destroy.")
+          Sequel::Deprecation.deprecate("Model#after_destroy_rollback", "Instead, call db.after_rollback in Model#before_destroy")
           db.after_rollback(sh){after_destroy_rollback}
         end
         called = false
         around_destroy do
           called = true
-          raise_hook_failure(:before_destroy) if before_destroy == false
+          if before_destroy == false
+            Sequel::Deprecation.deprecate("Having before_destroy return false to cancel the destroy", "Instead, call cancel_action inside before_destroy")
+            raise_hook_failure(:before_destroy)
+          end
           _destroy_delete
           after_destroy
           true
         end
         raise_hook_failure(:around_destroy) unless called
         if uacr.nil? ? (method(:after_destroy_commit).owner != InstanceMethods) : uacr
-          Sequel::Deprecation.deprecate("Model#after_destroy_commit", "Instead, call db.after_commit in Model#after_destroy.")
+          Sequel::Deprecation.deprecate("Model#after_destroy_commit", "Instead, call db.after_commit in Model#after_destroy")
           db.after_commit(sh){after_destroy_commit}
         end
         self
@@ -2125,11 +2132,18 @@ module Sequel
         called_cu = false
         around_save do
           called_save = true
-          raise_hook_failure(:before_save) if before_save == false
+          if before_save == false
+            Sequel::Deprecation.deprecate("Having before_save return false to cancel the save", "Instead, call cancel_action inside before_save")
+            raise_hook_failure(:before_save)
+          end
+
           if new?
             around_create do
               called_cu = true
-              raise_hook_failure(:before_create) if before_create == false
+              if before_create == false
+                Sequel::Deprecation.deprecate("Having before_create return false to cancel the create", "Instead, call cancel_action inside before_create")
+                raise_hook_failure(:before_create)
+              end
               pk = _insert
               _after_create(pk) # SEQUEL5: Remove
               # SEQUEL5
@@ -2144,7 +2158,10 @@ module Sequel
           else
             around_update do
               called_cu = true
-              raise_hook_failure(:before_update) if before_update == false
+              if before_update == false
+                Sequel::Deprecation.deprecate("Having before_update return false to cancel the update", "Instead, call cancel_action inside before_update")
+                raise_hook_failure(:before_update)
+              end
               columns = opts[:columns]
               if columns.nil?
                 @columns_updated = if opts[:changed] # SEQUEL5: Use local variable instead of instance variable
@@ -2249,6 +2266,7 @@ module Sequel
         around_validation do
           called = true
           if before_validation == false
+            Sequel::Deprecation.deprecate("Having before_validation return false to mark the object as invalid", "Instead, call cancel_action inside before_validation")
             if raise_errors
               raise_hook_failure(:before_validation)
             else

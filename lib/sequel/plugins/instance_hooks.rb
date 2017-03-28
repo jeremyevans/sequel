@@ -139,7 +139,12 @@ module Sequel
         # Run all hook blocks of the given hook type.  If a hook block returns false,
         # immediately return false without running the remaining blocks.
         def run_before_instance_hooks(hook)
-          instance_hooks(hook).each{|b| return false if b.call == false}
+          instance_hooks(hook).each do |b|
+            if b.call == false
+              Sequel::Deprecation.deprecate("Having #{hook} instance hook block return false to stop evaluation of further #{hook} instance hook blocks", "Instead, call cancel_action inside #{hook} instance hook block")
+              return false
+            end
+          end
         end
       end
     end

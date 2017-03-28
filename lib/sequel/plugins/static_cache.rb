@@ -225,13 +225,13 @@ module Sequel
       module InstanceMethods
         # Disallowing destroying the object unless the :frozen=>false option was used.
         def before_destroy
-          return false unless model.static_cache_allow_modifications?
+          cancel_action("modifying model objects that use the static_cache plugin is not allowed") unless model.static_cache_allow_modifications?
           super
         end
 
         # Disallowing saving the object unless the :frozen=>false option was used.
         def before_save
-          return false unless model.static_cache_allow_modifications?
+          cancel_action("modifying model objects that use the static_cache plugin is not allowed") unless model.static_cache_allow_modifications?
           super
         end
       end

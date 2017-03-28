@@ -265,7 +265,7 @@ describe "Model#save" do
     DB.sqls.must_equal ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
   end
 
-  it "should rollback if before_save returns false and raise_on_save_failure = true" do
+  deprecated "should rollback if before_save returns false and raise_on_save_failure = true" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     o.raise_on_save_failure = true
@@ -287,23 +287,23 @@ describe "Model#save" do
     DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
 
-  it "should rollback if before_save returns false and :raise_on_failure option is true" do
+  it "should rollback if before_save calls cancel_action and :raise_on_failure option is true" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     o.raise_on_save_failure = false
     def o.before_save
-      false
+      cancel_action
     end
     proc { o.save(:columns=>:y, :raise_on_failure => true) }.must_raise(Sequel::HookFailed)
     DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
   end
 
-  it "should not rollback outer transactions if before_save returns false and raise_on_save_failure = false" do
+  it "should not rollback outer transactions if before_save calls cancel_action and raise_on_save_failure = false" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     o.raise_on_save_failure = false
     def o.before_save
-      false
+      cancel_action
     end
     DB.transaction do
       o.save(:columns=>:y).must_be_nil
@@ -312,12 +312,12 @@ describe "Model#save" do
     DB.sqls.must_equal ["BEGIN", "BLAH", "COMMIT"]
   end
 
-  it "should rollback if before_save returns false and raise_on_save_failure = false" do
+  it "should rollback if before_save calls cancel_action and raise_on_save_failure = false" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
     o.raise_on_save_failure = false
     def o.before_save
-      false
+      cancel_action
     end
     o.save(:columns=>:y).must_be_nil
     DB.sqls.must_equal ["BEGIN", "ROLLBACK"]
@@ -684,7 +684,7 @@ describe "Model#save_changes" do
 
   it "should take options passed to save" do
     o = @c.new(:x => 1)
-    def o.before_validation; false; end
+    def o.before_validation; cancel_action; end
     proc{o.save_changes}.must_raise(Sequel::HookFailed)
     DB.sqls.must_equal []
     o.save_changes(:validate=>false)
