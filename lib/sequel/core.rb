@@ -356,14 +356,13 @@ module Sequel
 
   # Uses a transaction on all given databases with the given options. This:
   #
-  #   Sequel.transaction([DB1, DB2, DB3]){...}
+  #   Sequel.transaction([DB1, DB2, DB3]){}
   #
   # is equivalent to:
   #
   #   DB1.transaction do
   #     DB2.transaction do
   #       DB3.transaction do
-  #         ...
   #       end
   #     end
   #   end
