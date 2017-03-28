@@ -120,9 +120,14 @@ module Sequel
         # called to serialize the column.
         attr_reader :serialization_map
 
-        # Module to store the serialized column accessor methods, so they can
-        # call be overridden and call super to get the serialization behavior
-        attr_accessor :serialization_module
+        def serialization_module
+          Sequel::Deprecation.deprecate('Sequel::Model.serialization_module', 'There is no replacement')
+          @serialization_module
+        end
+        def serialization_module=(v)
+          Sequel::Deprecation.deprecate('Sequel::Model.serialization_module=', 'There is no replacement')
+          @serialization_module = v
+        end
 
         Plugins.inherited_instance_variables(self, :@deserialization_map=>:dup, :@serialization_map=>:dup)
 
@@ -159,8 +164,8 @@ module Sequel
         # Add serializated attribute acessor methods to the serialization_module
         def define_serialized_attribute_accessor(serializer, deserializer, *columns)
           m = self
-          include(self.serialization_module ||= Module.new) unless serialization_module
-          serialization_module.class_eval do
+          include(@serialization_module ||= Module.new) unless @serialization_module
+          @serialization_module.class_eval do
             columns.each do |column|
               m.serialization_map[column] = serializer
               m.deserialization_map[column] = deserializer

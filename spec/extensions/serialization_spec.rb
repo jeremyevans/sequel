@@ -12,6 +12,13 @@ describe "Serialization plugin" do
     DB.reset
   end
   
+  deprecated "should allow access to serialization_module" do
+    @c.plugin :serialization, :yaml, :abc
+    @c.serialization_module.must_be_kind_of Module
+    @c.serialization_module = v = Module.new
+    @c.serialization_module.must_equal v
+  end
+
   it "should allow setting additional serializable attributes via plugin :serialization call" do
     @c.plugin :serialization, :yaml, :abc
     @c.create(:abc => 1, :def=> 2)
@@ -366,6 +373,5 @@ describe "Serialization plugin" do
     @c.freeze
     @c.serialization_map.frozen?.must_equal true
     @c.deserialization_map.frozen?.must_equal true
-    @c.serialization_module.frozen?.must_equal true
   end
 end

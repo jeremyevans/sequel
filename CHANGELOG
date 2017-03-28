@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Model.{lazy_attributes,nested_attributes,composition,serialization}_module accessors (jeremyevans)
+
 * Deprecate Database#database_name on MySQL (jeremyevans)
 
 * Deprecate Database#use on MySQL (jeremyevans)

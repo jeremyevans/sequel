@@ -69,9 +69,14 @@ module Sequel
         # hash values.
         attr_reader :compositions
         
-        # A module included in the class holding the composition
-        # getter and setter methods.
-        attr_reader :composition_module
+        def composition_module
+          Sequel::Deprecation.deprecate('Sequel::Model.composition_module', 'There is no replacement')
+          @composition_module
+        end
+        def composition_module=(v)
+          Sequel::Deprecation.deprecate('Sequel::Model.composition_module=', 'There is no replacement')
+          @composition_module = v
+        end
         
         # Define a composition for this model, with name being the name of the composition.
         # You must provide either a :mapping option or both the :composer and :decomposer options. 
@@ -134,7 +139,7 @@ module Sequel
         # Define getter and setter methods for the composition object.
         def define_composition_accessor(name, opts=OPTS)
           composer = opts[:composer]
-          composition_module.class_eval do
+          @composition_module.class_eval do
             define_method(name) do 
               if compositions.has_key?(name)
                 compositions[name]
@@ -154,7 +159,7 @@ module Sequel
         # Freeze composition information when freezing model class.
         def freeze
           compositions.freeze.each_value(&:freeze)
-          composition_module.freeze
+          @composition_module.freeze
 
           super
         end

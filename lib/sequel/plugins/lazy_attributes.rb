@@ -38,9 +38,14 @@ module Sequel
       end
       
       module ClassMethods
-        # Module to store the lazy attribute getter methods, so they can
-        # be overridden and call super to get the lazy attribute behavior
-        attr_accessor :lazy_attributes_module
+        def lazy_attributes_module
+          Sequel::Deprecation.deprecate('Sequel::Model.lazy_attributes_module', 'There is no replacement')
+          @lazy_attributes_module
+        end
+        def lazy_attributes_module=(v)
+          Sequel::Deprecation.deprecate('Sequel::Model.lazy_attributes_module=', 'There is no replacement')
+          @lazy_attributes_module= v
+        end
 
         # Freeze lazy attributes module when freezing model class.
         def freeze
@@ -66,8 +71,8 @@ module Sequel
         # :dataset :: The base dataset to use for the lazy attribute lookup
         # :table :: The table name to use to qualify the attribute and primary key columns.
         def define_lazy_attribute_getter(a, opts=OPTS)
-          include(self.lazy_attributes_module ||= Module.new) unless lazy_attributes_module
-          lazy_attributes_module.class_eval do
+          include(@lazy_attributes_module ||= Module.new) unless @lazy_attributes_module
+          @lazy_attributes_module.class_eval do
             define_method(a) do
               if !values.has_key?(a) && !new?
                 lazy_attribute_lookup(a, opts)

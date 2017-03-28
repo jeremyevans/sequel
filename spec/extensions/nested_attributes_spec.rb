@@ -49,6 +49,12 @@ describe "NestedAttributes plugin" do
     @db.sqls
   end
   
+  deprecated "should allow access to nested_attributes_module" do
+    @Artist.nested_attributes_module.must_be_kind_of Module
+    @Artist.nested_attributes_module = v = Module.new
+    @Artist.nested_attributes_module.must_equal v
+  end
+
   it "should support creating new many_to_one objects" do
     a = @Album.new({:name=>'Al', :artist_attributes=>{:name=>'Ar'}})
     @db.sqls.must_equal []
@@ -695,8 +701,8 @@ describe "NestedAttributes plugin" do
     proc{@Album.load(:id=>10, :name=>'Al').set_nested_attributes(:tags, [{:id=>30, :name=>'T2', :number=>3}], :fields=>[:name])}.must_raise(Sequel::Error)
   end
 
-  it "should freeze nested_attributes_module when freezing model class" do
+  it "should not allow modifying ensted attributes after freezing" do
     @Artist.freeze
-    @Artist.nested_attributes_module.frozen?.must_equal true
+    proc{@Artist.nested_attributes :albums}.must_raise RuntimeError, TypeError
   end
 end

@@ -42,6 +42,12 @@ describe "Sequel::Plugins::LazyAttributes" do
     Object.send(:remove_const, :LazyAttributesModel)
   end
   
+  deprecated "should allow access to lazy_attributes_module" do
+    @c.lazy_attributes_module.must_be_kind_of Module
+    @c.lazy_attributes_module = v = Module.new
+    @c.lazy_attributes_module.must_equal v
+  end
+
   it "should allowing adding additional lazy attributes via plugin :lazy_attributes" do
     @c.set_dataset(@ds.select(:id, :blah))
     @c.dataset.sql.must_equal 'SELECT id, blah FROM la'
@@ -168,9 +174,9 @@ describe "Sequel::Plugins::LazyAttributes" do
     @db.sqls.must_equal ["SELECT la.id FROM la LIMIT 1", "SELECT la.name FROM la WHERE (id = 1) LIMIT 1"]
   end
 
-  it "should freeze lazy_attributes_module when freezing model class" do
+  it "should not allow additional lazy attributes after freezing" do
     @c.plugin :lazy_attributes, :blah
     @c.freeze
-    @c.lazy_attributes_module.frozen?.must_equal true
+    proc{@c.lazy_attributes :name}.must_raise RuntimeError, TypeError
   end
 end

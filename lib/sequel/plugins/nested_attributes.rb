@@ -81,9 +81,14 @@ module Sequel
       end
       
       module ClassMethods
-        # Module to store the nested_attributes setter methods, so they can
-        # call be overridden and call super to get the default behavior
-        attr_accessor :nested_attributes_module
+        def nested_attributes_module
+          Sequel::Deprecation.deprecate('Sequel::Model.nested_attributes_module', 'There is no replacement')
+          @nested_attributes_module
+        end
+        def nested_attributes_module=(v)
+          Sequel::Deprecation.deprecate('Sequel::Model.nested_attributes_module=', 'There is no replacement')
+          @nested_attributes_module = v
+        end
         
         # Freeze nested_attributes_module when freezing model class.
         def freeze
@@ -117,7 +122,7 @@ module Sequel
         #
         # If a block is provided, it is used to set the :reject_if option.
         def nested_attributes(*associations, &block)
-          include(self.nested_attributes_module ||= Module.new) unless nested_attributes_module
+          include(@nested_attributes_module ||= Module.new) unless @nested_attributes_module
           opts = associations.last.is_a?(Hash) ? associations.pop : {}
           reflections = associations.map{|a| association_reflection(a) || raise(Error, "no association named #{a} for #{self}")}
           reflections.each do |r|
@@ -133,7 +138,7 @@ module Sequel
         # Add a nested attribute setter method to a module included in the
         # class.
         def def_nested_attribute_method(reflection)
-          nested_attributes_module.class_eval do
+          @nested_attributes_module.class_eval do
             define_method("#{reflection[:name]}_attributes=") do |v|
               set_nested_attributes(reflection[:name], v)
             end
