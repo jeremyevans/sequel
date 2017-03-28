@@ -16,16 +16,22 @@ module Sequel
   # Alias for HookFailed, kept for backwards compatibility
   BeforeHookFailed = HookFailed
   
+  (
   # Exception class raised when +require_modification+ is set and an UPDATE or DELETE statement to modify the dataset doesn't
   # modify a single row.
   NoExistingObject = Class.new(Error)
+  ).name
   
+  (
   # Raised when an undefined association is used when eager loading.
   UndefinedAssociation = Class.new(Error)
+  ).name
 
+  (
   # Raised when a mass assignment method is called in strict mode with either a restricted column
   # or a column without a setter method.
   MassAssignmentRestriction = Class.new(Error)
+  ).name
   
   # Exception class raised when +raise_on_save_failure+ is set and validation fails
   class ValidationFailed < Error
@@ -48,10 +54,5 @@ module Sequel
         super
       end
     end
-  end
-
-  # Call name on each class to set the name for the class, so it gets cached.
-  constants.map{|c| const_get(c)}.each do |c|
-    Class === c && c.name
   end
 end
