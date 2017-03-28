@@ -113,6 +113,8 @@ describe "Sequel::Model()" do
       Sequel.cache_anonymous_models.must_equal true
       Sequel::Model.cache_anonymous_models = false
       Sequel.cache_anonymous_models.must_equal false
+      Sequel.cache_anonymous_models = true
+      Sequel.cache_anonymous_models.must_equal true
     end
 
     it "should work without raising an exception with a symbol" do
@@ -1041,6 +1043,10 @@ describe "Model.db_schema" do
     end
 
     @c.dataset = @dataset
+    @c.db_schema.must_equal(:x=>{}, :y=>{})
+    @c.columns.must_equal [:x, :y]
+
+    @c.instance_eval{@db_schema = nil}
     @c.db_schema.must_equal(:x=>{}, :y=>{})
     @c.columns.must_equal [:x, :y]
   end

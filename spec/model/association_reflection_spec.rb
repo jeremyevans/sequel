@@ -650,6 +650,10 @@ describe "Sequel::Model.finalize_associations" do
     Object.send(:remove_const, :OtoItem)
   end
 
+  it "AssociationReflection should have default finalize_settings method" do
+    Sequel::Model::Associations::AssociationReflection.new.finalize_settings[:associated_class].must_equal :class
+  end
+
   it "should finalize many_to_one associations" do
     r = Item.association_reflection(:item)
     r[:class].must_equal Item
