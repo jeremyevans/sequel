@@ -1041,11 +1041,11 @@ describe "A PostgreSQL database" do
   end
 
   it "should support indexes with index type" do
-    @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'hash'}
+    @db.create_table(:posts){point :p; index :p, :type => 'gist'}
     check_sqls do
       @db.sqls.must_equal [
-        'CREATE TABLE "posts" ("title" varchar(5))',
-        'CREATE INDEX "posts_title_index" ON "posts" USING hash ("title")'
+        'CREATE TABLE "posts" ("p" point)',
+        'CREATE INDEX "posts_p_index" ON "posts" USING gist ("p")'
       ]
     end
   end
