@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Database#use on MySQL (jeremyevans)
+
 * Make pg_hstore extension no longer update PG_NAMED_TYPES (jeremyevans)
 
 * Deprecate Sequel::PG_NAMED_TYPES (jeremyevans)

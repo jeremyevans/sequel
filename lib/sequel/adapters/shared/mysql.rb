@@ -190,6 +190,7 @@ module Sequel
       # Changes the database in use by issuing a USE statement.  I would be
       # very careful if I used this.
       def use(db_name)
+        Sequel::Deprecation.deprecate("Database#use", "Create a new Sequel::Database instance instead of using Database#use")
         disconnect
         @opts[:database] = db_name if self << "USE #{db_name}"
         @schemas = {}
