@@ -235,6 +235,7 @@ module Sequel
     #
     #   DB.each_server{|db| db.create_table(:users){primary_key :id; String :name}}
     def each_server(&block)
+      Sequel::Deprecation.deprecate("Database#each_server", "Switching to using Dataset#servers and Database#with_server from the server_block extension: \"DB.servers.each{|s| DB.with_server(s){}}\"")
       raise(Error, "Database#each_server must be passed a block") unless block
       servers.each{|s| self.class.connect(server_opts(s), &block)}
     end

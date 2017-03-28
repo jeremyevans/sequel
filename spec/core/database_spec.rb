@@ -1725,7 +1725,7 @@ describe "Database#remove_servers" do
 end
 
 describe "Database#each_server with do/jdbc adapter connection string without :adapter option" do
-  it "should yield a separate database object for each server" do
+  deprecated "should yield a separate database object for each server" do
     require 'sequel/adapters/mock'
     klass = Class.new(Sequel::Database)
     def klass.adapter_class(v)
@@ -1745,7 +1745,7 @@ describe "Database#each_server with do/jdbc adapter connection string without :a
     hosts.sort.must_equal [1, 3]
   end
 
-  it "should raise if not given a block" do
+  deprecated "should raise if not given a block" do
     proc{Sequel.mock.each_server}.must_raise(Sequel::Error)
   end
 end
@@ -1755,7 +1755,7 @@ describe "Database#each_server" do
     @db = Sequel.mock(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
   end
 
-  it "should yield a separate database object for each server" do
+  deprecated "should yield a separate database object for each server" do
     hosts = []
     @db.each_server do |db|
       db.must_be_kind_of(Sequel::Database)
@@ -1767,7 +1767,7 @@ describe "Database#each_server" do
     hosts.sort.must_equal [1, 3, 4]
   end
 
-  it "should disconnect and remove entry from Sequel::DATABASES after use" do
+  deprecated "should disconnect and remove entry from Sequel::DATABASES after use" do
     dbs = []
     dcs = []
     @db.each_server do |db|

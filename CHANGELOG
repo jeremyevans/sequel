@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Database#each_server (jeremyevans)
+
 * Make Model#_valid? private method accept only an options hash (jeremyevans)
 
 * Deprecate returning false from model before hooks to cancel the action, use Model#cancel_action (jeremyevans)
