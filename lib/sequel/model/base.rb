@@ -908,7 +908,6 @@ module Sequel
       # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
       def setter_methods
         return @setter_methods if @setter_methods
-        raise if frozen?
         @setter_methods = get_setter_methods
       end
 
