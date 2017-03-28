@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Database#{add,remove}_servers when not using a sharded connection pool (jeremyevans)
+
 * Deprecate Database#each_server (jeremyevans)
 
 * Make Model#_valid? private method accept only an options hash (jeremyevans)

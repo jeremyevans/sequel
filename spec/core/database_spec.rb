@@ -1724,6 +1724,26 @@ describe "Database#remove_servers" do
   end
 end
 
+describe "Database#add_servers and #remove_servers when not sharded" do
+  deprecated "should do nothing" do
+    db = Sequel.mock
+    db.opts[:servers].must_be_nil
+    db.add_servers(:foo=>{}).must_be_nil
+    db.opts[:servers].must_be_nil
+    db.remove_servers(:foo).must_be_nil
+    db.opts[:servers].must_be_nil
+  end
+
+  it "should raise Error" do
+    db = Sequel.mock
+    db.opts[:servers].must_be_nil
+    proc{db.add_servers(:foo=>{})}.must_raise Sequel::Error
+    db.opts[:servers].must_be_nil
+    proc{db.remove_servers(:foo)}.must_raise Sequel::Error
+    db.opts[:servers].must_be_nil
+  end if false # SEQUEL5
+end
+
 describe "Database#each_server with do/jdbc adapter connection string without :adapter option" do
   deprecated "should yield a separate database object for each server" do
     require 'sequel/adapters/mock'
