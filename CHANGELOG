@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Sequel::BeforeHookFailed (jeremyevans)
+
 * Deprecate passing multiple arguments as filter arguments when not using a conditions specifier (jeremyevans)
 
 * Deprecate passing Procs as filter arguments, require they be passed as blocks (jeremyevans)
