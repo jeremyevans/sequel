@@ -1739,42 +1739,73 @@ if DB.adapter_scheme == :postgres
     end
   end
 
-  describe "Postgres::PG_NAMED_TYPES" do
+  describe "Database#add_named_conversion_proc" do
     before(:all) do
       @db = DB
       @old_cp = @db.conversion_procs[1013]
       @db.conversion_procs.delete(1013)
-      Sequel::Postgres::PG_NAMED_TYPES[:oidvector] = lambda{|v| v.reverse}
-      @db.reset_conversion_procs
-      @db.register_array_type('oidvector')
+      @db.add_named_conversion_proc(:oidvector, &:reverse)
     end
     after(:all) do
-      Sequel::Postgres::PG_NAMED_TYPES.delete(:oidvector)
       @db.conversion_procs.delete(30)
       @db.conversion_procs[1013] = @old_cp
       @db.drop_table?(:foo)
-      @db.drop_enum(:foo_enum)
+      @db.drop_enum(:foo_enum) rescue nil
     end
 
-    it "should look up conversion procs by name" do
+    it "should work for scalar types" do
       @db.create_table!(:foo){oidvector :bar}
       @db[:foo].insert(Sequel.cast('21', :oidvector))
       @db[:foo].get(:bar).must_equal '12'
     end
 
-    it "should handle array types of named types" do
+    it "should work for array types" do
       @db.create_table!(:foo){column :bar, 'oidvector[]'}
       @db[:foo].insert(Sequel.pg_array(['21'], :oidvector))
       @db[:foo].get(:bar).must_equal ['12']
     end
 
-    it "should work with conversion procs on enums" do
+    it "should work with for enums" do
       @db.drop_enum(:foo_enum) rescue nil
       @db.create_enum(:foo_enum, %w(foo bar))
       @db.add_named_conversion_proc(:foo_enum){|string| string.reverse}
       @db.create_table!(:foo){foo_enum :bar}
       @db[:foo].insert(:bar => 'foo')
       @db[:foo].get(:bar).must_equal 'foo'.reverse
+    end
+  end
+
+  describe "Postgres::PG_NAMED_TYPES" do
+    before(:all) do
+      deprecated do
+        @db = DB
+        @old_cp = @db.conversion_procs[1013]
+        @db.conversion_procs.delete(1013)
+        Sequel::Postgres::PG_NAMED_TYPES[:oidvector] = lambda{|v| v.reverse}
+        @db.reset_conversion_procs
+        @db.register_array_type('oidvector')
+      end
+    end
+    after(:all) do
+      deprecated do
+        Sequel::Postgres::PG_NAMED_TYPES.delete(:oidvector)
+        @db.conversion_procs.delete(30)
+        @db.conversion_procs[1013] = @old_cp
+        @db.drop_table?(:foo)
+        @db.drop_enum(:foo_enum) rescue nil
+      end
+    end
+
+    deprecated "should look up conversion procs by name" do
+      @db.create_table!(:foo){oidvector :bar}
+      @db[:foo].insert(Sequel.cast('21', :oidvector))
+      @db[:foo].get(:bar).must_equal '12'
+    end
+
+    deprecated "should handle array types of named types" do
+      @db.create_table!(:foo){column :bar, 'oidvector[]'}
+      @db[:foo].insert(Sequel.pg_array(['21'], :oidvector))
+      @db[:foo].get(:bar).must_equal ['12']
     end
   end
 end

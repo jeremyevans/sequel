@@ -1,5 +1,9 @@
 === master
 
+* Make pg_hstore extension no longer update PG_NAMED_TYPES (jeremyevans)
+
+* Deprecate Sequel::PG_NAMED_TYPES (jeremyevans)
+
 * Add columns_updated plugin for making updated columns hash available in after_update and after_save hooks (jeremyevans)
 
 * Deprecate accessing @columns_updated directly in model after_update and after_save hooks (jeremyevans)

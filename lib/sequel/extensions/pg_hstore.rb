@@ -141,7 +141,7 @@ module Sequel
       module DatabaseMethods
         def self.extended(db)
           db.instance_eval do
-            add_named_conversion_proc(:hstore)
+            add_named_conversion_proc(:hstore, &HStore.method(:parse))
             @schema_type_classes[:hstore] = HStore
           end
         end
@@ -306,10 +306,6 @@ module Sequel
         k.to_s.gsub(ESCAPE_RE, ESCAPE_REPLACE)
       end
     end
-
-    PG_NAMED_TYPES = {} unless defined?(PG_NAMED_TYPES)
-    # Associate the named types by default.
-    PG_NAMED_TYPES[:hstore] = HStore.method(:parse)
   end
 
   module SQL::Builders

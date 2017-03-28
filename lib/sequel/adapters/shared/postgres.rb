@@ -182,7 +182,12 @@ module Sequel
       # a block is given, it is used as the conversion proc, otherwise
       # the conversion proc is looked up in the PG_NAMED_TYPES hash.
       def add_named_conversion_proc(name, &block)
-        add_named_conversion_procs(conversion_procs, name=>(block || PG_NAMED_TYPES[name]))
+        unless block
+          if block = PG_NAMED_TYPES[name]
+            Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each database you want to support the #{name} type")
+          end
+        end
+        add_named_conversion_procs(conversion_procs, name=>block)
       end
 
       # Commit an existing prepared transaction with the given transaction
@@ -1009,6 +1014,9 @@ module Sequel
       def get_conversion_procs
         procs = PG_TYPES.dup
         procs[1184] = procs[1114] = method(:to_application_timestamp)
+        unless PG_NAMED_TYPES.empty?
+          Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each Database instance where you want to support the following type(s): #{PG_NAMED_TYPES.keys.join(', ')}")
+        end
         add_named_conversion_procs(procs, PG_NAMED_TYPES)
         procs
       end
