@@ -181,6 +181,12 @@ module Sequel
       super
     end
 
+    def initialize_copy(_)
+      Sequel::Deprecation.deprecate("Database#dup and #clone", "Use Sequel.connect to create a new Database instance")
+      # raise(Error, "cannot dup/clone a Sequel::Database instance") # SEQUEL5
+      super
+    end
+
     # Cast the given type to a literal type
     #
     #   DB.cast_type_literal(Float) # double precision

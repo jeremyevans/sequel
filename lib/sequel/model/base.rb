@@ -214,6 +214,18 @@ module Sequel
         klass
       end
   
+      def initialize_copy(_)
+        Sequel::Deprecation.deprecate("Model.clone", "Create a subclass of the model instead of cloning it.")
+        # raise(Error, "cannot dup/clone a Sequel::Model class") # SEQUEL5
+        super
+      end
+      def dup
+        Sequel::Deprecation.deprecate("Model.dup", "Create a subclass of the model instead of duping it.")
+        # raise(Error, "cannot dup/clone a Sequel::Model class") # SEQUEL5
+        super
+      end
+
+
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another
       # object is given, it finds the first record whose primary key(s) match

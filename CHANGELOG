@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Dataset#dup/clone and Model.dup/clone (jeremyevans)
+
 * Deprecate the schema and scissors plugins (jeremyevans)
 
 * Deprecate Model.{lazy_attributes,nested_attributes,composition,serialization}_module accessors (jeremyevans)
