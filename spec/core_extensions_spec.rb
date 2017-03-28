@@ -11,9 +11,13 @@ unless Object.const_defined?('Sequel') && Sequel.const_defined?('Model')
   Sequel::Deprecation.backtrace_filter = true
 end
 
+# SEQUEL5: Remove
+output = Sequel::Deprecation.output
+Sequel::Deprecation.output = nil
 Sequel.quote_identifiers = false
 Sequel.identifier_input_method = nil
 Sequel.identifier_output_method = nil
+Sequel::Deprecation.output = output
 
 Regexp.send(:include, Sequel::SQL::StringMethods)
 String.send(:include, Sequel::SQL::StringMethods)
