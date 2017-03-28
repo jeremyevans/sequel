@@ -37,7 +37,7 @@ module Sequel
         private
 
         # Set validation context before running validations
-        def _valid?(raise_errors, opts)
+        def _valid?(opts)
           @validation_context = opts[:validation_context] if opts[:validation_context]
           super
         ensure

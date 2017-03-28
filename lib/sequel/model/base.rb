@@ -1749,7 +1749,7 @@ module Sequel
         set_server(opts[:server]) if opts[:server] 
         _before_validation
         if opts[:validate] != false # SEQUEL5: Remove if
-          unless checked_save_failure(opts){_valid?(true, opts)}
+          unless checked_save_failure(opts){_valid?(opts)}
             raise(ValidationFailed.new(self)) if raise_on_failure?(opts)
             return
           end
@@ -1949,7 +1949,7 @@ module Sequel
       def valid?(opts = OPTS)
         _before_validation
         begin
-          _valid?(false, opts)
+          _valid?(opts)
         rescue HookFailed
           false
         end
@@ -2254,41 +2254,27 @@ module Sequel
         (!ds.opts[:select] || ds.opts[:returning]) && ds.supports_insert_select? 
       end
 
-      # Internal validation method.  If +raise_errors+ is +true+, hook
-      # failures will be raised as HookFailure exceptions.  If it is
-      # +false+, +false+ will be returned instead.
-      def _valid?(raise_errors, opts)
+      # Internal validation method, running validation hooks.
+      def _valid?(opts)
         return errors.empty? if frozen?
         errors.clear
         called = false
-        error = false
         # skip_validate = opts[:validate] == false # SEQUEL5
         around_validation do
           called = true
           if before_validation == false
             Sequel::Deprecation.deprecate("Having before_validation return false to mark the object as invalid", "Instead, call cancel_action inside before_validation")
-            if raise_errors
-              raise_hook_failure(:before_validation)
-            else
-              error = true
-            end
-            false
+            raise_hook_failure(:before_validation)
           else
             validate # unless skip_validate # SEQUEL5
             after_validation
-            errors.empty?
           end
         end
         # return true if skip_validate # SEQUEL5
-        error = true unless called
-        if error
-          if raise_errors
-            raise_hook_failure(:around_validation)
-          else
-            false
-          end
-        else
+        if called
           errors.empty?
+        else
+          raise_hook_failure(:around_validation)
         end
       end
 

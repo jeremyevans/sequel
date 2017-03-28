@@ -35,7 +35,7 @@ module Sequel
         # If the model instance is not valid, go through all of the errors entries.  For
         # any that apply to multiple columns, remove them and add separate error entries,
         # one per column.
-        def _valid?(*)
+        def _valid?(opts)
           v = super
           unless v
             errors.keys.select{|k| k.is_a?(Array)}.each do |ks|
