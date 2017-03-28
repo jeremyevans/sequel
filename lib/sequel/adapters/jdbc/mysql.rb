@@ -27,6 +27,7 @@ module Sequel
         # of the connection string, since the JDBC does no parsing on the
         # given connection string by default.
         def database_name
+          Sequel::Deprecation.deprecate("Database#database_name", "Instead, use .get{DATABASE{}}")
           u = URI.parse(uri.sub(/\Ajdbc:/, ''))
           (m = /\/(.*)/.match(u.path)) && m[1]
         end
