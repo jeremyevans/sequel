@@ -1,5 +1,7 @@
 === master
 
+* Correctly handle false values in the split_values plugin (bananarne) (#1333)
+
 * Deprecate Dataset#dup/clone and Model.dup/clone (jeremyevans)
 
 * Deprecate the schema and scissors plugins (jeremyevans)
