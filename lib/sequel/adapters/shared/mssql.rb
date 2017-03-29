@@ -576,6 +576,7 @@ module Sequel
       FETCH_NEXT = " FETCH NEXT ".freeze
 
       NON_SQL_OPTIONS = (Dataset::NON_SQL_OPTIONS + [:disable_insert_output, :mssql_unicode_strings]).freeze
+      LIMIT_ALL = Object.new.freeze
 
       Dataset.def_mutation_method(:disable_insert_output, :output, :module=>self)
       Dataset.def_sql_method(self, :delete, %w'with delete limit from output from2 where')
@@ -855,7 +856,9 @@ module Sequel
       # for a compound dataset, apply the order after all compounds have been
       # added.
       def compound_from_self
-        if @opts[:order]  && !(@opts[:sql] || @opts[:limit] || @opts[:offset])
+        if @opts[:offset] && !@opts[:limit] && !is_2012_or_later?
+          clone(:limit=>LIMIT_ALL).from_self
+        elsif @opts[:order]  && !(@opts[:sql] || @opts[:limit] || @opts[:offset])
           unordered
         else
           super
@@ -1016,9 +1019,13 @@ module Sequel
 
       def shared_limit_sql(sql, l)
         if is_2005_or_later?
-          sql << TOP_PAREN
-          literal_append(sql, l)
-          sql << PAREN_CLOSE
+          if l == LIMIT_ALL
+            sql << " TOP (100) PERCENT"
+          else
+            sql << TOP_PAREN
+            literal_append(sql, l)
+            sql << PAREN_CLOSE
+          end
         else
           sql << TOP
           literal_append(sql, l)

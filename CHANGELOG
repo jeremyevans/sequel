@@ -1,5 +1,7 @@
 === master
 
+* Correctly handle datasets with offsets but no limits used in compound datasets on MSSQL <2012 (jeremyevans)
+
 * Correctly handle false values in the split_values plugin (bananarne) (#1333)
 
 * Deprecate Dataset#dup/clone and Model.dup/clone (jeremyevans)
