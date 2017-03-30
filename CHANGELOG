@@ -1,4 +1,4 @@
-=== master
+=== 4.45.0 (2017-04-01)
 
 * Correctly handle datasets with offsets but no limits used in compound datasets on MSSQL <2012 (jeremyevans)
 
