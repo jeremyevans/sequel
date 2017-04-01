@@ -60,18 +60,17 @@
                 <a name='method-c-new'></a>
                 <div class='synopsis'>
                   <span class='name'>new</span>
-                  <span class='arguments'>(ds, table)</span>
+                  <span class='arguments'>(table, unused=nil)</span>
                 </div>
                 <div class='description'>
                   
-                  <p>Store the dataset to use as the basis for qualification,  and the table
-                  used to qualify unqualified columns.</p>
+                  <p>Set the table used to qualify unqualified columns</p>
                 </div>
                 <div class='source'>
                   <a class='source-toggle' href='#' onclick="toggleCode('method-c-new-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/ast_transformer.rb, line 93</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">ds</span>, <span class="ruby-identifier">table</span>)&#x000A;  <span class="ruby-ivar">@ds</span> = <span class="ruby-identifier">ds</span>&#x000A;  <span class="ruby-ivar">@table</span> = <span class="ruby-identifier">table</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-new-source'><span class="ruby-comment"># File lib/sequel/ast_transformer.rb, line 92</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">table</span>, <span class="ruby-identifier">unused</span>=<span class="ruby-keyword">nil</span>)&#x000A;  <span class="ruby-keyword">if</span> <span class="ruby-identifier">unused</span>&#x000A;    <span class="ruby-comment"># :nocov:</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Passing two arguments to Sequel::Qualifier.new&quot;</span>, <span class="ruby-string">&#39;Pass only the second arguument specifying the table used for qualification&#39;</span>)&#x000A;    <span class="ruby-ivar">@table</span> = <span class="ruby-identifier">unused</span>&#x000A;    <span class="ruby-comment"># :nocov:</span>&#x000A;  <span class="ruby-keyword">else</span>&#x000A;    <span class="ruby-ivar">@table</span> = <span class="ruby-identifier">table</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

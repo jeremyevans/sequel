@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-01-16 09:47:58 -0800</span>
+          <span class='datetime'>2017-03-21 12:22:17 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -54,8 +54,8 @@
             configurations, and database sharding.</p>
             </li><li>
             <p><a href="../classes/Sequel.html">Sequel</a> currently has adapters for ADO,
-            Amalgalite, CUBRID, DataObjects, IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle,
-            PostgreSQL, SQLAnywhere, SQLite3, Swift, and TinyTDS.</p>
+            Amalgalite,  IBM_DB, JDBC, MySQL, Mysql2, ODBC, Oracle, PostgreSQL,
+            SQLAnywhere, SQLite3, and TinyTDS.</p>
             </li></ul>
             
             <h2 id="label-Resources">Resources<span><a href="#label-Resources">&para;</a> <a href="#top">&uarr;</a></span></h2>
@@ -524,13 +524,14 @@
             
             <p>You can explicitly set the table name or even the dataset used:</p>
             
-            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">my_posts</span>)&#x000A;<span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">set_dataset</span> :<span class="ruby-identifier">my_posts</span></pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(:<span class="ruby-identifier">my_posts</span>); <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-comment"># or:</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">my_posts</span>]); <span class="ruby-keyword">end</span></pre>
             
-            <p>If you call <code>set_dataset</code> with a symbol, it assumes you are
-            referring to the table with the same name.  You can also call it with a
-            dataset, which will set the defaults for all retrievals for that model:</p>
+            <p>If you pass a symbol to the <code>Sequel::Model</code> method, it assumes
+            you are referring to the table with the same name.  You can also call it
+            with a dataset, which will set the defaults for all retrievals for that
+            model:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Post</span>.<span class="ruby-identifier">set_dataset</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">my_posts</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">category</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;ruby&#39;</span>)&#x000A;<span class="ruby-constant">Post</span>.<span class="ruby-identifier">set_dataset</span> <span class="ruby-constant">DB</span>[:<span class="ruby-identifier">my_posts</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">date</span>)</pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">my_posts</span>].<span class="ruby-identifier">where</span>(:<span class="ruby-identifier">category</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-string">&#39;ruby&#39;</span>)); <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">class</span> <span class="ruby-constant">Post</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">DB</span>[:<span class="ruby-identifier">my_posts</span>].<span class="ruby-identifier">select</span>(:<span class="ruby-identifier">id</span>, :<span class="ruby-identifier">name</span>).<span class="ruby-identifier">order</span>(:<span class="ruby-identifier">date</span>)); <span class="ruby-keyword">end</span></pre>
             
             <h3 id="label-Model+instances">Model instances<span><a href="#label-Model+instances">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-02-10 07:35:34 -0800</span>
+          <span class='datetime'>2017-03-21 12:22:17 -0700</span>
         </div>
       </div>
       <div id='content'>
@@ -232,31 +232,6 @@
             <p>Handles paths in the connection string similar to the SQLite adapter, so
             see the sqlite section below for details.</p>
             
-            <h3 id="label-cubrid">cubrid<span><a href="#label-cubrid">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>cubrid is a ruby extension for accessing a CUBRID database.  Currently, the
-            ruby cubrid gem is in fairly rough state, with broken transaction support
-            and some other issues, but most things work.</p>
-            
-            <h3 id="label-do+">do <span><a href="#label-do+">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>Requires: data_objects</p>
-            
-            <p>The DataObjects adapter supports PostgreSQL, MySQL, and SQLite.  One
-            possible advantage of using DataObjects is that it does the typecasting in
-            C, which may be faster than the other adapters.</p>
-            
-            <p>Similar to the JDBC adapter, the DO adapter only cares about connection
-            strings, which can either be the String argument given to <a
-            href="../../classes/Sequel.html#method-c-connect">Sequel.connect</a>
-            directly or contained in a :uri or :url option.  The DO adapter passes
-            through the connection string directly to DataObjects, it does no
-            processing of it (other than removing the do: prefix).</p>
-            
-            <p>Connection string examples:</p>
-            
-            <pre>do:sqlite3::memory:&#x000A;do:postgres://user:password@host/database&#x000A;do:mysql://user:password@host/database</pre>
-            
             <h3 id="label-ibmdb">ibmdb<span><a href="#label-ibmdb">&para;</a> <a href="#top">&uarr;</a></span></h3>
             
             <p>requires &#39;ibm_db&#39;</p>
@@ -297,7 +272,7 @@
             
             <p>Example connection strings:</p>
             
-            <pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:firebirdsql:localhost/3050:/path/to/database.fdb&#x000A;jdbc:jdbcprogress:T:hostname:port:database&#x000A;jdbc:cubrid:hostname:port:database:::&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
+            <pre>jdbc:sqlite::memory:&#x000A;jdbc:postgresql://localhost/database?user=username&#x000A;jdbc:mysql://localhost/test?user=root&amp;password=root&#x000A;jdbc:h2:mem:&#x000A;jdbc:hsqldb:mem:mymemdb&#x000A;jdbc:derby:memory:myDb;create=true&#x000A;jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true&#x000A;jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test&#x000A;jdbc:oracle:thin:user/password@localhost:1521:database&#x000A;jdbc:db2://localhost:3700/database:user=user;password=password;&#x000A;jdbc:sqlanywhere://localhost?DBN=Test;UID=user;PWD=password</pre>
             
             <p>You can also use JNDI connection strings:</p>
             
@@ -511,25 +486,6 @@
             database is used.  Attempts to force the use of more than 1 connection can
             result in weird behavior, since the connections will be to separate memory
             databases.</p>
-            
-            <h3 id="label-swift">swift<span><a href="#label-swift">&para;</a> <a href="#top">&uarr;</a></span></h3>
-            
-            <p>swift is a ruby 1.9+ library, so you&#39;ll need to be running ruby 1.9+. 
-            It can connect to SQLite, MySQL, and PostgreSQL, and you must specify which
-            database using the db_type option.</p>
-            
-            <p>You need to install one of the swift db adapters</p>
-            <ul><li>
-            <p>swift-db-sqlite3</p>
-            </li><li>
-            <p>swift-db-mysql</p>
-            </li><li>
-            <p>swift-db-postgres</p>
-            </li></ul>
-            
-            <p>Examples:</p>
-            
-            <pre>swift:///?database=:memory:&amp;db_type=sqlite&#x000A;swift://root:root@localhost/test?db_type=mysql&#x000A;swift://root:root@localhost/test?db_type=postgres</pre>
             
             <h3 id="label-tinytds">tinytds<span><a href="#label-tinytds">&para;</a> <a href="#top">&uarr;</a></span></h3>
             

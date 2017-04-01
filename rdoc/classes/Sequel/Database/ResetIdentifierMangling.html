@@ -43,18 +43,18 @@
           </div>
           <div id='method-list'>
             <h2>Methods</h2>
-            <h3>Public Instance</h3>
+            <h3>Public Class</h3>
             <ol>
-              <li><a href="#method-i-extended">extended</a></li>
+              <li><a href="#method-c-extended">extended</a></li>
             </ol>
           </div>
           <div id='context'>
           </div>
           <div id='section'>
             <div id='methods'>
-              <h2>Public Instance methods</h2>
-              <div class='method public-instance' id='method-method-i-extended'>
-                <a name='method-i-extended'></a>
+              <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-extended'>
+                <a name='method-c-extended'></a>
                 <div class='synopsis'>
                   <span class='name'>extended</span>
                   <span class='arguments'>(obj)</span>
@@ -63,10 +63,10 @@
                   
                 </div>
                 <div class='source'>
-                  <a class='source-toggle' href='#' onclick="toggleCode('method-i-extended-source'); return false">
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-extended-source'); return false">
                     [show source]
                   </a>
-                  <pre id='method-i-extended-source'><span class="ruby-comment"># File lib/sequel/database/misc.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-identifier">extended</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-comment"># :nocov:</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Database::ResetIdentifierMangling is no longer needed and will be removed in Sequel 5.  Please update your adapter.&quot;</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:reset_identifier_mangling</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:reset_identifier_mangling</span>)&#x000A;  <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                  <pre id='method-c-extended-source'><span class="ruby-comment"># File lib/sequel/database/misc.rb, line 31</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">extended</span>(<span class="ruby-identifier">obj</span>)&#x000A;  <span class="ruby-comment"># :nocov:</span>&#x000A;  <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Deprecation</span>.<span class="ruby-identifier">deprecate</span>(<span class="ruby-string">&quot;Sequel::Database::ResetIdentifierMangling is no longer needed and will be removed in Sequel 5.  Please update your adapter.&quot;</span>)&#x000A;  <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:reset_identifier_mangling</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">respond_to?</span>(<span class="ruby-value">:reset_identifier_mangling</span>)&#x000A;  <span class="ruby-comment"># :nocov:</span>&#x000A;<span class="ruby-keyword">end</span></pre>
                 </div>
               </div>
             </div>

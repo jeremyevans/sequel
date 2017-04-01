@@ -89,6 +89,23 @@
                     <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
+                    <td class='context-item-name'>DEPRECATION_REPLACEMENTS</td>
+                    <td>=</td>
+                    <td class='context-item-value'>
+                      {
+                      :after_commit=>"Use obj.after_save_hook{obj.db.after_commit{}} instead",
+                      :after_destroy_commit=>"Use obj.after_destroy_hook{obj.db.after_commit{}} instead",
+                      :after_destroy_rollback=>"Use obj.before_destroy_hook{obj.db.after_rollback{}} instead",
+                      :after_rollback=>"Use obj.before_save_hook{obj.db.after_rollback{}} instead"
+                      }.freeze
+                    </td>
+                    <td>&nbsp;</td>
+                    <td class='context-item-desc'>
+                      
+                      <p>SEQUEL5: Remove</p>
+                    </td>
+                  </tr>
+                  <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>HOOKS</td>
                     <td>=</td>
                     <td class='context-item-value'>BEFORE_HOOKS + AFTER_HOOKS</td>

@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang='en'>
+  <head>
+    <title>Sequel::Plugins::ValidationContexts</title>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type'>
+    <link href='../../../css/style.css' media='screen' rel='stylesheet' type='text/css'>
+    <script type='text/javascript'>
+      function popupCode(url) {
+        window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+      }
+      
+      function toggleCode(id) {
+        var code = document.getElementById(id)
+      
+        code.style.display = code.style.display != 'block' ? 'block' : 'none'
+        return true
+      }
+      
+      // Make codeblocks hidden by default
+      document.writeln('<' + 'style type="text/css">.method .source pre { display: none }<\/style>')
+    </script>
+  </head>
+  <body class='page'>
+    <div class='class' id='wrapper'>
+      <div class='header'>
+        <h1 class='name'>
+          <span class='type'>module</span>
+          Sequel::Plugins::ValidationContexts
+        </h1>
+        <ol class='paths'>
+          <li>
+            <a href="../../../files/lib/sequel/plugins/validation_contexts_rb.html">lib/sequel/plugins/validation_contexts.rb</a>
+          </li>
+        </ol>
+      </div>
+      <div id='content'>
+        <div id='text'>
+          <div id='description'>
+            
+            <p>The validation_contexts plugin adds support for a validation_context method
+            inside a validate method.  You pass in the validation context to use via
+            the :validation_context option to Sequel::Model#save &amp;&amp;
+            Sequel::Model#valid?:</p>
+            
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>&#x000A;  <span class="ruby-identifier">plugin</span> :<span class="ruby-identifier">validation_contexts</span>&#x000A;  <span class="ruby-keyword">def</span> <span class="ruby-identifier">validate</span>&#x000A;    <span class="ruby-keyword">super</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(:<span class="ruby-identifier">status_id</span>, <span class="ruby-string">&#39;not 1&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">!=</span> <span class="ruby-value">1</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">validation_context</span> <span class="ruby-operator">==</span> :<span class="ruby-identifier">initial</span>&#x000A;    <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add</span>(:<span class="ruby-identifier">status_id</span>, <span class="ruby-string">&#39;not 2&#39;</span>) <span class="ruby-keyword">if</span> <span class="ruby-identifier">status_id</span> <span class="ruby-operator">!=</span> <span class="ruby-value">2</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">validation_context</span> <span class="ruby-operator">==</span> :<span class="ruby-identifier">approve</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">status_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">valid?</span>(:<span class="ruby-identifier">validation_context=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">initial</span>) <span class="ruby-comment"># =&gt; true</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">status_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">valid?</span>(:<span class="ruby-identifier">validation_context=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">initial</span>) <span class="ruby-comment"># =&gt; false</span>&#x000A;&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">status_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">1</span>).<span class="ruby-identifier">valid?</span>(:<span class="ruby-identifier">validation_context=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">approve</span>) <span class="ruby-comment"># =&gt; false</span>&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">new</span>(:<span class="ruby-identifier">status_id=</span><span class="ruby-operator">&gt;</span><span class="ruby-value">2</span>).<span class="ruby-identifier">valid?</span>(:<span class="ruby-identifier">validation_context=</span><span class="ruby-operator">&gt;</span>:<span class="ruby-identifier">approve</span>) <span class="ruby-comment"># =&gt; true</span></pre>
+            
+            <p>There is no validation context used by default, so validation_context will
+            be <code>nil</code> if one is not specified.  If you want to differentiate
+            between creating new objects and updating existing objects, just use
+            <code>new?</code>.</p>
+            
+            <p>Once this plugin is loaded into a model, after you freeze an instance of
+            that model, you can no longer specify a validation context when validating
+            the instance.</p>
+          </div>
+          <div id='context'>
+          </div>
+          <div id='class-list'>
+            <h2>Classes and Modules</h2>
+            <ol>
+              <li><a href="ValidationContexts/InstanceMethods.html">Sequel::Plugins::ValidationContexts::InstanceMethods</a></li>
+            </ol>
+          </div>
+          <div id='section'>
+          </div>
+        </div>
+      </div>
+      <div id='footer-push'></div>
+    </div>
+    <div id='footer'>
+      <a href="https://github.com/rdoc/hanna-nouveau"><strong>Hanna Nouveau</strong> RDoc template</a>
+    </div>
+  </body>
+</html>

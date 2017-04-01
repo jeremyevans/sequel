@@ -51,6 +51,7 @@
             <h2>Methods</h2>
             <h3>Public Class</h3>
             <ol>
+              <li><a href="#method-c-def_dataset_caching_method">def_dataset_caching_method</a></li>
               <li><a href="#method-c-new">new</a></li>
             </ol>
             <h3>Public Instance</h3>
@@ -64,6 +65,23 @@
           <div id='section'>
             <div id='methods'>
               <h2>Public Class methods</h2>
+              <div class='method public-class' id='method-method-c-def_dataset_caching_method'>
+                <a name='method-c-def_dataset_caching_method'></a>
+                <div class='synopsis'>
+                  <span class='name'>def_dataset_caching_method</span>
+                  <span class='arguments'>(mod, meth)</span>
+                </div>
+                <div class='description'>
+                  
+                  <p>Define a method in the module</p>
+                </div>
+                <div class='source'>
+                  <a class='source-toggle' href='#' onclick="toggleCode('method-c-def_dataset_caching_method-source'); return false">
+                    [show source]
+                  </a>
+                  <pre id='method-c-def_dataset_caching_method-source'><span class="ruby-comment"># File lib/sequel/model/dataset_module.rb, line 47</span>&#x000A;<span class="ruby-keyword">def</span> <span class="ruby-keyword">self</span>.<span class="ruby-identifier">def_dataset_caching_method</span>(<span class="ruby-identifier">mod</span>, <span class="ruby-identifier">meth</span>)&#x000A;  <span class="ruby-identifier">mod</span>.<span class="ruby-identifier">send</span>(<span class="ruby-value">:define_method</span>, <span class="ruby-identifier">meth</span>) <span class="ruby-keyword">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">name</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span><span class="ruby-operator">|</span>&#x000A;    <span class="ruby-keyword">if</span> <span class="ruby-identifier">block</span>&#x000A;      <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-identifier">name</span>){<span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)}&#x000A;    <span class="ruby-keyword">else</span>&#x000A;      <span class="ruby-identifier">key</span> = <span class="ruby-value">:&quot;_#{meth}_#{name}_ds&quot;</span>&#x000A;      <span class="ruby-ivar">@model</span>.<span class="ruby-identifier">def_dataset_method</span>(<span class="ruby-identifier">name</span>) <span class="ruby-keyword">do</span>&#x000A;        <span class="ruby-identifier">cached_dataset</span>(<span class="ruby-identifier">key</span>){<span class="ruby-identifier">send</span>(<span class="ruby-identifier">meth</span>, <span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)}&#x000A;      <span class="ruby-keyword">end</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
+                </div>
+              </div>
               <div class='method public-class' id='method-method-c-new'>
                 <a name='method-c-new'></a>
                 <div class='synopsis'>

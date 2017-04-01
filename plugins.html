@@ -40,7 +40,7 @@
 
   <div id="content">
     <br style="clear: both;" />
-    <h2>Sequel::Model Plugins for v4.44.0</h2>
+    <h2>Sequel::Model Plugins for v4.45.0</h2>
 
 <p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
@@ -98,6 +98,7 @@
 </ul></li>
 <li>Saving:<ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/BeforeAfterSave.html">before_after_save</a>: Refreshes created objects and resets modified flag before calling after_create/update/save hooks.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ColumnsUpdated.html">columns_updated</a>: Makes columns hash used for updates available in after_update and after_save hooks.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/IdentifierColumns.html">identifier_columns</a>: Automatically handles column names with 2 or more consecutive underscores when saving.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/InstanceFilters.html">instance_filters</a>: Allows you to add per instance filters that are used when updating or destroying the instance.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/MssqlOptimisticLocking.html">mssql_optimistic_locking</a>: Uses a timestamp/rowversion column on Microsoft SQL Server to prevent concurrent updates overwriting changes.</li>
@@ -134,6 +135,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ConstraintValidations.html">constraint_validations</a>: Setup automatic validations for constraints added via the <a href="rdoc-plugins/files/lib/sequel/extensions/constraint_validations_rb.html">constraint_validations extension</a>.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ErrorSplitter.html">error_splitter</a>: Splits multi-column errors entries into separate errors, one per column.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationContexts.html">validation_contexts</a>: Allow specifying a context to use during validations.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers</a>: The preferred default validations plugin, which uses instance-level methods.</li>
 </ul></li>
 <li>Other:<ul>
@@ -283,6 +285,7 @@
 <li><a href='https://github.com/jeremyevans/sequel-annotate'>sequel-annotate</a>: Generates model annotations for Sequel models, including constraint and trigger information on PostgreSQL.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
 <li><a href='https://github.com/nickgartmann/sequel-location'>sequel-location</a>: Easy setup and syntax for doing geolocation search on PostgreSQL.</li>
+<li><a href='https://github.com/janko-m/sequel-jsonapi_eager'>sequel-jsonapi_eager</a>: Helps properly eager load associations when exposing objects in a JSON API.</li>
 <li><a href='http://github.com/jeremyevans/sequel_pg'>sequel_pg</a>: Faster SELECTs when using Sequel with pg.</li>
 <li><a href='https://github.com/celsworth/sequel-pg_advisory_locking'>sequel-pg_advisory_locking</a>: Adds PostreSQL advisory locking support.</li>
 <li><a href='http://github.com/mpalmer/sequel-pg-comment'>sequel-pg-comment</a>: Document your schema by setting comments on all your PgSQL objects.</li>
@@ -290,9 +293,9 @@
 <li><a href='http://github.com/jeremyevans/sequel_postgresql_triggers'>sequel_postgresql_triggers</a>: Database enforced timestamps, immutable columns, and counter/sum caches.</li>
 <li><a href='http://github.com/brasten/sequel-rails'>sequel-rails</a>: Rails 3 plugin that allows you to use Sequel instead of ActiveRecord.</li>
 <li><a href='http://github.com/gucki/sequel_rails3'>sequel_rails3</a>: Another Rails 3 plugin that allows you to use Sequel instead of ActiveRecord.</li>
+<li><a href='https://github.com/chanks/sequel-savepoint-hooks'>sequel-savepoint-hooks</a>: Have after_commit/after_rollback hooks apply to current savepoint instead of transaction.</li>
 <li><a href='https://github.com/earaujoassis/sequel-seed'>sequel-seed</a>: A Sequel extension to make seeds/fixtures manageable like migrations.</li>
 <li><a href='http://github.com/jsvd/sequel_vectorized'>sequel_vectorized</a>: Allows Sequel::Dataset to be exported as an Hash of Arrays and NArrays.</li>
-<li><a href='https://github.com/janko-m/sequel-jsonapi_eager'>sequel-jsonapi_eager</a>: Helps properly eager load associations when exposing objects in a JSON API.</li>
 </ul>
 
 <h3>External Adapters</h3>

@@ -60,6 +60,14 @@
             existing objects, and the setting will not be persisted until after the
             object has been saved.</p>
             
+            <p>SEQUEL5: Starting in <a href="../../Sequel.html">Sequel</a> 5, the
+            :delay_pks association option will default to :delay_pks=&gt;:always.  If
+            you would like to use the <a href="../../Sequel.html">Sequel</a> 4 behavior
+            of having the setter make modifications immediately, explicitly use the
+            :delay_pks=&gt;false option.  Additionally, <a
+            href="../../Sequel.html">Sequel</a> 5 will not support the current
+            :delay_pks=&gt;true behavior, treating it as :delay_pks=&gt;:always.</p>
+            
             <p>By default, if you pass a nil value to the setter, an exception will be
             raised. You can change this behavior by using the :association_pks_nil
             association option. If set to :ignore, the setter will take no action if

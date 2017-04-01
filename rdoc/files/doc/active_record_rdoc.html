@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2017-02-08 14:57:24 -0800</span>
+          <span class='datetime'>2017-03-08 08:23:22 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -719,10 +719,10 @@
             
             <pre class="ruby"><span class="ruby-constant">BACKUP_DB</span> = <span class="ruby-constant">Sequel</span>.<span class="ruby-identifier">connect</span>(<span class="ruby-string">&#39;postgres://...&#39;</span>)&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">db</span> = <span class="ruby-constant">BACKUP_DB</span></pre>
             
-            <p>If you want a specific dataset in that database, you can use
-            <code>set_dataset</code> or <code>dataset=</code>:</p>
+            <p>If you want a specific dataset in that database for a model, setup the
+            model with a specific dataset:</p>
             
-            <pre class="ruby"><span class="ruby-constant">Album</span>.<span class="ruby-identifier">set_dataset</span> <span class="ruby-constant">BACKUP_DB</span>[:<span class="ruby-identifier">albums</span>]&#x000A;<span class="ruby-constant">Album</span>.<span class="ruby-identifier">dataset</span> = <span class="ruby-constant">BACKUP_DB</span>[:<span class="ruby-identifier">albums</span>]</pre>
+            <pre class="ruby"><span class="ruby-keyword">class</span> <span class="ruby-constant">Album</span> <span class="ruby-operator">&lt;</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Model</span>(<span class="ruby-constant">BACKUP_DB</span>[:<span class="ruby-identifier">albums</span>]); <span class="ruby-keyword">end</span></pre>
             
             <h4 id="label-exists-3F"><code>exists?</code><span><a href="#label-exists-3F">&para;</a> <a href="#top">&uarr;</a></span></h4>
             

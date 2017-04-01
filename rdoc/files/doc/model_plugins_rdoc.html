@@ -29,7 +29,7 @@
         </div>
         <div class='last-update'>
           Last Update:
-          <span class='datetime'>2013-09-06 13:38:06 -0700</span>
+          <span class='datetime'>2017-03-08 08:23:22 -0800</span>
         </div>
       </div>
       <div id='content'>
@@ -265,7 +265,8 @@
             <pre class="ruby"><span class="ruby-keyword">module</span> <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span><span class="ruby-operator">::</span><span class="ruby-constant">Foo</span>&#x000A;  <span class="ruby-keyword">module</span> <span class="ruby-constant">ClassMethods</span>&#x000A;    <span class="ruby-constant">Sequel</span><span class="ruby-operator">::</span><span class="ruby-constant">Plugins</span>.<span class="ruby-identifier">after_set_dataset</span>(<span class="ruby-keyword">self</span>, :<span class="ruby-identifier">set_foo_table</span>)&#x000A;&#x000A;    <span class="ruby-identifier">private</span>&#x000A;&#x000A;    <span class="ruby-keyword">def</span> <span class="ruby-identifier">set_foo_table</span>&#x000A;      <span class="ruby-ivar">@foo_state</span>[:<span class="ruby-identifier">table</span>] = <span class="ruby-identifier">table_name</span>&#x000A;    <span class="ruby-keyword">end</span>&#x000A;  <span class="ruby-keyword">end</span>&#x000A;<span class="ruby-keyword">end</span></pre>
             
             <p>With this code, any time the model&#39;s dataset changes, the state of the
-            plugin will be updated to set the correct table name.</p>
+            plugin will be updated to set the correct table name.  This is also called
+            when creating a new model class with a dataset.</p>
             
             <h2 id="label-Making+Dataset+Methods+Callable+as+Class+Methods">Making Dataset Methods Callable as Class Methods<span><a href="#label-Making+Dataset+Methods+Callable+as+Class+Methods">&para;</a> <a href="#top">&uarr;</a></span></h2>
             

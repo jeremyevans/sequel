@@ -96,8 +96,8 @@
                     <td class='context-item-name'>AFTER_HOOKS</td>
                     <td>=</td>
                     <td class='context-item-value'>
-                      [:after_create, :after_update, :after_save, :after_destroy,
-                      :after_validation, :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]
+                      [:after_create, :after_update, :after_save, :after_destroy, :after_validation,
+                      :after_commit, :after_rollback, :after_destroy_commit, :after_destroy_rollback]
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>
@@ -110,24 +110,16 @@
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES</td>
                     <td>=</td>
-                    <td class='context-item-value'>@Model_cache = {}</td>
+                    <td class='context-item-value'>@Model_cache</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Map that stores model classes created with <code>Sequel::Model()</code>, to
-                      allow the reopening of classes when dealing with code reloading.</p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>ANONYMOUS_MODEL_CLASSES_MUTEX</td>
                     <td>=</td>
-                    <td class='context-item-value'>@Model_mutex = Mutex.new</td>
+                    <td class='context-item-value'>Mutex.new # :nodoc:</td>
                     <td>&nbsp;</td>
-                    <td class='context-item-desc'>
-                      
-                      <p>Mutex protecting access to <a
-                      href="Model.html#ANONYMOUS_MODEL_CLASSES">ANONYMOUS_MODEL_CLASSES</a></p>
-                    </td>
+                    <td class='context-item-desc'></td>
                   </tr>
                   <tr class='top-aligned-row context-row'>
                     <td class='context-item-name'>AROUND_HOOKS</td>
@@ -212,7 +204,7 @@
                       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
                       :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
                       :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
-                      :@cache_anonymous_models=>nil, :@Model_mutex=>nil}
+                      :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}
                     </td>
                     <td>&nbsp;</td>
                     <td class='context-item-desc'>

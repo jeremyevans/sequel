@@ -102,8 +102,10 @@
             the issues fixed were so difficult to hit that even tests specifically
             designed to raise errors were unable to do so.</p>
             </li><li>
-            <p>Sequel.single_threaded = true now disables the mutex synchronization that
-            enforces thread safety for additional performance in single threaded mode.</p>
+            <p><a
+            href="../../../classes/Sequel.html#attribute-c-single_threaded">Sequel.single_threaded</a>
+            = true now disables the mutex synchronization that enforces thread safety
+            for additional performance in single threaded mode.</p>
             </li><li>
             <p>Sequel&#39;s migrators now only attempt to use transactions by default if
             the underlying database supports transactional DDL. SQLite does support
