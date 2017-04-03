@@ -26,7 +26,7 @@ Sequel::Model.cache_anonymous_models = false
 
 require './spec/guards_helper'
 
-IDENTIFIER_MANGLING = !ENV['SEQUEL_NO_MANGLE'] unless defined?(IDENTIFIER_MANGLING)
+IDENTIFIER_MANGLING = !!ENV['SEQUEL_IDENTIFIER_MANGLING'] unless defined?(IDENTIFIER_MANGLING)
 
 unless defined?(DB)
   # SEQUEL5: Remove :identifier_mangling=>false
