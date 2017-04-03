@@ -1171,6 +1171,9 @@ module Sequel
       !(@opts.collect{|k,v| k unless v.nil?}.compact & opts).empty?
     end
 
+    # From types allowed to be considered a simple_select_all
+    SIMPLE_SELECT_ALL_ALLOWED_FROM = [Symbol, SQL::AliasedExpression, SQL::Identifier, SQL::QualifiedIdentifier].freeze
+
     # Whether this dataset is a simple select from an underlying table, such as:
     #
     #   SELECT * FROM table
@@ -1178,7 +1181,7 @@ module Sequel
     def simple_select_all?
       non_sql = non_sql_options
       o = @opts.reject{|k,v| v.nil? || non_sql.include?(k)}
-      if (f = o[:from]) && f.length == 1 && (f.first.is_a?(Symbol) || f.first.is_a?(SQL::AliasedExpression))
+      if (f = o[:from]) && f.length == 1 && SIMPLE_SELECT_ALL_ALLOWED_FROM.any?{|x| f.first.is_a?(x)}
         case o.length
         when 1
           true

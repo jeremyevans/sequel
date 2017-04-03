@@ -746,6 +746,8 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_table.must_equal '"a"'
     @c.set_dataset @ds.from(:b)
     @c.simple_table.must_equal '"b"'
+    @c.set_dataset @ds.from(Sequel[:b][:a])
+    @c.simple_table.must_equal '"b"."a"'
     @c.set_dataset @ds.from(:b__a)
     @c.simple_table.must_equal '"b"."a"'
   end

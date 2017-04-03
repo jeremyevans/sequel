@@ -1,3 +1,7 @@
+=== master
+
+* Allow optimized lookups and deletes for models using SQL::Identifier and SQL::QualifiedIdentifier values as the FROM table (jeremyevans)
+
 === 4.45.0 (2017-04-01)
 
 * Correctly handle datasets with offsets but no limits used in compound datasets on MSSQL <2012 (jeremyevans)
