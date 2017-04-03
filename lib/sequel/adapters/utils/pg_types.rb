@@ -50,6 +50,8 @@ module Sequel
     # Non-builtin types that don't have fixed numbers should use this to register
     # conversion procs.
     PG_NAMED_TYPES = {} unless defined?(PG_NAMED_TYPES)
+    PG_NAMED__TYPES = PG_NAMED_TYPES
+    Sequel::Deprecation.deprecate_constant(self, :PG_NAMED_TYPES)
 
     # Hash with integer keys and callable values for converting PostgreSQL types.
     PG_TYPES = {} unless defined?(PG_TYPES)

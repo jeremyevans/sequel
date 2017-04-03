@@ -183,7 +183,7 @@ module Sequel
       # the conversion proc is looked up in the PG_NAMED_TYPES hash.
       def add_named_conversion_proc(name, &block)
         unless block
-          if block = PG_NAMED_TYPES[name]
+          if block = PG_NAMED__TYPES[name]
             Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each database you want to support the #{name} type")
           end
         end
@@ -1014,10 +1014,10 @@ module Sequel
       def get_conversion_procs
         procs = PG_TYPES.dup
         procs[1184] = procs[1114] = method(:to_application_timestamp)
-        unless PG_NAMED_TYPES.empty?
-          Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each Database instance where you want to support the following type(s): #{PG_NAMED_TYPES.keys.join(', ')}")
+        unless PG_NAMED__TYPES.empty?
+          Sequel::Deprecation.deprecate("Sequel::PG_NAMED_TYPES", "Call Database#add_named_conversion_proc directly for each Database instance where you want to support the following type(s): #{PG_NAMED__TYPES.keys.join(', ')}")
         end
-        add_named_conversion_procs(procs, PG_NAMED_TYPES)
+        add_named_conversion_procs(procs, PG_NAMED__TYPES)
         procs
       end
 
