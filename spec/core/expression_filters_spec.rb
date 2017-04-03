@@ -17,7 +17,13 @@ describe "Blockless Ruby Filters" do
     @d.l(:x).must_equal 'x'
   end
   
-  it "should support qualified columns and aliased columns using symbols" do
+  with_symbol_splitting "should support qualified columns and aliased columns using symbols" do
+    @d.l(:x__y).must_equal 'x.y'
+    @d.l(:x___y).must_equal 'x AS y'
+    @d.l(:x__y___z).must_equal 'x.y AS z'
+  end
+
+  deprecated "should support qualified columns and aliased columns using symbols 2" do
     @d.l(:x__y).must_equal 'x.y'
     @d.l(:x___y).must_equal 'x AS y'
     @d.l(:x__y___z).must_equal 'x.y AS z'
@@ -35,15 +41,15 @@ describe "Blockless Ruby Filters" do
       @d.l(:x__y___z).must_equal 'x__y___z'
       @d.l(Sequel.expr{x__y}).must_equal 'x__y'
     ensure
-      Sequel.split_symbols = true
+      Sequel.split_symbols = :deprecated
     end
   end
 
   it "should support NOT with SQL functions" do
     @d.l(~Sequel.function(:is_blah)).must_equal 'NOT is_blah()'
     @d.l(~Sequel.function(:is_blah, :x)).must_equal 'NOT is_blah(x)'
-    @d.l(~Sequel.function(:is_blah, :x__y)).must_equal 'NOT is_blah(x.y)'
-    @d.l(~Sequel.function(:is_blah, :x, :x__y)).must_equal 'NOT is_blah(x, x.y)'
+    @d.l(~Sequel.function(:is_blah, Sequel[:x][:y])).must_equal 'NOT is_blah(x.y)'
+    @d.l(~Sequel.function(:is_blah, :x, Sequel[:x][:y])).must_equal 'NOT is_blah(x, x.y)'
   end
 
   it "should handle multiple ~" do
@@ -187,7 +193,7 @@ describe "Blockless Ruby Filters" do
     @d.lit(1 + Sequel.expr(:x)).must_equal '(1 + x)'
     @d.lit(2**65 - Sequel.+(:x, 1)).must_equal "(#{2**65} - (x + 1))"
     @d.lit(1.0 / Sequel.function(:x)).must_equal '(1.0 / x())'
-    @d.lit(BigDecimal.new('1.0') * Sequel.expr(:a__y)).must_equal '(1.0 * a.y)'
+    @d.lit(BigDecimal.new('1.0') * Sequel[:a][:y]).must_equal '(1.0 * a.y)'
     @d.lit(2 ** Sequel.cast(:x, Integer)).must_equal 'power(2, CAST(x AS integer))'
     @d.lit(1 + Sequel.lit('x')).must_equal '(1 + x)'
     @d.lit(1 + Sequel.lit('?', :x)).must_equal '(1 + x)'
@@ -677,6 +683,10 @@ describe Sequel::SQL::VirtualRow do
     @d.l{sch__rank.function}.must_equal 'sch.rank()' 
     @d.l{sch__sum.function(c)}.must_equal 'sch.sum("c")'
     @d.l{sch__sum.function(c, 1)}.must_equal 'sch.sum("c", 1)'
+    @d.l{Sequel.qualify(sch[:sum], x[:y]).function(c, 1)}.must_equal 'sch.sum.x.y("c", 1)'
+  end
+
+  with_symbol_splitting "should support function method on qualified identifiers to create functions" do
     @d.l{Sequel.qualify(sch__sum, :x__y).function(c, 1)}.must_equal 'sch.sum.x.y("c", 1)'
   end
 
@@ -766,6 +776,9 @@ describe "Sequel core extension replacements" do
     Sequel.expr{|o| o.a}.must_be_kind_of(Sequel::SQL::Identifier)
     Sequel.expr{a}.must_be_kind_of(Sequel::SQL::Identifier)
     Sequel.expr(:a).must_be_kind_of(Sequel::SQL::Identifier)
+  end
+
+  with_symbol_splitting "Sequel.expr should return items wrapped in Sequel objects for splittable symbols" do
     Sequel.expr(:a__b).must_be_kind_of(Sequel::SQL::QualifiedIdentifier)
     Sequel.expr(:a___c).must_be_kind_of(Sequel::SQL::AliasedExpression)
     Sequel.expr(:a___c).expression.must_be_kind_of(Sequel::SQL::Identifier)
@@ -1063,7 +1076,7 @@ describe "Sequel core extension replacements" do
 
   it "#* with no arguments should use a ColumnAll for Identifier and QualifiedIdentifier" do
     l(Sequel.expr(:a).*, 'a.*')
-    l(Sequel.expr(:a__b).*, 'a.b.*')
+    l(Sequel[:a][:b].*, 'a.b.*')
   end
 
   it "SQL::Blob should be aliasable and castable by default" do

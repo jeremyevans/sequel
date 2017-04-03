@@ -33,6 +33,11 @@ describe "pg_enum extension" do
   it "should support #create_enum method for adding a new enum" do
     @db.create_enum(:foo, [:a, :b, :c])
     @db.sqls.first.must_equal "CREATE TYPE foo AS ENUM ('a', 'b', 'c')"
+    @db.create_enum(Sequel[:sch][:foo], %w'a b c')
+    @db.sqls.first.must_equal "CREATE TYPE sch.foo AS ENUM ('a', 'b', 'c')"
+  end
+
+  with_symbol_splitting "should support #create_enum method for adding a new enum with qualified symbol" do
     @db.create_enum(:sch__foo, %w'a b c')
     @db.sqls.first.must_equal "CREATE TYPE sch.foo AS ENUM ('a', 'b', 'c')"
   end
@@ -40,10 +45,15 @@ describe "pg_enum extension" do
   it "should support #drop_enum method for dropping an enum" do
     @db.drop_enum(:foo)
     @db.sqls.first.must_equal "DROP TYPE foo"
-    @db.drop_enum(:sch__foo, :if_exists=>true)
+    @db.drop_enum(Sequel[:sch][:foo], :if_exists=>true)
     @db.sqls.first.must_equal "DROP TYPE IF EXISTS sch.foo"
     @db.drop_enum('foo', :cascade=>true)
     @db.sqls.first.must_equal "DROP TYPE foo CASCADE"
+  end
+
+  with_symbol_splitting "should support #drop_enum method for dropping an enum with a splittable symbol" do
+    @db.drop_enum(:sch__foo, :if_exists=>true)
+    @db.sqls.first.must_equal "DROP TYPE IF EXISTS sch.foo"
   end
 
   it "should support #add_enum_value method for adding value to an existing enum" do
@@ -57,6 +67,11 @@ describe "pg_enum extension" do
   end
 
   it "should support :after option for #add_enum_value method for adding value after an existing enum value" do
+    @db.add_enum_value(Sequel[:sch][:foo], :a, :after=>:b)
+    @db.sqls.first.must_equal "ALTER TYPE sch.foo ADD VALUE 'a' AFTER 'b'"
+  end
+
+  with_symbol_splitting "should support :after option for #add_enum_value method for adding value after an existing enum value with splittable symbol" do
     @db.add_enum_value(:sch__foo, :a, :after=>:b)
     @db.sqls.first.must_equal "ALTER TYPE sch.foo ADD VALUE 'a' AFTER 'b'"
   end

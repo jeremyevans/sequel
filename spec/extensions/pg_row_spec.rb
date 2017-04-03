@@ -210,6 +210,31 @@ describe "pg_row extension" do
     @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
     @db.conversion_procs[5] = p5 = proc{|s| s * 2}
     @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
+    @db.register_row_type(Sequel[:foo][:bar])
+    @db.sqls.must_equal ["SELECT pg_type.oid, typrelid, typarray FROM pg_type INNER JOIN pg_namespace ON ((pg_namespace.oid = pg_type.typnamespace) AND (pg_namespace.nspname = 'foo')) WHERE ((typtype = 'c') AND (typname = 'bar')) LIMIT 1",
+      "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]
+    p1 = @db.conversion_procs[1]
+    p1.columns.must_equal [:bar, :baz]
+    p1.column_oids.must_equal [4, 5]
+    p1.column_converters.must_equal [p4, p5]
+    p1.oid.must_equal 1
+
+    c = p1.converter
+    c.superclass.must_equal @m::HashRow
+    c.columns.must_equal [:bar, :baz]
+    c.db_type.must_equal Sequel[:foo][:bar]
+    p1.typecaster.must_equal c
+
+    p1.call('(1,b)').must_equal(:bar=>1, :baz=>'bb')
+    @db.typecast_value(:pg_row_foo__bar, %w'1 b').must_equal(:bar=>'1', :baz=>'b')
+    @db.typecast_value(:pg_row_foo__bar, :bar=>'1', :baz=>'b').must_equal(:bar=>'1', :baz=>'b')
+    @db.literal(p1.call('(1,b)')).must_equal "ROW(1, 'bb')::foo.bar"
+  end
+
+  with_symbol_splitting "should allow registering row type parsers for schema qualify type symbols" do
+    @db.conversion_procs[4] = p4 = proc{|s| s.to_i}
+    @db.conversion_procs[5] = p5 = proc{|s| s * 2}
+    @db.fetch = [[{:oid=>1, :typrelid=>2, :typarray=>3}], [{:attname=>'bar', :atttypid=>4}, {:attname=>'baz', :atttypid=>5}]]
     @db.register_row_type(:foo__bar)
     @db.sqls.must_equal ["SELECT pg_type.oid, typrelid, typarray FROM pg_type INNER JOIN pg_namespace ON ((pg_namespace.oid = pg_type.typnamespace) AND (pg_namespace.nspname = 'foo')) WHERE ((typtype = 'c') AND (typname = 'bar')) LIMIT 1",
       "SELECT attname, (CASE pg_type.typbasetype WHEN 0 THEN atttypid ELSE pg_type.typbasetype END) AS atttypid FROM pg_attribute INNER JOIN pg_type ON (pg_type.oid = pg_attribute.atttypid) WHERE ((attrelid = 2) AND (attnum > 0) AND NOT attisdropped) ORDER BY attnum"]

@@ -38,7 +38,7 @@ describe Sequel::Dataset, " graphing" do
 
     @ds1.graph(@ds2, :x=>:id).all.must_equal [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}}]
     @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id).all.must_equal [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}]
-    @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>:points__id}, :table_alias=>:graph).all.must_equal [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11}}]
+    @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>Sequel[:points][:id]}, :table_alias=>:graph).all.must_equal [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11}}]
   end
 
   it "#graph_each should split the result set into component tables when using first" do
@@ -48,7 +48,7 @@ describe Sequel::Dataset, " graphing" do
 
     @ds1.graph(@ds2, :x=>:id).first.must_equal(:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7})
     @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id).first.must_equal(:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12})
-    @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>:points__id}, :table_alias=>:graph).first.must_equal(:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11})
+    @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>Sequel[:points][:id]}, :table_alias=>:graph).first.must_equal(:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11})
   end
 
   it "#graph_each should give a nil value instead of a hash when all values for a table are nil" do

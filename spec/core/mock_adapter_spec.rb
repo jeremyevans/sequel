@@ -456,7 +456,7 @@ describe "Sequel Mock Adapter" do
     Sequel.mock(:host=>'oracle')[:a].limit(1).with_quote_identifiers(false).sql.upcase.must_equal 'SELECT * FROM (SELECT * FROM A) T1 WHERE (ROWNUM <= 1)'
     Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').with_quote_identifiers(false).sql.must_equal "SELECT * FROM a WHERE (to_tsvector(CAST('simple' AS regconfig), (COALESCE(b, ''))) @@ to_tsquery(CAST('simple' AS regconfig), 'c'))"
     Sequel.mock(:host=>'sqlanywhere').from(:A).offset(1).with_quote_identifiers(false).sql.must_equal 'SELECT TOP 2147483647 START AT (1 + 1) * FROM A'
-    Sequel.mock(:host=>'sqlite')[:a___b].with_quote_identifiers(false).sql.must_equal "SELECT * FROM a AS 'b'"
+    Sequel.mock(:host=>'sqlite')[Sequel[:a].as(:b)].with_quote_identifiers(false).sql.must_equal "SELECT * FROM a AS 'b'"
   end
 
   it "should be able to mock schema calls" do

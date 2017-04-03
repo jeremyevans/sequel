@@ -63,6 +63,13 @@ describe "Sequel::Plugins::LazyAttributes" do
   end
 
   it "should handle lazy attributes that are qualified in the selection" do
+    @c.set_dataset(@ds.select(Sequel[:la][:id], Sequel[:la][:blah]))
+    @c.dataset.sql.must_equal 'SELECT la.id, la.blah FROM la'
+    @c.plugin :lazy_attributes, :blah
+    @c.dataset.sql.must_equal 'SELECT la.id FROM la'
+  end
+  
+  with_symbol_splitting "should handle lazy attributes that are qualified in the selection using symbol splitting" do
     @c.set_dataset(@ds.select(:la__id, :la__blah))
     @c.dataset.sql.must_equal 'SELECT la.id, la.blah FROM la'
     @c.plugin :lazy_attributes, :blah

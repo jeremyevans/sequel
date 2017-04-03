@@ -17,30 +17,33 @@ describe "Sequel::Plugins::TableSelect" do
   end
 
   it "should handle qualified tables" do
-    @Album.dataset = :s__albums
-    @Album.plugin :table_select
-    @Album.dataset.sql.must_equal 'SELECT s.albums.* FROM s.albums'
-
     @Album.dataset = Sequel.qualify(:s2, :albums)
+    @Album.plugin :table_select
     @Album.dataset.sql.must_equal 'SELECT s2.albums.* FROM s2.albums'
   end
 
   it "should handle aliases" do
-    @Album.dataset = :albums___a
-    @Album.plugin :table_select
-    @Album.dataset.sql.must_equal 'SELECT a.* FROM albums AS a'
-
     @Album.dataset = Sequel.as(:albums, :b)
+    @Album.plugin :table_select
     @Album.dataset.sql.must_equal 'SELECT b.* FROM albums AS b'
-
-    @Album.dataset = :s__albums___a
-    @Album.dataset.sql.must_equal 'SELECT a.* FROM s.albums AS a'
 
     @Album.dataset = @Album.db[:albums].from_self
     @Album.dataset.sql.must_equal 'SELECT t1.* FROM (SELECT * FROM albums) AS t1'
 
     @Album.dataset = Sequel.as(@Album.db[:albums], :b)
     @Album.dataset.sql.must_equal 'SELECT b.* FROM (SELECT * FROM albums) AS b'
+  end
+
+  with_symbol_splitting "should handle splittable symbols" do
+    @Album.dataset = :albums___a
+    @Album.plugin :table_select
+    @Album.dataset.sql.must_equal 'SELECT a.* FROM albums AS a'
+
+    @Album.dataset = :s__albums___a
+    @Album.dataset.sql.must_equal 'SELECT a.* FROM s.albums AS a'
+
+    @Album.dataset = :s__albums
+    @Album.dataset.sql.must_equal 'SELECT s.albums.* FROM s.albums'
   end
 
   it "should not add a table.* selection on existing dataset with explicit selection" do

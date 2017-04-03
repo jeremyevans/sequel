@@ -31,7 +31,7 @@ describe "Dataset#query" do
   
   it "should support #select" do
     q = @d.query do
-      select :a, :b___mongo
+      select :a, Sequel[:b].as(:mongo)
       from :yyy
     end
     q.class.must_equal @d.class
@@ -91,7 +91,7 @@ describe "Dataset#query" do
   unless Sequel.mock.dataset.frozen?
     deprecated "should have an appropriate mutation method" do
       @d.query! do
-        select :a, :b___mongo
+        select :a, Sequel[:b].as(:mongo)
         from :yyy
       end
       @d.sql.must_equal "SELECT a, b AS mongo FROM yyy"

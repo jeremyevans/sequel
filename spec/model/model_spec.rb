@@ -335,6 +335,11 @@ describe Sequel::Model do
   end
 
   it "table_name should respect table aliases" do
+    @model.set_dataset(Sequel[:foo].as(:x))
+    @model.table_name.must_equal :x
+  end
+  
+  with_symbol_splitting "table_name should respect table alias symbols" do
     @model.set_dataset(:foo___x)
     @model.table_name.must_equal :x
   end

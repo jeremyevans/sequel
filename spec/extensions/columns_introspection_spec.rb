@@ -20,17 +20,17 @@ describe "columns_introspection extension" do
     @db.sqls.length.must_equal 0
   end
 
-  it "should handle qualified symbols without a database query" do
+  with_symbol_splitting "should handle qualified symbols without a database query" do
     @ds.select(:t__x).columns.must_equal [:x]
     @db.sqls.length.must_equal 0
   end
 
-  it "should handle aliased symbols without a database query" do
+  with_symbol_splitting "should handle aliased symbols without a database query" do
     @ds.select(:x___a).columns.must_equal [:a]
     @db.sqls.length.must_equal 0
   end
 
-  it "should handle qualified and aliased symbols without a database query" do
+  with_symbol_splitting "should handle qualified and aliased symbols without a database query" do
     @ds.select(:t__x___a).columns.must_equal [:a]
     @db.sqls.length.must_equal 0
   end

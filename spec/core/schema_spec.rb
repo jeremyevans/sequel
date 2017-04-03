@@ -10,13 +10,17 @@ describe "DB#create_table" do
     @db.sqls.must_equal ['CREATE TABLE cats ()']
   end
 
-  it "should accept the table name in multiple formats" do
+  with_symbol_splitting "should accept the table name with splittable symbols" do
     @db.create_table(:cats__cats) {}
+    @db.sqls.must_equal ['CREATE TABLE cats.cats ()']
+  end
+
+  it "should accept the table name in multiple formats" do
     @db.create_table(Sequel[:cats][:cats]) {}
     @db.create_table("cats__cats1") {}
     @db.create_table(Sequel.identifier(:cats__cats2)) {}
     @db.create_table(Sequel.qualify(:cats3, :cats)) {}
-    @db.sqls.must_equal ['CREATE TABLE cats.cats ()', 'CREATE TABLE cats.cats ()', 'CREATE TABLE cats__cats1 ()', 'CREATE TABLE cats__cats2 ()', 'CREATE TABLE cats3.cats ()']
+    @db.sqls.must_equal ['CREATE TABLE cats.cats ()', 'CREATE TABLE cats__cats1 ()', 'CREATE TABLE cats__cats2 ()', 'CREATE TABLE cats3.cats ()']
   end
 
   it "should raise an error if the table name argument is not valid" do
@@ -1495,9 +1499,12 @@ describe "Database#create_view" do
     @db.sqls.must_equal ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c WITH LOCAL CHECK OPTION']
   end
 
-  it "should handle create_or_replace_view" do
+  with_symbol_splitting "should handle create_or_replace_view with splittable symbols" do
     @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
     @db.sqls.must_equal ['DROP VIEW sch.test', 'CREATE VIEW sch.test AS SELECT * FROM xyz']
+  end
+
+  it "should handle create_or_replace_view" do
     @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.must_equal ['DROP VIEW test', 'CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
     @db.create_or_replace_view Sequel.identifier(:test), @db[:items].select(:a, :b).order(:c)
@@ -1516,12 +1523,16 @@ describe "Database#drop_view" do
     @db = Sequel.mock
   end
   
+  with_symbol_splitting "should construct proper SQL for splittable symbols" do
+    @db.drop_view :sch__test
+    @db.sqls.must_equal ['DROP VIEW sch.test']
+  end
+
   it "should construct proper SQL" do
     @db.drop_view :test
     @db.drop_view Sequel.identifier(:test)
-    @db.drop_view :sch__test
     @db.drop_view Sequel.qualify(:sch, :test)
-    @db.sqls.must_equal ['DROP VIEW test', 'DROP VIEW test', 'DROP VIEW sch.test', 'DROP VIEW sch.test']
+    @db.sqls.must_equal ['DROP VIEW test', 'DROP VIEW test', 'DROP VIEW sch.test']
   end
 
   it "should drop multiple views at once" do
@@ -1589,6 +1600,19 @@ describe "Schema Parser" do
     end
     @db.schema(:x)
     c.must_equal ["x", {}]
+    @db.schema(Sequel[:s][:x])
+    c.must_equal ["x", {:schema=>"s"}]
+    ds = @db[Sequel[:s][:y]]
+    @db.schema(ds)
+    c.must_equal ["y", {:schema=>"s", :dataset=>ds}]
+  end
+
+  with_symbol_splitting "should provide options if given a table name with splittable symbols" do
+    c = nil
+    meta_def(@db, :schema_parse_table) do |t, opts|
+      c = [t, opts]
+      [[:a, {:db_type=>t.to_s}]]
+    end
     @db.schema(:s__x)
     c.must_equal ["x", {:schema=>"s"}]
     ds = @db[:s__y]
@@ -1638,6 +1662,31 @@ describe "Schema Parser" do
   end
 
   it "should convert various types of table name arguments" do
+    meta_def(@db, :schema_parse_table) do |t, opts|
+      [[t, opts]]
+    end
+    s1 = @db.schema(:x)
+    s1.must_equal [['x', {:ruby_default=>nil}]]
+    @db.schema(:x).object_id.must_equal s1.object_id
+    @db.schema(Sequel.identifier(:x)).object_id.must_equal s1.object_id
+
+    s2 = @db.schema(Sequel[:x][:y])
+    s2.must_equal [['y', {:schema=>'x', :ruby_default=>nil}]]
+    @db.schema(Sequel[:x][:y]).object_id.must_equal s2.object_id
+    @db.schema(Sequel.qualify(:x, :y)).object_id.must_equal s2.object_id
+
+    s2 = @db.schema(Sequel.qualify(:v, Sequel[:x][:y]))
+    s2.must_equal [['y', {:schema=>'x', :ruby_default=>nil, :information_schema_schema=>Sequel.identifier('v')}]]
+    @db.schema(Sequel.qualify(:v, Sequel[:x][:y])).object_id.must_equal s2.object_id
+    @db.schema(Sequel.qualify(Sequel[:v][:x], :y)).object_id.must_equal s2.object_id
+
+    s2 = @db.schema(Sequel.qualify(Sequel[:u][:v], Sequel[:x][:y]))
+    s2.must_equal [['y', {:schema=>'x', :ruby_default=>nil, :information_schema_schema=>Sequel.qualify('u', 'v')}]]
+    @db.schema(Sequel.qualify(Sequel[:u][:v], Sequel[:x][:y])).object_id.must_equal s2.object_id
+    @db.schema(Sequel.qualify(Sequel.qualify(:u, :v), Sequel.qualify(:x, :y))).object_id.must_equal s2.object_id
+  end
+
+  with_symbol_splitting "should convert splittable symbol arguments" do
     meta_def(@db, :schema_parse_table) do |t, opts|
       [[t, opts]]
     end

@@ -310,10 +310,13 @@ describe "Dataset#unused_table_alias" do
     @ds.from(:test, :test_0).cross_join(:test_1).unused_table_alias(:test).must_equal :test_2
   end
 
-  it "should return an appropriate symbol if given other forms of identifiers" do
-    @ds.unused_table_alias('test').must_equal :test_0
+  with_symbol_splitting "should return an appropriate symbol if given splittable symbol" do
     @ds.unused_table_alias(:b__t___test).must_equal :test_0
     @ds.unused_table_alias(:b__test).must_equal :test_0
+  end
+
+  it "should return an appropriate symbol if given other forms of identifiers" do
+    @ds.unused_table_alias('test').must_equal :test_0
     @ds.unused_table_alias(Sequel.qualify(:b, :test)).must_equal :test_0
     @ds.unused_table_alias(Sequel.expr(:b).as(:test)).must_equal :test_0
     @ds.unused_table_alias(Sequel.expr(:b).as(Sequel.identifier(:test))).must_equal :test_0
@@ -455,9 +458,8 @@ describe "Dataset#where" do
   it "should accept ranges" do
     @dataset.filter(:id => 4..7).sql.must_equal 'SELECT * FROM test WHERE ((id >= 4) AND (id <= 7))'
     @dataset.filter(:id => 4...7).sql.must_equal 'SELECT * FROM test WHERE ((id >= 4) AND (id < 7))'
-
-    @dataset.filter(:table__id => 4..7).sql.must_equal 'SELECT * FROM test WHERE ((table.id >= 4) AND (table.id <= 7))'
-    @dataset.filter(:table__id => 4...7).sql.must_equal 'SELECT * FROM test WHERE ((table.id >= 4) AND (table.id < 7))'
+    @dataset.filter(:id => 4..7).sql.must_equal 'SELECT * FROM test WHERE ((id >= 4) AND (id <= 7))'
+    @dataset.filter(:id => 4...7).sql.must_equal 'SELECT * FROM test WHERE ((id >= 4) AND (id < 7))'
   end
 
   it "should accept nil" do
@@ -908,21 +910,57 @@ describe "Dataset#as" do
   end
 end
 
-describe "Dataset#literal" do
+describe "Dataset#literal with expressions" do
   before do
     @ds = Sequel.mock.dataset
   end
   
-  it "should convert qualified symbol notation into dot notation" do
+  it "should convert qualified identifiers into dot notation" do
+    @ds.literal(Sequel[:abc][:def]).must_equal 'abc.def'
+  end
+  
+  it "should convert aliased expressions into SQL AS notation" do
+    @ds.literal(Sequel[:xyz].as(:x)).must_equal 'xyz AS x'
+    @ds.literal(Sequel[:abc][:def].as(:x)).must_equal 'abc.def AS x'
+  end
+  
+  it "should support names with digits" do
+    @ds.literal(:abc2).must_equal 'abc2'
+    @ds.literal(Sequel[:xx][:yy3]).must_equal 'xx.yy3'
+    @ds.literal(Sequel[:ab34][:temp3_4ax]).must_equal 'ab34.temp3_4ax'
+    @ds.literal(Sequel[:x1].as(:y2)).must_equal 'x1 AS y2'
+    @ds.literal(Sequel[:abc2][:def3].as(:ggg4)).must_equal 'abc2.def3 AS ggg4'
+  end
+  
+  it "should support upper case and lower case" do
+    @ds.literal(:ABC).must_equal 'ABC'
+    @ds.literal(Sequel[:Zvashtoy][:aBcD]).must_equal 'Zvashtoy.aBcD'
+  end
+
+  it "should support spaces inside column names" do
+    @ds = @ds.with_quote_identifiers(true)
+    @ds.literal(:"AB C").must_equal '"AB C"'
+    @ds.literal(Sequel[:"Zvas htoy"][:"aB cD"]).must_equal '"Zvas htoy"."aB cD"'
+    @ds.literal(Sequel[:"aB cD"].as(:"XX XX")).must_equal '"aB cD" AS "XX XX"'
+    @ds.literal(Sequel[:"Zva shtoy"][:"aB cD"].as("XX XX")).must_equal '"Zva shtoy"."aB cD" AS "XX XX"'
+  end
+end
+
+describe "Dataset#literal with splittable symbols" do
+  before do
+    @ds = Sequel.mock.dataset
+  end
+  
+  with_symbol_splitting "should convert qualified symbol notation into dot notation" do
     @ds.literal(:abc__def).must_equal 'abc.def'
   end
   
-  it "should convert AS symbol notation into SQL AS notation" do
+  with_symbol_splitting "should convert AS symbol notation into SQL AS notation" do
     @ds.literal(:xyz___x).must_equal 'xyz AS x'
     @ds.literal(:abc__def___x).must_equal 'abc.def AS x'
   end
   
-  it "should support names with digits" do
+  with_symbol_splitting "should support names with digits" do
     @ds.literal(:abc2).must_equal 'abc2'
     @ds.literal(:xx__yy3).must_equal 'xx.yy3'
     @ds.literal(:ab34__temp3_4ax).must_equal 'ab34.temp3_4ax'
@@ -930,12 +968,12 @@ describe "Dataset#literal" do
     @ds.literal(:abc2__def3___ggg4).must_equal 'abc2.def3 AS ggg4'
   end
   
-  it "should support upper case and lower case" do
+  with_symbol_splitting "should support upper case and lower case" do
     @ds.literal(:ABC).must_equal 'ABC'
     @ds.literal(:Zvashtoy__aBcD).must_equal 'Zvashtoy.aBcD'
   end
 
-  it "should support spaces inside column names" do
+  with_symbol_splitting "should support spaces inside column names" do
     @ds = @ds.with_quote_identifiers(true)
     @ds.literal(:"AB C").must_equal '"AB C"'
     @ds.literal(:"Zvas htoy__aB cD").must_equal '"Zvas htoy"."aB cD"'
@@ -980,6 +1018,9 @@ describe "Dataset#literal" do
 
   it "should literalize symbols as column references" do
     @dataset.literal(:name).must_equal "name"
+  end
+
+  with_symbol_splitting "should literalize symbols with embedded qualifiers as column references" do
     @dataset.literal(:items__name).must_equal "items.name"
     @dataset.literal(:"items__na#m$e").must_equal "items.na#m$e"
   end
@@ -1143,7 +1184,7 @@ describe "Dataset#from" do
     @dataset.select_sql.must_equal "SELECT * FROM DEFFROM"
   end
 
-  it "should accept :schema__table___alias symbol format" do
+  with_symbol_splitting "should accept :schema__table___alias symbol format" do
     @dataset.from(:abc__def).select_sql.must_equal "SELECT * FROM abc.def"
     @dataset.from(:a_b__c).select_sql.must_equal "SELECT * FROM a_b.c"
     @dataset.from(:'#__#').select_sql.must_equal 'SELECT * FROM #.#'
@@ -1155,7 +1196,7 @@ describe "Dataset#from" do
     @dataset.from(:'#___#').select_sql.must_equal 'SELECT * FROM # AS #'
   end
 
-  it "should not handle :foo__schema__table___alias specially" do
+  with_symbol_splitting "should not handle multi level qualification in embedded symbols specially" do
     @dataset.from(:foo__schema__table___alias).select_sql.must_equal "SELECT * FROM foo.schema__table AS alias"
   end
 
@@ -1176,15 +1217,20 @@ describe "Dataset#select" do
 
   it "should accept variable arity" do
     @d.select(:name).sql.must_equal 'SELECT name FROM test'
-    @d.select(:a, :b, :test__c).sql.must_equal 'SELECT a, b, test.c FROM test'
+    @d.select(:a, :b, Sequel[:test][:c]).sql.must_equal 'SELECT a, b, test.c FROM test'
+  end
+  
+  with_symbol_splitting "should accept symbols with embedded qualification and aliasing" do
+    @d.select(:test__cc).sql.must_equal 'SELECT test.cc FROM test'
+    @d.select(:test___cc).sql.must_equal 'SELECT test AS cc FROM test'
+    @d.select(:test__name___n).sql.must_equal 'SELECT test.name AS n FROM test'
   end
   
   it "should accept symbols and literal strings" do
     @d.select(Sequel.lit('aaa')).sql.must_equal 'SELECT aaa FROM test'
     @d.select(:a, Sequel.lit('b')).sql.must_equal 'SELECT a, b FROM test'
-    @d.select(:test__cc, Sequel.lit('test.d AS e')).sql.must_equal 'SELECT test.cc, test.d AS e FROM test'
-    @d.select(Sequel.lit('test.d AS e'), :test__cc).sql.must_equal 'SELECT test.d AS e, test.cc FROM test'
-    @d.select(:test__name___n).sql.must_equal 'SELECT test.name AS n FROM test'
+    @d.select(:test, Sequel.lit('test.d AS e')).sql.must_equal 'SELECT test, test.d AS e FROM test'
+    @d.select(Sequel.lit('test.d AS e'), :test).sql.must_equal 'SELECT test.d AS e, test FROM test'
   end
   
   it "should accept ColumnAlls" do
@@ -1192,6 +1238,10 @@ describe "Dataset#select" do
   end
   
   it "should accept QualifiedIdentifiers" do
+    @d.select(Sequel.expr(Sequel[:test][:name]).as(:n)).sql.must_equal 'SELECT test.name AS n FROM test'
+  end
+
+  with_symbol_splitting "should accept qualified identifiers in symbols in expressions" do
     @d.select(Sequel.expr(:test__name).as(:n)).sql.must_equal 'SELECT test.name AS n FROM test'
   end
 
@@ -1214,7 +1264,7 @@ describe "Dataset#select" do
   
   it "should accept arbitrary objects and literalize them correctly" do
     @d.select(1, :a, 't').sql.must_equal "SELECT 1, a, 't' FROM test"
-    @d.select(nil, Sequel.function(:sum, :t), :x___y).sql.must_equal "SELECT NULL, sum(t), x AS y FROM test"
+    @d.select(nil, Sequel.function(:sum, :t), Sequel[:x].as(:y)).sql.must_equal "SELECT NULL, sum(t), x AS y FROM test"
     @d.select(nil, 1, Sequel.as(:x, :y)).sql.must_equal "SELECT NULL, 1, x AS y FROM test"
   end
 
@@ -1240,6 +1290,10 @@ describe "Dataset#select_group" do
 
   it "should set both SELECT and GROUP" do
     @d.select_group(:name).sql.must_equal 'SELECT name FROM test GROUP BY name'
+    @d.select_group(:a, Sequel[:b][:c], Sequel[:d].as(:e)).sql.must_equal 'SELECT a, b.c, d AS e FROM test GROUP BY a, b.c, d'
+  end
+
+  with_symbol_splitting "should set both SELECT and GROUP when using splittable symbols" do
     @d.select_group(:a, :b__c, :d___e).sql.must_equal 'SELECT a, b.c, d AS e FROM test GROUP BY a, b.c, d'
   end
 
@@ -1275,11 +1329,11 @@ describe "Dataset#select_all" do
     @d.select_all(:test, :foo).sql.must_equal 'SELECT test.*, foo.* FROM test'
   end
   
-  it "should work correctly with qualified symbols" do
+  with_symbol_splitting "should work correctly with qualified symbols" do
     @d.select_all(:sch__test).sql.must_equal 'SELECT sch.test.* FROM test'
   end
   
-  it "should work correctly with aliased symbols" do
+  with_symbol_splitting "should work correctly with aliased symbols" do
     @d.select_all(:test___al).sql.must_equal 'SELECT al.* FROM test'
     @d.select_all(:sch__test___al).sql.must_equal 'SELECT al.* FROM test'
   end
@@ -1296,8 +1350,13 @@ describe "Dataset#select_all" do
     @d.select_all(Sequel.expr(:test).as(:al)).sql.must_equal 'SELECT al.* FROM test'
   end
   
-  it "should work correctly with SQL::JoinClauses" do
+  with_symbol_splitting "should work correctly with SQL::JoinClauses with splittable symbols" do
     d = @d.cross_join(:foo).cross_join(:test___al)
+    @d.select_all(*d.opts[:join]).sql.must_equal 'SELECT foo.*, al.* FROM test'
+  end
+  
+  it "should work correctly with SQL::JoinClauses" do
+    d = @d.cross_join(:foo).cross_join(Sequel[:test].as(:al))
     @d.select_all(*d.opts[:join]).sql.must_equal 'SELECT foo.*, al.* FROM test'
   end
 end
@@ -1734,8 +1793,12 @@ describe "Dataset#qualified_column_name" do
     @dataset.literal(@dataset.send(:qualified_column_name, :b1, :items)).must_equal 'items.b1'
   end
 
-  it "should not changed the qualifed column's table if given a qualified symbol" do
+  with_symbol_splitting "should not changed the qualifed column's table if given a qualified symbol" do
     @dataset.literal(@dataset.send(:qualified_column_name, :ccc__b, :items)).must_equal 'ccc.b'
+  end
+
+  it "should not changed the qualifed column's table if given a qualified identifier" do
+    @dataset.literal(@dataset.send(:qualified_column_name, Sequel[:ccc][:b], :items)).must_equal 'ccc.b'
   end
 
   it "should handle an aliased identifier" do
@@ -2018,6 +2081,11 @@ describe "Dataset#group_and_count" do
   end
 
   it "should format column aliases in the select clause but not in the group clause" do
+    @ds.group_and_count(Sequel[:name].as(:n)).sql.must_equal "SELECT name AS n, count(*) AS count FROM test GROUP BY name"
+    @ds.group_and_count(Sequel[:name][:n]).sql.must_equal "SELECT name.n, count(*) AS count FROM test GROUP BY name.n"
+  end
+
+  with_symbol_splitting "should format column aliases in the select clause but not in the group clause when using splittable symbols" do
     @ds.group_and_count(:name___n).sql.must_equal "SELECT name AS n, count(*) AS count FROM test GROUP BY name"
     @ds.group_and_count(:name__n).sql.must_equal "SELECT name.n, count(*) AS count FROM test GROUP BY name.n"
   end
@@ -2067,22 +2135,34 @@ describe "Dataset#first_source_alias" do
   end
   
   it "should be the entire first source if not aliased" do
+    deprecated do
+      # SEQUEL5: Remove deprecation block, but keep code
+      @ds.from(:s__t).first_source_alias.must_equal :s__t
+    end
+  end
+  
+  with_symbol_splitting "should be the alias if aliased when using symbol splitting" do
+    @ds.from(:t___a).first_source_alias.must_equal :a
+    @ds.from(:s__t___a).first_source_alias.must_equal :a
+  end
+  
+  with_symbol_splitting "should be aliased as first_source when using symbol splitting" do
+    @ds.from(:s__t___a).first_source.must_equal :a
+  end
+  
+  it "should be the entire first source if not aliased" do
     @ds.from(:t).first_source_alias.must_equal :t
     @ds.from(Sequel.identifier(:t__a)).first_source_alias.must_equal Sequel.identifier(:t__a)
-    @ds.from(:s__t).first_source_alias.must_equal :s__t
     @ds.from(Sequel.qualify(:s, :t)).first_source_alias.must_equal Sequel.qualify(:s, :t)
   end
   
   it "should be the alias if aliased" do
-    @ds.from(:t___a).first_source_alias.must_equal :a
-    @ds.from(:s__t___a).first_source_alias.must_equal :a
     @ds.from(Sequel.expr(:t).as(:a)).first_source_alias.must_equal :a
   end
   
   it "should be aliased as first_source" do
     @ds.from(:t).first_source.must_equal :t
     @ds.from(Sequel.identifier(:t__a)).first_source.must_equal Sequel.identifier(:t__a)
-    @ds.from(:s__t___a).first_source.must_equal :a
     @ds.from(Sequel.expr(:t).as(:a)).first_source.must_equal :a
   end
   
@@ -2098,14 +2178,23 @@ describe "Dataset#first_source_table" do
   
   it "should be the entire first source if not aliased" do
     @ds.from(:t).first_source_table.must_equal :t
+    deprecated do
+      # SEQUEL5: Remove deprecation block, but keep code
+      @ds.from(:s__t).first_source_table.must_equal :s__t
+    end
+  end
+  
+  it "should be the entire first source if not aliased" do
     @ds.from(Sequel.identifier(:t__a)).first_source_table.must_equal Sequel.identifier(:t__a)
-    @ds.from(:s__t).first_source_table.must_equal :s__t
     @ds.from(Sequel.qualify(:s, :t)).first_source_table.must_equal Sequel.qualify(:s, :t)
   end
   
-  it "should be the unaliased part if aliased" do
+  with_symbol_splitting "should be the unaliased part if aliased symbols with embedded aliasing" do
     @ds.literal(@ds.from(:t___a).first_source_table).must_equal "t"
     @ds.literal(@ds.from(:s__t___a).first_source_table).must_equal "s.t"
+  end
+  
+  it "should be the unaliased part if aliased" do
     @ds.literal(@ds.from(Sequel.expr(:t).as(:a)).first_source_table).must_equal "t"
   end
   
@@ -2184,6 +2273,10 @@ describe "Dataset#join_table" do
   end
   
   it "should support multiple joins" do
+    @d.join_table(:inner, :b, :items_id=>:id).join_table(:left_outer, :c, :b_id => Sequel[:b][:id]).sql.must_equal 'SELECT * FROM "items" INNER JOIN "b" ON ("b"."items_id" = "items"."id") LEFT OUTER JOIN "c" ON ("c"."b_id" = "b"."id")'
+  end
+
+  with_symbol_splitting "should support multiple joins with splittable symbols" do
     @d.join_table(:inner, :b, :items_id=>:id).join_table(:left_outer, :c, :b_id => :b__id).sql.must_equal 'SELECT * FROM "items" INNER JOIN "b" ON ("b"."items_id" = "items"."id") LEFT OUTER JOIN "c" ON ("c"."b_id" = "b"."id")'
   end
 
@@ -2260,11 +2353,11 @@ describe "Dataset#join_table" do
     @d.from(Sequel.as(:foo, :f)).join_table(:inner, :bar, :id => :bar_id).sql.must_equal 'SELECT * FROM "foo" AS "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
   end
   
-  it "should support implicit schemas in from table symbols" do
+  with_symbol_splitting "should support implicit schemas in from table symbols" do
     @d.from(:s__t).join(:u__v, {:id => :player_id}).sql.must_equal 'SELECT * FROM "s"."t" INNER JOIN "u"."v" ON ("u"."v"."id" = "s"."t"."player_id")'
   end
 
-  it "should support implicit aliases in from table symbols" do
+  with_symbol_splitting "should support implicit aliases in from table symbols" do
     @d.from(:t___z).join(:v___y, {:id => :player_id}).sql.must_equal 'SELECT * FROM "t" AS "z" INNER JOIN "v" AS "y" ON ("y"."id" = "z"."player_id")'
     @d.from(:s__t___z).join(:u__v___y, {:id => :player_id}).sql.must_equal 'SELECT * FROM "s"."t" AS "z" INNER JOIN "u"."v" AS "y" ON ("y"."id" = "z"."player_id")'
   end
@@ -2318,6 +2411,11 @@ describe "Dataset#join_table" do
   end
   
   it "should support joining datasets and aliasing the join" do
+    ds = Sequel.mock.dataset.from(:categories)
+    @d.join_table(:left_outer, ds, {Sequel[:ds][:item_id] => :id}, :table_alias=>:ds).sql.must_equal 'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "ds" ON ("ds"."item_id" = "items"."id")'      
+  end
+  
+  with_symbol_splitting "should support joining datasets and aliasing the join when using symbols with embedded qualification" do
     ds = Sequel.mock.dataset.from(:categories)
     @d.join_table(:left_outer, ds, {:ds__item_id => :id}, :table_alias=>:ds).sql.must_equal 'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "ds" ON ("ds"."item_id" = "items"."id")'      
   end
@@ -2374,6 +2472,14 @@ describe "Dataset#join_table" do
     proc{@d.join(:categories, [:id]){|j,lj,js|}}.must_raise(Sequel::Error)
   end
 
+  with_symbol_splitting "should support using a block that receieves the join table/alias, last join table/alias, and array of previous joins when using splittable symbols" do
+    @d.from(:items___i).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
+      join_alias.must_equal :c
+      last_join_alias.must_equal :i
+      joins.must_equal []
+    end
+  end
+
   it "should support using a block that receieves the join table/alias, last join table/alias, and array of previous joins" do
     @d.join(:categories) do |join_alias, last_join_alias, joins| 
       join_alias.must_equal :categories
@@ -2382,12 +2488,6 @@ describe "Dataset#join_table" do
     end
 
     @d.from(Sequel.as(:items, :i)).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
-      join_alias.must_equal :c
-      last_join_alias.must_equal :i
-      joins.must_equal []
-    end
-
-    @d.from(:items___i).join(:categories, nil, :table_alias=>:c) do |join_alias, last_join_alias, joins| 
       join_alias.must_equal :c
       last_join_alias.must_equal :i
       joins.must_equal []
@@ -2434,6 +2534,12 @@ describe "Dataset#join_table" do
   end
 
   it "should prefer explicit aliases over implicit" do
+    @d.from(Sequel[:items].as(:i)).join(Sequel[:categories].as(:c), {:category_id => :id}, {:table_alias=>:c2, :implicit_qualifier=>:i2}).sql.must_equal 'SELECT * FROM "items" AS "i" INNER JOIN "categories" AS "c2" ON ("c2"."category_id" = "i2"."id")'
+    @d.from(Sequel.expr(:items).as(:i)).join(Sequel.expr(:categories).as(:c), {:category_id => :id}, {:table_alias=>:c2, :implicit_qualifier=>:i2}).sql.
+      must_equal 'SELECT * FROM "items" AS "i" INNER JOIN "categories" AS "c2" ON ("c2"."category_id" = "i2"."id")'
+  end
+  
+  with_symbol_splitting "should prefer explicit aliases over implicit when using splittable symbols" do
     @d.from(:items___i).join(:categories___c, {:category_id => :id}, {:table_alias=>:c2, :implicit_qualifier=>:i2}).sql.must_equal 'SELECT * FROM "items" AS "i" INNER JOIN "categories" AS "c2" ON ("c2"."category_id" = "i2"."id")'
     @d.from(Sequel.expr(:items).as(:i)).join(Sequel.expr(:categories).as(:c), {:category_id => :id}, {:table_alias=>:c2, :implicit_qualifier=>:i2}).sql.
       must_equal 'SELECT * FROM "items" AS "i" INNER JOIN "categories" AS "c2" ON ("c2"."category_id" = "i2"."id")'
@@ -2478,7 +2584,7 @@ describe "Dataset aggregate methods" do
   
   it "should accept qualified columns" do
     5.times do
-      @d.avg(:test__bc).must_equal 'SELECT avg(test.bc) AS avg FROM test LIMIT 1'
+      @d.avg(Sequel[:test][:bc]).must_equal 'SELECT avg(test.bc) AS avg FROM test LIMIT 1'
     end
   end
   
@@ -2902,7 +3008,7 @@ describe "Dataset#get" do
   it "should work with aliased fields" do
     @d.freeze
     5.times do
-      @d.get(Sequel.expr(:x__b).as(:name)).must_equal "SELECT x.b AS name FROM test LIMIT 1"
+      @d.get(Sequel.expr(Sequel[:x][:b]).as(:name)).must_equal "SELECT x.b AS name FROM test LIMIT 1"
     end
   end
   
@@ -2937,10 +3043,16 @@ describe "Dataset#get" do
     @d.get([:name]).must_equal ['SELECT name FROM test LIMIT 1']
   end
   
-  it "should handle an array with aliases" do
+  it "should handle an array with aliased expressions" do
     @d = @d.with_fetch(:name=>1, :abc=>2)
-    @d.get([:n___name, Sequel.as(:a, :abc)]).must_equal [1, 2]
+    @d.get([Sequel[:n].as(:name), Sequel.as(:a, :abc)]).must_equal [1, 2]
     @d.db.sqls.must_equal ['SELECT n AS name, a AS abc FROM test LIMIT 1']
+  end
+  
+  with_symbol_splitting "should handle an array with symbols with embedded aliases" do
+    @d = @d.with_fetch(:name=>1, :abc=>2)
+    @d.get([:n___name, :a__b___abc]).must_equal [1, 2]
+    @d.db.sqls.must_equal ['SELECT n AS name, a.b AS abc FROM test LIMIT 1']
   end
   
   it "should raise an Error if an alias cannot be determined" do
@@ -3251,7 +3363,7 @@ describe "Dataset#multi_insert" do
       'COMMIT']
   end
   
-  it "should handle different formats for tables" do
+  with_symbol_splitting "should handle splittable symbols for tables" do
     @ds = @ds.from(:sch__tab)
     @ds.multi_insert(@list)
     @db.sqls.must_equal ['BEGIN',
@@ -3259,7 +3371,9 @@ describe "Dataset#multi_insert" do
       "INSERT INTO sch.tab (name) VALUES ('def')",
       "INSERT INTO sch.tab (name) VALUES ('ghi')",
       'COMMIT']
+  end
 
+  it "should handle SQL::QualifiedIdentifier for tables" do
     @ds = @ds.from(Sequel.qualify(:sch, :tab))
     @ds.multi_insert(@list)
     @db.sqls.must_equal ['BEGIN',
@@ -3267,7 +3381,9 @@ describe "Dataset#multi_insert" do
       "INSERT INTO sch.tab (name) VALUES ('def')",
       "INSERT INTO sch.tab (name) VALUES ('ghi')",
       'COMMIT']
+  end
 
+  it "should handle SQL::Identifier for tables" do
     @ds = @ds.from(Sequel.identifier(:sch__tab))
     @ds.multi_insert(@list)
     @db.sqls.must_equal ['BEGIN',
@@ -3324,7 +3440,11 @@ describe "Dataset#update_sql" do
     @ds.update_sql("a = b").must_equal "UPDATE items SET a = b"
   end
   
-  it "should handle implicitly qualified symbols" do
+  it "should handle qualified identifiers" do
+    @ds.update_sql(Sequel[:items][:a]=>:b).must_equal "UPDATE items SET items.a = b"
+  end
+  
+  with_symbol_splitting "should handle implicitly qualified symbols" do
     @ds.update_sql(:items__a=>:b).must_equal "UPDATE items SET items.a = b"
   end
   
@@ -3400,8 +3520,11 @@ describe "Dataset#insert_sql" do
     @ds.insert_sql([:a, :b, :c], Sequel.lit('VALUES (1, 2, 3)')).must_equal "INSERT INTO items (a, b, c) VALUES (1, 2, 3)"
   end
 
-  it "should use unaliased table name" do
+  with_symbol_splitting "should use unaliased table name when using splittable symbol" do
     @ds.from(:items___i).insert_sql(1).must_equal "INSERT INTO items VALUES (1)"
+  end
+
+  it "should use unaliased table name" do
     @ds.from(Sequel.as(:items, :i)).insert_sql(1).must_equal "INSERT INTO items VALUES (1)"
   end
 end
@@ -3873,6 +3996,10 @@ describe "Sequel::Dataset#qualify" do
   end
 
   it "should handle symbols" do
+    @ds.select(:a).qualify.sql.must_equal 'SELECT t.a FROM t'
+  end
+
+  with_symbol_splitting "should handle splittable symbols" do
     @ds.select(:a, :b__c, :d___e, :f__g___h).qualify.sql.must_equal 'SELECT t.a, b.c, t.d AS e, f.g AS h FROM t'
   end
 
@@ -4313,7 +4440,12 @@ describe "Sequel::Dataset#select_map" do
     @ds.db.sqls.must_equal ['SELECT a FROM t']
   end
 
-  it "should handle implicit qualifiers in arguments" do
+  it "should handle qualified identifiers in arguments" do
+    @ds.select_map(Sequel[:a][:b]).must_equal [1, 2]
+    @ds.db.sqls.must_equal ['SELECT a.b FROM t']
+  end
+
+  with_symbol_splitting "should handle implicit qualifiers in arguments" do
     @ds.select_map(:a__b).must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a.b FROM t']
   end
@@ -4324,8 +4456,13 @@ describe "Sequel::Dataset#select_map" do
     proc{@ds.select_map{[a{}, b]}}.must_raise(Sequel::Error)
   end
 
-  it "should handle implicit aliases in arguments" do
+  with_symbol_splitting "should handle implicit aliases in arguments" do
     @ds.select_map(:a___b).must_equal [1, 2]
+    @ds.db.sqls.must_equal ['SELECT a AS b FROM t']
+  end
+
+  it "should handle aliased expressions in arguments" do
+    @ds.select_map(Sequel[:a].as(:b)).must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a AS b FROM t']
   end
 
@@ -4372,8 +4509,13 @@ describe "Sequel::Dataset#select_map" do
   it "should handle an array of columns" do
     @ds.select_map([:c, :c]).must_equal [[1, 1], [2, 2]]
     @ds.db.sqls.must_equal ['SELECT c, c FROM t']
-    @ds.select_map([Sequel.expr(:d).as(:c), Sequel.qualify(:b, :c), Sequel.identifier(:c), Sequel.identifier(:c).qualify(:b), :a__c, :a__d___c]).must_equal [[1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2]]
-    @ds.db.sqls.must_equal ['SELECT d AS c, b.c, c, b.c, a.c, a.d AS c FROM t']
+    @ds.select_map([Sequel.expr(:d).as(:c), Sequel.qualify(:b, :c), Sequel.identifier(:c), Sequel.identifier(:c).qualify(:b)]).must_equal [[1, 1, 1, 1], [2, 2, 2, 2]]
+    @ds.db.sqls.must_equal ['SELECT d AS c, b.c, c, b.c FROM t']
+  end
+
+  with_symbol_splitting "should handle an array of columns with splittable symbols" do
+    @ds.select_map([:a__c, :a__d___c]).must_equal [[1, 1], [2, 2]]
+    @ds.db.sqls.must_equal ['SELECT a.c, a.d AS c FROM t']
   end
 
   it "should handle an array with a single element" do
@@ -4392,7 +4534,12 @@ describe "Sequel::Dataset#select_order_map" do
     @ds.db.sqls.must_equal ['SELECT a FROM t ORDER BY a']
   end
 
-  it "should handle implicit qualifiers in arguments" do
+  it "should handle qualified identifiers in arguments" do
+    @ds.select_order_map(Sequel[:a][:b]).must_equal [1, 2]
+    @ds.db.sqls.must_equal ['SELECT a.b FROM t ORDER BY a.b']
+  end
+
+  with_symbol_splitting "should handle implicit qualifiers in arguments" do
     @ds.select_order_map(:a__b).must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a.b FROM t ORDER BY a.b']
   end
@@ -4403,12 +4550,12 @@ describe "Sequel::Dataset#select_order_map" do
     proc{@ds.select_order_map{[a{}, b]}}.must_raise(Sequel::Error)
   end
 
-  it "should handle implicit aliases in arguments" do
+  with_symbol_splitting "should handle implicit aliases in arguments" do
     @ds.select_order_map(:a___b).must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a AS b FROM t ORDER BY a']
   end
 
-  it "should handle implicit qualifiers and aliases in arguments" do
+  with_symbol_splitting "should handle implicit qualifiers and aliases in arguments" do
     @ds.select_order_map(:t__a___b).must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT t.a AS b FROM t ORDER BY t.a']
   end
@@ -4416,6 +4563,10 @@ describe "Sequel::Dataset#select_order_map" do
   it "should handle AliasedExpressions" do
     @ds.select_order_map(Sequel.lit("a").as(:b)).must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a AS b FROM t ORDER BY a']
+    @ds.select_order_map(Sequel[:a].as(:b)).must_equal [1, 2]
+    @ds.db.sqls.must_equal ['SELECT a AS b FROM t ORDER BY a']
+    @ds.select_order_map(Sequel[:t][:a].as(:b)).must_equal [1, 2]
+    @ds.db.sqls.must_equal ['SELECT t.a AS b FROM t ORDER BY t.a']
   end
   
   it "should handle OrderedExpressions" do
@@ -4451,8 +4602,16 @@ describe "Sequel::Dataset#select_order_map" do
   it "should handle an array of columns" do
     @ds.select_order_map([:c, :c]).must_equal [[1, 1], [2, 2]]
     @ds.db.sqls.must_equal ['SELECT c, c FROM t ORDER BY c, c']
-    @ds.select_order_map([Sequel.expr(:d).as(:c), Sequel.qualify(:b, :c), Sequel.identifier(:c), Sequel.identifier(:c).qualify(:b), Sequel.identifier(:c).qualify(:b).desc, :a__c, Sequel.desc(:a__d___c), Sequel.desc(Sequel.expr(:a__d___c))]).must_equal [[1, 1, 1, 1, 1, 1, 1, 1], [2, 2, 2, 2, 2, 2, 2, 2]]
-    @ds.db.sqls.must_equal ['SELECT d AS c, b.c, c, b.c, b.c, a.c, a.d AS c, a.d AS c FROM t ORDER BY d, b.c, c, b.c, b.c DESC, a.c, a.d DESC, a.d DESC']
+  end
+
+  it "should handle an array of columns" do
+    @ds.select_order_map([Sequel.expr(:d).as(:c), Sequel.qualify(:b, :c), Sequel.identifier(:c), Sequel.identifier(:c).qualify(:b), Sequel.identifier(:c).qualify(:b).desc]).must_equal [[1, 1, 1, 1, 1], [2, 2, 2, 2, 2]]
+    @ds.db.sqls.must_equal ['SELECT d AS c, b.c, c, b.c, b.c FROM t ORDER BY d, b.c, c, b.c, b.c DESC']
+  end
+
+  with_symbol_splitting "should handle an array of columns with splittable symbols" do
+    @ds.select_order_map([:a__c, Sequel.desc(:a__d___c), Sequel.desc(Sequel.expr(:a__d___c))]).must_equal [[1, 1, 1], [2, 2, 2]]
+    @ds.db.sqls.must_equal ['SELECT a.c, a.d AS c, a.d AS c FROM t ORDER BY a.c, a.d DESC, a.d DESC']
   end
 
   it "should handle an array with a single element" do
@@ -4472,17 +4631,32 @@ describe "Sequel::Dataset#select_hash" do
     @ds.db.sqls.must_equal ['SELECT a, b FROM t']
   end
 
-  it "should handle implicit qualifiers in arguments" do
+  it "should handle qualified identifiers in arguments" do
+    @ds.select_hash(Sequel[:t][:a], Sequel[:t][:b]).must_equal(1=>2, 3=>4)
+    @ds.db.sqls.must_equal ['SELECT t.a, t.b FROM t']
+  end
+
+  with_symbol_splitting "should handle implicit qualifiers in arguments" do
     @ds.select_hash(:t__a, :t__b).must_equal(1=>2, 3=>4)
     @ds.db.sqls.must_equal ['SELECT t.a, t.b FROM t']
   end
 
-  it "should handle implicit aliases in arguments" do
+  it "should handle aliased expresssions in arguments" do
+    @ds.select_hash(Sequel[:c].as(:a), Sequel[:d].as(:b)).must_equal(1=>2, 3=>4)
+    @ds.db.sqls.must_equal ['SELECT c AS a, d AS b FROM t']
+  end
+
+  with_symbol_splitting "should handle implicit aliases in arguments" do
     @ds.select_hash(:c___a, :d___b).must_equal(1=>2, 3=>4)
     @ds.db.sqls.must_equal ['SELECT c AS a, d AS b FROM t']
   end
 
-  it "should handle implicit qualifiers and aliases in arguments" do
+  it "should handle qualified identifiers and aliased expressions in arguments" do
+    @ds.select_hash(Sequel[:t][:c].as(:a), Sequel[:t][:d].as(:b)).must_equal(1=>2, 3=>4)
+    @ds.db.sqls.must_equal ['SELECT t.c AS a, t.d AS b FROM t']
+  end
+
+  with_symbol_splitting "should handle implicit qualifiers and aliases in arguments" do
     @ds.select_hash(:t__c___a, :t__d___b).must_equal(1=>2, 3=>4)
     @ds.db.sqls.must_equal ['SELECT t.c AS a, t.d AS b FROM t']
   end
@@ -4528,17 +4702,17 @@ describe "Sequel::Dataset#select_hash_groups" do
     @ds.db.sqls.must_equal ['SELECT a, b FROM t']
   end
 
-  it "should handle implicit qualifiers in arguments" do
+  with_symbol_splitting "should handle implicit qualifiers in arguments" do
     @ds.select_hash_groups(:t__a, :t__b).must_equal(1=>[2], 3=>[4])
     @ds.db.sqls.must_equal ['SELECT t.a, t.b FROM t']
   end
 
-  it "should handle implicit aliases in arguments" do
+  with_symbol_splitting "should handle implicit aliases in arguments" do
     @ds.select_hash_groups(:c___a, :d___b).must_equal(1=>[2], 3=>[4])
     @ds.db.sqls.must_equal ['SELECT c AS a, d AS b FROM t']
   end
 
-  it "should handle implicit qualifiers and aliases in arguments" do
+  with_symbol_splitting "should handle implicit qualifiers and aliases in arguments" do
     @ds.select_hash_groups(:t__c___a, :t__d___b).must_equal(1=>[2], 3=>[4])
     @ds.db.sqls.must_equal ['SELECT t.c AS a, t.d AS b FROM t']
   end
@@ -4556,6 +4730,11 @@ describe "Sequel::Dataset#select_hash_groups" do
   it "should handle SQL::AliasedExpressions in arguments" do
     @ds.select_hash_groups(Sequel.expr(:c).as(:a), Sequel.expr(:t).as(:b)).must_equal(1=>[2], 3=>[4])
     @ds.db.sqls.must_equal ['SELECT c AS a, t AS b FROM t']
+  end
+
+  it "should handle SQL::QualifiedIdentifiers and SQL::AliasedExpressions in arguments" do
+    @ds.select_hash_groups(Sequel[:t][:c].as(:a), Sequel[:t][:d].as(:b)).must_equal(1=>[2], 3=>[4])
+    @ds.db.sqls.must_equal ['SELECT t.c AS a, t.d AS b FROM t']
   end
 
   it "should work with arrays of columns" do
@@ -4631,15 +4810,24 @@ describe "Dataset#skip_locked" do
 end
   
 describe "Custom ASTTransformer" do
-  it "should transform given objects" do
-    c = Class.new(Sequel::ASTTransformer) do
+  before do
+    @c = Class.new(Sequel::ASTTransformer) do
       def v(s)
         (s.is_a?(Symbol) || s.is_a?(String)) ? :"#{s}#{s}" : super
       end
     end.new
+  end
+
+  it "should transform given objects" do
+    ds = Sequel.mock.dataset.from(:t).cross_join(Sequel[:a].as(:g)).join(Sequel[:b].as(:h), [:c]).join(Sequel[:d].as(:i), :e=>:f)
+    ds.sql.must_equal 'SELECT * FROM t CROSS JOIN a AS g INNER JOIN b AS h USING (c) INNER JOIN d AS i ON (i.e = h.f)'
+    ds.clone(:from=>@c.transform(ds.opts[:from]), :join=>@c.transform(ds.opts[:join])).sql.must_equal 'SELECT * FROM tt CROSS JOIN aa AS g INNER JOIN bb AS h USING (cc) INNER JOIN dd AS i ON (ii.ee = hh.ff)'
+  end
+
+  with_symbol_splitting "should transform given objects with splittable symbols" do
     ds = Sequel.mock.dataset.from(:t).cross_join(:a___g).join(:b___h, [:c]).join(:d___i, :e=>:f)
     ds.sql.must_equal 'SELECT * FROM t CROSS JOIN a AS g INNER JOIN b AS h USING (c) INNER JOIN d AS i ON (i.e = h.f)'
-    ds.clone(:from=>c.transform(ds.opts[:from]), :join=>c.transform(ds.opts[:join])).sql.must_equal 'SELECT * FROM tt CROSS JOIN aa AS g INNER JOIN bb AS h USING (cc) INNER JOIN dd AS i ON (ii.ee = hh.ff)'
+    ds.clone(:from=>@c.transform(ds.opts[:from]), :join=>@c.transform(ds.opts[:join])).sql.must_equal 'SELECT * FROM tt CROSS JOIN aa AS g INNER JOIN bb AS h USING (cc) INNER JOIN dd AS i ON (ii.ee = hh.ff)'
   end
 end
 
@@ -4795,7 +4983,7 @@ describe "Dataset#schema_and_table" do
     @ds = Sequel.mock[:test]
   end
 
-  it "should correctly handle symbols" do
+  with_symbol_splitting "should correctly handle symbols" do
     @ds.schema_and_table(:s).must_equal [nil, 's']
     @ds.schema_and_table(:s___a).must_equal [nil, 's']
     @ds.schema_and_table(:t__s).must_equal ['t', 's']
@@ -4827,6 +5015,9 @@ describe "Dataset#split_qualifiers" do
 
   it "should correctly handle symbols" do
     @ds.split_qualifiers(:s).must_equal ['s']
+  end
+
+  with_symbol_splitting "should correctly handle splittable symbols" do
     @ds.split_qualifiers(:s___a).must_equal ['s']
     @ds.split_qualifiers(:t__s).must_equal ['t', 's']
     @ds.split_qualifiers(:t__s___a).must_equal ['t', 's']
@@ -4844,12 +5035,15 @@ describe "Dataset#split_qualifiers" do
     @ds.split_qualifiers(Sequel.qualify(:t, :s)).must_equal ['t', 's']
   end
 
-  it "should correctly handle complex qualified identifiers" do
+  with_symbol_splitting "should correctly handle complex qualified identifiers with splittable symbols" do
     @ds.split_qualifiers(Sequel.qualify(:d__t, :s)).must_equal ['d', 't', 's']
-    @ds.split_qualifiers(Sequel.qualify(Sequel.qualify(:d, :t), :s)).must_equal ['d', 't', 's']
     @ds.split_qualifiers(Sequel.qualify(:d, :t__s)).must_equal ['d', 't', 's']
-    @ds.split_qualifiers(Sequel.qualify(:d, Sequel.qualify(:t, :s))).must_equal ['d', 't', 's']
     @ds.split_qualifiers(Sequel.qualify(:d__t, :s__s2)).must_equal ['d', 't', 's', 's2']
+  end
+
+  it "should correctly handle complex qualified identifiers" do
+    @ds.split_qualifiers(Sequel.qualify(Sequel.qualify(:d, :t), :s)).must_equal ['d', 't', 's']
+    @ds.split_qualifiers(Sequel.qualify(:d, Sequel.qualify(:t, :s))).must_equal ['d', 't', 's']
     @ds.split_qualifiers(Sequel.qualify(Sequel.qualify(:d, :t), Sequel.qualify(:s, :s2))).must_equal ['d', 't', 's', 's2']
   end
 end
@@ -5115,6 +5309,9 @@ describe "#unqualified_column_for" do
 
   it "should handle Symbols" do
     @ds.unqualified_column_for(:a).must_equal Sequel.identifier('a')
+  end
+
+  with_symbol_splitting "should handle splittable symbols" do
     @ds.unqualified_column_for(:b__a).must_equal Sequel.identifier('a')
     @ds.unqualified_column_for(:a___c).must_equal Sequel.identifier('a').as('c')
     @ds.unqualified_column_for(:b__a___c).must_equal Sequel.identifier('a').as('c')

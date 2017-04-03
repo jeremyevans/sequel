@@ -62,7 +62,7 @@ describe Sequel::Model, "many_through_many" do
   it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup" do
     @c1.dataset = @c1.dataset.with_fetch(:id=>1)
     @c2.dataset = @c2.dataset.with_fetch(:id=>4, :x_foreign_key_x=>1)
-    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>Sequel./(:albums_artists__artist_id, 3)
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>(Sequel[:albums_artists][:artist_id] / 3)
     a = @c1.eager(:tags).all
     a.must_equal [@c1.load(:id => 1)]
     DB.sqls.must_equal ['SELECT * FROM artists', "SELECT tags.*, (albums_artists.artist_id / 3) AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((albums_artists.artist_id / 3) IN (1))"]
@@ -70,6 +70,20 @@ describe Sequel::Model, "many_through_many" do
   end
   
   it "should handle schema qualified tables" do
+    @c1.many_through_many :tags, :through=>[[Sequel[:myschema][:albums_artists], :artist_id, :album_id], [Sequel[:myschema][:albums], :id, :id], [Sequel[:myschema][:albums_tags], :album_id, :tag_id]]
+    @c1.load(:id=>1).tags_dataset.sql.must_equal "SELECT tags.* FROM tags INNER JOIN myschema.albums_tags ON (myschema.albums_tags.tag_id = tags.id) INNER JOIN myschema.albums ON (myschema.albums.id = myschema.albums_tags.album_id) INNER JOIN myschema.albums_artists ON (myschema.albums_artists.album_id = myschema.albums.id) WHERE (myschema.albums_artists.artist_id = 1)"
+
+    @c1.dataset = @c1.dataset.with_fetch(:id=>1)
+    @c2.dataset = @c2.dataset.with_fetch(:id=>4, :x_foreign_key_x=>1)
+    a = @c1.eager(:tags).all
+    a.must_equal [@c1.load(:id => 1)]
+    DB.sqls.must_equal ['SELECT * FROM artists', "SELECT tags.*, myschema.albums_artists.artist_id AS x_foreign_key_x FROM tags INNER JOIN myschema.albums_tags ON (myschema.albums_tags.tag_id = tags.id) INNER JOIN myschema.albums ON (myschema.albums.id = myschema.albums_tags.album_id) INNER JOIN myschema.albums_artists ON (myschema.albums_artists.album_id = myschema.albums.id) WHERE (myschema.albums_artists.artist_id IN (1))"]
+
+    Tag.dataset.columns(:id, :h1, :h2)
+    @c1.eager_graph(:tags).sql.must_equal 'SELECT artists.id, tags.id AS tags_id, tags.h1, tags.h2 FROM artists LEFT OUTER JOIN myschema.albums_artists AS albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN myschema.albums AS albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN myschema.albums_tags AS albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id)'
+  end
+  
+  with_symbol_splitting "should handle schema qualified table symbols" do
     @c1.many_through_many :tags, :through=>[[:myschema__albums_artists, :artist_id, :album_id], [:myschema__albums, :id, :id], [:myschema__albums_tags, :album_id, :tag_id]]
     @c1.load(:id=>1).tags_dataset.sql.must_equal "SELECT tags.* FROM tags INNER JOIN myschema.albums_tags ON (myschema.albums_tags.tag_id = tags.id) INNER JOIN myschema.albums ON (myschema.albums.id = myschema.albums_tags.album_id) INNER JOIN myschema.albums_artists ON (myschema.albums_artists.album_id = myschema.albums.id) WHERE (myschema.albums_artists.artist_id = 1)"
 
@@ -363,7 +377,7 @@ describe Sequel::Model, "many_through_many" do
   end
   
   it "should support an array for the select option" do
-    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel::SQL::ColumnAll.new(:tags), :albums__name]
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel::SQL::ColumnAll.new(:tags), Sequel[:albums][:name]]
     n = @c1.load(:id => 1234)
     n.tags_dataset.sql.must_equal 'SELECT tags.*, albums.name FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id = 1234)'
     n.tags.must_equal [@c2.load(:id=>1)]
@@ -386,7 +400,7 @@ describe Sequel::Model, "many_through_many" do
   end
 
   it "should support a :dataset option that is used instead of the default" do
-    @c1.many_through_many :tags, [[:a, :b, :c]], :dataset=>proc{Tag.join(:albums_tags, [:tag_id]).join(:albums, [:album_id]).join(:albums_artists, [:album_id]).filter(:albums_artists__artist_id=>id)}
+    @c1.many_through_many :tags, [[:a, :b, :c]], :dataset=>proc{Tag.join(:albums_tags, [:tag_id]).join(:albums, [:album_id]).join(:albums_artists, [:album_id]).filter(Sequel[:albums_artists][:artist_id]=>id)}
     n = @c1.load(:id => 1234)
     n.tags_dataset.sql.must_equal 'SELECT tags.* FROM tags INNER JOIN albums_tags USING (tag_id) INNER JOIN albums USING (album_id) INNER JOIN albums_artists USING (album_id) WHERE (albums_artists.artist_id = 1234)'
     n.tags.must_equal [@c2.load(:id=>1)]
@@ -839,7 +853,7 @@ describe "many_through_many eager loading methods" do
   end
 
   it "should respect the association's :select option" do
-    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>:tags__name
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>Sequel[:tags][:name]
     a = @c1.eager(:tags).all
     a.must_equal [@c1.load(:id=>1)]
     DB.sqls.must_equal ['SELECT * FROM artists',
@@ -1103,17 +1117,22 @@ describe "many_through_many eager loading methods" do
 
   it "should respect the association's :order" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[:blah1, :blah2]
-    @c1.order(:artists__blah2, :artists__blah3).eager_graph(:tags).sql.must_equal 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tags.blah1, tags.blah2'
+    @c1.order(Sequel[:artists][:blah2], Sequel[:artists][:blah3]).eager_graph(:tags).sql.must_equal 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tags.blah1, tags.blah2'
   end
 
-  it "should only qualify unqualified symbols, identifiers, or ordered versions in association's :order" do
+  with_symbol_splitting "should not qualify qualified symbols" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[Sequel.identifier(:blah__id), Sequel.identifier(:blah__id).desc, Sequel.desc(:blah__id), :blah__id, :album_id, Sequel.desc(:album_id), 1, Sequel.lit('RANDOM()'), Sequel.qualify(:b, :a)]
     @c1.order(:artists__blah2, :artists__blah3).eager_graph(:tags).sql.must_equal 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tags.blah__id, tags.blah__id DESC, blah.id DESC, blah.id, tags.album_id, tags.album_id DESC, 1, RANDOM(), b.a'
   end
 
+  it "should only qualify symbols, identifiers, or ordered versions in association's :order" do
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[Sequel.identifier(:blah__id), Sequel.identifier(:blah__id).desc, Sequel.desc(Sequel[:blah][:id]), Sequel[:blah][:id], :album_id, Sequel.desc(:album_id), 1, Sequel.lit('RANDOM()'), Sequel.qualify(:b, :a)]
+    @c1.order(Sequel[:artists][:blah2], Sequel[:artists][:blah3]).eager_graph(:tags).sql.must_equal 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tags.blah__id, tags.blah__id DESC, blah.id DESC, blah.id, tags.album_id, tags.album_id DESC, 1, RANDOM(), b.a'
+  end
+
   it "should not respect the association's :order if :order_eager_graph is false" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[:blah1, :blah2], :order_eager_graph=>false
-    @c1.order(:artists__blah2, :artists__blah3).eager_graph(:tags).sql.must_equal 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3'
+    @c1.order(Sequel[:artists][:blah2], Sequel[:artists][:blah3]).eager_graph(:tags).sql.must_equal 'SELECT artists.id, tags.id AS tags_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags ON (tags.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3'
   end
 
   it "should add the associations :order for multiple associations" do
@@ -1215,7 +1234,7 @@ describe Sequel::Model, "one_through_many" do
   it "should handle a :eager_loading_predicate_key option to change the SQL used in the lookup" do
     @c1.dataset = @c1.dataset.with_fetch(:id=>1)
     @c2.dataset = @c2.dataset.with_fetch(:id=>4, :x_foreign_key_x=>1)
-    @c1.one_through_many :tag, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>Sequel./(:albums_artists__artist_id, 3)
+    @c1.one_through_many :tag, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :eager_loading_predicate_key=>(Sequel[:albums_artists][:artist_id] / 3)
     a = @c1.eager(:tag).all
     a.must_equal [@c1.load(:id => 1)]
     DB.sqls.must_equal ['SELECT * FROM artists', "SELECT tags.*, (albums_artists.artist_id / 3) AS x_foreign_key_x FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE ((albums_artists.artist_id / 3) IN (1))"]
@@ -1486,7 +1505,7 @@ describe Sequel::Model, "one_through_many" do
   end
   
   it "should support an array for the select option" do
-    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel::SQL::ColumnAll.new(:tags), :albums__name]
+    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>[Sequel::SQL::ColumnAll.new(:tags), Sequel[:albums][:name]]
     n = @c1.load(:id => 1234)
     n.tag_dataset.sql.must_equal 'SELECT tags.*, albums.name FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) WHERE (albums_artists.artist_id = 1234) LIMIT 1'
     n.tag.must_equal @c2.load(:id=>1)
@@ -1509,7 +1528,7 @@ describe Sequel::Model, "one_through_many" do
   end
 
   it "should support a :dataset option that is used instead of the default" do
-    @c1.one_through_many :tag, [[:a, :b, :c]], :dataset=>proc{Tag.join(:albums_tags, [:tag_id]).join(:albums, [:album_id]).join(:albums_artists, [:album_id]).filter(:albums_artists__artist_id=>id)}
+    @c1.one_through_many :tag, [[:a, :b, :c]], :dataset=>proc{Tag.join(:albums_tags, [:tag_id]).join(:albums, [:album_id]).join(:albums_artists, [:album_id]).filter(Sequel[:albums_artists][:artist_id]=>id)}
     n = @c1.load(:id => 1234)
     n.tag_dataset.sql.must_equal 'SELECT tags.* FROM tags INNER JOIN albums_tags USING (tag_id) INNER JOIN albums USING (album_id) INNER JOIN albums_artists USING (album_id) WHERE (albums_artists.artist_id = 1234) LIMIT 1'
     n.tag.must_equal @c2.load(:id=>1)
@@ -1856,7 +1875,7 @@ describe "one_through_many eager loading methods" do
   end
 
   it "should respect the association's :select option" do
-    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>:tags__name
+    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :select=>Sequel[:tags][:name]
     a = @c1.eager(:tag).all
     a.must_equal [@c1.load(:id=>1)]
     DB.sqls.must_equal ['SELECT * FROM artists',
@@ -2107,10 +2126,15 @@ describe "one_through_many eager loading methods" do
 
   it "should respect the association's :order" do
     @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[:blah1, :blah2]
-    @c1.order(:artists__blah2, :artists__blah3).eager_graph(:tag).sql.must_equal 'SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tag.blah1, tag.blah2'
+    @c1.order(Sequel[:artists][:blah2], Sequel[:artists][:blah3]).eager_graph(:tag).sql.must_equal 'SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tag.blah1, tag.blah2'
   end
 
   it "should only qualify unqualified symbols, identifiers, or ordered versions in association's :order" do
+    @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[Sequel.identifier(:blah__id), Sequel.identifier(:blah__id).desc, Sequel.desc(Sequel[:blah][:id]), Sequel[:blah][:id], :album_id, Sequel.desc(:album_id), 1, Sequel.lit('RANDOM()'), Sequel.qualify(:b, :a)]
+    @c1.order(Sequel[:artists][:blah2], Sequel[:artists][:blah3]).eager_graph(:tag).sql.must_equal 'SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tag.blah__id, tag.blah__id DESC, blah.id DESC, blah.id, tag.album_id, tag.album_id DESC, 1, RANDOM(), b.a'
+  end
+
+  with_symbol_splitting "should not qualify qualified symbols in association's :order" do
     @c1.one_through_many :tag, [[:albums_artists, :artist_id, :album_id], {:table=>:albums, :left=>:id, :right=>:id}, [:albums_tags, :album_id, :tag_id]], :order=>[Sequel.identifier(:blah__id), Sequel.identifier(:blah__id).desc, Sequel.desc(:blah__id), :blah__id, :album_id, Sequel.desc(:album_id), 1, Sequel.lit('RANDOM()'), Sequel.qualify(:b, :a)]
     @c1.order(:artists__blah2, :artists__blah3).eager_graph(:tag).sql.must_equal 'SELECT artists.id, tag.id AS tag_id FROM artists LEFT OUTER JOIN albums_artists ON (albums_artists.artist_id = artists.id) LEFT OUTER JOIN albums ON (albums.id = albums_artists.album_id) LEFT OUTER JOIN albums_tags ON (albums_tags.album_id = albums.id) LEFT OUTER JOIN tags AS tag ON (tag.id = albums_tags.tag_id) ORDER BY artists.blah2, artists.blah3, tag.blah__id, tag.blah__id DESC, blah.id DESC, blah.id, tag.album_id, tag.album_id DESC, 1, RANDOM(), b.a'
   end

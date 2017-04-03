@@ -12,6 +12,11 @@ describe "pg_loose_count extension" do
   end
 
   it "should support schema qualified tables" do
+    @db.loose_count(Sequel[:a][:b]).must_equal 1
+    @db.sqls.must_equal ["SELECT CAST(reltuples AS integer) AS v FROM pg_class WHERE (oid = CAST(CAST('a.b' AS regclass) AS oid)) LIMIT 1"]
+  end
+
+  with_symbol_splitting "should support schema qualified table symbols" do
     @db.loose_count(:a__b).must_equal 1
     @db.sqls.must_equal ["SELECT CAST(reltuples AS integer) AS v FROM pg_class WHERE (oid = CAST(CAST('a.b' AS regclass) AS oid)) LIMIT 1"]
   end

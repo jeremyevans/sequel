@@ -24,25 +24,28 @@ describe "Sequel::Plugins::ColumnSelect" do
     @Album.dataset.sql.must_equal 'SELECT albs.id, albs.a, albs.b, albs.c FROM albs'
   end
 
-  it "should handle qualified tables" do
+  with_symbol_splitting "should handle splittable symbols" do
     @Album.dataset = :s__albums
     @Album.plugin :column_select
     @Album.dataset.sql.must_equal 'SELECT s.albums.id, s.albums.a, s.albums.b, s.albums.c FROM s.albums'
 
+    @Album.dataset = :albums___a
+    @Album.dataset.sql.must_equal 'SELECT a.id, a.a, a.b, a.c FROM albums AS a'
+
+    @Album.dataset = :s__albums___a
+    @Album.dataset.sql.must_equal 'SELECT a.id, a.a, a.b, a.c FROM s.albums AS a'
+  end
+
+  it "should handle qualified tables" do
     @Album.dataset = Sequel.qualify(:s2, :albums)
+    @Album.plugin :column_select
     @Album.dataset.sql.must_equal 'SELECT s2.albums.id, s2.albums.a, s2.albums.b, s2.albums.c FROM s2.albums'
   end
 
   it "should handle aliases" do
-    @Album.dataset = :albums___a
     @Album.plugin :column_select
-    @Album.dataset.sql.must_equal 'SELECT a.id, a.a, a.b, a.c FROM albums AS a'
-
     @Album.dataset = Sequel.as(:albums, :b)
     @Album.dataset.sql.must_equal 'SELECT b.id, b.a, b.b, b.c FROM albums AS b'
-
-    @Album.dataset = :s__albums___a
-    @Album.dataset.sql.must_equal 'SELECT a.id, a.a, a.b, a.c FROM s.albums AS a'
 
     @Album.dataset = @Album.db[:albums].from_self
     @Album.dataset.sql.must_equal 'SELECT t1.id, t1.a, t1.b, t1.c FROM (SELECT * FROM albums) AS t1'

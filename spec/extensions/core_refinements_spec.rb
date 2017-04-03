@@ -20,6 +20,9 @@ describe "Core refinements" do
   
   it "should support NOT via Symbol#~" do
     @d.l(~:x).must_equal 'NOT x'
+  end
+
+  with_symbol_splitting "should support NOT via Symbol#~ for splittable symbols" do
     @d.l(~:x__y).must_equal 'NOT x.y'
   end
   
@@ -97,7 +100,7 @@ describe "Core refinements" do
     @d.lit([:x.sql_function(1), 'y.z'.lit].sql_string_join(', ')).must_equal "(x(1) || ', ' || y.z)"
     @d.lit([:x, 1, :y].sql_string_join).must_equal "(x || '1' || y)"
     @d.lit([:x, 1, :y].sql_string_join(', ')).must_equal "(x || ', ' || '1' || ', ' || y)"
-    @d.lit([:x, 1, :y].sql_string_join(:y__z)).must_equal "(x || y.z || '1' || y.z || y)"
+    @d.lit([:x, 1, :y].sql_string_join(Sequel[:y][:z])).must_equal "(x || y.z || '1' || y.z || y)"
     @d.lit([:x, 1, :y].sql_string_join(1)).must_equal "(x || '1' || '1' || '1' || y)"
     @d.lit([:x, :y].sql_string_join('y.x || x.y'.lit)).must_equal "(x || y.x || x.y || y)"
     @d.lit([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).must_equal "(x || y || a || b)"
@@ -148,7 +151,7 @@ describe "Array#case and Hash#case" do
     @d.literal([[:x, :y]].case(:z)).must_equal '(CASE WHEN x THEN y ELSE z END)'
     @d.literal([[:x, :y], [:a, :b]].case(:z)).must_equal '(CASE WHEN x THEN y WHEN a THEN b ELSE z END)'
     @d.literal([[:x, :y], [:a, :b]].case(:z, :exp)).must_equal '(CASE exp WHEN x THEN y WHEN a THEN b ELSE z END)'
-    @d.literal([[:x, :y], [:a, :b]].case(:z, :exp__w)).must_equal '(CASE exp.w WHEN x THEN y WHEN a THEN b ELSE z END)'
+    @d.literal([[:x, :y], [:a, :b]].case(:z, Sequel[:exp][:w])).must_equal '(CASE exp.w WHEN x THEN y WHEN a THEN b ELSE z END)'
   end
 
   it "should return SQL CASE expression with expression even if nil" do
@@ -237,7 +240,9 @@ describe "#desc" do
   
   it "should format a DESC clause for a column ref" do
     @ds.literal(:test.desc).must_equal 'test DESC'
+  end
     
+  with_symbol_splitting "should format a DESC clause for a column ref with splittable symbol" do
     @ds.literal(:items__price.desc).must_equal 'items.price DESC'
   end
 
@@ -253,7 +258,9 @@ describe "#asc" do
   
   it "should format a ASC clause for a column ref" do
     @ds.literal(:test.asc).must_equal 'test ASC'
+  end
     
+  with_symbol_splitting "should format a ASC clause for a column ref with splittable symbol" do
     @ds.literal(:items__price.asc).must_equal 'items.price ASC'
   end
 
@@ -269,7 +276,9 @@ describe "#as" do
   
   it "should format a AS clause for a column ref" do
     @ds.literal(:test.as(:t)).must_equal 'test AS t'
+  end
     
+  with_symbol_splitting "should format a AS clause for a column ref with splittable symbols" do
     @ds.literal(:items__price.as(:p)).must_equal 'items.price AS p'
   end
 
@@ -289,13 +298,7 @@ describe "Column references" do
   
   it "should be quoted properly" do
     @ds.literal(:xyz).must_equal "`xyz`"
-    @ds.literal(:xyz__abc).must_equal "`xyz`.`abc`"
-
     @ds.literal(:xyz.as(:x)).must_equal "`xyz` AS `x`"
-    @ds.literal(:xyz__abc.as(:x)).must_equal "`xyz`.`abc` AS `x`"
-
-    @ds.literal(:xyz___x).must_equal "`xyz` AS `x`"
-    @ds.literal(:xyz__abc___x).must_equal "`xyz`.`abc` AS `x`"
   end
   
   it "should be quoted properly in SQL functions" do
@@ -311,6 +314,13 @@ describe "Column references" do
   
   it "should be quoted properly in a cast function" do
     @ds.literal(:x.cast(:integer)).must_equal "CAST(`x` AS integer)"
+  end
+
+  with_symbol_splitting "should be quoted properly when using splittable symbols" do
+    @ds.literal(:xyz__abc).must_equal "`xyz`.`abc`"
+    @ds.literal(:xyz__abc.as(:x)).must_equal "`xyz`.`abc` AS `x`"
+    @ds.literal(:xyz___x).must_equal "`xyz` AS `x`"
+    @ds.literal(:xyz__abc___x).must_equal "`xyz`.`abc` AS `x`"
     @ds.literal(:x__y.cast('varchar(20)')).must_equal "CAST(`x`.`y` AS varchar(20))"
   end
 end
@@ -337,7 +347,7 @@ describe "Symbol#*" do
     @ds.literal(:abc.*(5)).must_equal '(abc * 5)'
   end
 
-  it "should support qualified symbols if no argument" do
+  with_symbol_splitting "should support qualified symbols if no argument" do
     @ds.literal(:xyz__abc.*).must_equal 'xyz.abc.*'
   end
 end
@@ -360,6 +370,10 @@ describe "Symbol" do
   end
 
   it "should be able to qualify an identifier" do
+    @ds.literal(:xyz.identifier.qualify(Sequel[:xyz][:abc])).must_equal '"xyz"."abc"."xyz"'
+  end
+
+  with_symbol_splitting "should be able to qualify an identifier with qualified symbol" do
     @ds.literal(:xyz.identifier.qualify(:xyz__abc)).must_equal '"xyz"."abc"."xyz"'
   end
 
@@ -398,9 +412,12 @@ describe "Symbol" do
     @ds.literal(:abc.cast(:integer)).must_equal "CAST(abc AS integer)"
   end
 
+  with_symbol_splitting "should support sql array accesses via sql_subscript for splittable symbols" do
+    @ds.literal(:abc__def.sql_subscript(1)).must_equal "abc.def[1]"
+  end
+
   it "should support sql array accesses via sql_subscript" do
     @ds.literal(:abc.sql_subscript(1)).must_equal "abc[1]"
-    @ds.literal(:abc__def.sql_subscript(1)).must_equal "abc.def[1]"
     @ds.literal(:abc.sql_subscript(1)|2).must_equal "abc[1, 2]"
     @ds.literal(:abc.sql_subscript(1)[2]).must_equal "abc[1][2]"
   end

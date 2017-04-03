@@ -24,7 +24,7 @@
 module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
-  @split_symbols = true
+  @split_symbols = :deprecated
   @single_threaded = false
 
   class << self
@@ -242,13 +242,22 @@ module Sequel
   # For tables, these parts are the schema, table, and alias.
   def self.split_symbol(sym)
     unless v = Sequel.synchronize{SPLIT_SYMBOL_CACHE[sym]}
-      if split_symbols?
+      if split = split_symbols?
         v = case s = sym.to_s
         when COLUMN_REF_RE1
+          if split == :deprecated
+            Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.qualify(#{$1.inspect}, #{$2.inspect}).as(#{$3.inspect})")
+          end
           [$1.freeze, $2.freeze, $3.freeze].freeze
         when COLUMN_REF_RE2
+          if split == :deprecated
+            Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.identifier(#{$1.inspect}).as(#{$2.inspect})")
+          end
           [nil, $1.freeze, $2.freeze].freeze
         when COLUMN_REF_RE3
+          if split == :deprecated
+            Sequel::Deprecation.deprecate("Symbol splitting", "Either set Sequel.split_symbols = true, or change #{sym.inspect} to Sequel.qualify(#{$1.inspect}, #{$2.inspect})")
+          end
           [$1.freeze, $2.freeze, nil].freeze
         else
           [nil, s.freeze, nil].freeze

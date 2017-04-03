@@ -315,7 +315,7 @@ describe "identifier_mangling extension" do
       Sequel.mock(:host=>'oracle')[:a].limit(1).sql.must_equal 'SELECT * FROM (SELECT * FROM "A") "T1" WHERE (ROWNUM <= 1)'
       Sequel.mock(:host=>'postgres')[:a].full_text_search(:b, 'c').sql.must_equal "SELECT * FROM \"a\" WHERE (to_tsvector(CAST('simple' AS regconfig), (COALESCE(\"b\", ''))) @@ to_tsquery(CAST('simple' AS regconfig), 'c'))"
       Sequel.mock(:host=>'sqlanywhere').from(:a).offset(1).sql.must_equal 'SELECT TOP 2147483647 START AT (1 + 1) * FROM "A"'
-      Sequel.mock(:host=>'sqlite')[:a___b].sql.must_equal "SELECT * FROM `a` AS 'b'"
+      Sequel.mock(:host=>'sqlite')[Sequel[:a].as(:b)].sql.must_equal "SELECT * FROM `a` AS 'b'"
     ensure
       deprecated do
         Sequel.quote_identifiers = qi
@@ -341,7 +341,12 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_table.must_equal '"ba"'
     @c.set_primary_key :cd
     @c.simple_pk.must_equal '"dc"'
+    @c.set_dataset ds.from(Sequel[:ef][:gh])
+    @c.simple_table.must_equal '"fe"."hg"'
+  end
 
+  with_symbol_splitting "should have simple_pk and simple_table respect dataset's identifier input methods when using splittable symbols" do
+    ds = @db.from(:ab).with_identifier_input_method(:reverse)
     @c.set_dataset ds.from(:ef__gh)
     @c.simple_table.must_equal '"fe"."hg"'
   end
