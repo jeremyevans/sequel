@@ -393,7 +393,10 @@ module Sequel
       # sharding support.
       def db=(db)
         @db = db
-        set_dataset(db.dataset.clone(@dataset.opts)) if @dataset
+        if @dataset
+          Sequel::Deprecation.deprecate("Sequel::Model.db= when the model has an existing dataset", "Use Sequel::Model.dataset= instead")
+          set_dataset(db.dataset.clone(@dataset.opts))
+        end
       end
       
       # Returns the cached schema information if available or gets it

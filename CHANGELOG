@@ -1,5 +1,7 @@
 === master
 
+* Deprecate calling Model.db= on a model with a dataset (jeremyevans)
+
 * Deprecate splitting symbols to look for qualified/aliased identifiers (e.g. :table__column) (jeremyevans)
 
 * Allow optimized lookups and deletes for models using SQL::Identifier and SQL::QualifiedIdentifier values as the FROM table (jeremyevans)

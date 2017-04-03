@@ -304,35 +304,6 @@ describe Sequel::Model do
     @model.dataset.sql.must_equal 'SELECT * FROM foo'
   end
 
-  it "allows set_dataset to accept a Symbol" do
-    @model.db = DB
-    @model.set_dataset(:foo)
-    @model.table_name.must_equal :foo
-  end
-
-  it "allows set_dataset to accept a LiteralString" do
-    @model.db = DB
-    @model.set_dataset(Sequel.lit('foo'))
-    @model.table_name.must_equal Sequel.lit('foo')
-  end
-
-  it "allows set_dataset to acceptan SQL::Identifier" do
-    @model.db = DB
-    @model.set_dataset(Sequel.identifier(:foo))
-    @model.table_name.must_equal Sequel.identifier(:foo)
-  end
-
-  it "allows set_dataset to acceptan SQL::QualifiedIdentifier" do
-    @model.db = DB
-    @model.set_dataset(Sequel.qualify(:bar, :foo))
-    @model.table_name.must_equal Sequel.qualify(:bar, :foo)
-  end
-
-  it "allows set_dataset to acceptan SQL::AliasedExpression" do
-    @model.db = DB
-    @model.set_dataset(Sequel.as(:foo, :bar))
-    @model.table_name.must_equal :bar
-  end
 
   it "table_name should respect table aliases" do
     @model.set_dataset(Sequel[:foo].as(:x))
@@ -393,7 +364,7 @@ describe Sequel::Model do
   it "doesn't raise an error on inherited if there is an error setting the dataset" do
     db = Sequel.mock
     def db.schema(*) raise Sequel::Error; end
-    @model.db = db
+    @model.dataset = db[:foo]
     Class.new(@model)
   end
 
@@ -423,6 +394,38 @@ describe Sequel::Model do
       @c.must_equal(3=>[4])
       @d.must_equal 20
     end
+  end
+end
+
+describe Sequel::Model do
+  before do
+    @model = Class.new(Sequel::Model)
+    DB.reset
+  end
+
+  it "allows set_dataset to accept a Symbol" do
+    @model.set_dataset(:foo)
+    @model.table_name.must_equal :foo
+  end
+
+  it "allows set_dataset to accept a LiteralString" do
+    @model.set_dataset(Sequel.lit('foo'))
+    @model.table_name.must_equal Sequel.lit('foo')
+  end
+
+  it "allows set_dataset to acceptan SQL::Identifier" do
+    @model.set_dataset(Sequel.identifier(:foo))
+    @model.table_name.must_equal Sequel.identifier(:foo)
+  end
+
+  it "allows set_dataset to acceptan SQL::QualifiedIdentifier" do
+    @model.set_dataset(Sequel.qualify(:bar, :foo))
+    @model.table_name.must_equal Sequel.qualify(:bar, :foo)
+  end
+
+  it "allows set_dataset to acceptan SQL::AliasedExpression" do
+    @model.set_dataset(Sequel.as(:foo, :bar))
+    @model.table_name.must_equal :bar
   end
 end
 

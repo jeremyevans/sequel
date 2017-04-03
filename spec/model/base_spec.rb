@@ -562,19 +562,20 @@ describe "Model.db=" do
     @m = Class.new(Sequel::Model(@db1[:blue].filter(:x=>1)))
   end
   
-  it "should affect the underlying dataset" do
+  deprecated "should affect the underlying dataset" do
     @m.db = @db2
     
     @m.dataset.db.must_equal @db2
     @m.dataset.db.wont_equal @db1
   end
 
-  it "should keep the same dataset options" do
+  deprecated "should keep the same dataset options" do
     @m.db = @db2
     @m.dataset.sql.must_equal 'SELECT * FROM blue WHERE (x = 1)'
   end
 
   it "should use the database for subclasses" do
+    @m = Class.new(Sequel::Model)
     @m.db = @db2
     Class.new(@m).db.must_equal @db2
   end
