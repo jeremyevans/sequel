@@ -1043,6 +1043,12 @@ describe Sequel::Model, ".[]" do
     DB.sqls.must_equal ["SELECT * FROM items CROSS JOIN a WHERE (items.id = 1) LIMIT 1"]
   end
 
+  it "should handle a dataset that uses a subquery" do
+    @c.dataset = @c.dataset.cross_join(:a).from_self(:alias=>:b)
+    @c[1].must_equal @c.load(:name => 'sharon', :id => 1)
+    DB.sqls.must_equal ["SELECT * FROM (SELECT * FROM items CROSS JOIN a) AS b WHERE (id = 1) LIMIT 1"]
+  end
+
   it "should work correctly for composite primary key specified as array" do
     @c.set_primary_key [:node_id, :kind]
     @c[3921, 201].must_be_kind_of(@c)

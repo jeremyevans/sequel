@@ -1172,16 +1172,20 @@ module Sequel
     end
 
     # From types allowed to be considered a simple_select_all
-    SIMPLE_SELECT_ALL_ALLOWED_FROM = [Symbol, SQL::AliasedExpression, SQL::Identifier, SQL::QualifiedIdentifier].freeze
+    SIMPLE_SELECT_ALL_ALLOWED_FROM = [Symbol, SQL::Identifier, SQL::QualifiedIdentifier].freeze
 
     # Whether this dataset is a simple select from an underlying table, such as:
     #
     #   SELECT * FROM table
     #   SELECT table.* FROM table
     def simple_select_all?
+      return false unless (f = @opts[:from]) && f.length == 1
       non_sql = non_sql_options
       o = @opts.reject{|k,v| v.nil? || non_sql.include?(k)}
-      if (f = o[:from]) && f.length == 1 && SIMPLE_SELECT_ALL_ALLOWED_FROM.any?{|x| f.first.is_a?(x)}
+      from = f.first
+      from = from.expression if from.is_a?(SQL::AliasedExpression)
+
+      if SIMPLE_SELECT_ALL_ALLOWED_FROM.any?{|x| from.is_a?(x)}
         case o.length
         when 1
           true
