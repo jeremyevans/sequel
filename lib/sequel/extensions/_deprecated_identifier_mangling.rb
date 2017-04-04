@@ -70,7 +70,7 @@ module Sequel
       
       def identifier_input_method=(v)
         Sequel::Deprecation.deprecate("Dataset#identifier_input_method=", "Explicitly load the identifier_mangling extension if you would like to use this")
-        raise_if_frozen!("identifier_input_method=")
+        raise_if_frozen!(%w"identifier_input_method= with_identifier_input_method")
         skip_symbol_cache!
         @opts[:identifier_input_method] = v
       end
@@ -81,7 +81,7 @@ module Sequel
     
       def identifier_output_method=(v)
         Sequel::Deprecation.deprecate("Dataset#identifier_output_method=", "Explicitly load the identifier_mangling extension if you would like to use this")
-        raise_if_frozen!("identifier_output_method=")
+        raise_if_frozen!(%w"identifier_output_method= with_identifier_output_method")
         @opts[:identifier_output_method] = v
       end
 

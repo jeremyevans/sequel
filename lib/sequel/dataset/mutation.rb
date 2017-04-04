@@ -30,34 +30,34 @@ module Sequel
     
     # Like #extension, but modifies and returns the receiver instead of returning a modified clone.
     def extension!(*exts)
-      raise_if_frozen!("extension!")
+      raise_if_frozen!(%w"extension! extension")
       _extension!(exts)
     end
 
     # Avoid self-referential dataset by cloning.
     def from_self!(*args, &block)
-      raise_if_frozen!("from_self!")
+      raise_if_frozen!(%w"from_self! from_self")
       @opts = clone.from_self(*args, &block).opts
       self
     end
 
     # Remove the row_proc from the current dataset.
     def naked!
-      raise_if_frozen!("naked=")
+      raise_if_frozen!(%w"naked! naked")
       @opts[:row_proc] = nil
       self
     end
     
     # Set whether to quote identifiers for this dataset
     def quote_identifiers=(v)
-      raise_if_frozen!("quote_identifiers=")
+      raise_if_frozen!(%w"quote_identifiers= with_quote_identifiers")
       skip_symbol_cache!
       @opts[:quote_identifiers] = v
     end
 
     # Override the row_proc for this dataset
     def row_proc=(v)
-      raise_if_frozen!("row_proc=")
+      raise_if_frozen!(%w"row_proc= with_row_proc")
       @opts[:row_proc] = v
     end
     
@@ -67,7 +67,7 @@ module Sequel
     # to the receiver and merging the options of the resulting dataset into
     # the receiver's options.
     def mutation_method(meth, *args, &block)
-      raise_if_frozen!("#{meth}!")
+      raise_if_frozen!(["#{meth}!", meth])
       @opts = send(meth, *args, &block).opts
       @cache = {}
       self
@@ -78,7 +78,13 @@ module Sequel
       if frozen?
         raise RuntimeError, "can't modify frozen #{visible_class_name}"
       end
-      Sequel::Deprecation.deprecate("Dataset mutation is deprecated and will be removed in Sequel 5#{" (method called: #{meth})" if meth}")
+      case meth
+      when Array
+        meth = " (method called: #{meth.first}, non-mutating replacement: #{meth.last})"
+      when String
+        meth = " (method called: #{meth})"
+      end
+      Sequel::Deprecation.deprecate("Dataset mutation is deprecated and will be removed in Sequel 5#{meth}")
     end
 
     # Set the dataset to skip the symbol cache
