@@ -541,7 +541,7 @@ module Sequel
       #
       # See Dataset::PlaceholderLiteralizer for additional caveats.
       def finder(meth=OPTS, opts=OPTS, &block)
-        Sequel::Deprecation.deprecate("Sequel::Model.finder", "It has been moved to the finder plugin.")
+        Sequel::Deprecation.deprecate("Sequel::Model.finder and Sequel::Model.prepared_finder", "They have been moved to the finder plugin")
         if block
           raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
           raise Error, "cannot pass two option hashes to Model.finder" unless opts.equal?(OPTS)
@@ -792,7 +792,6 @@ module Sequel
       # exception:
       # :type :: Specifies the type of prepared statement to create
       def prepared_finder(meth=OPTS, opts=OPTS, &block)
-        Sequel::Deprecation.deprecate("Sequel::Model.finder", "It has been moved to the finder plugin.")
         if block
           raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
           meth = meth.merge(:prepare=>true)
