@@ -209,6 +209,13 @@ describe Sequel::Model, ".dataset_module" do
     @c.return_3.must_equal 3
   end
 
+  it "should not add private or protected methods defined in the module to the class" do
+    @c.dataset_module{private; def return_3() 3 end}
+    @c.dataset_module{protected; def return_4() 4 end}
+    @c.respond_to?(:return_3).must_equal false
+    @c.respond_to?(:return_4).must_equal false
+  end
+
   it "should cache calls and readd methods if set_dataset is used" do
     @c.dataset_module{def return_3() 3 end}
     @c.set_dataset :items

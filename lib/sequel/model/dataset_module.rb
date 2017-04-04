@@ -61,7 +61,8 @@ module Sequel
       # Add a class method to the related model that
       # calls the dataset method of the same name.
       def method_added(meth)
-        @model.send(:def_model_dataset_method, meth)
+        @model.send(:def_model_dataset_method, meth) if public_method_defined?(meth)
+        super
       end
     end
 
