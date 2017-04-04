@@ -413,7 +413,7 @@ module Sequel
     #   DB[:items].group(:sum).having(:sum=>10)
     #   # SELECT * FROM items GROUP BY sum HAVING (sum = 10)
     def having(*cond, &block)
-      _filter(:having, *cond, &block)
+      _filter_or_exclude(false, :having, *cond, &block)
     end
     
     # Adds an INTERSECT clause using a second dataset object.
@@ -1030,7 +1030,7 @@ module Sequel
     #
     # See the {"Dataset Filtering" guide}[rdoc-ref:doc/dataset_filtering.rdoc] for more examples and details.
     def where(*cond, &block)
-      _filter(:where, *cond, &block)
+      _filter_or_exclude(false, :where, *cond, &block)
     end
     
     # Add a common table expression (CTE) with the given name and a dataset that defines the CTE.
@@ -1224,8 +1224,8 @@ module Sequel
       end
     end
 
-    # Internal filter method so it works on either the having or where clauses.
     def _filter(clause, *cond, &block)
+      Sequel::Deprecation.deprecate("Sequel::Dataset#_filter (private method)", "Switch to calling Sequel::Dataset#where/having directly")
       _filter_or_exclude(false, clause, *cond, &block)
     end
 
