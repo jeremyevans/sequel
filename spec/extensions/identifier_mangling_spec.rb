@@ -24,7 +24,8 @@ describe "identifier_mangling extension" do
   end
 
   it "should upcase on input and downcase on output by default" do
-    db = Sequel::Database.new.extension(:identifier_mangling)
+    # SEQUEL5: Remove :identifier_mangling=>false
+    db = Sequel::Database.new(:identifier_mangling=>false).extension(:identifier_mangling)
     db.send(:identifier_input_method_default).must_equal :upcase
     db.send(:identifier_output_method_default).must_equal :downcase
   end
