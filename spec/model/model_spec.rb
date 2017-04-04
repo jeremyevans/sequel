@@ -350,12 +350,12 @@ describe Sequel::Model do
 
   it "should raise an error on set_dataset if there is an error connecting to the database" do
     def @model.columns() raise Sequel::DatabaseConnectionError end
-    proc{@model.set_dataset(Sequel::Database.new[:foo].join(:blah))}.must_raise Sequel::DatabaseConnectionError
+    proc{@model.set_dataset(Sequel::Database.new[:foo].join(:blah).from_self)}.must_raise Sequel::DatabaseConnectionError
   end
 
   it "should not raise an error if there is a problem getting the columns for a dataset" do
     def @model.columns() raise Sequel::Error end
-    @model.set_dataset(DB[:foo].join(:blah))
+    @model.set_dataset(DB[:foo].join(:blah).from_self)
   end
 
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
@@ -1038,7 +1038,7 @@ describe Sequel::Model, ".[]" do
     DB.sqls.must_equal ["SELECT * FROM items WHERE name = 'sharon'"]
   end
 
-  it "should use a qualified primary key if the dataset is joined" do
+  deprecated "should use a qualified primary key if the dataset is joined" do
     @c.dataset = @c.dataset.cross_join(:a)
     @c[1].must_equal @c.load(:name => 'sharon', :id => 1)
     DB.sqls.must_equal ["SELECT * FROM items CROSS JOIN a WHERE (items.id = 1) LIMIT 1"]
@@ -1118,7 +1118,7 @@ describe "Model.db_schema" do
     def @db.schema(table, opts={})
       raise Sequel::Error
     end
-    @c.dataset = @dataset.join(:x, :id).columns(:id, :x)
+    @c.dataset = @dataset.join(:x, :id).from_self.columns(:id, :x)
     @c.db_schema.must_equal(:x=>{}, :id=>{})
   end
   

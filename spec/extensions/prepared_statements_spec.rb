@@ -13,11 +13,18 @@ describe "prepared_statements plugin" do
     @db.sqls
   end
 
-  it "should correctly lookup by primary key for joined dataset" do
+  deprecated "should correctly lookup by primary key for joined dataset" do
     @c.dataset = @c.dataset.from(:people, :people2)
     @db.sqls
     @c[1].must_equal @p
     @db.sqls.must_equal ["SELECT * FROM people, people2 WHERE (people.id = 1) LIMIT 1 -- read_only"]
+  end 
+
+  it "should correctly lookup by primary key for dataset using subquery" do
+    @c.dataset = @c.dataset.from(:people, :people2).from_self(:alias=>:people)
+    @db.sqls
+    @c[1].must_equal @p
+    @db.sqls.must_equal ["SELECT * FROM (SELECT * FROM people, people2) AS people WHERE (id = 1) LIMIT 1 -- read_only"]
   end 
 
   it "should use prepared statements for pk lookups only if default is not optimized" do
@@ -25,8 +32,10 @@ describe "prepared_statements plugin" do
     @c.set_primary_key [:id, :name]
     @c.send(:use_prepared_statements_for_pk_lookup?).must_equal true
     @c.set_primary_key :id
+    deprecated do
     @c.dataset = @c.dataset.from(:people, :people2)
     @c.send(:use_prepared_statements_for_pk_lookup?).must_equal false
+    end
     @c.dataset = @db[:people].select(:id, :name, :i)
     @c.send(:use_prepared_statements_for_pk_lookup?).must_equal true
   end

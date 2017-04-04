@@ -26,7 +26,7 @@ describe "Class Table Inheritance Plugin" do
   before do
     [:staff, :executives, :managers, :employees].each{|t| @db[t].delete}
     class ::Employee < Sequel::Model(@db)
-      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
+      plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}, :alias=>:employees
     end 
     class ::Manager < Employee
       one_to_many :staff_members, :class=>:Staff
@@ -166,7 +166,7 @@ describe "Class Table Inheritance Plugin" do
   end
   
   it "should handle eagerly graphing one_to_many relationships" do
-    es = Executive.where(:name=>'Ex').eager_graph(:staff_members).all
+    es = Executive.where(Sequel[:employees][:name]=>'Ex').eager_graph(:staff_members).all
     es.must_equal [Executive[@i4]]
     es.map{|x| x.staff_members}.must_equal [[Staff[@i2]]]
   end

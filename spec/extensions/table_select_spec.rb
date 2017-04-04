@@ -55,7 +55,16 @@ describe "Sequel::Plugins::TableSelect" do
     @Album.dataset.sql.must_equal 'SELECT name, artist FROM albums'
   end
 
-  it "should not add a table.* selection on existing dataset with multiple tables" do
+  it "should add a table.* selection on existing dataset with subquery" do
+    @Album.dataset = @Album.db.from(:a1, :a2).from_self(:alias=>:foo)
+    @Album.plugin :table_select
+    @Album.dataset.sql.must_equal 'SELECT foo.* FROM (SELECT * FROM a1, a2) AS foo'
+
+    @Album.dataset = @Album.db.from(:a1).cross_join(:a2).from_self(:alias=>:foo)
+    @Album.dataset.sql.must_equal 'SELECT foo.* FROM (SELECT * FROM a1 CROSS JOIN a2) AS foo'
+  end
+
+  deprecated "should not add a table.* selection on existing dataset with multiple tables" do
     @Album.dataset = @Album.db.from(:a1, :a2)
     @Album.plugin :table_select
     @Album.dataset.sql.must_equal 'SELECT * FROM a1, a2'

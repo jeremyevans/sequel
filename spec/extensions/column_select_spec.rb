@@ -63,13 +63,22 @@ describe "Sequel::Plugins::ColumnSelect" do
     @Album.dataset.sql.must_equal 'SELECT name, artist FROM albums'
   end
 
-  it "should not add a explicit column selection on existing dataset with multiple tables" do
+  deprecated "should not add a explicit column selection on existing dataset with multiple tables" do
     @Album.dataset = @Album.db.from(:a1, :a2)
     @Album.plugin :column_select
     @Album.dataset.sql.must_equal 'SELECT * FROM a1, a2'
 
     @Album.dataset = @Album.db.from(:a1).cross_join(:a2)
     @Album.dataset.sql.must_equal 'SELECT * FROM a1 CROSS JOIN a2'
+  end
+
+  it "should add a explicit column selection on existing dataset with a subquery" do
+    @Album.dataset = @Album.db.from(:a1, :a2).from_self(:alias=>:foo)
+    @Album.plugin :column_select
+    @Album.dataset.sql.must_equal 'SELECT foo.id, foo.a, foo.b, foo.c FROM (SELECT * FROM a1, a2) AS foo'
+
+    @Album.dataset = @Album.db.from(:a1).cross_join(:a2).from_self(:alias=>:foo)
+    @Album.dataset.sql.must_equal 'SELECT foo.id, foo.a, foo.b, foo.c FROM (SELECT * FROM a1 CROSS JOIN a2) AS foo'
   end
 
   it "should use explicit column selection for many_to_many associations" do

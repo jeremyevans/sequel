@@ -999,6 +999,10 @@ module Sequel
           self.simple_table = db.literal(ds).freeze
           ds = db.from(ds)
         when Dataset
+          if ds.joined_dataset?
+            Sequel::Deprecation.deprecate("Using a joined dataset as a Sequel::Model dataset", respond_to?(:cti_base_model) ? "Use the class_table_inheritance plugin :alias option in #{cti_base_model.inspect}" : "Call from_self on the dataset to wrap it in a subquery")
+          end
+
           self.simple_table = if ds.send(:simple_select_all?)
             ds.literal(ds.first_source_table).freeze
           end

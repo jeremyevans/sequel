@@ -849,10 +849,16 @@ describe Sequel::Model, "#this" do
     instance.this.sql.must_equal "SELECT * FROM examples WHERE (a = 3) LIMIT 1"
   end
 
-  it "should use a qualified primary key if the dataset is joined" do
+  deprecated "should use a qualified primary key if the dataset is joined" do
     @example.dataset = @example.dataset.cross_join(:a)
     instance = @example.load(:id => 3)
     instance.this.sql.must_equal "SELECT * FROM examples CROSS JOIN a WHERE (examples.id = 3) LIMIT 1"
+  end
+
+  it "should use a primary key if the dataset uses a subquery" do
+    @example.dataset = @example.dataset.cross_join(:a).from_self(:alias=>:b)
+    instance = @example.load(:id => 3)
+    instance.this.sql.must_equal "SELECT * FROM (SELECT * FROM examples CROSS JOIN a) AS b WHERE (id = 3) LIMIT 1"
   end
 
   it "should support composite primary keys" do
