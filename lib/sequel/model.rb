@@ -33,7 +33,7 @@ module Sequel
 
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS + [:each_server, :where_all, :where_each, :where_single_value]) -
-      [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases, :first, :first!]
+      [:and, :or, :[], :columns, :columns!, :delete, :update, :add_graph_aliases]
     
     # Boolean settings that can be modified at the global, class, or instance level.
     BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, \
@@ -71,7 +71,8 @@ module Sequel
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
       :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil,
       :@use_after_commit_rollback=>nil, :@fast_pk_lookup_sql=>nil,
-      :@fast_instance_delete_sql=>nil, :@finders=>:dup, :@finder_loaders=>:dup,
+      :@fast_instance_delete_sql=>nil,
+      :@finders=>:dup, :@finder_loaders=>:dup, # SEQUEL5: Remove
       :@db=>nil, :@default_set_fields_options=>:dup, :@require_valid_table=>nil,
       :@cache_anonymous_models=>nil, :@dataset_module_class=>nil}
 
@@ -92,8 +93,8 @@ module Sequel
     @dataset_method_modules = []
     @default_eager_limit_strategy = true
     @default_set_fields_options = {}
-    @finders = {}
-    @finder_loaders = {}
+    @finders = {} # SEQUEL5: Remove
+    @finder_loaders = {} # SEQUEL5: Remove
     @overridable_methods_module = nil
     @fast_pk_lookup_sql = nil
     @fast_instance_delete_sql = nil

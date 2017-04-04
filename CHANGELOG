@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Model.finder and Model.prepared_finder, move to finder plugin (jeremyevans)
+
 * Deprecate calling Model.db= on a model with a dataset (jeremyevans)
 
 * Deprecate splitting symbols to look for qualified/aliased identifiers (e.g. :table__column) (jeremyevans)

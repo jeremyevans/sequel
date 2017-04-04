@@ -238,7 +238,7 @@ module Sequel
       #   # => #<Artist {:name=>'Bob', ...}>
       def [](*args)
         args = args.first if args.size <= 1
-        args.is_a?(Hash) ? first_where(args) : (primary_key_lookup(args) unless args.nil?)
+        args.is_a?(Hash) ? first(args) : (primary_key_lookup(args) unless args.nil?)
       end
 
       # Initializes a model instance as an existing record. This constructor is
@@ -464,12 +464,7 @@ module Sequel
       #   Artist.find{name > 'M'}
       #   # SELECT * FROM artists WHERE (name > 'M') LIMIT 1
       def find(*args, &block)
-        if args.length == 1 && !block
-          # Use optimized finder
-          first_where(args.first)
-        else
-          where(*args, &block).first
-        end
+        first(*args, &block)
       end
       
       # Like +find+ but invokes create with given conditions when record does not
@@ -487,7 +482,6 @@ module Sequel
       def find_or_create(cond, &block)
         find(cond) || create(cond, &block)
       end
-    
 
       FINDER_TYPES = [:first, :all, :each, :get].freeze
 
@@ -547,6 +541,7 @@ module Sequel
       #
       # See Dataset::PlaceholderLiteralizer for additional caveats.
       def finder(meth=OPTS, opts=OPTS, &block)
+        Sequel::Deprecation.deprecate("Sequel::Model.finder", "It has been moved to the finder plugin.")
         if block
           raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
           raise Error, "cannot pass two option hashes to Model.finder" unless opts.equal?(OPTS)
@@ -610,21 +605,13 @@ module Sequel
         end
       end
 
-      # An alias for calling first on the model's dataset, but with
-      # optimized handling of the single argument case.
-      def first(*args, &block)
-        if args.length == 1 && !block && !args.first.is_a?(Integer)
-          # Use optimized finder
-          first_where(args.first)
+      def first_where(cond)
+        Sequel::Deprecation.deprecate("Sequel::Model.first_where", "Instead, use Sequel::Model.first")
+        if cond.is_a?(Integer)
+          dataset.where(cond).first(cond)
         else
-          dataset.first(*args, &block)
+          dataset.first(cond)
         end
-      end
-
-      # An alias for calling first! on the model's dataset, but with
-      # optimized handling of the single argument case.
-      def first!(*args, &block)
-        first(*args, &block) || raise(Sequel::NoMatchingRow.new(dataset))
       end
 
       # Freeze a model class, disallowing any further changes to it.
@@ -632,7 +619,7 @@ module Sequel
         dataset_module.freeze
         overridable_methods_module.freeze
 
-        @finder_loaders.freeze
+        @finder_loaders.freeze # SEQUEL5: Remove
 
         if @dataset
           @dataset.freeze
@@ -640,14 +627,14 @@ module Sequel
           db_schema.freeze.each_value(&:freeze)
           columns.freeze
           setter_methods.freeze
-          @finder_loaders.each_key{|k| finder_for(k)}
+          @finder_loaders.each_key{|k| finder_for(k)} # SEQUEL5: Remove
         else
           @setter_methods = [].freeze
         end
 
         @dataset_method_modules.freeze
         @default_set_fields_options.freeze
-        @finders.freeze
+        @finders.freeze # SEQUEL5: Remove
         @plugins.freeze
         @allowed_columns.freeze if @allowed_columns
 
@@ -805,6 +792,7 @@ module Sequel
       # exception:
       # :type :: Specifies the type of prepared statement to create
       def prepared_finder(meth=OPTS, opts=OPTS, &block)
+        Sequel::Deprecation.deprecate("Sequel::Model.finder", "It has been moved to the finder plugin.")
         if block
           raise Error, "cannot pass both a method name argument and a block of Model.finder" unless meth.is_a?(Hash)
           meth = meth.merge(:prepare=>true)
@@ -1075,12 +1063,14 @@ module Sequel
       # Define a finder method in the given module with the given method name that
       # load rows using the finder with the given name.
       def def_finder_method(mod, meth, type)
+        # SEQUEL5: Remove
         mod.send(:define_method, meth){|*args, &block| finder_for(meth).send(type, *args, &block)}
       end
 
       # Define a prepared_finder method in the given module that will call the associated prepared
       # statement.
       def def_prepare_method(mod, meth)
+        # SEQUEL5: Remove
         mod.send(:define_method, meth){|*args, &block| finder_for(meth).call(prepare_method_arg_hash(args), &block)}
       end
 
@@ -1088,6 +1078,7 @@ module Sequel
       # for the method, load the finder and set correctly in the finders hash, then
       # return the finder.
       def finder_for(meth)
+        # SEQUEL5: Remove
         unless finder = (frozen? ? @finders[meth] : Sequel.synchronize{@finders[meth]})
           finder_loader = @finder_loaders.fetch(meth)
           finder = finder_loader.call(self)
@@ -1226,6 +1217,7 @@ module Sequel
       # An hash of prepared argument values for the given arguments, with keys
       # starting at a.  Used by the methods created by prepared_finder.
       def prepare_method_arg_hash(args)
+        # SEQUEL5: Remove
         h = {}
         prepare_method_args('a', args.length).zip(args).each{|k, v| h[k] = v}
         h
@@ -1233,6 +1225,7 @@ module Sequel
 
       # An array of prepared statement argument names, of length n and starting with base.
       def prepare_method_args(base, n)
+        # SEQUEL5: Remove
         (0...n).map do
           s = base.to_sym
           base = base.next
@@ -1254,9 +1247,9 @@ module Sequel
           ds.fetch_rows(sql){|r| return ds.row_proc.call(r)}
           nil
         elsif dataset.joined_dataset?
-          first_where(qualified_primary_key_hash(pk))
+          dataset.first(qualified_primary_key_hash(pk))
         else
-          first_where(primary_key_hash(pk))
+          dataset.first(primary_key_hash(pk))
         end
       end
 
@@ -1279,7 +1272,7 @@ module Sequel
       # Reset the instance dataset to a modified copy of the current dataset,
       # should be used whenever the model's dataset is modified.
       def reset_instance_dataset
-        Sequel.synchronize{@finders.clear if @finders}
+        Sequel.synchronize{@finders.clear} if @finders && !@finders.frozen?
         @instance_dataset = @dataset.limit(1).naked.skip_limit_check if @dataset
       end
   
@@ -2724,6 +2717,5 @@ module Sequel
 
     extend ClassMethods
     plugin self
-    finder(:where, :arity=>1, :mod=>ClassMethods)
   end
 end
