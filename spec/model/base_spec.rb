@@ -123,19 +123,19 @@ describe Sequel::Model, ".def_dataset_method" do
     @c = Class.new(Sequel::Model(:items))
   end
   
-  it "should add a method to the dataset and model if called with a block argument" do
+  deprecated "should add a method to the dataset and model if called with a block argument" do
     @c.def_dataset_method(:return_3){3}
     @c.return_3.must_equal 3
     @c.dataset.return_3.must_equal 3
   end
 
-  it "should handle weird method names" do
+  deprecated "should handle weird method names" do
     @c.def_dataset_method(:"return 3"){3}
     @c.send(:"return 3").must_equal 3
     @c.dataset.send(:"return 3").must_equal 3
   end
 
-  it "should not add a model method if the model already responds to the method" do
+  deprecated "should not add a model method if the model already responds to the method" do
     @c.instance_eval do
       def foo
         1
@@ -156,7 +156,7 @@ describe Sequel::Model, ".def_dataset_method" do
     @c.dataset.bar.must_equal 4
   end
 
-  it "should add all passed methods to the model if called without a block argument" do
+  deprecated "should add all passed methods to the model if called without a block argument" do
     @c.def_dataset_method(:return_3, :return_4)
     proc{@c.return_3}.must_raise(NoMethodError)
     proc{@c.return_4}.must_raise(NoMethodError)
@@ -168,14 +168,14 @@ describe Sequel::Model, ".def_dataset_method" do
     @c.return_4.must_equal 4
   end
 
-  it "should cache calls and readd methods if set_dataset is used" do
+  deprecated "should cache calls and readd methods if set_dataset is used" do
     @c.def_dataset_method(:return_3){3}
     @c.set_dataset :items
     @c.return_3.must_equal 3
     @c.dataset.return_3.must_equal 3
   end
 
-  it "should readd methods to subclasses, if set_dataset is used in a subclass" do
+  deprecated "should readd methods to subclasses, if set_dataset is used in a subclass" do
     @c.def_dataset_method(:return_3){3}
     c = Class.new(@c)
     c.set_dataset :items

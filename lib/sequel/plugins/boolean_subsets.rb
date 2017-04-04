@@ -9,7 +9,7 @@ module Sequel
     # <tt>column IS TRUE</tt> (assuming the database supports that syntax).
     #
     # You can provide a block to the plugin, which will be called with column name
-    # symbol, and should return an array of arguments to pass to +subset+.
+    # symbol, and should return an array of arguments to pass to +dataset_module.where+.
     # Using this, you can change the method name and arguments for each column.
     # This block is executed in the context of the model class.
     #
@@ -28,12 +28,11 @@ module Sequel
     #     [column.to_s.sub(/\Ais_/, ''), {column=>'Y'}]
     #   end
     module BooleanSubsets
-      # Add the boolean_attribute? class method to the model, and create
-      # attribute? boolean reader methods for the class's columns if the class has a dataset.
+      # Create boolean subset methods for each boolean column.
       def self.configure(model, &block)
         model.instance_eval do
           (class << self; self; end).send(:define_method, :boolean_subset_args, &block) if block
-          send(:create_boolean_subsets) if @dataset
+          create_boolean_subsets if @dataset
         end
       end
 
@@ -50,7 +49,10 @@ module Sequel
         # Add subset methods for all of the boolean columns in this model.
         def create_boolean_subsets
           if cs = check_non_connection_error{columns}
-            cs.each{|c| subset(*boolean_subset_args(c)) if db_schema[c][:type] == :boolean}
+            cs = cs.select{|c| db_schema[c][:type] == :boolean}.map{|c| boolean_subset_args(c)}
+            dataset_module do
+              cs.each{|c| where(*c)}
+            end
           end
         end
       end

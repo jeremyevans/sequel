@@ -1,5 +1,7 @@
 === master
 
+* Deprecate Model.def_dataset_method and Model.subset, move to def_dataset_method plugin (jeremyevans)
+
 * Deprecate Model.finder and Model.prepared_finder, move to finder plugin (jeremyevans)
 
 * Deprecate calling Model.db= on a model with a dataset (jeremyevans)

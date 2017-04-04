@@ -449,8 +449,10 @@ module Sequel
 
         if block
           raise(Error, "Defining a dataset method using a block requires only one argument") if args.length > 1
+          Sequel::Deprecation.deprecate("Sequel::Model.def_dataset_method", "Define the method inside a dataset_module block, or use the def_dataset_method_plugin")
           dataset_module{define_method(args.first, &block)}
         else
+          Sequel::Deprecation.deprecate("Sequel::Model.def_dataset_method", "Define a class method that calls the dataset method, or use the def_dataset_method_plugin")
           args.each{|arg| def_model_dataset_method(arg)}
         end
       end
@@ -935,15 +937,9 @@ module Sequel
       # This method creates dataset methods that do not accept arguments.  To create
       # dataset methods that accept arguments, you should use define a
       # method directly inside a #dataset_module block.
-      def subset(name, *args, &block)
-        if block || args.flatten.any?{|arg| arg.is_a?(Proc)}
-          def_dataset_method(name){filter(*args, &block)}
-        else
-          key = :"_subset_#{name}_ds"
-          def_dataset_method(name) do
-            cached_dataset(key){filter(*args)}
-          end
-        end
+      def subset(*args, &block)
+        Sequel::Deprecation.deprecate("Sequel::Model.subset", "Use the subset method inside a dataset_module block, or use the def_dataset_method plugin")
+        dataset_module{where(*args, &block)}
       end
       
       # Returns name of primary table for the dataset. If the table for the dataset

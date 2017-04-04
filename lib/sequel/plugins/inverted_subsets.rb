@@ -27,22 +27,29 @@ module Sequel
     #   # SELECT * FROM albums WHERE (published IS NOT TRUE)
     #
     module InvertedSubsets
-      # Default naming for inverted subsets
-      DEFAULT_NAME_BLOCK = lambda{|name| "not_#{name}"}
-
-      # Store the supplied block for calling later when subsets are defined, or
-      # create a default one if we need to.
-      def self.configure(model, &block)
-        model.instance_variable_set(:@inverted_subsets_name_block, block || DEFAULT_NAME_BLOCK)
+      def self.apply(mod, &block)
+        mod.instance_exec do
+          @dataset_module_class = Class.new(@dataset_module_class) do
+            include DatasetModuleMethods
+            if block
+              define_method(:inverted_subset_name, &block)
+              private :inverted_subset_name
+            end
+          end
+        end
       end
 
-      module ClassMethods
-        Plugins.inherited_instance_variables(self, :@inverted_subsets_name_block => nil)
-
+      module DatasetModuleMethods
         # Define a not_ prefixed subset which inverts the subset condition.
-        def subset(name, *args, &block)
+        def where(name, *args, &block)
           super
-          def_dataset_method(@inverted_subsets_name_block.call(name)){exclude(*args, &block)}
+          exclude(inverted_subset_name(name), *args, &block)
+        end
+
+        private
+
+        def inverted_subset_name(name)
+          "not_#{name}"
         end
       end
     end

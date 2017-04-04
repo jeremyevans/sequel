@@ -24,13 +24,21 @@ module Sequel
     #   Album.where(Sequel.|(Album.published_conditions, :ready=>true)).sql
     #   # SELECT * FROM albums WHERE ((published IS TRUE) OR (ready IS TRUE))
     module SubsetConditions
-      module ClassMethods
+      def self.apply(mod, &block)
+        mod.instance_exec do
+          @dataset_module_class = Class.new(@dataset_module_class) do
+            include DatasetModuleMethods
+          end
+        end
+      end
+
+      module DatasetModuleMethods
         # Also create a method that returns the conditions the filter uses.
-        def subset(name, *args, &block)
+        def where(name, *args, &block)
           super
           cond = args
           cond = cond.first if cond.size == 1
-          def_dataset_method(:"#{name}_conditions"){filter_expr(cond, &block)}
+          define_method(:"#{name}_conditions"){filter_expr(cond, &block)}
         end
       end
     end

@@ -572,7 +572,7 @@ describe Sequel::Model, ".subset" do
     DB.reset
   end
 
-  it "should create a filter on the underlying dataset" do
+  deprecated "should create a filter on the underlying dataset" do
     proc {@c.new_only}.must_raise(NoMethodError)
     
     @c.subset(:new_only){age < 'new'}
@@ -589,7 +589,7 @@ describe Sequel::Model, ".subset" do
     @c.new_only.pricey.sql.must_equal "SELECT * FROM items WHERE ((age < 'new') AND (price > 100))"
   end
 
-  it "should not override existing model methods" do
+  deprecated "should not override existing model methods" do
     def @c.active() true end
     @c.subset(:active, :active)
     @c.active.must_equal true
