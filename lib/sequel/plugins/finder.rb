@@ -2,6 +2,36 @@
 
 module Sequel
   module Plugins
+    # The finder plugin adds Model.finder for defining optimized finder methods.
+    # There are two ways to use this.  The recommended way is to pass a symbol
+    # that represents a model class method that returns a dataset:
+    #
+    #   def Artist.by_name(name)
+    #     where(:name=>name)
+    #   end
+    #
+    #   Artist.finder :by_name
+    #
+    # This creates an optimized first_by_name method, which you can call normally:
+    #
+    #   Artist.first_by_name("Joe")
+    #
+    # The alternative way to use this to pass your own block:
+    #
+    #   Artist.finder(:name=>:first_by_name){|pl, ds| ds.where(:name=>pl.arg).limit(1)}
+    #
+    # Additionally, there is a Model.prepared_finder method.  This works similarly
+    # to Model.finder, but uses a prepared statement.  This limits the types of
+    # arguments that will be accepted, but can perform better in the database.
+    # 
+    # Usage:
+    #
+    #   # Make all model subclasses support Model.finder
+    #   # (called before loading subclasses)
+    #   Sequel::Model.plugin :finder
+    #
+    #   # Make the Album class support Model.finder
+    #   Album.plugin :finder
     module Finder
       FINDER_TYPES = [:first, :all, :each, :get].freeze
 
