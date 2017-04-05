@@ -23,6 +23,7 @@ could conceivably be abused to do so:
 * Sequel.def_adapter_method (private)
 * Sequel::SQL::Expression.to_s_method (private)
 * Sequel::Plugins::HookClassMethods::ClassMethods#add_hook_type
+* Sequel::Plugins.def_dataset_methods
 
 As long as you don't call those with user input, you should not be
 vulnerable to code execution.
