@@ -17,7 +17,7 @@ describe Sequel::Model, "class dataset methods"  do
     @db.sqls.must_equal ["SELECT avg(id) AS avg FROM items LIMIT 1"]
     @c.count.must_equal 1
     @db.sqls.must_equal ["SELECT count(*) AS count FROM items LIMIT 1"]
-    @c.cross_join(@c).sql.must_equal "SELECT * FROM items CROSS JOIN items"
+    @c.cross_join(@c.table_name).sql.must_equal "SELECT * FROM items CROSS JOIN items"
     @c.distinct.sql.must_equal "SELECT DISTINCT * FROM items"
     @c.each{|r| r.must_equal @c.load(:id=>1)}.must_equal @d
     @db.sqls.must_equal ["SELECT * FROM items"]
@@ -38,11 +38,11 @@ describe Sequel::Model, "class dataset methods"  do
     @c.for_update.sql.must_equal "SELECT * FROM items FOR UPDATE"
     @c.from.sql.must_equal "SELECT *"
     @c.from_self.sql.must_equal "SELECT * FROM (SELECT * FROM items) AS t1"
-    @c.full_join(@c).sql.must_equal "SELECT * FROM items FULL JOIN items"
-    @c.full_outer_join(@c).sql.must_equal "SELECT * FROM items FULL OUTER JOIN items"
+    @c.full_join(@c.table_name).sql.must_equal "SELECT * FROM items FULL JOIN items"
+    @c.full_outer_join(@c.table_name).sql.must_equal "SELECT * FROM items FULL OUTER JOIN items"
     @c.get(:a).must_equal 1
     @db.sqls.must_equal ["SELECT a FROM items LIMIT 1"]
-    @c.graph(@c, nil, :table_alias=>:a).sql.must_equal "SELECT * FROM items LEFT OUTER JOIN items AS a"
+    @c.graph(@c.table_name, nil, :table_alias=>:a).sql.must_equal "SELECT * FROM items LEFT OUTER JOIN items AS a"
     @db.sqls
     @c.grep(:id, 'a%').sql.must_equal "SELECT * FROM items WHERE ((id LIKE 'a%' ESCAPE '\\'))"
     @c.group(:a).sql.must_equal "SELECT * FROM items GROUP BY a"
@@ -52,18 +52,18 @@ describe Sequel::Model, "class dataset methods"  do
     @c.having(:a).sql.must_equal "SELECT * FROM items HAVING a"
     @c.import([:id], [[1]])
     @db.sqls.must_equal ["BEGIN", "INSERT INTO items (id) VALUES (1)", "COMMIT"]
-    @c.inner_join(@c).sql.must_equal "SELECT * FROM items INNER JOIN items"
+    @c.inner_join(@c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
     @c.insert.must_equal 2
     @db.sqls.must_equal ["INSERT INTO items DEFAULT VALUES"]
     @c.intersect(@d, :from_self=>false).sql.must_equal "SELECT * FROM items INTERSECT SELECT * FROM items"
     @c.interval(:id).must_equal 1
     @db.sqls.must_equal ["SELECT (max(id) - min(id)) AS interval FROM items LIMIT 1"]
-    @c.join(@c).sql.must_equal "SELECT * FROM items INNER JOIN items"
-    @c.join_table(:inner, @c).sql.must_equal "SELECT * FROM items INNER JOIN items"
+    @c.join(@c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
+    @c.join_table(:inner, @c.table_name).sql.must_equal "SELECT * FROM items INNER JOIN items"
     @c.last.must_equal @c.load(:id=>1)
     @db.sqls.must_equal ["SELECT * FROM items ORDER BY id DESC LIMIT 1"]
-    @c.left_join(@c).sql.must_equal "SELECT * FROM items LEFT JOIN items"
-    @c.left_outer_join(@c).sql.must_equal "SELECT * FROM items LEFT OUTER JOIN items"
+    @c.left_join(@c.table_name).sql.must_equal "SELECT * FROM items LEFT JOIN items"
+    @c.left_outer_join(@c.table_name).sql.must_equal "SELECT * FROM items LEFT OUTER JOIN items"
     @c.limit(2).sql.must_equal "SELECT * FROM items LIMIT 2"
     @c.lock_style(:update).sql.must_equal "SELECT * FROM items FOR UPDATE"
     @c.map(:id).must_equal [1]
@@ -75,10 +75,10 @@ describe Sequel::Model, "class dataset methods"  do
     @c.multi_insert([{:id=>1}])
     @db.sqls.must_equal ["BEGIN", "INSERT INTO items (id) VALUES (1)", "COMMIT"]
     @c.naked.row_proc.must_be_nil
-    @c.natural_full_join(@c).sql.must_equal "SELECT * FROM items NATURAL FULL JOIN items"
-    @c.natural_join(@c).sql.must_equal "SELECT * FROM items NATURAL JOIN items"
-    @c.natural_left_join(@c).sql.must_equal "SELECT * FROM items NATURAL LEFT JOIN items"
-    @c.natural_right_join(@c).sql.must_equal "SELECT * FROM items NATURAL RIGHT JOIN items"
+    @c.natural_full_join(@c.table_name).sql.must_equal "SELECT * FROM items NATURAL FULL JOIN items"
+    @c.natural_join(@c.table_name).sql.must_equal "SELECT * FROM items NATURAL JOIN items"
+    @c.natural_left_join(@c.table_name).sql.must_equal "SELECT * FROM items NATURAL LEFT JOIN items"
+    @c.natural_right_join(@c.table_name).sql.must_equal "SELECT * FROM items NATURAL RIGHT JOIN items"
     @c.offset(2).sql.must_equal "SELECT * FROM items OFFSET 2"
     @c.order(:a).sql.must_equal "SELECT * FROM items ORDER BY a"
     @c.order_append(:a).sql.must_equal "SELECT * FROM items ORDER BY a"
@@ -88,8 +88,8 @@ describe Sequel::Model, "class dataset methods"  do
     @c.paged_each{|r| r.must_equal @c.load(:id=>1)}
     @db.sqls.must_equal ["BEGIN", "SELECT * FROM items ORDER BY id LIMIT 1000 OFFSET 0", "COMMIT"]
     @c.qualify.sql.must_equal 'SELECT items.* FROM items'
-    @c.right_join(@c).sql.must_equal "SELECT * FROM items RIGHT JOIN items"
-    @c.right_outer_join(@c).sql.must_equal "SELECT * FROM items RIGHT OUTER JOIN items"
+    @c.right_join(@c.table_name).sql.must_equal "SELECT * FROM items RIGHT JOIN items"
+    @c.right_outer_join(@c.table_name).sql.must_equal "SELECT * FROM items RIGHT OUTER JOIN items"
     @c.select(:a).sql.must_equal "SELECT a FROM items"
     @c.select_all(:items).sql.must_equal "SELECT items.* FROM items"
     @c.select_append(:a).sql.must_equal "SELECT *, a FROM items"

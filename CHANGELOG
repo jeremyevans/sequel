@@ -1,5 +1,9 @@
 === master
 
+* Deprecate model dataset #insert_sql accepting model instances (jeremyevans)
+
+* Deprecate model dataset #join_table and #graph accepting model classes (jeremyevans)
+
 * Support :alias option to class_table_inheritance plugin, wrapping subclass datasets in a subquery to fix ambiguous column issues (jeremyevans)
 
 * Deprecate Model.set_allowed_columns and Model#{set_all,set_only,update_all,update_only}, move to whitelist security plugin (jeremyevans)

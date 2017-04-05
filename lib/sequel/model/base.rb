@@ -2527,6 +2527,7 @@ module Sequel
       #   # FROM artists LEFT OUTER JOIN albums ON (albums.artist_id = artists.id)
       def graph(table, *args, &block)
         if table.is_a?(Class) && table < Sequel::Model
+          Sequel::Deprecation.deprecate("Passing Sequel::Model class as first argument to Sequel::Dataset#graph", "Pass the model's dataset as the first argument instead")
           super(table.dataset, *args, &block)
         else
           super
@@ -2541,6 +2542,7 @@ module Sequel
       #   # INSERT INTO albums (name) VALUES ('A')
       def insert_sql(*values)
         if values.size == 1 && (v = values.at(0)).is_a?(Sequel::Model) && !v.respond_to?(:sql_literal_append)
+          Sequel::Deprecation.deprecate("Passing Sequel::Model instance argument to Sequel::Dataset#insert", "Pass model_instance.values or model_instance.to_hash as the argument instead")
           super(v.to_hash)
         else
           super
@@ -2554,6 +2556,7 @@ module Sequel
       #   # SELECT * FROM artists INNER JOIN albums ON (albums.artist_id = artists.id)
       def join_table(type, table, *args, &block)
         if table.is_a?(Class) && table < Sequel::Model
+          Sequel::Deprecation.deprecate("Passing Sequel::Model class to a dataset join method", "Pass the model's table name or dataset as the first argument instead")
           if table.dataset.simple_select_all?
             super(type, table.table_name, *args, &block)
           else

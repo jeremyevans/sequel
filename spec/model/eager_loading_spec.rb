@@ -1926,13 +1926,13 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should respect the association's :eager_grapher option" do 
-    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :eager_grapher=>proc{|eo| eo[:self].graph(GraphBand, {:active=>true}, :table_alias=>eo[:table_alias], :join_type=>:inner)}
+    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :eager_grapher=>proc{|eo| eo[:self].graph(GraphBand.dataset, {:active=>true}, :table_alias=>eo[:table_alias], :join_type=>:inner)}
     GraphAlbum.eager_graph(:active_band).sql.must_equal "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums INNER JOIN bands AS active_band ON (active_band.active IS TRUE)"
 
-    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :eager_grapher=>proc{|eo| eo[:self].graph(GraphTrack, nil, :join_type=>:natural, :table_alias=>eo[:table_alias])}
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :eager_grapher=>proc{|eo| eo[:self].graph(GraphTrack.dataset, nil, :join_type=>:natural, :table_alias=>eo[:table_alias])}
     GraphAlbum.eager_graph(:right_tracks).sql.must_equal 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums NATURAL JOIN tracks AS right_tracks'
 
-    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :eager_grapher=>proc{|eo| eo[:self].graph(:ag, {:album_id=>:id}, :table_alias=>:a123, :implicit_qualifier=>eo[:implicit_qualifier]).graph(GraphGenre, [:album_id], :table_alias=>eo[:table_alias])}
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :eager_grapher=>proc{|eo| eo[:self].graph(:ag, {:album_id=>:id}, :table_alias=>:a123, :implicit_qualifier=>eo[:implicit_qualifier]).graph(GraphGenre.dataset, [:album_id], :table_alias=>eo[:table_alias])}
     GraphAlbum.eager_graph(:active_genres).sql.must_equal "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag AS a123 ON (a123.album_id = albums.id) LEFT OUTER JOIN genres AS active_genres USING (album_id)"
   end
 

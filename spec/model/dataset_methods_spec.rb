@@ -77,21 +77,21 @@ describe Sequel::Model::DatasetMethods  do
     @c.db.reset
   end
 
-  it "#join_table should allow use to use a model class when joining" do
+  deprecated "#join_table should allow use to use a model class when joining" do
     @c.join(Class.new(Sequel::Model(:categories)), :item_id => :id).sql.must_equal 'SELECT * FROM items INNER JOIN categories ON (categories.item_id = items.id)'
   end
 
-  it "#join_table should handle model classes that aren't simple selects using a subselect" do
+  deprecated "#join_table should handle model classes that aren't simple selects using a subselect" do
     @c.join(Class.new(Sequel::Model(DB[:categories].where(:foo=>1))), :item_id => :id).sql.must_equal 'SELECT * FROM items INNER JOIN (SELECT * FROM categories WHERE (foo = 1)) AS t1 ON (t1.item_id = items.id)'
   end
 
-  it "#graph should allow use to use a model class when joining" do
+  deprecated "#graph should allow use to use a model class when joining" do
     c = Class.new(Sequel::Model(:categories))
     c.columns :id
     @c.graph(c, :item_id => :id).sql.must_equal 'SELECT items.id, categories.id AS categories_id FROM items LEFT OUTER JOIN categories ON (categories.item_id = items.id)'
   end
 
-  it "#insert_sql should handle a single model instance as an argument" do
+  deprecated "#insert_sql should handle a single model instance as an argument" do
     @c.dataset.insert_sql(@c.load(:id=>1)).must_equal 'INSERT INTO items (id) VALUES (1)'
   end
 
