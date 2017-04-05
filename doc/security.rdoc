@@ -197,6 +197,14 @@ for plain strings as literal strings in update methods.
 The Sequel::Dataset#lock_style and Sequel::Model#lock! methods also treat
 an input string as SQL code. This method should not be called with user input.
 
+==== SQL Fragment passed to Virtual Row #` method
+
+Virtual row blocks currently support a #` method for using literal SQL:
+
+  DB[:table].where{a > `some SQL`}
+
+This method should not be called with user input.
+
 ==== SQL Type Names
 
 In general, most places where Sequel needs to use an SQL type that should
