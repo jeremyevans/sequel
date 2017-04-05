@@ -1,5 +1,7 @@
 === master
 
+* Do not raise MassAssignmentRestriction when setting nested attributes and using the :fields option, only check for fields given (jeremyevans)
+
 * Do not add class methods for private methods definined in dataset_module (jeremyevans)
 
 * Deprecate Model.def_dataset_method and Model.subset, move to def_dataset_method plugin (jeremyevans)

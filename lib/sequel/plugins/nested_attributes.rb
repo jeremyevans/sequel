@@ -245,7 +245,7 @@ module Sequel
         def nested_attributes_set_attributes(meta, obj, attributes)
           if fields = meta[:fields]
             fields = fields.call(obj) if fields.respond_to?(:call)
-            obj.set_only(attributes, fields)
+            obj.set_fields(attributes, fields, :missing=>:skip)
           else
             obj.set(attributes)
           end
