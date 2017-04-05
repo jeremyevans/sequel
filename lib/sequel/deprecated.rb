@@ -36,25 +36,32 @@ module Sequel
       attr_accessor :prefix
     end
 
-    # Print the message and possibly backtrace to the output.
-    def self.deprecate(method, instead=nil)
-      return unless output
-      message = instead ? "#{method} is deprecated and will be removed in Sequel 5.  #{instead}." : method
-      message = "#{prefix}#{message}" if prefix
-      output.puts(message)
-      case b = backtrace_filter
-      when Integer
-        caller.each do |c|
-          b -= 1
-          output.puts(c)
-          break if b <= 0
-        end
-      when true
-        caller.each{|c| output.puts(c)}
-      when Proc
-        caller.each_with_index{|line, line_no| output.puts(line) if b.call(line, line_no)}
+    if RUBY_VERSION < '1.9'
+      def self.deprecate(_method, _instead=nil)
+        # Sequel 5 will drop ruby 1.8 support completely, so it doesn't make sense to issue deprecation
+        # warnings on ruby 1.8.
       end
-      nil
+    else
+      # Print the message and possibly backtrace to the output.
+      def self.deprecate(method, instead=nil)
+        return unless output
+        message = instead ? "#{method} is deprecated and will be removed in Sequel 5.  #{instead}." : method
+        message = "#{prefix}#{message}" if prefix
+        output.puts(message)
+        case b = backtrace_filter
+        when Integer
+          caller.each do |c|
+            b -= 1
+            output.puts(c)
+            break if b <= 0
+          end
+        when true
+          caller.each{|c| output.puts(c)}
+        when Proc
+          caller.each_with_index{|line, line_no| output.puts(line) if b.call(line, line_no)}
+        end
+        nil
+      end
     end
 
     # If using ruby 2.3+, use Module#deprecate_constant to deprecate the constant,

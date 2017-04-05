@@ -1,5 +1,7 @@
 === master
 
+* Don't issue deprecation warnings on ruby 1.8.7, as Sequel 5 is dropping support for it (jeremyevans)
+
 * Deprecate Sequel::BasicObject#remove_methods! (jeremyevans)
 
 * Deprecate sequel/no_core_ext file (jeremyevans)

@@ -67,4 +67,4 @@ describe "Sequel::Deprecated" do
     @output.first.must_equal 'foo'
     @output.count.must_equal 4
   end
-end
+end if RUBY_VERSION >= '1.9'
