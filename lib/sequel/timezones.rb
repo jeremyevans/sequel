@@ -171,6 +171,7 @@ module Sequel
             v.to_datetime
           else
           # :nocov:
+            # SEQUEL5: Remove
             # Ruby 1.8 code, %N not available and %z broken on Windows
             offset_hours, offset_minutes = (v.utc_offset/60).divmod(60)
             string_to_datetime(v.strftime("%Y-%m-%dT%H:%M:%S") << sprintf(".%06i%+03i%02i", v.usec, offset_hours, offset_minutes))
@@ -186,6 +187,7 @@ module Sequel
           v.to_time
         else
         # :nocov:
+        # SEQUEL5: Remove
           string_to_datetime(v.strftime("%FT%T.%N%z"))
         # :nocov:
         end
