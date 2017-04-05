@@ -326,12 +326,12 @@ describe "Blockless Ruby Filters" do
     proc{Sequel::SQL::BooleanExpression.invert(Sequel.expr(:x) + 2)}.must_raise(Sequel::Error)
   end
 
-  it "should return self on .lit" do
+  deprecated "should return self on .lit" do
     y = Sequel.expr(:x) + 1
     y.lit.must_equal y
   end
 
-  it "should return have .sql_literal return the literal SQL for the expression" do
+  deprecated "should return have .sql_literal return the literal SQL for the expression" do
     y = Sequel.expr(:x) + 1
     y.sql_literal(@d).must_equal '(x + 1)'
     y.sql_literal(@d).must_equal @d.literal(y)

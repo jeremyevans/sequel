@@ -150,11 +150,13 @@ module Sequel
 
       # Returns +self+, because <tt>SQL::Expression</tt> already acts like +LiteralString+.
       def lit
+        Sequel::Deprecation.deprecate("Sequel::SQL::Expression#lit", "This method returns self, so just use the receiver")
         self
       end
       
       # Alias of +to_s+
       def sql_literal(ds)
+        Sequel::Deprecation.deprecate("Sequel::SQL::Expression#sql_literal", "Call Sequel::Dataset#literal with the expression instead")
         s = String.new
         to_s_append(ds, s)
         s
