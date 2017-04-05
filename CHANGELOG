@@ -1,5 +1,7 @@
 === master
 
+* Deprecate splitting virtual row method names (jeremyevans)
+
 * Deprecate passing blocks to virtual row methods, move to virtual_row_method_block extension (jeremyevans)
 
 * Deprecate Sequel::SQL::Expression#sql_literal and #lit (jeremyevans)

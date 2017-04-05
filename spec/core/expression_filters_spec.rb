@@ -29,7 +29,11 @@ describe "Blockless Ruby Filters" do
     @d.l(:x__y___z).must_equal 'x.y AS z'
   end
 
-  it "should support qualified columns using virtual rows" do
+  with_symbol_splitting "should support qualified columns using virtual rows" do
+    @d.l(Sequel.expr{x__y}).must_equal 'x.y'
+  end
+
+  deprecated "should support qualified columns using virtual rows" do
     @d.l(Sequel.expr{x__y}).must_equal 'x.y'
   end
 
@@ -541,7 +545,7 @@ describe Sequel::SQL::VirtualRow do
     @d.l{column}.must_equal '"column"'
   end
 
-  it "should treat methods without arguments that have embedded double underscores as qualified identifiers" do
+  with_symbol_splitting "should treat methods without arguments that have embedded double underscores as qualified identifiers" do
     @d.l{table__column}.must_equal '"table"."column"'
   end
 
@@ -733,10 +737,17 @@ describe Sequel::SQL::VirtualRow do
     @d.l{sum.function(c, 1)}.must_equal 'sum("c", 1)'
   end
 
-  it "should support function method on qualified identifiers to create functions" do
+  with_symbol_splitting "should support function method on foo__bar methods to create functions" do
     @d.l{sch__rank.function}.must_equal 'sch.rank()' 
     @d.l{sch__sum.function(c)}.must_equal 'sch.sum("c")'
     @d.l{sch__sum.function(c, 1)}.must_equal 'sch.sum("c", 1)'
+    @d.l{Sequel.qualify(sch[:sum], x[:y]).function(c, 1)}.must_equal 'sch.sum.x.y("c", 1)'
+  end
+
+  it "should support function method on qualified identifiers to create functions" do
+    @d.l{sch[rank].function}.must_equal 'sch.rank()' 
+    @d.l{sch[sum].function(c)}.must_equal 'sch.sum("c")'
+    @d.l{sch[sum].function(c, 1)}.must_equal 'sch.sum("c", 1)'
     @d.l{Sequel.qualify(sch[:sum], x[:y]).function(c, 1)}.must_equal 'sch.sum.x.y("c", 1)'
   end
 
@@ -747,6 +758,10 @@ describe Sequel::SQL::VirtualRow do
   it "should handle quoted function names" do
     @d = @d.with_extend{def supports_quoted_function_names?; true end}
     @d.l{rank.function}.must_equal '"rank"()' 
+  end
+
+  with_symbol_splitting "should handle quoted function names when using double underscores" do
+    @d = @d.with_extend{def supports_quoted_function_names?; true end}
     @d.l{sch__rank.function}.must_equal '"sch"."rank"()' 
   end
 
@@ -759,7 +774,7 @@ describe Sequel::SQL::VirtualRow do
   it "should not quote function names if an unquoted function is used" do
     @d = @d.with_extend{def supports_quoted_function_names?; true end}
     @d.l{rank.function.unquoted}.must_equal 'rank()' 
-    @d.l{sch__rank.function.unquoted}.must_equal 'sch.rank()' 
+    @d.l{sch[rank].function.unquoted}.must_equal 'sch.rank()' 
   end
 
   it "should deal with classes without requiring :: prefix" do
@@ -863,12 +878,12 @@ describe "Sequel core extension replacements" do
 
   it "Sequel.expr should treat blocks/procs as virtual rows and wrap the output" do
     l(Sequel.expr{1} + 1, "(1 + 1)")
-    l(Sequel.expr{o__a} + 1, "(o.a + 1)")
+    l(Sequel.expr{o[a]} + 1, "(o.a + 1)")
     l(Sequel.expr{[[:a, 1]]} & nil, "((a = 1) AND NULL)")
     l(Sequel.expr{|v| @o} + 1, "(foo + 1)")
 
     l(Sequel.expr(proc{1}) + 1, "(1 + 1)")
-    l(Sequel.expr(proc{o__a}) + 1, "(o.a + 1)")
+    l(Sequel.expr(proc{o[a]}) + 1, "(o.a + 1)")
     l(Sequel.expr(proc{[[:a, 1]]}) & nil, "((a = 1) AND NULL)")
     l(Sequel.expr(proc{|v| @o}) + 1, "(foo + 1)")
   end

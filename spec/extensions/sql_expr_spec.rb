@@ -44,7 +44,6 @@ describe "Sequel sql_expr extension" do
 
   it "Proc#sql_expr should should treat the object as a virtual row block" do
     @ds.literal(proc{a}.sql_expr).must_equal "a"
-    @ds.literal(proc{a__b}.sql_expr).must_equal "a.b"
     @ds.literal(proc{a(b)}.sql_expr).must_equal "a(b)"
   end
 

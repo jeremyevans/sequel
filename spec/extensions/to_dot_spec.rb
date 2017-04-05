@@ -96,7 +96,7 @@ END
   end
 
   it "should handle SQL::QualifiedIdentifiers" do
-    dot(@ds.select{a__b}).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"QualifiedIdentifier\"];", "3 -> 4 [label=\"table\"];", "4 [label=\"\\\"a\\\"\"];", "3 -> 5 [label=\"column\"];", "5 [label=\"\\\"b\\\"\"];"]
+    dot(@ds.select{a[b]}).must_equal ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"QualifiedIdentifier\"];", "3 -> 4 [label=\"table\"];", "4 [label=\"\\\"a\\\"\"];", "3 -> 5 [label=\"column\"];", "5 [label=\"\\\"b\\\"\"];"]
   end
 
   it "should handle SQL::OrderedExpressions" do

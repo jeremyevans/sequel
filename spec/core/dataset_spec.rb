@@ -580,16 +580,16 @@ describe "Dataset#where" do
     x = nil
     @dataset.filter{|r| x = r; false}
     x.must_be_kind_of(Sequel::SQL::VirtualRow)
-    @dataset.filter{|r| ((r.name < 'b') & {r.table__id => 1}) | r.is_active(r.blah, r.xx, r.x__y_z)}.sql.
-      must_equal "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
+    @dataset.filter{|r| ((r.name < 'b') & {r.table_id => 1}) | r.is_active(r.blah, r.xx, r.x_y_z)}.sql.
+      must_equal "SELECT * FROM test WHERE (((name < 'b') AND (table_id = 1)) OR is_active(blah, xx, x_y_z))"
   end
 
   it "should instance_eval the block in the context of a VirtualRow if the block doesn't request an argument" do
     x = nil
     @dataset.filter{x = self; false}
     x.must_be_kind_of(Sequel::SQL::VirtualRow)
-    @dataset.filter{((name < 'b') & {table__id => 1}) | is_active(blah, xx, x__y_z)}.sql.
-      must_equal "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
+    @dataset.filter{((name < 'b') & {table_id => 1}) | is_active(blah, xx, x_y_z)}.sql.
+      must_equal "SELECT * FROM test WHERE (((name < 'b') AND (table_id = 1)) OR is_active(blah, xx, x_y_z))"
   end
 
   it "should handle arbitrary objects" do
@@ -3020,7 +3020,7 @@ describe "Dataset#get" do
   end
   
   it "should accept a block that yields a virtual row" do
-    @d.get{|o| o.x__b.as(:name)}.must_equal "SELECT x.b AS name FROM test LIMIT 1"
+    @d.get{|o| o.x_b.as(:name)}.must_equal "SELECT x_b AS name FROM test LIMIT 1"
     @d.get{x(1).as(:name)}.must_equal "SELECT x(1) AS name FROM test LIMIT 1"
   end
   
@@ -3061,14 +3061,14 @@ describe "Dataset#get" do
   
   it "should support an array of expressions in a virtual row" do
     @d = @d.with_fetch(:name=>1, :abc=>2)
-    @d.get{[name, n__abc]}.must_equal [1, 2]
+    @d.get{[name, n[abc]]}.must_equal [1, 2]
     @d.db.sqls.must_equal ['SELECT name, n.abc FROM test LIMIT 1']
   end
   
   it "should work with static SQL" do
     @d.with_sql('SELECT foo').get(:name).must_equal "SELECT foo"
     @d = @d.with_fetch(:name=>1, :abc=>2)
-    @d.with_sql('SELECT foo').get{[name, n__abc]}.must_equal [1, 2]
+    @d.with_sql('SELECT foo').get{[name, n[abc]]}.must_equal [1, 2]
     @d.db.sqls.must_equal ['SELECT foo'] * 2
   end
 
@@ -4482,27 +4482,27 @@ describe "Sequel::Dataset#select_map" do
   end
   
   it "should handle an expression without a determinable alias" do
-    @ds.select_map{a(t__c)}.must_equal [1, 2]
+    @ds.select_map{a(t[c])}.must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a(t.c) AS v FROM t']
   end
 
   it "should accept a block" do
-    @ds.select_map{a(t__c).as(b)}.must_equal [1, 2]
+    @ds.select_map{a(t[c]).as(b)}.must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a(t.c) AS b FROM t']
   end
 
   it "should accept a block with an array of columns" do
-    @ds.select_map{[a(t__c).as(c), a(t__c).as(c)]}.must_equal [[1, 1], [2, 2]]
+    @ds.select_map{[a(t[c]).as(c), a(t[c]).as(c)]}.must_equal [[1, 1], [2, 2]]
     @ds.db.sqls.must_equal ['SELECT a(t.c) AS c, a(t.c) AS c FROM t']
   end
 
   it "should accept a block with a column" do
-    @ds.select_map(:c){a(t__c).as(c)}.must_equal [[1, 1], [2, 2]]
+    @ds.select_map(:c){a(t[c]).as(c)}.must_equal [[1, 1], [2, 2]]
     @ds.db.sqls.must_equal ['SELECT c, a(t.c) AS c FROM t']
   end
 
   it "should accept a block and array of arguments" do
-    @ds.select_map([:c, :c]){[a(t__c).as(c), a(t__c).as(c)]}.must_equal [[1, 1, 1, 1], [2, 2, 2, 2]]
+    @ds.select_map([:c, :c]){[a(t[c]).as(c), a(t[c]).as(c)]}.must_equal [[1, 1, 1, 1], [2, 2, 2, 2]]
     @ds.db.sqls.must_equal ['SELECT c, c, a(t.c) AS c, a(t.c) AS c FROM t']
   end
 
@@ -4575,27 +4575,27 @@ describe "Sequel::Dataset#select_order_map" do
   end
   
   it "should handle an expression without a determinable alias" do
-    @ds.select_order_map{a(t__c)}.must_equal [1, 2]
+    @ds.select_order_map{a(t[c])}.must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a(t.c) AS v FROM t ORDER BY a(t.c)']
   end
 
   it "should accept a block" do
-    @ds.select_order_map{a(t__c).as(b)}.must_equal [1, 2]
+    @ds.select_order_map{a(t[c]).as(b)}.must_equal [1, 2]
     @ds.db.sqls.must_equal ['SELECT a(t.c) AS b FROM t ORDER BY a(t.c)']
   end
 
   it "should accept a block with an array of columns" do
-    @ds.select_order_map{[c.desc, a(t__c).as(c)]}.must_equal [[1, 1], [2, 2]]
+    @ds.select_order_map{[c.desc, a(t[c]).as(c)]}.must_equal [[1, 1], [2, 2]]
     @ds.db.sqls.must_equal ['SELECT c, a(t.c) AS c FROM t ORDER BY c DESC, a(t.c)']
   end
 
   it "should accept a block with a column" do
-    @ds.select_order_map(:c){a(t__c).as(c)}.must_equal [[1, 1], [2, 2]]
+    @ds.select_order_map(:c){a(t[c]).as(c)}.must_equal [[1, 1], [2, 2]]
     @ds.db.sqls.must_equal ['SELECT c, a(t.c) AS c FROM t ORDER BY c, a(t.c)']
   end
 
   it "should accept a block and array of arguments" do
-    @ds.select_order_map([:c, :c]){[a(t__c).as(c), c.desc]}.must_equal [[1, 1, 1, 1], [2, 2, 2, 2]]
+    @ds.select_order_map([:c, :c]){[a(t[c]).as(c), c.desc]}.must_equal [[1, 1, 1, 1], [2, 2, 2, 2]]
     @ds.db.sqls.must_equal ['SELECT c, c, a(t.c) AS c, c FROM t ORDER BY c, c, a(t.c), c DESC']
   end
 

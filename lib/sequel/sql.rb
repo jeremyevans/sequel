@@ -1962,8 +1962,11 @@ module Sequel
               end
             end
           elsif args.empty?
-            if Sequel.split_symbols?
+            if split = Sequel.split_symbols?
               table, column = m.to_s.split(DOUBLE_UNDERSCORE, 2)
+              if column && split == :deprecated
+                Sequel::Deprecation.deprecate("Splitting virtual row method names", "Either set Sequel.split_symbols = true, or change #{m.inspect} to #{table}[:#{column}]")
+              end
               column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
             else
               Identifier.new(m)
