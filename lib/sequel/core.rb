@@ -141,8 +141,8 @@ module Sequel
   # it just loads a module that you can extend other classes with.  Consult the documentation
   # for each extension you plan on using for usage.
   #
-  #   Sequel.extension(:schema_dumper)
-  #   Sequel.extension(:pagination, :query)
+  #   Sequel.extension(:blank)
+  #   Sequel.extension(:core_extensions, :named_timezones)
   def self.extension(*extensions)
     extensions.each{|e| Kernel.require "sequel/extensions/#{e}"}
   end
