@@ -119,6 +119,10 @@ module Sequel
     #
     #   # Some examples of using these options:
     #
+    #   # Use a subquery for all subclass datasets, fixing issues with ambiguous
+    #   # column names.
+    #   Employee.plugin :class_table_inheritance, :key=>:kind, :alias=>:employees
+    #
     #   # Specifying the tables with a :table_map hash
     #   Employee.plugin :class_table_inheritance,
     #     :table_map=>{:Employee  => :employees,
@@ -179,6 +183,8 @@ module Sequel
       end
 
       # Initialize the plugin using the following options:
+      # :alias :: Use a subquery for each subclass dataset that joins to another table,
+      #           using this as the alias.
       # :key :: Column symbol that holds the key that identifies the class to use.
       #         Necessary if you want to call model methods on a superclass
       #         that return subclass instances
@@ -197,6 +203,7 @@ module Sequel
           @cti_instance_dataset = @instance_dataset
           @cti_table_columns = columns
           @cti_table_map = opts[:table_map] || {}
+          @cti_alias = opts[:alias]
         end
       end
 
@@ -235,7 +242,7 @@ module Sequel
         # For backwards compatibility.
         def cti_columns
           h = {}
-          cti_models.each { |m| h[m.table_name] = m.cti_table_columns }
+          cti_models.each { |m| h[m.cti_table_name] = m.cti_table_columns }
           h
         end
 
@@ -256,7 +263,7 @@ module Sequel
           super
         end
 
-        Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil)
+        Plugins.inherited_instance_variables(self, :@cti_models=>nil, :@cti_tables=>nil, :@cti_table_columns=>nil, :@cti_instance_dataset=>nil, :@cti_table_map=>nil, :@cti_alias=>nil)
 
         def inherited(subclass)
           ds = sti_dataset
@@ -278,25 +285,30 @@ module Sequel
               table = nil if !columns || columns.empty?
             end
           end
-          table = nil if table && (table == table_name)
+          table = nil if table && (table == cti_table_name)
 
           return unless table
 
           pk = primary_key
           subclass.instance_eval do
             if cti_tables.length == 1
-              ds = ds.select(*self.columns.map{|cc| Sequel.qualify(table_name, Sequel.identifier(cc))})
+              ds = ds.select(*self.columns.map{|cc| Sequel.qualify(cti_table_name, Sequel.identifier(cc))})
             end
             cols = columns - [pk]
             unless (cols & ds.columns).empty?
               Sequel::Deprecation.deprecate('Using class_table_inheritance with duplicate column names in subclass tables (other than the primary key column)', 'Make sure all tables used have unique column names, or implement support for handling duplicate column names in the class_table_inheritance plugin')
             end
             sel_app = cols.map{|cc| Sequel.qualify(table, Sequel.identifier(cc))}
-            @sti_dataset = ds.join(table, pk=>pk).select_append(*sel_app)
-            set_dataset(@sti_dataset)
+            @sti_dataset = ds = ds.join(table, pk=>pk).select_append(*sel_app)
+
+            if @cti_alias
+              ds = ds.from_self(:alias=>@cti_alias)
+            end
+
+            set_dataset(ds)
             set_columns(self.columns)
             @dataset = @dataset.with_row_proc(lambda{|r| subclass.sti_load(r)})
-            cols.each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>table)}
+            cols.each{|a| define_lazy_attribute_getter(a, :dataset=>dataset, :table=>@cti_alias||table)}
 
             @cti_models += [self]
             @cti_tables += [table]
@@ -311,11 +323,36 @@ module Sequel
 
         # The table name for the current model class's main table.
         def table_name
-          cti_tables ? cti_tables.last : super
+          if cti_tables
+            if @cti_alias
+              @cti_alias
+            else
+              cti_tables.last
+            end
+          else
+            super
+          end
+        end
+
+        # The name of the most recently joined table.
+        def cti_table_name
+          cti_tables ? cti_tables.last : dataset.first_source_alias
         end
 
         def sti_class_from_key(key)
           sti_class(sti_model_map[key])
+        end
+
+        private
+
+        # If using a subquery for class table inheritance, also use a subquery
+        # when setting subclass dataset.
+        def sti_subclass_dataset(key)
+          ds = super
+          if @cti_alias
+            ds = ds.from_self(:alias=>@cti_alias)
+          end
+          ds
         end
       end
 
@@ -346,8 +383,8 @@ module Sequel
           if new? && (set = self[model.sti_key])
             exp = model.sti_key_chooser.call(self)
             if set != exp
-              set_table = model.sti_class_from_key(set).table_name
-              exp_table = model.sti_class_from_key(exp).table_name
+              set_table = model.sti_class_from_key(set).cti_table_name
+              exp_table = model.sti_class_from_key(exp).cti_table_name
               set_column_value("#{model.sti_key}=", exp) if set_table != exp_table
             end
           end

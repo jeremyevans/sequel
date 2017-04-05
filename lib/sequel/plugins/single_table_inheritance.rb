@@ -171,7 +171,7 @@ module Sequel
           key = Array(sti_key_map[subclass]).dup
           sti_subclass_added(key)
           rp = dataset.row_proc
-          subclass.set_dataset(sti_dataset.where(SQL::QualifiedIdentifier.new(sti_dataset.first_source_alias, sti_key)=>Sequel.delay{Sequel.synchronize{key}}), :inherited=>true)
+          subclass.set_dataset(sti_subclass_dataset(key), :inherited=>true)
           subclass.instance_eval do
             @dataset = @dataset.with_row_proc(rp)
             @sti_key_array = key
@@ -229,6 +229,12 @@ module Sequel
           else
             raise(Error, "Invalid class type used: #{v.inspect}")
           end
+        end
+
+        # Use the given dataset for the subclass, with key being the allowed
+        # values for the sti_kind field.
+        def sti_subclass_dataset(key)
+          sti_dataset.where(SQL::QualifiedIdentifier.new(sti_dataset.first_source_alias, sti_key)=>Sequel.delay{Sequel.synchronize{key}})
         end
       end
 
