@@ -35,6 +35,7 @@ module Sequel
 
       # No-op method on ruby 1.9, which has a real +BasicObject+ class.
       def self.remove_methods!
+        Sequel::Deprecation.deprecate("Sequel::BasicObject#remove_methods!", "It has no effect, so stop calling it")
       end
     end
   end

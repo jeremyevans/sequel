@@ -714,7 +714,7 @@ describe Sequel::SQL::VirtualRow do
     @d.l{num < Math::PI.to_i}.must_equal "(\"num\" < 3)"
   end
   
-  it "should deal with methods added to Object after requiring Sequel" do
+  deprecated "should deal with methods added to Object after requiring Sequel" do
     class Object
       def adsoiwemlsdaf; 42; end
     end
@@ -722,7 +722,7 @@ describe Sequel::SQL::VirtualRow do
     @d.l{a > adsoiwemlsdaf}.must_equal '("a" > "adsoiwemlsdaf")'
   end
   
-  it "should deal with private methods added to Kernel after requiring Sequel" do
+  deprecated "should deal with private methods added to Kernel after requiring Sequel" do
     module Kernel
       private
       def adsoiwemlsdaf2; 42; end

@@ -1,5 +1,9 @@
 === master
 
+* Deprecate Sequel::BasicObject#remove_methods! (jeremyevans)
+
+* Deprecate sequel/no_core_ext file (jeremyevans)
+
 * Deprecate model dataset #insert_sql accepting model instances (jeremyevans)
 
 * Deprecate model dataset #join_table and #graph accepting model classes (jeremyevans)
